@@ -1,8 +1,7 @@
-import { prisma } from "@charmverse/core/prisma-client";
+import { prisma } from '@charmverse/core/prisma-client';
 import _uniqBy from 'lodash/uniqBy';
 
 const spaceDomain = 'op-retrofunding-review-process';
-
 
 function getSunnyAttestations() {
   return prisma.optimismProjectAttestation.count({
@@ -14,9 +13,8 @@ function getSunnyAttestations() {
         source: 'sunny_awards'
       }
     }
-  })
+  });
 }
-
 
 function getTotalNonDraftApplications() {
   return prisma.proposal.count({
@@ -26,7 +24,7 @@ function getTotalNonDraftApplications() {
       },
       status: 'published'
     }
-  })
+  });
 }
 
 function getTotaApprovedApplications() {
@@ -42,11 +40,10 @@ function getTotaApprovedApplications() {
         }
       }
     }
-  })
+  });
 }
 
 async function getTotalReviewers() {
-
   const assignedReviewerUsers = await prisma.proposalReviewer.findMany({
     where: {
       evaluation: {
@@ -62,15 +59,13 @@ async function getTotalReviewers() {
     }
   });
 
-  const roleReviewers = assignedReviewerUsers.filter(reviewer => !!reviewer.roleId);
+  const roleReviewers = assignedReviewerUsers.filter((reviewer) => !!reviewer.roleId);
 
-  const uniqueRoleReviewers = _uniqBy(roleReviewers, 'roleId').map(reviewer => reviewer.roleId);
+  const uniqueRoleReviewers = _uniqBy(roleReviewers, 'roleId').map((reviewer) => reviewer.roleId);
 
+  const userReviewers = assignedReviewerUsers.filter((reviewer) => !!reviewer.userId);
 
-  const userReviewers = assignedReviewerUsers.filter(reviewer => !!reviewer.userId);
-
-
-  const uniqueUserReviewers = _uniqBy(userReviewers, 'userId').map(reviewer => reviewer.userId);
+  const uniqueUserReviewers = _uniqBy(userReviewers, 'userId').map((reviewer) => reviewer.userId);
 
   const extraUserReviewers = await prisma.user.count({
     where: {
@@ -89,8 +84,7 @@ async function getTotalReviewers() {
         }
       }
     }
-  })
-
+  });
 
   console.log('User reviewers', uniqueUserReviewers.length);
   console.log('Extra reviewers', extraUserReviewers);
@@ -123,8 +117,6 @@ async function getStats() {
   console.log(`Total reviewers: ${totalReviewers}`);
   console.log(`Total sunny attestations: ${attestations}`);
   console.log('Total credentials issued for proposals:', inAppCredentials.length);
-
 }
-
 
 getStats().then(console.log).catch(console.error);

@@ -36,15 +36,21 @@ export function aggregateResults({
   answers: AnswerData[];
   criteria: { id: string }[];
 }): AggregateResults {
-  const criteriaScores: Record<string, number[]> = criteria.reduce((criteriaRecord, _criteria) => {
-    criteriaRecord[_criteria.id] = [];
-    return criteriaRecord;
-  }, {} as Record<string, number[]>);
+  const criteriaScores: Record<string, number[]> = criteria.reduce(
+    (criteriaRecord, _criteria) => {
+      criteriaRecord[_criteria.id] = [];
+      return criteriaRecord;
+    },
+    {} as Record<string, number[]>
+  );
 
-  const criteriaComments: Record<string, string[]> = criteria.reduce((criteriaRecord, _criteria) => {
-    criteriaRecord[_criteria.id] = [];
-    return criteriaRecord;
-  }, {} as Record<string, string[]>);
+  const criteriaComments: Record<string, string[]> = criteria.reduce(
+    (criteriaRecord, _criteria) => {
+      criteriaRecord[_criteria.id] = [];
+      return criteriaRecord;
+    },
+    {} as Record<string, string[]>
+  );
 
   const reviewersResults: ReviewerResults[] = [];
 
@@ -77,21 +83,27 @@ export function aggregateResults({
 
     reviewersResults.push({ id: reviewer, answersMap, average, sum: scoreSum });
   });
-  const criteriaSummary = Object.entries(criteriaScores).reduce((acc, [criteriaId, scores]) => {
-    acc[criteriaId] = scores.length
-      ? { average: mean(scores), sum: sum(scores), comments: criteriaComments[criteriaId] }
-      : { average: null, sum: null, comments: [] };
-    return acc;
-  }, {} as Record<string, CriteriaResults>);
+  const criteriaSummary = Object.entries(criteriaScores).reduce(
+    (acc, [criteriaId, scores]) => {
+      acc[criteriaId] = scores.length
+        ? { average: mean(scores), sum: sum(scores), comments: criteriaComments[criteriaId] }
+        : { average: null, sum: null, comments: [] };
+      return acc;
+    },
+    {} as Record<string, CriteriaResults>
+  );
 
   const allScores = Object.values(criteriaScores).flat();
   const allScoresSum = allScores.length ? sum(allScores) : null;
   const allScoresAverage = allScores.length ? roundNumber(mean(allScores)) : null;
 
-  const mappedReviewerResults = reviewersResults.reduce((acc, reviewer) => {
-    acc[reviewer.id] = reviewer;
-    return acc;
-  }, {} as Record<string, ReviewerResults>);
+  const mappedReviewerResults = reviewersResults.reduce(
+    (acc, reviewer) => {
+      acc[reviewer.id] = reviewer;
+      return acc;
+    },
+    {} as Record<string, ReviewerResults>
+  );
 
   return {
     reviewersResults: mappedReviewerResults,

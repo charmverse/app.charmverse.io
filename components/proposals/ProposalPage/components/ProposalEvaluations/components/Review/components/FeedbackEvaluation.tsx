@@ -30,10 +30,10 @@ export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
     : !evaluation.isReviewer
-    ? 'You do not have permission to pass or reject this proposal'
-    : archived
-    ? 'You cannot pass or reject an archived proposal'
-    : null;
+      ? 'You do not have permission to pass or reject this proposal'
+      : archived
+        ? 'You cannot pass or reject an archived proposal'
+        : null;
 
   async function onMoveForward() {
     try {

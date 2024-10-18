@@ -41,14 +41,14 @@ function getUser(input: string): Prisma.UserWhereInput {
   return stringUtils.isUUID(input)
     ? { id: input }
     : isAddress(input)
-    ? {
-        wallets: {
-          some: {
-            address: input
+      ? {
+          wallets: {
+            some: {
+              address: input
+            }
           }
         }
-      }
-    : { path: input };
+      : { path: input };
 }
 
 async function mergeWallet({ duplicateAddressOrUserIdOrPath, originalAddressOrUserIdOrPath }: Props) {

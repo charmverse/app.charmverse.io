@@ -49,10 +49,10 @@ function InputSearchRoleBase({
           return role.id === defaultValue;
         })
       : defaultValue instanceof Array
-      ? roles?.filter((r) => defaultValue.includes(r.id))
-      : undefined;
+        ? roles?.filter((r) => defaultValue.includes(r.id))
+        : undefined;
 
-  const filteredRoles = !!filter && !!roles ? filterRoles(roles as any, filter as IRolesFilter) : roles ?? [];
+  const filteredRoles = !!filter && !!roles ? filterRoles(roles as any, filter as IRolesFilter) : (roles ?? []);
 
   if (roles?.length === 0 && showWarningOnNoRoles && !readOnly) {
     return (

@@ -15,8 +15,8 @@ import type { IdenticalCredentialProps } from './saveIssuedCredential';
 type PendingCredentialContent<T extends AttestationType> = T extends 'proposal'
   ? PartialIssuableProposalCredentialContent
   : T extends 'reward'
-  ? PartialIssuableRewardApplicationCredentialContent
-  : never;
+    ? PartialIssuableRewardApplicationCredentialContent
+    : never;
 
 export type GnosisSafeTransactionToIndex<T extends AttestationType = AttestationType> = Pick<
   PendingSafeTransaction,
@@ -133,8 +133,8 @@ export async function indexGnosisSafeCredentialTransaction({
     safetransactionInDb.credentialType === 'reward'
       ? indexOnchainRewardCredentials
       : safetransactionInDb.credentialType === 'proposal'
-      ? indexOnchainProposalCredentials
-      : null;
+        ? indexOnchainProposalCredentials
+        : null;
 
   if (!indexer) {
     throw new InvalidInputError(`Invalid credential type ${safetransactionInDb.credentialType}. Cannot index`);
@@ -161,74 +161,86 @@ export async function indexGnosisSafeCredentialTransaction({
   let newValues = {};
 
   if (safetransactionInDb.credentialType === 'reward') {
-    const mappedCredentialsByApplicationId = issuedCredentials.reduce((acc, val) => {
-      const key = getKey({
-        credentialTemplateId: val.credentialTemplateId as string,
-        rewardApplicationId: val.rewardApplicationId as string,
-        credentialEvent: val.credentialEvent,
-        userId: val.userId
-      });
-      acc[key] = val;
-      return acc;
-    }, {} as Record<string, IssuedCredential>);
+    const mappedCredentialsByApplicationId = issuedCredentials.reduce(
+      (acc, val) => {
+        const key = getKey({
+          credentialTemplateId: val.credentialTemplateId as string,
+          rewardApplicationId: val.rewardApplicationId as string,
+          credentialEvent: val.credentialEvent,
+          userId: val.userId
+        });
+        acc[key] = val;
+        return acc;
+      },
+      {} as Record<string, IssuedCredential>
+    );
 
     const values = (safetransactionInDb as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent;
 
     // Create a new map of values that may have failed processing
-    newValues = Object.entries(values).reduce((acc, [rewardId, pendingRewardApplicationCredentials]) => {
-      const filtered = pendingRewardApplicationCredentials.filter((pendingCredential) => {
-        const key = getKey({
-          credentialTemplateId: pendingCredential.credentialTemplateId as string,
-          rewardApplicationId: pendingCredential.rewardApplicationId as string,
-          credentialEvent: pendingCredential.event,
-          userId: pendingCredential.recipientUserId
+    newValues = Object.entries(values).reduce(
+      (acc, [rewardId, pendingRewardApplicationCredentials]) => {
+        const filtered = pendingRewardApplicationCredentials.filter((pendingCredential) => {
+          const key = getKey({
+            credentialTemplateId: pendingCredential.credentialTemplateId as string,
+            rewardApplicationId: pendingCredential.rewardApplicationId as string,
+            credentialEvent: pendingCredential.event,
+            userId: pendingCredential.recipientUserId
+          });
+          const issuedCredential = mappedCredentialsByApplicationId[key];
+
+          return !issuedCredential;
         });
-        const issuedCredential = mappedCredentialsByApplicationId[key];
 
-        return !issuedCredential;
-      });
+        if (filtered.length) {
+          acc[rewardId] = filtered;
+        }
 
-      if (filtered.length) {
-        acc[rewardId] = filtered;
-      }
-
-      return acc;
-    }, {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>);
+        return acc;
+      },
+      {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>
+    );
   } else if (safetransactionInDb.credentialType === 'proposal') {
-    const mappedCredentialsByProposalId = issuedCredentials.reduce((acc, val) => {
-      const key = getKey({
-        credentialTemplateId: val.credentialTemplateId as string,
-        rewardApplicationId: val.rewardApplicationId as string,
-        credentialEvent: val.credentialEvent,
-        userId: val.userId,
-        proposalId: val.proposalId as string
-      });
-      acc[key] = val;
-      return acc;
-    }, {} as Record<string, IssuedCredential>);
+    const mappedCredentialsByProposalId = issuedCredentials.reduce(
+      (acc, val) => {
+        const key = getKey({
+          credentialTemplateId: val.credentialTemplateId as string,
+          rewardApplicationId: val.rewardApplicationId as string,
+          credentialEvent: val.credentialEvent,
+          userId: val.userId,
+          proposalId: val.proposalId as string
+        });
+        acc[key] = val;
+        return acc;
+      },
+      {} as Record<string, IssuedCredential>
+    );
 
     const values = (safetransactionInDb as TypedPendingGnosisSafeTransaction<'proposal'>).credentialContent;
 
     // Create a new map of values that may have failed processing
-    newValues = Object.entries(values).reduce((acc, [proposalId, pendingProposalCredentials]) => {
-      const filtered = pendingProposalCredentials.filter((pendingCredential) => {
-        const key = getKey({
-          credentialTemplateId: pendingCredential.credentialTemplateId as string,
-          proposalId: pendingCredential.proposalId as string,
-          credentialEvent: pendingCredential.event,
-          userId: pendingCredential.recipientUserId
+    newValues = Object.entries(values).reduce(
+      (acc, [proposalId, pendingProposalCredentials]) => {
+        const filtered = pendingProposalCredentials.filter((pendingCredential) => {
+          const key = getKey({
+            credentialTemplateId: pendingCredential.credentialTemplateId as string,
+            proposalId: pendingCredential.proposalId as string,
+            credentialEvent: pendingCredential.event,
+            userId: pendingCredential.recipientUserId
+          });
+          const issuedCredential = mappedCredentialsByProposalId[key];
+
+          return !issuedCredential;
         });
-        const issuedCredential = mappedCredentialsByProposalId[key];
 
-        return !issuedCredential;
-      });
+        if (filtered.length) {
+          acc[proposalId] = filtered;
+        }
 
-      if (filtered.length) {
-        acc[proposalId] = filtered;
-      }
-
-      return acc;
-    }, {} as Record<string, PartialIssuableProposalCredentialContent[]>);
+        return acc;
+      },
+      {} as Record<string, PartialIssuableProposalCredentialContent[]>
+    );
   }
 
   if (Object.keys(newValues).length === 0) {

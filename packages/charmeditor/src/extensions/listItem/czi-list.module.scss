@@ -1,4 +1,3 @@
-
 .ProseMirror {
   counter-reset: czi-counter-0;
   counter-reset: czi-counter-1;
@@ -94,7 +93,6 @@
     top: 0;
     width: 24pt;
   }
-
 
   ul[data-indent='7'] li > span > p:first-child::before,
   ul[data-indent='4'] li > span > p:first-child::before,

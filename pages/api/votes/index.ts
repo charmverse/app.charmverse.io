@@ -62,21 +62,21 @@ async function getVotes(req: NextApiRequest, res: NextApiResponse<ExtendedVote[]
       content: vote.content
         ? vote.content
         : vote.description
-        ? {
-            type: 'doc',
-            content: [
-              {
-                type: 'paragraph',
-                content: [
-                  {
-                    type: 'text',
-                    text: vote.description
-                  }
-                ]
-              }
-            ]
-          }
-        : null
+          ? {
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: vote.description
+                    }
+                  ]
+                }
+              ]
+            }
+          : null
     }))
   );
 }

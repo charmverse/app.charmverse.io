@@ -94,15 +94,15 @@ function MentionsMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId?: st
     roundedCounter < filteredMembers.length
       ? 'members'
       : roundedCounter < filteredMembers.length + pageOptions.length
-      ? 'pages'
-      : 'roles';
+        ? 'pages'
+        : 'roles';
 
   const activeItemIndex =
     selectedGroup === 'members'
       ? roundedCounter
       : selectedGroup === 'pages'
-      ? roundedCounter - filteredMembers.length
-      : roundedCounter - filteredMembers.length - pageOptions.length;
+        ? roundedCounter - filteredMembers.length
+        : roundedCounter - filteredMembers.length - pageOptions.length;
 
   function showAllMembersToggle() {
     setShowAllMembers(true);

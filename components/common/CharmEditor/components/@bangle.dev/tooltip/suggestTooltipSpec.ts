@@ -174,8 +174,8 @@ export function replaceSuggestMarkWith(
           maybeNode instanceof Node || isInputFragment
             ? maybeNode
             : typeof maybeNode === 'string'
-            ? state.schema.text(maybeNode)
-            : Node.fromJSON(state.schema, maybeNode);
+              ? state.schema.text(maybeNode)
+              : Node.fromJSON(state.schema, maybeNode);
       } catch (e) {
         log.error('suggest-tooltip error', e);
         return tr;

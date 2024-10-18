@@ -57,7 +57,10 @@ export class DocumentPage extends GlobalPage {
 
   public charmverseInlineCommentThread: Locator;
 
-  constructor(public page: Page, rootSelector?: string) {
+  constructor(
+    public page: Page,
+    rootSelector?: string
+  ) {
     super(page);
     this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
     this.header = new PageHeader(page);

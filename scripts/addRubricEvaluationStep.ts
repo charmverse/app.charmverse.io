@@ -5,14 +5,11 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function addRubricEvaluationStep() {
-  const proposalPaths: string[] = [
-    
-  ]
-  const spaceDomain = 'op-grants'
-  const criterias: string[] = [
-    
-  ]
-  const reviewerRoleTitle = 'Superchain reviewers', approverRoleTitle = 'Approvers';
+  const proposalPaths: string[] = [];
+  const spaceDomain = 'op-grants';
+  const criterias: string[] = [];
+  const reviewerRoleTitle = 'Superchain reviewers',
+    approverRoleTitle = 'Approvers';
   const space = await prisma.space.findFirstOrThrow({
     where: {
       domain: spaceDomain
@@ -27,13 +24,13 @@ async function addRubricEvaluationStep() {
       name: reviewerRoleTitle,
       spaceId: space.id
     }
-  })
+  });
   const approverRole = await prisma.role.findFirstOrThrow({
     where: {
       name: approverRoleTitle,
       spaceId: space.id
     }
-  })
+  });
 
   const rubricTitle = 'Superchain Rubric';
   const rubricIndex = 2;
@@ -63,42 +60,42 @@ async function addRubricEvaluationStep() {
           increment: 1
         }
       }
-    })
-  
+    });
+
     await prisma.proposalEvaluation.create({
       data: {
         index: rubricIndex,
         title: rubricTitle,
-        type: "rubric",
+        type: 'rubric',
         proposalId: proposal.id,
         evaluationApprovers: {
           create: [
             {
               proposalId: proposal.id,
-              roleId: approverRole.id,
-            },
+              roleId: approverRole.id
+            }
           ]
         },
         reviewers: {
           create: [
             {
               proposalId: proposal.id,
-              roleId: reviewerRole.id,
-            },
+              roleId: reviewerRole.id
+            }
           ]
         },
         rubricCriteria: {
           createMany: {
-            data:  criterias.map((title) => ({
-              parameters: {max: 1, min: 0},
+            data: criterias.map((title) => ({
+              parameters: { max: 1, min: 0 },
               proposalId: proposal.id,
               title,
-              type: "range",
+              type: 'range'
             }))
           }
         }
       }
-    })
+    });
   }
 }
 

@@ -338,8 +338,8 @@ export function RubricAnswersForm({
                 (archived
                   ? 'You cannot evaluate an archived proposal'
                   : disabled
-                  ? 'You must be a reviewer to submit an evaluation'
-                  : undefined)
+                    ? 'You must be a reviewer to submit an evaluation'
+                    : undefined)
               }
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}

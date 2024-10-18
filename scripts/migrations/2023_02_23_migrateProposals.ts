@@ -123,15 +123,18 @@ async function assignProposalsToDefaultCategory() {
     }
   });
 
-  const bySpace = uncategorised.reduce((acc, proposal) => {
-    if (!acc[proposal.spaceId]) {
-      acc[proposal.spaceId] = [];
-    }
+  const bySpace = uncategorised.reduce(
+    (acc, proposal) => {
+      if (!acc[proposal.spaceId]) {
+        acc[proposal.spaceId] = [];
+      }
 
-    acc[proposal.spaceId].push(proposal);
+      acc[proposal.spaceId].push(proposal);
 
-    return acc;
-  }, {} as Record<string, Pick<Proposal, 'id' | 'spaceId'>[]>);
+      return acc;
+    },
+    {} as Record<string, Pick<Proposal, 'id' | 'spaceId'>[]>
+  );
 
   const uniqueSpaces = Object.keys(bySpace);
 

@@ -87,8 +87,8 @@ function NestedPageComponent({ isLinkedPage = false, node, getPos }: NodeViewPro
     node.attrs?.type === 'proposal_template'
       ? `/proposals/new?template=${node.attrs.id}`
       : documentPage
-      ? `/${documentPage.path}`
-      : '';
+        ? `/${documentPage.path}`
+        : '';
   const staticPath = staticPage ? `/${staticPage.path}` : '';
   const categoryPath = forumCategoryPage ? `/forum/${forumCategoryPage.path}` : '';
   const appPath = pagePath || staticPath || categoryPath;

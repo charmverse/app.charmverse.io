@@ -35,17 +35,16 @@
     "react/forbid-prop-types": 0,
     "@next/next/no-img-element": "off",
     "@typescript-eslint/array-type": "error",
-    "@stylistic/ts/ban-ts-comment": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/consistent-type-imports": [
       "error",
       {
         "prefer": "type-imports"
       }
     ],
-    "@stylistic/ts/no-empty-function": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@stylistic/ts/no-inferrable-types": "off",
-    "@stylistic/ts/no-empty-interface": "off",
+    "@typescript-eslint/no-empty-object-type": "off",
     "@typescript-eslint/no-unused-vars": "off",
     "@stylistic/ts/member-delimiter-style": [
       "error",
@@ -125,6 +124,7 @@
     "no-console": "error",
     "no-confusing-arrow": "off",
     "no-else-return": "off",
+    "no-empty-function": "off",
     "no-multiple-empty-lines": [
       "error",
       {

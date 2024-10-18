@@ -20,7 +20,6 @@
 }
 
 @media print {
-
   // taken from https://github.com/gregnb/react-to-print#examples
   html,
   body {
@@ -42,13 +41,11 @@
     display: block;
     break-before: auto;
     break-inside: avoid;
-
   }
 
   body.dark-mode * {
     background-color: #191919;
   }
-
 
   .dont-print-me {
     display: none !important;

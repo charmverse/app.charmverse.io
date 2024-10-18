@@ -305,8 +305,8 @@ export function RelationPropertyEditOptions({
                       ? 'sync'
                       : 'remove'
                     : relatedProperty && relatedPropertyTitle !== relatedProperty.name
-                    ? 'rename'
-                    : null;
+                      ? 'rename'
+                      : null;
 
                 if (action === 'sync') {
                   syncRelationProperty({

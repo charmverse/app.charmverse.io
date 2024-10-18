@@ -1,6 +1,6 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { ensureFarcasterUserExists } from "@root/lib/farcaster/ensureFarcasterUserExists";
-import { sleep } from "@root/lib/utils/sleep";
+import { prisma } from '@charmverse/core/prisma-client';
+import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
+import { sleep } from '@root/lib/utils/sleep';
 
 async function fixProjectMembers() {
   const projectMembersWithoutUser = await prisma.projectMember.findMany({
@@ -13,7 +13,7 @@ async function fixProjectMembers() {
   });
 
   for (const member of projectMembersWithoutUser) {
-    const farcasterUser = await ensureFarcasterUserExists({fid: member.farcasterId as number});
+    const farcasterUser = await ensureFarcasterUserExists({ fid: member.farcasterId as number });
 
     await prisma.projectMember.update({
       where: {

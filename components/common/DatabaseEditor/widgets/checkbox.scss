@@ -8,7 +8,9 @@
   border-radius: 44px;
   padding: 2px;
   background-color: rgba(var(--center-channel-color-rgb), 0.24);
-  transition: background 200ms ease 0s, box-shadow 200ms ease 0s;
+  transition:
+    background 200ms ease 0s,
+    box-shadow 200ms ease 0s;
   cursor: pointer;
 
   &.on:not(.disabled) {
@@ -28,7 +30,9 @@
     height: 14px;
     border-radius: 44px;
     background-color: rgb(var(--center-channel-bg-rgb));
-    transition: transform 200ms ease-out 0s, background 200ms ease-out 0s;
+    transition:
+      transform 200ms ease-out 0s,
+      background 200ms ease-out 0s;
     transform: translateX(0) translateY(0);
   }
 }

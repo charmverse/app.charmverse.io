@@ -61,7 +61,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="MoreHorizIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -142,7 +142,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="MoreHorizIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -180,7 +180,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
           class="octo-board-header-cell narrow"
         >
           <button
-            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-1e2vri7-MuiButtonBase-root-MuiButton-root"
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-7zos53-MuiButtonBase-root-MuiButton-root"
             tabindex="0"
             type="button"
           >
@@ -204,12 +204,12 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id1"
                 draggable="true"
                 style="opacity: 1;"
@@ -218,13 +218,13 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -251,12 +251,12 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id2"
                 draggable="true"
                 style="opacity: 1;"
@@ -265,13 +265,13 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -298,16 +298,16 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               </div>
             </a>
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-10iebat-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <span
-                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-6rkz1o-MuiButton-startIcon"
+                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="AddIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -318,7 +318,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 </svg>
               </span>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
               >
                 New
               </p>
@@ -328,12 +328,12 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id3"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id3"
                 draggable="true"
                 style="opacity: 1;"
@@ -342,13 +342,13 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -375,16 +375,16 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               </div>
             </a>
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-10iebat-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <span
-                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-6rkz1o-MuiButton-startIcon"
+                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="AddIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -395,7 +395,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 </svg>
               </span>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
               >
                 New
               </p>
@@ -497,7 +497,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="MoreHorizIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -519,7 +519,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -578,7 +578,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="MoreHorizIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -600,7 +600,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -616,7 +616,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
           class="octo-board-header-cell narrow"
         >
           <button
-            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-1e2vri7-MuiButtonBase-root-MuiButton-root"
+            class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-7zos53-MuiButtonBase-root-MuiButton-root"
             tabindex="0"
             type="button"
           >
@@ -640,12 +640,12 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id1"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id1"
                 draggable="true"
                 style="opacity: 1;"
@@ -654,13 +654,13 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -687,12 +687,12 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               </div>
             </a>
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id2"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id2"
                 draggable="true"
                 style="opacity: 1;"
@@ -701,13 +701,13 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -734,16 +734,16 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               </div>
             </a>
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-10iebat-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <span
-                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-6rkz1o-MuiButton-startIcon"
+                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="AddIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -754,7 +754,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 </svg>
               </span>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
               >
                 New
               </p>
@@ -764,12 +764,12 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             class="octo-board-column"
           >
             <a
-              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-12nabwm-MuiTypography-root-MuiLink-root"
               draggable="false"
               href="/test-space/id3"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id3"
                 draggable="true"
                 style="opacity: 1;"
@@ -778,13 +778,13 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                   data-testid="page-actions-context-menu"
                 >
                   <button
-                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-166rzxd-MuiButtonBase-root-MuiIconButton-root"
                     tabindex="0"
                     type="button"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-1e279rb-MuiSvgIcon-root"
                       data-testid="MoreHorizIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -811,16 +811,16 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               </div>
             </a>
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-10iebat-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-colorSecondary MuiButton-disableElevation css-36o0f5-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <span
-                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-6rkz1o-MuiButton-startIcon"
+                class="MuiButton-icon MuiButton-startIcon MuiButton-iconSizeSmall css-h0vgxp-MuiButton-startIcon"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-411e09-MuiSvgIcon-root"
                   data-testid="AddIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -831,7 +831,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 </svg>
               </span>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 css-e3qfi3-MuiTypography-root"
               >
                 New
               </p>

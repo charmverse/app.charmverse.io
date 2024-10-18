@@ -133,10 +133,13 @@ async function getAttest() {
 
   const decoder = new SchemaEncoder(schema);
   const parsed = decoder.decodeData(attestation.data);
-  const values = parsed.reduce((acc, item) => {
-    acc[item.name] = item.value.value as string;
-    return acc;
-  }, {} as Record<string, string | number>);
+  const values = parsed.reduce(
+    (acc, item) => {
+      acc[item.name] = item.value.value as string;
+      return acc;
+    },
+    {} as Record<string, string | number>
+  );
 
   console.log(attestation);
   console.log('data', values);

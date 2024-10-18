@@ -86,8 +86,8 @@ export function getNotificationUrl(
           notification.pageType === 'post'
             ? `/forum/post/${notification.pagePath}`
             : notification.pageType === 'bounty' && notification.applicationId
-            ? `/rewards/applications/${notification.applicationId}`
-            : `/${notification.pagePath}`;
+              ? `/rewards/applications/${notification.applicationId}`
+              : `/${notification.pagePath}`;
 
         return `${basePath}${getUrlSearchParamsFromNotificationType(notification)}`;
       }

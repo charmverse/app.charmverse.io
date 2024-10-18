@@ -166,8 +166,8 @@ export async function findSpaceIssuableRewardCredentials({
   const query: Prisma.BountyWhereInput = applicationId
     ? { applications: { some: { id: applicationId } } }
     : rewardIdsList?.length
-    ? { OR: [{ id: { in: rewardIdsList } }, { page: { id: { in: rewardIdsList } } }] }
-    : {};
+      ? { OR: [{ id: { in: rewardIdsList } }, { page: { id: { in: rewardIdsList } } }] }
+      : {};
 
   const rewards = await prisma.bounty.findMany({
     where: query,
@@ -212,19 +212,22 @@ export async function findSpaceIssuableRewardCredentials({
     }
   });
 
-  const pendingRewardsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
-    for (const rewardId of pendingTx.rewardIds) {
-      const pendingRewardCredentials =
-        (pendingTx as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent?.[rewardId] ?? [];
+  const pendingRewardsInSafe = pendingSafeTransactions.reduce(
+    (acc, pendingTx) => {
+      for (const rewardId of pendingTx.rewardIds) {
+        const pendingRewardCredentials =
+          (pendingTx as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent?.[rewardId] ?? [];
 
-      if (!acc[rewardId]) {
-        acc[rewardId] = [];
+        if (!acc[rewardId]) {
+          acc[rewardId] = [];
+        }
+
+        acc[rewardId].push(...pendingRewardCredentials);
       }
-
-      acc[rewardId].push(...pendingRewardCredentials);
-    }
-    return acc;
-  }, {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>);
+      return acc;
+    },
+    {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>
+  );
 
   return rewards
     .map((reward) =>

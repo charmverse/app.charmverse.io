@@ -34,7 +34,8 @@ export function DateTimePicker<T extends DateTime>({
           field: { ...props.slotProps?.field, clearable: true },
           textField: {
             ...props.slotProps?.textField,
-            placeholder: typeof placeholder === 'string' ? placeholder ?? 'Empty' : placeholder === true ? 'Empty' : '',
+            placeholder:
+              typeof placeholder === 'string' ? (placeholder ?? 'Empty') : placeholder === true ? 'Empty' : '',
             onClick: () => setOpen(true)
           }
         }}

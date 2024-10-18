@@ -98,9 +98,9 @@ export function mapDbProposalToProposal({
     const totalReviews = evaluation.appealedAt
       ? evaluation.appealReviews.length
       : evaluation.type === 'rubric'
-      ? // 1 answer per user per rubric, we care about unique respondents
-        arrayUtils.uniqueValues(evaluation.rubricAnswers.map((a) => a.userId)).length
-      : evaluation.reviews.length;
+        ? // 1 answer per user per rubric, we care about unique respondents
+          arrayUtils.uniqueValues(evaluation.rubricAnswers.map((a) => a.userId)).length
+        : evaluation.reviews.length;
 
     if (!stepPermissions?.evaluate) {
       draftRubricAnswers = [];

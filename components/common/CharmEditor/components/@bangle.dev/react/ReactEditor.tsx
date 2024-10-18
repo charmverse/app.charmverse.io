@@ -131,13 +131,9 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   // set current
   editorViewPayloadRef.current.enableSuggestions = enableSuggestions;
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return editor;
-    },
-    [editor]
-  );
+  useImperativeHandle(ref, () => {
+    return editor;
+  }, [editor]);
 
   // Make sure views are updated after we get the doc_data
   useEffect(() => {

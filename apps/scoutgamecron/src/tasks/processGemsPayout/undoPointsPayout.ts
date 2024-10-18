@@ -21,16 +21,19 @@ export async function undoPointsPayout({ week }: { week: string }) {
       }
     })
     .then((receipts) =>
-      receipts.reduce((acc, val) => {
-        if (val.recipientId) {
-          if (!acc[val.recipientId]) {
-            acc[val.recipientId] = [];
+      receipts.reduce(
+        (acc, val) => {
+          if (val.recipientId) {
+            if (!acc[val.recipientId]) {
+              acc[val.recipientId] = [];
+            }
+            acc[val.recipientId].push(val);
           }
-          acc[val.recipientId].push(val);
-        }
 
-        return acc;
-      }, {} as Record<string, (PointsReceipt & { event: BuilderEvent })[]>)
+          return acc;
+        },
+        {} as Record<string, (PointsReceipt & { event: BuilderEvent })[]>
+      )
     );
 
   const affectedUsers = Object.entries(earnedPointReceipts);

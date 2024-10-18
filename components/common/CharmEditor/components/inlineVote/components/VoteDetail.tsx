@@ -105,7 +105,7 @@ export function VoteDetail({
 
   const hasPassedDeadline = new Date(deadline) < new Date();
   const userVoteChoice =
-    userVotes && user ? userVotes.find((userVote) => userVote.userId === user.id)?.choices ?? userChoice : userChoice;
+    userVotes && user ? (userVotes.find((userVote) => userVote.userId === user.id)?.choices ?? userChoice) : userChoice;
 
   const relativeDate = DateTime.fromJSDate(new Date(deadline)).toRelative({ base: DateTime.now() });
 

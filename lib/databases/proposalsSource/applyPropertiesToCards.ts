@@ -74,13 +74,16 @@ export function applyPropertiesToCard({
   proposalProperties: ProposalCardData;
   canViewPrivateFields: boolean;
 }) {
-  const filteredProperties = Object.entries(proposalProperties.fields.properties).reduce((acc, [key, value]) => {
-    const boardProperty = boardProperties.find((p) => p.id === key);
-    if (canViewPrivateFields || !boardProperty?.private) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {} as ProposalCardData['fields']['properties']);
+  const filteredProperties = Object.entries(proposalProperties.fields.properties).reduce(
+    (acc, [key, value]) => {
+      const boardProperty = boardProperties.find((p) => p.id === key);
+      if (canViewPrivateFields || !boardProperty?.private) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as ProposalCardData['fields']['properties']
+  );
 
   const properties = {
     ...block.fields.properties,

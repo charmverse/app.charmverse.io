@@ -1,4 +1,3 @@
-
 import { promises as fsPromises, existsSync } from 'fs';
 import { join, parse, resolve } from 'path';
 
@@ -36,7 +35,7 @@ async function copyFilesToFlatDir(sourceDir: string, targetDir: string): Promise
 }
 
 /**
- * 
+ *
  * @param sourceDirs Should be a directory relative to the root of the project ie. __e2e__/proposals
  */
 async function exportKnowledge(sourceDirs: string[]) {
@@ -46,6 +45,5 @@ async function exportKnowledge(sourceDirs: string[]) {
     await copyFilesToFlatDir(sourceDir, target);
   }
 }
-
 
 exportKnowledge(['__e2e__/proposals', '__e2e__/po/settings', '__e2e__/utils']).then(() => console.log('done'));

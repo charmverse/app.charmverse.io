@@ -86,15 +86,18 @@ export async function seedTestPages({
     level1PermissionInputs.push(...permissions);
   }
 
-  const mappedPermissions = level1PermissionInputs.reduce((acc, val) => {
-    if (!acc[val.pageId]) {
-      acc[val.pageId] = [];
-    }
+  const mappedPermissions = level1PermissionInputs.reduce(
+    (acc, val) => {
+      if (!acc[val.pageId]) {
+        acc[val.pageId] = [];
+      }
 
-    acc[val.pageId].push(val);
+      acc[val.pageId].push(val);
 
-    return acc;
-  }, {} as Record<string, Prisma.PagePermissionCreateManyInput[]>);
+      return acc;
+    },
+    {} as Record<string, Prisma.PagePermissionCreateManyInput[]>
+  );
 
   const level2PageInputs: Prisma.PageCreateManyInput[] = [];
   const level2PermissionInputs: Prisma.PagePermissionCreateManyInput[] = [];

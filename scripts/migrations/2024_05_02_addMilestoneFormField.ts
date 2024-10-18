@@ -12,7 +12,7 @@ async function addMilestoneFormField() {
     }
   });
 
-  const uniqueFormIds = Array.from(new Set(proposals.map(proposal => proposal.formId))) as string[];
+  const uniqueFormIds = Array.from(new Set(proposals.map((proposal) => proposal.formId))) as string[];
   const totalForms = uniqueFormIds.length;
   let currentForm = 0;
 
@@ -30,17 +30,17 @@ async function addMilestoneFormField() {
           }
         }
       });
-  
-      const highestIndex = Math.max(...form.formFields.map(field => field.index));
+
+      const highestIndex = Math.max(...form.formFields.map((field) => field.index));
       await prisma.formField.create({
         data: {
           formId,
           type: 'milestone',
-          name: "Milestone",
+          name: 'Milestone',
           required: false,
-          index: highestIndex !== -1 ? highestIndex + 1 : -1,
+          index: highestIndex !== -1 ? highestIndex + 1 : -1
         }
-      })
+      });
     } catch (e) {
       console.error(`Error adding milestone field to form ${formId}`, e);
     } finally {

@@ -103,18 +103,18 @@ export async function upsertPostCategoryPermission<
           }
         }
       : assignee.group === 'space'
-      ? {
-          spaceId_postCategoryId: {
-            spaceId: assignee.id,
-            postCategoryId
+        ? {
+            spaceId_postCategoryId: {
+              spaceId: assignee.id,
+              postCategoryId
+            }
           }
-        }
-      : {
-          roleId_postCategoryId: {
-            roleId: assignee.id,
-            postCategoryId
-          }
-        };
+        : {
+            roleId_postCategoryId: {
+              roleId: assignee.id,
+              postCategoryId
+            }
+          };
 
   const permission = await prisma.postCategoryPermission.upsert({
     where: whereQuery,

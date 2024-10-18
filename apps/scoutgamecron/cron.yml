@@ -1,26 +1,26 @@
 version: 1
 cron:
-  - name: "process-builder-activity"
-    url: "/process-builder-activity"
+  - name: 'process-builder-activity'
+    url: '/process-builder-activity'
     # every 20 minutes
-    schedule: "*/20 * * * *"
+    schedule: '*/20 * * * *'
 
-  - name: "process-gems-payout"
-    url: "/process-gems-payout"
+  - name: 'process-gems-payout'
+    url: '/process-gems-payout'
     # Start of every hour
-    schedule: "0 * * * *"
+    schedule: '0 * * * *'
 
-  - name: "process-nft-mints"
-    url: "/process-nft-mints"
+  - name: 'process-nft-mints'
+    url: '/process-nft-mints'
     # Every 5 minutes
-    schedule: "*/20 * * * *"
+    schedule: '*/20 * * * *'
 
-  - name: "update-mixpanel-user-profiles"
-    url: "/update-mixpanel-user-profiles"
+  - name: 'update-mixpanel-user-profiles'
+    url: '/update-mixpanel-user-profiles'
     # Every day at midnight
-    schedule: "0 0 * * *"
+    schedule: '0 0 * * *'
 
-  - name: "alert-low-wallet-gas-balance"
-    url: "/alert-low-wallet-gas-balance"
+  - name: 'alert-low-wallet-gas-balance'
+    url: '/alert-low-wallet-gas-balance'
     # Every 5 minutes
-    schedule: "*/5 * * * *"
+    schedule: '*/5 * * * *'

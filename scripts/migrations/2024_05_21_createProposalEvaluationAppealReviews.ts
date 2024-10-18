@@ -6,7 +6,7 @@ async function createProposalEvaluationAppealReviews() {
     where: {
       appeal: true
     }
-  })
+  });
 
   for (const proposalEvaluationReview of proposalEvaluationReviews) {
     try {
@@ -17,7 +17,7 @@ async function createProposalEvaluationAppealReviews() {
             reviewerId: proposalEvaluationReview.reviewerId,
             result: proposalEvaluationReview.result,
             completedAt: proposalEvaluationReview.completedAt,
-            declineReasons: proposalEvaluationReview.declineReasons,
+            declineReasons: proposalEvaluationReview.declineReasons
           }
         }),
         prisma.proposalEvaluationReview.delete({

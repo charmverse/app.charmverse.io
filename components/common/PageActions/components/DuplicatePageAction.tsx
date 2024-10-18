@@ -66,8 +66,8 @@ export function DuplicatePageAction({
         excludedPageTypes.includes(pageType)
           ? 'Page type cannot be duplicated'
           : disabled
-          ? 'You do not have permission to duplicate this page'
-          : ''
+            ? 'You do not have permission to duplicate this page'
+            : ''
       }
     >
       <div>

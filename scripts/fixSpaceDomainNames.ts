@@ -31,7 +31,6 @@ async function getInvalidSpaceDomains() {
 async function fixSpaceDomainNames() {
   const invalidSpaceDomains = await getInvalidSpaceDomains();
 
-
   for (const invalidDomain of invalidSpaceDomains) {
     const updatedDomain = invalidDomain.toLowerCase().replace(/(\s|\.)/g, '-');
     console.log('🔥', `updating ${invalidDomain} -> ${updatedDomain}`);
