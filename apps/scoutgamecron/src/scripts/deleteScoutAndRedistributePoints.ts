@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 
 async function deleteScoutAndRedistributePoints() {
   const builderUsername = "ccdev5";
@@ -32,7 +33,7 @@ async function deleteScoutAndRedistributePoints() {
     nftPurchaseEventsRecord[nftPurchaseEvent.scout.id] += nftPurchaseEvent.tokensPurchased;
   });
 
-  await prisma.$transaction(async () => {
+  await prisma.$transaction(async (tx) => {
     await prisma.scout.delete({
       where: {
         username: builderUsername
@@ -47,36 +48,13 @@ async function deleteScoutAndRedistributePoints() {
     })
     for (const [scoutId, tokensPurchased] of Object.entries(nftPurchaseEventsRecord)) {
       const points = tokensPurchased * 20
-      await prisma.pointsReceipt.create({
-        data: {
-          recipient: {
-            connect: {
-              id: scoutId
-            }
-          },
-          activities: {
-            create: {
-              recipientType: "scout",
-              type: "points",
-              userId: scoutId,
-            }
-          },
-          event: {
-            create: {
-              type: "misc_event",
-              description: `You received a ${points} point gift from Scout Game`,
-              season: currentSeason,
-              week: getCurrentWeek(),
-              builder: {
-                connect: {
-                  id: scoutId,
-                }
-              },
-            }
-          },
-          claimedAt: new Date(),
-          value: points,
-        }
+      await sendPoints({
+        tx,
+        builderId: scoutId,
+        points,
+        description: `You received a ${points} point gift from Scout Game`,
+        claimed: true,
+        earnedAs: "scout",
       })
       await prisma.userSeasonStats.update({
         where: {
@@ -89,19 +67,6 @@ async function deleteScoutAndRedistributePoints() {
           nftsPurchased: {
             decrement: tokensPurchased
           },
-          pointsEarnedAsScout: {
-            increment: points
-          }
-        }
-      })
-      await prisma.userAllTimeStats.update({
-        where: {
-          userId: scoutId
-        },
-        data: {
-          pointsEarnedAsScout: {
-            increment: points
-          }
         }
       })
     }
