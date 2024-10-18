@@ -62,7 +62,7 @@ export async function getUsers({
   });
   return users.map((user) => ({
     ...user,
-    nftsPurchased: user.userSeasonStats[0]?.nftsPurchased || 0
+    nftsPurchased: user.userSeasonStats.find(({ season }) => season === '2024-W41')?.nftsPurchased || 0
   }));
 }
 
