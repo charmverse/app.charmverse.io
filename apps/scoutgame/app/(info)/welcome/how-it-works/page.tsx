@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import { HowItWorksPage } from 'components/welcome/how-it-works/HowItWorksPage';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,8 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function HowItWorks() {
-  const user = await getUserFromSession();
-
   // logic in middleware.ts ensures that user is logged in
-  return <HowItWorksPage username={user!.username} />;
+  return <HowItWorksPage />;
 }
