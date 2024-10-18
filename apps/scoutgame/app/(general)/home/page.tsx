@@ -1,5 +1,5 @@
 import { HomePage } from 'components/home/HomePage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Home({
   searchParams

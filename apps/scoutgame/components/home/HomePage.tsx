@@ -24,7 +24,7 @@ export function HomePage({ user, tab }: { user: SessionUser | null; tab: string 
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense fallback={<LoadingCards />}>
+        <Suspense key={currentTab} fallback={<LoadingCards />}>
           <TodaysHotBuildersCarousel userId={user?.id} />
         </Suspense>
         <HomeTabsMenu tab={currentTab} />

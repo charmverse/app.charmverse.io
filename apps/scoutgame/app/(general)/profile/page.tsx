@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 
 import type { ProfileTab } from 'components/profile/ProfilePage';
 import { ProfilePage } from 'components/profile/ProfilePage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 import { getUserStats } from 'lib/users/getUserStats';
 
 export const dynamic = 'force-dynamic';

@@ -4,7 +4,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 import 'theme/styles.scss';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
