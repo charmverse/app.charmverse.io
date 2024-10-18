@@ -12,7 +12,6 @@ import Modal from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useUser } from 'hooks/useUser';
 import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
@@ -97,7 +96,6 @@ export function PassFailEvaluation({
   const [declineReason, setDeclineReason] = useState<string | null>(null);
   const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
   const [declineMessage, setDeclineMessage] = useState('');
-  const { isSpaceMember } = useIsSpaceMember();
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -163,7 +161,7 @@ export function PassFailEvaluation({
               wrapColumn
               value={reviewerOptions}
               onChange={() => {}}
-              hideIdentity={!(showReviewerIdentities || isSpaceMember)}
+              hideIdentity={!showReviewerIdentities}
             />
           </Box>
           <FormLabel>
