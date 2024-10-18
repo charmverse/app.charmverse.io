@@ -28,7 +28,8 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
         .toLowerCase(),
       name: faker.internet.domainWord(),
       ownerType: 'org' as const,
-      defaultBranch: 'main'
+      defaultBranch: 'main',
+
     };
 
     githubRepoCreateManyInput.push(githubRepoCreateInput);
@@ -39,7 +40,8 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
       ownerType: 'org',
       handPicked: false,
       fork: false,
-      createdAt: new Date()
+      createdAt: new Date(),
+      bonusPartner: null,
     });
   });
 

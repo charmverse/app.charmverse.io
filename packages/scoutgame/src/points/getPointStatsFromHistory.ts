@@ -157,7 +157,3 @@ export async function getPointStatsFromHistory({
     userId
   };
 }
-
-getPointStatsFromHistory({
-  userIdOrUsername: ''
-});
