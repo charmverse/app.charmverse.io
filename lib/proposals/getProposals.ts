@@ -1,4 +1,4 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalPermissionFlags, SmallProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   IssuedCredential,
   Proposal,
@@ -17,6 +17,8 @@ import type {
 } from '@root/lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
 import { sortBy } from 'lodash-es';
+
+import { permissionsApiClient } from 'lib/permissions/api/client';
 
 import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';
@@ -53,11 +55,18 @@ export type ProposalWithUsersLite = Pick<
 
 export async function getProposals({
   ids,
-  spaceId
+  spaceId,
+  userId
 }: {
+  userId: string;
   ids: string[];
   spaceId: string;
 }): Promise<ProposalWithUsersLite[]> {
+  const proposalPermissions = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
+    spaceId,
+    userId
+  });
+
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {
@@ -140,7 +149,8 @@ export async function getProposals({
   return proposals.map((proposal) => {
     return mapDbProposalToProposalLite({
       proposal,
-      space: space as IssuableProposalCredentialSpace
+      space: space as IssuableProposalCredentialSpace,
+      permissionsLite: proposalPermissions[proposal.id]
     });
   });
 }
@@ -149,7 +159,8 @@ export async function getProposals({
 function mapDbProposalToProposalLite({
   proposal,
   permissions,
-  space
+  space,
+  permissionsLite
 }: {
   proposal: Proposal & {
     authors: (ProposalAuthor & IssuableProposalCredentialAuthor)[];
@@ -163,6 +174,7 @@ function mapDbProposalToProposalLite({
   };
   space: IssuableProposalCredentialSpace & { useOnchainCredentials?: boolean | null };
   permissions?: ProposalPermissionFlags;
+  permissionsLite?: SmallProposalPermissionFlags;
 }): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
@@ -171,7 +183,6 @@ function mapDbProposalToProposalLite({
     space
   });
   const fields = (rest.fields as ProposalFields) ?? null;
-
   const validSelectedCredentials = proposal.selectedCredentialTemplates.filter((templateId) =>
     space.credentialTemplates.some((t) => t.id === templateId)
   );
@@ -216,7 +227,8 @@ function mapDbProposalToProposalLite({
     updatedAt: (proposal.page?.updatedAt || new Date()).toISOString(),
     updatedBy: proposal.page?.updatedBy || '',
     pageId: proposal.page?.id || '',
-    reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
+    // Only show the reviewers if the user has permission to evaluate
+    reviewers: permissionsLite?.evaluate ? (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [] : [],
     rewardIds: rewards.map((r) => r.id),
     fields
   };
