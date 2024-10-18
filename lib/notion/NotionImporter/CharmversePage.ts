@@ -55,10 +55,10 @@ export class CharmversePage {
       notionPage.parent.type === 'database_id'
         ? notionPage.parent.database_id
         : notionPage.parent.type === 'page_id'
-        ? notionPage.parent.page_id
-        : notionPage.parent.type === 'block_id'
-        ? this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? null
-        : null;
+          ? notionPage.parent.page_id
+          : notionPage.parent.type === 'block_id'
+            ? (this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? null)
+            : null;
     const charmverseParentPage = notionParentPageId
       ? await this.notionPage.fetchAndCreatePage({
           notionPageId: notionParentPageId

@@ -31,7 +31,7 @@ export function DocumentHistory({
   const createdBy = getMemberById(page.createdBy)?.username ?? 'Unknown user';
   const updatedBy = getMemberById(page.updatedBy)?.username ?? createdBy;
   const deletedBy = getMemberById(page.deletedBy)?.username ?? null;
-  const lockedBy = page.lockedBy ? getMemberById(page.lockedBy)?.username ?? 'Unknown user' : null;
+  const lockedBy = page.lockedBy ? (getMemberById(page.lockedBy)?.username ?? 'Unknown user') : null;
 
   const tooltipCreatedAt = getRelativeTimeInThePast(new Date(page.createdAt));
   const tooltipUpdatedAt = getRelativeTimeInThePast(new Date(page.updatedAt));

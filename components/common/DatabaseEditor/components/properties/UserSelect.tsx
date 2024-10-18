@@ -227,7 +227,7 @@ export function UserSelect({
             showEmptyPlaceholder && <EmptyPlaceholder>Empty</EmptyPlaceholder>
           ) : (
             <MembersDisplay
-              wrapColumn={displayType === 'details' ? false : wrapColumn ?? false}
+              wrapColumn={displayType === 'details' ? false : (wrapColumn ?? false)}
               readOnly={true}
               members={memberIds.map((id) => membersRecord[id]).filter(isTruthy)}
               onDelete={(memberId) => onChange(memberIds.filter((id) => id !== memberId))}

@@ -3,7 +3,7 @@ import { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 import { projectFieldColumnIds, projectMemberFieldColumnIds } from 'lib/projects/formField';
 import { ProposalBoardBlockFields } from 'lib/proposals/blocks/interfaces';
-import fs from "fs";
+import fs from 'fs';
 
 /**
  * Use this script to perform database searches.
@@ -11,13 +11,13 @@ import fs from "fs";
 
 async function exportCustomProposalSourceBoardProperties() {
   const boards: {
-    id: string,
-    customProperties: IPropertyTemplate[]
-  }[] = []
+    id: string;
+    customProperties: IPropertyTemplate[];
+  }[] = [];
 
   const proposalSourceBoards = await prisma.block.findMany({
     where: {
-      type: "board",
+      type: 'board',
       fields: {
         path: ['sourceType'],
         equals: 'proposals'
@@ -28,7 +28,7 @@ async function exportCustomProposalSourceBoardProperties() {
       id: true,
       fields: true
     }
-  })
+  });
 
   const total = proposalSourceBoards.length;
   let count = 0;
@@ -37,37 +37,40 @@ async function exportCustomProposalSourceBoardProperties() {
     try {
       const proposalBlock = await prisma.proposalBlock.findFirst({
         where: {
-          type: "board",
-          spaceId: proposalSourceBoard.spaceId,
+          type: 'board',
+          spaceId: proposalSourceBoard.spaceId
         },
         select: {
           fields: true
         }
-      })
+      });
       const proposalBlockFields = proposalBlock?.fields as unknown as ProposalBoardBlockFields;
       const proposalBlockPropertyIds = proposalBlockFields?.cardProperties.map((cardProperty) => cardProperty.id) ?? [];
       const fields = proposalSourceBoard.fields as unknown as BoardFields;
       const cardProperties = fields.cardProperties ?? [];
       const customProposalBoardProperties = cardProperties.filter((cardProperty) => {
-        return !defaultProposalPropertyTypes.includes(cardProperty.type) && cardProperty.type !== 'proposalEvaluationAverage' &&
+        return (
+          !defaultProposalPropertyTypes.includes(cardProperty.type) &&
+          cardProperty.type !== 'proposalEvaluationAverage' &&
           cardProperty.type !== 'proposalEvaluationTotal' &&
           cardProperty.type !== 'proposalEvaluatedBy' &&
           cardProperty.type !== 'proposalRubricCriteriaTotal' &&
           // deprecated property just remove it
-          ((cardProperty.type as string) !== 'proposalCategory') &&
+          (cardProperty.type as string) !== 'proposalCategory' &&
           !cardProperty.formFieldId &&
           !cardProperty.evaluationTitle &&
           !cardProperty.criteriaTitle &&
           !projectFieldColumnIds.includes(cardProperty.id) &&
           !projectMemberFieldColumnIds.includes(cardProperty.id) &&
-          !proposalBlockPropertyIds.includes(cardProperty.id);
+          !proposalBlockPropertyIds.includes(cardProperty.id)
+        );
       });
-      
+
       if (customProposalBoardProperties.length) {
         boards.push({
           id: proposalSourceBoard.id,
           customProperties: customProposalBoardProperties
-        })
+        });
       }
     } catch (error) {
       console.error(error);
@@ -82,19 +85,19 @@ async function exportCustomProposalSourceBoardProperties() {
 
 async function importCustomProposalSourceBoardProperties() {
   const boards = JSON.parse(fs.readFileSync('boards.json', 'utf-8')) as {
-    id: string,
-    customProperties: IPropertyTemplate[]
+    id: string;
+    customProperties: IPropertyTemplate[];
   }[];
 
   const proposalSourceBoards = await prisma.block.findMany({
     where: {
-      type: "board",
+      type: 'board',
       fields: {
         path: ['sourceType'],
         equals: 'proposals'
       },
       space: {
-        domain: "taiko"
+        domain: 'taiko'
       }
     },
     select: {
@@ -104,10 +107,13 @@ async function importCustomProposalSourceBoardProperties() {
     }
   });
 
-  const proposalSourceBoardRecord: Record<string, {
-    id: string,
-    fields: BoardFields
-  }> = {};
+  const proposalSourceBoardRecord: Record<
+    string,
+    {
+      id: string;
+      fields: BoardFields;
+    }
+  > = {};
 
   for (const proposalSourceBoard of proposalSourceBoards) {
     proposalSourceBoardRecord[proposalSourceBoard.id] = {
@@ -131,12 +137,12 @@ async function importCustomProposalSourceBoardProperties() {
             fields: {
               ...boardFields,
               cardProperties: [
-                ...boardFields.cardProperties as unknown as Prisma.JsonValue[],
-                ...board.customProperties as unknown as Prisma.JsonValue[]
+                ...(boardFields.cardProperties as unknown as Prisma.JsonValue[]),
+                ...(board.customProperties as unknown as Prisma.JsonValue[])
               ]
             }
           }
-        })
+        });
       }
     } catch (error) {
       console.error(error);

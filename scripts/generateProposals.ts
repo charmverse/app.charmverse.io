@@ -6,7 +6,17 @@ import { randomIntFromInterval } from 'lib/utils/random';
 const minRubricScore = 0;
 const maxRubricScore = 20;
 
-async function generateRubricProposals({ spaceIdOrDomain, amount, complete, selectedCredentialTemplateIds }: { spaceIdOrDomain: string; amount: number; complete?: boolean; selectedCredentialTemplateIds?: string[] }) {
+async function generateRubricProposals({
+  spaceIdOrDomain,
+  amount,
+  complete,
+  selectedCredentialTemplateIds
+}: {
+  spaceIdOrDomain: string;
+  amount: number;
+  complete?: boolean;
+  selectedCredentialTemplateIds?: string[];
+}) {
   const space = await getSpace(spaceIdOrDomain);
 
   for (let i = 0; i < amount; i++) {
@@ -16,7 +26,7 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
       proposalStatus: 'published',
       authors: [space.createdBy],
       title: `Proposal ${i}`,
-      selectedCredentialTemplateIds ,
+      selectedCredentialTemplateIds,
       evaluationInputs: [
         {
           evaluationType: 'rubric',
@@ -74,10 +84,9 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 //   }
 // }).then(console.log)
 
-const spaceDomain = 'colorful-lavender-turtle'
+const spaceDomain = 'colorful-lavender-turtle';
 
-generateRubricProposals({ amount: 3, spaceIdOrDomain: spaceDomain, complete: true })
-.then(console.log);
+generateRubricProposals({ amount: 3, spaceIdOrDomain: spaceDomain, complete: true }).then(console.log);
 
 // prisma.proposal.updateMany({
 //   where: {

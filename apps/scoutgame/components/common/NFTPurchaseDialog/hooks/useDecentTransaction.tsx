@@ -36,8 +36,8 @@ async function prepareDecentTransaction({ txConfig }: { txConfig: BoxActionReque
         return Array.isArray(value)
           ? `${value.map((v: string) => `${key}=${v}`).join('&')}`
           : typeof value === 'object'
-          ? `${key}=${JSON.stringify(value, (_key, val) => (typeof val === 'bigint' ? `${val.toString()}n` : val))}`
-          : `${key}=${encodeURIComponent(value)}`;
+            ? `${key}=${JSON.stringify(value, (_key, val) => (typeof val === 'bigint' ? `${val.toString()}n` : val))}`
+            : `${key}=${encodeURIComponent(value)}`;
       })
       .join('&');
     return `${path}${queryString ? `?${queryString}` : ''}`;

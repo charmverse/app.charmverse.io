@@ -188,7 +188,7 @@ export function formatDate(dateInput: Date | string, config?: DateFormatConfig, 
     {
       day: 'numeric',
       month: config?.month ?? 'short',
-      year: config?.withYear ?? !isCurrentYear ? 'numeric' : undefined
+      year: (config?.withYear ?? !isCurrentYear) ? 'numeric' : undefined
     },
     locale
   );

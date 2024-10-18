@@ -31,7 +31,7 @@ const closedMixin = (theme: Theme) =>
     overflowX: 'hidden' as const,
     width: 0,
     border: 'none'
-  } as const);
+  }) as const;
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'sidebarWidth'

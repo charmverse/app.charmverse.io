@@ -100,7 +100,7 @@ export const makeSelectSortedViews = () =>
 
 export function getView(viewId: string | undefined): (state: RootState) => BoardView | null {
   return (state: RootState): BoardView | null => {
-    return viewId ? state.views.views[viewId] ?? null : null;
+    return viewId ? (state.views.views[viewId] ?? null) : null;
   };
 }
 

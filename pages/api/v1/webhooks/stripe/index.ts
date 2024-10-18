@@ -171,8 +171,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
                 paymentMethod: invoice.metadata?.transaction_hash
                   ? 'crypto'
                   : charge?.payment_method_details?.type?.startsWith('ach')
-                  ? 'ach'
-                  : 'card',
+                    ? 'ach'
+                    : 'card',
                 userId: space.createdBy
               });
             }
@@ -435,8 +435,8 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             paymentMethod: invoice.metadata?.transaction_hash
               ? 'crypto'
               : charge.payment_method_details?.type?.startsWith('ach')
-              ? 'ach'
-              : 'card',
+                ? 'ach'
+                : 'card',
             userId: space.createdBy
           });
         }

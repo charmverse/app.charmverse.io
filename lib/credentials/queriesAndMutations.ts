@@ -276,10 +276,13 @@ export async function getCharmverseOffchainCredentialsByWallets({
     }
   });
 
-  const issuedCredsMap = issuedCredentials.reduce((acc, val) => {
-    acc[val.ceramicId as string] = val;
-    return acc;
-  }, {} as Record<string, (typeof issuedCredentials)[number]>);
+  const issuedCredsMap = issuedCredentials.reduce(
+    (acc, val) => {
+      acc[val.ceramicId as string] = val;
+      return acc;
+    },
+    {} as Record<string, (typeof issuedCredentials)[number]>
+  );
 
   const favoriteCredentials = await prisma.favoriteCredential.findMany({
     where: {

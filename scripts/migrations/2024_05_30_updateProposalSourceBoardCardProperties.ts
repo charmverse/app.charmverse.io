@@ -2,13 +2,18 @@ import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { BoardFields, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 function isEvaluationProperty(type: PropertyType) {
-  return type === 'proposalRubricCriteriaTotal' || type === "proposalEvaluatedBy" || type === "proposalEvaluationTotal" || type === "proposalEvaluationAverage"
+  return (
+    type === 'proposalRubricCriteriaTotal' ||
+    type === 'proposalEvaluatedBy' ||
+    type === 'proposalEvaluationTotal' ||
+    type === 'proposalEvaluationAverage'
+  );
 }
 
 export async function updateProposalSourceBoardCardProperties() {
   const proposalSourceBoards = await prisma.block.findMany({
     where: {
-      type: "board",
+      type: 'board',
       fields: {
         path: ['sourceType'],
         equals: 'proposals'
@@ -19,7 +24,7 @@ export async function updateProposalSourceBoardCardProperties() {
       id: true,
       fields: true
     }
-  })
+  });
 
   let count = 0;
   const total = proposalSourceBoards.length;
@@ -30,7 +35,13 @@ export async function updateProposalSourceBoardCardProperties() {
       const cardProperties = fields.cardProperties ?? [];
       const evaluationProperties = cardProperties.filter((cardProperty) => isEvaluationProperty(cardProperty.type));
       if (evaluationProperties.length) {
-        const rubricCriteriaTotalProperties = Array.from(new Set(cardProperties.filter((cardProperty) => cardProperty.type === 'proposalRubricCriteriaTotal').map(property => property.name)));
+        const rubricCriteriaTotalProperties = Array.from(
+          new Set(
+            cardProperties
+              .filter((cardProperty) => cardProperty.type === 'proposalRubricCriteriaTotal')
+              .map((property) => property.name)
+          )
+        );
         const rubricCriterias = await prisma.proposalRubricCriteria.findMany({
           where: {
             evaluation: {
@@ -52,9 +63,9 @@ export async function updateProposalSourceBoardCardProperties() {
           }
         });
         const rubricCriterialRecords: Record<string, string> = {};
-        rubricCriterias.forEach(rubricCriteria => {
-          rubricCriterialRecords[rubricCriteria.title] = rubricCriteria.evaluation.title
-        })
+        rubricCriterias.forEach((rubricCriteria) => {
+          rubricCriterialRecords[rubricCriteria.title] = rubricCriteria.evaluation.title;
+        });
         const { fields: _fields } = await prisma.block.update({
           where: {
             id: proposalSourceBoard.id
@@ -63,17 +74,20 @@ export async function updateProposalSourceBoardCardProperties() {
             fields: {
               ...fields,
               cardProperties: cardProperties.map((cardProperty) => {
-                const evaluationProperty = isEvaluationProperty(cardProperty.type)
+                const evaluationProperty = isEvaluationProperty(cardProperty.type);
                 if (evaluationProperty) {
                   return {
                     ...cardProperty,
                     private: true,
-                    criteriaTitle: cardProperty.type === "proposalRubricCriteriaTotal" ? cardProperty.name : undefined,
-                    evaluationTitle: cardProperty.type === "proposalRubricCriteriaTotal" ? rubricCriterialRecords[cardProperty.name] : cardProperty.name
-                  } as IPropertyTemplate
+                    criteriaTitle: cardProperty.type === 'proposalRubricCriteriaTotal' ? cardProperty.name : undefined,
+                    evaluationTitle:
+                      cardProperty.type === 'proposalRubricCriteriaTotal'
+                        ? rubricCriterialRecords[cardProperty.name]
+                        : cardProperty.name
+                  } as IPropertyTemplate;
                 }
 
-                return cardProperty
+                return cardProperty;
               })
             } as unknown as Prisma.JsonObject
           }

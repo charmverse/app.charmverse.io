@@ -29,10 +29,10 @@ export function ResetResultButton({
   const disabledTooltip = !hasMovePermission
     ? 'You do not have permission to move reset results of this proposal'
     : evaluation.type === 'vote'
-    ? 'You cannot revert the results of a vote'
-    : archived
-    ? 'You cannot reset an archived proposal'
-    : '';
+      ? 'You cannot revert the results of a vote'
+      : archived
+        ? 'You cannot reset an archived proposal'
+        : '';
 
   async function resetStep() {
     try {

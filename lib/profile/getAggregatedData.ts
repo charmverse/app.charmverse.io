@@ -109,7 +109,7 @@ export async function getAggregatedData(userId: string): Promise<AggregatedProfi
         title: vote.title || vote.page?.title,
         voteId: vote.id,
         successful: vote.status === 'Passed'
-      } as ProfileVoteEvent)
+      }) as ProfileVoteEvent
   );
 
   const bounties: ProfileBountyEvent[] = [

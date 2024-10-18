@@ -33,7 +33,10 @@ class DropCursorView {
 
   handlers: { name: string; handler: (event: Event) => void }[];
 
-  constructor(readonly editorView: EditorView, options: DropCursorOptions) {
+  constructor(
+    readonly editorView: EditorView,
+    options: DropCursorOptions
+  ) {
     this.width = options.width ?? 1;
     this.color = options.color === false ? undefined : options.color || 'black';
     this.class = options.class;
@@ -148,8 +151,8 @@ class DropCursorView {
       (draggedNode ? draggedNode?.type.name === 'page' || draggedNode?.type.name === 'linkedPage' : true)
         ? domElementAtCoords
         : domElementAtCoords?.parentElement?.dataset?.pageType?.match(/(page|card)/)
-        ? domElementAtCoords.parentElement
-        : null
+          ? domElementAtCoords.parentElement
+          : null
     ) as HTMLElement | null;
 
     const hoveredPageDomNodeId = hoveredPageDomNode?.dataset.id;

@@ -188,7 +188,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
     setStep('select_template');
   }
 
-  const errorText = typeof saveError === 'string' ? saveError : saveError?.message ?? 'Error creating space';
+  const errorText = typeof saveError === 'string' ? saveError : (saveError?.message ?? 'Error creating space');
 
   if (step === 'join_space') {
     return (

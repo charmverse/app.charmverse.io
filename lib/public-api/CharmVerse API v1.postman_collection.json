@@ -1,330 +1,273 @@
 {
-	"info": {
-		"_postman_id": "c1819e70-133b-472a-b7b7-48827971fb93",
-		"name": "CharmVerse API v1",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "3087129"
-	},
-	"item": [
-		{
-			"name": "Retrieve Database schema",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"databases",
-						"{{DATABASE_ID_OR_PATH}}"
-					],
-					"query": [
-						{
-							"key": "",
-							"value": null,
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get proposal comments",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/comments",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"proposals",
-						"{{PROPOSAL_OR_PATH}}",
-						"comments"
-					],
-					"query": [
-						{
-							"key": "",
-							"value": null,
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get proposal",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"proposals",
-						"{{PROPOSAL_OR_PATH}}"
-					],
-					"query": [
-						{
-							"key": "",
-							"value": null,
-							"disabled": true
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Compute user permissions for a proposal",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/compute-permissions?userId=873d7393-8625-4e7c-b19b-f7d32c2157b8",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"proposals",
-						"{{PROPOSAL_OR_PATH}}",
-						"compute-permissions"
-					],
-					"query": [
-						{
-							"key": "userId",
-							"value": "873d7393-8625-4e7c-b19b-f7d32c2157b8"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Search database cards",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"query\": {\n    \"properties\": {\n    }\n  }\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/search",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"databases",
-						"{{DATABASE_ID_OR_PATH}}",
-						"search"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create card in database",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"title\": \"Markdown Import\",\n  \"contentMarkdown\": \"# Oechalidum tange meque sequentis nati ferus\\n\\n## Nec precanda torvo\\n\\nLorem markdownum positisque superi; tuque huic arbore arbore, diu funda: **illuc\\nesset**. Post [inlisit](http://www.si-venter.com/abprodesse.html) paludibus\\narboreis intravit: questus fessam meo aer [nec](http://musco.net/nulli.php)?\\nPotens sibi ortu, et vis sistite vulnere robigine parte.\\n\\n    if (filename_lock_pack(console_mp, drop_viral_snow)) {\\n        kbpsGps(3, zip_zip + wampHddRegular);\\n    }\\n    viralNetCard(cloneCamelcase);\\n    var analog = remote.function(soa_internic_ttl, 203562, fat_text) / 97 +\\n            file_igp;\\n\\nVirginis fauni; inprobe tamen mercibus quicquid territa. Hercule tune lanugine\\niuvenumque cum maturuit flavescere ventis.\\n\\n## Quae membraque sagittas tellus ponat\\n\\nPrunaque utilis remollescit manifesta ambae, intendunt valles ardua pinea mutua.\\nLeves ille auster vires.\\n\\nHabitata vocatum. Saxo decor, catenas figuras pennas quod inque quam Pagasaea,\\nviolentus herbas. Tela hoc redderet tantum demptos doleres plus, mei agros\\ncaptat dolebis vittas. Carmen inaequalis nec intrat, ureret anguis plangi fuit\\nademi amictu: caesique at! Tenet ubi oculis pennis senem in nati eruiturque\\ninane, in.\\n\\n> Mentiris pro, mons [terra](http://www.leves-nisi.net/illo-sacer.html) nacta\\n> calido desit, nec unus, Cephalus Phoce et datis: frequentant. Siculo\\n> constiterant vidit nunc forma fidemque resonare aspergine procul placabilis\\n> ungues opibus. Capillis pollice aderam Minyeidas, nate populisque monte\\n> caelatus Capitolia *carmen* utque quae situs curvavit, promisitque.\\n\\nMembra et exemplis dixit; est valles inferias, te operis. Iura iaculantem agros\\nsororis flumen: danda ad limite, duro me Parthenopeia me saltus Minervae iterum\\ncoeuntia *se*. Turaque **in ibant**. Exhalantes terra cecidisse fixum lacerto\\nnate.\",\n  \"properties\": {\n  }\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/cards",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"databases",
-						"{{DATABASE_ID_OR_PATH}}",
-						"cards"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Update card in a database",
-			"request": {
-				"method": "PATCH",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n  \"title\": \"New title 2\",\n  \"properties\": {\n  }\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"cards",
-						"{{CARD_ID_OR_PATH}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List bounties",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/bounties",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"bounties"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Retrieve an individual card",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"cards",
-						"{{CARD_ID_OR_PATH}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Retrieve a page",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/pages/{{PAGE_ID}}",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"pages",
-						"{{PAGE_ID}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List proposals",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{API_URL}}/proposals",
-					"host": [
-						"{{API_URL}}"
-					],
-					"path": [
-						"proposals"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+  "info": {
+    "_postman_id": "c1819e70-133b-472a-b7b7-48827971fb93",
+    "name": "CharmVerse API v1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "3087129"
+  },
+  "item": [
+    {
+      "name": "Retrieve Database schema",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}",
+          "host": ["{{API_URL}}"],
+          "path": ["databases", "{{DATABASE_ID_OR_PATH}}"],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get proposal comments",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/comments",
+          "host": ["{{API_URL}}"],
+          "path": ["proposals", "{{PROPOSAL_OR_PATH}}", "comments"],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get proposal",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}",
+          "host": ["{{API_URL}}"],
+          "path": ["proposals", "{{PROPOSAL_OR_PATH}}"],
+          "query": [
+            {
+              "key": "",
+              "value": null,
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Compute user permissions for a proposal",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/proposals/{{PROPOSAL_OR_PATH}}/compute-permissions?userId=873d7393-8625-4e7c-b19b-f7d32c2157b8",
+          "host": ["{{API_URL}}"],
+          "path": ["proposals", "{{PROPOSAL_OR_PATH}}", "compute-permissions"],
+          "query": [
+            {
+              "key": "userId",
+              "value": "873d7393-8625-4e7c-b19b-f7d32c2157b8"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Search database cards",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"query\": {\n    \"properties\": {\n    }\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/search",
+          "host": ["{{API_URL}}"],
+          "path": ["databases", "{{DATABASE_ID_OR_PATH}}", "search"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create card in database",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Markdown Import\",\n  \"contentMarkdown\": \"# Oechalidum tange meque sequentis nati ferus\\n\\n## Nec precanda torvo\\n\\nLorem markdownum positisque superi; tuque huic arbore arbore, diu funda: **illuc\\nesset**. Post [inlisit](http://www.si-venter.com/abprodesse.html) paludibus\\narboreis intravit: questus fessam meo aer [nec](http://musco.net/nulli.php)?\\nPotens sibi ortu, et vis sistite vulnere robigine parte.\\n\\n    if (filename_lock_pack(console_mp, drop_viral_snow)) {\\n        kbpsGps(3, zip_zip + wampHddRegular);\\n    }\\n    viralNetCard(cloneCamelcase);\\n    var analog = remote.function(soa_internic_ttl, 203562, fat_text) / 97 +\\n            file_igp;\\n\\nVirginis fauni; inprobe tamen mercibus quicquid territa. Hercule tune lanugine\\niuvenumque cum maturuit flavescere ventis.\\n\\n## Quae membraque sagittas tellus ponat\\n\\nPrunaque utilis remollescit manifesta ambae, intendunt valles ardua pinea mutua.\\nLeves ille auster vires.\\n\\nHabitata vocatum. Saxo decor, catenas figuras pennas quod inque quam Pagasaea,\\nviolentus herbas. Tela hoc redderet tantum demptos doleres plus, mei agros\\ncaptat dolebis vittas. Carmen inaequalis nec intrat, ureret anguis plangi fuit\\nademi amictu: caesique at! Tenet ubi oculis pennis senem in nati eruiturque\\ninane, in.\\n\\n> Mentiris pro, mons [terra](http://www.leves-nisi.net/illo-sacer.html) nacta\\n> calido desit, nec unus, Cephalus Phoce et datis: frequentant. Siculo\\n> constiterant vidit nunc forma fidemque resonare aspergine procul placabilis\\n> ungues opibus. Capillis pollice aderam Minyeidas, nate populisque monte\\n> caelatus Capitolia *carmen* utque quae situs curvavit, promisitque.\\n\\nMembra et exemplis dixit; est valles inferias, te operis. Iura iaculantem agros\\nsororis flumen: danda ad limite, duro me Parthenopeia me saltus Minervae iterum\\ncoeuntia *se*. Turaque **in ibant**. Exhalantes terra cecidisse fixum lacerto\\nnate.\",\n  \"properties\": {\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/databases/{{DATABASE_ID_OR_PATH}}/cards",
+          "host": ["{{API_URL}}"],
+          "path": ["databases", "{{DATABASE_ID_OR_PATH}}", "cards"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update card in a database",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"New title 2\",\n  \"properties\": {\n  }\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
+          "host": ["{{API_URL}}"],
+          "path": ["cards", "{{CARD_ID_OR_PATH}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List bounties",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/bounties",
+          "host": ["{{API_URL}}"],
+          "path": ["bounties"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve an individual card",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/cards/{{CARD_ID_OR_PATH}}",
+          "host": ["{{API_URL}}"],
+          "path": ["cards", "{{CARD_ID_OR_PATH}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve a page",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "{{API_KEY}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/pages/{{PAGE_ID}}",
+          "host": ["{{API_URL}}"],
+          "path": ["pages", "{{PAGE_ID}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List proposals",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/proposals",
+          "host": ["{{API_URL}}"],
+          "path": ["proposals"]
+        }
+      },
+      "response": []
+    }
+  ]
 }

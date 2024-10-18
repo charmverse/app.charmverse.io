@@ -395,21 +395,21 @@ export function mapBountyPermissions(bountyPermissions: BountyPermission[]): Bou
             group: 'public'
           }
         : permission.userId
-        ? {
-            group: 'user',
-            id: permission.userId
-          }
-        : permission.roleId
-        ? {
-            group: 'role',
-            id: permission.roleId
-          }
-        : permission.spaceId
-        ? {
-            group: 'space',
-            id: permission.spaceId
-          }
-        : null;
+          ? {
+              group: 'user',
+              id: permission.userId
+            }
+          : permission.roleId
+            ? {
+                group: 'role',
+                id: permission.roleId
+              }
+            : permission.spaceId
+              ? {
+                  group: 'space',
+                  id: permission.spaceId
+                }
+              : null;
 
     if (targetGroup) {
       // TODO: better separation between permission levels and groups

@@ -1,1 +1,37 @@
-{"version":"1.1","models":{"kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i":[{"jws":{"payload":"AXESICS9trkBwAQBG-f0b0-UgJHf4lTjAzuggis84fPfpopN","signatures":[{"signature":"WrqgIAPkE2WTuPZOWN0EFfiwV0YqGQGdTlYmygOs82R1foKkj0KB9Va9PrVIyDovjm418-BmGEjYoZqWzl9EBQ","protected":"eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3FYNERheG9rN0M1YTgxVWtmZENONXFyNXhQVWZmVEZVMW5xR2h3UWNoV2lFI3o2TWtxWDREYXhvazdDNWE4MVVrZmRDTjVxcjV4UFVmZlRGVTFucUdod1FjaFdpRSJ9"}],"link":"bafyreibexw3lsaoaaqarxz7un5hzjaer37rfjyydhoqiekz44hz57jukju"},"linkedBlock":"omRkYXRhqWRuYW1ldENoYXJtdmVyc2VDcmVkZW50aWFsZXZpZXdzoWZhdXRob3KhZHR5cGVvZG9jdW1lbnRBY2NvdW50ZnNjaGVtYaZkdHlwZWZvYmplY3RlJGRlZnOhb0dyYXBoUUxEYXRlVGltZaRkdHlwZWZzdHJpbmdldGl0bGVvR3JhcGhRTERhdGVUaW1lZmZvcm1hdGlkYXRlLXRpbWVpbWF4TGVuZ3RoGGRnJHNjaGVtYXgsaHR0cHM6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQvMjAyMC0xMi9zY2hlbWFocmVxdWlyZWSJZmlzc3VlcmlyZWNpcGllbnRnY29udGVudGNzaWdkdHlwZW92ZXJpZmljYXRpb25VcmxnY2hhaW5JZGhzY2hlbWFJZGl0aW1lc3RhbXBqcHJvcGVydGllc6pjc2lnomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGR0eXBlomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGZpc3N1ZXKjZHR5cGVmc3RyaW5naW1heExlbmd0aBoAAYagaW1pbkxlbmd0aAFnY2hhaW5JZKFkdHlwZWdpbnRlZ2VyZ2NvbnRlbnSiZHR5cGVmc3RyaW5naW1heExlbmd0aBoAAYagaHNjaGVtYUlkomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgZA+hpcmVjaXBpZW50omR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGl0aW1lc3RhbXChZCRyZWZ3Iy8kZGVmcy9HcmFwaFFMRGF0ZVRpbWVsY2hhcm12ZXJzZUlkomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgZA+hvdmVyaWZpY2F0aW9uVXJsomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoHRhZGRpdGlvbmFsUHJvcGVydGllc/RndmVyc2lvbmMyLjBpaW50ZXJmYWNl9GlyZWxhdGlvbnOgamltcGxlbWVudHOAa2Rlc2NyaXB0aW9ueCdDaGFybVZlcnNlIGNyZWRlbnRpYWxzIGlzc3VlZCB1c2luZyBFQVNvYWNjb3VudFJlbGF0aW9uoWR0eXBlZGxpc3RmaGVhZGVyo2NzZXBlbW9kZWxlbW9kZWxSzgEEAXFxCwAJaG1vZGVsLXYxa2NvbnRyb2xsZXJzgXg4ZGlkOmtleTp6Nk1rcVg0RGF4b2s3QzVhODFVa2ZkQ041cXI1eFBVZmZURlUxbnFHaHdRY2hXaUU="}]},"indices":{"kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i":[{"fields":[{"path":["timestamp"]}]},{"fields":[{"path":["issuer"]}]},{"fields":[{"path":["recipient"]}]},{"fields":[{"path":["schemaId"]}]},{"fields":[{"path":["charmverseId"]}]},{"fields":[{"path":["type"]}]}]},"aliases":{"kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i":"CharmverseCredential"},"views":{"account":{},"root":{},"models":{"kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i":{}}},"commonEmbeds":[]}
+{
+  "version": "1.1",
+  "models": {
+    "kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i": [
+      {
+        "jws": {
+          "payload": "AXESICS9trkBwAQBG-f0b0-UgJHf4lTjAzuggis84fPfpopN",
+          "signatures": [
+            {
+              "signature": "WrqgIAPkE2WTuPZOWN0EFfiwV0YqGQGdTlYmygOs82R1foKkj0KB9Va9PrVIyDovjm418-BmGEjYoZqWzl9EBQ",
+              "protected": "eyJhbGciOiJFZERTQSIsImtpZCI6ImRpZDprZXk6ejZNa3FYNERheG9rN0M1YTgxVWtmZENONXFyNXhQVWZmVEZVMW5xR2h3UWNoV2lFI3o2TWtxWDREYXhvazdDNWE4MVVrZmRDTjVxcjV4UFVmZlRGVTFucUdod1FjaFdpRSJ9"
+            }
+          ],
+          "link": "bafyreibexw3lsaoaaqarxz7un5hzjaer37rfjyydhoqiekz44hz57jukju"
+        },
+        "linkedBlock": "omRkYXRhqWRuYW1ldENoYXJtdmVyc2VDcmVkZW50aWFsZXZpZXdzoWZhdXRob3KhZHR5cGVvZG9jdW1lbnRBY2NvdW50ZnNjaGVtYaZkdHlwZWZvYmplY3RlJGRlZnOhb0dyYXBoUUxEYXRlVGltZaRkdHlwZWZzdHJpbmdldGl0bGVvR3JhcGhRTERhdGVUaW1lZmZvcm1hdGlkYXRlLXRpbWVpbWF4TGVuZ3RoGGRnJHNjaGVtYXgsaHR0cHM6Ly9qc29uLXNjaGVtYS5vcmcvZHJhZnQvMjAyMC0xMi9zY2hlbWFocmVxdWlyZWSJZmlzc3VlcmlyZWNpcGllbnRnY29udGVudGNzaWdkdHlwZW92ZXJpZmljYXRpb25VcmxnY2hhaW5JZGhzY2hlbWFJZGl0aW1lc3RhbXBqcHJvcGVydGllc6pjc2lnomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGR0eXBlomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGZpc3N1ZXKjZHR5cGVmc3RyaW5naW1heExlbmd0aBoAAYagaW1pbkxlbmd0aAFnY2hhaW5JZKFkdHlwZWdpbnRlZ2VyZ2NvbnRlbnSiZHR5cGVmc3RyaW5naW1heExlbmd0aBoAAYagaHNjaGVtYUlkomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgZA+hpcmVjaXBpZW50omR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoGl0aW1lc3RhbXChZCRyZWZ3Iy8kZGVmcy9HcmFwaFFMRGF0ZVRpbWVsY2hhcm12ZXJzZUlkomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgZA+hvdmVyaWZpY2F0aW9uVXJsomR0eXBlZnN0cmluZ2ltYXhMZW5ndGgaAAGGoHRhZGRpdGlvbmFsUHJvcGVydGllc/RndmVyc2lvbmMyLjBpaW50ZXJmYWNl9GlyZWxhdGlvbnOgamltcGxlbWVudHOAa2Rlc2NyaXB0aW9ueCdDaGFybVZlcnNlIGNyZWRlbnRpYWxzIGlzc3VlZCB1c2luZyBFQVNvYWNjb3VudFJlbGF0aW9uoWR0eXBlZGxpc3RmaGVhZGVyo2NzZXBlbW9kZWxlbW9kZWxSzgEEAXFxCwAJaG1vZGVsLXYxa2NvbnRyb2xsZXJzgXg4ZGlkOmtleTp6Nk1rcVg0RGF4b2s3QzVhODFVa2ZkQ041cXI1eFBVZmZURlUxbnFHaHdRY2hXaUU="
+      }
+    ]
+  },
+  "indices": {
+    "kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i": [
+      { "fields": [{ "path": ["timestamp"] }] },
+      { "fields": [{ "path": ["issuer"] }] },
+      { "fields": [{ "path": ["recipient"] }] },
+      { "fields": [{ "path": ["schemaId"] }] },
+      { "fields": [{ "path": ["charmverseId"] }] },
+      { "fields": [{ "path": ["type"] }] }
+    ]
+  },
+  "aliases": { "kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i": "CharmverseCredential" },
+  "views": {
+    "account": {},
+    "root": {},
+    "models": { "kjzl6hvfrbw6c6ijxjsqnolzxb0bqhso3naujxrk60g5v9vci9xqpq6gkvyxz7i": {} }
+  },
+  "commonEmbeds": []
+}

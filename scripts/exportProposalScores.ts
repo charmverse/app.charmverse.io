@@ -52,17 +52,20 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
 
   const customProposalProperties = (customBlocks as ProposalBoardBlock)?.fields.cardProperties || [];
 
-  const propertyMap = exportedCustomProps.reduce((acc, propName) => {
-    const property = customProposalProperties.find((prop) => prop.name === propName);
+  const propertyMap = exportedCustomProps.reduce(
+    (acc, propName) => {
+      const property = customProposalProperties.find((prop) => prop.name === propName);
 
-    if (!property) {
-      throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
-    }
+      if (!property) {
+        throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
+      }
 
-    acc[propName] = property;
+      acc[propName] = property;
 
-    return acc;
-  }, {} as Record<string, ProposalPropertyField>);
+      return acc;
+    },
+    {} as Record<string, ProposalPropertyField>
+  );
 
   const formFields = await prisma.formField.findMany({
     where: {
@@ -139,14 +142,17 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     [...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps, ...exportedCustomFields]
   ];
 
-  const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
-    const results = aggregateResults({
-      answers: proposal.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-      criteria: proposal.rubricCriteria
-    });
-    acc[proposal.id] = results;
-    return acc;
-  }, {} as Record<string, AggregateResults>);
+  const aggregatedResultsByProposal = proposals.reduce(
+    (acc, proposal) => {
+      const results = aggregateResults({
+        answers: proposal.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
+        criteria: proposal.rubricCriteria
+      });
+      acc[proposal.id] = results;
+      return acc;
+    },
+    {} as Record<string, AggregateResults>
+  );
 
   const sortedProposals = proposals.sort((a, b) => {
     const avgA = aggregatedResultsByProposal[a.id]?.allScores?.sum;
@@ -236,8 +242,8 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       const value = !rowValue
         ? '-'
         : stringUtils.isUUID(rowValue)
-        ? property.options.find((opt) => opt.id === rowValue)?.value ?? '-'
-        : rowValue;
+          ? (property.options.find((opt) => opt.id === rowValue)?.value ?? '-')
+          : rowValue;
 
       (row as any)[rowKey] = `${cellEnclosure}${(value as string)
         .replace(new RegExp(cellEnclosure, 'g'), '')

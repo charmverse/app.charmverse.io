@@ -84,45 +84,45 @@ export function UserCredentialRow({
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
       : credential.type === 'charmverse' &&
-        credential.schemaId === externalCredentialSchemaId &&
-        'GrantRound' in charmCredential &&
-        charmCredential.Source === 'Gitcoin'
-      ? {
-          title: charmCredential.Name,
-          subtitle: ['Gitcoin Round', charmCredential.GrantRound],
-          iconUrl: credential.iconUrl ?? '/images/logos/gitcoin-logo.png',
-          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
-        }
-      : credential.type === 'charmverse' &&
-        credential.schemaId === externalCredentialSchemaId &&
-        'GrantRound' in charmCredential &&
-        charmCredential.Source === 'Questbook'
-      ? {
-          title: charmCredential.Name,
-          subtitle: charmCredential.GrantRound,
-          iconUrl: credential.iconUrl ?? WorkspacePremiumIcon,
-          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
-        }
-      : credential.type === 'gitcoin'
-      ? {
-          title: 'Gitcoin Passport Score',
-          subtitle: 'Gitcoin',
-          iconUrl: '/images/logos/gitcoin_passport.svg',
-          attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score?.toFixed(2) }]
-        }
-      : {
-          title: schemaInfo?.title ?? '',
-          subtitle: [proposalCredentialSchemaId, rewardCredentialSchemaId].includes(credential.schemaId)
-            ? credential.content.Organization
-            : schemaInfo?.organization ?? '',
-          iconUrl: credential.iconUrl ?? schemaInfo?.iconUrl ?? '',
-          attestationContent: (schemaInfo?.fields ?? []).map((fieldDef) => ({
-            name: fieldDef.name,
-            value: fieldDef.mapper
-              ? fieldDef.mapper(credential.content[fieldDef.name])
-              : credential.content[fieldDef.name]
-          }))
-        };
+          credential.schemaId === externalCredentialSchemaId &&
+          'GrantRound' in charmCredential &&
+          charmCredential.Source === 'Gitcoin'
+        ? {
+            title: charmCredential.Name,
+            subtitle: ['Gitcoin Round', charmCredential.GrantRound],
+            iconUrl: credential.iconUrl ?? '/images/logos/gitcoin-logo.png',
+            attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+          }
+        : credential.type === 'charmverse' &&
+            credential.schemaId === externalCredentialSchemaId &&
+            'GrantRound' in charmCredential &&
+            charmCredential.Source === 'Questbook'
+          ? {
+              title: charmCredential.Name,
+              subtitle: charmCredential.GrantRound,
+              iconUrl: credential.iconUrl ?? WorkspacePremiumIcon,
+              attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+            }
+          : credential.type === 'gitcoin'
+            ? {
+                title: 'Gitcoin Passport Score',
+                subtitle: 'Gitcoin',
+                iconUrl: '/images/logos/gitcoin_passport.svg',
+                attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score?.toFixed(2) }]
+              }
+            : {
+                title: schemaInfo?.title ?? '',
+                subtitle: [proposalCredentialSchemaId, rewardCredentialSchemaId].includes(credential.schemaId)
+                  ? credential.content.Organization
+                  : (schemaInfo?.organization ?? ''),
+                iconUrl: credential.iconUrl ?? schemaInfo?.iconUrl ?? '',
+                attestationContent: (schemaInfo?.fields ?? []).map((fieldDef) => ({
+                  name: fieldDef.name,
+                  value: fieldDef.mapper
+                    ? fieldDef.mapper(credential.content[fieldDef.name])
+                    : credential.content[fieldDef.name]
+                }))
+              };
 
   if (credential.type === 'onchain' && !schemaInfo) {
     return null;

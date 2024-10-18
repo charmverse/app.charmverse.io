@@ -90,11 +90,14 @@ export async function storeOptimismProjectAttestations() {
 
   const optimismProjectMetadataAttestationRecord = optimismAttestations
     .filter((attestation) => attestation.schemaId === optimismProjectMetadataAttestationSchemaId)
-    .reduce((acc, attestation) => {
-      const projectRefUid = (attestation.content as OptimismProjectMetadataAttestation).projectRefUID;
-      acc[projectRefUid] = attestation as EASAttestationFromApi<OptimismProjectMetadataAttestation>;
-      return acc;
-    }, {} as Record<string, EASAttestationFromApi<OptimismProjectMetadataAttestation>>);
+    .reduce(
+      (acc, attestation) => {
+        const projectRefUid = (attestation.content as OptimismProjectMetadataAttestation).projectRefUID;
+        acc[projectRefUid] = attestation as EASAttestationFromApi<OptimismProjectMetadataAttestation>;
+        return acc;
+      },
+      {} as Record<string, EASAttestationFromApi<OptimismProjectMetadataAttestation>>
+    );
 
   const optimismProjectAttestationRecord = optimismAttestations
     .filter(
@@ -102,10 +105,13 @@ export async function storeOptimismProjectAttestations() {
         attestation.schemaId === optimismProjectAttestationSchemaId &&
         optimismProjectMetadataAttestationRecord[attestation.id]
     )
-    .reduce((acc, attestation) => {
-      acc[attestation.id] = attestation as EASAttestationFromApi<OptimismProjectAttestation>;
-      return acc;
-    }, {} as Record<string, EASAttestationFromApi<OptimismProjectAttestation>>);
+    .reduce(
+      (acc, attestation) => {
+        acc[attestation.id] = attestation as EASAttestationFromApi<OptimismProjectAttestation>;
+        return acc;
+      },
+      {} as Record<string, EASAttestationFromApi<OptimismProjectAttestation>>
+    );
 
   let totalUpdatedProjects = 0;
 

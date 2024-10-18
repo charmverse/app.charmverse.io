@@ -71,8 +71,8 @@ export function NftAvatarGalleryPopup({
             nfts.length === 0
               ? 'You do not own any NFTs'
               : filteredNfts.length === 0
-              ? "The NFT you're looking for couldn't be found."
-              : ''
+                ? "The NFT you're looking for couldn't be found."
+                : ''
           }
         />
       </DialogContent>

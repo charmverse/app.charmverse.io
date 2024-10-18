@@ -91,10 +91,13 @@ export async function createFormResponse(req: NextApiRequestWithApiPageKey, res:
     await updateDatabaseSchema({ boardId: board.id, properties: allProperties });
   }
 
-  const reduced = updatedBody.reduce((acc, val) => {
-    acc[val.question.id] = val.answer;
-    return acc;
-  }, {} as Record<string, any>);
+  const reduced = updatedBody.reduce(
+    (acc, val) => {
+      acc[val.question.id] = val.answer;
+      return acc;
+    },
+    {} as Record<string, any>
+  );
 
   const card = await createDatabaseCardPage({
     title: 'Form Response',

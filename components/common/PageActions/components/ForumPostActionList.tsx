@@ -85,8 +85,8 @@ export function ForumPostActionList({
           post?.isDraft
             ? 'Draft post cannot be converted proposal'
             : !canCreateProposal || post?.proposalId
-            ? 'You do not have the permission to convert to proposal'
-            : ''
+              ? 'You do not have the permission to convert to proposal'
+              : ''
         }
       >
         <div>

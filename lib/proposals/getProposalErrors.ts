@@ -111,12 +111,12 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
       return !evaluation.title.trim()
         ? 'Title is required for rubric criteria'
         : evaluation.reviewers.length === 0
-        ? `Reviewers are required for the "${evaluation.title}" step`
-        : evaluation.rubricCriteria.length === 0
-        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
-        : evaluation.rubricCriteria.some((c) => !c.title?.trim())
-        ? `Rubric criteria is missing a label in the "${evaluation.title}" step`
-        : false;
+          ? `Reviewers are required for the "${evaluation.title}" step`
+          : evaluation.rubricCriteria.length === 0
+            ? `At least one rubric criteria is required for the "${evaluation.title}" step`
+            : evaluation.rubricCriteria.some((c) => !c.title?.trim())
+              ? `Rubric criteria is missing a label in the "${evaluation.title}" step`
+              : false;
     case 'pass_fail':
       if (evaluation.appealable && (!evaluation.appealReviewers || evaluation.appealReviewers?.length === 0)) {
         return `Appeal reviewers are required for the "${evaluation.title}" step`;
@@ -126,12 +126,12 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
       return evaluation.reviewers.length === 0
         ? `Voters are required for the "${evaluation.title}" step`
         : !evaluation.voteSettings
-        ? `Vote details are required for the "${evaluation.title}" step`
-        : evaluation.voteSettings.strategy === 'token'
-        ? !evaluation.voteSettings.chainId || !evaluation.voteSettings.tokenAddress
-          ? `Chain and token address is required for the "${evaluation.title}" step`
-          : false
-        : false;
+          ? `Vote details are required for the "${evaluation.title}" step`
+          : evaluation.voteSettings.strategy === 'token'
+            ? !evaluation.voteSettings.chainId || !evaluation.voteSettings.tokenAddress
+              ? `Chain and token address is required for the "${evaluation.title}" step`
+              : false
+            : false;
     default:
       return false;
   }

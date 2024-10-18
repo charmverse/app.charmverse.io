@@ -31,7 +31,7 @@ async function backfillGitcoinEasyRetroPGFAttestations() {
               type: 'profile'
             }
           }
-        } 
+        }
       ]
     },
     select: {
