@@ -28,6 +28,7 @@ import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { Repo } from 'lib/repos/getRepos';
 
 import { AddRepoButton } from './AddRepoButton/AddRepoButton';
+import { DeleteRepoButton } from './DeleteRepoButton/DeleteRepoButton';
 
 type SortField = 'commits' | 'prs' | 'closedPrs' | 'contributors' | 'owner' | 'createdAt';
 type SortOrder = 'asc' | 'desc';
@@ -38,7 +39,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const debouncedFilterString = useDebouncedValue(filterString);
-  const { data: filteredRepos, isValidating, isLoading } = useSearchRepos(debouncedFilterString);
+  const { data: filteredRepos, mutate, isValidating, isLoading } = useSearchRepos(debouncedFilterString);
   const showFilteredResults = Boolean(debouncedFilterString || filteredRepos || isValidating || isLoading);
 
   const filteredAndSortedRepos = useMemo(() => {
@@ -62,7 +63,6 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
       setSortOrder('desc');
     }
   };
-
   return (
     <Container maxWidth='xl'>
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
@@ -156,7 +156,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                   Contributors
                 </TableSortLabel>
               </TableCell>
-              <TableCell>Deleted</TableCell>
+              <TableCell align='center'>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -177,7 +177,9 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 <TableCell>{repo.prs}</TableCell>
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
-                <TableCell>{repo.deletedAt ? 'Yes' : ''}</TableCell>
+                <TableCell align='center'>
+                  <DeleteRepoButton onDelete={() => mutate()} repoId={repo.id} deletedAt={repo.deletedAt} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
