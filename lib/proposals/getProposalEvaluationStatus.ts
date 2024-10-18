@@ -10,7 +10,7 @@ export function getProposalEvaluationStatus({
   if (result === 'archived') {
     return 'archived';
   } else if (step === 'draft') {
-    return 'unpublished';
+    return 'draft';
   } else if (step === 'feedback') {
     return result === 'in_progress' ? 'in_progress' : 'passed';
   } else if (step === 'pass_fail' || step === 'rubric' || step === 'vote') {
@@ -21,8 +21,10 @@ export function getProposalEvaluationStatus({
     } else if (result === 'pass') {
       return 'passed';
     }
-  } else if (step === 'rewards' || step === 'credentials') {
-    return result === 'in_progress' ? 'unpublished' : 'passed';
+  } else if (step === 'rewards') {
+    return result === 'in_progress' ? 'unpublished' : 'published';
+  } else if (step === 'credentials') {
+    return result === 'in_progress' ? 'not_issued' : 'issued';
   }
 
   return 'in_progress';
