@@ -144,8 +144,8 @@ export function UserIdentities() {
           const identityDisconnectMenuItemTooltip = cannotDisconnect
             ? `You can't disconnect your last connected account`
             : isIdentityInUse
-            ? `You can't disconnect your current active identity`
-            : '';
+              ? `You can't disconnect your current active identity`
+              : '';
 
           return (
             <>
@@ -173,8 +173,8 @@ export function UserIdentities() {
                               You need to have more than one wallet to set a primary wallet
                             `
                               : isPrimaryWallet
-                              ? 'Wallet already selected as primary wallet'
-                              : ''
+                                ? 'Wallet already selected as primary wallet'
+                                : ''
                           }
                         >
                           <div>
@@ -194,8 +194,8 @@ export function UserIdentities() {
                             lowerCaseEqual(wallet.address, account)
                               ? "You can't disconnect your current active wallet."
                               : cannotDisconnect
-                              ? `You can't disconnect your last wallet`
-                              : ''
+                                ? `You can't disconnect your last wallet`
+                                : ''
                           }
                         >
                           <div>
@@ -209,76 +209,76 @@ export function UserIdentities() {
                         </Tooltip>
                       ]
                     : item.type === 'Discord'
-                    ? [
-                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
-                          <div>
-                            <MenuItem disabled={isIdentityDisconnectDisabled} key='disconnect' onClick={disconnect}>
-                              Disconnect
-                            </MenuItem>
-                          </div>
-                        </Tooltip>
-                      ]
-                    : item.type === 'Telegram'
-                    ? [
-                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
-                          <div>
-                            <MenuItem
-                              disabled={isIdentityDisconnectDisabled}
-                              key='disconnect'
-                              onClick={() => disconnectFromTelegram()}
-                            >
-                              Disconnect
-                            </MenuItem>
-                          </div>
-                        </Tooltip>
-                      ]
-                    : item.type === 'Google'
-                    ? [
-                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
-                          <div>
-                            <MenuItem
-                              disabled={isIdentityDisconnectDisabled}
-                              key='disconnect'
-                              onClick={disconnectGoogleAccount}
-                            >
-                              Disconnect
-                            </MenuItem>
-                          </div>
-                        </Tooltip>
-                      ]
-                    : item.type === 'VerifiedEmail' && verifiedEmail
-                    ? [
-                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
-                          <div>
-                            <MenuItem
-                              disabled={isIdentityDisconnectDisabled}
-                              key='disconnect'
-                              onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}
-                            >
-                              Disconnect
-                            </MenuItem>
-                          </div>
-                        </Tooltip>
-                      ]
-                    : item.type === 'Farcaster'
-                    ? [
-                        <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
-                          <div>
-                            <MenuItem
-                              disabled={isIdentityDisconnectDisabled}
-                              key='disconnect'
-                              onClick={() =>
-                                disconnectFarcaster(undefined, {
-                                  onSuccess: () => refreshUser()
-                                })
-                              }
-                            >
-                              Disconnect
-                            </MenuItem>
-                          </div>
-                        </Tooltip>
-                      ]
-                    : []
+                      ? [
+                          <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                            <div>
+                              <MenuItem disabled={isIdentityDisconnectDisabled} key='disconnect' onClick={disconnect}>
+                                Disconnect
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
+                        ]
+                      : item.type === 'Telegram'
+                        ? [
+                            <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                              <div>
+                                <MenuItem
+                                  disabled={isIdentityDisconnectDisabled}
+                                  key='disconnect'
+                                  onClick={() => disconnectFromTelegram()}
+                                >
+                                  Disconnect
+                                </MenuItem>
+                              </div>
+                            </Tooltip>
+                          ]
+                        : item.type === 'Google'
+                          ? [
+                              <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                                <div>
+                                  <MenuItem
+                                    disabled={isIdentityDisconnectDisabled}
+                                    key='disconnect'
+                                    onClick={disconnectGoogleAccount}
+                                  >
+                                    Disconnect
+                                  </MenuItem>
+                                </div>
+                              </Tooltip>
+                            ]
+                          : item.type === 'VerifiedEmail' && verifiedEmail
+                            ? [
+                                <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                                  <div>
+                                    <MenuItem
+                                      disabled={isIdentityDisconnectDisabled}
+                                      key='disconnect'
+                                      onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}
+                                    >
+                                      Disconnect
+                                    </MenuItem>
+                                  </div>
+                                </Tooltip>
+                              ]
+                            : item.type === 'Farcaster'
+                              ? [
+                                  <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                                    <div>
+                                      <MenuItem
+                                        disabled={isIdentityDisconnectDisabled}
+                                        key='disconnect'
+                                        onClick={() =>
+                                          disconnectFarcaster(undefined, {
+                                            onSuccess: () => refreshUser()
+                                          })
+                                        }
+                                      >
+                                        Disconnect
+                                      </MenuItem>
+                                    </div>
+                                  </Tooltip>
+                                ]
+                              : []
                 }
                 action={
                   item.type === 'RandomName' ? (

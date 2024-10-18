@@ -8,7 +8,7 @@ const FILE_OUTPUT_PATH = './dev-candidates.csv';
 
 const targetDomains: string[] = [
   // Add domains here
-]
+];
 
 async function generateCSV() {
   const users = await prisma.user.findMany({
@@ -79,7 +79,7 @@ async function generateCSV() {
     },
     include: {
       verifiedEmails: true,
-      googleAccounts: true,
+      googleAccounts: true
     },
     take: 150
   });
@@ -91,11 +91,10 @@ async function generateCSV() {
   let allUsersData = [];
 
   for (const user of users) {
-
     const email = user.verifiedEmails?.[0]?.email ?? user.googleAccounts?.[0]?.email;
 
-    const emailName = user.verifiedEmails?.find(verified => !verified.name.match('@'));
-    const googleName = user.googleAccounts?.find(google => !google.name.match('@'));
+    const emailName = user.verifiedEmails?.find((verified) => !verified.name.match('@'));
+    const googleName = user.googleAccounts?.find((google) => !google.name.match('@'));
 
     const name = emailName?.name || googleName?.name;
 
@@ -104,7 +103,7 @@ async function generateCSV() {
     // console.table(proposalData);
     allUsersData.push({
       name: fName ?? '',
-      'email': email,
+      email: email
     });
   }
 

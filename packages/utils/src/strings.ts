@@ -22,8 +22,8 @@ export function prettyPrint(input: any): string {
     typeof input === 'object'
       ? JSON.stringify(input, (key, value) => (typeof value === 'bigint' ? value.toString() : value), 2)
       : input.toString
-      ? input.toString()
-      : input;
+        ? input.toString()
+        : input;
 
   log.info(pretty);
 

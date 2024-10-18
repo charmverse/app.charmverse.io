@@ -183,26 +183,26 @@ export async function importSpaceSettings({
               ])
             } as BoardFields)
           : b.type === 'view'
-          ? ({
-              ...(matchingBlock?.fields as any),
-              ...(b.fields as any),
-              sortOptions: mergeArrayWithoutDuplicates(
-                [
-                  ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
-                  ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
-                ],
-                'propertyId'
-              ),
-              columnWidths: {
-                ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
-                ...(b?.fields as any as BoardViewFields)?.columnWidths
-              },
-              visiblePropertyIds: arrayUtils.uniqueValues([
-                ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
-                ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
-              ])
-            } as BoardViewFields)
-          : {};
+            ? ({
+                ...(matchingBlock?.fields as any),
+                ...(b.fields as any),
+                sortOptions: mergeArrayWithoutDuplicates(
+                  [
+                    ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
+                    ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
+                  ],
+                  'propertyId'
+                ),
+                columnWidths: {
+                  ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
+                  ...(b?.fields as any as BoardViewFields)?.columnWidths
+                },
+                visiblePropertyIds: arrayUtils.uniqueValues([
+                  ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
+                  ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
+                ])
+              } as BoardViewFields)
+            : {};
 
       return prisma.rewardBlock.upsert({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },
@@ -241,26 +241,26 @@ export async function importSpaceSettings({
               ])
             } as BoardFields)
           : b.type === 'view'
-          ? ({
-              ...(matchingBlock?.fields as any),
-              ...(b.fields as any),
-              sortOptions: mergeArrayWithoutDuplicates(
-                [
-                  ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
-                  ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
-                ],
-                'propertyId'
-              ),
-              columnWidths: {
-                ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
-                ...(b?.fields as any as BoardViewFields)?.columnWidths
-              },
-              visiblePropertyIds: arrayUtils.uniqueValues([
-                ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
-                ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
-              ])
-            } as BoardViewFields)
-          : {};
+            ? ({
+                ...(matchingBlock?.fields as any),
+                ...(b.fields as any),
+                sortOptions: mergeArrayWithoutDuplicates(
+                  [
+                    ...((matchingBlock?.fields as any as BoardViewFields)?.sortOptions ?? []),
+                    ...((b.fields as any as BoardViewFields)?.sortOptions ?? [])
+                  ],
+                  'propertyId'
+                ),
+                columnWidths: {
+                  ...(matchingBlock?.fields as any as BoardViewFields)?.columnWidths,
+                  ...(b?.fields as any as BoardViewFields)?.columnWidths
+                },
+                visiblePropertyIds: arrayUtils.uniqueValues([
+                  ...((b.fields as any as BoardViewFields).visiblePropertyIds ?? []),
+                  ...((matchingBlock?.fields as any as BoardViewFields)?.visiblePropertyIds ?? [])
+                ])
+              } as BoardViewFields)
+            : {};
 
       return prisma.proposalBlock.upsert({
         where: { id_spaceId: { id: b.id, spaceId: targetSpace.id } },

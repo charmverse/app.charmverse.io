@@ -94,7 +94,7 @@ export function InvitesTable() {
                   {getExpires(invite)}
                 </TableCell>
                 <TableCell width={150}>
-                  <Tooltip arrow placement='top' title={!isValid.valid ? isValid.message ?? 'Invite invalid' : ''}>
+                  <Tooltip arrow placement='top' title={!isValid.valid ? (isValid.message ?? 'Invite invalid') : ''}>
                     <div>
                       <TokenGateRolesSelect
                         disabled={!isValid.valid}
@@ -120,10 +120,10 @@ export function InvitesTable() {
                       placement='top'
                       title={
                         !isValid.valid
-                          ? isValid.message ?? 'Invite invalid'
+                          ? (isValid.message ?? 'Invite invalid')
                           : copied[invite.id]
-                          ? 'Copied!'
-                          : 'Click to copy link'
+                            ? 'Copied!'
+                            : 'Click to copy link'
                       }
                       disableInteractive
                     >

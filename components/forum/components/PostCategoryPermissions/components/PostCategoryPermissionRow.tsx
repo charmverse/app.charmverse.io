@@ -76,8 +76,8 @@ export function PostCategoryRolePermissionRow({
   const tooltip = !canEdit
     ? disabledTooltip || 'You cannot edit permissions for this category'
     : usingDefault
-    ? 'Default setting'
-    : '';
+      ? 'Default setting'
+      : '';
 
   return (
     <Box display='flex' justifyContent='space-between' alignItems='center'>

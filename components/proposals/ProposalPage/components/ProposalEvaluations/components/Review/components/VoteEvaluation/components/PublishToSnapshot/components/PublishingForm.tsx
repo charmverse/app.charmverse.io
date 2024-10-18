@@ -268,8 +268,8 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
         err instanceof SystemError
           ? err
           : (err as any)?.error_description
-          ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
-          : new UnknownError();
+            ? new ExternalServiceError(`Snapshot error: ${err?.error_description}`)
+            : new UnknownError();
 
       setFormError(errorToShow);
     }

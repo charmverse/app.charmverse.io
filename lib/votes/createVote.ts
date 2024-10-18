@@ -51,7 +51,7 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
 
   const maxChoices = type !== VoteType.Approval && vote.maxChoices ? vote.maxChoices : 1;
   const voteType = maxChoices > 1 ? VoteType.MultiChoice : type;
-  const threshold = voteType === VoteType.MultiChoice ? 0 : +vote.threshold ?? DEFAULT_THRESHOLD;
+  const threshold = voteType === VoteType.MultiChoice ? 0 : (+vote.threshold ?? DEFAULT_THRESHOLD);
 
   const dbVote = await prisma.vote.create({
     data: {

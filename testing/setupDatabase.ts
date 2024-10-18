@@ -367,25 +367,28 @@ export async function generateBounty({
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
     bountyPermissions
-  ).reduce((createManyInputs, permissionLevel) => {
-    const permissions = bountyPermissions[permissionLevel] as TargetPermissionGroup[];
+  ).reduce(
+    (createManyInputs, permissionLevel) => {
+      const permissions = bountyPermissions[permissionLevel] as TargetPermissionGroup[];
 
-    permissions.forEach((p) => {
-      createManyInputs.push({
-        permissionLevel,
-        userId: p.group === 'user' ? p.id : undefined,
-        roleId: p.group === 'role' ? p.id : undefined,
-        spaceId: p.group === 'space' ? p.id : undefined,
-        public: p.group === 'public' ? true : undefined
+      permissions.forEach((p) => {
+        createManyInputs.push({
+          permissionLevel,
+          userId: p.group === 'user' ? p.id : undefined,
+          roleId: p.group === 'role' ? p.id : undefined,
+          spaceId: p.group === 'space' ? p.id : undefined,
+          public: p.group === 'public' ? true : undefined
+        });
       });
-    });
 
-    createManyInputs.push({
-      permissionLevel
-    });
+      createManyInputs.push({
+        permissionLevel
+      });
 
-    return createManyInputs;
-  }, [] as Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[]);
+      return createManyInputs;
+    },
+    [] as Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[]
+  );
 
   await prisma.$transaction([
     // Step 1 - Initialise bounty with page and bounty permissions
@@ -1087,7 +1090,7 @@ export async function generateBoard({
               roleId: p.roleId,
               spaceId: p.spaceId,
               userId: p.userId
-            } as Prisma.PagePermissionCreateManyInput)
+            }) as Prisma.PagePermissionCreateManyInput
         )
       );
     } else {

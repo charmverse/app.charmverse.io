@@ -133,7 +133,7 @@ export function PropertyTemplateMenu({
             ({
               group: reviewer.roleId ? 'role' : 'user',
               id: reviewer.roleId ?? reviewer.userId
-            } as SelectOption)
+            }) as SelectOption
         );
         return (
           <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>

@@ -21,8 +21,8 @@ export function PublishProposalAction({ proposalId }: { proposalId: string }) {
   const disabledTooltip = !proposal?.permissions?.move
     ? `You cannot ${label.toLowerCase()} this proposal`
     : proposal?.archived
-    ? 'You cannot move an archived proposal'
-    : '';
+      ? 'You cannot move an archived proposal'
+      : '';
 
   async function onClick() {
     if (disabledTooltip) {

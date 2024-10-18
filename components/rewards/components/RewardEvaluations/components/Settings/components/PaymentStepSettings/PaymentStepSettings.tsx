@@ -30,7 +30,7 @@ export function PaymentStepSettings({
   EvaluationStepSettingsProps,
   'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate' | 'rewardPublished'
 >) {
-  const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
+  const rewardType = rewardInput ? (rewardInput.rewardType ?? getRewardType(rewardInput)) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
 

@@ -83,10 +83,13 @@ export const tierColors: Record<ConnectWaitlistTier, string> = {
 
 // Find the highest number in an array of objects that is less than or equal to n
 export function findHighestNumberInArray<Z extends string, T extends Record<Z, number>>(array: T[], key: Z, n: number) {
-  return array.reduce<T | null>((acc, item) => {
-    if (n >= item[key] && (!acc || item[key] > acc[key])) {
-      return item;
-    }
-    return acc;
-  }, null as T | null);
+  return array.reduce<T | null>(
+    (acc, item) => {
+      if (n >= item[key] && (!acc || item[key] > acc[key])) {
+        return item;
+      }
+      return acc;
+    },
+    null as T | null
+  );
 }

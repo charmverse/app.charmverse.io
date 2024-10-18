@@ -75,7 +75,7 @@ function TableRows(props: Props): JSX.Element {
   const setIsExpanded = useCallback(
     ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
       setCollapsedCardIds((prev) => {
-        return expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId];
+        return expanded ? (prev?.filter((id) => id !== cardId) ?? []) : [...(prev ?? []), cardId];
       });
     },
     [setCollapsedCardIds]
@@ -103,8 +103,8 @@ function TableRows(props: Props): JSX.Element {
     return collapsedCardIds === null
       ? false
       : collapsedCardIds?.length !== 0
-      ? !collapsedCardIds?.includes(cardId)
-      : !!props.expandSubRowsOnLoad;
+        ? !collapsedCardIds?.includes(cardId)
+        : !!props.expandSubRowsOnLoad;
   };
   return (
     <>

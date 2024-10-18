@@ -24,10 +24,10 @@ export type OptionalFalseyFields<T> = {
   [K in keyof T]: T[K] extends string
     ? T[K] | undefined
     : T[K] extends boolean
-    ? T[K] | undefined
-    : null extends T[K]
-    ? T[K] | undefined
-    : T[K];
+      ? T[K] | undefined
+      : null extends T[K]
+        ? T[K] | undefined
+        : T[K];
 };
 
 // mutative method

@@ -186,7 +186,7 @@ export async function createWorkspace({
               permissionLevel: 'full_access',
               postCategoryId: category.id,
               spaceId: space.id
-            } as Prisma.PostCategoryPermissionCreateManyInput)
+            }) as Prisma.PostCategoryPermissionCreateManyInput
         )
       })
     ]);

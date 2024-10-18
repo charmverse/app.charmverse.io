@@ -713,7 +713,7 @@ export class SpaceEventHandler {
     const content: PageContent =
       documentRoom && documentRoom.participants.size !== 0
         ? documentRoom.node.toJSON()
-        : page?.content ?? emptyDocument;
+        : (page?.content ?? emptyDocument);
     let position: null | number = null;
     let participant: DocumentEventHandler | null = null;
 

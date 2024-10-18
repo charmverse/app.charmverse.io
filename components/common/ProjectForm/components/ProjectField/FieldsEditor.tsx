@@ -22,7 +22,7 @@ export function FieldsEditor({
       {properties.map((property) => {
         // If in edit mode always show the field,
         // otherwise only show the field if it's not hidden
-        const isShown = onChange ? true : fieldConfig?.[property.field]?.show ?? true;
+        const isShown = onChange ? true : (fieldConfig?.[property.field]?.show ?? true);
         if (!isShown) {
           return null;
         }
@@ -63,9 +63,9 @@ export function FieldsEditor({
                         onChange({
                           ...(fieldConfig ?? {}),
                           [property.field]: {
-                            required: !isChecked ? false : fieldConfig?.[property.field]?.required ?? true,
+                            required: !isChecked ? false : (fieldConfig?.[property.field]?.required ?? true),
                             show: isChecked,
-                            private: !isChecked ? false : fieldConfig?.[property.field]?.private ?? true
+                            private: !isChecked ? false : (fieldConfig?.[property.field]?.private ?? true)
                           }
                         });
                       }}

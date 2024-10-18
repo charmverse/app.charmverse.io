@@ -15,5 +15,5 @@ export function randomTimeOfDay(date: DateTime) {
     minute: faker.number.int({ min: 0, max: 59 }),
     hour: faker.number.int({ min: 0, max: 23 }),
     second: faker.number.int({ min: 0, max: 59 })
-  })
+  });
 }

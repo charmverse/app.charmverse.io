@@ -13,10 +13,10 @@ const StyledIconContainer = styled.div<{
     ? result === 'pass'
       ? theme.palette.success.main
       : result === 'fail'
-      ? theme.palette.error.main
-      : isAppealActive
-      ? theme.palette.warning.main
-      : theme.palette.primary.main
+        ? theme.palette.error.main
+        : isAppealActive
+          ? theme.palette.warning.main
+          : theme.palette.primary.main
     : theme.palette.gray.main;
 
   const isPastOrPresent = result || isCurrent;

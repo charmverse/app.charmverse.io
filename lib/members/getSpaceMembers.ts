@@ -33,17 +33,20 @@ export async function getSpaceMembers({
   const visibleProperties = skipAccessCheck
     ? await getAllMemberPropertiesBySpace({ spaceId })
     : await getAccessibleMemberPropertiesBySpace({ requestingUserId, spaceId });
-  const visiblePropertiesMap = (visibleProperties as MemberProperty[]).reduce((acc, prop) => {
-    acc[prop.id] = prop.name;
-    if (prop.options instanceof Array) {
-      for (const option of prop.options) {
-        if (option) {
-          acc[(option as any).id] = (option as any).name;
+  const visiblePropertiesMap = (visibleProperties as MemberProperty[]).reduce(
+    (acc, prop) => {
+      acc[prop.id] = prop.name;
+      if (prop.options instanceof Array) {
+        for (const option of prop.options) {
+          if (option) {
+            acc[(option as any).id] = (option as any).name;
+          }
         }
       }
-    }
-    return acc;
-  }, {} as Record<string, string>);
+      return acc;
+    },
+    {} as Record<string, string>
+  );
   const spaceRoles = await prisma.spaceRole.findMany({
     where:
       whereOr.length !== 0

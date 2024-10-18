@@ -8,7 +8,7 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { unparse } from 'papaparse';
 
-const spaceDomain = "concrete-floor-sailfish";
+const spaceDomain = 'concrete-floor-sailfish';
 const FILE_INPUT_PATH = path.join(__dirname, 'op.csv');
 const FILE_OUTPUT_PATH = path.join(__dirname, 'op-output.csv');
 
@@ -18,24 +18,23 @@ function getCsvData<T>(path: string): T[] {
     const records = parse(content, { columns: true }) as T[];
 
     return records;
-  } catch (e) {
-  }
+  } catch (e) {}
 
   return [];
 }
 
 type ProjectData = {
-  'Project Name': string
-  'Twitter': string
-  'Won?': string
-}
+  'Project Name': string;
+  Twitter: string;
+  'Won?': string;
+};
 
 type ExtractedProjectData = {
-  "Project name": string
-  "Twitter handle": string
-  "Invite link": string,
-  "Space id": string
-}
+  'Project name': string;
+  'Twitter handle': string;
+  'Invite link': string;
+  'Space id': string;
+};
 
 function extractTwitterUsername(twitterValue: string) {
   if (twitterValue.startsWith('@')) {
@@ -43,8 +42,8 @@ function extractTwitterUsername(twitterValue: string) {
   } else if (twitterValue.startsWith('https://')) {
     const url = new URL(twitterValue);
     if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
-      const [,username] = url.pathname.split('/');
-      return username
+      const [, username] = url.pathname.split('/');
+      return username;
     }
   }
 
@@ -67,7 +66,7 @@ export async function generateOpGrantSpaces() {
   let current = 0;
 
   const extractedProjectsTitles = new Set<string>();
-  const extractedProjectsData: ExtractedProjectData[]= []
+  const extractedProjectsData: ExtractedProjectData[] = [];
 
   let lastId = '';
   const batchSize = 100;
@@ -82,12 +81,12 @@ export async function generateOpGrantSpaces() {
           domain: spaceDomain
         },
         page: {
-          type: "proposal",
+          type: 'proposal',
           createdAt: {
-            gte: new Date("2024-01-01T00:00:00Z")
+            gte: new Date('2024-01-01T00:00:00Z')
           }
         },
-        status: "published",
+        status: 'published'
       },
       select: {
         id: true,
@@ -107,12 +106,12 @@ export async function generateOpGrantSpaces() {
           select: {
             userId: true
           }
-        },
+        }
       },
       orderBy: {
-        id: 'asc',
+        id: 'asc'
       },
-      take: batchSize,
+      take: batchSize
     });
 
     if (proposals.length === 0) {
@@ -122,49 +121,60 @@ export async function generateOpGrantSpaces() {
     lastId = proposals[proposals.length - 1].id;
 
     for (const proposal of proposals) {
-      const projectNameField = proposal.form?.formFields.find(formField => formField.name.toLowerCase().startsWith('project name'));
-      const projectTitle = (projectNameField?.answers.find(answer => answer.proposalId === proposal.id)?.value as string)?.replace(/[\p{Emoji}]/gu, '').trim();
-      const projectData = uniqueProjectsData.find(projectData => projectData['Project Name'] === projectTitle);
+      const projectNameField = proposal.form?.formFields.find((formField) =>
+        formField.name.toLowerCase().startsWith('project name')
+      );
+      const projectTitle = (
+        projectNameField?.answers.find((answer) => answer.proposalId === proposal.id)?.value as string
+      )
+        ?.replace(/[\p{Emoji}]/gu, '')
+        .trim();
+      const projectData = uniqueProjectsData.find((projectData) => projectData['Project Name'] === projectTitle);
 
       // If project title is not found in the CSV, or if it's already processed, or if it's not in the list of unique projects, or if the project data is not found, skip
-      if (!projectTitle || extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
+      if (
+        !projectTitle ||
+        extractedProjectsTitles.has(projectTitle) ||
+        !projectTitles.has(projectTitle) ||
+        !projectData
+      ) {
         current++;
-        console.log(`Project ${current} of ${total} done.`)
+        console.log(`Project ${current} of ${total} done.`);
         continue;
       }
 
       try {
-        const authors = proposal.authors.map(author => author.userId);
+        const authors = proposal.authors.map((author) => author.userId);
         const space = await createWorkspace({
           spaceData: {
             name: projectTitle,
             spaceImage: '',
-            origin: spaceDomain,
+            origin: spaceDomain
           },
           userId: proposal.createdBy,
           extraAdmins: authors,
-          spaceTemplate: 'templateImpactCommunity',
+          spaceTemplate: 'templateImpactCommunity'
         });
         await updateTrackGroupProfile(space, spaceDomain);
         extractedProjectsData.push({
-          "Project name": projectTitle,
-          "Invite link": `https://app.charmverse.io/join?domain=${space.domain}`,
-          "Twitter handle": extractTwitterUsername(projectData["Twitter"]) ?? '',
-          "Space id": space.id,
-        })
+          'Project name': projectTitle,
+          'Invite link': `https://app.charmverse.io/join?domain=${space.domain}`,
+          'Twitter handle': extractTwitterUsername(projectData['Twitter']) ?? '',
+          'Space id': space.id
+        });
         extractedProjectsTitles.add(projectTitle);
         await addCharms({
-          amount: projectData["Won?"] === "Yes" ? 10 : 2,
+          amount: projectData['Won?'] === 'Yes' ? 10 : 2,
           recipient: {
-            spaceId: space.id,
+            spaceId: space.id
           },
-          actorId: proposal.createdBy,
-        })
+          actorId: proposal.createdBy
+        });
       } catch (err) {
         log.error(`Error creating space for project ${projectTitle}`, err);
       } finally {
         current++;
-        console.log(`Project ${current} of ${total} done.`)
+        console.log(`Project ${current} of ${total} done.`);
       }
     }
   }

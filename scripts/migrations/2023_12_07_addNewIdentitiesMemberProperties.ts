@@ -7,30 +7,30 @@ export async function addNewIdentitiesMemberProperties() {
       createdBy: true,
       memberProperties: {
         select: {
-          type: true,
+          type: true
         }
       }
     }
-  })
+  });
 
   const totalSpaces = spaces.length;
   let count = 0;
 
   for (const space of spaces) {
     try {
-      const hasGoogleMemberProperty = space.memberProperties.find(p => p.type === 'google');
-      const hasTelegramMemberProperty = space.memberProperties.find(p => p.type === 'telegram');
-      const hasWalletMemberProperty = space.memberProperties.find(p => p.type === 'wallet');
+      const hasGoogleMemberProperty = space.memberProperties.find((p) => p.type === 'google');
+      const hasTelegramMemberProperty = space.memberProperties.find((p) => p.type === 'telegram');
+      const hasWalletMemberProperty = space.memberProperties.find((p) => p.type === 'wallet');
 
-      const newIdentitiesMemberProperties: Prisma.MemberPropertyCreateManyInput[] = []
+      const newIdentitiesMemberProperties: Prisma.MemberPropertyCreateManyInput[] = [];
       if (!hasGoogleMemberProperty) {
         newIdentitiesMemberProperties.push({
           createdBy: space.createdBy,
           name: 'Google',
           spaceId: space.id,
           type: 'google',
-          updatedBy: space.createdBy,
-        })
+          updatedBy: space.createdBy
+        });
       }
 
       if (!hasTelegramMemberProperty) {
@@ -39,8 +39,8 @@ export async function addNewIdentitiesMemberProperties() {
           name: 'Telegram',
           spaceId: space.id,
           type: 'telegram',
-          updatedBy: space.createdBy,
-        })
+          updatedBy: space.createdBy
+        });
       }
 
       if (!hasWalletMemberProperty) {
@@ -49,21 +49,21 @@ export async function addNewIdentitiesMemberProperties() {
           name: 'Wallet',
           spaceId: space.id,
           type: 'wallet',
-          updatedBy: space.createdBy,
-        })
+          updatedBy: space.createdBy
+        });
       }
 
       if (newIdentitiesMemberProperties.length) {
         await prisma.memberProperty.createMany({
           data: newIdentitiesMemberProperties
-        })
+        });
       }
     } catch (err) {
-      console.error(`Failed to create new identity member properties for space ${space.id}`)
+      console.error(`Failed to create new identity member properties for space ${space.id}`);
     }
 
-    count+=1;
-    console.log(`Created new identity member properties for space ${space.id} (${count}/${totalSpaces})`)
+    count += 1;
+    console.log(`Created new identity member properties for space ${space.id} (${count}/${totalSpaces})`);
   }
 }
 

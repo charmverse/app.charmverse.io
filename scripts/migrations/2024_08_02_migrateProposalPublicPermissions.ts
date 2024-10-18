@@ -58,10 +58,8 @@ async function migrateProposalPublicPermissions() {
   console.log(`Migrating ${proposalsToMigrate.length} proposals`);
 
   const workflowUpdates = await prisma.proposalWorkflow.findMany({
-    where: {
-      
-    }
-  })
+    where: {}
+  });
 
   await prisma.proposalEvaluationPermission.createMany({
     data: proposalsToMigrate.flatMap((proposal) =>
@@ -71,7 +69,7 @@ async function migrateProposalPublicPermissions() {
             evaluationId: ev.id,
             operation: 'view',
             systemRole: 'public'
-          } as Prisma.ProposalEvaluationPermissionCreateManyInput)
+          }) as Prisma.ProposalEvaluationPermissionCreateManyInput
       )
     )
   });

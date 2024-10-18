@@ -37,10 +37,13 @@ export async function searchDatabase({
     spaceId
   });
 
-  const mappedSchemas = boardSchema.schema.reduce((acc, prop) => {
-    acc[prop.id] = prop;
-    return acc;
-  }, {} as Record<string, PageProperty>);
+  const mappedSchemas = boardSchema.schema.reduce(
+    (acc, prop) => {
+      acc[prop.id] = prop;
+      return acc;
+    },
+    {} as Record<string, PageProperty>
+  );
 
   const nestedJsonQuery: Prisma.NestedJsonFilter[] = [];
 

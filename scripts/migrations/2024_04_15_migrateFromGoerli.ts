@@ -1,13 +1,11 @@
-import { arrayUtils } from "@charmverse/core/utilities";
-import { PaymentMethod, TokenGate, prisma } from "@charmverse/core/prisma-client";
-import { baseUrl } from "config/constants";
-import { lowerCaseEqual, prettyPrint } from "lib/utils/strings";
-import { goerli, sepolia } from "viem/chains";
-import { UnsignedTransaction } from "@lens-protocol/domain/entities";
-
+import { arrayUtils } from '@charmverse/core/utilities';
+import { PaymentMethod, TokenGate, prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from 'config/constants';
+import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
+import { goerli, sepolia } from 'viem/chains';
+import { UnsignedTransaction } from '@lens-protocol/domain/entities';
 
 async function migratePaymentMethods() {
-
   const usdcGoerliContract = '0x07865c6e87b9f70255377e024ace6630c1eaa37f';
 
   const usdcSepoliaContract = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';
@@ -21,18 +19,17 @@ async function migratePaymentMethods() {
       contractAddress: usdcSepoliaContract,
       chainId: sepolia.id
     }
-  })
+  });
 
   await prisma.paymentMethod.deleteMany({
     where: {
       chainId: goerli.id
     }
   });
-
 }
 
 async function clearGoerliTokenGates() {
-  const tokenGates = await prisma.$queryRaw`SELECT id, conditions, "spaceId" FROM "TokenGate"
+  const tokenGates = (await prisma.$queryRaw`SELECT id, conditions, "spaceId" FROM "TokenGate"
   WHERE conditions::jsonb @> 
       '{
           "accessControlConditions": [
@@ -40,19 +37,18 @@ async function clearGoerliTokenGates() {
                   "chain": 5
               }
           ]
-      }'` as TokenGate[]
+      }'`) as TokenGate[];
 
   await prisma.tokenGate.deleteMany({
     where: {
       id: {
-        in: tokenGates.map(tg => tg.id)
+        in: tokenGates.map((tg) => tg.id)
       }
     }
-  })
+  });
 }
 
-
-async function clearOldRewardsToken () {
+async function clearOldRewardsToken() {
   await prisma.bounty.updateMany({
     where: {
       chainId: goerli.id
@@ -63,15 +59,13 @@ async function clearOldRewardsToken () {
       rewardAmount: null,
       customReward: null
     }
-  })
+  });
 }
-
 
 async function migrateFromGoerli() {
   await migratePaymentMethods();
   await clearOldRewardsToken();
   await clearGoerliTokenGates();
-
 }
 
 migrateFromGoerli().then(() => null);

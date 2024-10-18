@@ -184,7 +184,7 @@ export function MemberPropertiesProvider({ children }: { children: ReactNode }) 
         addPropertyPermissions,
         mutateProperties,
         updateMemberPropertyVisibility
-      } as Context),
+      }) as Context,
     [properties, addProperty]
   );
 

@@ -210,8 +210,8 @@ export function NotificationsPopover({
               unArchivedNotifications.length === 0
                 ? ''
                 : inboxState === 'unread'
-                ? 'Show all notifications'
-                : 'Show unread notifications only'
+                  ? 'Show all notifications'
+                  : 'Show unread notifications only'
             }
           >
             <Box

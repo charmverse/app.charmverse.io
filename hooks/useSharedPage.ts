@@ -81,10 +81,10 @@ export const useSharedPage = () => {
     publicPageType: (isRewardsPath
       ? 'rewards'
       : isProposalsPath
-      ? 'proposals'
-      : isForumPath
-      ? 'forum'
-      : null) as PublicPageType | null
+        ? 'proposals'
+        : isForumPath
+          ? 'forum'
+          : null) as PublicPageType | null
   };
 };
 

@@ -48,46 +48,49 @@ export class PageFromBlock implements CardPage {
     properties: Record<string, BoardPropertyValue>,
     propertySchemas: PageProperty[]
   ): Record<string, string | number> {
-    const values: any = Object.keys(properties).reduce((constructedObj, propertyId) => {
-      const matchedSchema = propertySchemas.find((schema) => schema.id === propertyId);
+    const values: any = Object.keys(properties).reduce(
+      (constructedObj, propertyId) => {
+        const matchedSchema = propertySchemas.find((schema) => schema.id === propertyId);
 
-      if (matchedSchema) {
-        const currentValue = properties[propertyId];
-        let valueToAssign =
-          matchedSchema.type === 'select'
-            ? matchedSchema.options?.find((option) => option.id === currentValue)?.value
-            : matchedSchema.type === 'multiSelect'
-            ? (currentValue as string[])
-                .map((value) => matchedSchema.options?.find((op) => op.id === value)?.value)
-                .filter((value) => !!value)
-            : currentValue;
+        if (matchedSchema) {
+          const currentValue = properties[propertyId];
+          let valueToAssign =
+            matchedSchema.type === 'select'
+              ? matchedSchema.options?.find((option) => option.id === currentValue)?.value
+              : matchedSchema.type === 'multiSelect'
+                ? (currentValue as string[])
+                    .map((value) => matchedSchema.options?.find((op) => op.id === value)?.value)
+                    .filter((value) => !!value)
+                : currentValue;
 
-        // Provide some extra mappings for fields
-        if (valueToAssign) {
-          if (matchedSchema.type === 'number') {
-            if (typeof valueToAssign !== 'number') {
-              valueToAssign = parseFloat(valueToAssign as string);
-            }
-          } else if (matchedSchema.type === 'checkbox') {
-            // Empty checkbox considered as false
-            valueToAssign = valueToAssign === 'true' || valueToAssign === true;
-          } else if (matchedSchema.type === 'date') {
-            try {
-              const parsed = JSON.parse(valueToAssign as string) as DatabaseDate;
-              valueToAssign = parsed;
-            } catch (err) {
-              // Ignore
+          // Provide some extra mappings for fields
+          if (valueToAssign) {
+            if (matchedSchema.type === 'number') {
+              if (typeof valueToAssign !== 'number') {
+                valueToAssign = parseFloat(valueToAssign as string);
+              }
+            } else if (matchedSchema.type === 'checkbox') {
+              // Empty checkbox considered as false
+              valueToAssign = valueToAssign === 'true' || valueToAssign === true;
+            } else if (matchedSchema.type === 'date') {
+              try {
+                const parsed = JSON.parse(valueToAssign as string) as DatabaseDate;
+                valueToAssign = parsed;
+              } catch (err) {
+                // Ignore
+              }
             }
           }
+
+          const humanFriendlyPropertyKey = matchedSchema.name;
+
+          constructedObj[humanFriendlyPropertyKey] = valueToAssign;
         }
 
-        const humanFriendlyPropertyKey = matchedSchema.name;
-
-        constructedObj[humanFriendlyPropertyKey] = valueToAssign;
-      }
-
-      return constructedObj;
-    }, <any>{});
+        return constructedObj;
+      },
+      <any>{}
+    );
 
     return values;
   }

@@ -21,8 +21,8 @@ export function RewardsDueDatePicker({
         typeof value === 'number'
           ? DateTime.fromMillis(value)
           : value?.toString()
-          ? DateTime.fromISO(value.toString())
-          : null
+            ? DateTime.fromISO(value.toString())
+            : null
       }
       disabled={disabled}
       disablePast

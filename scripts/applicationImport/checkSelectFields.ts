@@ -1,15 +1,10 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { writeToSameFolder } from "lib/utils/file";
+import { prisma } from '@charmverse/core/prisma-client';
+import { writeToSameFolder } from 'lib/utils/file';
 
-
-
-
-
-async function checkSelectFields({spaceDomain, templatePath}: {templatePath: string; spaceDomain: string;}) {
-
+async function checkSelectFields({ spaceDomain, templatePath }: { templatePath: string; spaceDomain: string }) {
   const proposal = await prisma.proposal.findFirstOrThrow({
     where: {
-      page: {path: templatePath, type: 'proposal_template'},
+      page: { path: templatePath, type: 'proposal_template' },
       space: {
         domain: spaceDomain
       }
@@ -28,9 +23,12 @@ async function checkSelectFields({spaceDomain, templatePath}: {templatePath: str
         }
       }
     }
-  })
+  });
 
-  await writeToSameFolder({fileName: 'selectFields.ts', data:`export const selectFields = ${JSON.stringify(proposal.form!.formFields, null, 2)}`});
+  await writeToSameFolder({
+    fileName: 'selectFields.ts',
+    data: `export const selectFields = ${JSON.stringify(proposal.form!.formFields, null, 2)}`
+  });
 }
 
 // resolveFields({templatePath: 'page-path', spaceDomain: 'space-domain'}).then(console.log)

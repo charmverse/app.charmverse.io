@@ -1,7 +1,9 @@
 <script async type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=G-NFFT204NB1"></script>
 <script type="text/javascript">
-  function gtag() { dataLayer.push(arguments); }
-  !function (w, a) {
+  function gtag() {
+    dataLayer.push(arguments);
+  }
+  !(function (w, a) {
     function config() {
       gtag('config', 'G-NFFT204NB1', { anonymize_ip: true, send_page_view: false });
     }
@@ -10,8 +12,8 @@
       gtag('js', new Date());
     }
     gtag('set', 'developer_id.dYzMzMD', true);
-    config()
-    w[a] = (w[a] && w[a].filter(c => c.name !== 'globalGtag')) || [];
+    config();
+    w[a] = (w[a] && w[a].filter((c) => c.name !== 'globalGtag')) || [];
     w[a].push({
       name: 'globalGtag',
       report: gtag,
@@ -19,17 +21,20 @@
         trackingId: 'G-NFFT204NB1'
       }
     });
-  }(window, "promoteAnalyticsChannels");
+  })(window, 'promoteAnalyticsChannels');
 </script>
-<script type="text/javascript"
-  src="https://static.parastorage.com/services/cookie-consent-banner-for-uou/1.709.0//app.bundle.min.js" async></script>
+<script
+  type="text/javascript"
+  src="https://static.parastorage.com/services/cookie-consent-banner-for-uou/1.709.0//app.bundle.min.js"
+  async
+></script>
 
 <script type="text/javascript">
   (function () {
-
     // overwrite XHR response which clears out session cookies
     const isEvilRequest = (url) => /_api\/tag-manager\/api\/v1\/tags\/sites\//.test(url);
-    const response = '{"tags":[],"errors":[],"config":{"consentPolicy":{"essential":true,"functional":true,"analytics":true,"advertising":true,"dataToThirdParty":true},"geo":"US","experiments":{"specs.tagManagerPartytown":"true","specs.tagManagerConfigOverrides":"true","specs.tagManagerRenderTagByPageID":"true","specs.ignoreDisabledAppMarketTemplates":"false","specs.tagManagerEmbedScriptsFreeSites":"true","specs.cookieConsent.CcpWixCookieBannerDeclineAll":"true","specs.cookieConsent.OverrideUoUConsentVersion":"false","specs.tagManagerNewSiteEmbedsService":"true","specs.cookieConsent.CcpHostsIntegration":"true","specs.cookieConsent.CcpML_MigrationUoU":"true","specs.cookieConsent.CcpLpIntegration":"true","specs.returnNonEssentialCustomEmbeds":"true"}}}';
+    const response =
+      '{"tags":[],"errors":[],"config":{"consentPolicy":{"essential":true,"functional":true,"analytics":true,"advertising":true,"dataToThirdParty":true},"geo":"US","experiments":{"specs.tagManagerPartytown":"true","specs.tagManagerConfigOverrides":"true","specs.tagManagerRenderTagByPageID":"true","specs.ignoreDisabledAppMarketTemplates":"false","specs.tagManagerEmbedScriptsFreeSites":"true","specs.cookieConsent.CcpWixCookieBannerDeclineAll":"true","specs.cookieConsent.OverrideUoUConsentVersion":"false","specs.tagManagerNewSiteEmbedsService":"true","specs.cookieConsent.CcpHostsIntegration":"true","specs.cookieConsent.CcpML_MigrationUoU":"true","specs.cookieConsent.CcpLpIntegration":"true","specs.returnNonEssentialCustomEmbeds":"true"}}}';
 
     // Override the open method of XMLHttpRequest to intercept all requests
     var originalOpen = XMLHttpRequest.prototype.open;
@@ -42,19 +47,15 @@
     XMLHttpRequest.prototype.send = function (body) {
       if (this._url && isEvilRequest(this._url)) {
         console.log('ignore evil request');
-      }
-      else {
+      } else {
         originalSend.apply(this, arguments);
       }
     };
-
   })();
 </script>
 
-
 <script type="text/javascript">
   (function () {
-
     // XMLHttpRequest.prototype.open = function (method, url) {
     //   console.log("Intercepted HTTP request: " + method + " " + url);
     //   if (isEvilRequest(url)) {
@@ -65,11 +66,8 @@
     //     originalOpen.apply(this, arguments);
     //   }
     // };
-
-
     // XMLHttpRequest = new Proxy(XMLHttpRequest, {
     //   construct: function (target, args) {
-
     //     console.log('fetch args', args);
     //     if (args[0] && isEvilRequest(args[0])) {
     //       console.log('evil request');
@@ -91,7 +89,6 @@
     //     return xhr;
     //   },
     // });
-
     // window.fetch = new Proxy(window.fetch, {
     //   apply: function (target, that, args) {
     //     // args holds argument of fetch function
@@ -112,6 +109,5 @@
     //     return temp;
     //   }
     // });
-
   })();
 </script>

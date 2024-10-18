@@ -54,8 +54,8 @@ const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
     groupByProperty?.type === 'proposalEvaluationType'
       ? PROPOSAL_STEP_LABELS[group.option!.value as ProposalEvaluationStep]
       : groupByProperty?.type === 'proposalStatus'
-      ? EVALUATION_STATUS_LABELS[group.option!.value as ProposalEvaluationStatus]
-      : groupTitle;
+        ? EVALUATION_STATUS_LABELS[group.option!.value as ProposalEvaluationStatus]
+        : groupTitle;
 
   const preventPropertyDeletion =
     props.groupByProperty && proposalPropertyTypesList.includes(props.groupByProperty.type as any);

@@ -61,8 +61,8 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
         {evaluation.shareReviews
           ? 'Evaluation results are anonymous'
           : evaluation.isReviewer
-          ? 'Evaluation results are only visible to Reviewers'
-          : 'Only Reviewers can submit an evaluation'}
+            ? 'Evaluation results are only visible to Reviewers'
+            : 'Only Reviewers can submit an evaluation'}
       </Alert>
 
       <MultiTabs activeTab={rubricView} setActiveTab={setRubricView} tabs={evaluationTabs} fullWidthTabs>
