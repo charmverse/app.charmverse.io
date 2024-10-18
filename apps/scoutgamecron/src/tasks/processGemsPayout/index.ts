@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { weeklyRewardableBuilders } from '@packages/scoutgame/builderNfts/constants';
-import { currentSeason, getCurrentWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
+import { currentSeason, getLastWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/points/getPointsCountForWeekWithNormalisation';
 import { DateTime } from 'luxon';
@@ -9,7 +9,7 @@ import { processScoutPointsPayout } from './processScoutPointsPayout';
 
 export async function processGemsPayout() {
   const now = DateTime.utc();
-  const week = getCurrentWeek();
+  const week = getLastWeek(); // it is the new week, so get last week to pay out
 
   if (now.weekday !== 1 || now.hour !== 0) {
     log.info('Gems Payout: It is not yet Sunday at 12:00 AM UTC, skipping');
