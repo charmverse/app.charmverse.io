@@ -6,7 +6,7 @@ The all-in-one Space for DAOs
 
 There are several ways you can contribute:
 
-- Tweet us: [@charmverse](https://twitter.com/charmverse)
+- Tweet us: [@charmverse](https://x.com/charmverse)
 - Email us: [hello@charmverse.io](mailto:hello@charmverse.io)
 - Join Discord: [CharmVerse.io](https://discord.gg/ACYCzBGC2M)
 - Pull Requests are welcome! See developer setup below 🙌
@@ -278,7 +278,7 @@ On the client side, we have tests written with `react-testing-library`. In order
 
 **Info for running individual tests**
 
-If you are using VSCode, install the (Jest Runner plugin)[https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner]
+If you are using VSCode, install the [Jest Runner plugin](https://marketplace.visualstudio.com/items?itemName=firsttris.vscode-jest-runner)
 
 In .vscode/settings.json, add:
 
