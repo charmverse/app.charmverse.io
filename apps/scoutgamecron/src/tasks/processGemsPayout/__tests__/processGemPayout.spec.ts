@@ -39,6 +39,24 @@ describe('processGemsPayout', () => {
     expect(events.length).toBe(1);
   });
 
+  it('should not run twice', async () => {
+    // Mock the current time to be Monday at 00:00:00 UTC
+    const mockNow = DateTime.fromObject(
+      { year: 2024, month: 1, day: 1, hour: 0, minute: 0, second: 0 },
+      { zone: 'utc' }
+    );
+
+    jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
+      getBuildersLeaderboard: jest.fn()
+    }));
+    const { getBuildersLeaderboard } = await import('@packages/scoutgame/getBuildersLeaderboard');
+    // mock the prisma count to return 1
+    jest.spyOn(prisma.builderEvent, 'count').mockResolvedValue(1);
+
+    await processGemsPayout(createContext(), { now: mockNow });
+    expect(getBuildersLeaderboard).toHaveBeenCalledTimes(0);
+  });
+
   it('should not run at other times', async () => {
     jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
       getBuildersLeaderboard: jest.fn()
