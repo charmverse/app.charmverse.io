@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
@@ -44,6 +45,7 @@ export async function processScoutPointsPayout({
   );
 
   if (totalNftsPurchased === 0) {
+    log.warn(`No NFTs purchased for builder in week ${week}`, { userId: builderId });
     return;
   }
 
@@ -59,6 +61,7 @@ export async function processScoutPointsPayout({
   });
 
   if (existingGemsPayoutEvent) {
+    log.warn(`Gems payout event already exists for builder in week ${week}`, { userId: builderId });
     return;
   }
 
