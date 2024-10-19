@@ -50,17 +50,25 @@ export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
   username = `user-${uuid()}`,
-  displayName = 'Test Scout'
+  displayName = 'Test Scout',
+  builderId,
+  season
 }: {
   username?: string;
   displayName?: string;
+  builderId?: string; // automatically "scout" a builder
+  season?: string;
 } = {}) {
-  return prisma.scout.create({
+  const scout = await prisma.scout.create({
     data: {
       username,
       displayName
     }
   });
+  if (builderId) {
+    await mockNFTPurchaseEvent({ builderId, scoutId: scout.id, season });
+  }
+  return scout;
 }
 
 export async function mockGemPayoutEvent({
