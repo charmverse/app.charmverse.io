@@ -35,7 +35,7 @@ export async function sendPointsClaimEmails() {
             email: scout.email!,
             userId: scout.id
           },
-          senderAddress: `The Scout Game <updates@mail.thesunnyawards.fun>`,
+          senderAddress: `The Scout Game <updates@mail.scoutgame.xyz>`,
           subject: 'Congratulations you just earned points in the Scout Game',
           html
         });
