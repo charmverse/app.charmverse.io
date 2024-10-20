@@ -2,11 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 
-async function deleteBuilderAndRedistributePoints({
-  builderUsername
-}: {
-  builderUsername: string
-}) {
+async function deleteBuilderAndRedistributePoints({ builderUsername }: { builderUsername: string }) {
   const builder = await prisma.scout.findUnique({
     where: {
       username: builderUsername
@@ -16,7 +12,7 @@ async function deleteBuilderAndRedistributePoints({
   if (!builder) {
     throw new Error(`Builder with username ${builderUsername} not found`);
   }
-  
+
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderNFT: {
@@ -31,7 +27,7 @@ async function deleteBuilderAndRedistributePoints({
       tokensPurchased: true,
       scout: {
         select: {
-          id: true,
+          id: true
         }
       }
     }
@@ -46,48 +42,51 @@ async function deleteBuilderAndRedistributePoints({
     nftPurchaseEventsRecord[nftPurchaseEvent.scout.id] += nftPurchaseEvent.tokensPurchased;
   });
 
-  await prisma.$transaction(async (tx) => {
-    await prisma.scout.delete({
-      where: {
-        username: builderUsername
-      }
-    })
-    await prisma.nFTPurchaseEvent.deleteMany({
-      where: {
-        id: {
-          in: nftPurchaseEventIds
-        }
-      }
-    })
-    for (const [scoutId, tokensPurchased] of Object.entries(nftPurchaseEventsRecord)) {
-      const points = tokensPurchased * 20
-      await sendPoints({
-        tx,
-        builderId: scoutId,
-        points,
-        description: `You received a ${points} point gift from Scout Game`,
-        claimed: true,
-        earnedAs: "scout",
-      })
-      await prisma.userSeasonStats.update({
+  await prisma.$transaction(
+    async (tx) => {
+      await prisma.scout.delete({
         where: {
-          userId_season: {
-            userId: scoutId,
-            season: currentSeason
-          }
-        },
-        data: {
-          nftsPurchased: {
-            decrement: tokensPurchased
-          },
+          username: builderUsername
         }
-      })
+      });
+      await prisma.nFTPurchaseEvent.deleteMany({
+        where: {
+          id: {
+            in: nftPurchaseEventIds
+          }
+        }
+      });
+      for (const [scoutId, tokensPurchased] of Object.entries(nftPurchaseEventsRecord)) {
+        const points = tokensPurchased * 20;
+        await sendPoints({
+          tx,
+          builderId: scoutId,
+          points,
+          description: `You received a ${points} point gift from Scout Game`,
+          claimed: true,
+          earnedAs: 'scout'
+        });
+        await prisma.userSeasonStats.update({
+          where: {
+            userId_season: {
+              userId: scoutId,
+              season: currentSeason
+            }
+          },
+          data: {
+            nftsPurchased: {
+              decrement: tokensPurchased
+            }
+          }
+        });
+      }
+    },
+    {
+      timeout: 60000
     }
-  }, {
-    timeout: 60000
-  });
+  );
 }
 
 deleteBuilderAndRedistributePoints({
-  builderUsername: ""
+  builderUsername: ''
 });
