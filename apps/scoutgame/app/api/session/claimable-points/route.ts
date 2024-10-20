@@ -1,6 +1,6 @@
+import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { NextResponse } from 'next/server';
 
-import { getClaimablePoints } from 'lib/points/getClaimablePoints';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export async function GET() {
