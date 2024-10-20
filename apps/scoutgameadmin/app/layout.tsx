@@ -1,9 +1,8 @@
-import { AppProviders } from '@connect-shared/components/layout/AppProviders';
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
-import theme from 'theme/theme';
+import { AppProviders } from 'components/common/AppProviders';
 
 import 'theme/styles.scss';
 
@@ -46,7 +45,7 @@ export default async function RootLayout({
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script src='/__ENV.js' />
-        <AppProviders theme={theme}>{children}</AppProviders>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

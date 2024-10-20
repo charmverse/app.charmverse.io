@@ -22,7 +22,11 @@ export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> 
   in_progress: 'In Progress',
   passed: 'Passed',
   unpublished: 'Unpublished',
-  archived: 'Archived'
+  not_issued: 'Not Issued',
+  draft: 'Draft',
+  archived: 'Archived',
+  issued: 'Issued',
+  published: 'Published'
 };
 
 export const proposalStatusColors: Record<ProposalEvaluationStatus, string> = {
@@ -30,7 +34,11 @@ export const proposalStatusColors: Record<ProposalEvaluationStatus, string> = {
   in_progress: 'yellow',
   passed: 'green',
   unpublished: 'gray',
-  archived: 'gray'
+  archived: 'gray',
+  draft: 'gray',
+  not_issued: 'gray',
+  issued: 'green',
+  published: 'green'
 };
 
 export const proposalDbProperties: {
@@ -161,7 +169,11 @@ export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, str
   in_progress: 'In Progress',
   passed: 'Pass',
   unpublished: 'Unpublish',
-  archived: 'Archive'
+  archived: 'Archive',
+  draft: 'Draft',
+  not_issued: 'Not Issue',
+  issued: 'Issue',
+  published: 'Publish'
 };
 
 export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {

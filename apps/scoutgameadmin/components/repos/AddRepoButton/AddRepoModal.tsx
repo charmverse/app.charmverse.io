@@ -18,13 +18,13 @@ import { mutate } from 'swr';
 import { useCreateRepo, useSearchReposByOwnerFromGithub } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
-interface AddRepoModalProps {
+type Props = {
   open: boolean;
   onClose: () => void;
   onAdd: () => void;
-}
+};
 
-export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
+export function AddRepoModal({ open, onClose, onAdd }: Props) {
   const [repoInput, setRepoInput] = useState('');
   const { trigger: addGithubRepo, isMutating: isImporting } = useCreateRepo();
   const debouncedFilterString = useDebouncedValue(repoInput);
@@ -55,7 +55,7 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>Add new repos by owner</DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent>
+        <DialogContent sx={{ pt: 0 }}>
           <TextField
             autoFocus
             margin='dense'
@@ -77,7 +77,7 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
           />
           {error && (
             <Typography variant='caption' color='error'>
-              {error.message}
+              {error.message || error.status || error.toString()}
             </Typography>
           )}
           {(isValidating || isLoading) && <Typography variant='caption'>Checking for repos...</Typography>}
@@ -101,7 +101,9 @@ export function AddRepoModal({ open, onClose, onAdd }: AddRepoModalProps) {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={onClose}>Cancel</Button>
+          <Button variant='outlined' color='secondary' onClick={onClose}>
+            Cancel
+          </Button>
           <LoadingButton
             loading={isImporting}
             disabled={error || newRepos.length === 0}

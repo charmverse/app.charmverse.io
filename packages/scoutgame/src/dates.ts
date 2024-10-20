@@ -40,8 +40,8 @@ export function getCurrentWeek(): ISOWeek {
   return _formatWeek(DateTime.utc());
 }
 
-export function getLastWeek(): ISOWeek {
-  return getPreviousWeek(getCurrentWeek());
+export function getLastWeek(now: DateTime = DateTime.utc()): ISOWeek {
+  return getPreviousWeek(_formatWeek(now));
 }
 
 export function getPreviousWeek(week: ISOWeek): ISOWeek {
