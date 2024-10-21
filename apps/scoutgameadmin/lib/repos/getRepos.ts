@@ -10,6 +10,7 @@ export type Repo = {
   prs: number;
   closedPrs: number;
   contributors: number;
+  bonusPartner: string | null;
 };
 
 export async function getRepos({ searchString }: { searchString?: string } = {}): Promise<Repo[]> {
@@ -42,15 +43,24 @@ export async function getRepos({ searchString }: { searchString?: string } = {})
             }
           }
         : {
-            events: {
-              some: {
-                githubUser: {
-                  builderId: {
-                    not: null
+            OR: [
+              {
+                events: {
+                  some: {
+                    githubUser: {
+                      builderId: {
+                        not: null
+                      }
+                    }
                   }
                 }
+              },
+              {
+                bonusPartner: {
+                  not: null
+                }
               }
-            }
+            ]
           },
     include: {
       events: true
@@ -65,6 +75,7 @@ export async function getRepos({ searchString }: { searchString?: string } = {})
     commits: repo.events.filter((event) => event.type === 'commit').length,
     prs: repo.events.filter((event) => event.type === 'merged_pull_request').length,
     closedPrs: repo.events.filter((event) => event.type === 'closed_pull_request').length,
-    contributors: new Set(repo.events.map((event) => event.createdBy)).size
+    contributors: new Set(repo.events.map((event) => event.createdBy)).size,
+    bonusPartner: repo.bonusPartner
   }));
 }
