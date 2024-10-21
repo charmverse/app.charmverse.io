@@ -1,29 +1,16 @@
 'use server';
 
-import { prisma } from '@charmverse/core/prisma-client';
 import { Typography, Stack } from '@mui/material';
-import { currentSeason } from '@packages/scoutgame/dates';
 
 import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
+import { getUserSeasonStats } from 'lib/scouts/getUserSeasonStats';
 import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { ScoutStats } from './ScoutStats';
 
 export async function ScoutProfile({ userId, isMobile }: { userId: string; isMobile?: boolean }) {
-  const getUserSeasonStats = (_userId: string) =>
-    prisma.userSeasonStats.findUnique({
-      where: {
-        userId_season: {
-          userId: _userId,
-          season: currentSeason
-        }
-      },
-      select: {
-        pointsEarnedAsScout: true
-      }
-    });
   const [error, data] = await safeAwaitSSRData(
     Promise.all([getUserSeasonStats(userId), getScoutedBuilders({ scoutId: userId })])
   );
