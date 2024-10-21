@@ -8,6 +8,6 @@ export async function GET() {
   if (!user) {
     return NextResponse.json({ points: 0 });
   }
-  const result = await getClaimablePoints(user.id);
-  return NextResponse.json({ points: result.totalClaimablePoints });
+  const claimablePoints = await getClaimablePoints({ userId: user.id });
+  return NextResponse.json({ points: claimablePoints });
 }

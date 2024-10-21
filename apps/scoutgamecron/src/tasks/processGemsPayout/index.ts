@@ -7,6 +7,8 @@ import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/poin
 import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
+import { sendGemsPayoutEmails } from '../sendGemsPayoutEmails/sendGemsPayoutEmails';
+
 import { processScoutPointsPayout } from './processScoutPointsPayout';
 
 export async function processGemsPayout(
@@ -62,5 +64,7 @@ export async function processGemsPayout(
     }
   }
 
-  log.info(`Processed ${topWeeklyBuilders.length} builders points payout`);
+  const emailsSent = await sendGemsPayoutEmails();
+
+  log.info(`Processed ${topWeeklyBuilders.length} builders points payout`, { emailsSent });
 }
