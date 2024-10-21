@@ -6,7 +6,7 @@ import { render } from '@react-email/render';
 
 import { ClaimPointsTemplate } from './templates/ClaimPointsTemplate';
 
-export async function sendPointsClaimEmails() {
+export async function sendGemsPayoutEmails({ week }: { week: string }) {
   const scouts = await prisma.scout.findMany({
     where: {
       email: {
@@ -21,13 +21,14 @@ export async function sendPointsClaimEmails() {
     }
   });
 
+  let totalEmailsSent = 0;
+
   for (const scout of scouts) {
     try {
-      const pointsToClaim = await getClaimablePoints(scout.id);
-
-      if (pointsToClaim.totalClaimablePoints) {
+      const weeklyClaimablePoints = await getClaimablePoints({ userId: scout.id, week });
+      if (weeklyClaimablePoints) {
         const html = await render(
-          ClaimPointsTemplate({ points: pointsToClaim.totalClaimablePoints, displayName: scout.displayName })
+          ClaimPointsTemplate({ points: weeklyClaimablePoints, displayName: scout.displayName })
         );
         await sendEmail({
           to: {
@@ -39,9 +40,12 @@ export async function sendPointsClaimEmails() {
           subject: 'Congratulations you just earned points in the Scout Game',
           html
         });
+        totalEmailsSent += 1;
       }
     } catch (error) {
       log.error('Error sending points claim email', { error, scoutId: scout.id });
     }
   }
+
+  return totalEmailsSent;
 }

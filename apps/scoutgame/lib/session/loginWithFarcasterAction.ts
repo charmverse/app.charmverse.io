@@ -24,17 +24,7 @@ export const loginWithFarcasterAction = actionClient
     const { fid } = await verifyFarcasterUser(parsedInput);
 
     if (inviteCode && parsedInput.inviteCode === inviteCode) {
-      cookies().set(
-        'invite-code',
-        await sealData(
-          {
-            inviteCode
-          },
-          {
-            password: authSecret as string
-          }
-        )
-      );
+      cookies().set('invite-code', await sealData({ inviteCode }, { password: authSecret as string }));
       log.info('Builder logged in with invite code', { fid });
     } else {
       // throws an error if user does not have access
