@@ -49,7 +49,7 @@ export function MockDataProvider({ children, userContext }: { children: ReactNod
               setSpace: () => {},
               setSpaces: () => {},
               isLoaded: true,
-              createNewSpace: async () => ({} as any),
+              createNewSpace: async () => ({}) as any,
               isCreatingSpace: false
             }}
           >

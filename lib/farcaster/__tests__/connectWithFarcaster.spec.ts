@@ -15,7 +15,7 @@ const getProfile = ({ userId }: { userId: string }) =>
     bio: 'biooo',
     displayName: 'My name',
     pfpUrl: 'https://example.com'
-  } as FarcasterBody & { userId: string });
+  }) as FarcasterBody & { userId: string };
 
 describe('connectFarcaster', () => {
   test('should connect a user to a Farcaster profile', async () => {

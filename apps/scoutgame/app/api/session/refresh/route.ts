@@ -7,6 +7,10 @@ import type { NextRequest } from 'next/server';
 // This API Route is non-blocking and called on every page load. Use it to refresh things about the current user
 export async function GET(req: NextRequest) {
   const session = await getSession();
+
+  // save session to update the LAX cookie
+  await session.save();
+
   const userId = session.scoutId;
   if (userId) {
     const scout = await prisma.scout.findUnique({

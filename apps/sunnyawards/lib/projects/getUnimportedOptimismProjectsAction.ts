@@ -49,10 +49,13 @@ export const getUnimportedOptimismProjectsAction = authActionClient
       }
     })) as { fid: number; account: FarcasterProfile['body']; userId: string }[];
 
-    const farcasterUserMap = farcasterUsers.reduce((acc, user) => {
-      acc[user.fid] = user.account;
-      return acc;
-    }, {} as Record<number, FarcasterProfile['body']>);
+    const farcasterUserMap = farcasterUsers.reduce(
+      (acc, user) => {
+        acc[user.fid] = user.account;
+        return acc;
+      },
+      {} as Record<number, FarcasterProfile['body']>
+    );
 
     const unresolvedUsers = arrayUtils.uniqueValues(
       attestationsWithoutProject.flatMap((attestation) => {

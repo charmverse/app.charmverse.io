@@ -22,7 +22,7 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
@@ -38,13 +38,13 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     result
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      const nextPage = data?.onboarded ? redirectUrl : '/welcome';
+      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/home';
 
       if (!data?.success) {
         return;
       }
 
-      setUser(data.user);
+      await refreshUser(data.user);
 
       await revalidatePath();
       router.push(nextPage);

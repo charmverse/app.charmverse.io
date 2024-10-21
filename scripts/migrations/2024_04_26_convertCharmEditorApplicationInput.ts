@@ -1,17 +1,17 @@
-import { prisma } from "@charmverse/core/prisma-client";
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function convertCharmEditorApplicationInput() {
   const applications = await prisma.application.findMany({
     where: {
       message: {
         not: null
-      },
+      }
     },
     select: {
       id: true,
       message: true
     }
-  })
+  });
 
   const total = applications.length;
   let current = 0;
@@ -34,18 +34,18 @@ async function convertCharmEditorApplicationInput() {
                     {
                       type: 'text',
                       text: application.message
-                    },
+                    }
                   ]
                 }
               ]
             }
           }
-        })
+        });
       }
     } catch (err) {
-      console.error(`Failed to convert message for application ${application.id}`, err)
+      console.error(`Failed to convert message for application ${application.id}`, err);
     } finally {
-      console.log(`Processed ${current} of ${total} applications`)
+      console.log(`Processed ${current} of ${total} applications`);
     }
   }
 }

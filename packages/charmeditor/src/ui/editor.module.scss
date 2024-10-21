@@ -1,4 +1,3 @@
-
 .ProseMirror {
   /* paragraph spacing */
   > p {
@@ -12,7 +11,7 @@
   }
   /** Tab indent **/
   :global(.charm-tab) {
-    tab-size: var(--tab-width);  // should equal list item padding
+    tab-size: var(--tab-width); // should equal list item padding
 
     &[data-indent='1'] {
       tab-size: calc(2 * var(--tab-width));

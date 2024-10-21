@@ -16,7 +16,12 @@ export function createObject<T>(entries: [string | null | undefined, T][]): {
 
 class MatchType {
   // eslint-disable-next-line no-useless-constructor
-  constructor(public start: number, public end: number, public match: boolean, private _sourceString: string) {
+  constructor(
+    public start: number,
+    public end: number,
+    public match: boolean,
+    private _sourceString: string
+  ) {
     // no-op
   }
 

@@ -3,7 +3,6 @@
     width: 100%;
   }
 
-
   .add-buttons {
     display: flex;
     flex-direction: column;
@@ -103,9 +102,7 @@
     }
   }
 
-
   &.content-blocks {
-
     &:hover,
     &:focus-within {
       .CardDetailContentsMenu {

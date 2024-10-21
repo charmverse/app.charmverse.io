@@ -106,8 +106,8 @@ export function NewProposalButton() {
           !canCreateProposal
             ? 'You do not have the permission to create a proposal.'
             : !hasWorkflows
-            ? 'Add a workflow from the space settings to start using proposals'
-            : ''
+              ? 'Add a workflow from the space settings to start using proposals'
+              : ''
         }
       >
         <Box>

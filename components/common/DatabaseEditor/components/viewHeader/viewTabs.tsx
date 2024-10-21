@@ -238,10 +238,13 @@ function ViewTabs(props: ViewTabsProps) {
 
   const views = viewsProp.filter((view) => !view.fields.inline);
   const viewIds = views.map((view) => view.id);
-  const viewsRecord = viewsProp.reduce((acc, view) => {
-    acc[view.id] = view;
-    return acc;
-  }, {} as Record<string, BoardView>);
+  const viewsRecord = viewsProp.reduce(
+    (acc, view) => {
+      acc[view.id] = view;
+      return acc;
+    },
+    {} as Record<string, BoardView>
+  );
   // Find the index of the current view
   const currentViewIndex = viewIds.findIndex((viewId) => viewId === activeView?.id);
   const shownViews = views.slice(0, maxTabsShown);

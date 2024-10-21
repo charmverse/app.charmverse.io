@@ -93,9 +93,7 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) 
       {children}
       {!readOnly && (
         <Controls className='controls'>
-          {props.extraControls?.map((control, index) => (
-            <BlockItemButton {...control} key={`${index.toString()}`} />
-          ))}
+          {props.extraControls?.map((control, index) => <BlockItemButton {...control} key={`${index.toString()}`} />)}
           {onEdit && (
             <ListItemButton
               onClick={handleEdit}

@@ -384,7 +384,7 @@ export class NotionPage {
                 results: response.results,
                 parent_block_id: listBlockChildrenParameters.block_id,
                 next_cursor: response.next_cursor
-              } as ChildBlockListResponse)
+              }) as ChildBlockListResponse
           )
           .catch((error) => {
             if (error.status > 499) {

@@ -24,12 +24,12 @@ type PickNotNullable<T> = {
 export type OptionalNullable<T> = T extends any[]
   ? OptionalNullable<T[number]>[]
   : T extends object
-  ? {
-      [K in keyof PickNullable<T>]?: OptionalNullable<T[K]>;
-    } & {
-      [K in keyof PickNotNullable<T>]: OptionalNullable<T[K]>;
-    }
-  : T;
+    ? {
+        [K in keyof PickNullable<T>]?: OptionalNullable<T[K]>;
+      } & {
+        [K in keyof PickNotNullable<T>]: OptionalNullable<T[K]>;
+      }
+    : T;
 
 // export type RequiredFields<T, K extends keyof T> = {
 //   T in K;

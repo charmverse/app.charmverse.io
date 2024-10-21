@@ -13,8 +13,8 @@ export function getRewardType(
   return reward.customReward
     ? 'custom'
     : reward.rewardToken
-    ? 'token'
-    : isNewReward && !isFromTemplate
-    ? 'token'
-    : 'none';
+      ? 'token'
+      : isNewReward && !isFromTemplate
+        ? 'token'
+        : 'none';
 }

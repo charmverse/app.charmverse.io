@@ -23,14 +23,17 @@ async function exportForumPosters(outputPath: string) {
   console.log('Found', posts.length, 'forum posts');
 
   // create a list of authors with theri count of posts
-  const counts = posts.reduce((acc, post) => {
-    const author = post.author?.username || 'N/A';
-    if (!acc[author]) {
-      acc[author] = 0;
-    }
-    acc[author]++;
-    return acc;
-  }, {} as Record<string, number>);
+  const counts = posts.reduce(
+    (acc, post) => {
+      const author = post.author?.username || 'N/A';
+      if (!acc[author]) {
+        acc[author] = 0;
+      }
+      acc[author]++;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const users = posts.map((post) => post.author);
 
@@ -75,14 +78,17 @@ async function exportProposalVoters(outputPath: string) {
   console.log('Found', votes.length, 'proposal votes');
 
   const userVotes = votes.map((vote) => vote.userVotes).flat();
-  const counts = userVotes.reduce((acc, doc) => {
-    const author = doc.user?.username || 'N/A';
-    if (!acc[author]) {
-      acc[author] = 0;
-    }
-    acc[author]++;
-    return acc;
-  }, {} as Record<string, number>);
+  const counts = userVotes.reduce(
+    (acc, doc) => {
+      const author = doc.user?.username || 'N/A';
+      if (!acc[author]) {
+        acc[author] = 0;
+      }
+      acc[author]++;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
   console.log('user votes', counts);
 
   const users = userVotes.map((post) => post.user);

@@ -17,16 +17,16 @@ export type AttestationType = PrismaAttestationType | 'gitcoinProject' | 'optimi
 export type CredentialDataInput<T extends AttestationType = AttestationType> = T extends 'proposal'
   ? ProposalCredential
   : T extends 'reward'
-  ? RewardCredential
-  : T extends 'external'
-  ? ExternalCredential
-  : T extends 'gitcoinProject'
-  ? GitcoinProjectCredential
-  : T extends 'optimismProject'
-  ? OptimismProjectAttestationData
-  : T extends 'optimismProjectSnapshot'
-  ? OptimismProjectSnapshotAttestationMetaData
-  : never;
+    ? RewardCredential
+    : T extends 'external'
+      ? ExternalCredential
+      : T extends 'gitcoinProject'
+        ? GitcoinProjectCredential
+        : T extends 'optimismProject'
+          ? OptimismProjectAttestationData
+          : T extends 'optimismProjectSnapshot'
+            ? OptimismProjectSnapshotAttestationMetaData
+            : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
   type: T;

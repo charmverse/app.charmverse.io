@@ -4,7 +4,7 @@ import { stringToValidPath } from 'lib/utils/strings';
 async function createPathForConnectProjects() {
   const projects = await prisma.project.findMany({
     where: {
-      source: "connect"
+      source: 'connect'
     },
     select: {
       id: true,
@@ -19,12 +19,12 @@ async function createPathForConnectProjects() {
   for (const project of projects) {
     try {
       const processesName = processedProjectNames.has(project.name);
-      let path = ''
+      let path = '';
       const nameToPath = stringToValidPath({ input: project.name, wordSeparator: '-', autoReplaceEmpty: false });
       if (processesName) {
-        path = `${nameToPath}-${Math.random().toString().replace('0.', '')}`
+        path = `${nameToPath}-${Math.random().toString().replace('0.', '')}`;
       } else {
-        path = nameToPath
+        path = nameToPath;
       }
 
       await prisma.project.update({

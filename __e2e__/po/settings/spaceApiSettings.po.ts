@@ -19,10 +19,13 @@ export class ApiSettings extends SettingsModal {
     super(page);
     this.webhookUrlInput = page.locator('data-test=webhook-url-input >> input');
     this.webhookSigningSecret = page.locator('data-test=webhook-signing-secret >> input');
-    this.namespaceSwitches = Object.values(WebhookNameSpaces).reduce((inputs, namespace) => {
-      inputs[namespace] = page.locator(`data-test=enable-${namespace}-switch >> input`);
-      return inputs;
-    }, {} as Record<WebhookNameSpaces, Locator>);
+    this.namespaceSwitches = Object.values(WebhookNameSpaces).reduce(
+      (inputs, namespace) => {
+        inputs[namespace] = page.locator(`data-test=enable-${namespace}-switch >> input`);
+        return inputs;
+      },
+      {} as Record<WebhookNameSpaces, Locator>
+    );
     this.saveButton = page.locator('data-test=submit');
   }
 

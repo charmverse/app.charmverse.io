@@ -77,7 +77,7 @@ export async function syncProposalPermissionsWithWorkflowPermissions({
                 systemRole: permission.systemRole,
                 userId: permission.userId,
                 evaluationId: proposalEvaluation.id
-              } as Prisma.ProposalEvaluationPermissionCreateManyInput)
+              }) as Prisma.ProposalEvaluationPermissionCreateManyInput
           )
         });
       }

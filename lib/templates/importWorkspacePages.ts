@@ -73,13 +73,16 @@ export function _generateNewPages({
 }: GenerateNewPagesInput): NewPagesOutput {
   const pageArgs: Prisma.PageCreateInput[] = [];
 
-  const sourcePagesMap = (sourcePages ?? []).reduce((acc, page) => {
-    acc[page.id] = page;
-    if (page.bountyId) {
-      acc[page.bountyId] = page;
-    }
-    return acc;
-  }, {} as Record<string, PageMeta>);
+  const sourcePagesMap = (sourcePages ?? []).reduce(
+    (acc, page) => {
+      acc[page.id] = page;
+      if (page.bountyId) {
+        acc[page.bountyId] = page;
+      }
+      return acc;
+    },
+    {} as Record<string, PageMeta>
+  );
 
   const blockArgs: NewPagesOutput['blockArgs'] = [];
   const bountyArgs: NewPagesOutput['bountyArgs'] = [];

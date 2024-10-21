@@ -1,9 +1,7 @@
-import { log } from "@charmverse/core/log";
-import { prisma } from "@charmverse/core/prisma-client";
-import { refreshPointStatsFromHistory } from "@packages/scoutgame/points/refreshPointStatsFromHistory";
-import { prettyPrint } from "@packages/utils/strings";
-
-
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { refreshPointStatsFromHistory } from '@packages/scoutgame/points/refreshPointStatsFromHistory';
+import { prettyPrint } from '@packages/utils/strings';
 
 async function refreshPointsFromTransactionHistory() {
   const scouts = await prisma.scout.findMany({

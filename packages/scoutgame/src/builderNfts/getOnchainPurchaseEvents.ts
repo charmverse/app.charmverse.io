@@ -57,8 +57,7 @@ const contractAddress = realOptimismMainnetBuildersContract;
 async function getAndParseLogs() {
   const logs = await client.getLogs({
     address: contractAddress,
-    fromBlock: 16330000n,
-    // fromBlock: 126062456n,
+    fromBlock: BigInt(126062456),
     toBlock: 'latest'
   });
 

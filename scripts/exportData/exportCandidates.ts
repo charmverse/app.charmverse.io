@@ -50,20 +50,23 @@ async function generateCSV() {
     console.log('\nUser:', user.username);
     const proposals = user.pages.filter((page) => page.proposal?.status === 'published');
     const proposalData = proposals.map((page) => {
-      const answers = page.proposal?.formAnswers.reduce((acc, answer) => {
-        const question = page.proposal?.form?.formFields.find((field) => field.id === answer.fieldId);
-        if (question) {
-          const answerValue = answer.value as FormFieldValue;
-          let answerStr = '';
-          if (typeof (answerValue as LongTextValue).contentText === 'string') {
-            answerStr = (answerValue as LongTextValue).contentText;
-          } else {
-            answerStr = answerValue?.toString() ?? '';
+      const answers = page.proposal?.formAnswers.reduce(
+        (acc, answer) => {
+          const question = page.proposal?.form?.formFields.find((field) => field.id === answer.fieldId);
+          if (question) {
+            const answerValue = answer.value as FormFieldValue;
+            let answerStr = '';
+            if (typeof (answerValue as LongTextValue).contentText === 'string') {
+              answerStr = (answerValue as LongTextValue).contentText;
+            } else {
+              answerStr = answerValue?.toString() ?? '';
+            }
+            acc[`Form question: ${question.name}`] = answerStr;
           }
-          acc[`Form question: ${question.name}`] = answerStr;
-        }
-        return acc;
-      }, {} as Record<string, string>);
+          return acc;
+        },
+        {} as Record<string, string>
+      );
       return {
         User: user.username,
         'User email': user.email,

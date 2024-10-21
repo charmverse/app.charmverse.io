@@ -28,10 +28,6 @@ type BuilderProfileProps = {
   builderActivities: BuilderActivity[];
   gemsCollected?: number;
   rank?: number | null;
-  user?: {
-    id: string;
-    username: string;
-  } | null;
 };
 
 const PaperContainer = styled(Paper)(({ theme }) => ({
@@ -58,8 +54,7 @@ export function PublicBuilderProfileContainer({
   totalNftsSold,
   builderActivities,
   gemsCollected,
-  rank,
-  user
+  rank
 }: BuilderProfileProps) {
   const isDesktop = useMdScreen();
 
@@ -89,7 +84,6 @@ export function PublicBuilderProfileContainer({
                     hideDetails
                     showPurchaseButton
                     size='small'
-                    userId={user?.id}
                   />
                 </Box>
                 <Stack gap={1} pr={1}>
@@ -140,7 +134,6 @@ export function PublicBuilderProfileContainer({
                       gemsCollected: 0,
                       builderPoints: 0
                     }}
-                    userId={user?.id}
                     hideDetails
                     showPurchaseButton
                   />

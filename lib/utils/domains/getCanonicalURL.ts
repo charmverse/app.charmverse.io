@@ -27,8 +27,8 @@ function absoluteUrl(req: IncomingMessage) {
   const host = req
     ? req.headers['x-forwarded-host'] || req.headers.host || ''
     : typeof window !== 'undefined'
-    ? window.location.host
-    : '';
+      ? window.location.host
+      : '';
   if (!host) {
     log.error('Host is not set');
   }

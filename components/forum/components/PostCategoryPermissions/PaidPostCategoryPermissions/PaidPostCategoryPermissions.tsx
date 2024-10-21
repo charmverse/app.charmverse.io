@@ -48,10 +48,10 @@ export function PaidPostCategoryPermissions({ postCategoryId }: Props) {
   const addRolesRowTooltip = !currentUserPermissions?.manage_permissions
     ? 'You cannot manage permissions for this category'
     : roles?.length === 0
-    ? 'Create roles for this space to assign permissions'
-    : !assignableRolesExist
-    ? 'All available roles already have permissions in this post category.'
-    : '';
+      ? 'Create roles for this space to assign permissions'
+      : !assignableRolesExist
+        ? 'All available roles already have permissions in this post category.'
+        : '';
 
   return (
     <Grid container>

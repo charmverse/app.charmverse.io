@@ -1,7 +1,4 @@
-import { Page, prisma } from "@charmverse/core/prisma-client";
-
-
-
+import { Page, prisma } from '@charmverse/core/prisma-client';
 
 async function cleanupDuplicateProposalCards() {
   const targetSpace = 'charmverse';
@@ -15,7 +12,7 @@ async function cleanupDuplicateProposalCards() {
   //   }
   // })
 
-  const proposalCards = await prisma.page.findMany({
+  const proposalCards = (await prisma.page.findMany({
     where: {
       syncWithPageId: {
         not: null
@@ -28,55 +25,56 @@ async function cleanupDuplicateProposalCards() {
     select: {
       id: true,
       syncWithPageId: true,
-      parentId: true,
+      parentId: true
     },
     orderBy: {
       createdBy: 'asc'
     }
-  }) as {[key in keyof Pick<Page, 'id' | 'syncWithPageId' | 'parentId'>]: NonNullable<Page[key]>}[];
+  })) as { [key in keyof Pick<Page, 'id' | 'syncWithPageId' | 'parentId'>]: NonNullable<Page[key]> }[];
 
-  const cardsToDelete = proposalCards.reduce((acc, card) => {
+  const cardsToDelete = proposalCards.reduce(
+    (acc, card) => {
+      // Cards in different boards can have the same syncWithPageId, so we need to also dedupe by parent board id
+      const key = `${card.parentId}-${card.syncWithPageId}`;
 
-    // Cards in different boards can have the same syncWithPageId, so we need to also dedupe by parent board id
-    const key = `${card.parentId}-${card.syncWithPageId}`
+      if (!acc.cardMap[key]) {
+        acc.cardMap[key] = card.id;
+      } else {
+        acc.cardIdsToDelete.push(card.id);
+      }
 
-    if (!acc.cardMap[key]) {
-      acc.cardMap[key] = card.id;
-    } else {
-      acc.cardIdsToDelete.push(card.id);
-    }
-
-    return acc;
-
-  }, {cardMap: {} as Record<string, string>, cardIdsToDelete: [] as string[]});
-
+      return acc;
+    },
+    { cardMap: {} as Record<string, string>, cardIdsToDelete: [] as string[] }
+  );
 
   if (cardsToDelete.cardIdsToDelete.length > 0) {
-
-    await prisma.$transaction(async tx => {
-      await tx.page.deleteMany({
-        where: {
-//          spaceId: space.id,
-          type: 'card',
-          id: {
-            in: cardsToDelete.cardIdsToDelete
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.page.deleteMany({
+          where: {
+            //          spaceId: space.id,
+            type: 'card',
+            id: {
+              in: cardsToDelete.cardIdsToDelete
+            }
           }
-        }
-      });
-      await tx.block.deleteMany({
-        where: {
-          // spaceId: space.id,
-          type: 'card',
-          id: {
-            in: cardsToDelete.cardIdsToDelete
+        });
+        await tx.block.deleteMany({
+          where: {
+            // spaceId: space.id,
+            type: 'card',
+            id: {
+              in: cardsToDelete.cardIdsToDelete
+            }
           }
-        }
-      });
-    }, {timeout: 60000})
+        });
+      },
+      { timeout: 60000 }
+    );
     console.log('Deleted', cardsToDelete.cardIdsToDelete.length, 'duplicate cards');
   }
-
 }
 cleanupDuplicateProposalCards().then(() => {
-  console.log('Done')
-})
+  console.log('Done');
+});

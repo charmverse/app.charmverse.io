@@ -19,15 +19,20 @@ const desktopVariants = {
 };
 
 export function Template({ children }: { children: ReactNode }) {
-  const key = usePathname();
+  const path = usePathname();
   const theme = useTheme();
   const matchesMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  if (path.startsWith('/info')) {
+    return children;
+  }
+
   if (matchesMobile) {
     return (
       <AnimatePresence mode='wait'>
         <motion.div
           style={{ height: '100%' }}
-          key={key}
+          key={path}
           initial='hidden'
           animate='enter'
           exit='exit'
@@ -45,7 +50,7 @@ export function Template({ children }: { children: ReactNode }) {
     <AnimatePresence mode='wait'>
       <motion.div
         style={{ height: '100%' }}
-        key={key}
+        key={path}
         initial='hidden'
         animate='enter'
         exit='exit'

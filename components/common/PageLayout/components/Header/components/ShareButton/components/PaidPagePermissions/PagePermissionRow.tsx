@@ -47,10 +47,10 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
   const assigneeLabel = isDefaultPermission
     ? 'Default permissions'
     : assignee.group === 'role'
-    ? role?.name
-    : assignee.group === 'user'
-    ? member?.username
-    : '';
+      ? role?.name
+      : assignee.group === 'user'
+        ? member?.username
+        : '';
 
   const isGuest = assignee.group === 'user' && !!member?.isGuest;
   const currentValue = existingPermission?.permissionLevel;
@@ -60,16 +60,21 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
       keyof typeof pagePermissionLevels | 'delete',
       string
     ][];
-    const options = permissionsList.reduce((acc, [level, label]) => {
-      acc[level] = (
-        <>
-          <ListItemText sx={{ pr: 1 }}>{level === 'delete' && isDefaultPermission ? 'No access' : label}</ListItemText>
-          {currentValue === level && <CheckIcon fontSize='small' />}
-          {level === 'delete' && !currentValue && <CheckIcon fontSize='small' />}
-        </>
-      );
-      return acc;
-    }, {} as Record<keyof typeof pagePermissionLevels | 'delete', JSX.Element>);
+    const options = permissionsList.reduce(
+      (acc, [level, label]) => {
+        acc[level] = (
+          <>
+            <ListItemText sx={{ pr: 1 }}>
+              {level === 'delete' && isDefaultPermission ? 'No access' : label}
+            </ListItemText>
+            {currentValue === level && <CheckIcon fontSize='small' />}
+            {level === 'delete' && !currentValue && <CheckIcon fontSize='small' />}
+          </>
+        );
+        return acc;
+      },
+      {} as Record<keyof typeof pagePermissionLevels | 'delete', JSX.Element>
+    );
     return options;
   }, [isDefaultPermission, currentValue]);
 

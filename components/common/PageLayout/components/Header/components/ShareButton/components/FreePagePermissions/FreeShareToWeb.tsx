@@ -20,8 +20,8 @@ export default function FreeShareToWeb({ pageId }: Props) {
     currentPage?.type === 'proposal' && proposal?.status === 'draft'
       ? 'This draft is only visible to authors and reviewers until it is published.'
       : currentPage?.type === 'proposal' && proposal?.status !== 'draft'
-      ? `Published ${proposalsLabel}  are publicly visible.`
-      : null;
+        ? `Published ${proposalsLabel}  are publicly visible.`
+        : null;
 
   const isChecked =
     // If space has public proposals, don't interfere with non-proposal pages

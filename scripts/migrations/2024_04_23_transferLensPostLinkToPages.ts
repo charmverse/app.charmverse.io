@@ -1,12 +1,12 @@
 // @ts-nocheck
-import { prisma } from "@charmverse/core/prisma-client";
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function transferLensPostLinkToPages() {
   const proposals = await prisma.proposal.findMany({
     where: {
       lensPostLink: {
         not: null
-      },
+      }
     },
     select: {
       lensPostLink: true,
@@ -16,7 +16,7 @@ async function transferLensPostLinkToPages() {
         }
       }
     }
-  })
+  });
 
   const total = proposals.length;
   let current = 0;
@@ -32,12 +32,12 @@ async function transferLensPostLinkToPages() {
           data: {
             lensPostLink: proposal.lensPostLink
           }
-        })
+        });
       }
     } catch (err) {
-      console.error(`Failed to transfer lensPostLink for proposal ${proposal.page?.id}`, err)
+      console.error(`Failed to transfer lensPostLink for proposal ${proposal.page?.id}`, err);
     } finally {
-      console.log(`Processed ${current} of ${total} proposals`)
+      console.log(`Processed ${current} of ${total} proposals`);
     }
   }
 }

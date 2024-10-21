@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { BountyCasterPage } from 'components/info/PartnerRewards/BountyCaster';
+import { BountyCasterPage } from 'components/info/pages/PartnerRewards/BountyCasterPage';
 
 export const metadata: Metadata = {
   title: 'BountyCaster Partner Rewards'

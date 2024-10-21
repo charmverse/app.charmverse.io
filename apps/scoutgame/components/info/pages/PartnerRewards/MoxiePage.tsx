@@ -1,31 +1,19 @@
 import { Typography } from '@mui/material';
-import Image from 'next/image';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+import { InfoPageContainer } from 'components/info/InfoPageContainer';
 
 export function MoxiePage() {
   return (
-    <DocumentPageContainer data-test='parther-moxie-page'>
-      <Image
-        src='/images/info/rewards-partner-moxie.jpg'
-        width={854}
-        height={285}
-        style={{
-          maxWidth: '100%',
-          height: 'auto'
-        }}
-        alt='rewads partner moxie'
-        priority={true}
-      />
+    <InfoPageContainer data-test='partner-moxie-page' image='/images/info/rewards-partner-moxie.jpg' title='Moxie'>
       <Document />
-    </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
 function Document() {
   return (
-    <InfoCard title='Moxie'>
+    <InfoCard>
       <Typography>
         Moxie is partnering with Scout Game to reward Scouts for supporting Builders! Moxie will distribute 2M $Moxie to
         Scouts during Season 1!

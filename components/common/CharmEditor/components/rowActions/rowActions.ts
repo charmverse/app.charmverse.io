@@ -323,7 +323,7 @@ export function getNodeForRowPosition({
   const nodeStart = topPos.pos;
   const firstChild = pmNode.type.name === 'doc' ? pmNode.firstChild : null;
   const nodeSize =
-    pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : firstChild?.content.size ?? pmNode.content.size;
+    pmNode && pmNode.type.name !== 'doc' ? pmNode.nodeSize : (firstChild?.content.size ?? pmNode.content.size);
   // nodeSize includes the start and end tokens, so we need to subtract 1
   // for images, nodeSize is 0
   let nodeEnd = nodeStart + (nodeSize > 0 ? nodeSize - 1 : 0);

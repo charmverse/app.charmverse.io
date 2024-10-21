@@ -4,7 +4,7 @@ import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';
 
 import { BuildersCarousel } from './BuildersCarousel';
 
-export async function TodaysHotBuildersCarousel({ userId }: { userId?: string }) {
+export async function TodaysHotBuildersCarousel() {
   const builders = await getTodaysHotBuilders();
-  return <BuildersCarousel builders={builders} userId={userId} />;
+  return <BuildersCarousel builders={builders} />;
 }

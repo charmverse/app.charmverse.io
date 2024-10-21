@@ -256,8 +256,8 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page, refr
           !pagePermissions?.edit_content
             ? "You don't have permission to undo changes"
             : !mutator.canUndo
-            ? 'Nothing to undo'
-            : ''
+              ? 'Nothing to undo'
+              : ''
         }
       >
         <div>

@@ -2,6 +2,8 @@ import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Container, Stack } from '@mui/material';
 import type { PropsWithChildren } from '@packages/utils/react';
 
+import { SidebarInfo } from 'components/info/SidebarInfo';
+
 import { ScrollButton } from './components/ScrollButton';
 
 // For Info pages

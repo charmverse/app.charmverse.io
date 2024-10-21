@@ -81,10 +81,10 @@ export function useFavoriteCredentials() {
               ? // issued credential id is undefined sometimes
                 _userCredential.issuedCredentialId && _userCredential.issuedCredentialId === payload.issuedCredentialId
               : _userCredential.type === 'onchain'
-              ? _userCredential.id === payload.attestationId
-              : _userCredential.type === 'gitcoin'
-              ? lowerCaseEqual(_userCredential.recipient, payload.gitcoinWalletAddress)
-              : false
+                ? _userCredential.id === payload.attestationId
+                : _userCredential.type === 'gitcoin'
+                  ? lowerCaseEqual(_userCredential.recipient, payload.gitcoinWalletAddress)
+                  : false
           ) {
             return {
               ..._userCredential,

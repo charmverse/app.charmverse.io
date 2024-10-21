@@ -75,31 +75,34 @@ export async function mapPropertiesFromApiToSystem({
     throw new InvalidStateError(`No schema found for the databaseIdOrSchema provided`);
   }
 
-  const mappedProperties = Object.entries(properties).reduce((acc, [key, value]) => {
-    if (value === undefined) {
-      return acc;
-    }
+  const mappedProperties = Object.entries(properties).reduce(
+    (acc, [key, value]) => {
+      if (value === undefined) {
+        return acc;
+      }
 
-    const propertySchema = schema.find((prop) => prop.name === key || prop.id === key);
+      const propertySchema = schema.find((prop) => prop.name === key || prop.id === key);
 
-    if (!propertySchema) {
-      throw new InvalidCustomPropertyKeyError({
-        boardSchema: schema,
-        key
+      if (!propertySchema) {
+        throw new InvalidCustomPropertyKeyError({
+          boardSchema: schema,
+          key
+        });
+      } else if (!fieldMappers[propertySchema.type as UpdateableDatabaseFields]) {
+        throw new InvalidInputError(`The property "${key}" cannot be created or updated via the public API`);
+      }
+
+      const mappedValue = fieldMappers[propertySchema.type as UpdateableDatabaseFields]({
+        schema: propertySchema,
+        value
       });
-    } else if (!fieldMappers[propertySchema.type as UpdateableDatabaseFields]) {
-      throw new InvalidInputError(`The property "${key}" cannot be created or updated via the public API`);
-    }
 
-    const mappedValue = fieldMappers[propertySchema.type as UpdateableDatabaseFields]({
-      schema: propertySchema,
-      value
-    });
+      acc[propertySchema.id] = mappedValue;
 
-    acc[propertySchema.id] = mappedValue;
-
-    return acc;
-  }, {} as Record<string, BoardPropertyValue>);
+      return acc;
+    },
+    {} as Record<string, BoardPropertyValue>
+  );
 
   return mappedProperties;
 }

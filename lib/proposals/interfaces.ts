@@ -27,7 +27,17 @@ import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus = 'in_progress' | 'passed' | 'declined' | 'unpublished' | 'archived';
+export type ProposalEvaluationStatus =
+  | 'in_progress'
+  | 'passed'
+  | 'declined'
+  | 'unpublished'
+  | 'archived'
+  | 'draft'
+  | 'not_issued'
+  | 'issued'
+  | 'published';
+
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 

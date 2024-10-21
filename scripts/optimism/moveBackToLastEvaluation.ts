@@ -11,25 +11,29 @@ export async function moveBackToLastEvaluation() {
   const proposal = await prisma.proposal.findFirstOrThrow({
     where: {
       page: {
-        path: pagePath,
+        path: pagePath
       }
     },
     select: {
       evaluations: {
         orderBy: {
-          index: "asc"
+          index: 'asc'
         }
       },
       fields: true
     }
-  })
+  });
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
-  const lastEvaluationId = currentEvaluation?.finalStep || currentEvaluation?.appealedAt || (currentEvaluation?.id === proposal.evaluations.at(-1)?.id && 
-    currentEvaluation?.result === 'pass') ? currentEvaluation?.id : proposal.evaluations.at(-1)?.id;
+  const lastEvaluationId =
+    currentEvaluation?.finalStep ||
+    currentEvaluation?.appealedAt ||
+    (currentEvaluation?.id === proposal.evaluations.at(-1)?.id && currentEvaluation?.result === 'pass')
+      ? currentEvaluation?.id
+      : proposal.evaluations.at(-1)?.id;
 
   if (!lastEvaluationId) {
-    throw new Error()
+    throw new Error();
   }
 
   const rewards = await prisma.bounty.findMany({
@@ -45,9 +49,9 @@ export async function moveBackToLastEvaluation() {
       proposal: true,
       permissions: true
     }
-  })
+  });
 
-  const pendingRewards: ProposalFields['pendingRewards'] = rewards.map(reward => ({
+  const pendingRewards: ProposalFields['pendingRewards'] = rewards.map((reward) => ({
     page: {
       icon: reward.page!.icon,
       type: reward.page!.type,
@@ -55,7 +59,7 @@ export async function moveBackToLastEvaluation() {
       updatedAt: reward.page!.updatedAt,
       contentText: reward.page!.contentText,
       headerImage: reward.page!.headerImage,
-      content: reward.page!.content as PageContent,
+      content: reward.page!.content as PageContent
     },
     reward: {
       chainId: reward.chainId,
@@ -66,16 +70,21 @@ export async function moveBackToLastEvaluation() {
       maxSubmissions: reward.maxSubmissions,
       approveSubmitters: reward.approveSubmitters,
       allowMultipleApplications: reward.allowMultipleApplications,
-      reviewers: reward.permissions.filter(perm => perm.permissionLevel === "reviewer").map(perm => ({
-        id: perm.id,
-        roleId: perm.roleId,
-        userId: perm.userId,
-        proposalId: reward.proposal!.id,
-        systemRole: null,
-        evaluationId: null
-      })),
+      reviewers: reward.permissions
+        .filter((perm) => perm.permissionLevel === 'reviewer')
+        .map((perm) => ({
+          id: perm.id,
+          roleId: perm.roleId,
+          userId: perm.userId,
+          proposalId: reward.proposal!.id,
+          systemRole: null,
+          evaluationId: null
+        })),
       allowedSubmitterRoles: [],
-      assignedSubmitters: reward.permissions.filter(perm => perm.permissionLevel === "submitter").map(perm => perm.userId).filter(isTruthy)
+      assignedSubmitters: reward.permissions
+        .filter((perm) => perm.permissionLevel === 'submitter')
+        .map((perm) => perm.userId)
+        .filter(isTruthy)
     },
     draftId: v4()
   }));
@@ -123,7 +132,7 @@ export async function moveBackToLastEvaluation() {
             path: pagePath
           }
         }
-      },
+      }
     }),
     prisma.proposalEvaluation.updateMany({
       where: {
@@ -135,5 +144,5 @@ export async function moveBackToLastEvaluation() {
         completedAt: null
       }
     })
-  ])
+  ]);
 }

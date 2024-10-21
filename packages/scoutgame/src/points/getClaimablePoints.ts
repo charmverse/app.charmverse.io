@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getPreviousSeason } from '@packages/scoutgame/dates';
 
-export async function getClaimablePoints(userId: string): Promise<{ totalClaimablePoints: number }> {
+import { currentSeason, getPreviousSeason } from '../dates';
+
+export async function getClaimablePoints({ userId, week }: { week?: string; userId: string }): Promise<number> {
   const previousSeason = getPreviousSeason(currentSeason);
   const claimableSeasons = [previousSeason, currentSeason].filter(Boolean);
   if (claimableSeasons.length === 0) {
@@ -12,6 +13,7 @@ export async function getClaimablePoints(userId: string): Promise<{ totalClaimab
       recipientId: userId,
       claimedAt: null,
       event: {
+        week,
         season: {
           in: claimableSeasons
         }
@@ -22,9 +24,5 @@ export async function getClaimablePoints(userId: string): Promise<{ totalClaimab
     }
   });
 
-  const totalClaimablePoints = pointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
-
-  return {
-    totalClaimablePoints
-  };
+  return pointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
 }

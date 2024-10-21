@@ -24,17 +24,20 @@ export async function getProposalDocumentsToSign({
     }
   });
 
-  const documents = docs.reduce((acc, doc) => {
-    const evaluationId = doc.evaluationId;
+  const documents = docs.reduce(
+    (acc, doc) => {
+      const evaluationId = doc.evaluationId;
 
-    if (!acc[evaluationId]) {
-      acc[evaluationId] = [];
-    }
+      if (!acc[evaluationId]) {
+        acc[evaluationId] = [];
+      }
 
-    acc[evaluationId].push(doc);
+      acc[evaluationId].push(doc);
 
-    return acc;
-  }, {} as Record<string, DocumentWithSigners[]>);
+      return acc;
+    },
+    {} as Record<string, DocumentWithSigners[]>
+  );
 
   return documents;
 }

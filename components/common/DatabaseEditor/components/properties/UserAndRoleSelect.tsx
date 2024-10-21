@@ -243,7 +243,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
 
   const mappedMembers: MemberOptionPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
   const mappedRoles: RoleOptionPopulated[] =
-    roles?.map((includedRole) => ({ ...includedRole, group: 'role' } as ListSpaceRolesResponse & { group: 'role' })) ??
+    roles?.map((includedRole) => ({ ...includedRole, group: 'role' }) as ListSpaceRolesResponse & { group: 'role' }) ??
     [];
 
   const filteredOptions = useMemo(() => {

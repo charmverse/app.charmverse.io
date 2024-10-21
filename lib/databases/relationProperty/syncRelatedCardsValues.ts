@@ -156,11 +156,14 @@ export async function syncRelatedCardsValues(
       select: { ...pageFieldsForBlockPrismaSelect }
     })
     .then((_pages) =>
-      _pages.reduce((acc, page) => {
-        acc[page.id] = page;
+      _pages.reduce(
+        (acc, page) => {
+          acc[page.id] = page;
 
-        return acc;
-      }, {} as Record<string, Pick<Page, keyof PageFieldsForBlock>>)
+          return acc;
+        },
+        {} as Record<string, Pick<Page, keyof PageFieldsForBlock>>
+      )
     );
 
   for (const block of updatedBlocks) {

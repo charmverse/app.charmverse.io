@@ -3,12 +3,12 @@ import { Prisma, prisma } from '@charmverse/core/prisma-client';
 export async function transformBlockCommentToPageComment() {
   const blocks = await prisma.block.findMany({
     where: {
-      type: "comment"
+      type: 'comment'
     },
     select: {
       parentId: true,
       fields: true,
-      createdBy: true,
+      createdBy: true
     }
   });
 
@@ -17,12 +17,12 @@ export async function transformBlockCommentToPageComment() {
     await prisma.pageComment.create({
       data: {
         content: (block.fields as Record<string, any>)?.content ?? Prisma.JsonNull,
-        contentText: "",
+        contentText: '',
         pageId,
         createdBy: block.createdBy
       }
-    })
+    });
   }
 }
 
-transformBlockCommentToPageComment()
+transformBlockCommentToPageComment();

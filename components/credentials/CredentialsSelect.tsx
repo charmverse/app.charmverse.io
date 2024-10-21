@@ -64,8 +64,8 @@ export function CredentialSelect({
       templateType === 'proposal'
         ? proposalCredentialTemplates
         : templateType === 'reward'
-        ? rewardCredentialTemplates
-        : ([] as CredentialTemplate[]);
+          ? rewardCredentialTemplates
+          : ([] as CredentialTemplate[]);
 
     return options ?? [];
   }, [proposalCredentialTemplates, rewardCredentialTemplates, templateType]);

@@ -50,36 +50,46 @@ export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
   username = `user-${uuid()}`,
-  displayName = 'Test Scout'
+  displayName = 'Test Scout',
+  builderId,
+  season
 }: {
   username?: string;
   displayName?: string;
+  builderId?: string; // automatically "scout" a builder
+  season?: string;
 } = {}) {
-  return prisma.scout.create({
+  const scout = await prisma.scout.create({
     data: {
       username,
       displayName
     }
   });
+  if (builderId) {
+    await mockNFTPurchaseEvent({ builderId, scoutId: scout.id, season });
+  }
+  return scout;
 }
 
 export async function mockGemPayoutEvent({
   builderId,
   recipientId,
   amount = 10,
-  week = getCurrentWeek()
+  week = getCurrentWeek(),
+  season = mockSeason
 }: {
   builderId: string;
   recipientId?: string;
   amount?: number;
   week?: string;
+  season?: string;
 }) {
   return prisma.gemsPayoutEvent.create({
     data: {
       gems: amount,
       points: 0,
       week,
-      season: mockSeason,
+      season,
       builder: {
         connect: {
           id: builderId
@@ -87,7 +97,7 @@ export async function mockGemPayoutEvent({
       },
       builderEvent: {
         create: {
-          season: mockSeason,
+          season,
           type: 'gems_payout',
           week: getCurrentWeek(),
           builder: {

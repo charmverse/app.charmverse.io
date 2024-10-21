@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 
   const cookieName = process.env.AUTH_COOKIE || getIronOptions().cookieName;
 
-  response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Strict; Path=/`);
+  response.headers.set('Set-Cookie', `${cookieName}=${sealedSession}; HttpOnly; Secure; SameSite=Lax; Path=/`);
 
   return response;
 }

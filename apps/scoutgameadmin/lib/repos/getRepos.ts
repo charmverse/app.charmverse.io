@@ -21,13 +21,17 @@ export async function getRepos({ searchString }: { searchString?: string } = {})
     take: 500,
     orderBy:
       typeof searchString === 'string'
-        ? {
-            _relevance: {
-              fields: ['owner'],
-              search: searchString,
-              sort: 'desc'
-            }
-          }
+        ? [
+            {
+              _relevance: {
+                fields: ['owner'],
+                search: searchString,
+                sort: 'desc'
+              }
+            },
+            { createdAt: 'desc' },
+            { name: 'asc' }
+          ]
         : undefined,
     where:
       typeof searchString === 'string'

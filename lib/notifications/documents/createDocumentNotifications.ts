@@ -334,7 +334,7 @@ export async function createDocumentNotifications(webhookData: {
       const commentId = webhookData.event.comment.id;
       const authorIds = webhookData.event.post
         ? [webhookData.event.post.author.id]
-        : webhookData.event.document?.authors.map(({ id }) => id) ?? [];
+        : (webhookData.event.document?.authors.map(({ id }) => id) ?? []);
       const documentId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
 
