@@ -64,7 +64,7 @@ export async function processGemsPayout(
     }
   }
 
-  const emailsSent = await sendGemsPayoutEmails();
+  const emailsSent = await sendGemsPayoutEmails({ week });
 
   log.info(`Processed ${topWeeklyBuilders.length} builders points payout`, { emailsSent });
 }

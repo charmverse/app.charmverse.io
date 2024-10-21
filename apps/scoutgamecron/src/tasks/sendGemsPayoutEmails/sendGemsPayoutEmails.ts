@@ -1,14 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { sendEmail } from '@packages/mailer/mailer';
-import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { render } from '@react-email/render';
-import { DateTime } from 'luxon';
 
 import { ClaimPointsTemplate } from './templates/ClaimPointsTemplate';
 
-export async function sendGemsPayoutEmails() {
+export async function sendGemsPayoutEmails({ week }: { week: string }) {
   const scouts = await prisma.scout.findMany({
     where: {
       email: {
@@ -27,7 +25,7 @@ export async function sendGemsPayoutEmails() {
 
   for (const scout of scouts) {
     try {
-      const weeklyClaimablePoints = await getClaimablePoints({ userId: scout.id, week: getLastWeek(DateTime.utc()) });
+      const weeklyClaimablePoints = await getClaimablePoints({ userId: scout.id, week });
       if (weeklyClaimablePoints) {
         const html = await render(
           ClaimPointsTemplate({ points: weeklyClaimablePoints, displayName: scout.displayName })
