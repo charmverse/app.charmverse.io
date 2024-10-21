@@ -14,14 +14,12 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 export function BuildersGalleryContainer({
   initialBuilders,
   showHotIcon,
-  userId,
   sort,
   initialCursor
 }: {
   initialCursor: CompositeCursor | null;
   initialBuilders: BuilderInfo[];
   showHotIcon: boolean;
-  userId?: string;
   sort: BuildersSort;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +84,6 @@ export function BuildersGalleryContainer({
         showHotIcon={showHotIcon}
         size={isDesktop ? 'medium' : 'small'}
         columns={5}
-        userId={userId}
       />
       {nextCursor && <div ref={observerTarget} style={{ height: '20px', width: '100%' }} />}
       {isLoading && (

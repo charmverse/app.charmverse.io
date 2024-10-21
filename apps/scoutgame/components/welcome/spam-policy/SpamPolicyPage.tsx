@@ -1,16 +1,18 @@
 'use client';
 
 import { Button, Typography } from '@mui/material';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
-import type { SessionUser } from 'lib/session/getUserFromSession';
+import { useUser } from 'components/layout/UserProvider';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
-export function SpamPolicyPage({ user, redirectToProfile }: { user: SessionUser | null; redirectToProfile: boolean }) {
+export function SpamPolicyPage({ redirectToProfile }: { redirectToProfile: boolean }) {
+  const { user } = useUser();
   const router = useRouter();
   // programmatically added builders will land here skipping the /welcome/builder page
   // we set the onboardedAt flag on that page, so make sure we set it here too if the user hasn't been onboarded yet
@@ -40,6 +42,7 @@ export function SpamPolicyPage({ user, redirectToProfile }: { user: SessionUser 
         {user ? (
           user.onboardedAt ? (
             <Button
+              LinkComponent={Link}
               href={redirectToProfile ? '/profile' : '/welcome/how-it-works'}
               data-test='continue-button'
               disabled={isExecuting}

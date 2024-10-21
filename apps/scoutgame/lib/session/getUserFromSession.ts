@@ -5,7 +5,15 @@ import { cacheGetUser, getUser } from './getUser';
 
 export type SessionUser = Pick<
   Scout,
-  'id' | 'username' | 'displayName' | 'avatar' | 'builderStatus' | 'currentBalance' | 'onboardedAt' | 'agreedToTermsAt'
+  | 'id'
+  | 'username'
+  | 'displayName'
+  | 'avatar'
+  | 'builderStatus'
+  | 'currentBalance'
+  | 'onboardedAt'
+  | 'agreedToTermsAt'
+  | 'bio'
 >;
 
 export async function getUserFromSession(): Promise<SessionUser | null> {

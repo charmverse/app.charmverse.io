@@ -10,7 +10,7 @@ import { LeaderboardTable } from './components/LeaderboardTable';
 import { TopBuildersTable } from './components/TopBuildersTable';
 import { TopScoutsTable } from './components/TopScoutsTable';
 
-export async function HomeTab({ tab, userId }: { tab: string; userId?: string }) {
+export async function HomeTab({ tab }: { tab: string }) {
   if (tab === 'activity') {
     const activities = await getBuilderActivities({ limit: 100 });
     return <ActivityTable activities={activities} />;
@@ -23,12 +23,12 @@ export async function HomeTab({ tab, userId }: { tab: string; userId?: string })
 
   if (tab === 'top-builders') {
     const topBuilders = await getTopBuilders({ limit: 200 });
-    return <TopBuildersTable builders={topBuilders} userId={userId} />;
+    return <TopBuildersTable builders={topBuilders} />;
   }
 
   if (tab === 'leaderboard') {
     const data = await getLeaderboard({ limit: 200 });
-    return <LeaderboardTable data={data} userId={userId} />;
+    return <LeaderboardTable data={data} />;
   }
   return null;
 }

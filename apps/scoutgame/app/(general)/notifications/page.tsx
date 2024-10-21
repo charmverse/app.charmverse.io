@@ -1,14 +1,14 @@
+import { getSession } from '@connect-shared/lib/session/getSession';
 import { getNotifications } from '@packages/scoutgame/notifications/getNotifications';
 
 import { NotificationsPage } from 'components/notifications/NotificationsPage';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Page() {
-  const user = await getUserFromSession();
+  const { scoutId } = await getSession();
 
-  const notifications = user
+  const notifications = scoutId
     ? await getNotifications({
-        userId: user.id
+        userId: scoutId
       })
     : [];
 
