@@ -1,8 +1,10 @@
-import { processNftMints } from '../tasks/processNftMints';
+import { sendGemsPayoutEmails } from '../tasks/processGemsPayout/sendGemsPayoutEmails/sendGemsPayoutEmails';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function query() {
-  await processNftMints();
+  await sendGemsPayoutEmails({
+    week: '2024-W42'
+  });
   // const builderNft = await prisma.builderNft.findMany({
   //   where: {
   //     tokenId: {

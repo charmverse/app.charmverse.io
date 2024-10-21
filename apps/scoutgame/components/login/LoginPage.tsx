@@ -1,13 +1,33 @@
+'use client';
+
+import { log } from '@charmverse/core/log';
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { createContext, useEffect, useContext, useMemo, useState } from 'react';
 
 import { SinglePageLayout } from 'components/common/Layout';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
+import { useGetUserTrigger } from 'hooks/api/session';
 
 import { LaunchDate } from './LaunchDate';
 
 export function LoginPage() {
+  const { trigger: triggerReload } = useGetUserTrigger();
+  const router = useRouter();
+  // HACK: Remove this after we change session cookies to LAX
+  useEffect(() => {
+    async function loadUser() {
+      const updated = await triggerReload();
+      if (updated) {
+        log.info('Redirect user to profile from login page', { userId: updated.id });
+        router.push('/profile?tab=win');
+      }
+    }
+    loadUser();
+  }, []);
+
   return (
     <>
       <InfoBackgroundImage />
