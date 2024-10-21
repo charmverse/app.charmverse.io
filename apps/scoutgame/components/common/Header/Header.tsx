@@ -20,11 +20,12 @@ import { InstallAppMenuItem } from './components/InstallAppMenuItem';
 
 export function Header() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const { execute: logoutUser, isExecuting: isExecutingLogout } = useAction(logoutAction, {
     onSuccess: async () => {
+      await refreshUser();
       revalidatePathAction();
       router.push('/');
     },
