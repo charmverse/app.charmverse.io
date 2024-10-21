@@ -56,42 +56,45 @@ export async function GET() {
     }
   });
   const rows: MoxieBonusRow[] = [];
-  for (const builder of builders) {
-    if (builder.farcasterId && builder.events.length > 0) {
-      // TODO: record moxie fan token data so we dont have to look it up again
-      const moxieNft = await getMoxieFanToken(builder.farcasterId);
-      if (moxieNft) {
-        const scoutFids = builder.builderNfts
-          .map((nft) => nft.nftSoldEvents.map((e) => e.scout.farcasterId))
-          .flat()
-          .filter(Boolean);
-        for (const scoutFid of uniq(scoutFids)) {
-          const fanTokenAmount = await getMoxieFanTokenAmount({
-            builderFid: builder.farcasterId,
-            scoutFid: scoutFid!
-          });
-          const scout = await prisma.scout.findUnique({
-            where: {
-              farcasterId: scoutFid!
-            }
-          });
-          if (fanTokenAmount && scout) {
-            // console.log('found scout with fan token', builder.farcasterId, scoutFid, fanTokenAmount);
-            rows.push({
-              'Scout FID': scoutFid!,
-              'Scout email': scout.email || '',
-              'Scout username': scout.username,
-              'Builder FID': builder.farcasterId,
-              'Builder username': builder.username,
-              'Builder event':
-                (builder.events[0]!.type === 'merged_pull_request' ? `PR on ` : `Commit on `) +
-                builder.events[0]!.createdAt.toDateString()
+
+  await Promise.all(
+    builders.map(async (builder) => {
+      if (builder.farcasterId && builder.events.length > 0) {
+        // TODO: record moxie fan token data so we dont have to look it up again
+        const moxieNft = await getMoxieFanToken(builder.farcasterId);
+        if (moxieNft) {
+          const scoutFids = builder.builderNfts
+            .map((nft) => nft.nftSoldEvents.map((e) => e.scout.farcasterId))
+            .flat()
+            .filter(Boolean);
+          for (const scoutFid of uniq(scoutFids)) {
+            const fanTokenAmount = await getMoxieFanTokenAmount({
+              builderFid: builder.farcasterId,
+              scoutFid: scoutFid!
             });
+            const scout = await prisma.scout.findUnique({
+              where: {
+                farcasterId: scoutFid!
+              }
+            });
+            if (fanTokenAmount && scout) {
+              // console.log('found scout with fan token', builder.farcasterId, scoutFid, fanTokenAmount);
+              rows.push({
+                'Scout FID': scoutFid!,
+                'Scout email': scout.email || '',
+                'Scout username': scout.username,
+                'Builder FID': builder.farcasterId,
+                'Builder username': builder.username,
+                'Builder event':
+                  (builder.events[0]!.type === 'merged_pull_request' ? `PR on ` : `Commit on `) +
+                  builder.events[0]!.createdAt.toDateString()
+              });
+            }
           }
         }
       }
-    }
-  }
+    })
+  );
 
   return respondWithTSV(rows, 'moxie_bonus_report.tsv');
 }
@@ -175,7 +178,9 @@ export async function getMoxieFanTokenAmount({
 }
 
 // at most, 10 req per second
-const rateLimiter = RateLimit(10);
+// Moxy's rate limit is 3000/min and burst of 300/second.
+// @source https://docs.airstack.xyz/airstack-docs-and-faqs/api-capabilities#rate-limits
+const rateLimiter = RateLimit(50);
 
 async function getGQLQuery(query: string) {
   await rateLimiter();
