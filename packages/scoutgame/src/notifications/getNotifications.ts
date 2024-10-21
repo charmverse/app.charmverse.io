@@ -72,7 +72,11 @@ export type ScoutGameNotification =
   | BuilderRecipientStrikeNotification
   | ScoutRecipientStrikeNotification;
 
-export async function getNotifications({ userId }: { userId: string }): Promise<ScoutGameNotification[]> {
+export async function getNotifications({ userId }: { userId?: string }): Promise<ScoutGameNotification[]> {
+  if (!userId) {
+    return [];
+  }
+
   if (!stringUtils.isUUID(userId)) {
     throw new InvalidInputError(`userId required for notifications`);
   }
