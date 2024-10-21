@@ -35,7 +35,7 @@ async function getProposalsEndpoint(req: NextApiRequest, res: NextApiResponse<Pr
     spaceId
   });
 
-  const proposals = await getProposals({ ids, spaceId });
+  const proposals = await getProposals({ ids, spaceId, userId });
 
   const userRoleIds = await getAssignedRoleIds({ spaceId, userId });
 
