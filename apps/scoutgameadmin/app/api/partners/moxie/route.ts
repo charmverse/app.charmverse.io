@@ -174,15 +174,16 @@ export async function getMoxieFanTokenAmount({
   return data.data.MoxieUserPortfolios.MoxieUserPortfolio?.[0]?.amount || 0;
 }
 
-// at most, 1 req per second
-const rateLimiter = RateLimit(1);
+// at most, 10 req per second
+const rateLimiter = RateLimit(10);
 
 async function getGQLQuery(query: string) {
   await rateLimiter();
   const response = await fetch('https://api.airstack.xyz/gql', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: process.env.AIRSTACK_API_KEY as string
     },
     body: JSON.stringify({ query })
   });
