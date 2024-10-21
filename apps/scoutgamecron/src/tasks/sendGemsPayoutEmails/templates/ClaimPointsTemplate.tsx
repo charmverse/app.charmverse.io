@@ -42,7 +42,7 @@ export function ClaimPointsTemplate({ points, displayName }: { points: number; d
             <Text>
               Congratulations, {displayName} you just earned {points} points this week in the Scout Game.
             </Text>
-            <Button href='https://scoutgame.xyz/profile?tab=win'>Claim</Button>
+            <Button href='http://localhost:3000/profile?tab=win'>Claim</Button>
           </Section>
         </Section>
       </Section>
