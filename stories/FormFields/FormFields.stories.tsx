@@ -84,6 +84,7 @@ export function FormFieldsInputs() {
     <GlobalContext>
       <CustomFormFieldAnswers
         {...props}
+        isAuthor={true}
         enableComments={true}
         proposalId=''
         applyProject={() => {}}
@@ -172,6 +173,7 @@ export function FormFieldsInputsDisplay() {
     <GlobalContext>
       <CustomFormFieldAnswers
         {...props}
+        isAuthor={true}
         proposalId=''
         enableComments={true}
         applyProject={() => {}}
