@@ -214,13 +214,13 @@ export function mapRewardToCard({
     [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
       ? 1
       : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
-      ? (
-          countRemainingSubmissionSlots({
-            applications: validApplications,
-            limit: reward.maxSubmissions
-          }) as number
-        )?.toString()
-      : '',
+        ? (
+            countRemainingSubmissionSlots({
+              applications: validApplications,
+              limit: reward.maxSubmissions
+            }) as number
+          )?.toString()
+        : '',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (rewardPage?.createdBy && [rewardPage.createdBy]) || '',
     // focalboard component expects a timestamp
@@ -323,13 +323,13 @@ function mapApplicationToCard({
     [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
       ? 1
       : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
-      ? (
-          countRemainingSubmissionSlots({
-            applications: validApplications,
-            limit: reward.maxSubmissions
-          }) as number
-        )?.toString()
-      : '',
+        ? (
+            countRemainingSubmissionSlots({
+              applications: validApplications,
+              limit: reward.maxSubmissions
+            }) as number
+          )?.toString()
+        : '',
     // Reward status allows matching application by reward status - Hide in the front end
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',

@@ -128,7 +128,7 @@ test.describe('Database with proposals as datasource', async () => {
 
       const proposalStatusBadge = databasePage.page
         .locator(`data-test=database-row-${card.id}`)
-        .filter({ hasText: 'Unpublished' });
+        .filter({ hasText: 'Draft' });
 
       expect(proposalStatusBadge).toBeVisible();
 

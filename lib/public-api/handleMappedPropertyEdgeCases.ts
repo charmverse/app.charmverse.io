@@ -12,20 +12,26 @@ export function handleMappedPropertyEdgeCases({
   mapped,
   schema
 }: PropertyEdgeCaseInput): Record<string, BoardPropertyValue> {
-  const mappedSchema = schema.reduce((acc, val) => {
-    acc[val.id] = val;
-    return acc;
-  }, {} as Record<string, PageProperty>);
-
-  const updatedObject = Object.entries(mapped).reduce((acc, [key, value]) => {
-    if (mappedSchema[key]?.type === 'checkbox' && value === 'false') {
+  const mappedSchema = schema.reduce(
+    (acc, val) => {
+      acc[val.id] = val;
       return acc;
-    }
+    },
+    {} as Record<string, PageProperty>
+  );
 
-    acc[key] = value;
+  const updatedObject = Object.entries(mapped).reduce(
+    (acc, [key, value]) => {
+      if (mappedSchema[key]?.type === 'checkbox' && value === 'false') {
+        return acc;
+      }
 
-    return acc;
-  }, {} as Record<string, BoardPropertyValue>);
+      acc[key] = value;
+
+      return acc;
+    },
+    {} as Record<string, BoardPropertyValue>
+  );
 
   return updatedObject;
 }

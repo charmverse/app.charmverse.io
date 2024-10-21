@@ -54,7 +54,7 @@ export function PostCategoryInput({
   return (
     <PostCategoryAutocomplete
       value={postCategory ?? null}
-      options={readOnly ? categories ?? [] : postableCategories}
+      options={readOnly ? (categories ?? []) : postableCategories}
       disabled={readOnly}
       onChange={updateForumPost}
     />

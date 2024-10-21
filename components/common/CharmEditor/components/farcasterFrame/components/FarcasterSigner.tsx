@@ -40,8 +40,8 @@ export function FarcasterSigner() {
           {signerApprovalModalPopupState.isOpen
             ? 'Waiting for approval...'
             : isCreatingSigner
-            ? 'Loading...'
-            : 'Sign in with Farcaster'}
+              ? 'Loading...'
+              : 'Sign in with Farcaster'}
         </Typography>
       </StyledButton>
     </Stack>

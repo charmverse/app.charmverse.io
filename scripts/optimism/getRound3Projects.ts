@@ -7,7 +7,7 @@ const client = new ApolloClient({ uri: 'https://vote.optimism.io/graphql', cache
 type ContributionLink = {
   type: string;
   url: string;
-}
+};
 
 export type OPProjectData = {
   id: string;
@@ -21,55 +21,55 @@ export type OPProjectData = {
     address: {
       address: string;
     };
-  }
+  };
   websiteUrl: string;
   contributionLinks: ContributionLink[];
-}
+};
 
 const getProjects = async (after: string) => {
-    const { data } = await client.query({
-      query: gql`
-        query Retro3PGF($after: String, $first: Int!, $orderBy: ProjectOrder!) {
-          retroPGF {
-            projects(after:$after, first: $first, orderBy: $orderBy) {
-              edges {
-                cursor
-                node {
-                  id,
-                  bio
-                  displayName
-                  profile {
-                    profileImageUrl
-                    bannerImageUrl
-                  }
-                  contributionLinks {
-                    type
-                    url
-                  }
-                  websiteUrl
-                  applicant {
-                    address {
-                      address
-                      isContract
-                    }
+  const { data } = await client.query({
+    query: gql`
+      query Retro3PGF($after: String, $first: Int!, $orderBy: ProjectOrder!) {
+        retroPGF {
+          projects(after: $after, first: $first, orderBy: $orderBy) {
+            edges {
+              cursor
+              node {
+                id
+                bio
+                displayName
+                profile {
+                  profileImageUrl
+                  bannerImageUrl
+                }
+                contributionLinks {
+                  type
+                  url
+                }
+                websiteUrl
+                applicant {
+                  address {
+                    address
+                    isContract
                   }
                 }
               }
             }
-            projectsAggregate {
-              total
-            }
+          }
+          projectsAggregate {
+            total
           }
         }
-      `,
-      variables: {
-        after: after || null,
-        first: 100,
-        orderBy: 'shuffle'
       }
-    });
+    `,
+    variables: {
+      after: after || null,
+      first: 100,
+      orderBy: 'shuffle'
+    }
+  });
 
-    return data.retroPGF;
+  return data.retroPGF;
 };
 
 const getAllProjects = async () => {
@@ -80,7 +80,10 @@ const getAllProjects = async () => {
     const lastProjectCursor = projects.length ? projects[projects.length - 1].cursor : '';
     const res = await getProjects(lastProjectCursor);
 
-    const { projects: { edges }, projectsAggregate } = res;
+    const {
+      projects: { edges },
+      projectsAggregate
+    } = res;
 
     total = projectsAggregate.total;
 
@@ -101,7 +104,7 @@ const getAllProjects = async () => {
 function getTwitterHandle(links: ContributionLink[]) {
   // find twitter.com or x.com  in url
   const link = links.find((link) => link.url.match(/twitter\.com|x\.com/));
-  let handle = link?.url?.match(/^https?:\/\/(www\.)?(twitter\.com|x\.com)\/(#!\/)?([^\/]+)(\/\w+)*$/)?.[3]
+  let handle = link?.url?.match(/^https?:\/\/(www\.)?(twitter\.com|x\.com)\/(#!\/)?([^\/]+)(\/\w+)*$/)?.[3];
   if (handle?.includes('?')) {
     handle = handle.split('?')[0];
   }
@@ -130,7 +133,7 @@ export async function getProjectsImportData(): Promise<ProjectInputRow[]> {
       twitterUsername: twitterHandle,
       avatarUrl: project.profile.profileImageUrl,
       website: project.websiteUrl
-    }
+    };
   });
 
   console.log('🔥', `Loaded data for ${opProjectsData.length} projects`);

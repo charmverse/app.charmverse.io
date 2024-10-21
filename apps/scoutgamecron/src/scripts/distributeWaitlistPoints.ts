@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { BuilderEventType, prisma } from "@charmverse/core/prisma-client";
+import { BuilderEventType, prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { ConnectWaitlistTier, getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 
@@ -11,7 +11,6 @@ const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   common: 10
 };
 
-
 export async function distributeWaitlistPoints() {
   const waitlistRecords = await prisma.connectWaitlistSlot.findMany({
     select: {
@@ -20,7 +19,7 @@ export async function distributeWaitlistPoints() {
       githubLogin: true,
       percentile: true
     }
-  })
+  });
 
   for (const record of waitlistRecords) {
     const scout = await prisma.scout.findFirst({
@@ -30,7 +29,7 @@ export async function distributeWaitlistPoints() {
       select: {
         id: true
       }
-    })
+    });
 
     if (scout) {
       const tier = getTier(record.percentile);
@@ -58,22 +57,22 @@ export async function distributeWaitlistPoints() {
                   type: 'misc_event' as BuilderEventType,
                   week: getCurrentWeek(),
                   description: 'Received points for participating in pre-season week as a Builder',
-                  builderId: scout.id,
+                  builderId: scout.id
                 }
               },
               activities: {
                 create: {
-                  type: "points",
+                  type: 'points',
                   userId: scout.id,
-                  recipientType: "builder"
+                  recipientType: 'builder'
                 }
               }
             }
           })
-        ])
+        ]);
       }
 
-      log.info(`Successfully distributed ${points} points to ${record.username} (${record.fid})`)
+      log.info(`Successfully distributed ${points} points to ${record.username} (${record.fid})`);
     }
   }
 }

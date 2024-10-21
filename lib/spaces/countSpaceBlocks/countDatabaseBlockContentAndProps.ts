@@ -54,16 +54,22 @@ export async function countDatabaseBlockContentAndProps({ spaceId }: BlocksCount
   // 3 - Get schemas for each database block and sum up
   let totalProperties = 0;
 
-  const databaseSchemas = databaseBlockRecords.reduce((acc, block) => {
-    // Create a local map for this database
-    const boardProps = (block as any as Board).fields.cardProperties?.reduce((propAcc, prop) => {
-      totalProperties += 1;
-      propAcc[prop.id] = prop;
-      return propAcc;
-    }, {} as Record<string, IPropertyTemplate>);
-    acc[block.id] = boardProps;
-    return acc;
-  }, {} as Record<string, Record<string, IPropertyTemplate>>);
+  const databaseSchemas = databaseBlockRecords.reduce(
+    (acc, block) => {
+      // Create a local map for this database
+      const boardProps = (block as any as Board).fields.cardProperties?.reduce(
+        (propAcc, prop) => {
+          totalProperties += 1;
+          propAcc[prop.id] = prop;
+          return propAcc;
+        },
+        {} as Record<string, IPropertyTemplate>
+      );
+      acc[block.id] = boardProps;
+      return acc;
+    },
+    {} as Record<string, Record<string, IPropertyTemplate>>
+  );
 
   detailedCount.details.databaseProperties = totalProperties;
 

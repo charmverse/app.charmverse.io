@@ -27,7 +27,6 @@
   }
 }
 
-
 /* Main app */
 
 .dragover {
@@ -51,7 +50,6 @@
 /*-- Property list --*/
 
 .octo-propertyvalue {
-
   &.empty {
     color: rgba(var(--center-channel-color-rgb), 0.4);
   }
@@ -80,5 +78,8 @@
 .octo-propertyvalue.Editable.active,
 .octo-table-cell .Editable.active {
   border-radius: 3px;
-  box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px, rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
+  box-shadow:
+    rgba(15, 15, 15, 0.05) 0 0 0 1px,
+    rgba(15, 15, 15, 0.1) 0 3px 6px,
+    rgba(15, 15, 15, 0.2) 0 9px 24px;
 }

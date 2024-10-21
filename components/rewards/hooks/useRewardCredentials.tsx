@@ -76,7 +76,7 @@ export function useRewardCredentials() {
                 credentialTemplateId: ic.credentialTemplateId,
                 recipientAddress: ic.recipientAddress,
                 rewardApplicationId: ic.rewardApplicationId
-              } as PartialIssuableRewardApplicationCredentialContent)
+              }) as PartialIssuableRewardApplicationCredentialContent
           ),
           type: 'reward'
         });

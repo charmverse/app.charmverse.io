@@ -46,16 +46,15 @@ module.exports = {
     },
     {
       name: 'no-test-imports',
-      comment:
-        'This module imports a test utility file. Test utilities cannot be used in production',
+      comment: 'This module imports a test utility file. Test utilities cannot be used in production',
       severity: 'error',
       from: {
-        pathNot: "^.*(\\.spec\\.ts|\\.spec\\.tsx|__e2e__|__integration-tests__|testing|testUtils).*$"
+        pathNot: '^.*(\\.spec\\.ts|\\.spec\\.tsx|__e2e__|__integration-tests__|testing|testUtils).*$'
       },
       to: {
         path: 'testing/|__e2e__/'
       }
-    },
+    }
     /* rules from the 'recommended' preset: */
     // {
     //   name: 'no-orphans',
@@ -235,7 +234,6 @@ module.exports = {
     // }
   ],
   options: {
-
     /* conditions specifying which files not to follow further when encountered:
        - path: a regular expression to match
        - dependencyTypes: see https://github.com/sverweij/dependency-cruiser/blob/main/doc/rules-reference.md#dependencytypes-and-dependencytypesnot
@@ -250,7 +248,7 @@ module.exports = {
        - dynamic: a boolean indicating whether to ignore dynamic (true) or static (false) dependencies.
           leave out if you want to exclude neither (recommended!)
     */
-    exclude : {
+    exclude: {
       // ignore dynamic imports (CharmEditor currently imports itself via PollComponent)
       dynamic: true
     },
@@ -258,7 +256,8 @@ module.exports = {
     /* pattern specifying which files to include (regular expression)
        dependency-cruiser will skip everything not matching this pattern
     */
-    includeOnly : '^(__e2e__|adapters|background|charmClient|components|connectors|context|hooks|lib|background|models|pages|testing|theme)',
+    includeOnly:
+      '^(__e2e__|adapters|background|charmClient|components|connectors|context|hooks|lib|background|models|pages|testing|theme)',
 
     /* dependency-cruiser will include modules matching against the focus
        regular expression in its output, as well as their neighbours (direct
@@ -356,7 +355,7 @@ module.exports = {
          If you have an `exportsFields` attribute in your webpack config, that one
          will have precedence over the one specified here.
       */
-      exportsFields: ["exports"],
+      exportsFields: ['exports'],
       /* List of conditions to check for in the exports field. e.g. use ['imports']
          if you're only interested in exposed es6 modules, ['require'] for commonjs,
          or all conditions at once `(['import', 'require', 'node', 'default']`)
@@ -366,7 +365,7 @@ module.exports = {
         If you have a 'conditionNames' attribute in your webpack config, that one will
         have precedence over the one specified here.
       */
-      conditionNames: ["import", "require", "node", "default"],
+      conditionNames: ['import', 'require', 'node', 'default'],
       /*
          The extensions, by default are the same as the ones dependency-cruiser
          can access (run `npx depcruise --info` to see which ones that are in
@@ -385,7 +384,7 @@ module.exports = {
          this if you're not sure, but still use TypeScript. In a future version
          of dependency-cruiser this will likely become the default.
        */
-      mainFields: ["main", "types"],
+      mainFields: ['main', 'types']
     },
     reporterOptions: {
       dot: {
@@ -394,7 +393,7 @@ module.exports = {
            collapses everything in node_modules to one folder deep so you see
            the external modules, but not the innards your app depends upon.
          */
-        collapsePattern: 'node_modules/(@[^/]+/[^/]+|[^/]+)',
+        collapsePattern: 'node_modules/(@[^/]+/[^/]+|[^/]+)'
 
         /* Options to tweak the appearance of your graph.See
            https://github.com/sverweij/dependency-cruiser/blob/main/doc/options-reference.md#reporteroptions
@@ -475,7 +474,7 @@ module.exports = {
           dependency graph reporter (`archi`) you probably want to tweak
           this collapsePattern to your situation.
         */
-        collapsePattern: '^(packages|src|lib|app|bin|test(s?)|spec(s?))/[^/]+|node_modules/(@[^/]+/[^/]+|[^/]+)',
+        collapsePattern: '^(packages|src|lib|app|bin|test(s?)|spec(s?))/[^/]+|node_modules/(@[^/]+/[^/]+|[^/]+)'
 
         /* Options to tweak the appearance of your graph.See
            https://github.com/sverweij/dependency-cruiser/blob/main/doc/options-reference.md#reporteroptions
@@ -486,9 +485,9 @@ module.exports = {
         // theme: {
         // },
       },
-      "text": {
-        "highlightFocused": true
-      },
+      text: {
+        highlightFocused: true
+      }
     }
   }
 };

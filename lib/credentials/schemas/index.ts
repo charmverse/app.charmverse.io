@@ -83,24 +83,24 @@ export const charmverseCredentialSchemas = [attestationSchemaIds.proposal, attes
 export type CredentialDataInput<T extends ExtendedAttestationType = ExtendedAttestationType> = T extends 'proposal'
   ? ProposalCredential
   : T extends 'reward'
-  ? RewardCredential
-  : T extends 'external'
-  ? ExternalCredential
-  : T extends 'gitcoinProject'
-  ? GitcoinProjectCredential
-  : T extends 'optimismProject'
-  ? OptimismProjectAttestationData
-  : T extends 'optimismProjectSnapshot'
-  ? OptimismProjectSnapshotAttestationMetaData
-  : T extends 'charmQualifyingEvent'
-  ? CharmQualifyingEvent
-  : T extends 'charmUserIdentifier'
-  ? CharmUserIdentifier
-  : T extends 'charmProject'
-  ? CharmProject
-  : T extends 'charmProjectMetadata'
-  ? CharmProjectMetadata
-  : never;
+    ? RewardCredential
+    : T extends 'external'
+      ? ExternalCredential
+      : T extends 'gitcoinProject'
+        ? GitcoinProjectCredential
+        : T extends 'optimismProject'
+          ? OptimismProjectAttestationData
+          : T extends 'optimismProjectSnapshot'
+            ? OptimismProjectSnapshotAttestationMetaData
+            : T extends 'charmQualifyingEvent'
+              ? CharmQualifyingEvent
+              : T extends 'charmUserIdentifier'
+                ? CharmUserIdentifier
+                : T extends 'charmProject'
+                  ? CharmProject
+                  : T extends 'charmProjectMetadata'
+                    ? CharmProjectMetadata
+                    : never;
 
 export type CredentialData<T extends ExtendedAttestationType = ExtendedAttestationType> = {
   type: T;

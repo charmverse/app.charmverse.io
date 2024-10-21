@@ -92,11 +92,11 @@ function renderPopUp<T>(
                   horizontal: 'right'
                 }
               : popUpParams.placement === 'top-end'
-              ? {
-                  vertical: 'top',
-                  horizontal: 'right'
-                }
-              : undefined
+                ? {
+                    vertical: 'top',
+                    horizontal: 'right'
+                  }
+                : undefined
           }
           // close popovers on mouse leave
           // slotProps={{ paper: { onMouseLeave: close } }}

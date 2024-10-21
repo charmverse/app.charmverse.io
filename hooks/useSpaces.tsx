@@ -93,7 +93,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         isLoaded,
         createNewSpace,
         isCreatingSpace
-      } as IContext),
+      }) as IContext,
     [spaces, memberSpaces, isLoaded, setSpace, createNewSpace, isCreatingSpace]
   );
 

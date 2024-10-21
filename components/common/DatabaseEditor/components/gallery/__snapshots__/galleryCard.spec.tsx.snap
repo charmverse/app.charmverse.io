@@ -6,7 +6,7 @@ exports[`src/components/gallery/GalleryCard without block content should match s
     class="variable variable"
   >
     <div
-      class="GalleryCard selected MuiBox-root css-1oaiypi"
+      class="GalleryCard selected MuiBox-root css-1ck4zfx"
       data-test="gallery-card-cardId"
       draggable="true"
       style="opacity: 1;"

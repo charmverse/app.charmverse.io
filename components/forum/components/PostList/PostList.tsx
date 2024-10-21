@@ -100,7 +100,7 @@ export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
     [search, postsData, searchData]
   );
 
-  const postsToShow = (search && searchData ? searchData : postsData ?? []).map((post) => post.data).flat();
+  const postsToShow = (search && searchData ? searchData : (postsData ?? [])).map((post) => post.data).flat();
 
   const currentCategoryId =
     typeof categoryId === 'string' ? categoryId : Array.isArray(categoryId) ? categoryId[0] : null;

@@ -247,14 +247,14 @@ export function trackedTransaction(
       const newStep = approved
         ? step
         : step.slice.size && !cellDeleteTr
-        ? new ReplaceStep(
-            step.to, // We insert all the same steps, but with "from"/"to" both set to "to" in order not to delete content. Mapped as needed.
-            step.to,
-            step.slice,
-            // @ts-ignore types are wrong
-            step.structure
-          )
-        : false;
+          ? new ReplaceStep(
+              step.to, // We insert all the same steps, but with "from"/"to" both set to "to" in order not to delete content. Mapped as needed.
+              step.to,
+              step.slice,
+              // @ts-ignore types are wrong
+              step.structure
+            )
+          : false;
 
       // We didn't apply the original step in its original place. We adjust the map accordingly.
       const invertStep = originalStep.invert(tr.docs[originalStepIndex]).map(map);

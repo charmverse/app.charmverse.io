@@ -36,9 +36,9 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
     pageId: boardId,
     permission: {
       assignee: {
-        group: 'public',
+        group: 'public'
       },
-    permissionLevel: 'view'
+      permissionLevel: 'view'
     }
   });
 
@@ -57,10 +57,11 @@ async function toggleBoardPublishedState(boardId: string, publish: boolean): Pro
 
   for (const card of cardsInBoard) {
     await permissionsApiClient.pages.upsertPagePermission({
-      pageId: card.id, permission: {
-      assignee: {group: 'public'},
-      permissionLevel: 'view'
-    }
+      pageId: card.id,
+      permission: {
+        assignee: { group: 'public' },
+        permissionLevel: 'view'
+      }
     });
     processed += 1;
     console.log(`Processed card ${processed} / ${totalCards}`);

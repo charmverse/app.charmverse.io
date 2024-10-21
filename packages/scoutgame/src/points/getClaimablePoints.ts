@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getPreviousSeason } from '@packages/scoutgame/dates';
+
+import { currentSeason, getPreviousSeason } from '../dates';
 
 export async function getClaimablePoints(userId: string): Promise<{ totalClaimablePoints: number }> {
   const previousSeason = getPreviousSeason(currentSeason);

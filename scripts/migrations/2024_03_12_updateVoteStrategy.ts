@@ -4,7 +4,7 @@ import { VoteSettings } from 'lib/proposals/interfaces';
 export async function updateVoteStrategy() {
   const voteProposalEvaluations = await prisma.proposalEvaluation.findMany({
     where: {
-      type: "vote"
+      type: 'vote'
     },
     select: {
       id: true,
@@ -15,7 +15,7 @@ export async function updateVoteStrategy() {
       },
       voteSettings: true
     }
-  })
+  });
 
   let current = 0;
 
@@ -27,14 +27,18 @@ export async function updateVoteStrategy() {
         const publishToSnapshot = (voteSettings as any).publishToSnapshot as boolean;
         // delete (voteSettings as any).publishToSnapshot;
         await prisma.$transaction([
-          ...(vote ? [prisma.vote.update({
-            where: {
-              id: vote.id
-            },
-            data: {
-              strategy: publishToSnapshot ? "snapshot" : "regular"
-            }
-          })] : []),
+          ...(vote
+            ? [
+                prisma.vote.update({
+                  where: {
+                    id: vote.id
+                  },
+                  data: {
+                    strategy: publishToSnapshot ? 'snapshot' : 'regular'
+                  }
+                })
+              ]
+            : []),
           prisma.proposalEvaluation.update({
             where: {
               id: voteProposalEvaluation.id
@@ -42,11 +46,11 @@ export async function updateVoteStrategy() {
             data: {
               voteSettings: {
                 ...voteSettings,
-                strategy: publishToSnapshot ? "snapshot" : "regular"
+                strategy: publishToSnapshot ? 'snapshot' : 'regular'
               }
             }
           })
-        ])
+        ]);
       }
       current++;
       console.log(`Updated vote strategy: ${current}/${voteProposalEvaluations.length}`);

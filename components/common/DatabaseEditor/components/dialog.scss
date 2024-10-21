@@ -18,7 +18,8 @@
     display: flex;
     flex-direction: column;
     background-color: rgb(var(--center-channel-bg-rgb));
-    box-shadow: rgba(var(--center-channel-color-rgb), 0.1) 0 0 0 1px,
+    box-shadow:
+      rgba(var(--center-channel-color-rgb), 0.1) 0 0 0 1px,
       rgba(var(--center-channel-color-rgb), 0.1) 0 2px 4px;
     padding: 0;
 

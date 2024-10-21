@@ -136,8 +136,8 @@ export function CategoryContextMenu({ categoryId, onDelete, permissions }: Props
               !permissions.delete_category
                 ? 'You do not have permissions to delete this category'
                 : isDefaultSpacePostCategory
-                ? 'You cannot delete the default post category'
-                : ''
+                  ? 'You cannot delete the default post category'
+                  : ''
             }
           >
             <MenuItem

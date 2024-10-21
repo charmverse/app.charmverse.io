@@ -189,7 +189,7 @@ function PropertyValueElement(props: Props) {
     autoExpand: true,
     onChange: setValue,
     displayType,
-    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    multiline: displayType === 'details' ? true : (props.wrapColumn ?? false),
     onSave: async () => {
       try {
         await mutator.changePropertyValue(card, propertyTemplate.id, value);
@@ -385,7 +385,7 @@ function PropertyValueElement(props: Props) {
         placeholderText={emptyDisplayValue}
         value={value.toString()}
         onChange={setValue}
-        multiline={displayType === 'details' ? true : props.wrapColumn ?? false}
+        multiline={displayType === 'details' ? true : (props.wrapColumn ?? false)}
         onSave={() => {
           if (reward) {
             try {
@@ -567,7 +567,7 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : ((propertyValue as string[]) ?? [])}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           try {
@@ -608,7 +608,7 @@ function PropertyValueElement(props: Props) {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
-        memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
+        memberIds={typeof propertyValue === 'string' ? [propertyValue] : ((propertyValue as string[]) ?? [])}
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           if (proposal) {
@@ -767,7 +767,7 @@ function PropertyValueElement(props: Props) {
     return typeof subRowsEmptyValueContent === 'string' ? (
       <span>{subRowsEmptyValueContent}</span>
     ) : (
-      subRowsEmptyValueContent ?? null
+      (subRowsEmptyValueContent ?? null)
     );
   }
 

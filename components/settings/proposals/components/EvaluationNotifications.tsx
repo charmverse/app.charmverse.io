@@ -41,8 +41,8 @@ export function EvaluationNotificationsRow({
                 evaluation.type === 'vote'
                   ? 'The vote on {pageTitle} has passed. View results.'
                   : nextEvaluationTitle
-                  ? `Your ${proposalFeatureTitle} has successfully completed the ${evaluation.title} step and is now moving to the ${nextEvaluationTitle} step`
-                  : `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.approve}`
+                    ? `Your ${proposalFeatureTitle} has successfully completed the ${evaluation.title} step and is now moving to the ${nextEvaluationTitle} step`
+                    : `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.approve}`
               }
               onChange={(e) => {
                 onChange({

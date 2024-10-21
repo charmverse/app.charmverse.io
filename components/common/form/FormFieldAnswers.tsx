@@ -103,28 +103,31 @@ export function FormFieldAnswers({
       return {};
     }
 
-    return Object.values(threads).reduce((acc, thread) => {
-      if (!thread) {
-        return acc;
-      }
+    return Object.values(threads).reduce(
+      (acc, thread) => {
+        if (!thread) {
+          return acc;
+        }
 
-      const fieldAnswerId = thread.fieldAnswerId;
-      if (!fieldAnswerId) {
-        return acc;
-      }
+        const fieldAnswerId = thread.fieldAnswerId;
+        if (!fieldAnswerId) {
+          return acc;
+        }
 
-      if (!acc[fieldAnswerId]) {
+        if (!acc[fieldAnswerId]) {
+          return {
+            ...acc,
+            [fieldAnswerId]: [thread]
+          };
+        }
+
         return {
           ...acc,
-          [fieldAnswerId]: [thread]
+          [fieldAnswerId]: [...acc[fieldAnswerId], thread]
         };
-      }
-
-      return {
-        ...acc,
-        [fieldAnswerId]: [...acc[fieldAnswerId], thread]
-      };
-    }, {} as Record<string, ThreadWithComments[]>);
+      },
+      {} as Record<string, ThreadWithComments[]>
+    );
   }, [threads]);
   return (
     <FormFieldAnswersContainer>

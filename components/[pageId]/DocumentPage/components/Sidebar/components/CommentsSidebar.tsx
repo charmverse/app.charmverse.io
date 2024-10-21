@@ -236,8 +236,8 @@ function EditorCommentsSidebarComponent({
     !view || !threads
       ? new Set()
       : checkIsContentEmpty(view?.state.doc.toJSON())
-      ? new Set(Object.keys(threads))
-      : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+        ? new Set(Object.keys(threads))
+        : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
   // Making sure the position sort doesn't filter out comments that are not in the view
   const inlineThreadsIds =

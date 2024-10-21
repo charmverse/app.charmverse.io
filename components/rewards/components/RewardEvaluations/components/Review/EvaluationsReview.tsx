@@ -156,7 +156,7 @@ export function EvaluationsReview({
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index}
             title={evaluation.title}
-            result={application ? evaluation.result ?? null : null}
+            result={application ? (evaluation.result ?? null) : null}
             actions={
               evaluation.type === 'apply' || evaluation.type === 'kyc' || readOnly ? null : (
                 <EvaluationStepActions canEdit openSettings={() => openSettings(evaluation)} />

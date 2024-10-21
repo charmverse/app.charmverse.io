@@ -1,4 +1,15 @@
-import { Form, FormField, Page, Proposal, ProposalAppealReviewer, ProposalEvaluation, ProposalEvaluationPermission, ProposalReviewer, ProposalRubricCriteria, prisma } from '@charmverse/core/prisma-client';
+import {
+  Form,
+  FormField,
+  Page,
+  Proposal,
+  ProposalAppealReviewer,
+  ProposalEvaluation,
+  ProposalEvaluationPermission,
+  ProposalReviewer,
+  ProposalRubricCriteria,
+  prisma
+} from '@charmverse/core/prisma-client';
 import { writeToSameFolder } from '@root/lib/utils/file';
 
 /**
@@ -6,18 +17,19 @@ import { writeToSameFolder } from '@root/lib/utils/file';
  */
 
 export type ExportedProposalTemplate = Proposal & {
-  page: Page
+  page: Page;
   form: Form & {
-    formFields: FormField[]
-  }
-  evaluations: (ProposalEvaluation & { rubricCriteria: ProposalRubricCriteria[],
-    reviewers: ProposalReviewer[],
-    appealReviewers: ProposalAppealReviewer[],
-    permissions: ProposalEvaluationPermission[]})[] 
-}
+    formFields: FormField[];
+  };
+  evaluations: (ProposalEvaluation & {
+    rubricCriteria: ProposalRubricCriteria[];
+    reviewers: ProposalReviewer[];
+    appealReviewers: ProposalAppealReviewer[];
+    permissions: ProposalEvaluationPermission[];
+  })[];
+};
 
 async function exportProposalTemplate(): Promise<ExportedProposalTemplate> {
-
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: '123445'
@@ -38,9 +50,9 @@ async function exportProposalTemplate(): Promise<ExportedProposalTemplate> {
         }
       }
     }
-  })
+  });
 
-  await writeToSameFolder({fileName: 'proposal.json', data: JSON.stringify(proposal, null, 2)});
+  await writeToSameFolder({ fileName: 'proposal.json', data: JSON.stringify(proposal, null, 2) });
 
   return proposal as ExportedProposalTemplate;
 }

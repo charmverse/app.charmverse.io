@@ -57,7 +57,7 @@ function GuildRow(props: { data: ItemData[]; index: number; style: React.CSSProp
                 alt={guild.name}
                 sx={{ width: 32, height: 32 }}
                 src={
-                  guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : guild.imageUrl ?? undefined
+                  guild.imageUrl?.startsWith('/') ? `https://guild.xyz${guild.imageUrl}` : (guild.imageUrl ?? undefined)
                 }
               />
             </ListItemIcon>

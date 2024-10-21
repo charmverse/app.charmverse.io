@@ -372,7 +372,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       href="/test-space/1"
                     >
                       <div
-                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        class="KanbanCard MuiBox-root css-1ck4zfx"
                         data-test="kanban-card-1"
                         draggable="true"
                         style="opacity: 1;"
@@ -419,7 +419,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       href="/test-space/2"
                     >
                       <div
-                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        class="KanbanCard MuiBox-root css-1ck4zfx"
                         data-test="kanban-card-2"
                         draggable="true"
                         style="opacity: 1;"
@@ -1037,7 +1037,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
               class="Gallery"
             >
               <div
-                class="GalleryCard MuiBox-root css-1oaiypi"
+                class="GalleryCard MuiBox-root css-1ck4zfx"
                 data-test="gallery-card-1"
                 draggable="true"
                 style="opacity: 1;"
@@ -1065,7 +1065,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 </div>
               </div>
               <div
-                class="GalleryCard MuiBox-root css-1oaiypi"
+                class="GalleryCard MuiBox-root css-1ck4zfx"
                 data-test="gallery-card-2"
                 draggable="true"
                 style="opacity: 1;"
@@ -1666,7 +1666,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       href="/test-space/1"
                     >
                       <div
-                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        class="KanbanCard MuiBox-root css-1ck4zfx"
                         data-test="kanban-card-1"
                         draggable="true"
                         style="opacity: 1;"
@@ -1713,7 +1713,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       href="/test-space/2"
                     >
                       <div
-                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        class="KanbanCard MuiBox-root css-1ck4zfx"
                         data-test="kanban-card-2"
                         draggable="true"
                         style="opacity: 1;"

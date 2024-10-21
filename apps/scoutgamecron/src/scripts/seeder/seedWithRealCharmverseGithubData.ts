@@ -166,7 +166,7 @@ async function generateNftPurchaseEvents({
         scoutId: getRandomValue(scoutId),
         tokensPurchased: 10,
         txHash: `0xabc`
-      } as Prisma.NFTPurchaseEventCreateManyInput)
+      }) as Prisma.NFTPurchaseEventCreateManyInput
   );
 
   await prisma.nFTPurchaseEvent.createMany({ data: inputs });
@@ -193,4 +193,4 @@ async function script() {
   await seedBuilderNFTs();
 }
 
-script()
+script();

@@ -33,8 +33,8 @@ export function SocialShareLink({ text, link, site }: { text: string; link: stri
     site === 'x'
       ? `https://twitter.com/intent/tweet?text=${urlEncodedText}&url=${encodeURIComponent(link)}`
       : site === 'warpcast'
-      ? `https://warpcast.com/~/compose?text=${urlEncodedText}&embeds%5B%5D=${encodeURIComponent(link)}`
-      : `https://t.me/share/url?text=${urlEncodedText}&url=${encodeURIComponent(link)}`;
+        ? `https://warpcast.com/~/compose?text=${urlEncodedText}&embeds%5B%5D=${encodeURIComponent(link)}`
+        : `https://t.me/share/url?text=${urlEncodedText}&url=${encodeURIComponent(link)}`;
 
   return (
     <Tooltip title={`Share on ${capitalize(site)}`}>

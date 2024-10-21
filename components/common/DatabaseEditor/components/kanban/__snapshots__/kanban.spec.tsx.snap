@@ -209,7 +209,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               href="/test-space/id1"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id1"
                 draggable="true"
                 style="opacity: 1;"
@@ -256,7 +256,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               href="/test-space/id2"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id2"
                 draggable="true"
                 style="opacity: 1;"
@@ -333,7 +333,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
               href="/test-space/id3"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id3"
                 draggable="true"
                 style="opacity: 1;"
@@ -645,7 +645,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               href="/test-space/id1"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id1"
                 draggable="true"
                 style="opacity: 1;"
@@ -692,7 +692,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               href="/test-space/id2"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id2"
                 draggable="true"
                 style="opacity: 1;"
@@ -769,7 +769,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
               href="/test-space/id3"
             >
               <div
-                class="KanbanCard MuiBox-root css-1oaiypi"
+                class="KanbanCard MuiBox-root css-1ck4zfx"
                 data-test="kanban-card-id3"
                 draggable="true"
                 style="opacity: 1;"

@@ -84,13 +84,13 @@ function ProposalStatusSelectBase({
   const currentEvaluationResult = proposal.currentStep.result;
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
-  const rewardLabel = getFeatureTitle('Rewards');
-
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     if (currentEvaluationStep === 'draft') {
-      return ['passed', 'unpublished'];
-    } else if (currentEvaluationStep === 'rewards' || currentEvaluationStep === 'credentials') {
-      return ['passed', 'unpublished'];
+      return ['passed', 'draft'];
+    } else if (currentEvaluationStep === 'rewards') {
+      return ['published', 'unpublished'];
+    } else if (currentEvaluationStep === 'credentials') {
+      return ['issued', 'not_issued'];
     } else if (currentEvaluationStep === 'feedback') {
       return ['passed', 'in_progress'];
     } else {
@@ -102,16 +102,9 @@ function ProposalStatusSelectBase({
   const options: IPropertyOption[] = statusOptions.map((status) => {
     const statusLabel = EVALUATION_STATUS_LABELS[status];
 
-    const value =
-      currentEvaluationStep === 'rewards'
-        ? `${rewardLabel} ${statusLabel}`
-        : currentEvaluationStep === 'credentials'
-          ? `Credentials ${statusLabel}`
-          : statusLabel;
-
     return {
       id: status,
-      value,
+      value: statusLabel,
       dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
       color: proposalStatusColors[status]
     };
@@ -159,9 +152,9 @@ function ProposalStatusSelectBase({
       disableClearable
       onChange={(status) => {
         onChange(
-          status === 'complete' || status === 'passed' || status === 'published'
+          status === 'complete' || status === 'passed' || status === 'published' || status === 'issued'
             ? 'pass'
-            : status === 'declined' || status === 'unpublished'
+            : status === 'declined' || status === 'unpublished' || status === 'draft' || status === 'not_issued'
               ? 'fail'
               : null
         );

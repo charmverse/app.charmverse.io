@@ -22,16 +22,16 @@ export function generateSpacePermissionQuery({
         }
       }
     : roleId
-    ? {
-        roleId_forSpaceId: {
-          forSpaceId,
-          roleId
+      ? {
+          roleId_forSpaceId: {
+            forSpaceId,
+            roleId
+          }
         }
-      }
-    : {
-        userId_forSpaceId: {
-          forSpaceId,
-          userId: userId as string
-        }
-      };
+      : {
+          userId_forSpaceId: {
+            forSpaceId,
+            userId: userId as string
+          }
+        };
 }

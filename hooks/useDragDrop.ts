@@ -72,8 +72,8 @@ export function useDragDrop<Item extends { id: string }>({
         dragDirection === 'top'
           ? `0px -2px 0px ${theme.palette.primary.main}`
           : dragDirection === 'bottom'
-          ? `0px 2px 0px ${theme.palette.primary.main}`
-          : undefined
+            ? `0px 2px 0px ${theme.palette.primary.main}`
+            : undefined
     }
   };
 }

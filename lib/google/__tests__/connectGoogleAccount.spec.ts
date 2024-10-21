@@ -10,7 +10,7 @@ const googleAvatarUrl = 'https://example.com/google-avatar-1.png';
 
 jest.mock('../verifyGoogleToken', () => {
   return {
-    verifyGoogleToken: (email: string) => ({ email } as any)
+    verifyGoogleToken: (email: string) => ({ email }) as any
   };
 });
 afterAll(async () => {

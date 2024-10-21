@@ -4,12 +4,12 @@ export async function convertMemberPropertyNameToText() {
   await prisma.memberProperty.updateMany({
     where: {
       // @ts-ignore
-      type: "name"
+      type: 'name'
     },
     data: {
-      type: "text"
+      type: 'text'
     }
-  })
+  });
 }
 
 convertMemberPropertyNameToText();

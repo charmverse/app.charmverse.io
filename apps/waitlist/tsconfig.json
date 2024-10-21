@@ -2,12 +2,7 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/waitlist",
     "rootDir": "../../",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext",
-      "webworker"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -25,70 +20,26 @@
       }
     ],
     "paths": {
-      "@connect-shared/*": [
-        "../../@connect-shared/*"
-      ],
-      "components/*": [
-        "./components/*"
-      ],
-      "lib/*": [
-        "./lib/*"
-      ],
-      "public/*": [
-        "./public/*"
-      ],
-      "hooks/*": [
-        "./hooks/*"
-      ],
-      "theme/*": [
-        "./theme/*"
-      ],
-      "@root/adapters/*": [
-        "../../adapters/*"
-      ],
-      "@root/components/*": [
-        "../../components/*"
-      ],
-      "@root/config/*": [
-        "../../config/*"
-      ],
-      "@root/lib/*": [
-        "../../lib/*"
-      ],
-      "@root/hooks/*": [
-        "../../hooks/*"
-      ],
-      "@root/testing/*": [
-        "../../testing/*"
-      ],
-      "@charmverse/core/prisma": [
-        "../../node_modules/@charmverse/core/dist/cjs/prisma"
-      ],
-      "@charmverse/core/prisma-client": [
-        "../../node_modules/@charmverse/core/dist/cjs/prisma-client"
-      ],
-      "@charmverse/core/shared": [
-        "../../node_modules/@charmverse/core/dist/cjs/shared"
-      ],
-      "@charmverse/core/log": [
-        "../../node_modules/@charmverse/core/dist/cjs/lib/log"
-      ],
-      "@charmverse/core/utilities": [
-        "../../node_modules/@charmverse/core/dist/cjs/utilities"
-      ],
-      "@charmverse/core/errors": [
-        "../../node_modules/@charmverse/core/dist/cjs/errors"
-      ]
+      "@connect-shared/*": ["../../@connect-shared/*"],
+      "components/*": ["./components/*"],
+      "lib/*": ["./lib/*"],
+      "public/*": ["./public/*"],
+      "hooks/*": ["./hooks/*"],
+      "theme/*": ["./theme/*"],
+      "@root/adapters/*": ["../../adapters/*"],
+      "@root/components/*": ["../../components/*"],
+      "@root/config/*": ["../../config/*"],
+      "@root/lib/*": ["../../lib/*"],
+      "@root/hooks/*": ["../../hooks/*"],
+      "@root/testing/*": ["../../testing/*"],
+      "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
+      "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
+      "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
+      "@charmverse/core/log": ["../../node_modules/@charmverse/core/dist/cjs/lib/log"],
+      "@charmverse/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
+      "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "../../node_modules",
-    ".next/"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["../../node_modules", ".next/"]
 }
