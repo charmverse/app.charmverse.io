@@ -1,23 +1,27 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import 'server-only';
 
+import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
+import { findScoutOrThrow } from 'lib/scouts/findScoutOrThrow';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { getScoutStats } from 'lib/scouts/getScoutStats';
 import type { BasicUserInfo } from 'lib/users/interfaces';
-import { BasicUserInfoSelect } from 'lib/users/queries';
+import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 
 export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUserInfo }) {
-  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders] = await Promise.all([
-    prisma.scout.findUniqueOrThrow({
-      where: {
-        id: publicUser.id
-      },
-      select: BasicUserInfoSelect
-    }),
+  const allPromises = [
+    findScoutOrThrow(publicUser.id),
     getScoutStats(publicUser.id),
     getScoutedBuilders({ scoutId: publicUser.id })
-  ]);
+  ] as const;
+  const [error, data] = await safeAwaitSSRData(Promise.all(allPromises));
+
+  if (error) {
+    return <ErrorSSRMessage />;
+  }
+
+  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders] = data;
 
   return (
     <PublicScoutProfileContainer

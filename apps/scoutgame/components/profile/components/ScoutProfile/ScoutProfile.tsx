@@ -1,29 +1,25 @@
 'use server';
 
-import { prisma } from '@charmverse/core/prisma-client';
 import { Typography, Stack } from '@mui/material';
-import { currentSeason } from '@packages/scoutgame/dates';
 
+import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
+import { getUserSeasonStats } from 'lib/scouts/getUserSeasonStats';
+import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { ScoutStats } from './ScoutStats';
 
-export async function ScoutProfile({ userId }: { userId: string }) {
-  const [seasonStats, scoutedBuilders] = await Promise.all([
-    prisma.userSeasonStats.findUnique({
-      where: {
-        userId_season: {
-          userId,
-          season: currentSeason
-        }
-      },
-      select: {
-        pointsEarnedAsScout: true
-      }
-    }),
-    getScoutedBuilders({ scoutId: userId })
-  ]);
+export async function ScoutProfile({ userId, isMobile }: { userId: string; isMobile?: boolean }) {
+  const [error, data] = await safeAwaitSSRData(
+    Promise.all([getUserSeasonStats(userId), getScoutedBuilders({ scoutId: userId })])
+  );
+
+  if (error) {
+    return <ErrorSSRMessage />;
+  }
+
+  const [seasonStats, scoutedBuilders] = data;
 
   const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSoldToScout || 0), 0);
 
