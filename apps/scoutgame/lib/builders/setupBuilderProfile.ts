@@ -118,7 +118,7 @@ export async function setupBuilderProfile({
   });
 
   // mark builder as applied if they haven't been marked as such yet
-  if (scout.builderStatus === null) {
+  if (scout.builderStatus === null || inviteCode) {
     await prisma.scout.update({
       where: {
         id: unsealedUserId

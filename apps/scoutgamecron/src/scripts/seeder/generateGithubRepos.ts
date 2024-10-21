@@ -39,7 +39,8 @@ export async function generateGithubRepos(totalGithubRepos: number): Promise<[Gi
       ownerType: 'org',
       handPicked: false,
       fork: false,
-      createdAt: new Date()
+      createdAt: new Date(),
+      bonusPartner: null
     });
   });
 

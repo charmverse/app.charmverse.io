@@ -1,18 +1,35 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { weeklyRewardableBuilders } from '@packages/scoutgame/builderNfts/constants';
-import { currentSeason, getCurrentWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
+import { currentSeason, getLastWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
 import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/points/getPointsCountForWeekWithNormalisation';
+import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from './processScoutPointsPayout';
 
-export async function processGemsPayout() {
-  const now = DateTime.utc();
-  const week = getCurrentWeek();
+export async function processGemsPayout(
+  ctx: Context,
+  { season = currentSeason, now = DateTime.utc() }: { season?: string; now?: DateTime } = {}
+) {
+  const week = getLastWeek(now);
 
-  if (now.weekday !== 1 || now.hour !== 0) {
+  // run for the first few hours every Monday at midnight UTC
+  if (now.weekday !== 1 || now.hour > 3) {
     log.info('Gems Payout: It is not yet Sunday at 12:00 AM UTC, skipping');
+    return;
+  }
+
+  const existingPayoutCount = await prisma.builderEvent.count({
+    where: {
+      week,
+      type: 'gems_payout'
+    }
+  });
+
+  if (existingPayoutCount > 0) {
+    log.info('Gems Payout: Payout already exists for this week, skipping');
     return;
   }
 
@@ -20,18 +37,14 @@ export async function processGemsPayout() {
 
   const { normalisationFactor, totalPoints } = await getPointsCountForWeekWithNormalisation({ week });
 
-  log.info(
-    `Allocation: ${weeklyAllocatedPoints} -- Total points for week ${week}: ${totalPoints} -- Normalisation factor: ${normalisationFactor}`,
-    {
-      weeklyPayoutParams: {
-        week,
-        season: currentSeason,
-        normalisationFactor,
-        totalPoints,
-        allocatedPoints: weeklyAllocatedPoints
-      }
-    }
-  );
+  log.debug(`Allocation: ${weeklyAllocatedPoints} -- Total points for week ${week}: ${totalPoints}`, {
+    topWeeklyBuilders: topWeeklyBuilders.length,
+    week,
+    season,
+    normalisationFactor,
+    totalPoints,
+    allocatedPoints: weeklyAllocatedPoints
+  });
 
   for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
     try {
@@ -41,7 +54,7 @@ export async function processGemsPayout() {
         rank,
         gemsCollected,
         week,
-        season: currentSeason,
+        season,
         normalisationFactor
       });
     } catch (error) {

@@ -1,17 +1,41 @@
+import type { Metadata, ResolvingMetadata } from 'next';
+import type { ResolvedOpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
 import { notFound } from 'next/navigation';
 
+import { FarcasterMetadata } from 'components/[username]/FarcasterMetadata';
 import { PublicProfilePage } from 'components/[username]/PublicProfilePage';
 import { getUserByPath } from 'lib/users/getUserByPath';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Profile({
-  params,
-  searchParams
-}: {
+type Props = {
   params: { username: string };
   searchParams: { [key: string]: string | string[] | undefined };
-}) {
+};
+
+export async function generateMetadata({ params, searchParams }: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const user = await getUserByPath(params.username);
+
+  if (!user) {
+    return {};
+  }
+
+  const previousMetadata = await parent;
+  const previousOg = previousMetadata.openGraph || ({} as ResolvedOpenGraph);
+
+  return {
+    title: `${user.username} user profile`,
+    openGraph: {
+      images: user.nftImageUrl || user.avatar || previousOg.images || '',
+      title: `${user.username} user profile`
+    },
+    twitter: {
+      title: `${user.username} user profile`
+    }
+  };
+}
+
+export default async function Profile({ params, searchParams }: Props) {
   const user = await getUserByPath(params.username);
   const tab = searchParams.tab || (user?.builderStatus === 'approved' ? 'builder' : 'scout');
 
@@ -21,24 +45,7 @@ export default async function Profile({
 
   return (
     <>
-      {user?.avatar && (
-        <>
-          <title>{`${user.username} user profile`}</title>
-          <meta property='og:title' content={`${user.username} user profile`} />
-          <meta property='og:image:alt' content={`${user.username} user profile`} />
-          <meta property='og:image' content={user.nftImageUrl || user.avatar} />
-          <meta property='og:image:width' content='800' />
-          <meta property='og:image:height' content='800' />
-          {/* Custom meta tags for farcaster */}
-          <meta name='fc:frame' content='vNext' />
-          <meta name='fc:frame:image' content={user.congratsImageUrl || user.nftImageUrl || user.avatar} />
-          <meta property='fc:frame:image:aspect_ratio' content='1:1' />
-          {/* Button 1 */}
-          <meta name='fc:frame:button:1' content='Scout Builder' />
-          <meta name='fc:frame:button:1:action' content='link' />
-          <meta name='fc:frame:button:1:target' content={`${process.env.DOMAIN}/u/${user.username}`} />
-        </>
-      )}
+      <FarcasterMetadata user={user} />
       <PublicProfilePage user={user} tab={tab} />
     </>
   );
