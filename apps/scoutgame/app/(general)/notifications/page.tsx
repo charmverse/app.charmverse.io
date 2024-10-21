@@ -2,15 +2,16 @@ import { getNotifications } from '@packages/scoutgame/notifications/getNotificat
 
 import { NotificationsPage } from 'components/notifications/NotificationsPage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { safeAwaitSSRData } from 'lib/utils/async';
 
 export default async function Page() {
   const user = await getUserFromSession();
 
-  const notifications = user
-    ? await getNotifications({
-        userId: user.id
-      })
-    : [];
+  const [, notifications = []] = await safeAwaitSSRData(
+    getNotifications({
+      userId: user?.id
+    })
+  );
 
   return <NotificationsPage notifications={notifications} />;
 }

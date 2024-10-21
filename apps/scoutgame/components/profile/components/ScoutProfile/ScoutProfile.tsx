@@ -4,26 +4,35 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { Typography, Stack } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/dates';
 
+import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
+import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { ScoutStats } from './ScoutStats';
 
 export async function ScoutProfile({ userId, isMobile }: { userId: string; isMobile?: boolean }) {
-  const [seasonStats, scoutedBuilders] = await Promise.all([
+  const getUserSeasonStats = (_userId: string) =>
     prisma.userSeasonStats.findUnique({
       where: {
         userId_season: {
-          userId,
+          userId: _userId,
           season: currentSeason
         }
       },
       select: {
         pointsEarnedAsScout: true
       }
-    }),
-    getScoutedBuilders({ scoutId: userId })
-  ]);
+    });
+  const [error, data] = await safeAwaitSSRData(
+    Promise.all([getUserSeasonStats(userId), getScoutedBuilders({ scoutId: userId })])
+  );
+
+  if (error) {
+    return <ErrorSSRMessage />;
+  }
+
+  const [seasonStats, scoutedBuilders] = data;
 
   const nftsPurchasedThisSeason = scoutedBuilders.reduce((acc, builder) => acc + (builder.nftsSoldToScout || 0), 0);
 
