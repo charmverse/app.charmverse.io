@@ -4,7 +4,6 @@ import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { findScoutOrThrow } from 'lib/scouts/findScoutOrThrow';
 import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 import { getScoutStats } from 'lib/scouts/getScoutStats';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 import { safeAwaitSSRData } from 'lib/utils/async';
 
@@ -14,8 +13,7 @@ export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUser
   const allPromises = [
     findScoutOrThrow(publicUser.id),
     getScoutStats(publicUser.id),
-    getScoutedBuilders({ scoutId: publicUser.id }),
-    getUserFromSession()
+    getScoutedBuilders({ scoutId: publicUser.id })
   ] as const;
   const [error, data] = await safeAwaitSSRData(Promise.all(allPromises));
 
@@ -35,7 +33,6 @@ export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUser
       seasonPoints={seasonPoints}
       nftsPurchased={nftsPurchased}
       scoutedBuilders={scoutedBuilders}
-      userId={user?.id}
     />
   );
 }

@@ -8,15 +8,7 @@ import { BuildersGalleryContainer } from './BuildersGalleryContainer';
 
 export const dynamic = 'force-dynamic';
 
-export async function ScoutPageBuildersGallery({
-  sort,
-  showHotIcon,
-  userId
-}: {
-  sort: BuildersSort;
-  showHotIcon: boolean;
-  userId?: string;
-}) {
+export async function ScoutPageBuildersGallery({ sort, showHotIcon }: { sort: BuildersSort; showHotIcon: boolean }) {
   const [error, data] = await safeAwaitSSRData(
     getSortedBuilders({
       sort: sort as BuildersSort,
@@ -39,7 +31,6 @@ export async function ScoutPageBuildersGallery({
       initialCursor={nextCursor}
       initialBuilders={builders}
       showHotIcon={showHotIcon}
-      userId={userId}
     />
   );
 }

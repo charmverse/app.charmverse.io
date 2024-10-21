@@ -1,5 +1,4 @@
 import { HomePage } from 'components/home/HomePage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Home({
   searchParams
@@ -7,7 +6,6 @@ export default async function Home({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const tab = searchParams.tab as string;
-  const user = await getUserFromSession();
 
-  return <HomePage user={user || null} tab={tab || 'leaderboard'} />;
+  return <HomePage tab={tab || 'leaderboard'} />;
 }

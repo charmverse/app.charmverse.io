@@ -6,12 +6,12 @@ import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { BuildersCarousel } from './BuildersCarousel';
 
-export async function TodaysHotBuildersCarousel({ userId }: { userId?: string }) {
+export async function TodaysHotBuildersCarousel() {
   const [error, builders] = await safeAwaitSSRData(getTodaysHotBuilders());
 
   if (error) {
     return <ErrorSSRMessage />;
   }
 
-  return <BuildersCarousel builders={builders} userId={userId} />;
+  return <BuildersCarousel builders={builders} />;
 }

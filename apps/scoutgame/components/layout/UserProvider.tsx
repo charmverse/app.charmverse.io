@@ -1,29 +1,29 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { useGetUserTrigger } from 'hooks/api/session';
+import { useGetUser } from 'hooks/api/session';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 
 type UserContext = {
   user: SessionUser | null;
-  setUser: (user: SessionUser | null) => void;
-  reloadUser: () => Promise<void>;
+  refreshUser: (_user?: SessionUser | null) => Promise<SessionUser | null | undefined>;
 };
 
 export const UserContext = createContext<Readonly<UserContext | null>>(null);
 
 export function UserProvider({ children, userSession }: { children: ReactNode; userSession: SessionUser | null }) {
-  const [user, setUser] = useState<SessionUser | null>(userSession);
-  const { trigger: triggerReload } = useGetUserTrigger();
+  const { data: user = userSession, mutate: mutateUser } = useGetUser();
 
-  const reloadUser = useCallback(async () => {
-    const updated = await triggerReload();
-    setUser(updated);
-  }, [triggerReload]);
+  const refreshUser = useCallback(
+    async (_user?: SessionUser | null) => {
+      return mutateUser(_user);
+    },
+    [mutateUser]
+  );
 
-  const value = useMemo(() => ({ user, reloadUser, setUser }), [user, reloadUser, setUser]);
+  const value = useMemo(() => ({ user, refreshUser }), [user, refreshUser]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
