@@ -21,7 +21,7 @@ export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUser
     return <ErrorSSRMessage />;
   }
 
-  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders, user] = data;
+  const [scout, { allTimePoints, seasonPoints, nftsPurchased }, scoutedBuilders] = data;
 
   return (
     <PublicScoutProfileContainer
