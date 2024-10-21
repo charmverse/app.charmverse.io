@@ -1,6 +1,6 @@
 'use client';
 
-import { Clear as ClearIcon } from '@mui/icons-material';
+import { ArrowDropDown as ArrowDropDownIcon, Add as AddIcon, Clear as ClearIcon } from '@mui/icons-material';
 import {
   CircularProgress,
   Container,
@@ -98,11 +98,11 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           }}
         />
         <Box>
-          <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }}>
-            Add User
+          <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }} startIcon={<AddIcon />}>
+            Add
           </AddUserButton>
           <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
-            Export Users
+            Export
           </ExportButton>
         </Box>
       </Stack>

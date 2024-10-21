@@ -10,11 +10,13 @@ export function ExportButton({
   children,
   src,
   filename,
+  onComplete,
   ...props
 }: {
   children: ReactNode;
   src: string;
   filename: string;
+  onComplete?: () => void;
 } & ButtonProps) {
   const { trigger, isMutating, error } = useGETtrigger<undefined, string>(src);
   async function onClick() {
@@ -26,6 +28,7 @@ export function ExportButton({
     document.body.appendChild(link);
     link.click();
     link.remove();
+    onComplete?.();
   }
   return (
     <LoadingButton loading={isMutating} onClick={onClick} {...props}>
