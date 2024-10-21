@@ -1,9 +1,9 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import { Blockquote } from 'components/common/DocumentPageContainer/components/Blockquote';
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 
-import { InfoPageContainer } from '../InfoPageContainer';
+import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function BuilderNftsPage() {
   return (

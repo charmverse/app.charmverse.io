@@ -4,14 +4,18 @@ import { InfoCard } from 'components/common/DocumentPageContainer/components/Inf
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
+import { InfoPageContainer } from '../components/InfoPageContainer';
+
 export function TermsPage() {
   return (
-    <DocumentPageContainer data-test='terms-page'>
-      <Typography variant='h4' align='center' color='secondary'>
-        Terms
-      </Typography>
-      <Document />
-    </DocumentPageContainer>
+    <InfoPageContainer data-test='terms-page'>
+      <DocumentPageContainer>
+        <Typography variant='h4' align='center' color='secondary'>
+          Terms
+        </Typography>
+        <Document />
+      </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
