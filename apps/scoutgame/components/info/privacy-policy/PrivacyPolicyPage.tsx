@@ -8,11 +8,8 @@ import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function PrivacyPolicyPage() {
   return (
-    <InfoPageContainer data-test='privacy-page'>
+    <InfoPageContainer data-test='privacy-page' title='Privacy Policy'>
       <DocumentPageContainer>
-        <Typography variant='h4' align='center' color='secondary'>
-          Privacy Policy
-        </Typography>
         <Document />
       </DocumentPageContainer>
     </InfoPageContainer>

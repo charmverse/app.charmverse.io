@@ -8,11 +8,8 @@ import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function DataProcessingPage() {
   return (
-    <InfoPageContainer data-test='dpa-page'>
+    <InfoPageContainer data-test='dpa-page' title='Data Processing Addendum'>
       <DocumentPageContainer>
-        <Typography variant='h4' align='center' color='secondary'>
-          Data Processing Addendum
-        </Typography>
         <Document />
       </DocumentPageContainer>
     </InfoPageContainer>

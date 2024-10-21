@@ -8,11 +8,8 @@ import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function TermsPage() {
   return (
-    <InfoPageContainer data-test='terms-page'>
+    <InfoPageContainer data-test='terms-page' title='Terms'>
       <DocumentPageContainer>
-        <Typography variant='h4' align='center' color='secondary'>
-          Terms
-        </Typography>
         <Document />
       </DocumentPageContainer>
     </InfoPageContainer>
