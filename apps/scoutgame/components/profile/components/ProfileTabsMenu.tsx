@@ -16,7 +16,7 @@ const mobileTabs = ['scout', 'build', 'win'];
 
 export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
   const { data: claimablePoints } = useGetClaimablePoints();
-  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'), { noSsr: true });
   const isDesktop = useMdScreen();
   const router = useRouter();
 

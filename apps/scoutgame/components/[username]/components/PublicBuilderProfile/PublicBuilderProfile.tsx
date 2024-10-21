@@ -6,7 +6,6 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
@@ -19,8 +18,7 @@ export async function PublicBuilderProfile({ publicUser }: { publicUser: BasicUs
     builderNft,
     { allTimePoints = 0, seasonPoints = 0, rank = 0, gemsCollected = 0 } = {},
     builderActivities = [],
-    { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {},
-    user
+    { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
   ] = isApprovedBuilder
     ? await Promise.all([
         prisma.builderNft.findUnique({
@@ -37,8 +35,7 @@ export async function PublicBuilderProfile({ publicUser }: { publicUser: BasicUs
         }),
         getBuilderStats(builderId),
         getBuilderActivities({ builderId, limit: 200 }),
-        getBuilderScouts(builderId),
-        getUserFromSession()
+        getBuilderScouts(builderId)
       ])
     : [];
 
@@ -57,7 +54,6 @@ export async function PublicBuilderProfile({ publicUser }: { publicUser: BasicUs
       builderActivities={builderActivities}
       gemsCollected={gemsCollected}
       rank={rank}
-      user={user}
     />
   );
 }

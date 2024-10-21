@@ -22,7 +22,7 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
@@ -44,7 +44,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         return;
       }
 
-      setUser(data.user);
+      await refreshUser(data.user);
 
       await revalidatePath();
       router.push(nextPage);

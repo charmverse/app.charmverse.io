@@ -9,7 +9,7 @@ import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
 
 import { ScoutStats } from './ScoutStats';
 
-export async function ScoutProfile({ userId, isMobile }: { userId: string; isMobile?: boolean }) {
+export async function ScoutProfile({ userId }: { userId: string }) {
   const [seasonStats, scoutedBuilders] = await Promise.all([
     prisma.userSeasonStats.findUnique({
       where: {
@@ -39,7 +39,7 @@ export async function ScoutProfile({ userId, isMobile }: { userId: string; isMob
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} columns={3} size='small' userId={userId} />
+          <BuildersGallery builders={scoutedBuilders} columns={3} size='small' />
         ) : (
           <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
         )}

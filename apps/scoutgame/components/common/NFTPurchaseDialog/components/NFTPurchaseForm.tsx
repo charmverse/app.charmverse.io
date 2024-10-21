@@ -74,7 +74,7 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
 }
 
 export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const builderId = builder.id;
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
@@ -147,6 +147,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     async onSuccess(res) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id });
+        await refreshUser();
         log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
       } else {
         log.warn('NFT minted but no transaction id returned', {
