@@ -19,7 +19,7 @@ import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
 import { TableCellText } from './TableCellText';
 
-export function TopBuildersTable({ builders, userId }: { builders: TopBuilderInfo[]; userId?: string }) {
+export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
   return (
     <TableContainer data-test='top-builders-table' component={Paper} sx={{ px: { md: 6 } }}>
       <Table aria-label='Top scouts table' size='small'>
@@ -105,7 +105,7 @@ export function TopBuildersTable({ builders, userId }: { builders: TopBuilderInf
                 </Stack>
               </TableCell>
               <TableCell align='center' width='150px'>
-                <ScoutButton builder={builder} isAuthenticated={!!userId} />
+                <ScoutButton builder={builder} />
               </TableCell>
             </TableRow>
           ))}

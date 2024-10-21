@@ -8,7 +8,9 @@ import { useUser } from 'hooks/useUser';
 
 import { ConfirmAuthCode } from './ConfirmAuthCode';
 
-export function CustomModal({ onClose, ...props }: Omit<ModalProps, 'children'>, ref: Ref<HTMLDivElement>) {
+type Props = Omit<ModalProps, 'children'>;
+
+export function CustomModal({ onClose, ...props }: Props, ref: Ref<HTMLDivElement>) {
   const { trigger: deleteOtp, error: deleteOtpError, isMutating: isLoadingDeleteOtp } = useDeleteOtp();
   const { refreshUser } = useUser();
 

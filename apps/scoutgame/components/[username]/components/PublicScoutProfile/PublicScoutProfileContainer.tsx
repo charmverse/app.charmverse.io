@@ -20,7 +20,6 @@ export type ScoutProfileProps = {
   seasonPoints: number;
   nftsPurchased: number;
   scoutedBuilders: BuilderInfo[];
-  userId?: string;
 };
 
 export function PublicScoutProfileContainer({
@@ -28,8 +27,7 @@ export function PublicScoutProfileContainer({
   allTimePoints,
   seasonPoints,
   nftsPurchased,
-  scoutedBuilders,
-  userId
+  scoutedBuilders
 }: ScoutProfileProps) {
   const isDesktop = useMdScreen();
   return (
@@ -68,12 +66,7 @@ export function PublicScoutProfileContainer({
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery
-            builders={scoutedBuilders}
-            columns={5}
-            size={isDesktop ? 'large' : 'small'}
-            userId={userId}
-          />
+          <BuildersGallery builders={scoutedBuilders} columns={5} size={isDesktop ? 'large' : 'small'} />
         ) : (
           <Typography>This Scout hasn't discovered any Builders yet. Check back to see who they find!</Typography>
         )}

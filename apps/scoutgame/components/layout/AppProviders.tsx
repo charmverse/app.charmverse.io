@@ -9,6 +9,7 @@ import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 import theme from 'theme/theme';
 
+import { SWRProvider } from './SwrProvider';
 import { UserProvider } from './UserProvider';
 
 export function AppProviders({ children, user }: { children: ReactNode; user: SessionUser | null }) {
@@ -17,7 +18,9 @@ export function AppProviders({ children, user }: { children: ReactNode; user: Se
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
         <WagmiProvider>
-          <UserProvider userSession={user}>{children}</UserProvider>
+          <SWRProvider>
+            <UserProvider userSession={user}>{children}</UserProvider>
+          </SWRProvider>
         </WagmiProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
