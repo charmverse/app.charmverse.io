@@ -13,9 +13,13 @@ export async function mergeProfiles({
       id: primaryProfileId
     },
     select: {
+      deletedAt: true,
       spaceRoles: true
     }
   });
+  if (primary.deletedAt) {
+    throw new Error('Primary profile is already deleted');
+  }
 
   const secondary = await prisma.user.findUniqueOrThrow({
     where: {
