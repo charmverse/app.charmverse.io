@@ -73,7 +73,7 @@ export function getWeekStartEndFormatted(date: Date) {
   return `${start.toFormat('MMM, dd')} - ${end.toFormat('MMM, dd')}`;
 }
 
-export function getStartOfSeason(week: ISOWeek) {
+export function getStartOfSeason(week: Season) {
   return getDateFromISOWeek(week);
 }
 

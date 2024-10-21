@@ -30,13 +30,13 @@ export function HeaderActions() {
           </ExportButton>
         </MenuItem>
         <MenuItem>
-          <ExportButton filename='celo_export.tsv' src='/api/bonus-export/celo'>
-            Celo Report | {lastWeek}
+          <ExportButton filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
+            Celo Report ({lastWeek})
           </ExportButton>
         </MenuItem>
         <MenuItem>
-          <ExportButton filename='moxie_export.tsv' src='/api/repos/moxie-report'>
-            Moxie Report | {lastWeek}
+          <ExportButton filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
+            Moxie Report ({lastWeek})
           </ExportButton>
         </MenuItem>
       </Menu>
