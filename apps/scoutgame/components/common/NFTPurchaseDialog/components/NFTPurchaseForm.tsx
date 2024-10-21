@@ -246,6 +246,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         recipientAddress: address as `0x${string}`,
         amount: tokensToBuy
       });
+      await refreshUser();
     } else {
       if (!decentTransactionInfo?.tx) {
         return;
