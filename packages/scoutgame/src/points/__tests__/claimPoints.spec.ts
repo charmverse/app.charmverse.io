@@ -17,15 +17,18 @@ describe('claimPoints', () => {
     await mockGemPayoutEvent({
       builderId: builder.id,
       recipientId: builder.id,
-      amount: 10
+      amount: 10,
+      season: currentSeason
     });
     await mockBuilderNft({
-      builderId: builder.id
+      builderId: builder.id,
+      season: currentSeason
     });
     await mockNFTPurchaseEvent({
       builderId: builder.id,
       scoutId: scout.id,
-      points: 20
+      points: 20,
+      season: currentSeason
     });
 
     await claimPoints({ userId: builder.id, season: currentSeason });
