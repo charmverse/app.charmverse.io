@@ -27,5 +27,5 @@ cron:
 
   - name: 'send-points-claim-emails'
     url: '/send-points-claim-emails'
-    # Every Monday at 00:00
+    # Every Monday at 2am
     schedule: '0 2 * * 1'
