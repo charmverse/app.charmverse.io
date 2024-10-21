@@ -6,7 +6,6 @@ import type {
   ScoutGameActivityType
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getBonusPartner } from '@packages/scoutgame/bonus';
 import { getWeekFromDate, getStartOfSeason, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
@@ -15,7 +14,7 @@ import { gemsValues } from './config';
 import type { PullRequest } from './github/getPullRequestsByUser';
 import { getRecentPullRequestsByUser } from './github/getRecentPullRequestsByUser';
 
-type RepoInput = Pick<GithubRepo, 'defaultBranch'>;
+type RepoInput = Pick<GithubRepo, 'defaultBranch' | 'bonusPartner'>;
 
 export type MergedPullRequestMeta = Pick<
   PullRequest,
@@ -212,7 +211,7 @@ export async function recordMergedPullRequest({
               week,
               type: 'merged_pull_request',
               githubEventId: event.id,
-              bonusPartner: getBonusPartner(pullRequest.repository.nameWithOwner),
+              bonusPartner: repo.bonusPartner,
               gemsReceipt: {
                 create: {
                   type: gemReceiptType,
