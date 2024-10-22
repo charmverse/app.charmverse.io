@@ -3,12 +3,14 @@
 import { log } from '@charmverse/core/log';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
-import { createContext, useContext, useEffect, useMemo } from 'react';
-import { useLocalStorage } from 'usehooks-ts';
+import { createContext, useContext, useMemo } from 'react';
 
+import { useGetPendingNftTransactions } from 'hooks/api/session';
 import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
+import type { TxResponse } from 'lib/session/getPendingNftTransactions';
 
 import { useSnackbar } from './SnackbarContext';
+import { useUser } from './UserProvider';
 
 type PurchaseContext = {
   isExecutingTransaction: boolean;
@@ -20,8 +22,8 @@ type PurchaseContext = {
 export const PurchaseContext = createContext<Readonly<PurchaseContext | null>>(null);
 
 export function PurchaseProvider({ children }: { children: ReactNode }) {
-  const [pendingTransactionId, setPendingTransactionId] = useLocalStorage('pendingTransactionId', '');
   const { showMessage } = useSnackbar();
+  const { refreshUser } = useUser();
 
   const {
     isExecuting: isExecutingTransaction,
@@ -29,26 +31,28 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     result: transactionResult,
     executeAsync: checkDecentTransaction
   } = useAction(checkDecentTransactionAction, {
-    onExecute({ input }) {
-      setPendingTransactionId(input.pendingTransactionId);
-    },
     onSuccess({ input }) {
       showMessage(`Transaction ${input.txHash || ''} was successful`, 'success');
-      setPendingTransactionId('');
     },
     onError({ error, input }) {
       log.error('Error checking Decent transaction', { error, input });
       showMessage(error.serverError?.message || 'Something went wrong', 'error');
-      setPendingTransactionId('');
     }
   });
 
-  useEffect(() => {
-    // If the user refreshes the page we still want to show him the result of the transaction
-    if (pendingTransactionId && !isExecutingTransaction) {
-      checkDecentTransaction({ pendingTransactionId });
+  useGetPendingNftTransactions(!isExecutingTransaction, undefined, {
+    onSuccess(txs: TxResponse[]) {
+      for (const tx of txs) {
+        if (tx.status === 'completed') {
+          showMessage(`Transaction ${tx.destinationChainTxHash} was successful`, 'success');
+        } else if (tx.status === 'failed') {
+          showMessage(`Transaction ${tx.destinationChainTxHash} failed`, 'error');
+        }
+      }
+
+      refreshUser();
     }
-  }, [pendingTransactionId, isExecutingTransaction]);
+  });
 
   const value = useMemo(
     () => ({
