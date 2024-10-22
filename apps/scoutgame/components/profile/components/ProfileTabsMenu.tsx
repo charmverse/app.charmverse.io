@@ -47,15 +47,7 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
   }
 
   if (!isMobile) {
-    return (
-      <TabsMenu
-        value={tab || 'scout-build'}
-        tabs={[
-          { value: 'scout-build', label: 'Scout. Build.' },
-          { value: 'win', label: 'Win', showBadge: showWinBadge }
-        ]}
-      />
-    );
+    return <TabsMenu value={tab || 'scout-build'} tabs={[{ value: 'scout-build', label: 'Scout. Build.' }]} />;
   }
 
   return (
@@ -63,8 +55,7 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
       value={tab || 'scout'}
       tabs={[
         { value: 'scout', label: 'Scout' },
-        { value: 'build', label: 'Build' },
-        { value: 'win', label: 'Win', showBadge: showWinBadge }
+        { value: 'build', label: 'Build' }
       ]}
     />
   );

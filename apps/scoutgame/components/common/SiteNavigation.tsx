@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -76,6 +77,14 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           value='scout'
           icon={<PiBinocularsLight size='24px' />}
           LinkComponent={Link}
+        />
+        <BottomNavigationAction
+          LinkComponent={Link}
+          label='Claim'
+          href='/claim'
+          value='claim'
+          icon={<Image src='/images/claim-icon.svg' alt='Claim' width={26} height={26} />}
+          onClick={(e) => openAuthModal?.(e, 'claim')}
         />
         <BottomNavigationAction
           LinkComponent={Link}
