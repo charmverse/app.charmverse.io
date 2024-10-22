@@ -3,19 +3,6 @@
 import { Button, List, ListItem, ListItemAvatar, Stack, Typography, styled } from '@mui/material';
 import Link from 'next/link';
 
-// make a styled icon with a number and circle border that uses primary color
-const StyledIcon = styled('div')`
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${({ theme }) => theme.palette.secondary.main};
-  border-radius: 50%;
-  border: 2px solid ${({ theme }) => theme.palette.secondary.main};
-`;
-
 export function HowItWorksContent() {
   return (
     <>
@@ -25,7 +12,7 @@ export function HowItWorksContent() {
       <List sx={{ mb: 2 }}>
         <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
-            <StyledIcon>1</StyledIcon>
+            <img src='/images/number_icon_1.png' alt='1' />
           </ListItemAvatar>
           <Typography fontSize='1.1rem'>
             <strong>Discover builders who are contributing to cool onchain projects.</strong> Choose from the Hot
@@ -34,7 +21,7 @@ export function HowItWorksContent() {
         </ListItem>
         <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
-            <StyledIcon>2</StyledIcon>
+            <img src='/images/number_icon_2.png' alt='2' />
           </ListItemAvatar>
           <Stack display='flex' gap={2}>
             <Typography fontSize='1.1rem'>
@@ -51,7 +38,7 @@ export function HowItWorksContent() {
         </ListItem>
         <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
-            <StyledIcon>3</StyledIcon>
+            <img src='/images/number_icon_3.png' alt='3' />
           </ListItemAvatar>
           <Typography fontSize='1.1rem'>
             <strong>Watch your points increase</strong> as your builders climb the weekly Leaderboard. The more they
