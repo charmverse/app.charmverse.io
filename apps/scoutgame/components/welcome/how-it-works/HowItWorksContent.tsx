@@ -1,8 +1,10 @@
 'use client';
 
-import { Button, List, ListItem, ListItemAvatar, Stack, Typography, styled } from '@mui/material';
+import { Button, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
+
+import { PointsIcon } from 'components/common/Icons';
 
 export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React.MouseEventHandler }) {
   return (
@@ -26,7 +28,19 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
           </ListItemAvatar>
           <Stack display='flex' gap={2}>
             <Typography fontSize='1.1rem'>
-              <strong>Scout them by buying their Builder Cards with points</strong> or <strong>ETH / USDC</strong> on
+              <strong>
+                Scout them by buying their Builder Cards with{' '}
+                <Typography
+                  component='span'
+                  color='secondary'
+                  fontSize='inherit'
+                  fontWeight='inherit'
+                  style={{ display: 'inline-flex', gap: 4 }}
+                >
+                  points <PointsIcon color='blue' size={24} />
+                </Typography>
+              </strong>{' '}
+              or <strong>ETH / USDC</strong> on
             </Typography>
             <Stack flexDirection='row' gap={2} width='100%' justifyContent='center'>
               <img src='/images/crypto/ethereum-circle.png' alt='Ethereum' title='Ethereum' width='24' height='24' />
@@ -42,8 +56,21 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
             <img src='/images/number_icon_3.png' alt='3' />
           </ListItemAvatar>
           <Typography fontSize='1.1rem'>
-            <strong>Watch your points increase</strong> as your builders climb the weekly Leaderboard. The more they
-            code, the higher you go!
+            <strong>
+              Watch your{' '}
+              <Typography
+                component='span'
+                color='secondary'
+                fontSize='inherit'
+                fontWeight='inherit'
+                style={{ display: 'inline-flex', gap: 4 }}
+              >
+                points <PointsIcon color='blue' size={24} />
+              </Typography>
+              {'  '}
+              increase
+            </strong>{' '}
+            as your builders climb the weekly Leaderboard. The more they code, the higher you go!
           </Typography>
         </ListItem>
       </List>
