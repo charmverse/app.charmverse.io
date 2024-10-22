@@ -9,7 +9,7 @@ import { getTokenPurchasePrice } from '@packages/scoutgame/builderNfts/getTokenP
 import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 
-async function syncUserNFTsFromOnchainData({
+export async function syncUserNFTsFromOnchainData({
   username,
   scoutId
 }: {
@@ -32,7 +32,7 @@ async function syncUserNFTsFromOnchainData({
   const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id });
 
   const txRequiringReconciliation = userPurchases.filter((p) => !p.nftPurchase);
-
+  console.log(txRequiringReconciliation);
   for (let i = 0; i < txRequiringReconciliation.length; i++) {
     log.info(`Processing missing tx ${i + 1} / ${txRequiringReconciliation.length}`);
 

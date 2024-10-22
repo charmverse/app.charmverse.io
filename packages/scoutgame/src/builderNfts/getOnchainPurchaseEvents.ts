@@ -133,7 +133,9 @@ function groupEventsByTransactionHash(events: ParsedLogs): SimplifiedGroupedEven
 
 export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string }) {
   const logs = await getAndParseLogs();
-
+  // const events = logs.filter((l) => l.args.scout);
+  // console.log(events.slice(0, 10));
+  // console.log(logs.filter((l) => l.args.scout).length);
   const groupedEvents = groupEventsByTransactionHash(logs as any);
 
   const nftPurchases = await prisma.nFTPurchaseEvent.findMany({
