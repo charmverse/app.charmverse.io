@@ -23,7 +23,7 @@ export function HowItWorksContent() {
         Scout Game in a Nutshell
       </Typography>
       <List sx={{ mb: 2 }}>
-        <ListItem sx={{ alignItems: 'flex-start' }}>
+        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
             <StyledIcon>1</StyledIcon>
           </ListItemAvatar>
@@ -32,7 +32,7 @@ export function HowItWorksContent() {
             Builders section or explore the Scout page to find hidden gems.
           </Typography>
         </ListItem>
-        <ListItem sx={{ alignItems: 'flex-start' }}>
+        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
             <StyledIcon>2</StyledIcon>
           </ListItemAvatar>
@@ -49,7 +49,7 @@ export function HowItWorksContent() {
             </Stack>
           </Stack>
         </ListItem>
-        <ListItem sx={{ alignItems: 'flex-start' }}>
+        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
             <StyledIcon>3</StyledIcon>
           </ListItemAvatar>
