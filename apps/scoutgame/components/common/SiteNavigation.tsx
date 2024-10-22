@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
@@ -77,14 +76,6 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           value='scout'
           icon={<PiBinocularsLight size='24px' />}
           LinkComponent={Link}
-        />
-        <BottomNavigationAction
-          LinkComponent={Link}
-          label='Notifications'
-          href='/notifications'
-          value='notifications'
-          icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
-          onClick={(e) => openAuthModal?.(e, 'notifications')}
         />
         <BottomNavigationAction
           LinkComponent={Link}
