@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 
 import { HowItWorksContent } from 'components/welcome/how-it-works/HowItWorksContent';
 
-const pagesToShowOnboarding = ['/home', '/scout'];
+const pagesToShowOnboarding = ['/home', '/scout', '/u/'];
 
 function WelcomeModal({ userId }: { userId?: string }) {
   const [isOpen, setIsOpen] = useState(false);
