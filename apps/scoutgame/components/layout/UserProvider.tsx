@@ -28,7 +28,7 @@ export function UserProvider({ children, userSession }: { children: ReactNode; u
   );
 
   useEffect(() => {
-    if (user && !user?.agreedToTermsAt && !agreeToTermsPaths.includes(pathname)) {
+    if (user && !user?.agreedToTermsAt && !agreeToTermsPaths.some((path) => pathname.startsWith(path))) {
       log.debug('Redirect user to agree to terms page', { pathname });
       redirect('/welcome');
     }

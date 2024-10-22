@@ -4,7 +4,7 @@ import { randomIntFromInterval } from '@root/lib/utils/random';
 
 import { expect, test } from './test';
 
-test.describe('Welcome page - onboarding flow', () => {
+test.describe('Onboarding flow', () => {
   test('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
     await page.goto('/');
     // Logged in user should be redirected
@@ -35,9 +35,10 @@ test.describe('Welcome page - onboarding flow', () => {
     await expect(welcomePage.userEmailInput).toHaveValue(email);
 
     await welcomePage.notifyAboutGrants.focus();
-    expect(await welcomePage.notifyAboutGrants.isChecked()).toBe(true);
+    await expect(welcomePage.notifyAboutGrants).toBeChecked();
 
     await welcomePage.acceptTerms.click();
+    await expect(welcomePage.acceptTerms).toBeChecked();
 
     await welcomePage.submitExtraDetails.click();
 
@@ -50,11 +51,13 @@ test.describe('Welcome page - onboarding flow', () => {
       },
       select: {
         id: true,
+        agreedToTermsAt: true,
         sendMarketing: true
       }
     });
 
     expect(user.sendMarketing).toBe(true);
+    expect(user.agreedToTermsAt).not.toBeNull();
 
     await welcomePage.continueButton.click();
 
@@ -78,5 +81,25 @@ test.describe('Welcome page - onboarding flow', () => {
     });
 
     expect(!!userAfterOnboarding.onboardedAt).toBe(true);
+  });
+
+  test('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
+    const newUser = await mockScout();
+    await utils.loginAsUserId(newUser.id);
+
+    // Test redirect from home page
+    await page.goto('/home');
+    await page.waitForURL('**/welcome');
+    await expect(welcomePage.container).toBeVisible();
+
+    // Test redirect from scouts page
+    await page.goto('/scout');
+    await page.waitForURL('**/welcome');
+    await expect(welcomePage.container).toBeVisible();
+
+    // Test  that info page does not redirect
+    await page.goto('/info');
+    await page.waitForURL('**/info');
+    await expect(infoPage.container).toBeVisible();
   });
 });
