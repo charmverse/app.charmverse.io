@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getLastWeek, getPreviousSeason, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek, getPreviousSeason, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
 
 export type WeeklyReward = {
   week: string;
@@ -35,7 +35,12 @@ export async function getPointsWithEvents({
       recipientId: userId,
       claimedAt: isClaimed ? { not: null } : { equals: null },
       event: {
-        week: !isClaimed ? getLastWeek() : undefined,
+        // show all the weeks except the current week
+        week: !isClaimed
+          ? {
+              not: getCurrentWeek()
+            }
+          : undefined,
         season: {
           in: claimableSeasons
         }
