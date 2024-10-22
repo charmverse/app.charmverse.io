@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
+import type { Season } from '@packages/scoutgame/dates';
 import { getWeekFromDate, getStartOfSeason, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
@@ -37,7 +38,7 @@ export async function recordCommit({
   }
 
   const week = getWeekFromDate(now.toJSDate());
-  const start = getStartOfSeason(season);
+  const start = getStartOfSeason(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
