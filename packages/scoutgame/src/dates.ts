@@ -23,7 +23,7 @@ export const seasons = [
   }
 ] as const;
 
-type Season = (typeof seasons)[number]['start'];
+export type Season = (typeof seasons)[number]['start'];
 
 export const currentSeason: Season = '2024-W41';
 
