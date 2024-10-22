@@ -28,7 +28,7 @@ export async function generateScout({ index }: { index: number }) {
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
       walletAddress: faker.finance.ethereumAddress(),
-      farcasterId: faker.number.int({ min: 1, max: 5000 }) + index,
+      farcasterId: faker.number.int({ min: 1, max: 500000 }) + index,
       farcasterName: displayName
     }
   });

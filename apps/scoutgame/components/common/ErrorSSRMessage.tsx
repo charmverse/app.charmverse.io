@@ -11,7 +11,7 @@ export function ErrorSSRMessage({ message }: { message?: string }) {
 
   return (
     <Alert severity='warning'>
-      {message || 'An error occured while loading your data. Please try to refresh or contact us on discord'}
+      {message || 'An error occurred while loading your data. Please try to refresh or contact us on Discord'}
     </Alert>
   );
 }

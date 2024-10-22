@@ -31,7 +31,7 @@ export function PointsClaimButton() {
         sx={{
           width: {
             xs: 'fit-content',
-            md: '200px'
+            md: '100%'
           }
         }}
         disabled={isExecuting}

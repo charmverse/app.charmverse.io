@@ -18,7 +18,6 @@ export const bonusPartnersRecord: Record<string, { repos: string[]; icon: string
       'celo-org/celo-composer',
       'valora-inc/hooks',
       'Glo-Foundation/glo-wallet',
-      'Ubeswap/ubeswap-interface-v3',
       'gitcoinco/grants-stack',
       'GoodDollar/GoodWeb3-Mono',
       'GoodDollar/GoodCollective',

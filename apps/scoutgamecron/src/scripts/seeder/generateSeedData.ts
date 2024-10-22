@@ -88,7 +88,7 @@ export async function generateSeedData() {
   }
 
   for (let i = 0; i < totalScouts; i++) {
-    const scout = await generateScout({ index: i });
+    const scout = await generateScout({ index: i + totalBuilders });
     // Realistically a scout will only scout a few builders, by purchasing multiple of their nfts
     const assignedBuilders = assignBuildersToScout(builders);
     scouts.push({
