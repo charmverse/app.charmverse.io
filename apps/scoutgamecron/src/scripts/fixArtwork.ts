@@ -33,7 +33,7 @@ async function refreshArtworks() {
 
   for (let i = 0; i < totalNfts; i++) {
     const nft = builderNfts[i];
-    log.info(`Updating artwork for NFT ${nft.tokenId} of ${totalNfts}`);
+    log.info(`[tokenId: ${nft.tokenId}] Updating artwork for NFT ${i+1} of ${totalNfts} `);
 
     const avatar = nft.builder.avatar;
 
@@ -65,12 +65,15 @@ async function refreshArtworks() {
       }
     });
 
-    await uploadMetadata({
+    const metadataPath = await uploadMetadata({
       season: currentSeason,
       tokenId: BigInt(tokenId),
       username: nft.builder.username,
       attributes: []
     });
+
+    log.info('Artwork uploaded', filePath);
+    log.info('Metadata uploaded', metadataPath);
   }
 }
 
