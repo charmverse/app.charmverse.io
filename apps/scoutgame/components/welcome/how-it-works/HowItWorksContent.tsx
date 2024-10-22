@@ -2,8 +2,9 @@
 
 import { Button, List, ListItem, ListItemAvatar, Stack, Typography, styled } from '@mui/material';
 import Link from 'next/link';
+import React from 'react';
 
-export function HowItWorksContent() {
+export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React.MouseEventHandler }) {
   return (
     <>
       <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>
@@ -49,6 +50,7 @@ export function HowItWorksContent() {
       <Button
         LinkComponent={Link}
         variant='contained'
+        onClick={onClickContinue}
         href='/'
         data-test='continue-button'
         sx={{ margin: '0 auto', display: 'flex', width: 'fit-content' }}
