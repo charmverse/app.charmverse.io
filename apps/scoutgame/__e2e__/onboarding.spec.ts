@@ -54,6 +54,7 @@ test.describe('Onboarding flow', () => {
       },
       select: {
         id: true,
+        email: true,
         agreedToTermsAt: true,
         sendMarketing: true
       }
@@ -61,7 +62,7 @@ test.describe('Onboarding flow', () => {
 
     expect(user.sendMarketing).toBe(true);
     expect(user.agreedToTermsAt).not.toBeNull();
-
+    expect(user.email).toBe(email);
     await welcomePage.continueButton.click();
 
     await page.waitForURL('**/welcome/how-it-works');
