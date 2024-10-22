@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
-import { getDateFromISOWeek } from '@packages/scoutgame/dates';
+import { getDateFromISOWeek, Season } from '@packages/scoutgame/dates';
 import { recordMergedPullRequest } from '../tasks/processBuilderActivity/recordMergedPullRequest';
 import { recordCommit } from '../tasks/processBuilderActivity/recordCommit';
 
@@ -12,7 +12,7 @@ export async function approveBuilder({
 }: {
   githubLogin?: string;
   builderId?: string;
-  season: string;
+  season: Season;
 }) {
   if (githubLogin && builderId) {
     throw new Error('Only provide githubLogin or builderId');
