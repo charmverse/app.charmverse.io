@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { Box, Paper, Typography, Stack } from '@mui/material';
 import Image from 'next/image';

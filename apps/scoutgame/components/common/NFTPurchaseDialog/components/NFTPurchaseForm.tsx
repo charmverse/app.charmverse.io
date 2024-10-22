@@ -26,7 +26,7 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { convertCostToPoints, convertCostToUsdDisplay } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -37,8 +37,9 @@ import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
+import { usePurchase } from 'components/layout/PurchaseProvider';
+import { useSnackbar } from 'components/layout/SnackbarContext';
 import { useUser } from 'components/layout/UserProvider';
-import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
@@ -79,6 +80,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
+  const { checkDecentTransaction, isExecutingTransaction } = usePurchase();
+  const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
 
@@ -118,20 +121,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   } = useAction(purchaseWithPointsAction, {
     onError({ error, input }) {
       log.error('Error purchasing with points', { input, error });
-      setSubmitError(error.serverError?.message || 'Something went wrong');
-    },
-    onExecute() {
-      setSubmitError(null);
-    }
-  });
-
-  const {
-    isExecuting: isExecutingTransaction,
-    hasSucceeded: transactionHasSucceeded,
-    executeAsync: checkDecentTransaction
-  } = useAction(checkDecentTransactionAction, {
-    onError({ error, input }) {
-      log.error('Error checking Decent transaction', { error, input });
       setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
@@ -253,7 +242,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       }
 
       if (chainId !== selectedPaymentOption.chainId) {
-        await switchChainAsync({ chainId: selectedPaymentOption.chainId });
+        await switchChainAsync(
+          { chainId: selectedPaymentOption.chainId },
+          {
+            onError() {
+              showMessage('Failed to switch chain');
+            }
+          }
+        );
       }
 
       const _value = BigInt(String((decentTransactionInfo.tx as any).value || 0).replace('n', ''));
@@ -327,7 +323,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
+  if (hasPurchasedWithPoints || savedDecentTransaction) {
     return <SuccessView builder={builder} />;
   }
 
@@ -357,7 +353,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         <Typography textAlign='center' fontWeight={600} color='secondary'>
           <>
             {pricePerNft}{' '}
-            <Box display='inline' position='relative' top={4}>
+            <Box component='span' display='inline' position='relative' top={4}>
               <PointsIcon color='blue' size={18} />
             </Box>
           </>
@@ -443,7 +439,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             {purchaseCost && (
               <>
                 {purchaseCostInPoints.toLocaleString()}{' '}
-                <Box display='inline' position='relative' top={4}>
+                <Box component='span' display='inline' position='relative' top={4}>
                   <PointsIcon size={18} />
                 </Box>
               </>

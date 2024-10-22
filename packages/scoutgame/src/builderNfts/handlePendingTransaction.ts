@@ -23,6 +23,22 @@ export async function handlePendingTransaction({
     throw new InvalidInputError(`Pending transaction id must be a valid uuid`);
   }
 
+  const initialTransaction = await prisma.pendingNftTransaction.findFirst({
+    where: {
+      id: pendingTransactionId
+    }
+  });
+
+  if (initialTransaction && (initialTransaction.status === 'completed' || initialTransaction.status === 'failed')) {
+    log.info(
+      'handlePendingTransaction has propably run twice since the transaction is already completed. Abording the process.',
+      {
+        pendingTransactionId
+      }
+    );
+    return;
+  }
+
   // Atomically set the status to 'processing' only if it's currently 'pending'
   const updatedTx = await prisma.pendingNftTransaction.updateMany({
     where: {
