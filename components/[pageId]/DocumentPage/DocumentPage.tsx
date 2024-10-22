@@ -519,6 +519,7 @@ function DocumentPageComponent({
                         getFieldState={getFieldState}
                         onSave={onSave}
                         pageId={page.id}
+                        isAuthor={proposalAuthors.includes(user?.id || '')}
                         threads={threads}
                         // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
                         key={proposal?.status === 'draft' ? 'draft' : 'published'}

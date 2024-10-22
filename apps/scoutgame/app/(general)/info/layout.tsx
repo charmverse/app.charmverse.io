@@ -3,7 +3,7 @@ import { Container, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { ScrollButton } from 'components/common/DocumentPageContainer/components/ScrollButton';
-import { SidebarInfo } from 'components/info/SidebarInfo';
+import { SidebarInfo } from 'components/info/components/SidebarInfo';
 
 export default async function Layout({
   children

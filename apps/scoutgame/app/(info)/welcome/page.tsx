@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 

@@ -3,7 +3,7 @@ import { Link, Typography } from '@mui/material';
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 
-import { InfoPageContainer } from '../InfoPageContainer';
+import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function BuildersPage() {
   return (

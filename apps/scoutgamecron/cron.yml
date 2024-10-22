@@ -24,8 +24,3 @@ cron:
     url: '/alert-low-wallet-gas-balance'
     # Every 5 minutes
     schedule: '*/5 * * * *'
-
-  - name: 'send-points-claim-emails'
-    url: '/send-points-claim-emails'
-    # Every Monday at 00:00
-    schedule: '0 2 * * 1'

@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { stringify } from 'csv-stringify/sync';
 import type { NextRequest } from 'next/server';
+
+import { respondWithTSV } from 'lib/nextjs/respondWithTSV';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ type ScoutWithGithubUser = {
   weeklyBuilderRank?: number;
 };
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const users = await prisma.scout.findMany({
     select: {
       id: true,
@@ -66,13 +67,6 @@ export async function GET(req: NextRequest) {
     nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
     weeklyBuilderRank: user.userWeeklyStats[0]?.rank || undefined
   }));
-  const exportString = stringify(rows, { header: true, columns: Object.keys(rows[0]) });
 
-  return new Response(exportString, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/tsv',
-      'Content-Disposition': 'attachment; filename=scout_users_export.tsv'
-    }
-  });
+  return respondWithTSV(rows, 'scout_users_export.tsv');
 }

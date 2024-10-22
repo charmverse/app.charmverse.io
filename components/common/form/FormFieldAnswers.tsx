@@ -51,6 +51,7 @@ type FormFieldAnswersProps = {
   values?: Record<string, FormFieldValue>;
   pageId?: string;
   isDraft?: boolean;
+  isAuthor: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
   projectId?: string | null;
   proposalId: string;
@@ -71,6 +72,7 @@ export function FormFieldAnswers({
   onSave,
   formFields,
   disabled,
+  isAuthor,
   enableComments,
   getFieldState,
   control,
@@ -233,7 +235,7 @@ export function FormFieldAnswers({
                       )
                     }
                     description={formField.description as PageContent}
-                    disabled={disabled}
+                    disabled={disabled || (!isAuthor && formField.type === 'optimism_project_profile')}
                     type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
                     label={formField.name}
                     options={formField.options as SelectOptionType[]}

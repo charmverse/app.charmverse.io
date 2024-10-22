@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@mui/lab": "^6.0.0-beta.11",
-    "@packages/onchain": "^0.0.0"
+    "@packages/onchain": "^0.0.0",
+    "@packages/scoutgame": "^0.0.0"
   }
 }

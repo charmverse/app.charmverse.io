@@ -9,7 +9,7 @@ import { ScoutPageBuildersGallery } from './components/ScoutPageBuildersGallery'
 import { SearchBuildersInput } from './components/SearchBuildersInput';
 import { SortOptionTabs, sortOptions } from './components/SortOptionTabs';
 
-export function ScoutPage({ sort, user }: { sort: BuildersSort; user?: { username: string; id: string } | null }) {
+export function ScoutPage({ sort }: { sort: BuildersSort }) {
   const currentSort = sortOptions.some((t) => t.value === sort) ? sort : 'top';
 
   return (
@@ -17,7 +17,7 @@ export function ScoutPage({ sort, user }: { sort: BuildersSort; user?: { usernam
       <SearchBuildersInput />
       <SortOptionTabs value={currentSort} />
       <Suspense key={currentSort} fallback={<LoadingGallery />}>
-        <ScoutPageBuildersGallery sort={currentSort} showHotIcon={currentSort === 'hot'} userId={user?.id} />
+        <ScoutPageBuildersGallery sort={currentSort} showHotIcon={currentSort === 'hot'} />
       </Suspense>
     </PageContainer>
   );

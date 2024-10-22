@@ -75,19 +75,21 @@ export async function mockGemPayoutEvent({
   builderId,
   recipientId,
   amount = 10,
-  week = getCurrentWeek()
+  week = getCurrentWeek(),
+  season = mockSeason
 }: {
   builderId: string;
   recipientId?: string;
   amount?: number;
   week?: string;
+  season?: string;
 }) {
   return prisma.gemsPayoutEvent.create({
     data: {
       gems: amount,
       points: 0,
       week,
-      season: mockSeason,
+      season,
       builder: {
         connect: {
           id: builderId
@@ -95,7 +97,7 @@ export async function mockGemPayoutEvent({
       },
       builderEvent: {
         create: {
-          season: mockSeason,
+          season,
           type: 'gems_payout',
           week: getCurrentWeek(),
           builder: {

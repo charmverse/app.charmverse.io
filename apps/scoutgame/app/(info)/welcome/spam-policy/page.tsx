@@ -1,9 +1,6 @@
 import type { Metadata } from 'next';
 
 import { SpamPolicyPage } from 'components/welcome/spam-policy/SpamPolicyPage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
-
-export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   other: {
@@ -13,7 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default async function SpamPolicy({ searchParams }: { searchParams: { 'profile-redirect': string } }) {
-  const user = await getUserFromSession();
-
-  return <SpamPolicyPage user={user} redirectToProfile={searchParams['profile-redirect'] === 'true'} />;
+  return <SpamPolicyPage redirectToProfile={searchParams['profile-redirect'] === 'true'} />;
 }

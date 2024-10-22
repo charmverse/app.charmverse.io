@@ -4,14 +4,15 @@ import { InfoCard } from 'components/common/DocumentPageContainer/components/Inf
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
+import { InfoPageContainer } from '../components/InfoPageContainer';
+
 export function DataProcessingPage() {
   return (
-    <DocumentPageContainer data-test='dpa-page'>
-      <Typography variant='h4' align='center' color='secondary'>
-        Data Processing Addendum
-      </Typography>
-      <Document />
-    </DocumentPageContainer>
+    <InfoPageContainer data-test='dpa-page' title='Data Processing Addendum'>
+      <DocumentPageContainer>
+        <Document />
+      </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 

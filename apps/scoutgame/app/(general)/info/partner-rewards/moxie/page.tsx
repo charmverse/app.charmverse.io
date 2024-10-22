@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { MoxiePage } from 'components/info/pages/PartnerRewards/MoxiePage';
+import { MoxiePage } from 'components/info/partner-rewards/MoxiePage';
 
 export const metadata: Metadata = {
   title: 'Moxie Partner Rewards'

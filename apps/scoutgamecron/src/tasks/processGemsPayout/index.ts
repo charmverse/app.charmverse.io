@@ -8,6 +8,7 @@ import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from './processScoutPointsPayout';
+import { sendGemsPayoutEmails } from './sendGemsPayoutEmails/sendGemsPayoutEmails';
 
 export async function processGemsPayout(
   ctx: Context,
@@ -62,5 +63,7 @@ export async function processGemsPayout(
     }
   }
 
-  log.info(`Processed ${topWeeklyBuilders.length} builders points payout`);
+  const emailsSent = await sendGemsPayoutEmails({ week });
+
+  log.info(`Processed ${topWeeklyBuilders.length} builders points payout`, { emailsSent });
 }
