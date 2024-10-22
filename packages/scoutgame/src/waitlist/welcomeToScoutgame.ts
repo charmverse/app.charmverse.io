@@ -72,10 +72,11 @@ export async function welcomeFromWaitlistToScoutgame({ fid }: { fid: number }): 
 
   const tier = getTier(waitlistSlot.percentile);
 
-  const message = getMessage(tier === 'legendary' ? 'legendary' : 'builder', waitlistSlot.username as string);
+  const message = getMessage(tier, waitlistSlot.username as string);
 
   await writeToFarcaster({
     neynarSignerId: process.env.NEYNAR_SIGNER_ID as string,
-    text: message
+    text: message,
+    embedUrl: `https://scoutgame.xyz`
   });
 }
