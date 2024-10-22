@@ -19,7 +19,7 @@ function WelcomeModal({ userId }: { userId?: string }) {
     const hasSeenModal = getCookie('hasSeenWelcomeModal');
     if (
       !userId &&
-      // !isTestEnv &&
+      !isTestEnv &&
       hasSeenModal !== 'true' &&
       pagesToShowOnboarding.some((path) => pathname.startsWith(path))
     ) {
