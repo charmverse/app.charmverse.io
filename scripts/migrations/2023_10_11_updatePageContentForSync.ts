@@ -216,5 +216,4 @@ export async function updatePageContentForSync(
   }
 }
 
-
 updatePageContentForSync();

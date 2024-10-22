@@ -168,11 +168,14 @@ export async function getCharmverseOnchainCredentials({
           }
         })
       : []
-  ).reduce((acc, val) => {
-    const iconUrl = val.bounty.space.credentialLogo;
-    acc[val.id] = iconUrl;
-    return acc;
-  }, {} as Record<string, string | null>);
+  ).reduce(
+    (acc, val) => {
+      const iconUrl = val.bounty.space.credentialLogo;
+      acc[val.id] = iconUrl;
+      return acc;
+    },
+    {} as Record<string, string | null>
+  );
 
   const proposalCredentialIconUrls = (
     proposalCredentials.length
@@ -194,11 +197,14 @@ export async function getCharmverseOnchainCredentials({
           }
         })
       : []
-  ).reduce((acc, val) => {
-    const iconUrl = val.space.credentialLogo;
-    acc[val.id] = iconUrl;
-    return acc;
-  }, {} as Record<string, string | null>);
+  ).reduce(
+    (acc, val) => {
+      const iconUrl = val.space.credentialLogo;
+      acc[val.id] = iconUrl;
+      return acc;
+    },
+    {} as Record<string, string | null>
+  );
 
   return {
     rewardCredentials: rewardCredentials.map((attestation) => {
@@ -226,15 +232,18 @@ export async function getOnchainCredentialsById({
 }: {
   attestations: { id: string; chainId: EasSchemaChain }[];
 }): Promise<EASAttestationFromApi[]> {
-  const groupedByChain = attestations.reduce((acc, val) => {
-    if (!acc[val.chainId]) {
-      acc[val.chainId] = [];
-    }
+  const groupedByChain = attestations.reduce(
+    (acc, val) => {
+      if (!acc[val.chainId]) {
+        acc[val.chainId] = [];
+      }
 
-    acc[val.chainId].push(val.id);
+      acc[val.chainId].push(val.id);
 
-    return acc;
-  }, {} as Record<EasSchemaChain, string[]>);
+      return acc;
+    },
+    {} as Record<EasSchemaChain, string[]>
+  );
 
   const foundAttestations = await Promise.all(
     Object.entries(groupedByChain).map(([chainId, attestationIds]) => {

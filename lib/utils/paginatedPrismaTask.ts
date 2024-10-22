@@ -12,16 +12,16 @@ type PrismaArgs<M extends PrismaModel> = Pick<
   M extends 'block'
     ? Prisma.BlockFindManyArgs
     : M extends 'page'
-    ? Prisma.PageFindManyArgs
-    : M extends 'post'
-    ? Prisma.PostFindManyArgs
-    : M extends 'proposal'
-    ? Prisma.ProposalFindManyArgs
-    : M extends 'memberPropertyValue'
-    ? Prisma.MemberPropertyValueFindManyArgs
-    : M extends 'space'
-    ? Prisma.SpaceFindManyArgs
-    : never,
+      ? Prisma.PageFindManyArgs
+      : M extends 'post'
+        ? Prisma.PostFindManyArgs
+        : M extends 'proposal'
+          ? Prisma.ProposalFindManyArgs
+          : M extends 'memberPropertyValue'
+            ? Prisma.MemberPropertyValueFindManyArgs
+            : M extends 'space'
+              ? Prisma.SpaceFindManyArgs
+              : never,
   'select' | 'where' | 'include'
 >;
 

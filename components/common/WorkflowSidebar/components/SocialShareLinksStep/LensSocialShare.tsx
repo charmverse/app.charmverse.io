@@ -66,10 +66,10 @@ export function LensSocialShare({
           lensPostLink
             ? 'View on lens'
             : hasFarcasterProfile
-            ? canPublishToLens
-              ? 'Publish to Lens'
-              : 'You do not have permission to publish to Lens'
-            : 'Please create a Lens profile first'
+              ? canPublishToLens
+                ? 'Publish to Lens'
+                : 'You do not have permission to publish to Lens'
+              : 'Please create a Lens profile first'
         }
       >
         <div style={{ display: 'flex' }}>

@@ -60,8 +60,8 @@ export function GithubSettings({
                   isConnectingWithGithubApp
                     ? 'Connecting with CharmVerse Github App'
                     : !isAdmin
-                    ? 'Only admins can connect to Github'
-                    : undefined
+                      ? 'Only admins can connect to Github'
+                      : undefined
                 }
                 disabled={!isAdmin}
                 external

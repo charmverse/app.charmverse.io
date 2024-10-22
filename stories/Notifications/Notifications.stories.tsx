@@ -85,7 +85,7 @@ const forum: PostNotification[] = [
     postPath: '/post',
     postTitle: 'Test post'
   }
-].map((notification) => ({ ...baseFields, ...notification } as PostNotification));
+].map((notification) => ({ ...baseFields, ...notification }) as PostNotification);
 
 const cards: CardNotification[] = [
   {

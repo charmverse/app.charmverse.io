@@ -1,4 +1,3 @@
-
 .bangle-tooltip {
   z-index: var(--z-index-modal);
 
@@ -204,7 +203,6 @@
   margin-bottom: 0.5rem;
 }
 
-
 .bangle-editor p > code {
   font-family: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
   padding: 0.2em 0.4em;
@@ -403,9 +401,9 @@
 }
 
 /** placeholder - do not show while content is loading **/
-.content-loaded  {
+.content-loaded {
   .ProseMirror[data-placeholder]::before,
-  .charm-placeholder::before  {
+  .charm-placeholder::before {
     display: block;
     height: 0;
     color: var(--secondary-text);
@@ -414,7 +412,7 @@
     pointer-events: none;
     position: relative;
   }
-  .ProseMirror[data-placeholder]::before  {
+  .ProseMirror[data-placeholder]::before {
     top: 3px;
   }
 }
@@ -424,7 +422,6 @@
     display: none;
   }
 }
-
 
 /** Begin Resizable columns **/
 
@@ -488,7 +485,16 @@
 }
 
 .bangle-editor-core.readonly {
-  p, h1, h2, h3, ul, ol, code, .tableScrollWrapper, .charm-column-row, .bangle-nv-container {
+  p,
+  h1,
+  h2,
+  h3,
+  ul,
+  ol,
+  code,
+  .tableScrollWrapper,
+  .charm-column-row,
+  .bangle-nv-container {
     &:has(div.charm-row-decoration-suggestions) {
       // important for column row, as it uses inline-styles
       display: none !important;

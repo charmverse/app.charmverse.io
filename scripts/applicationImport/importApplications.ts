@@ -119,11 +119,14 @@ async function importApplications({
 
   const formId = formProposal.formId as string;
 
-  const formQuestions = formProposal.form!.formFields.reduce((acc, val) => {
-    acc[val.name.trim().toLowerCase()] = val;
-    acc[val.id] = val;
-    return acc;
-  }, {} as Record<string, FormField>);
+  const formQuestions = formProposal.form!.formFields.reduce(
+    (acc, val) => {
+      acc[val.name.trim().toLowerCase()] = val;
+      acc[val.id] = val;
+      return acc;
+    },
+    {} as Record<string, FormField>
+  );
 
   // for (let i=0; i< 5; i++) {
 

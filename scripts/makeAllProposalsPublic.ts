@@ -1,21 +1,19 @@
-import { ProposalOperation, prisma } from "@charmverse/core/prisma-client"
-import { ProposalWorkflowTyped } from "@charmverse/core/proposals";
+import { ProposalOperation, prisma } from '@charmverse/core/prisma-client';
+import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
-
-
-const spaceDomain = 'demo-space'
-
+const spaceDomain = 'demo-space';
 
 async function makeAllProposalsPublic() {
-  const spaceId = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: spaceDomain
-    },
-    select: {
-      id: true
-    }
-  }).then(space => space.id);
-
+  const spaceId = await prisma.space
+    .findUniqueOrThrow({
+      where: {
+        domain: spaceDomain
+      },
+      select: {
+        id: true
+      }
+    })
+    .then((space) => space.id);
 
   const workflows = (await prisma.proposalWorkflow.findMany({
     where: {
@@ -26,9 +24,11 @@ async function makeAllProposalsPublic() {
   let i = 0;
 
   for (const workflow of workflows) {
-    i+=1;
-    const updatedEvaluations = workflow.evaluations.map(evaluation => {
-      const existingPublicEvaluationPermission = evaluation.permissions.find(permission => permission.systemRole === 'public');
+    i += 1;
+    const updatedEvaluations = workflow.evaluations.map((evaluation) => {
+      const existingPublicEvaluationPermission = evaluation.permissions.find(
+        (permission) => permission.systemRole === 'public'
+      );
 
       if (!existingPublicEvaluationPermission) {
         return {
@@ -73,17 +73,14 @@ async function makeAllProposalsPublic() {
   });
 
   const createdPermissions = await prisma.proposalEvaluationPermission.createMany({
-
-    data: evaluationsWithoutPublicPermission.map(evaluation => ({
+    data: evaluationsWithoutPublicPermission.map((evaluation) => ({
       evaluationId: evaluation.id,
       systemRole: 'public',
       operation: 'view' as ProposalOperation
     }))
-  })
-  
+  });
+
   console.log(`Updated ${createdPermissions.count} evaluations with public permissions`);
-
-
 }
 
-makeAllProposalsPublic()
+makeAllProposalsPublic();

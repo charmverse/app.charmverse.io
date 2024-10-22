@@ -139,7 +139,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
                   userId: r.userId,
                   roleId: r.roleId,
                   proposalId
-                } as Omit<Prisma.ProposalReviewerCreateManyInput, 'evaluationId'>)
+                }) as Omit<Prisma.ProposalReviewerCreateManyInput, 'evaluationId'>
             )
           }
         },
@@ -151,7 +151,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
                   userId: r.userId,
                   roleId: r.roleId,
                   proposalId
-                } as Omit<Prisma.ProposalAppealReviewerCreateManyInput, 'evaluationId'>)
+                }) as Omit<Prisma.ProposalAppealReviewerCreateManyInput, 'evaluationId'>
             )
           }
         },
@@ -163,7 +163,7 @@ export async function syncProposalWithTemplateEvaluationsAndWorkflowPermissions(
                   userId: r.userId,
                   roleId: r.roleId,
                   proposalId
-                } as Omit<Prisma.ProposalEvaluationApproverCreateManyInput, 'evaluationId'>)
+                }) as Omit<Prisma.ProposalEvaluationApproverCreateManyInput, 'evaluationId'>
             )
           }
         }

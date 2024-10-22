@@ -6,7 +6,7 @@ export async function uncheckProposalPublishedNotification() {
       id: true,
       notificationToggles: true
     }
-  })
+  });
 
   let count = 0;
   const total = spacesWithNotificationToggles.length;
@@ -19,11 +19,11 @@ export async function uncheckProposalPublishedNotification() {
         },
         data: {
           notificationToggles: {
-            ...spaceWithNotificationToggles.notificationToggles as Prisma.JsonObject,
-            'proposals__proposal_published': false
+            ...(spaceWithNotificationToggles.notificationToggles as Prisma.JsonObject),
+            proposals__proposal_published: false
           }
         }
-      })
+      });
     } catch (err) {
       console.error('Error in space:', spaceWithNotificationToggles.id, {
         err

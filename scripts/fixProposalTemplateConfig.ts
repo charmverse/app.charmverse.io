@@ -194,7 +194,7 @@ async function fixEmptyProposalTemplateConfig({
                       description: criterion.description,
                       id: uuid(),
                       index: criterion.index
-                    } as Prisma.ProposalRubricCriteriaCreateManyInput)
+                    }) as Prisma.ProposalRubricCriteriaCreateManyInput
                 )
               }
             }

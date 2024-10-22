@@ -507,8 +507,8 @@ export class NotionBlock {
           block.link_to_page.type === 'page_id'
             ? block.link_to_page.page_id
             : block.link_to_page.type === 'database_id'
-            ? block.link_to_page.database_id
-            : null;
+              ? block.link_to_page.database_id
+              : null;
         if (linkedPageId === this.charmversePage.notionPageId) {
           return {
             type: 'linkedPage',

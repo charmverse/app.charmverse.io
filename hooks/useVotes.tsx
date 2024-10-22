@@ -54,14 +54,17 @@ export function VotesProvider({ children }: { children: ReactNode }) {
     const unsubscribeFromCreatedVotes = subscribe('votes_created', (newVotes) => {
       // Mutate the votes
       setVotes((prev) => {
-        const votesToAssign = newVotes.reduce((acc, vote) => {
-          // In future, we'll want to check if the vote is linked to current space.
-          // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions
-          const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : vote.createdBy?.id || '';
-          acc[vote.id] = { ...vote, createdBy };
+        const votesToAssign = newVotes.reduce(
+          (acc, vote) => {
+            // In future, we'll want to check if the vote is linked to current space.
+            // For now we can depend on implicit filtering on the server, as each time we switch space we switch subscriptions
+            const createdBy = typeof vote.createdBy === 'string' ? vote.createdBy : vote.createdBy?.id || '';
+            acc[vote.id] = { ...vote, createdBy };
 
-          return acc;
-        }, {} as Record<string, ExtendedVote>);
+            return acc;
+          },
+          {} as Record<string, ExtendedVote>
+        );
 
         return { ...prev, ...votesToAssign };
       });

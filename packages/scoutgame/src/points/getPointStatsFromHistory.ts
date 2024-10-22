@@ -61,13 +61,8 @@ export async function getPointStatsFromHistory({
         OR: [
           {
             event: {
+              builderId: userId,
               type: 'gems_payout'
-            },
-            activities: {
-              some: {
-                userId,
-                recipientType: 'builder'
-              }
             }
           },
           {
@@ -87,13 +82,10 @@ export async function getPointStatsFromHistory({
         OR: [
           {
             event: {
+              builderId: {
+                not: userId
+              },
               type: 'gems_payout'
-            },
-            activities: {
-              some: {
-                userId,
-                recipientType: 'scout'
-              }
             }
           }
         ]
@@ -104,38 +96,10 @@ export async function getPointStatsFromHistory({
     tx.pointsReceipt.findMany({
       where: {
         recipientId: userId,
-        OR: [
-          {
-            event: {
-              type: 'misc_event'
-            },
-            activities: {
-              some: {
-                userId,
-                recipientType: 'builder'
-              }
-            }
-          },
-          {
-            event: {
-              type: 'misc_event'
-            },
-            activities: {
-              some: {
-                userId,
-                recipientType: 'scout'
-              }
-            }
-          },
-          {
-            event: {
-              type: 'misc_event'
-            },
-            activities: {
-              none: {}
-            }
-          }
-        ]
+        event: {
+          builderId: userId,
+          type: 'misc_event'
+        }
       }
     }),
     // All points received
@@ -170,10 +134,17 @@ export async function getPointStatsFromHistory({
   const missingPointRecords = allPointsReceivedRecords.filter(
     (record) =>
       !pointsReceivedAsBuilderRecords.some((r) => r.id === record.id) &&
-      !pointsReceivedAsScoutRecords.some((r) => r.id === record.id)
+      !pointsReceivedAsScoutRecords.some((r) => r.id === record.id) &&
+      !bonusPointsReceivedRecords.some((r) => r.id === record.id)
   );
 
-  assert.equal(allPointsReceived, allPointsReceivedSum);
+  // console.log(missingPointRecords);
+
+  assert.equal(
+    allPointsReceived,
+    allPointsReceivedSum,
+    `All points received sum does not match for scout id: ${userId}`
+  );
 
   return {
     balance,

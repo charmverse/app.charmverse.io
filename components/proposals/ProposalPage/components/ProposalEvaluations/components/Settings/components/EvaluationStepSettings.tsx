@@ -157,8 +157,8 @@ export function EvaluationStepSettings({
             {evaluation.type === 'vote'
               ? 'Voters'
               : requiredReviews !== 1
-              ? `Reviewers (required ${requiredReviews})`
-              : 'Reviewers'}
+                ? `Reviewers (required ${requiredReviews})`
+                : 'Reviewers'}
           </Typography>
         </FormLabel>
         <Typography variant='caption'>Who can evaluate the proposal during this step</Typography>

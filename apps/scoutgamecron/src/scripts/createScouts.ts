@@ -37,4 +37,4 @@ async function createScouts(farcasterUsernames: string[]) {
   }
 }
 
-createScouts(['juampi']);
+createScouts(['sky']);

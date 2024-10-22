@@ -9,6 +9,5 @@
   "exports": {
     "./*": "./src/*.ts"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

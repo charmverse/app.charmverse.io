@@ -90,7 +90,7 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
                 proposalId: ic.proposalId,
                 credentialTemplateId: ic.credentialTemplateId,
                 recipientAddress: ic.recipientAddress
-              } as PartialIssuableProposalCredentialContent)
+              }) as PartialIssuableProposalCredentialContent
           ),
           type: 'proposal'
         });

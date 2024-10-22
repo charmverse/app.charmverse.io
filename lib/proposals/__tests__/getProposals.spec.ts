@@ -28,7 +28,8 @@ describe('getProposals', () => {
 
     const list = await getProposals({
       ids: [proposal.id, deletedProposal.id, proposalTemplate.id],
-      spaceId: space.id
+      spaceId: space.id,
+      userId: user.id
     });
 
     expect(list).toHaveLength(1);

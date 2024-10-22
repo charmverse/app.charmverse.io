@@ -5,7 +5,10 @@ import { GeneralPageLayout } from './GeneralPageLayout.po';
 export class HomePage extends GeneralPageLayout {
   tabs = ['leaderboard', 'top-scouts', 'top-builders', 'activity'];
 
-  constructor(protected page: Page, public container = page.locator('data-test=home-page')) {
+  constructor(
+    protected page: Page,
+    public container = page.locator('data-test=home-page')
+  ) {
     super(page);
   }
 

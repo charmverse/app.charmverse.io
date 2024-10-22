@@ -118,7 +118,7 @@ export function getCardPropertiesFromRubric({
     if (proposalEvaluationReviewerAverageProp) {
       const totalReviewers = Object.keys(reviewersResults).length;
       properties[proposalEvaluationReviewerAverageProp.id] =
-        totalReviewers === 0 ? 0 : (allScores.sum ?? 0) / totalReviewers ?? '';
+        totalReviewers === 0 ? 0 : ((allScores.sum ?? 0) / totalReviewers ?? '');
     }
   }
 

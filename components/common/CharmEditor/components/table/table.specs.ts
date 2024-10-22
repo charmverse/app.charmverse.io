@@ -83,5 +83,5 @@ export const spec = Object.entries(TableNodesSpecs).map(
       name,
       type: 'node',
       schema
-    } as BaseRawNodeSpec)
+    }) as BaseRawNodeSpec
 );

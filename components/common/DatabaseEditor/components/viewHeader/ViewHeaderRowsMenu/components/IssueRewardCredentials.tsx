@@ -122,16 +122,16 @@ export function IssueRewardCredentials({
     !space?.useOnchainCredentials || !space.credentialsChainId || !space.credentialsWallet
       ? 'A space admin must set up onchain credentials to use this functionality'
       : !issuableRewardCredentials?.length
-      ? 'No onchain credentials to issue'
-      : !account || !signer
-      ? 'Unlock your wallet to issue credentials'
-      : !userWalletCanIssueCredentialsForSpace
-      ? gnosisSafeForCredentials
-        ? `You must be connected as one of the owners of the ${gnosisSafeForCredentials.address} Gnosis Safe on ${
-            getChainById(space?.credentialsChainId)?.chainName
-          }`
-        : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
-      : undefined;
+        ? 'No onchain credentials to issue'
+        : !account || !signer
+          ? 'Unlock your wallet to issue credentials'
+          : !userWalletCanIssueCredentialsForSpace
+            ? gnosisSafeForCredentials
+              ? `You must be connected as one of the owners of the ${gnosisSafeForCredentials.address} Gnosis Safe on ${
+                  getChainById(space?.credentialsChainId)?.chainName
+                }`
+              : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
+            : undefined;
 
   const disableIssueCredentialRows =
     !!disableIssueCredentialsMenu || publishingCredential || chainId !== space?.credentialsChainId;

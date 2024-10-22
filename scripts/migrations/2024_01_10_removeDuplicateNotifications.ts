@@ -1,4 +1,4 @@
-import { prisma } from "@charmverse/core/prisma-client";
+import { prisma } from '@charmverse/core/prisma-client';
 
 async function removeDuplicateNotifications() {
   const notificationsMetadata = await prisma.userNotificationMetadata.findMany({
@@ -7,20 +7,20 @@ async function removeDuplicateNotifications() {
       createdAt: true,
       id: true
     }
-  })
+  });
 
   const userIdCreatedAtNotificationsSet: Set<string> = new Set();
   const notificationMetadataIds: string[] = [];
-  notificationsMetadata.forEach(notificationMetadata => {
+  notificationsMetadata.forEach((notificationMetadata) => {
     const { userId, createdAt } = notificationMetadata;
-    const key = `${userId}.${createdAt}`
+    const key = `${userId}.${createdAt}`;
 
     if (userIdCreatedAtNotificationsSet.has(key)) {
       notificationMetadataIds.push(notificationMetadata.id);
     } else {
       userIdCreatedAtNotificationsSet.add(key);
     }
-  })
+  });
 
   await prisma.userNotificationMetadata.deleteMany({
     where: {
@@ -28,7 +28,7 @@ async function removeDuplicateNotifications() {
         in: notificationMetadataIds
       }
     }
-  })
+  });
 }
 
-removeDuplicateNotifications()
+removeDuplicateNotifications();

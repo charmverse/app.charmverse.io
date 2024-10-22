@@ -334,8 +334,8 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
 
   const ContentProps = useMemo(() => ({ isAdjacent, hasSelectedChildView }), [isAdjacent, hasSelectedChildView]);
   const TransitionProps = useMemo(() => ({ timeout: 50 }), []);
-  const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' } as const), []);
-  const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' } as const), []);
+  const anchorOrigin = useMemo(() => ({ vertical: 'bottom', horizontal: 'left' }) as const, []);
+  const transformOrigin = useMemo(() => ({ vertical: 'top', horizontal: 'left' }) as const, []);
 
   const [userSpacePermissions] = useCurrentSpacePermissions();
 

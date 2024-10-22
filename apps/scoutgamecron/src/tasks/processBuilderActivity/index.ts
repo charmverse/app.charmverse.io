@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason, getStartOfSeason } from '@packages/scoutgame/dates';
+import { getCurrentWeek, currentSeason, getDateFromISOWeek } from '@packages/scoutgame/dates';
+import type Koa from 'koa';
 
 import { processBuilderActivity } from './processBuilderActivity';
 import { updateBuildersRank } from './updateBuildersRank';
@@ -10,10 +11,10 @@ type ProcessPullRequestsOptions = {
   season?: string;
 };
 
-export async function processAllBuilderActivity({
-  createdAfter = new Date(Date.now() - 30 * 60 * 1000),
-  season = currentSeason
-}: ProcessPullRequestsOptions = {}) {
+export async function processAllBuilderActivity(
+  ctx: Koa.Context | null,
+  { createdAfter = new Date(Date.now() - 30 * 60 * 1000), season = currentSeason }: ProcessPullRequestsOptions = {}
+) {
   const builders = await prisma.scout.findMany({
     where: {
       builderStatus: 'approved',
@@ -28,9 +29,16 @@ export async function processAllBuilderActivity({
       id: 'asc'
     },
     select: {
+      createdAt: true,
       id: true,
       githubUser: {
         select: {
+          events: {
+            take: 1,
+            select: {
+              id: true
+            }
+          },
           id: true,
           login: true
         }
@@ -41,12 +49,23 @@ export async function processAllBuilderActivity({
   log.info(`Processing activity for ${builders.length} builders`);
 
   for (const builder of builders) {
+    // If the builder was created less than and hr and has no existing events
+    const newBuilder = builder.createdAt > new Date(Date.now() - 60 * 60 * 1000) && !builder.githubUser[0]?.events[0];
+
+    if (newBuilder) {
+      log.info(`Detected new builder. Pulling in github data for this season`, {
+        builderId: builder.id,
+        githubUserId: builder.githubUser[0]?.id
+      });
+    }
+
     await processBuilderActivity({
       builderId: builder.id,
       githubUser: builder.githubUser[0]!,
-      createdAfter,
+      createdAfter: newBuilder ? getDateFromISOWeek(season).toJSDate() : createdAfter,
       season
     });
+
     if (builders.indexOf(builder) % 10 === 0) {
       log.debug(`Processed ${builders.indexOf(builder)}/${builders.length} builders.`, {
         lastId: builder.id, // log last id in case we want to start in the middle of the process

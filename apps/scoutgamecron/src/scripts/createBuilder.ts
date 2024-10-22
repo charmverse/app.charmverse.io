@@ -6,11 +6,13 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { log } from '@charmverse/core/log';
-import { importReposByUser } from '@packages/scoutgame/importReposByUser';
 
 process.env.DOMAIN = 'https://scoutgame.xyz';
 
 async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: string }) {
+  if (process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY) {
+    throw new Error('BUILDER_SMART_CONTRACT_OWNER_PRIVKEY is not set');
+  }
   const githubUser = await octokit.rest.users.getByUsername({ username: githubLogin });
   const profile = await getFarcasterUserById(fid);
   if (!profile) {
@@ -59,20 +61,25 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
           }
     }
   });
-  console.log('builder created', builder);
-  // await importReposByUser(githubLogin);
+  console.log('Created a builder record', builder);
   await approveBuilder({ builderId: builder.id, season: currentSeason });
+  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/builder/' + builder.username);
 }
 
-createBuilder({ fid: 4179, githubLogin: 'Maurelian' });
-
-// use this to search farcaster id by username
+// search farcaster id by username
 // (async () => {
-//   const user = await getFarcasterUserByUsername('txbi');
-//   console.log('user', user);
+//   console.log(await getFarcasterUserByUsername('mattcasey')));
 // })();
 
-// use this to import repos for an org
+// search waitlist to find github login and farcaster id
 // (async () => {
-//   // await importReposByUser('TogetherCrew');
+//   console.log(
+//   await prisma.connectWaitlistSlot.findFirst({
+//     where: {
+//       username: 'mattcasey
+//     }
+//   })
+// );
 // })();
+
+createBuilder({ fid: 866880, githubLogin: 'Ansonhkg' });

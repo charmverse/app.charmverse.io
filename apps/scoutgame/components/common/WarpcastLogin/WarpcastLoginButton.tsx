@@ -9,7 +9,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { useUser } from 'components/layout/UserProvider';
@@ -22,10 +22,11 @@ import { WarpcastIcon } from './WarpcastIcon';
 export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
-  const { setUser } = useUser();
+  const { refreshUser } = useUser();
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
+  const inviteCode = searchParams.get('invite-code');
   const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
 
   const { executeAsync: revalidatePath, isExecuting: isRevalidatingPath } = useAction(revalidatePathAction);
@@ -37,13 +38,13 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     result
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      const nextPage = data?.onboarded ? redirectUrl : '/welcome';
+      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/home';
 
       if (!data?.success) {
         return;
       }
 
-      setUser(data.user);
+      await refreshUser(data.user);
 
       await revalidatePath();
       router.push(nextPage);
@@ -67,7 +68,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
 
   const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
     if (res.message && res.signature) {
-      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature });
+      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
     } else {
       log.error('Did not receive message or signature from Farcaster', res);
     }

@@ -166,8 +166,8 @@ export async function getPageMarkdown({
                         getChainById(reward.reward.chainId!)?.chainName || 'Unknown Chain'
                       }`
                     : reward.reward.rewardType === 'custom'
-                    ? `Reward: ${reward.reward.customReward}`
-                    : ``
+                      ? `Reward: ${reward.reward.customReward}`
+                      : ``
                 }`
               )
             )

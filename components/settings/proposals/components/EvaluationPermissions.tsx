@@ -196,8 +196,8 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
         resource.group === 'system_role'
           ? { operation, systemRole: resource.id as ProposalSystemRole }
           : resource.group === 'role'
-          ? { operation, roleId: resource.id }
-          : { operation, userId: resource.id };
+            ? { operation, roleId: resource.id }
+            : { operation, userId: resource.id };
       newPermissions.push(permission);
     });
     onChange({ ...evaluation, permissions: newPermissions });

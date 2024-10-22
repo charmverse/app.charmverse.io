@@ -351,12 +351,15 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     )
   );
 
-  const mappedBoardPages = pages.reduce((acc, page) => {
-    if (page.type === 'board') {
-      acc[page.id] = !!page.isLocked;
-    }
-    return acc;
-  }, {} as Record<string, boolean>);
+  const mappedBoardPages = pages.reduce(
+    (acc, page) => {
+      if (page.type === 'board') {
+        acc[page.id] = !!page.isLocked;
+      }
+      return acc;
+    },
+    {} as Record<string, boolean>
+  );
 
   const blocksWithLocked = updatedBlocks.map((block) => {
     if (block.type === 'board') {

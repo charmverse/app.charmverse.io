@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { CeloPage } from 'components/info/PartnerRewards/CeloPage';
+import { CeloPage } from 'components/info/partner-rewards/CeloPage';
 
 export const metadata: Metadata = {
   title: 'Celo Partner Rewards'

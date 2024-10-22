@@ -289,8 +289,8 @@ class CardFilter {
           sourceValue = !Number.isNaN(Number(propertyValue))
             ? { from: Number(propertyValue) }
             : typeof propertyValue === 'string'
-            ? (JSON.parse(propertyValue) as { from: number })
-            : { from: undefined };
+              ? (JSON.parse(propertyValue) as { from: number })
+              : { from: undefined };
         } catch (error) {
           log.error('Could not parse card property value', { propertyValue, error });
         }

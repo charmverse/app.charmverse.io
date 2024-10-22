@@ -119,16 +119,16 @@ export function EvaluationsReview({
     [proposalTemplates]
   );
 
-  const isCredentialsComplete =
-    hasCredentialsStep && currentEvaluation?.result === 'pass' && !hasPendingOnchainCredentials;
-  const isCredentialsActive =
-    hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
+  const isCredentialsActive = hasCredentialsStep && currentEvaluation?.result === 'pass' && isRewardsComplete;
+
+  const isCredentialsComplete = isCredentialsActive && !hasPendingOnchainCredentials;
 
   const shareLink = getAbsolutePath(pagePath || '', currentSpace?.domain);
   const shareText = `${pageTitle || 'Untitled'} from ${currentSpace?.name} is now open for feedback.\n`;
   const { user } = useUser();
   const isRewardsActive =
-    hasRewardsStep && currentEvaluation?.result === 'pass' && (!hasCredentialsStep || !!isCredentialsComplete);
+    hasRewardsStep && currentEvaluation?.result === 'pass' && !isCredentialsActive && !isCredentialsComplete;
+
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -186,12 +186,12 @@ export function EvaluationsReview({
   const disabledPublishTooltip = !proposal?.permissions.evaluate
     ? `Only reviewers can publish ${lowercaseRewardsTitle}`
     : proposal?.archived
-    ? `Cannot publish ${lowercaseRewardsTitle} for an archived proposal`
-    : !isRewardsActive
-    ? `Proposal must be in ${lowercaseRewardsTitle} step to publish ${lowercaseRewardsTitle}`
-    : isRewardsComplete
-    ? `${capitalisedRewardsTitle} step is already complete`
-    : null;
+      ? `Cannot publish ${lowercaseRewardsTitle} for an archived proposal`
+      : !isRewardsActive
+        ? `Proposal must be in ${lowercaseRewardsTitle} step to publish ${lowercaseRewardsTitle}`
+        : isRewardsComplete
+          ? `${capitalisedRewardsTitle} step is already complete`
+          : null;
 
   return (
     <LoadingComponent isLoading={!proposal}>
@@ -275,6 +275,7 @@ export function EvaluationsReview({
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
+                isLastStep={index === proposal.evaluations.length - 1 && !hasRewardsStep && !hasCredentialsStep}
                 refreshProposal={refreshProposal}
               />
             )}
@@ -315,13 +316,34 @@ export function EvaluationsReview({
           </EvaluationStepRow>
         );
       })}
+      {hasRewardsStep && (
+        <EvaluationStepRow
+          expanded={expandedEvaluationId === 'rewards'}
+          expandedContainer={expandedContainer}
+          isCurrent={isRewardsActive}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
+          index={proposal ? proposal.evaluations.length + 1 : 0}
+          result={isRewardsComplete ? 'pass' : null}
+          title={rewardsTitle}
+        >
+          <RewardReviewStep
+            disabledPublishTooltip={disabledPublishTooltip}
+            proposalId={proposal?.id}
+            pendingRewards={pendingRewards}
+            rewardIds={proposal?.rewardIds}
+            onSubmit={refreshProposal}
+            makeRewardsPublic={!!proposal?.fields?.makeRewardsPublic}
+            togglePublicRewards={(value) => onChangeRewardSettings?.({ makeRewardsPublic: !!value })}
+          />
+        </EvaluationStepRow>
+      )}
       {hasCredentialsStep && (
         <EvaluationStepRow
           expanded={expandedEvaluationId === 'credentials'}
           expandedContainer={expandedContainer}
           isCurrent={isCredentialsActive}
           onChange={(e, expand) => setExpandedEvaluationId(expand ? 'credentials' : undefined)}
-          index={proposal ? proposal.evaluations.length + 1 : 0}
+          index={proposal ? proposal.evaluations.length + (hasRewardsStep ? 2 : 1) : 0}
           result={isCredentialsComplete ? 'pass' : null}
           title='Credentials'
           actions={
@@ -335,27 +357,6 @@ export function EvaluationsReview({
           <ProposalCredentials
             selectedCredentialTemplates={proposal.selectedCredentialTemplates}
             proposalId={proposal.id}
-          />
-        </EvaluationStepRow>
-      )}
-      {hasRewardsStep && (
-        <EvaluationStepRow
-          expanded={expandedEvaluationId === 'rewards'}
-          expandedContainer={expandedContainer}
-          isCurrent={isRewardsActive}
-          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
-          index={proposal ? proposal.evaluations.length + (hasCredentialsStep ? 2 : 1) : 0}
-          result={isRewardsComplete ? 'pass' : null}
-          title={rewardsTitle}
-        >
-          <RewardReviewStep
-            disabledPublishTooltip={disabledPublishTooltip}
-            proposalId={proposal?.id}
-            pendingRewards={pendingRewards}
-            rewardIds={proposal?.rewardIds}
-            onSubmit={refreshProposal}
-            makeRewardsPublic={!!proposal?.fields?.makeRewardsPublic}
-            togglePublicRewards={(value) => onChangeRewardSettings?.({ makeRewardsPublic: !!value })}
           />
         </EvaluationStepRow>
       )}

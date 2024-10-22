@@ -1,6 +1,7 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
+import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import type { UserStats } from 'lib/users/getUserStats';
 import type { BasicUserInfo } from 'lib/users/interfaces';
@@ -77,11 +78,11 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
           </Paper>
         </Stack>
 
-        <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : null}>
+        <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : <LoadingComponent isLoading />}>
           {tab === 'win' ? (
             <PointsClaimScreen userId={user.id} username={user.username} />
           ) : tab === 'scout' ? (
-            <ScoutProfile userId={user.id} isMobile />
+            <ScoutProfile userId={user.id} />
           ) : tab === 'build' ? (
             <BuilderProfile builder={user} />
           ) : (
@@ -96,7 +97,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
                 <Typography variant='h6' color='text.secondary'>
                   Scout
                 </Typography>
-                <ScoutProfile userId={user.id} isMobile={false} />
+                <ScoutProfile userId={user.id} />
               </Paper>
               <Paper
                 sx={{

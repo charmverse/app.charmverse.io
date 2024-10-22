@@ -112,20 +112,31 @@ export function ActionableProposalsTable({
                     router.push(`/${router.query.domain}/${proposal.path}`);
                   }}
                 >
-                  <TableCell
-                    sx={{ minWidth: 250, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
-                  >
-                    <Typography>{proposal.title || 'Untitled'}</Typography>
-                    <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
-                      <OpenButton />
-                    </Link>
+                  <TableCell sx={{ minWidth: 250 }}>
+                    <Stack
+                      sx={{
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexDirection: 'row'
+                      }}
+                    >
+                      <Typography>{proposal.title || 'Untitled'}</Typography>
+                      <Link href={`/${proposal.path}`} onClick={(e) => e.stopPropagation()}>
+                        <OpenButton />
+                      </Link>
+                    </Stack>
                   </TableCell>
-                  <TableCell align='center' width={200}>
+                  <TableCell
+                    align='center'
+                    sx={{
+                      minWidth: 150
+                    }}
+                  >
                     <Typography color={isOverdue ? 'error' : 'initial'}>{dueDateText}</Typography>
                   </TableCell>
                   <TableCell
                     sx={{
-                      minWidth: 250
+                      minWidth: 150
                     }}
                   >
                     <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={1}>
@@ -135,7 +146,7 @@ export function ActionableProposalsTable({
                       </Typography>
                     </Stack>
                   </TableCell>
-                  <TableCell align='center' width={150}>
+                  <TableCell align='center' sx={{ minWidth: 100 }}>
                     <Typography
                       sx={{
                         display: 'flex',

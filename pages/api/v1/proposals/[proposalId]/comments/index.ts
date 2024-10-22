@@ -224,8 +224,8 @@ async function getProposalComments(req: NextApiRequest, res: NextApiResponse<Pub
   const expand = Array.isArray(req.query.expand)
     ? req.query.expand
     : typeof req.query.expand === 'string'
-    ? [req.query.expand]
-    : [];
+      ? [req.query.expand]
+      : [];
 
   const hasUnsupportedExpandableFields = expand.some((expandField) => !expandableFields.includes(expandField));
 

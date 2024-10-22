@@ -40,8 +40,8 @@ export function getCurrentWeek(): ISOWeek {
   return _formatWeek(DateTime.utc());
 }
 
-export function getLastWeek(): ISOWeek {
-  return getPreviousWeek(getCurrentWeek());
+export function getLastWeek(now: DateTime = DateTime.utc()): ISOWeek {
+  return getPreviousWeek(_formatWeek(now));
 }
 
 export function getPreviousWeek(week: ISOWeek): ISOWeek {
@@ -68,7 +68,12 @@ export function getWeekStartEnd(date: Date) {
   return { start: startOfWeek, end: endOfWeek };
 }
 
-export function getStartOfSeason(week: ISOWeek) {
+export function getWeekStartEndFormatted(date: Date) {
+  const { start, end } = getWeekStartEnd(date);
+  return `${start.toFormat('MMM, dd')} - ${end.toFormat('MMM, dd')}`;
+}
+
+export function getStartOfSeason(week: Season) {
   return getDateFromISOWeek(week);
 }
 

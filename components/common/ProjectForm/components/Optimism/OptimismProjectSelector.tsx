@@ -143,7 +143,7 @@ function OptimismProjectSelectorReadOnly({ value, ...props }: Props) {
         disabled
         fullWidth
         renderValue={() =>
-          !project ? <Typography color='textSecondary'>Select a project</Typography> : project?.name ?? ''
+          !project ? <Typography color='textSecondary'>Select a project</Typography> : (project?.name ?? '')
         }
       >
         {project && (

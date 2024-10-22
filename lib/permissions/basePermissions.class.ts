@@ -9,17 +9,23 @@ import type { AbstractPermissions, UserPermissionFlags } from './interfaces';
  */
 export abstract class BasePermissions<O extends string> implements AbstractPermissions<O> {
   get empty(): UserPermissionFlags<O, false> {
-    return typedKeys(this.operations).reduce((flags, operation) => {
-      flags[operation] = false;
-      return flags;
-    }, {} as UserPermissionFlags<O, false>);
+    return typedKeys(this.operations).reduce(
+      (flags, operation) => {
+        flags[operation] = false;
+        return flags;
+      },
+      {} as UserPermissionFlags<O, false>
+    );
   }
 
   get full(): UserPermissionFlags<O, true> {
-    return typedKeys(this.operations).reduce((flags, operation) => {
-      flags[operation] = true;
-      return flags;
-    }, {} as UserPermissionFlags<O, true>);
+    return typedKeys(this.operations).reduce(
+      (flags, operation) => {
+        flags[operation] = true;
+        return flags;
+      },
+      {} as UserPermissionFlags<O, true>
+    );
   }
 
   get operationFlags(): UserPermissionFlags<O> {

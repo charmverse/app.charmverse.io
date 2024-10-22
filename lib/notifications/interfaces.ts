@@ -162,16 +162,15 @@ export type ProposalNotification = NotificationBase & {
 
 export type CustomNotificationType = 'orange-dao';
 
-export type CustomNotification =
-  | (NotificationBase & {
-      group: 'custom';
-      pageTitle: string;
-    }) & {
-      type: 'orange-dao';
-      content: {
-        pageId: string;
-      };
-    };
+export type CustomNotification = (NotificationBase & {
+  group: 'custom';
+  pageTitle: string;
+}) & {
+  type: 'orange-dao';
+  content: {
+    pageId: string;
+  };
+};
 
 export type VoteNotificationType = 'new_vote';
 

@@ -1,10 +1,8 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { findOrCreateFarcasterUser } from "lib/farcaster/findOrCreateFarcasterUser";
+import { prisma } from '@charmverse/core/prisma-client';
+import { findOrCreateFarcasterUser } from 'lib/farcaster/findOrCreateFarcasterUser';
+import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 
-
-
-async function onboardScouts({fids}: {fids: number[]}) {
-
+async function onboardScouts({ fids, tierOverride }: { fids: number[]; tierOverride?: ConnectWaitlistTier }) {
   const existingAccounts = await prisma.scout.findMany({
     where: {
       farcasterId: {
@@ -13,46 +11,21 @@ async function onboardScouts({fids}: {fids: number[]}) {
     }
   });
 
-  console.log(`Found ${existingAccounts.length} existing accounts`)
+  console.log(`Found ${existingAccounts.length} existing accounts`);
 
-  const fidsRequiringAccount = fids.filter(fid => !existingAccounts.some(account => account.farcasterId === fid));
+  const fidsRequiringAccount = fids.filter((fid) => !existingAccounts.some((account) => account.farcasterId === fid));
   const totalFidsToProcess = fidsRequiringAccount.length;
 
   for (let i = 0; i < totalFidsToProcess; i++) {
     const fid = fidsRequiringAccount[i];
-    console.log(`Creating user ${i+1} / ${totalFidsToProcess}`)
-    await findOrCreateFarcasterUser({fid})
+    console.log(`Creating user ${i + 1} / ${totalFidsToProcess}`);
+    const user = await findOrCreateFarcasterUser({ fid, tierOverride: 'mythic' });
+    console.log(`Created user ${user.id}. View: https://scoutgame.xyz/u/${user.username}`);
   }
 }
-
-
-async function issuePoints({fids}: {fids: number[]}) {
-
-  console.log('Skipping points issuing')
-  return;
-
-  await prisma.scout.updateMany({
-    where: {
-      farcasterId: {
-        in: fids
-      }
-    },
-    data: {
-      currentBalance: {
-        increment: 50
-      }
-    }
-  }
-  )
-}
-
-
-
-const fidList = [4339];
-
-
 
 async function script() {
-  await onboardScouts({fids: fidList});
-  await issuePoints({fids: fidList});
+  await onboardScouts({ fids: [5516], tierOverride: 'mythic' });
 }
+
+script();

@@ -4,14 +4,15 @@ import { InfoCard } from 'components/common/DocumentPageContainer/components/Inf
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
+import { InfoPageContainer } from '../components/InfoPageContainer';
+
 export function TermsPage() {
   return (
-    <DocumentPageContainer data-test='terms-page'>
-      <Typography variant='h4' align='center' color='secondary'>
-        Terms
-      </Typography>
-      <Document />
-    </DocumentPageContainer>
+    <InfoPageContainer data-test='terms-page' title='Terms'>
+      <DocumentPageContainer>
+        <Document />
+      </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 
@@ -61,7 +62,7 @@ function Document() {
         Farcaster account throughout the entire duration of the Service usage period. The User alone is responsible for
         keeping the access codes to their crypto wallet and other 3rd party accounts private, and Scout Game declines
         all liability if the Service is used by a person other than the User or a person authorized by the latter,
-        possessing the usernames and passwords to the User's account. User account is non-transferrable.
+        possessing the usernames and passwords to the User's account. User account is non-transferable.
       </Typography>
 
       <Typography variant='h5' color='secondary'>

@@ -4,6 +4,7 @@ import Koa from 'koa';
 import { DateTime } from 'luxon';
 
 import * as middleware from './middleware';
+import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
@@ -14,7 +15,7 @@ const app = new Koa();
 const router = new Router();
 
 // add a task endpoint which will be configured in cron.yml
-function addTask(path: string, handler: (ctx: Koa.DefaultContext) => any) {
+function addTask(path: string, handler: (ctx: Koa.Context) => any) {
   router.post(path, async (ctx) => {
     // just in case we need to disable cron in production
     if (process.env.DISABLE_CRON === 'true') {
@@ -53,6 +54,8 @@ addTask('/process-gems-payout', processGemsPayout);
 addTask('/process-nft-mints', processNftMints);
 
 addTask('/update-mixpanel-user-profiles', updateMixpanelUserProfilesTask);
+
+addTask('/alert-low-wallet-gas-balance', alertLowWalletGasBalance);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);

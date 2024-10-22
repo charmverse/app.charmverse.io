@@ -22,13 +22,13 @@ async function addFarcasterMemberProperty() {
         data: {
           createdBy: space.createdBy,
           name: 'Farcaster',
-          type: "farcaster",
+          type: 'farcaster',
           updatedBy: space.createdBy,
           spaceId: space.id,
           enabledViews: [],
-          index: maxIndex + 1,
+          index: maxIndex + 1
         }
-      })
+      });
     } catch (error) {
       console.error(error);
     } finally {

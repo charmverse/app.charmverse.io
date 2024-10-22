@@ -77,14 +77,14 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
     currentPage?.type === 'proposal'
       ? publishProposalInfoLabel
       : currentPagePermissions?.grant_permissions !== true
-      ? 'You cannot update permissions for this page'
-      : null;
+        ? 'You cannot update permissions for this page'
+        : null;
 
   const isShareChecked =
     // If not using space wide proposals, go by the page permissions
     (currentPage?.type !== 'proposal' && !!publicPermission) || !!proposal?.isPublic;
 
-  const baseShareAlertMessage = currentPage ? alerts[currentPage.type] ?? '' : '';
+  const baseShareAlertMessage = currentPage ? (alerts[currentPage.type] ?? '') : '';
 
   const shareAlertMessage = (
     currentPage?.type === 'proposal'

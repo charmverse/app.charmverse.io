@@ -70,19 +70,25 @@ export async function getSubtree({ pageId, userId }: { pageId: string; userId: s
     );
 
     // Keep track of all proposal blocks for later filtering
-    const proposalBlocksMap: Record<string, BlockWithDetails> = proposalBoardBlocks.reduce((acc, board) => {
-      acc[board.id] = board;
-      return acc;
-    }, {} as Record<string, BlockWithDetails>);
+    const proposalBlocksMap: Record<string, BlockWithDetails> = proposalBoardBlocks.reduce(
+      (acc, board) => {
+        acc[board.id] = board;
+        return acc;
+      },
+      {} as Record<string, BlockWithDetails>
+    );
 
     // Prepare blocks for processing
-    const blocksGroupedByBoard = proposalBoardBlocks.reduce((acc, board) => {
-      acc[board.id] = {
-        board,
-        cards: []
-      };
-      return acc;
-    }, {} as Record<string, { board: BlockWithDetails; cards: BlockWithDetails[] }>);
+    const blocksGroupedByBoard = proposalBoardBlocks.reduce(
+      (acc, board) => {
+        acc[board.id] = {
+          board,
+          cards: []
+        };
+        return acc;
+      },
+      {} as Record<string, { board: BlockWithDetails; cards: BlockWithDetails[] }>
+    );
 
     if (proposalBoardBlocks.length) {
       blocks.forEach((_block) => {

@@ -24,10 +24,13 @@ interface Props {
 export default function InputGeneratorText({ onChange, title = 'Options', minimumOptions = 1, defaultOptions }: Props) {
   const [options, setOptions] = useState<Record<number | string, string>>(
     defaultOptions
-      ? defaultOptions.reduce((optionSet, opt, index) => {
-          optionSet[index] = opt;
-          return optionSet;
-        }, {} as Record<number, string>)
+      ? defaultOptions.reduce(
+          (optionSet, opt, index) => {
+            optionSet[index] = opt;
+            return optionSet;
+          },
+          {} as Record<number, string>
+        )
       : { 0: '' }
   );
 

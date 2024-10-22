@@ -1,13 +1,13 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../core"
-		},
-		{
-			"path": "../permissions-api"
-		}
-	]
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../permissions-api"
+    }
+  ]
 }

@@ -56,8 +56,8 @@ export const FormFieldContainer = styled(Stack, {
     dragDirection === 'top'
       ? `0px -2px 0px ${theme.palette.primary.main}`
       : dragDirection === 'bottom'
-      ? `0px 2px 0px ${theme.palette.primary.main}`
-      : 'none'};
+        ? `0px 2px 0px ${theme.palette.primary.main}`
+        : 'none'};
   padding: ${(props) => props.theme.spacing(1)};
   padding-left: 0;
   flex-direction: row;

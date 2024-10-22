@@ -215,7 +215,7 @@ export function ViewHeaderRowsMenu({
                   value: userId
                 },
                 scope: WebhookEventNames.CardPersonPropertyAssigned
-              } as CreateEventPayload)
+              }) as CreateEventPayload
           )
         )
         .flat()
@@ -293,10 +293,10 @@ export function ViewHeaderRowsMenu({
                 propertyTemplate.type === 'proposalStep' && isStepDisabled
                   ? 'To change multiple proposals, they must use the same workflow and be in the same step'
                   : propertyTemplate.type === 'proposalStatus' && isStatusDisabled
-                  ? 'To change multiple proposals, they must be in the same step'
-                  : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
-                  ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
-                  : undefined
+                    ? 'To change multiple proposals, they must be in the same step'
+                    : propertyTemplate.type === 'proposalReviewer' && isReviewersDisabled
+                      ? `To change multiple proposal's reviewers, they must not be in draft or feedback step`
+                      : undefined
               }
             />
           ))

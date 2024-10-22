@@ -1,37 +1,29 @@
 import type { Scout } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
 import { getSession } from '@connect-shared/lib/session/getSession';
-import { replaceS3Domain } from '@root/lib/utils/url';
+
+import { cacheGetUser, getUser } from './getUser';
 
 export type SessionUser = Pick<
   Scout,
-  'id' | 'username' | 'displayName' | 'avatar' | 'builderStatus' | 'currentBalance' | 'onboardedAt' | 'agreedToTermsAt'
+  | 'id'
+  | 'username'
+  | 'displayName'
+  | 'avatar'
+  | 'builderStatus'
+  | 'currentBalance'
+  | 'onboardedAt'
+  | 'agreedToTermsAt'
+  | 'bio'
 >;
 
 export async function getUserFromSession(): Promise<SessionUser | null> {
   const session = await getSession();
-  if (session?.scoutId) {
-    const user = await prisma.scout.findFirst({
-      where: {
-        id: session.scoutId
-      },
-      select: {
-        id: true,
-        username: true,
-        displayName: true,
-        avatar: true,
-        builderStatus: true,
-        currentBalance: true,
-        onboardedAt: true,
-        agreedToTermsAt: true,
-        bio: true
-      }
-    });
+  return getUser(session.scoutId);
+}
 
-    if (user?.avatar) {
-      user.avatar = replaceS3Domain(user.avatar);
-    }
-    return user;
-  }
-  return null;
+export async function getCachedUserFromSession(): Promise<SessionUser | null> {
+  const session = await getSession();
+  const cached = cacheGetUser(session.scoutId);
+
+  return cached;
 }

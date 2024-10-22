@@ -120,8 +120,8 @@ export function DefaultPagePermissions() {
               {isFreeSpace
                 ? pagePermissionLevels.editor
                 : selectedPagePermission === null
-                ? pagePermissionLabelsWithNone.none
-                : pagePermissionLabelsWithNone[selectedPagePermission]}
+                  ? pagePermissionLabelsWithNone.none
+                  : pagePermissionLabelsWithNone[selectedPagePermission]}
             </Button>
           </Box>
         </UpgradeWrapper>

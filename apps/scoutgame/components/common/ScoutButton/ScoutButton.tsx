@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 import type { NFTPurchaseProps } from 'components/common/NFTPurchaseDialog/components/NFTPurchaseForm';
-import type { MinimalUserInfo } from 'lib/users/interfaces';
+import { useUser } from 'components/layout/UserProvider';
 
 import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
 
@@ -21,16 +21,12 @@ const NFTPurchaseDialog = dynamic(
   }
 );
 
-export function ScoutButton({
-  builder,
-  isAuthenticated = true
-}: {
-  builder: NFTPurchaseProps['builder'];
-  isAuthenticated?: boolean;
-}) {
+export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
   const [dialogLoadingStatus, setDialogLoadingStatus] = useState<boolean>(false);
+  const { user } = useUser();
+  const isAuthenticated = Boolean(user?.id);
 
   const handleClick = () => {
     if (isAuthenticated) {

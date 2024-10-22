@@ -323,8 +323,8 @@ export class FidusEditor {
         (content0.type === 'text'
           ? content0.marks
           : content0.type === 'paragraph'
-          ? content0.content?.[0]?.marks
-          : []) ?? [];
+            ? content0.content?.[0]?.marks
+            : []) ?? [];
     } else if (sliceLength === 2) {
       const content1 = step.slice?.content?.[1];
 

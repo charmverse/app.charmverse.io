@@ -18,18 +18,21 @@ import {
   TextField,
   Box,
   IconButton,
-  TableSortLabel
+  TableSortLabel,
+  Button
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
 
+import { ExportButton } from 'components/common/ExportButton';
 import { useSearchRepos } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { Repo } from 'lib/repos/getRepos';
 
-import { AddRepoButton } from './AddRepoButton/AddRepoButton';
-import { ExportButton } from './ExportButton';
+import { AddRepoButton } from './components/AddRepoButton/AddRepoButton';
+import { DeleteRepoButton } from './components/DeleteRepoButton/DeleteRepoButton';
+import { HeaderActions } from './components/HeaderActions';
 
-type SortField = 'commits' | 'prs' | 'closedPrs' | 'contributors' | 'owner' | 'createdAt';
+type SortField = 'commits' | 'prs' | 'closedPrs' | 'contributors' | 'owner' | 'createdAt' | 'bonusPartner';
 type SortOrder = 'asc' | 'desc';
 
 export function ReposDashboard({ repos }: { repos: Repo[] }) {
@@ -38,7 +41,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
   const debouncedFilterString = useDebouncedValue(filterString);
-  const { data: filteredRepos, isValidating, isLoading } = useSearchRepos(debouncedFilterString);
+  const { data: filteredRepos, mutate, isValidating, isLoading } = useSearchRepos(debouncedFilterString);
   const showFilteredResults = Boolean(debouncedFilterString || filteredRepos || isValidating || isLoading);
 
   const filteredAndSortedRepos = useMemo(() => {
@@ -46,8 +49,10 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
       return filteredRepos || [];
     }
     return repos.sort((a, b) => {
-      if (a[sortField] < b[sortField]) return sortOrder === 'asc' ? -1 : 1;
-      if (a[sortField] > b[sortField]) return sortOrder === 'asc' ? 1 : -1;
+      if (!a[sortField]) return sortOrder === 'asc' ? -1 : 1;
+      if (!b[sortField]) return sortOrder === 'asc' ? 1 : -1;
+      if (a[sortField]! < b[sortField]!) return sortOrder === 'asc' ? -1 : 1;
+      if (a[sortField]! > b[sortField]!) return sortOrder === 'asc' ? 1 : -1;
       // sort by name as a secondary sort if the field is the same
       if (a[sortField] === b[sortField]) return a.name.localeCompare(b.name);
       return 0;
@@ -62,16 +67,12 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
       setSortOrder('desc');
     }
   };
-
   return (
     <Container maxWidth='xl'>
-      <Typography variant='h4' component='h1' gutterBottom>
-        Git Repos Dashboard
-      </Typography>
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
         <TextField
           label='Search'
-          placeholder='Filter by owner or name'
+          placeholder='Filter by owner'
           variant='outlined'
           value={filterString}
           onChange={(e) => setFilter(e.target.value)}
@@ -91,14 +92,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
             }
           }}
         />
-        <Box>
-          <AddRepoButton variant='contained' color='primary' sx={{ mr: 2 }}>
-            Import Repos
-          </AddRepoButton>
-          <ExportButton variant='outlined' filename='github_repos.tsv' src='/api/repos/export'>
-            Export Repos
-          </ExportButton>
-        </Box>
+        <HeaderActions />
       </Stack>
       <TableContainer component={Paper}>
         <Table>
@@ -114,15 +108,6 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 </TableSortLabel>
               </TableCell>
               <TableCell>Name</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'createdAt'}
-                  direction={sortField === 'createdAt' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('createdAt')}
-                >
-                  Imported at
-                </TableSortLabel>
-              </TableCell>
               <TableCell>
                 <TableSortLabel
                   active={sortField === 'commits'}
@@ -159,7 +144,16 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                   Contributors
                 </TableSortLabel>
               </TableCell>
-              <TableCell>Deleted</TableCell>
+              <TableCell>
+                <TableSortLabel
+                  active={sortField === 'bonusPartner'}
+                  direction={sortField === 'bonusPartner' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('bonusPartner')}
+                >
+                  Bonus Partner
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align='center'>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -175,12 +169,14 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                     {repo.name}
                   </Link>
                 </TableCell>
-                <TableCell>{new Date(repo.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell>{repo.commits}</TableCell>
                 <TableCell>{repo.prs}</TableCell>
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
-                <TableCell>{repo.deletedAt ? 'Yes' : ''}</TableCell>
+                <TableCell>{repo.bonusPartner ? repo.bonusPartner : ''}</TableCell>
+                <TableCell align='center'>
+                  <DeleteRepoButton onDelete={() => mutate()} repoId={repo.id} deletedAt={repo.deletedAt} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

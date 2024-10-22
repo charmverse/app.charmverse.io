@@ -3,14 +3,22 @@
 import { Box, Paper, Typography, Stack } from '@mui/material';
 import Image from 'next/image';
 
+import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { getClaimablePointsWithEvents } from 'lib/points/getClaimablePointsWithEvents';
+import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
 import { QualifiedActionsTable } from './QualifiedActionsTable';
 
 export async function PointsClaimScreen({ userId, username }: { userId: string; username: string }) {
-  const { totalClaimablePoints, weeklyRewards, bonusPartners } = await getClaimablePointsWithEvents(userId);
+  const [error, data] = await safeAwaitSSRData(getClaimablePointsWithEvents(userId));
+
+  if (error) {
+    return <ErrorSSRMessage />;
+  }
+
+  const { totalClaimablePoints, weeklyRewards, bonusPartners } = data;
 
   if (!totalClaimablePoints) {
     return (
