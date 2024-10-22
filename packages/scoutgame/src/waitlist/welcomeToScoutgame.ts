@@ -1,14 +1,41 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { writeToFarcaster } from '@packages/farcaster/messaging/writeToFarcaster';
 
+import type { ConnectWaitlistTier } from './scoring/constants';
 import { getTier } from './scoring/constants';
 
-const messages = [
+const embedUrl = 'https://scoutgame.xyz';
+
+const pastTierMessage1 =
+  '@username The Scout Game has started! You earned EARLY ENTRY by joining our Waitlist. Check out the action now and begin your Scout journey!';
+const pastTierMessage2 =
+  "@username The Scout Game has started! You earned EARLY ENTRY by joining our Waitlist. Don't wait to begin your Scout journey. Check out the action now!";
+
+const messages: { tier: ConnectWaitlistTier | 'builder'; messages: string[] }[] = [
   {
     tier: 'legendary',
+    messages: [pastTierMessage1, pastTierMessage2]
+  },
+  {
+    tier: 'mythic',
+    messages: [pastTierMessage1, pastTierMessage2]
+  },
+  {
+    tier: 'epic',
+    messages: [pastTierMessage1, pastTierMessage2]
+  },
+  {
+    tier: 'rare',
     messages: [
-      '@username The Scout Game begins now for Legendary Scouts. You earned the Legendary level from the Watilist game and have been given 50 points to start scouting with. Check it out now. https://scoutgame.xyz/',
-      "@username The Scout Game begins now for Legendary Scouts. You earned the Legendary level from the Watilist game and have been given 50 points to start scouting with. Let's go! https://scoutgame.xyz/"
+      '@username The Scout Game begins now for Rare Scouts. You earned the Rare level from the Waitlist game and have been given 15 points to start scouting with. Check it out now.',
+      '@username The Scout Game begins now for Rare Scouts. You earned the Rare level from the Waitlist game and have been given 15 points to start scouting with. Lets go!'
+    ]
+  },
+  {
+    tier: 'common',
+    messages: [
+      '@username The Scout Game begins now for Common Scouts. You earned the Rare level from the Waitilist game and have been given 10 points to start scouting with. Check it out now.',
+      '@username The Scout Game begins now for Common Scouts. You earned the Rare level from the Watilist game and have been given 10 points to start scouting with. Lets go!'
     ]
   },
   {
@@ -20,7 +47,7 @@ const messages = [
   }
 ];
 
-function getMessage(tier: 'legendary' | 'builder', realUsername: string): string {
+function getMessage(tier: ConnectWaitlistTier | 'builder', realUsername: string): string {
   // Find the message group by tier
   const group = messages.find((messageGroup) => messageGroup.tier === tier);
   if (!group) {

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
+import type { Season } from '@packages/scoutgame/dates';
 import { getWeekFromDate, getStartOfSeason, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
@@ -24,7 +25,7 @@ export async function recordCommit({
   now = DateTime.utc()
 }: {
   commit: RequiredCommitFields;
-  season: string;
+  season: Season;
   now?: DateTime;
 }) {
   if (!commit.author || !commit.commit.author) {

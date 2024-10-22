@@ -7,6 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getBonusPartner } from '@packages/scoutgame/bonus';
+import type { Season } from '@packages/scoutgame/dates';
 import { getWeekFromDate, getStartOfSeason, streakWindow, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
@@ -36,7 +37,7 @@ export async function recordMergedPullRequest({
   pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
   isFirstMergedPullRequest?: boolean;
-  season: string;
+  season: Season;
   now?: DateTime;
 }) {
   if (!pullRequest.mergedAt) {
