@@ -3,14 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { uploadMetadata } from '@packages/scoutgame/builderNfts/artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
-import { uploadArtwork } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
+import { uploadArtwork, uploadArtworkCongrats } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 async function refreshArtworks() {
   const builderNfts = await prisma.builderNft.findMany({
     where: {
-      season: currentSeason,
-      contractAddress: getBuilderContractAddress().toLowerCase()
+      season: currentSeason
     },
     include: {
       builder: {
@@ -22,7 +21,8 @@ async function refreshArtworks() {
     },
     orderBy: {
       tokenId: 'asc'
-    }
+    },
+    skip: 124
   });
 
   console.log('Contract ', getBuilderContractAddress());
@@ -77,4 +77,5 @@ async function refreshArtworks() {
   }
 }
 
-refreshArtworks().then(console.log);
+// refreshArtworks().then(console.log);
+
