@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import type { AutocompleteRenderGetTagProps } from '@mui/material';
@@ -197,6 +198,11 @@ export function UserSelect({
 }: UserSelectProps): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(defaultOpened);
   const { membersRecord } = useMembers();
+
+  const members = memberIds.map((id) => membersRecord[id]).filter(isTruthy);
+  if (members.length !== memberIds.length) {
+    log.warn('Missing profile for some members', { memberIds: memberIds.filter((id) => !membersRecord[id]) });
+  }
 
   const _onChange = useCallback(
     (newMemberIds: string[]) => {
