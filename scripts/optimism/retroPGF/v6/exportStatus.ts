@@ -17,14 +17,14 @@ async function exportFullReviewSummary() {
     Title: string;
     'Full Review Status': string;
     Link: string;
-    'Project Id': string;
+    'Attestation Id': string;
     Rejected: number;
     'Rejected Reasons': string;
     Approved: number;
     Pending: number;
-    'Author Email': string;
+    // 'Author Email': string;
   }[] = pages.map(({ path, proposal, title }) => {
-    const projectId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
+    const attestationId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
     const currentEvaluation = getCurrentEvaluation(proposal!.evaluations);
     const evaluation = proposal!.evaluations.find((evaluation) => evaluation.title === 'Full Review');
     if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
@@ -55,12 +55,12 @@ async function exportFullReviewSummary() {
     }
 
     // const authorEmails = proposal!.authors.map((author) => author.author.verifiedEmails[0]?.email).filter(Boolean);
-    const application = applications.find((application) => application.project.id === projectId);
-    const applicationEmails =
-      application?.project.organization?.organization.team.map((member) => member.user.email).filter(Boolean) || [];
-    if (applicationEmails.length === 0) {
-      console.log('missing author email', title);
-    }
+    // const application = applications.find((application) => application.project.id === projectId);
+    // const applicationEmails =
+    //   application?.project.organization?.organization.team.map((member) => member.user.email).filter(Boolean) || [];
+    // if (applicationEmails.length === 0) {
+    //   console.log('missing author email', title);
+    // }
 
     return {
       Title: title,
@@ -70,8 +70,8 @@ async function exportFullReviewSummary() {
       'Rejected Reasons': rejectedMessages.join(', '),
       Approved: approved,
       Pending: 5 - approved - rejected,
-      'Project Id': projectId || 'N/A',
-      'Author Email': applicationEmails.join(',')
+      'Attestation Id': attestationId || 'N/A'
+      // 'Author Email': authorEmails.join(',')
     };
   });
 
@@ -96,14 +96,14 @@ async function exportFullReviewSummary() {
     header: true,
     columns: [
       'Title',
-      // 'Link',
+      'Link',
       'Project Id',
       'Full Review Status',
-      // 'Approved',
-      // 'Rejected',
+      'Approved',
+      'Rejected',
       // 'Rejected Reasons',
-      // 'Pending',
-      'Author Email'
+      'Pending'
+      // 'Author Email'
     ]
   });
 
@@ -143,9 +143,6 @@ async function exportReviewers() {
     proposal.evaluations.forEach((evaluation) => {
       evaluation.reviewers.forEach((reviewer) => {
         if (reviewer.userId) {
-          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
-            console.log(' reviewer', proposal.id);
-          }
           acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
           acc[reviewer.userId].proposals[proposal.id] = true;
           if (evaluation.reviews.some((review) => review.reviewerId === reviewer.userId)) {
@@ -155,9 +152,6 @@ async function exportReviewers() {
       });
       evaluation.appealReviewers.forEach((reviewer) => {
         if (reviewer.userId) {
-          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
-            console.log('appeal reviewer', proposal.id);
-          }
           acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
           acc[reviewer.userId].proposals[proposal.id] = true;
           if (evaluation.appealReviews.some((review) => review.reviewerId === reviewer.userId)) {
@@ -189,12 +183,6 @@ async function exportReviewers() {
 
   console.log('Found', users.length, 'users out of ', userIds.length);
 
-  const shanwellsUser = users.find((user) => user.username === 'shanwells.ca@gmail.com');
-  if (shanwellsUser) {
-    console.log('User ID for shanwells.ca@gmail.com:', shanwellsUser);
-  } else {
-    console.log('User with email shanwells.ca@gmail.com not found');
-  }
   const csvData = Object.entries(countMap)
     .map(([key, value]) => {
       const user = users.find((user) => user.id === key);
@@ -215,6 +203,6 @@ async function exportReviewers() {
   console.log('Exported to', reviewersFile);
 }
 
-//exportFullReviewSummary().catch(console.error);
+exportFullReviewSummary().catch(console.error);
 
-exportReviewers().catch(console.error);
+//exportReviewers().catch(console.error);
