@@ -6,7 +6,7 @@ import { mockBuilder, mockBuilderNft } from '../../testing/database';
 import { randomLargeInt } from '../../testing/generators';
 import { builderNftChain, getBuilderContractAddress } from '../constants';
 
-jest.unstable_mockModule('../clients/builderContractAdminWriteClient', () => ({
+jest.unstable_mockModule('../clients/builderContractMinterWriteClient', () => ({
   getBuilderContractMinterClient: () => ({
     getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
     registerBuilderToken: jest.fn(),
