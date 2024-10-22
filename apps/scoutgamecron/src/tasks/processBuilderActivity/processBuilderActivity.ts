@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Season } from '@packages/scoutgame/dates';
 import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 
@@ -15,7 +16,7 @@ type Props = {
     login: string;
   };
   createdAfter: Date;
-  season: string;
+  season: Season;
   now?: DateTime;
 };
 
