@@ -1,7 +1,7 @@
 import { Paper, Stack, Table, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
 
-export function BuilderRewardsTable() {
+export async function BuilderRewardsTable() {
   return (
     <Stack gap={1} alignItems='center'>
       <Typography color='secondary' variant='h6'>
@@ -15,10 +15,10 @@ export function BuilderRewardsTable() {
           }}
         >
           <TableRow>
-            <TableCell>Builder</TableCell>
-            <TableCell>Cards Held</TableCell>
-            <TableCell>Rank</TableCell>
-            <TableCell>Points</TableCell>
+            <TableCell align='left'>Builder</TableCell>
+            <TableCell align='center'>Cards Held</TableCell>
+            <TableCell align='center'>Rank</TableCell>
+            <TableCell align='right'>Points</TableCell>
           </TableRow>
         </TableHead>
       </Table>

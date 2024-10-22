@@ -1,4 +1,4 @@
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
@@ -21,43 +21,55 @@ export type ClaimPageProps = {
 export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonusPartners }: ClaimPageProps) {
   return (
     <PageContainer>
-      <Box
-        sx={{
-          gap: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          margin: 'auto'
+      <Stack
+        gap={2}
+        mt={2}
+        flexDirection={{
+          xs: 'column',
+          md: 'row'
         }}
-        data-test='claim-page'
       >
-        <Stack
-          gap={2}
-          mt={2}
-          flexDirection={{
-            xs: 'column-reverse',
-            md: 'row'
-          }}
-        >
-          <Stack flex={1} gap={4}>
-            <PointsClaimScreen
-              totalClaimablePoints={totalClaimablePoints}
-              username={username}
-              bonusPartners={bonusPartners}
-            />
-            <PointsTable
-              weeklyRewards={weeklyRewards}
-              title='Unclaimed'
-              emptyMessage='Nice, you have claimed all of your rewards to date!'
-            />
+        <Stack flex={1} gap={4}>
+          <PointsClaimScreen
+            totalClaimablePoints={totalClaimablePoints}
+            username={username}
+            bonusPartners={bonusPartners}
+          />
+          <PointsTable
+            weeklyRewards={weeklyRewards}
+            title='Unclaimed'
+            emptyMessage='Nice, you have claimed all of your rewards to date!'
+          />
+          <Stack
+            sx={{
+              display: {
+                xs: 'flex',
+                md: 'none'
+              }
+            }}
+          >
             <Suspense fallback={<LoadingComponent isLoading />}>
-              <ClaimedPointsTable />
+              <BuilderRewardsTable />
             </Suspense>
           </Stack>
-          <Stack flex={1}>
-            <BuilderRewardsTable />
-          </Stack>
+          <Suspense fallback={<LoadingComponent isLoading />}>
+            <ClaimedPointsTable />
+          </Suspense>
         </Stack>
-      </Box>
+        <Stack
+          sx={{
+            flex: 1,
+            display: {
+              xs: 'none',
+              md: 'flex'
+            }
+          }}
+        >
+          <Suspense fallback={<LoadingComponent isLoading />}>
+            <BuilderRewardsTable />
+          </Suspense>
+        </Stack>
+      </Stack>
     </PageContainer>
   );
 }

@@ -28,7 +28,15 @@ export function PointsTable({
           }}
         >
           <TableRow>
-            <TableCell align='left' sx={{ width: 225 }}>
+            <TableCell
+              align='left'
+              sx={{
+                width: {
+                  xs: 175,
+                  md: 225
+                }
+              }}
+            >
               ACTION
             </TableCell>
             <TableCell align='center'>WEEK</TableCell>
@@ -61,7 +69,9 @@ export function PointsTable({
             backgroundColor: 'background.dark'
           }}
         >
-          <Typography variant='h6'>{emptyMessage}</Typography>
+          <Typography variant='h6' textAlign='center'>
+            {emptyMessage}
+          </Typography>
         </Paper>
       )}
     </Stack>

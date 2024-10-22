@@ -1,5 +1,3 @@
-'use server';
-
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
@@ -43,42 +41,58 @@ export async function PointsClaimScreen({
   return (
     <Paper
       sx={{
-        gap: 2,
+        gap: 1,
         padding: 4,
         borderRadius: 2,
         display: 'flex',
-        flexDirection: {
-          xs: 'row',
-          md: 'column'
-        },
         backgroundColor: 'background.dark',
-        width: '100%'
+        width: '100%',
+        alignItems: 'center',
+        flexDirection: 'column'
       }}
     >
-      <Stack gap={1} alignItems='center'>
-        <Typography variant='h5' textAlign='center' fontWeight={500} color='secondary'>
-          Congratulations!
-        </Typography>
-        <Typography variant='h5'>You have earned Scout Points!</Typography>
-        <Typography variant='h6'>
-          <b>{username}</b> <span style={{ fontSize: '0.8em' }}>will receive</span>
-        </Typography>
-        <Stack flexDirection='row' alignItems='center' justifyContent='center' gap={1}>
-          <Typography variant='h4' fontWeight={500}>
-            {totalClaimablePoints}
+      <Typography variant='h5' textAlign='center' fontWeight={500} color='secondary'>
+        Congratulations!
+      </Typography>
+      <Typography variant='h5' textAlign='center'>
+        You have earned Scout Points!
+      </Typography>
+
+      <Stack
+        sx={{
+          flexDirection: {
+            xs: 'row',
+            md: 'column'
+          },
+          gap: 1,
+          justifyContent: 'space-between',
+          width: '100%',
+          alignItems: 'center'
+        }}
+      >
+        <Stack flexDirection='column' alignItems='center' gap={0.5}>
+          <Typography variant='h6'>
+            <b>{username}</b> <span style={{ fontSize: '0.8em' }}>will receive</span>
           </Typography>
-          <Image
-            width={35}
-            height={35}
-            style={{ marginRight: 10 }}
-            src='/images/profile/scout-game-icon.svg'
-            alt='Scouts'
-          />{' '}
-          {bonusPartners.length > 0 ? '+ ' : ''}
-          <BonusPartnersDisplay bonusPartners={bonusPartners} size={35} />
+          <Stack flexDirection='row' alignItems='center' gap={1}>
+            <Typography variant='h4' fontWeight={500}>
+              {totalClaimablePoints}
+            </Typography>
+            <Image
+              width={35}
+              height={35}
+              style={{ marginRight: 10 }}
+              src='/images/profile/scout-game-icon.svg'
+              alt='Scouts'
+            />{' '}
+            {bonusPartners.length > 0 ? '+ ' : ''}
+            <BonusPartnersDisplay bonusPartners={bonusPartners} size={35} />
+          </Stack>
         </Stack>
+        <Box width={{ xs: 'fit-content', md: '100%' }}>
+          <PointsClaimButton />
+        </Box>
       </Stack>
-      <PointsClaimButton />
     </Paper>
   );
 }
