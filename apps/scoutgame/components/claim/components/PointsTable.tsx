@@ -3,42 +3,45 @@ import { Stack } from '@mui/system';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
-import type { WeeklyReward } from 'lib/points/getClaimablePointsWithEvents';
+import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 
 function WeeklyPointsRows({ weeklyReward }: { weeklyReward: WeeklyReward }) {
   const rows: ReactNode[] = [];
 
   if (weeklyReward.rank) {
     rows.push(
-      <TableRow key={weeklyReward.weekNumber} sx={{ mb: 1 }}>
+      <TableRow key={`${weeklyReward.weekNumber}rank`} sx={{ mb: 1 }}>
         <TableCell align='left'>Finished {weeklyReward.rank}</TableCell>
-        <TableCell align='center'>{weeklyReward.week}</TableCell>
-        <TableCell align='center'>{weeklyReward.githubContributionReward.points}</TableCell>
+        <TableCell align='center'>{weeklyReward.weekNumber}</TableCell>
+        <TableCell align='right'>{weeklyReward.githubContributionReward.points}</TableCell>
       </TableRow>
     );
   }
 
   if (weeklyReward.builderReward) {
     rows.push(
-      <TableRow key={weeklyReward.weekNumber} sx={{ mb: 1 }}>
+      <TableRow key={`${weeklyReward.weekNumber}builder-rewards`} sx={{ mb: 1 }}>
         <TableCell align='left'>Builder rewards</TableCell>
-        <TableCell align='center'>{weeklyReward.week}</TableCell>
-        <TableCell align='center'>{weeklyReward.builderReward.points}</TableCell>
+        <TableCell align='center'>{weeklyReward.weekNumber}</TableCell>
+        <TableCell align='right'>{weeklyReward.builderReward.points}</TableCell>
       </TableRow>
     );
   }
 
   if (weeklyReward.soldNftReward) {
     rows.push(
-      <TableRow key={weeklyReward.weekNumber} sx={{ mb: 1 }}>
+      <TableRow key={`${weeklyReward.weekNumber}sold-nft`} sx={{ mb: 1 }}>
         <TableCell align='left'>
-          <Typography>Sold {weeklyReward.soldNftReward.quantity}</Typography>
+          <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={0.5}>
+            <Typography>Sold {weeklyReward.soldNftReward.quantity}</Typography>
+            <Image alt='card' src='/images/profile/icons/card.svg' width={18} height={18} />
+          </Stack>
         </TableCell>
         <TableCell align='center'>
-          <Typography>{weeklyReward.week}</Typography>
+          <Typography>{weeklyReward.weekNumber}</Typography>
         </TableCell>
-        <TableCell align='center'>
-          <Stack direction='row' alignItems='center' justifyContent='center' gap={0.5}>
+        <TableCell>
+          <Stack direction='row' alignItems='center' justifyContent='flex-end' gap={0.5}>
             <Typography>{weeklyReward.soldNftReward.points}</Typography>
             <Image alt='scout game icon' src='/images/profile/scout-game-icon.svg' width={20} height={20} />
           </Stack>
@@ -68,23 +71,23 @@ export function PointsTable({
         <TableHead
           sx={{
             backgroundColor: 'background.dark',
-            '& .MuiTableCell-root': { padding: 1, borderBottom: 'none', textTransform: 'uppercase' }
+            '& .MuiTableCell-root': { padding: 1, px: 1.5, borderBottom: 'none' }
           }}
         >
           <TableRow sx={{ mb: 1 }}>
-            <TableCell align='left'>Action</TableCell>
-            <TableCell align='center'>Week</TableCell>
-            <TableCell align='center'>Points</TableCell>
+            <TableCell align='left'>ACTION</TableCell>
+            <TableCell align='center'>WEEK</TableCell>
+            <TableCell align='right'>POINTS</TableCell>
           </TableRow>
         </TableHead>
         {weeklyRewards.length ? (
           <TableBody
             sx={{
               backgroundColor: 'background.dark',
-              '& .MuiTableCell-root': { padding: 1, borderBottom: 'none' }
+              '& .MuiTableCell-root': { p: 1, borderBottom: 'none', px: 1.5 }
             }}
           >
-            {[...weeklyRewards, ...weeklyRewards, ...weeklyRewards, ...weeklyRewards].map((weeklyReward) => (
+            {weeklyRewards.map((weeklyReward) => (
               <WeeklyPointsRows key={weeklyReward.weekNumber} weeklyReward={weeklyReward} />
             ))}
           </TableBody>
@@ -99,8 +102,7 @@ export function PointsTable({
             display: 'flex',
             mt: 0,
             justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'background.dark'
+            alignItems: 'center'
           }}
         >
           <Typography variant='h6'>{emptyMessage}</Typography>

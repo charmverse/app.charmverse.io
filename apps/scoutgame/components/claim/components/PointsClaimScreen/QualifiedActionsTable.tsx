@@ -2,7 +2,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 
-import type { WeeklyReward } from 'lib/points/getClaimablePointsWithEvents';
+import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 

@@ -1,12 +1,14 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Box, Stack } from '@mui/material';
+import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
-import type { WeeklyReward } from 'lib/points/getClaimablePointsWithEvents';
+import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
+import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 
 import { PageContainer } from '../layout/PageContainer';
 
 import { BuilderRewardsTable } from './components/BuilderRewardsTable/BuilderRewardsTable';
+import { ClaimedPointsTable } from './components/ClaimedPointsTable';
 import { PointsTable } from './components/PointsTable';
 
 export type ClaimPageProps = {
@@ -47,16 +49,9 @@ export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonus
               title='Unclaimed'
               emptyMessage='Nice, you have claimed all of your rewards to date!'
             />
-            <PointsTable
-              emptyMessage='History yet to be made.'
-              weeklyRewards={weeklyRewards}
-              title={
-                <Stack direction='row' alignItems='center' gap={0.5}>
-                  <CheckCircleIcon />
-                  Claimed
-                </Stack>
-              }
-            />
+            <Suspense fallback={<LoadingComponent isLoading />}>
+              <ClaimedPointsTable />
+            </Suspense>
           </Stack>
           <Stack flex={1}>
             <BuilderRewardsTable />
