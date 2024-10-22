@@ -1,26 +1,32 @@
 import { ApplicationStatus, ProposalStatus, prisma } from '@charmverse/core/prisma-client';
 import { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
 import { prettyPrint } from '@root/lib/utils/strings';
-
+import {proposalsToExport} from './proposalsToExport';
+import { stringify } from 'csv-stringify/sync';
+import { RewardFields } from '@root/lib/rewards/blocks/interfaces';
+import fs from 'node:fs/promises';
 const domain = 'op-grants';
+
+const milestonePropertyTypeId = '6b4a0ac7-8a69-45e1-b112-a12779483f06';
+const criticalMilestoneValueId = 'ff571db9-e4b8-4a98-8ed8-12a7fdc326e5';
 
 const headers = [
   "Project Name",
-  "Time of Proposal Submission",
-  "Date",
-  "Cycle",
+  // "Time of Proposal Submission",
+  // "Date",
+  // "Cycle",
   "Critical Milestones",
   "Completion percentage",
-  "Type",
-  "Milestone Status",
-  "Due Date",
-  "Proposal Link",
-  "Reviewer",
-  "Initial Distribution Date",
-  "(OP) Distributed",
-  "Total Amount (OP)",
-  "Incentive Program Launched?",
-  "L2 Address"
+  // "Type",
+  // "Milestone Status",
+  // "Due Date",
+  // "Proposal Link",
+  // "Reviewer",
+  // "Initial Distribution Date",
+  // "(OP) Distributed",
+  // "Total Amount (OP)",
+  // "Incentive Program Launched?",
+  // "L2 Address"
 ] as const;
 
 type HeaderName = typeof headers[number];
@@ -31,20 +37,31 @@ const data: string[] = [];
 // const milestonePropertyTypeId = '6b4a0ac7-8a69-45e1-b112-a12779483f06';
 // const criticalMilestoneValueId = 'ff571db9-e4b8-4a98-8ed8-12a7fdc326e5';
 
-const cleanPaths = data.filter((path) => !!path).map((path) => path.split('/').pop()) as string[];
-
 async function exportMilestoneCompletionStatus() {
   const proposals = await prisma.proposal.findMany({
     where: {
       space: {
         domain: domain
       },
-      status: ProposalStatus.published,
-      evaluations: {
-        every: {
-          result: 'pass'
-        }
+      page: {
+        OR: [
+          {
+            path: {
+              in: proposalsToExport
+            }
+          },
+          {
+            additionalPaths: {
+              hasSome: proposalsToExport
+            }
+          }
+        ]
       },
+      // evaluations: {
+      //   every: {
+      //     result: 'pass'
+      //   }
+      // },
       // page: {
       //   OR: [
       //     {
@@ -68,6 +85,12 @@ async function exportMilestoneCompletionStatus() {
         }
       },
       rewards: {
+        where: {
+          fields: {
+            path: ['properties', milestonePropertyTypeId],
+            equals: criticalMilestoneValueId
+          }
+        },
         select: {
           id: true,
           status: true,
@@ -84,7 +107,9 @@ async function exportMilestoneCompletionStatus() {
 
   let orderedProposalValues: string[] = [];
 
-  for (const proposalPath of data) {
+  let rows: Record<HeaderName, any>[] = [];
+
+  for (const proposalPath of proposalsToExport) {
     if (!proposalPath) {
       orderedProposalValues.push('');
       continue;
@@ -94,6 +119,10 @@ async function exportMilestoneCompletionStatus() {
 
     if (!pagePath) {
       throw new Error('Invalid page path: ' + pagePath);
+    }
+
+    if (pagePath.match('kelpdao')) {
+      console.log({pagePath}, proposals.some(p => p.page?.path.match('kelpdao')));
     }
 
     const matchingProposal = proposals.find(
@@ -112,12 +141,21 @@ async function exportMilestoneCompletionStatus() {
       reward.applications.some((app) => completionStatuses.includes(app.status))
     ).length;
 
-    orderedProposalValues.push(`${completedRewards}/${totalRewards}`);
+
+    const record: Record<HeaderName, any> = {
+      "Project Name": matchingProposal.page!.path,
+      "Critical Milestones": `${completedRewards}/${totalRewards}`,
+      "Completion percentage": Math.round((completedRewards / totalRewards) * 100) + '%',
+    }
+
+    rows.push(record);
   }
 
-  console.log('Paths', cleanPaths.length, 'Proposals', proposals.length);
-
   console.log(orderedProposalValues.join('\n'));
+
+  const csv = stringify(rows, { header: true });
+
+  await fs.writeFile('milestone-completion-status.csv', csv);
 }
 
 
@@ -156,5 +194,5 @@ async function getSeasonProperty({seasonNumber}: {seasonNumber: number}) {
   };
 }
 
-getSeasonProperty({seasonNumber: 5}).then(prettyPrint)
-// exportMilestoneCompletionStatus().then(console.log).catch(console.error);
+// getSeasonProperty({seasonNumber: 5}).then(prettyPrint)
+exportMilestoneCompletionStatus().then(console.log).catch(console.error);

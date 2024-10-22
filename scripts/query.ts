@@ -6,10 +6,42 @@ import { DateTime } from 'luxon';
 const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
-async function query() {
-  const w = await prisma.connectWaitlistSlot.findFirst({ where: { percentile: { lt: 30 } } });
+const names = [
+  "DelegateKit - A complete Farcaster DAO toolkit",
+  "Doxa: The Governance Game",
+  "KelpDAO - Bringing restaking to Optimism",
+  "Noun PCs - Zynga for Farcaster",
+  "HyperArc - Make Social Graphs Great Again",
+  "LOGX: Aggregated Orderbook Perp DEX",
+  "Ponder surveys for superchain builders"
+];
 
-  console.log(w);
+async function query() {
+  const w = await prisma.proposal.findMany({
+    where: { 
+      AND: [
+        { space: { domain: 'op-grants' } },
+        { status: 'published' },
+        { page: {
+          title: {
+            in: names
+          }
+        } }
+      ]
+    },
+    include: {
+      page: {
+        select: {
+          title: true,
+          path: true
+        }
+      }
+    }
+  });
+
+  prettyPrint(w.map(p => ({title: p.page!.title, path: `https://app.charmverse.io/op-grants/${p.page!.path}`})));
+
+  console.log(w.length, names.length);
 }
 
 query();
