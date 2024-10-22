@@ -13,7 +13,7 @@ import { useSnackbar } from './SnackbarContext';
 type PurchaseContext = {
   isExecutingTransaction: boolean;
   transactionHasSucceeded: boolean;
-  checkDecentTransaction: (input: { pendingTransactionId: string }) => Promise<any>;
+  checkDecentTransaction: (input: { pendingTransactionId: string; txHash: string }) => Promise<any>;
   error: string;
 };
 
@@ -33,7 +33,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       setPendingTransactionId(input.pendingTransactionId);
     },
     onSuccess({ input }) {
-      showMessage(`Transaction ${input.pendingTransactionId} was successful`, 'success');
+      showMessage(`Transaction ${input.txHash || ''} was successful`, 'success');
       setPendingTransactionId('');
     },
     onError({ error, input }) {

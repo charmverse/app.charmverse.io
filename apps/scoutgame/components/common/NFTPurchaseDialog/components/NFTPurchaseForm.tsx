@@ -135,7 +135,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
-        await checkDecentTransaction({ pendingTransactionId: res.data.id });
+        await checkDecentTransaction({ pendingTransactionId: res.data.id, txHash: res.data.txHash });
         await refreshUser();
         log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
       } else {
