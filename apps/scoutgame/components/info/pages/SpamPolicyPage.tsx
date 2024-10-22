@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 
-import { InfoPageContainer } from '../InfoPageContainer';
+import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function SpamPolicyPage() {
   return (

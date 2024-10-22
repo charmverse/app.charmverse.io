@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 
-import { InfoPageContainer } from '../InfoPageContainer';
+import { InfoPageContainer } from '../components/InfoPageContainer';
 
 export function PointsPage() {
   return (

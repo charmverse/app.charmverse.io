@@ -4,14 +4,15 @@ import { InfoCard } from 'components/common/DocumentPageContainer/components/Inf
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
 
+import { InfoPageContainer } from '../components/InfoPageContainer';
+
 export function PrivacyPolicyPage() {
   return (
-    <DocumentPageContainer data-test='privacy-page'>
-      <Typography variant='h4' align='center' color='secondary'>
-        Privacy Policy
-      </Typography>
-      <Document />
-    </DocumentPageContainer>
+    <InfoPageContainer data-test='privacy-page' title='Privacy Policy'>
+      <DocumentPageContainer>
+        <Document />
+      </DocumentPageContainer>
+    </InfoPageContainer>
   );
 }
 

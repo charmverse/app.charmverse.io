@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { InfoPageContainer } from 'components/info/InfoPageContainer';
+import { InfoPageContainer } from 'components/info/components/InfoPageContainer';
 
 export function MoxiePage() {
   return (

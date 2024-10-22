@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { Game7Page } from 'components/info/pages/PartnerRewards/Game7Page';
+import { Game7Page } from 'components/info/partner-rewards/Game7Page';
 
 export const metadata: Metadata = {
   title: 'Game7 Partner Rewards'
