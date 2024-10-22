@@ -1,7 +1,9 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
+import { redirect, usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 
 import { useGetUser } from 'hooks/api/session';
 import type { SessionUser } from 'lib/session/getUserFromSession';
@@ -13,15 +15,24 @@ type UserContext = {
 
 export const UserContext = createContext<Readonly<UserContext | null>>(null);
 
+const agreeToTermsPaths = ['/welcome', '/info'];
+
 export function UserProvider({ children, userSession }: { children: ReactNode; userSession: SessionUser | null }) {
   const { data: user = userSession, mutate: mutateUser } = useGetUser();
-
+  const pathname = usePathname();
   const refreshUser = useCallback(
     async (_user?: SessionUser | null) => {
       return mutateUser(_user);
     },
     [mutateUser]
   );
+
+  useEffect(() => {
+    if (user && !user?.agreedToTermsAt && !agreeToTermsPaths.some((path) => pathname.startsWith(path))) {
+      log.debug('Redirect user to agree to terms page', { pathname });
+      redirect('/welcome');
+    }
+  }, [user, pathname]);
 
   const value = useMemo(() => ({ user, refreshUser }), [user, refreshUser]);
 
