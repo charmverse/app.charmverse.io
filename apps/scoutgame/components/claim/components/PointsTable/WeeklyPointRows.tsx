@@ -4,27 +4,13 @@ import type { ReactNode } from 'react';
 
 import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 
+import { DividerRow } from '../common/DividerRow';
+import { PointsCell } from '../common/PointsCell';
+
 function getOrdinal(n: number): string {
   const ordinal = new Intl.PluralRules('en', { type: 'ordinal' }).select(n);
   const suffix = { zero: '', one: 'st', two: 'nd', few: 'rd', many: 'th', other: 'th' }[ordinal];
   return `${n}${suffix}`;
-}
-
-function PointsCell({ points }: { points: number }) {
-  return (
-    <Stack direction='row' alignItems='center' justifyContent='flex-end' gap={0.5}>
-      <Typography>{points}</Typography>
-      <Image alt='scout game icon' src='/images/profile/scout-game-icon.svg' width={20} height={20} />
-    </Stack>
-  );
-}
-
-function DividerRow() {
-  return (
-    <TableRow sx={{ backgroundColor: 'background.default' }}>
-      <TableCell colSpan={3} sx={{ '&.MuiTableCell-root': { padding: 0.25, backgroundColor: 'inherit' } }} />
-    </TableRow>
-  );
 }
 
 export function WeeklyPointsRows({ weeklyReward }: { weeklyReward: WeeklyReward }) {

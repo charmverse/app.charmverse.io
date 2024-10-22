@@ -16,13 +16,14 @@ export type ClaimPageProps = {
   weeklyRewards: WeeklyReward[];
   bonusPartners: string[];
   username: string;
+  period: string;
 };
 
-export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonusPartners }: ClaimPageProps) {
+export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonusPartners, period }: ClaimPageProps) {
   return (
     <PageContainer>
       <Stack
-        gap={2}
+        gap={8}
         mt={2}
         flexDirection={{
           xs: 'column',
@@ -49,7 +50,7 @@ export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonus
             }}
           >
             <Suspense fallback={<LoadingComponent isLoading />}>
-              <BuilderRewardsTable />
+              <BuilderRewardsTable period={period} />
             </Suspense>
           </Stack>
           <Suspense fallback={<LoadingComponent isLoading />}>
@@ -66,7 +67,7 @@ export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonus
           }}
         >
           <Suspense fallback={<LoadingComponent isLoading />}>
-            <BuilderRewardsTable />
+            <BuilderRewardsTable period={period} />
           </Suspense>
         </Stack>
       </Stack>

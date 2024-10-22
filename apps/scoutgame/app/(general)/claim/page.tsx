@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Claim Points'
 };
 
-export default async function Claim() {
+export default async function Claim({ searchParams }: { searchParams: { tab: string } }) {
   const user = await getUserFromSession();
 
   if (!user) {
@@ -27,6 +27,7 @@ export default async function Claim() {
 
   return (
     <ClaimPage
+      period={searchParams.tab}
       username={user.username}
       totalClaimablePoints={totalPoints}
       weeklyRewards={weeklyRewards}

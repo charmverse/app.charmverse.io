@@ -83,7 +83,16 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Claim'
           href='/claim'
           value='claim'
-          icon={<Image src='/images/claim-icon.svg' alt='Claim' width={26} height={26} />}
+          icon={
+            <Badge
+              color='error'
+              variant='dot'
+              overlap={isDesktop ? 'rectangular' : 'circular'}
+              invisible={!claimablePoints || claimablePoints.points === 0}
+            >
+              <Image src='/images/claim-icon.svg' alt='Claim' width={26} height={26} />
+            </Badge>
+          }
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
         <BottomNavigationAction
@@ -92,16 +101,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           // This makes sure the UI doesn't flicker from single column to double column for desktop screens
           href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
           value='profile'
-          icon={
-            <Badge
-              color='error'
-              variant='dot'
-              overlap={isDesktop ? 'rectangular' : 'circular'}
-              invisible={!claimablePoints || claimablePoints.points === 0}
-            >
-              <SlUser size='19px' style={{ margin: '2px 0 3px' }} />
-            </Badge>
-          }
+          icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
           onClick={(e) => openAuthModal?.(e, 'profile')}
         />
         <BottomNavigationAction
