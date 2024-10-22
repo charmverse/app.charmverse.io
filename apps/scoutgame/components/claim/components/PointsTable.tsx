@@ -102,7 +102,8 @@ export function PointsTable({
             display: 'flex',
             mt: 0,
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            backgroundColor: 'background.dark'
           }}
         >
           <Typography variant='h6'>{emptyMessage}</Typography>
