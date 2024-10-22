@@ -17,6 +17,7 @@ export async function mockBuilder({
   githubUserId = randomLargeInt(),
   onboardedAt,
   username = uuid(),
+  agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
   createNft = false
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
@@ -27,6 +28,7 @@ export async function mockBuilder({
       displayName: 'Test User',
       builderStatus,
       onboardedAt,
+      agreedToTermsAt,
       githubUser: {
         create: {
           id: githubUserId,
@@ -51,10 +53,14 @@ export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 export async function mockScout({
   username = `user-${uuid()}`,
   displayName = 'Test Scout',
+  agreedToTermsAt = new Date(),
+  onboardedAt = new Date(),
   builderId,
   season
 }: {
   username?: string;
+  agreedToTermsAt?: Date | null;
+  onboardedAt?: Date | null;
   displayName?: string;
   builderId?: string; // automatically "scout" a builder
   season?: string;
@@ -62,6 +68,8 @@ export async function mockScout({
   const scout = await prisma.scout.create({
     data: {
       username,
+      agreedToTermsAt,
+      onboardedAt,
       displayName
     }
   });

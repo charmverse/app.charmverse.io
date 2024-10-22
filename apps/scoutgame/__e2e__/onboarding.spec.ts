@@ -19,7 +19,10 @@ test.describe('Onboarding flow', () => {
   });
 
   test('Save new user preferences and get through onboarding', async ({ welcomePage, homePage, page, utils }) => {
-    const newUser = await mockScout();
+    const newUser = await mockScout({
+      onboardedAt: null,
+      agreedToTermsAt: null
+    });
     await utils.loginAsUserId(newUser.id);
 
     // Logged in user should be redirected automatically
@@ -83,8 +86,28 @@ test.describe('Onboarding flow', () => {
     expect(!!userAfterOnboarding.onboardedAt).toBe(true);
   });
 
+  test('Require terms of service agreement for user that was onboarded somehow', async ({
+    page,
+    welcomePage,
+    utils
+  }) => {
+    const onboardedUser = await mockScout({
+      agreedToTermsAt: null,
+      onboardedAt: new Date()
+    });
+    await utils.loginAsUserId(onboardedUser.id);
+
+    // Test redirect from home page
+    await page.goto('/home');
+    await page.waitForURL('**/welcome');
+    await expect(welcomePage.container).toBeVisible();
+  });
+
   test('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
-    const newUser = await mockScout();
+    const newUser = await mockScout({
+      agreedToTermsAt: null,
+      onboardedAt: null
+    });
     await utils.loginAsUserId(newUser.id);
 
     // Test redirect from home page
