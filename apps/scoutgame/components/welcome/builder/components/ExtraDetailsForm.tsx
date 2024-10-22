@@ -81,7 +81,9 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
-        <FormLabel id='form-email'>Email</FormLabel>
+        <FormLabel id='form-email' required>
+          Email
+        </FormLabel>
         <Controller
           control={control}
           name='email'
@@ -91,6 +93,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
               placeholder='Your email'
               autoFocus
               aria-labelledby='form-email'
+              required
               type='email'
               error={!!error?.message}
               {...field}
