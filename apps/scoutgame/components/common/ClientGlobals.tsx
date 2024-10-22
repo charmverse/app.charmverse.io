@@ -13,5 +13,5 @@ export function ClientGlobals({ userId }: { userId?: string }) {
   usePageView();
   useRefreshUserProfiles();
 
-  return <WelcomeModal />;
+  return <WelcomeModal userId={userId} />;
 }

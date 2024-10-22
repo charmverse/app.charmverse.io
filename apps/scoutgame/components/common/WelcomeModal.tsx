@@ -3,7 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { Dialog, DialogContent } from '@mui/material';
 import { getCookie, setCookie } from '@packages/utils/browser';
-import { isProdEnv } from '@root/config/constants';
+import { isTestEnv } from '@root/config/constants';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
@@ -11,14 +11,19 @@ import { HowItWorksContent } from 'components/welcome/how-it-works/HowItWorksCon
 
 const pagesToShowOnboarding = ['/home', '/scout', '/profile', '/claim'];
 
-function WelcomeModal() {
+function WelcomeModal({ userId }: { userId?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const hasSeenModal = getCookie('hasSeenWelcomeModal');
-    if (isProdEnv && hasSeenModal !== 'true' && pagesToShowOnboarding.some((path) => pathname.startsWith(path))) {
-      log.info('Showing welcome modal');
+    if (
+      !userId &&
+      !isTestEnv &&
+      hasSeenModal !== 'true' &&
+      pagesToShowOnboarding.some((path) => pathname.startsWith(path))
+    ) {
+      log.info('Showing how-it-works modal to anonymous user');
       setIsOpen(true);
     }
   }, []);
