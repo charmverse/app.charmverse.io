@@ -52,20 +52,3 @@ export async function welcomeFromWaitlistToScoutgame({ fid }: { fid: number }): 
     text: message
   });
 }
-
-// prisma.connectWaitlistSlot
-//   .upsert({
-//     where: {
-//       fid: 4339
-//     },
-//     create: {
-//       fid: 4339,
-//       username: 'meb',
-//       percentile: 98
-//     },
-//     update: {
-//       percentile: 98
-//     }
-//   })
-//   .then(() => welcomeFromWaitlistToScoutgame({ fid: 4339 }).then(console.log))
-//   .catch(console.error);

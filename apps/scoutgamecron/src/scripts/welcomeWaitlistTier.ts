@@ -25,8 +25,20 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
     }
   };
 
+  const existingScouts = await prisma.scout.findMany({
+    where: {
+      farcasterId: {
+        gte: 1
+      }
+    },
+    select: {
+      farcasterId: true
+    }
+  })
+
+  // Only message users who are not already scouts
   const users = await prisma.connectWaitlistSlot.findMany({
-    where: whereQuery,
+    where: {...whereQuery, fid: {notIn: existingScouts.map(scout => scout.farcasterId).filter(Boolean) as number[]}},
     orderBy: {
       fid: 'asc'
     }
