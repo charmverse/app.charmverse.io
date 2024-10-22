@@ -8,8 +8,8 @@ import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 import { PageContainer } from '../layout/PageContainer';
 
 import { BuilderRewardsTable } from './components/BuilderRewardsTable/BuilderRewardsTable';
-import { ClaimedPointsTable } from './components/ClaimedPointsTable';
-import { PointsTable } from './components/PointsTable';
+import { ClaimedPointsTable } from './components/PointsTable/ClaimedPointsTable';
+import { PointsTable } from './components/PointsTable/PointsTable';
 
 export type ClaimPageProps = {
   totalClaimablePoints: number;
