@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { Dialog, DialogContent } from '@mui/material';
 import { getCookie, setCookie } from '@packages/utils/browser';
+import { isProdEnv } from '@root/config/constants';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 
@@ -16,7 +17,7 @@ function WelcomeModal() {
 
   useEffect(() => {
     const hasSeenModal = getCookie('hasSeenWelcomeModal');
-    if (hasSeenModal !== 'true' && pagesToShowOnboarding.some((path) => pathname.startsWith(path))) {
+    if (isProdEnv && hasSeenModal !== 'true' && pagesToShowOnboarding.some((path) => pathname.startsWith(path))) {
       log.info('Showing welcome modal');
       setIsOpen(true);
     }
