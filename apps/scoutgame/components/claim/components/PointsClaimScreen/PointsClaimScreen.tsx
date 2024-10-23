@@ -5,15 +5,15 @@ import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
 
 export async function PointsClaimScreen({
-  totalClaimablePoints,
+  totalUnclaimedPoints,
   username,
   bonusPartners
 }: {
-  totalClaimablePoints: number;
+  totalUnclaimedPoints: number;
   username: string;
   bonusPartners: string[];
 }) {
-  if (!totalClaimablePoints) {
+  if (!totalUnclaimedPoints) {
     return (
       <Paper
         sx={{
@@ -76,7 +76,7 @@ export async function PointsClaimScreen({
           </Typography>
           <Stack flexDirection='row' alignItems='center' gap={1}>
             <Typography variant='h4' fontWeight={500}>
-              {totalClaimablePoints}
+              {totalUnclaimedPoints}
             </Typography>
             <Image
               width={35}

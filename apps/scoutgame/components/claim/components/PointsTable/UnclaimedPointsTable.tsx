@@ -1,12 +1,9 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Stack } from '@mui/material';
-
 import { getPointsReceiptsRewards } from 'lib/points/getPointsReceiptsRewards';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { PointsTable } from './PointsTable';
 
-export async function ClaimedPointsTable() {
+export async function UnclaimedPointsTable() {
   const user = await getUserFromSession();
 
   if (!user) {
@@ -15,19 +12,14 @@ export async function ClaimedPointsTable() {
 
   const pointsReceiptRewards = await getPointsReceiptsRewards({
     userId: user.id,
-    isClaimed: true
+    isClaimed: false
   });
 
   return (
     <PointsTable
-      emptyMessage='History yet to be made.'
+      emptyMessage='Nice, you have claimed all of your rewards to date!'
       pointsReceiptRewards={pointsReceiptRewards}
-      title={
-        <Stack direction='row' alignItems='center' gap={0.5}>
-          <CheckCircleIcon />
-          Claimed
-        </Stack>
-      }
+      title='Unclaimed'
     />
   );
 }

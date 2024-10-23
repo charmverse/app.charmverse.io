@@ -6,10 +6,6 @@ import { sealData } from 'iron-session';
 const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';
 
 export async function GET(request: Request) {
-  if (!isDevEnv && !isTestEnv) {
-    return new Response('This endpoint is only available in test environment', { status: 403 });
-  }
-
   const { searchParams } = new URL(request.url);
 
   const userId = searchParams.get('userId');

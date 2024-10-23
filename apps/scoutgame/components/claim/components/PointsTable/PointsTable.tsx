@@ -2,16 +2,16 @@ import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } f
 import { Stack } from '@mui/system';
 import type { ReactNode } from 'react';
 
-import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
+import type { PointsReceiptReward } from 'lib/points/getPointsReceiptsRewards';
 
-import { WeeklyPointsRows } from './WeeklyPointRows';
+import { PointsReceiptRewardRow } from './PointsReceiptRewardRow';
 
 export function PointsTable({
-  weeklyRewards,
+  pointsReceiptRewards,
   title,
   emptyMessage
 }: {
-  weeklyRewards: WeeklyReward[];
+  pointsReceiptRewards: PointsReceiptReward[];
   title: ReactNode | string;
   emptyMessage: string;
 }) {
@@ -43,20 +43,20 @@ export function PointsTable({
             <TableCell align='right'>POINTS</TableCell>
           </TableRow>
         </TableHead>
-        {weeklyRewards.length ? (
+        {pointsReceiptRewards.length ? (
           <TableBody
             sx={{
               backgroundColor: 'background.dark',
               '& .MuiTableCell-root': { p: 1, borderBottom: 'none', px: 1.5 }
             }}
           >
-            {weeklyRewards.map((weeklyReward) => (
-              <WeeklyPointsRows key={weeklyReward.weekNumber} weeklyReward={weeklyReward} />
+            {pointsReceiptRewards.map((pointsReceiptReward) => (
+              <PointsReceiptRewardRow key={pointsReceiptReward.weekNumber} pointsReceiptReward={pointsReceiptReward} />
             ))}
           </TableBody>
         ) : null}
       </Table>
-      {weeklyRewards.length ? null : (
+      {pointsReceiptRewards.length ? null : (
         <Paper
           sx={{
             width: '100%',

@@ -3,23 +3,21 @@ import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
-import type { WeeklyReward } from 'lib/points/getPointsWithEvents';
 
 import { PageContainer } from '../layout/PageContainer';
 
 import { BuilderRewardsTable } from './components/BuilderRewardsTable/BuilderRewardsTable';
 import { ClaimedPointsTable } from './components/PointsTable/ClaimedPointsTable';
-import { PointsTable } from './components/PointsTable/PointsTable';
+import { UnclaimedPointsTable } from './components/PointsTable/UnclaimedPointsTable';
 
 export type ClaimPageProps = {
-  totalClaimablePoints: number;
-  weeklyRewards: WeeklyReward[];
+  totalUnclaimedPoints: number;
   bonusPartners: string[];
   username: string;
   period: string;
 };
 
-export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonusPartners, period }: ClaimPageProps) {
+export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, period }: ClaimPageProps) {
   return (
     <PageContainer>
       <Stack
@@ -32,15 +30,13 @@ export function ClaimPage({ username, totalClaimablePoints, weeklyRewards, bonus
       >
         <Stack flex={1} gap={4}>
           <PointsClaimScreen
-            totalClaimablePoints={totalClaimablePoints}
+            totalUnclaimedPoints={totalUnclaimedPoints}
             username={username}
             bonusPartners={bonusPartners}
           />
-          <PointsTable
-            weeklyRewards={weeklyRewards}
-            title='Unclaimed'
-            emptyMessage='Nice, you have claimed all of your rewards to date!'
-          />
+          <Suspense fallback={<LoadingComponent isLoading />}>
+            <UnclaimedPointsTable />
+          </Suspense>
           <Stack
             sx={{
               display: {

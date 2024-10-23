@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ClaimPage } from 'components/claim/ClaimPage';
-import { getPointsWithEvents } from 'lib/points/getPointsWithEvents';
+import { getUnclaimedPoints } from 'lib/points/getUnclaimedPoints';
 import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
@@ -20,17 +20,13 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
     return null;
   }
 
-  const { totalPoints, weeklyRewards, bonusPartners } = await getPointsWithEvents({
-    userId: user.id,
-    isClaimed: false
-  });
+  const { bonusPartners, totalUnclaimedPoints } = await getUnclaimedPoints(user.id);
 
   return (
     <ClaimPage
       period={searchParams.tab}
       username={user.username}
-      totalClaimablePoints={totalPoints}
-      weeklyRewards={weeklyRewards}
+      totalUnclaimedPoints={totalUnclaimedPoints}
       bonusPartners={bonusPartners}
     />
   );

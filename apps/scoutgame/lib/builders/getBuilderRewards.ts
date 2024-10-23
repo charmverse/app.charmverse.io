@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@root/lib/utils/types';
 
 export async function getSeasonBuilderRewards({ userId }: { userId: string }): Promise<
   {
@@ -79,6 +80,9 @@ export async function getWeeklyBuilderRewards({ userId, week }: { userId: string
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
+      value: {
+        gt: 0
+      },
       event: {
         week,
         type: 'gems_payout'
@@ -111,12 +115,17 @@ export async function getWeeklyBuilderRewards({ userId, week }: { userId: string
   return pointsReceipts
     .map((receipt) => {
       const builder = receipt.event.builder;
+      const rank = builder.userWeeklyStats[0]?.rank || null;
+      if (rank === null) {
+        return null;
+      }
       return {
-        rank: builder.userWeeklyStats[0]?.rank || null,
+        rank,
         username: builder.username,
         avatar: builder.avatar,
         points: receipt.value
       };
     })
+    .filter(isTruthy)
     .sort((a, b) => b.points - a.points);
 }
