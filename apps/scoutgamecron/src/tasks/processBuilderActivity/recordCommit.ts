@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GemsReceiptType, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getBonusPartner } from '@packages/scoutgame/bonus';
 import type { Season } from '@packages/scoutgame/dates';
 import { getWeekFromDate, getStartOfSeason, isToday } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
@@ -128,6 +127,15 @@ export async function recordCommit({
         if (!existingBuilderEvent) {
           const activityType: ScoutGameActivityType = 'daily_commit';
 
+          const repo = await prisma.githubRepo.findUniqueOrThrow({
+            where: {
+              id: commit.repository.id
+            },
+            select: {
+              bonusPartner: true
+            }
+          });
+
           // It's a new event, we can record notification
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
@@ -153,7 +161,7 @@ export async function recordCommit({
               week,
               type: 'daily_commit',
               githubEventId: event.id,
-              bonusPartner: getBonusPartner(commit.repository.full_name),
+              bonusPartner: repo.bonusPartner,
               gemsReceipt: {
                 create: {
                   type: gemReceiptType,

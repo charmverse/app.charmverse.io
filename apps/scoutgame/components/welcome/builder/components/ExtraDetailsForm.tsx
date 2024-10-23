@@ -21,6 +21,7 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
+import { useUser } from 'components/layout/UserProvider';
 import { useIsMounted } from 'hooks/useIsMounted';
 import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
@@ -29,10 +30,13 @@ import type { FormValues } from 'lib/users/termsOfServiceSchema';
 
 export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   const router = useRouter();
+  const { refreshUser } = useUser();
   const [errors, setErrors] = useState<string[] | null>(null);
 
   const { execute, isExecuting } = useAction(saveTermsOfServiceAction, {
-    onSuccess() {
+    async onSuccess() {
+      // update the user object with the new terms of service agreement
+      await refreshUser();
       // If builder already has a status, show the spam policy page
       // Otherwise show the github connection page
       if (user.builderStatus) {
@@ -77,7 +81,9 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   return (
     <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
       <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
-        <FormLabel id='form-email'>Email</FormLabel>
+        <FormLabel id='form-email' required>
+          Email
+        </FormLabel>
         <Controller
           control={control}
           name='email'
@@ -87,6 +93,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
               placeholder='Your email'
               autoFocus
               aria-labelledby='form-email'
+              required
               type='email'
               error={!!error?.message}
               {...field}

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
-import { Season, getDateFromISOWeek } from '@packages/scoutgame/dates';
+import { getDateFromISOWeek, Season } from '@packages/scoutgame/dates';
 import { recordMergedPullRequest } from '../tasks/processBuilderActivity/recordMergedPullRequest';
 import { recordCommit } from '../tasks/processBuilderActivity/recordCommit';
 

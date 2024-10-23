@@ -1,5 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+
+import type { BoardFields } from 'lib/databases/board';
+import type { CardFields } from 'lib/databases/card';
+
 // Please read before running. Not battle-tested
 export async function mergeProfiles({
   primaryProfileId,
@@ -74,7 +78,8 @@ export async function mergeProfiles({
         id: secondaryProfileId
       },
       data: {
-        deletedAt: new Date()
+        deletedAt: new Date(),
+        username: `Merged with user id: ${primaryProfileId}`
       }
     }),
     prisma.spaceRole.updateMany({
@@ -278,6 +283,15 @@ export async function mergeProfiles({
       }
     })
   ]);
+
+  for (const spaceRole of secondary.spaceRoles) {
+    await migratePersonPropertyValues({
+      spaceId: spaceRole.spaceId,
+      primaryId: primaryProfileId,
+      secondaryId: secondaryProfileId
+    });
+  }
+
   log.debug('results', {
     'page.createdBy': results[0],
     'page.updatedBy': results[1],
@@ -309,4 +323,76 @@ export async function mergeProfiles({
     'userGnosisSafe.userId': results[27],
     'discordUser.userId': results[28]
   });
+}
+
+// This function is used to migrate person property values from one user to another by space
+async function migratePersonPropertyValues({
+  spaceId,
+  primaryId,
+  secondaryId
+}: {
+  spaceId: string;
+  primaryId: string;
+  secondaryId: string;
+}) {
+  const boards = await prisma.block.findMany({
+    where: {
+      spaceId,
+      type: {
+        in: ['board', 'inline_board', 'inline_linked_board', 'linked_board']
+      }
+    }
+  });
+
+  const boardsWithPeopleProperties = boards
+    .map((b) => ({
+      boardId: b.id,
+      personProperties: (b.fields as unknown as BoardFields)?.cardProperties.filter((p) => p.type === 'person')
+    }))
+    .filter((r) => r.personProperties.length > 0);
+
+  // console.log('Found boards with person propertiesto check', { spaceId, boards: boardsWithPeopleProperties.length });
+
+  for (const board of boardsWithPeopleProperties) {
+    const cards = await prisma.block.findMany({
+      where: {
+        parentId: board.boardId,
+        type: 'card'
+      }
+    });
+    const cardsToUpdate = cards
+      .map((c) => {
+        const fields = { ...(c.fields as unknown as CardFields) };
+        let updated = false;
+        board.personProperties.forEach((e) => {
+          const personValue = fields.properties[e.id];
+          if (personValue === secondaryId) {
+            fields.properties[e.id] = primaryId;
+            updated = true;
+          } else if (Array.isArray(personValue) && personValue.includes(secondaryId)) {
+            fields.properties[e.id] = personValue.map((p) => (p === secondaryId ? primaryId : p));
+            updated = true;
+          }
+        });
+        if (updated) {
+          return {
+            cardId: c.id,
+            fields
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+    if (cardsToUpdate.length > 0) {
+      log.debug(`Updating ${cardsToUpdate.length} database cards`);
+      await prisma.$transaction(
+        cardsToUpdate.map((card) =>
+          prisma.block.update({
+            where: { id: card!.cardId },
+            data: { fields: card!.fields }
+          })
+        )
+      );
+    }
+  }
 }
