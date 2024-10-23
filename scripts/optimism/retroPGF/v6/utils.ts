@@ -18,7 +18,8 @@ export function getProposals() {
         include: {
           evaluations: {
             include: {
-              reviews: true
+              reviews: true,
+              reviewers: true
             }
           },
           formAnswers: true
@@ -30,9 +31,9 @@ export function getProposals() {
 
 export type DatabaseProposals = Awaited<ReturnType<typeof getProposals>>;
 
-export function findProposalMatch(opProjectId: string, proposals: DatabaseProposals) {
+export function findProposalMatch(attestationId: string, proposals: DatabaseProposals) {
   return proposals.find(
-    (r) => r.proposal?.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value === opProjectId
+    (r) => r.proposal?.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value === attestationId
   );
 }
 

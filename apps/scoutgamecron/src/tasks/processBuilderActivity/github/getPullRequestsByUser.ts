@@ -90,7 +90,7 @@ export async function getPullRequestsByUser({ login, after }: { login: string; a
 
   while (hasNextPage) {
     try {
-      // @ts-ignore
+      // @ts-expect-error tbd what error is
       const { search } = await octokit.graphql.paginate<GraphQLSearchResponse>(prSearchQuery, {
         queryString,
         first: 100,

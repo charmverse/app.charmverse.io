@@ -5,17 +5,20 @@ import { Stack } from '@mui/system';
 import { useState } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
 
-import type { FormValues } from '../form';
+import type { EvaluationStepFormValues } from '../form';
 
 import { EvaluationAppealSettings } from './EvaluationAppealSettings';
 import { EvaluationRequiredReviews } from './EvaluationRequiredReviews';
+import { ShowRubricResults } from './ShowRubricResults';
+import { StepActionButtonLabel } from './StepActionButtonLabel';
+import { StepFailReasonSelect } from './StepFailReasonSelect';
 
 export function EvaluationAdvancedSettingsAccordion({
   formValues,
   setValue
 }: {
-  formValues: FormValues;
-  setValue: UseFormSetValue<FormValues>;
+  formValues: EvaluationStepFormValues;
+  setValue: UseFormSetValue<EvaluationStepFormValues>;
 }) {
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
@@ -33,6 +36,7 @@ export function EvaluationAdvancedSettingsAccordion({
         <AccordionDetails>
           <Stack gap={2}>
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'rubric' && <ShowRubricResults formValues={formValues} setValue={setValue} />}
             {formValues.type === 'pass_fail' && (
               <>
                 <EvaluationRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />

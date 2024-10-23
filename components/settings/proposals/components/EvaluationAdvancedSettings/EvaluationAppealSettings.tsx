@@ -4,14 +4,14 @@ import type { UseFormSetValue } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { FormValues } from '../form';
+import type { EvaluationStepFormValues } from '../form';
 
 export function EvaluationAppealSettings({
   setValue,
   formValues
 }: {
-  formValues: FormValues;
-  setValue: UseFormSetValue<FormValues>;
+  formValues: EvaluationStepFormValues;
+  setValue: UseFormSetValue<EvaluationStepFormValues>;
 }) {
   const { appealable, appealRequiredReviews, finalStep } = formValues;
   return (

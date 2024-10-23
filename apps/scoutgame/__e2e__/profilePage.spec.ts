@@ -24,6 +24,7 @@ test.describe('Profile page', () => {
 
   test('An onboarded user can access the profile page', async ({ page, profilePage, utils }) => {
     const builder = await mockBuilder({
+      agreedToTermsAt: new Date(),
       onboardedAt: new Date()
     });
     await utils.loginAsUserId(builder.id);

@@ -4,14 +4,14 @@ import type { UseFormSetValue } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { FormValues } from '../form';
+import type { EvaluationStepFormValues } from '../form';
 
 export function EvaluationRequiredReviews({
   setValue,
   requiredReviews
 }: {
   requiredReviews: WorkflowEvaluationJson['requiredReviews'];
-  setValue: UseFormSetValue<FormValues>;
+  setValue: UseFormSetValue<EvaluationStepFormValues>;
 }) {
   return (
     <Box className='octo-propertyrow'>

@@ -7,8 +7,8 @@ import { fieldIds, spaceId, templateId, getProjectsFromFile, applicationsFile } 
 import { uniq } from 'lodash';
 import { getProposals } from './utils';
 
-const fullReviewsummaryFile = './op-full-review-sep-16.csv';
-const reviewersFile = './op-reviewers-june-21.csv';
+const fullReviewsummaryFile = './op-full-review-oct-22.csv';
+const reviewersFile = './op-reviewers-oct-22.csv';
 
 async function exportFullReviewSummary() {
   const pages = await getProposals();
@@ -17,14 +17,14 @@ async function exportFullReviewSummary() {
     Title: string;
     'Full Review Status': string;
     Link: string;
-    'Project Id': string;
+    'Attestation Id': string;
     Rejected: number;
     'Rejected Reasons': string;
     Approved: number;
     Pending: number;
-    'Author Email': string;
+    'Project Emails': string;
   }[] = pages.map(({ path, proposal, title }) => {
-    const projectId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
+    const attestationId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
     const currentEvaluation = getCurrentEvaluation(proposal!.evaluations);
     const evaluation = proposal!.evaluations.find((evaluation) => evaluation.title === 'Full Review');
     if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
@@ -55,11 +55,16 @@ async function exportFullReviewSummary() {
     }
 
     // const authorEmails = proposal!.authors.map((author) => author.author.verifiedEmails[0]?.email).filter(Boolean);
-    const application = applications.find((application) => application.project.id === projectId);
+    const application = applications.find((application) => application.attestationId === attestationId);
+    // console.log(application, title, attestationId);
+    if (!application) {
+      console.log('missing application', title);
+    }
     const applicationEmails =
       application?.project.organization?.organization.team.map((member) => member.user.email).filter(Boolean) || [];
-    if (applicationEmails.length === 0) {
-      console.log('missing author email', title);
+    if (applicationEmails.length === 0 && application?.project.organization) {
+      console.log('missing author email', title, attestationId);
+      console.log(application?.project.organization?.organization.team);
     }
 
     return {
@@ -70,8 +75,8 @@ async function exportFullReviewSummary() {
       'Rejected Reasons': rejectedMessages.join(', '),
       Approved: approved,
       Pending: 5 - approved - rejected,
-      'Project Id': projectId || 'N/A',
-      'Author Email': applicationEmails.join(',')
+      'Attestation Id': attestationId || 'N/A',
+      'Project Emails': applicationEmails.join(',')
     };
   });
 
@@ -96,14 +101,14 @@ async function exportFullReviewSummary() {
     header: true,
     columns: [
       'Title',
-      // 'Link',
-      'Project Id',
+      'Link',
+      'Attestation Id',
       'Full Review Status',
-      // 'Approved',
-      // 'Rejected',
+      'Approved',
+      'Rejected',
       // 'Rejected Reasons',
-      // 'Pending',
-      'Author Email'
+      'Pending',
+      'Project Emails'
     ]
   });
 
@@ -143,9 +148,6 @@ async function exportReviewers() {
     proposal.evaluations.forEach((evaluation) => {
       evaluation.reviewers.forEach((reviewer) => {
         if (reviewer.userId) {
-          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
-            console.log(' reviewer', proposal.id);
-          }
           acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
           acc[reviewer.userId].proposals[proposal.id] = true;
           if (evaluation.reviews.some((review) => review.reviewerId === reviewer.userId)) {
@@ -155,9 +157,6 @@ async function exportReviewers() {
       });
       evaluation.appealReviewers.forEach((reviewer) => {
         if (reviewer.userId) {
-          if (reviewer.userId === '25135b4b-0b9b-4e4c-aa00-9ba88b82f925') {
-            console.log('appeal reviewer', proposal.id);
-          }
           acc[reviewer.userId] = acc[reviewer.userId] || { proposals: {}, reviewed: {} };
           acc[reviewer.userId].proposals[proposal.id] = true;
           if (evaluation.appealReviews.some((review) => review.reviewerId === reviewer.userId)) {
@@ -189,12 +188,6 @@ async function exportReviewers() {
 
   console.log('Found', users.length, 'users out of ', userIds.length);
 
-  const shanwellsUser = users.find((user) => user.username === 'shanwells.ca@gmail.com');
-  if (shanwellsUser) {
-    console.log('User ID for shanwells.ca@gmail.com:', shanwellsUser);
-  } else {
-    console.log('User with email shanwells.ca@gmail.com not found');
-  }
   const csvData = Object.entries(countMap)
     .map(([key, value]) => {
       const user = users.find((user) => user.id === key);
@@ -215,6 +208,6 @@ async function exportReviewers() {
   console.log('Exported to', reviewersFile);
 }
 
-//exportFullReviewSummary().catch(console.error);
+exportFullReviewSummary().catch(console.error);
 
-exportReviewers().catch(console.error);
+//exportReviewers().catch(console.error);

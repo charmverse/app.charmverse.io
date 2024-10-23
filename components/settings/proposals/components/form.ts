@@ -1,6 +1,6 @@
 import type { ProposalEvaluationType, ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma-client';
 
-export type FormValues = {
+export type EvaluationStepFormValues = {
   id: string;
   title: string;
   type: ProposalEvaluationType;
@@ -23,4 +23,5 @@ export type FormValues = {
   }[];
   appealable?: boolean | null;
   appealRequiredReviews?: number | null;
+  showAuthorResultsOnRubricFail?: boolean | null;
 };

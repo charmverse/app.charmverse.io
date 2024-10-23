@@ -11,7 +11,7 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DataNotFoundError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 
-export async function getSubtree({ pageId, userId }: { pageId: string; userId: string }) {
+export async function getSubtree({ pageId, userId }: { pageId: string; userId?: string }) {
   const page = await prisma.page.findFirstOrThrow({
     where: {
       id: pageId
@@ -44,13 +44,12 @@ export async function getSubtree({ pageId, userId }: { pageId: string; userId: s
   if (block?.type === 'board') {
     (block as any as Board).isLocked = !!page.isLocked;
   }
-
   // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
     let result = await getBlocksAndRefresh(block, blocks);
 
     // Only edit
-    if (page.isLocked && block?.type === 'board' && !computed.edit_lock && block) {
+    if (((page.isLocked && !computed.edit_lock) || !computed.edit_content) && block?.type === 'board' && block) {
       const views = result.filter((b) => b.type === 'view');
       const cards = result.filter((b) => b.type === 'card');
       const filteredCards = filterLockedDatabaseCards({
@@ -120,7 +119,6 @@ export async function getSubtree({ pageId, userId }: { pageId: string; userId: s
     let filtered = blocks.filter(
       (b) => !proposalBlocksMap[b.id] && (typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read)
     );
-
     const cardsWithProposalProps = [...filtered, ...refreshedBlocks];
 
     // Only edit
