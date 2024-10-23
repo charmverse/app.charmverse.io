@@ -51,7 +51,7 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
         value={isSeason ? 'season' : week || lastWeek}
       />
       <Stack direction='row' gap={1} alignItems='center'>
-        <Link href={`/claim?tab=${previousWeek}`}>
+        <Link href={previousWeek ? `/claim?tab=${previousWeek}` : ''}>
           <IconButton disabled={!previousWeek} size='small'>
             <ChevronLeftIcon />
           </IconButton>
@@ -61,7 +61,7 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
             ? `Season ${currentSeasonNumber}`
             : `Week ${getSeasonWeekFromISOWeek({ season: currentSeason, week })}`}
         </Typography>
-        <Link href={`/claim?tab=${nextWeek}`}>
+        <Link href={nextWeek ? `/claim?tab=${nextWeek}` : ''}>
           <IconButton disabled={!nextWeek} size='small'>
             <ChevronRightIcon />
           </IconButton>

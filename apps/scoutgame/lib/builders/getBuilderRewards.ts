@@ -166,7 +166,7 @@ export async function getWeeklyBuilderRewards({
       const builder = receipt.event.builder;
       const cardsHeld = builderTokensRecord[builder.id];
       const rank = builder.userWeeklyStats[0]?.rank || null;
-      if (rank === null) {
+      if (rank === null || cardsHeld === 0) {
         return null;
       }
       return {
