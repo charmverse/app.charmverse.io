@@ -29,8 +29,5 @@ export async function transformResponse(response: Response) {
 }
 
 export default function fetchWrapper<T>(resource: string, init?: RequestInit): Promise<T> {
-  // creating a new AbortController
-  const controller = new AbortController();
-
   return fetch(resource, init).then(transformResponse) as Promise<T>;
 }
