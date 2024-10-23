@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import type { Season } from '@packages/scoutgame/dates';
 import { mockRepo, mockBuilder } from '@packages/scoutgame/testing/database';
 import { mockSeason } from '@packages/scoutgame/testing/generators';
 import { DateTime } from 'luxon';
@@ -66,7 +67,7 @@ describe('processBuilderActivity', () => {
       builderId: builder.id,
       githubUser: builder.githubUser,
       createdAfter: new Date(),
-      season: mockSeason
+      season: mockSeason as Season
     });
 
     const builderEvents = await prisma.builderEvent.count({
@@ -114,7 +115,7 @@ describe('processBuilderActivity', () => {
       builderId: builder.id,
       githubUser: builder.githubUser,
       createdAfter: new Date(),
-      season: mockSeason
+      season: mockSeason as Season
     });
 
     const builderEvents = await prisma.builderEvent.count({

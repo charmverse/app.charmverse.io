@@ -11,10 +11,6 @@ import { roundNumberInRange } from '@packages/utils/numbers';
 
 import { notifyNewScore } from './notifyNewScore';
 
-// const prisma = new PrismaClient({
-//   log: ['query']
-// });
-
 export type TierChangeResult = Pick<ConnectWaitlistSlot, 'fid' | 'username' | 'percentile' | 'score'> & {
   newTier: ConnectWaitlistTier;
   tierChange: TierChange;
