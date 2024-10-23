@@ -6,7 +6,7 @@ import { InfoPageContainer } from 'components/info/components/InfoPageContainer'
 
 export function Game7Page() {
   return (
-    <InfoPageContainer data-test='partner-game7-page' image='/images/info/rewards-partner-game7.jpg' title='Game7'>
+    <InfoPageContainer data-test='partner-game7-page' image='/images/info/rewards-partner-game7.png' title='Game7'>
       <Document />
     </InfoPageContainer>
   );
@@ -35,11 +35,6 @@ function Document() {
         <ListItem>
           <a href='https://github.com/G7DAO/safes' target='_blank' rel='noreferrer'>
             https://github.com/G7DAO/safes
-          </a>
-        </ListItem>
-        <ListItem>
-          <a href='https://github.com/PermissionlessGames/degen-casino' target='_blank' rel='noreferrer'>
-            https://github.com/PermissionlessGames/degen-casino
           </a>
         </ListItem>
         <ListItem>
