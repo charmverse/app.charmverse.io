@@ -15,17 +15,18 @@ import { authSchema } from '../farcaster/config';
 import { authorizeUserByLaunchDate } from './authorizeUserByLaunchDate';
 import { saveSession } from './saveSession';
 
-const inviteCode = env('SCOUTGAME_INVITE_CODE') ?? process.env.REACT_APP_SCOUTGAME_INVITE_CODE;
-
 export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login_with_farcaster' })
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { fid } = await verifyFarcasterUser(parsedInput);
 
-    if (inviteCode && parsedInput.inviteCode === inviteCode) {
-      cookies().set('invite-code', await sealData({ inviteCode }, { password: authSecret as string }));
-      log.info('Builder logged in with invite code', { fid });
+    if (parsedInput.inviteCode) {
+      cookies().set(
+        'invite-code',
+        await sealData({ inviteCode: parsedInput.inviteCode }, { password: authSecret as string })
+      );
+      log.info(`Builder logged in with invite code: ${parsedInput.inviteCode}`, { fid });
     } else {
       // throws an error if user does not have access
       await authorizeUserByLaunchDate({ fid });
