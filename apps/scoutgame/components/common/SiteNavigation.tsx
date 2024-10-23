@@ -133,6 +133,8 @@ function getActiveButton(pathname: string) {
     return 'profile';
   } else if (pathname.startsWith('/info')) {
     return 'info';
+  } else if (pathname.startsWith('/claim')) {
+    return 'claim';
   }
   return null;
 }

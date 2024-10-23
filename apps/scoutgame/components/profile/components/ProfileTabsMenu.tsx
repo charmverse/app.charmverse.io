@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { TabsMenu } from 'components/common/Tabs/TabsMenu';
-import { useGetClaimablePoints } from 'hooks/api/session';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import type { ProfileTab } from '../ProfilePage';
@@ -15,14 +14,9 @@ const desktopTabs = ['scout-build', 'win'];
 const mobileTabs = ['scout', 'build', 'win'];
 
 export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
-  const { data: claimablePoints } = useGetClaimablePoints();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'), { noSsr: true });
   const isDesktop = useMdScreen();
   const router = useRouter();
-
-  const showWinBadge = claimablePoints && claimablePoints.points > 0;
-
-  // Initially both mobile and desktop is set to false, without returning early the UI flickers
 
   useEffect(() => {
     if (!isMobile && !isDesktop) {
@@ -42,12 +36,13 @@ export function ProfileTabsMenu({ tab }: { tab: ProfileTab }) {
     }
   }, [tab, isMobile, isDesktop, router]);
 
+  // Initially both mobile and desktop is set to false, without returning early the UI flickers
   if (!isMobile && !isDesktop) {
     return null;
   }
 
   if (!isMobile) {
-    return <TabsMenu value={tab || 'scout-build'} tabs={[{ value: 'scout-build', label: 'Scout. Build.' }]} />;
+    return null;
   }
 
   return (

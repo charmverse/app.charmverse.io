@@ -28,7 +28,14 @@ export function PointsTable({
           }}
         >
           <TableRow>
-            <TableCell align='left'>ACTION</TableCell>
+            <TableCell
+              align='left'
+              sx={{
+                minWidth: 150
+              }}
+            >
+              ACTION
+            </TableCell>
             <TableCell align='center'>WEEK</TableCell>
             <TableCell align='right'>POINTS</TableCell>
           </TableRow>
