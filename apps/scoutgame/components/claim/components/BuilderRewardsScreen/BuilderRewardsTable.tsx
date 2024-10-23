@@ -1,36 +1,19 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-import {
-  currentSeason,
-  currentSeasonNumber,
-  getLastWeek,
-  getNextWeek,
-  getPreviousWeek,
-  getSeasonWeekFromISOWeek
-} from '@packages/scoutgame/dates';
+import { Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 
 import { Avatar } from 'components/common/Avatar';
-import { TabsMenu } from 'components/common/Tabs/TabsMenu';
-import { getWeeklyBuilderRewards, getSeasonBuilderRewards } from 'lib/builders/getBuilderRewards';
+import { getSeasonBuilderRewards, getWeeklyBuilderRewards } from 'lib/builders/getBuilderRewards';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { DividerRow } from '../common/DividerRow';
 import { PointsCell } from '../common/PointsCell';
 
-export async function BuilderRewardsTable({ period }: { period: string }) {
+export async function BuilderRewardsTable({ week }: { week: string | null }) {
   const user = await getUserFromSession();
   if (!user) {
     return null;
   }
-
-  const isSeason = period === 'season';
-  const lastWeek = getLastWeek();
-  const week = isSeason ? null : period || lastWeek;
-  const previousWeek = week ? (week === currentSeason ? null : getPreviousWeek(week)) : null;
-  const nextWeek = week ? (week === lastWeek ? null : getNextWeek(week)) : null;
 
   const builderRewards = week
     ? await getWeeklyBuilderRewards({ week, userId: user.id })
@@ -39,35 +22,7 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
   const totalPoints = builderRewards.reduce((acc, reward) => acc + reward.points, 0);
 
   return (
-    <Stack gap={1} alignItems='center'>
-      <Typography color='secondary' variant='h6'>
-        Builder Rewards
-      </Typography>
-      <TabsMenu
-        tabs={[
-          { value: week || lastWeek, label: 'Weekly' },
-          { value: 'season', label: 'Season Total' }
-        ]}
-        value={isSeason ? 'season' : week || lastWeek}
-      />
-      <Stack direction='row' gap={1} alignItems='center'>
-        <Link href={previousWeek ? `/claim?tab=${previousWeek}` : ''}>
-          <IconButton disabled={!previousWeek} size='small'>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Link>
-        <Typography>
-          {!week
-            ? `Season ${currentSeasonNumber}`
-            : `Week ${getSeasonWeekFromISOWeek({ season: currentSeason, week })}`}
-        </Typography>
-        <Link href={nextWeek ? `/claim?tab=${nextWeek}` : ''}>
-          <IconButton disabled={!nextWeek} size='small'>
-            <ChevronRightIcon />
-          </IconButton>
-        </Link>
-      </Stack>
-
+    <>
       <Table>
         <TableHead
           sx={{
@@ -78,7 +33,7 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
           <TableRow>
             <TableCell align='left'>BUILDER</TableCell>
             <TableCell align='center'>CARDS HELD</TableCell>
-            {isSeason ? null : <TableCell align='center'>RANK</TableCell>}
+            {week ? <TableCell align='center'>RANK</TableCell> : null}
             <TableCell align='right'>POINTS</TableCell>
           </TableRow>
         </TableHead>
@@ -145,6 +100,6 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
           <Image src='/images/cat-with-binoculars.png' alt='Scouts' width={400} height={400} />
         </Paper>
       )}
-    </Stack>
+    </>
   );
 }

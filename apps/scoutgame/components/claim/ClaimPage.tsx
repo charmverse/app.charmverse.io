@@ -2,11 +2,11 @@ import { Stack } from '@mui/material';
 import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 
 import { PageContainer } from '../layout/PageContainer';
 
-import { BuilderRewardsTable } from './components/BuilderRewardsTable/BuilderRewardsTable';
+import { BuilderRewardsScreen } from './components/BuilderRewardsScreen/BuilderRewardsScreen';
+import { LoadingTable } from './components/common/LoadingTable';
 import { ClaimedPointsTable } from './components/PointsTable/ClaimedPointsTable';
 import { UnclaimedPointsTable } from './components/PointsTable/UnclaimedPointsTable';
 
@@ -34,7 +34,7 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
             username={username}
             bonusPartners={bonusPartners}
           />
-          <Suspense fallback={<LoadingComponent isLoading />}>
+          <Suspense fallback={<LoadingTable />}>
             <UnclaimedPointsTable />
           </Suspense>
           <Stack
@@ -45,26 +45,24 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
               }
             }}
           >
-            <Suspense fallback={<LoadingComponent isLoading />}>
-              <BuilderRewardsTable period={period} />
-            </Suspense>
+            <BuilderRewardsScreen period={period} />
           </Stack>
-          <Suspense fallback={<LoadingComponent isLoading />}>
+          <Suspense fallback={<LoadingTable />}>
             <ClaimedPointsTable />
           </Suspense>
         </Stack>
         <Stack
           sx={{
             flex: 1,
+            height: 'fit-content',
+            justifyContent: 'flex-start',
             display: {
               xs: 'none',
               md: 'flex'
             }
           }}
         >
-          <Suspense fallback={<LoadingComponent isLoading />}>
-            <BuilderRewardsTable period={period} />
-          </Suspense>
+          <BuilderRewardsScreen period={period} />
         </Stack>
       </Stack>
     </PageContainer>
