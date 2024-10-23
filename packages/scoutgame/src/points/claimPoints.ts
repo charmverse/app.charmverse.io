@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { currentSeason, getCurrentWeek, seasons } from '../dates';
+import { currentSeason, seasons } from '../dates';
 
 export async function claimPoints({ season = currentSeason, userId }: { season?: string; userId: string }) {
   const previousSeason = seasons.findLast((s) => s.start < season)?.start;
@@ -10,9 +10,6 @@ export async function claimPoints({ season = currentSeason, userId }: { season?:
       recipientId: userId,
       claimedAt: null,
       event: {
-        week: {
-          not: getCurrentWeek()
-        },
         season: { in: seasonsToQuery }
       }
     },
