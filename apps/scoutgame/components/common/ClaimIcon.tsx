@@ -1,11 +1,34 @@
 import { SvgIcon } from '@mui/material';
 
-export function ClaimIcon() {
+export function ClaimIcon({ animate = false }: { animate?: boolean }) {
   return (
     <SvgIcon
       sx={{
         width: 25,
-        height: 25
+        height: 25,
+        '@keyframes wiggle': {
+          '0%': {
+            transform: 'rotate(0deg)',
+            scale: 1
+          },
+          '5%': {
+            transform: 'rotate(-15deg)',
+            scale: 1.25
+          },
+          '10%': {
+            transform: 'rotate(0deg)',
+            scale: 1
+          },
+          '15%': {
+            transform: 'rotate(15deg)',
+            scale: 1.25
+          },
+          '20%': {
+            transform: 'rotate(0deg)',
+            scale: 1
+          }
+        },
+        animation: animate ? 'wiggle 10s ease-in-out infinite' : 'none'
       }}
     >
       <svg width='25px' height='25px' viewBox='0 0 25 25' version='1.1'>

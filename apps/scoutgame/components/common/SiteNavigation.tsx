@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge, BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -83,16 +83,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Claim'
           href='/claim'
           value='claim'
-          icon={
-            <Badge
-              color='error'
-              variant='dot'
-              overlap={isDesktop ? 'rectangular' : 'circular'}
-              invisible={!claimablePoints || claimablePoints.points === 0}
-            >
-              <ClaimIcon />
-            </Badge>
-          }
+          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
         <BottomNavigationAction

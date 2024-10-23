@@ -7,18 +7,18 @@ export async function getClaimablePoints({ userId, week }: { week?: string; user
   bonusPartners: string[];
 }> {
   const previousSeason = getPreviousSeason(currentSeason);
-  const seasons = [previousSeason, currentSeason].filter(Boolean);
-  if (seasons.length === 0) {
+  const claimableSeasons = [previousSeason, currentSeason].filter(Boolean);
+  if (claimableSeasons.length === 0) {
     throw new Error(`No seasons found to claim points: ${currentSeason}`);
   }
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
-      claimedAt: { equals: null },
+      claimedAt: null,
       event: {
         week,
         season: {
-          in: seasons
+          in: claimableSeasons
         }
       }
     },
