@@ -117,10 +117,9 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
             ))}
             <DividerRow />
             <TableRow>
-              <TableCell>
+              <TableCell colSpan={week ? 3 : 2}>
                 <Typography>Total Scout Points</Typography>
               </TableCell>
-              <TableCell colSpan={isSeason ? 1 : 2} />
               <TableCell align='right'>
                 <PointsCell points={totalPoints} />
               </TableCell>

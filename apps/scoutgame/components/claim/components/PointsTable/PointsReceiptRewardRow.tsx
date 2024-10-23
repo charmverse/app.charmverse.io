@@ -22,15 +22,7 @@ function BuilderRewardRow({ builderReward }: { builderReward: BuilderPointsRecei
     <>
       <DividerRow />
       <TableRow key={`${builderReward.weekNumber}builder-rewards`}>
-        <TableCell
-          align='left'
-          sx={{
-            width: {
-              xs: 175,
-              md: 225
-            }
-          }}
-        >
+        <TableCell align='left'>
           <Typography>Builder rewards</Typography>
         </TableCell>
         <TableCell align='center'>
@@ -53,15 +45,7 @@ function LeaderboardRankRewardRow({
     <>
       <DividerRow />
       <TableRow key={`${leaderboardRankReward.weekNumber}rank`}>
-        <TableCell
-          align='left'
-          sx={{
-            width: {
-              xs: 175,
-              md: 225
-            }
-          }}
-        >
+        <TableCell align='left'>
           <Typography>Finished {getOrdinal(leaderboardRankReward.rank)}</Typography>
         </TableCell>
         <TableCell align='center'>
@@ -80,15 +64,7 @@ function SoldNftsRewardRow({ soldNftsReward }: { soldNftsReward: SoldNftsPointsR
     <>
       <DividerRow />
       <TableRow key={`${soldNftsReward.weekNumber}sold-nft`}>
-        <TableCell
-          align='left'
-          sx={{
-            width: {
-              xs: 175,
-              md: 225
-            }
-          }}
-        >
+        <TableCell align='left'>
           <Stack direction='row' alignItems='center' justifyContent='flex-start' gap={0.5}>
             <Typography>Sold {soldNftsReward.quantity}</Typography>
             <Image alt='card' src='/images/profile/icons/card.svg' width={18} height={18} />

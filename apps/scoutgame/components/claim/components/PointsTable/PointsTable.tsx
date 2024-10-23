@@ -24,21 +24,11 @@ export function PointsTable({
         <TableHead
           sx={{
             backgroundColor: 'background.dark',
-            '& .MuiTableCell-root': { padding: 1, px: 1.5, borderBottom: 'none' }
+            '& .MuiTableCell-root': { padding: 1, px: 1.5, borderBottom: 'none', width: '33.33%' }
           }}
         >
           <TableRow>
-            <TableCell
-              align='left'
-              sx={{
-                width: {
-                  xs: 175,
-                  md: 225
-                }
-              }}
-            >
-              ACTION
-            </TableCell>
+            <TableCell align='left'>ACTION</TableCell>
             <TableCell align='center'>WEEK</TableCell>
             <TableCell align='right'>POINTS</TableCell>
           </TableRow>
@@ -47,7 +37,7 @@ export function PointsTable({
           <TableBody
             sx={{
               backgroundColor: 'background.dark',
-              '& .MuiTableCell-root': { p: 1, borderBottom: 'none', px: 1.5 }
+              '& .MuiTableCell-root': { p: 1, borderBottom: 'none', px: 1.5, width: '33.33%' }
             }}
           >
             {pointsReceiptRewards.map((pointsReceiptReward) => (
