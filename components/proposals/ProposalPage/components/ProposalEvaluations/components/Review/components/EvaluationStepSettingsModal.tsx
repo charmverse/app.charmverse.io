@@ -14,13 +14,15 @@ export function EvaluationStepSettingsModal({
   evaluationInput,
   templateId,
   saveEvaluation,
-  updateEvaluation
+  updateEvaluation,
+  isAdmin
 }: {
   close: VoidFunction;
   evaluationInput: ProposalEvaluationValues;
   templateId?: string | null;
   saveEvaluation: (evaluation: ProposalEvaluationValues) => void;
   updateEvaluation: (evaluation: Partial<ProposalEvaluationValues>) => void;
+  isAdmin: boolean;
 }) {
   const { data: proposalTemplate } = useGetProposalTemplate(templateId);
   const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput as ProposalEvaluationInput);
@@ -42,7 +44,7 @@ export function EvaluationStepSettingsModal({
           Cancel
         </Button>
         <Button
-          disabled={evaluationInputError}
+          disabled={!isAdmin && evaluationInputError}
           disabledTooltip={evaluationInputError}
           onClick={() => saveEvaluation(evaluationInput)}
         >
