@@ -24,6 +24,7 @@ export const seasons = [
 ] as const;
 
 export type Season = (typeof seasons)[number]['start'];
+export const seasonStarts = seasons.map((s) => s.start);
 
 export const currentSeason: Season = '2024-W41';
 
@@ -46,6 +47,10 @@ export function getLastWeek(now: DateTime = DateTime.utc()): ISOWeek {
 
 export function getPreviousWeek(week: ISOWeek): ISOWeek {
   return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
+}
+
+export function getNextWeek(week: ISOWeek): ISOWeek {
+  return _formatWeek(getDateFromISOWeek(week).plus({ week: 1 }));
 }
 
 export function getPreviousSeason(season: Season): Season {

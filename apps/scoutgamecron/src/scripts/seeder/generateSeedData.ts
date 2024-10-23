@@ -38,9 +38,9 @@ function assignBuildersToScout(builders: BuilderInfo[]) {
 
 export async function generateSeedData() {
   // Total number of users that are builders (should be less than totalUsers)
-  const totalBuilders = faker.number.int({ min: 25, max: 50 });
+  const totalBuilders = faker.number.int({ min: 50, max: 100 });
   // Total number of github repos
-  const totalGithubRepos = faker.number.int({ min: 10, max: 25 });
+  const totalGithubRepos = faker.number.int({ min: 25, max: 50 });
 
   const totalScoutBuilders = faker.number.int({ min: 5, max: 15 });
 
@@ -88,7 +88,7 @@ export async function generateSeedData() {
   }
 
   for (let i = 0; i < totalScouts; i++) {
-    const scout = await generateScout({ index: i });
+    const scout = await generateScout({ index: i + totalBuilders });
     // Realistically a scout will only scout a few builders, by purchasing multiple of their nfts
     const assignedBuilders = assignBuildersToScout(builders);
     scouts.push({
@@ -111,10 +111,13 @@ export async function generateSeedData() {
 
     for (const builder of builders) {
       const dailyGithubEvents = await generateBuilderEvents(
-        builder.githubUser,
-        builder.assignedRepos,
-        repoPRCounters,
-        date
+        {
+          builderId: builder.id,
+          githubUser: builder.githubUser,
+          githubRepos: builder.assignedRepos,
+          repoPRCounters,
+          date
+        }
       );
       totalGithubEvents += dailyGithubEvents;
     }

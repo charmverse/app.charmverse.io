@@ -30,12 +30,12 @@ export async function recordMergedPullRequest({
   pullRequest,
   repo,
   season,
-  isFirstMergedPullRequest: _isFirstMergedPullRequest,
+  skipFirstMergedPullRequestCheck,
   now = DateTime.utc()
 }: {
   pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
-  isFirstMergedPullRequest?: boolean;
+  skipFirstMergedPullRequestCheck?: boolean;
   season: Season;
   now?: DateTime;
 }) {
@@ -43,7 +43,7 @@ export async function recordMergedPullRequest({
     throw new Error('Pull request was not merged');
   }
   const week = getWeekFromDate(now.toJSDate());
-  const start = getStartOfSeason(season);
+  const start = getStartOfSeason(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -95,8 +95,8 @@ export async function recordMergedPullRequest({
     }
   });
 
-  let isFirstMergedPullRequest = _isFirstMergedPullRequest ?? totalMergedPullRequests === 0;
-  if (isFirstMergedPullRequest) {
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0;
+  if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
       defaultBranch: repo.defaultBranch,

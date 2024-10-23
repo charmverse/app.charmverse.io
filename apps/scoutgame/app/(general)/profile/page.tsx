@@ -29,6 +29,10 @@ export default async function Profile({
     return null;
   }
 
+  if ((tab as string) === 'win') {
+    redirect('/claim');
+  }
+
   if (!user.onboardedAt) {
     log.info('Redirect user to welcome page', { userId: user?.id });
     redirect('/welcome');

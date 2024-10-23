@@ -9,13 +9,12 @@ import type { BasicUserInfo } from 'lib/users/interfaces';
 import { PageContainer } from '../layout/PageContainer';
 
 import { BuilderProfile } from './components/BuilderProfile/BuilderProfile';
-import { PointsClaimScreen } from './components/PointsClaimScreen/PointsClaimScreen';
 import { ProfileStats } from './components/ProfileStats';
 import { ProfileTabsMenu } from './components/ProfileTabsMenu';
 import { ScoutProfile } from './components/ScoutProfile/ScoutProfile';
 import { ScoutProfileLoading } from './components/ScoutProfile/ScoutProfileLoading';
 
-export type ProfileTab = 'build' | 'scout' | 'win' | 'scout-build';
+export type ProfileTab = 'build' | 'scout' | 'scout-build';
 
 export type UserProfileWithPoints = BasicUserInfo &
   UserStats & {
@@ -79,9 +78,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         </Stack>
 
         <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : <LoadingComponent isLoading />}>
-          {tab === 'win' ? (
-            <PointsClaimScreen userId={user.id} username={user.username} />
-          ) : tab === 'scout' ? (
+          {tab === 'scout' ? (
             <ScoutProfile userId={user.id} />
           ) : tab === 'build' ? (
             <BuilderProfile builder={user} />
