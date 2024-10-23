@@ -1,14 +1,15 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { Clear as ClearIcon } from '@mui/icons-material';
 import {
+  Stack,
   CircularProgress,
   Container,
   InputAdornment,
   Link,
   Typography,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -21,6 +22,8 @@ import {
   TableSortLabel,
   Button
 } from '@mui/material';
+import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
+import Image from 'next/image';
 import React, { useState, useMemo } from 'react';
 
 import { ExportButton } from 'components/common/ExportButton';
@@ -173,7 +176,9 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 <TableCell>{repo.prs}</TableCell>
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
-                <TableCell>{repo.bonusPartner ? repo.bonusPartner : ''}</TableCell>
+                <TableCell>
+                  {repo.bonusPartner ? <BonusPartnersDisplay bonusPartner={repo.bonusPartner} /> : ''}
+                </TableCell>
                 <TableCell align='center'>
                   <DeleteRepoButton onDelete={() => mutate()} repoId={repo.id} deletedAt={repo.deletedAt} />
                 </TableCell>
@@ -183,5 +188,19 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
         </Table>
       </TableContainer>
     </Container>
+  );
+}
+
+function BonusPartnersDisplay({ bonusPartner, size = 20 }: { bonusPartner: string; size?: number }) {
+  const info = bonusPartnersRecord[bonusPartner];
+  if (!info) {
+    log.warn(`No partner info found for ${bonusPartner}`);
+    return null;
+  }
+  return (
+    <Stack flexDirection='row' gap={1} alignItems='center'>
+      <Image width={20} height={20} src={info.icon} alt='Bonus partner' />
+      {info.name}
+    </Stack>
   );
 }

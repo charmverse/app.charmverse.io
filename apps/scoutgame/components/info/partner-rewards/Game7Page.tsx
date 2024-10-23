@@ -38,11 +38,6 @@ function Document() {
           </a>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/PermissionlessGames/degen-casino' target='_blank' rel='noreferrer'>
-            https://github.com/PermissionlessGames/degen-casino
-          </a>
-        </ListItem>
-        <ListItem>
           <a href='https://github.com/G7DAO/seer' target='_blank' rel='noreferrer'>
             https://github.com/G7DAO/seer
           </a>
