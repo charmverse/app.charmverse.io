@@ -21,7 +21,7 @@ function BuilderRewardRow({ builderReward }: { builderReward: BuilderPointsRecei
   return (
     <>
       <DividerRow />
-      <TableRow key={`${builderReward.weekNumber}builder-rewards`}>
+      <TableRow key={`${builderReward.period}builder-rewards`}>
         <TableCell
           align='left'
           sx={{
@@ -31,7 +31,7 @@ function BuilderRewardRow({ builderReward }: { builderReward: BuilderPointsRecei
           <Typography>Builder rewards</Typography>
         </TableCell>
         <TableCell align='center'>
-          <Typography>{builderReward.weekNumber}</Typography>
+          <Typography>{builderReward.period}</Typography>
         </TableCell>
         <TableCell align='right'>
           <PointsCell points={builderReward.points} />
@@ -49,7 +49,7 @@ function LeaderboardRankRewardRow({
   return (
     <>
       <DividerRow />
-      <TableRow key={`${leaderboardRankReward.weekNumber}rank`}>
+      <TableRow key={`${leaderboardRankReward.period}rank`}>
         <TableCell
           align='left'
           sx={{
@@ -59,7 +59,7 @@ function LeaderboardRankRewardRow({
           <Typography>Finished {getOrdinal(leaderboardRankReward.rank)}</Typography>
         </TableCell>
         <TableCell align='center'>
-          <Typography>{leaderboardRankReward.weekNumber}</Typography>
+          <Typography>{leaderboardRankReward.period}</Typography>
         </TableCell>
         <TableCell align='right'>
           <PointsCell points={leaderboardRankReward.points} />
@@ -73,7 +73,7 @@ function SoldNftsRewardRow({ soldNftsReward }: { soldNftsReward: SoldNftsPointsR
   return (
     <>
       <DividerRow />
-      <TableRow key={`${soldNftsReward.weekNumber}sold-nft`}>
+      <TableRow key={`${soldNftsReward.period}sold-nft`}>
         <TableCell
           align='left'
           sx={{
@@ -86,7 +86,7 @@ function SoldNftsRewardRow({ soldNftsReward }: { soldNftsReward: SoldNftsPointsR
           </Stack>
         </TableCell>
         <TableCell align='center'>
-          <Typography>{soldNftsReward.weekNumber}</Typography>
+          <Typography>{soldNftsReward.period}</Typography>
         </TableCell>
         <TableCell align='right'>
           <PointsCell points={soldNftsReward.points} />

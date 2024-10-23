@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getPreviousSeason, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
+import type { Season } from '@packages/scoutgame/dates';
+import { currentSeason, getPreviousSeason, getSeasonWeekFromISOWeek, seasonStarts } from '@packages/scoutgame/dates';
 
 export type PointsReceiptRewardType = 'builder' | 'sold_nfts' | 'leaderboard_rank';
 
 type PointsReceiptRewardBase = {
-  weekNumber: number;
+  period: string;
   points: number;
   type: PointsReceiptRewardType;
 };
@@ -47,7 +48,8 @@ export async function getPointsReceiptsRewards({
       claimedAt: isClaimed ? { not: null } : { equals: null },
       event: {
         season: {
-          in: seasons
+          // Can only claim points for this season and previous seasons
+          in: isClaimed ? seasonStarts : seasons
         }
       },
       value: {
@@ -113,48 +115,51 @@ export async function getPointsReceiptsRewards({
     const points = receipt.value;
     const week = receipt.event.week;
     const weeklyRank = weeklyRankRecord[week];
+    const seasonIndex = seasonStarts.indexOf(receipt.event.season as Season);
     const weekNumber = getSeasonWeekFromISOWeek({
       season: receipt.event.season,
       week
     });
 
+    const period = seasonIndex < 2 ? `S${seasonIndex - 1} W1` : `S1 W${weekNumber}`;
+
     if (receipt.event.type === 'nft_purchase' && receipt.event.nftPurchaseEvent) {
-      if (!soldNftRewards[week]) {
-        soldNftRewards[week] = {
+      if (!soldNftRewards[period]) {
+        soldNftRewards[period] = {
           points: 0,
           quantity: 0,
-          weekNumber,
+          period,
           type: 'sold_nfts'
         };
       }
-      soldNftRewards[week].points += receipt.value;
-      soldNftRewards[week].quantity += receipt.event.nftPurchaseEvent.tokensPurchased;
+      soldNftRewards[period].points += receipt.value;
+      soldNftRewards[period].quantity += receipt.event.nftPurchaseEvent.tokensPurchased;
     } else if (receipt.event.type === 'gems_payout') {
       if (receipt.event.builderId !== receipt.recipientId) {
-        if (!builderRewards[week]) {
-          builderRewards[week] = {
+        if (!builderRewards[period]) {
+          builderRewards[period] = {
             points: 0,
-            weekNumber,
+            period,
             type: 'builder',
             bonusPartners: []
           };
         }
-        builderRewards[week].points += points;
+        builderRewards[period].points += points;
         const bonusPartner = receipt.event.bonusPartner;
         if (bonusPartner) {
-          builderRewards[week].bonusPartners.push(bonusPartner);
+          builderRewards[period].bonusPartners.push(bonusPartner);
           bonusPartners.add(bonusPartner);
         }
       } else if (weeklyRank) {
-        if (!leaderboardRankRewards[week]) {
-          leaderboardRankRewards[week] = {
+        if (!leaderboardRankRewards[period]) {
+          leaderboardRankRewards[period] = {
             points: 0,
             rank: weeklyRank,
-            weekNumber,
+            period,
             type: 'leaderboard_rank'
           };
         }
-        leaderboardRankRewards[week].points += points;
+        leaderboardRankRewards[period].points += points;
       }
     }
   }
@@ -164,9 +169,9 @@ export async function getPointsReceiptsRewards({
     ...Object.values(soldNftRewards),
     ...Object.values(leaderboardRankRewards)
   ].sort((a, b) => {
-    if (a.weekNumber === b.weekNumber) {
+    if (a.period === b.period) {
       return b.points - a.points;
     }
-    return b.weekNumber - a.weekNumber;
+    return b.period.localeCompare(a.period);
   });
 }

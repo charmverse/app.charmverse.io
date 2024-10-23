@@ -48,7 +48,7 @@ export function PointsTable({
             }}
           >
             {pointsReceiptRewards.map((pointsReceiptReward) => (
-              <PointsReceiptRewardRow key={pointsReceiptReward.weekNumber} pointsReceiptReward={pointsReceiptReward} />
+              <PointsReceiptRewardRow key={pointsReceiptReward.period} pointsReceiptReward={pointsReceiptReward} />
             ))}
           </TableBody>
         ) : null}

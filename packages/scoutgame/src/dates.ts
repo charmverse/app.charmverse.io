@@ -24,6 +24,7 @@ export const seasons = [
 ] as const;
 
 export type Season = (typeof seasons)[number]['start'];
+export const seasonStarts = seasons.map((s) => s.start);
 
 export const currentSeason: Season = '2024-W41';
 
