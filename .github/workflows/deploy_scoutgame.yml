@@ -222,7 +222,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      npm run scoutgame:e2e:ci -- -- --workers=2 || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
+                      npm run scoutgame:e2e:ci -- -- --timeout=20000 --workers=2 || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
 
       # Upload reporst for Github Actions
       # Sources:
