@@ -33,9 +33,6 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
       },
       pointsReceived: {
         where: {
-          value: {
-            gt: 0
-          },
           event: {
             type: 'gems_payout'
           }
@@ -70,17 +67,19 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
   scout.pointsReceived.forEach((receipt) => {
     const builder = receipt.event.builder;
     const builderId = builder.id;
-    const cardsHeld = builderTokensRecord[builderId];
-    if (!builderRewardsRecord[builderId]) {
-      builderRewardsRecord[builderId] = {
-        username: builder.username,
-        avatar: builder.avatar,
-        cardsHeld,
-        points: 0,
-        rank: null
-      };
+    const cardsHeld = builderTokensRecord[builderId] || 0;
+    if (cardsHeld) {
+      if (!builderRewardsRecord[builderId]) {
+        builderRewardsRecord[builderId] = {
+          username: builder.username,
+          avatar: builder.avatar,
+          cardsHeld,
+          points: 0,
+          rank: null
+        };
+      }
+      builderRewardsRecord[builderId].points += receipt.value;
     }
-    builderRewardsRecord[builderId].points += receipt.value;
   });
 
   return Object.values(builderRewardsRecord).sort((a, b) => b.points - a.points);
@@ -120,9 +119,6 @@ export async function getWeeklyBuilderRewards({
       },
       pointsReceived: {
         where: {
-          value: {
-            gt: 0
-          },
           event: {
             week,
             type: 'gems_payout'
