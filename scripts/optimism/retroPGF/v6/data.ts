@@ -15,7 +15,7 @@ export const templateId = '58ccc779-7d07-4918-896b-4d19f753ec04';
 export const farcasterUsersFile = '../__data/optimism/farcaster-profiles.json';
 export const savedFarcasterProfiles = JSON.parse(readFileSync(farcasterUsersFile).toString());
 
-export const applicationsFile = '../__data/optimism/v6_applications.json';
+export const applicationsFile = '../__data/optimism/v6_applications_updated.json';
 
 // Schema for the JSON file provided by Optimism
 export type RetroApplication = {
