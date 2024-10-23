@@ -1,7 +1,7 @@
+import { NEYNAR_SIGNER_ID } from '@packages/farcaster/constants';
+import { writeToFarcaster } from '@packages/farcaster/messaging/writeToFarcaster';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
-import { baseUrl, isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@root/config/constants';
-import { NEYNAR_SIGNER_ID } from '@root/lib/farcaster/constants';
-import { writeToFarcaster } from '@root/lib/farcaster/messaging/writeToFarcaster';
+import { baseUrl, isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@packages/utils/env';
 
 import type { TierChangeResult } from './refreshPercentilesForEveryone';
 
