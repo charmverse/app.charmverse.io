@@ -94,13 +94,15 @@ export async function BuilderRewardsTable({ period }: { period: string }) {
                 <DividerRow />
                 <TableRow key={reward.username}>
                   <TableCell>
-                    <Stack direction='row' alignItems='center' gap={1}>
-                      <Avatar src={reward.avatar} name={reward.username} size='small' />
-                      <Typography>{reward.username}</Typography>
-                    </Stack>
+                    <Link href={`/u/${reward.username}`}>
+                      <Stack direction='row' alignItems='center' gap={1}>
+                        <Avatar src={reward.avatar} name={reward.username} size='small' />
+                        <Typography>{reward.username}</Typography>
+                      </Stack>
+                    </Link>
                   </TableCell>
                   <TableCell align='center'>
-                    <Typography>0</Typography>
+                    <Typography>{reward.cardsHeld}</Typography>
                   </TableCell>
                   {reward.rank ? (
                     <TableCell align='center'>

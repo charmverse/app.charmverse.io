@@ -1,14 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
-export async function getSeasonBuilderRewards({ userId }: { userId: string }): Promise<
-  {
-    username: string;
-    avatar: string | null;
-    points: number;
-    rank: null;
-  }[]
-> {
+type BuilderReward = {
+  username: string;
+  avatar: string | null;
+  points: number;
+  rank: number | null;
+  cardsHeld: number;
+};
+
+export async function getSeasonBuilderRewards({ userId }: { userId: string }): Promise<BuilderReward[]> {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
@@ -39,16 +41,40 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
     }
   });
 
-  const buildersRecord: Record<string, { username: string; avatar: string | null }> = {};
-  builders.forEach((builder) => {
-    buildersRecord[builder.id] = {
-      username: builder.username,
-      avatar: builder.avatar
-    };
+  const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
+    where: {
+      scoutId: userId
+    },
+    select: {
+      builderNFT: {
+        select: {
+          builderId: true
+        }
+      },
+      tokensPurchased: true
+    }
   });
 
-  const builderRewardsRecord: Record<string, { username: string; avatar: string | null; points: number; rank: null }> =
-    {};
+  const builderTokensRecord: Record<string, number> = {};
+
+  nftPurchaseEvents.forEach((event) => {
+    const builderId = event.builderNFT.builderId;
+    builderTokensRecord[builderId] = (builderTokensRecord[builderId] || 0) + event.tokensPurchased;
+  });
+
+  const buildersRecord: Record<string, Omit<BuilderReward, 'points' | 'rank'>> = {};
+  builders.forEach((builder) => {
+    const cardsHeld = builderTokensRecord[builder.id] || 0;
+    if (cardsHeld) {
+      buildersRecord[builder.id] = {
+        username: builder.username,
+        avatar: builder.avatar,
+        cardsHeld
+      };
+    }
+  });
+
+  const builderRewardsRecord: Record<string, BuilderReward> = {};
 
   pointsReceipts.forEach((receipt) => {
     const builderId = receipt.event.builderId;
@@ -58,6 +84,7 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
         builderRewardsRecord[builderId] = {
           username: builder.username,
           avatar: builder.avatar,
+          cardsHeld: builder.cardsHeld,
           points: 0,
           rank: null
         };
@@ -69,14 +96,13 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
   return Object.values(builderRewardsRecord).sort((a, b) => b.points - a.points);
 }
 
-export async function getWeeklyBuilderRewards({ userId, week }: { userId: string; week: string }): Promise<
-  {
-    rank: number | null;
-    username: string;
-    avatar: string | null;
-    points: number;
-  }[]
-> {
+export async function getWeeklyBuilderRewards({
+  userId,
+  week
+}: {
+  userId: string;
+  week: string;
+}): Promise<BuilderReward[]> {
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       recipientId: userId,
@@ -112,18 +138,52 @@ export async function getWeeklyBuilderRewards({ userId, week }: { userId: string
     }
   });
 
+  const uniqueBuilderIds = Array.from(new Set(pointsReceipts.map((receipt) => receipt.event.builder.id)));
+
+  const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
+    where: {
+      scoutId: userId,
+      builderEvent: {
+        week: {
+          lte: week
+        }
+      },
+      builderNFT: {
+        builderId: { in: uniqueBuilderIds },
+        season: currentSeason
+      }
+    },
+    select: {
+      builderNFT: {
+        select: {
+          builderId: true
+        }
+      },
+      tokensPurchased: true
+    }
+  });
+
+  const builderTokensRecord: Record<string, number> = {};
+
+  nftPurchaseEvents.forEach((event) => {
+    const builderId = event.builderNFT.builderId;
+    builderTokensRecord[builderId] = (builderTokensRecord[builderId] || 0) + event.tokensPurchased;
+  });
+
   return pointsReceipts
     .map((receipt) => {
       const builder = receipt.event.builder;
+      const cardsHeld = builderTokensRecord[builder.id] || 0;
       const rank = builder.userWeeklyStats[0]?.rank || null;
-      if (rank === null) {
+      if (rank === null || cardsHeld === 0) {
         return null;
       }
       return {
         rank,
         username: builder.username,
         avatar: builder.avatar,
-        points: receipt.value
+        points: receipt.value,
+        cardsHeld
       };
     })
     .filter(isTruthy)
