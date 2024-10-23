@@ -1,7 +1,6 @@
 'use client';
 
 import { Badge, BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -13,6 +12,7 @@ import { useUser } from 'components/layout/UserProvider';
 import { useGetClaimablePoints } from 'hooks/api/session';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
+import { ClaimIcon } from './ClaimIcon';
 import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
@@ -90,7 +90,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
               overlap={isDesktop ? 'rectangular' : 'circular'}
               invisible={!claimablePoints || claimablePoints.points === 0}
             >
-              <Image src='/images/claim-icon.svg' alt='Claim' width={26} height={26} />
+              <ClaimIcon />
             </Badge>
           }
           onClick={(e) => openAuthModal?.(e, 'claim')}
