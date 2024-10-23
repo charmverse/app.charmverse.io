@@ -2,7 +2,7 @@ import { prisma, type GithubRepo, type GithubUser } from '@charmverse/core/prism
 import { faker } from '@faker-js/faker';
 import { DateTime } from 'luxon';
 
-import { currentSeason, getWeekFromDate } from '@packages/scoutgame/dates';
+import { currentSeason, getWeekFromDate, Season } from '@packages/scoutgame/dates';
 import { generatePullRequest } from './generatePullRequest';
 import { randomTimeOfDay } from './generator';
 import { PullRequest } from '../../tasks/processBuilderActivity/github/getPullRequestsByUser';
@@ -19,7 +19,7 @@ async function processBuilderActivity({
 }: {
   builderId: string;
   date: DateTime,
-  season: string,
+  season: Season,
   pullRequests: PullRequest[],
 }) {
   const week = getWeekFromDate(date.toJSDate());

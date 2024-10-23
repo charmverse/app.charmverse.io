@@ -35,7 +35,7 @@ export async function getClaimablePoints({ userId, week }: { week?: string; user
   const totalUnclaimedPoints = pointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
   const bonusPartners = Array.from(new Set(pointsReceipts.map((receipt) => receipt.event.bonusPartner))).filter(
     (bp) => bp !== null
-  );
+  ) as string[];
 
   return {
     points: totalUnclaimedPoints,
