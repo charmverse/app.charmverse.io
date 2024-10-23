@@ -1,5 +1,6 @@
 'use client';
 
+import { LoadingButton } from '@mui/lab';
 import { Button, Dialog, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
@@ -25,7 +26,7 @@ export function PointsClaimButton() {
 
   return (
     <>
-      <Button
+      <LoadingButton
         variant='contained'
         color='primary'
         sx={{
@@ -34,12 +35,13 @@ export function PointsClaimButton() {
             md: '100%'
           }
         }}
+        loading={isExecuting}
         data-testid='claim-points-button'
         disabled={isExecuting}
         onClick={handleClaim}
       >
         Claim
-      </Button>
+      </LoadingButton>
       <Dialog open={showModal} onClose={handleCloseModal} data-testid='claim-points-success-modal'>
         <Stack gap={2} textAlign='center' my={2}>
           <Typography color='secondary' variant='h5' fontWeight={600}>
