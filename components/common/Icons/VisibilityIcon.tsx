@@ -22,9 +22,9 @@ export function VisibilityIcon({
   }
 
   const icon = visible ? (
-    <MuiVisibilityIcon color='gray' fontSize={size} onClick={handleClick} />
+    <MuiVisibilityIcon fontSize={size} onClick={handleClick} />
   ) : (
-    <VisibilityOffIcon color='gray' fontSize={size} onClick={handleClick} />
+    <VisibilityOffIcon fontSize={size} onClick={handleClick} />
   );
 
   const tooltip = visible ? visibleTooltip : hiddenTooltip;
