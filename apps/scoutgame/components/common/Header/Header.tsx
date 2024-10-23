@@ -98,7 +98,7 @@ export function Header() {
                     onClick={handleOpenUserMenu}
                     sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
                   >
-                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary'>
+                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-testid='user-points-balance'>
                       {user.currentBalance}
                     </Typography>
                     <Image

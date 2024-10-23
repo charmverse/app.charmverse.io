@@ -34,12 +34,13 @@ export function PointsClaimButton() {
             md: '100%'
           }
         }}
+        data-testid='claim-points-button'
         disabled={isExecuting}
         onClick={handleClaim}
       >
         Claim
       </Button>
-      <Dialog open={showModal} onClose={handleCloseModal}>
+      <Dialog open={showModal} onClose={handleCloseModal} data-testid='claim-points-success-modal'>
         <Stack gap={2} textAlign='center' my={2}>
           <Typography color='secondary' variant='h5' fontWeight={600}>
             Congratulations!
