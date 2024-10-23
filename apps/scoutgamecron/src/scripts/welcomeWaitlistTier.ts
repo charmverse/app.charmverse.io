@@ -43,7 +43,7 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
     orderBy: {
       fid: 'asc'
     },
-    skip: 2
+    skip: 0
   });
 
   const totalUsersInTier = users.length;
@@ -51,8 +51,8 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
   log.info(`Processing ${totalUsersInTier} users in tier ${tier}`);
 
 
-  const limit = totalUsersInTier;
-  // const limit = 1;
+ // const limit = totalUsersInTier;
+   const limit = 1;
 
   for (let i = 0; i < limit; i++) {
     const user = users[i];
@@ -63,4 +63,4 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
 }
 
 
-// welcomeWaitlistTier('rare').then(console.log).catch(console.error);
+welcomeWaitlistTier('common').then(console.log).catch(console.error);
