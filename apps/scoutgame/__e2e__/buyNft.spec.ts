@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { installMockWallet } from '@johanneskares/wallet-mock';
+import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { mockBuilder, mockBuilderNft } from '@packages/scoutgame/testing/database';
 import { delay } from '@root/lib/utils/async';
 import { custom, http } from 'viem';
@@ -21,9 +22,15 @@ test.describe('Buy Nft', () => {
         [optimism.id]: (config) => {
           return custom({
             request: async ({ method, params }) => {
+              // console.log('method inside metamask method', method);
+              // console.log('method inside metamask params', params);
               // Mock only this RPC call
               if (method === 'eth_estimateGas') {
-                return '500000';
+                return 500000;
+              }
+
+              if (method === 'eth_sendRawTransaction') {
+                return '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
               }
 
               const response = await http()(config).request({ method, params });
@@ -37,7 +44,7 @@ test.describe('Buy Nft', () => {
             request: async ({ method, params }) => {
               // Mock only this RPC call
               if (method === 'eth_estimateGas') {
-                return '500000';
+                return 500000;
               }
 
               const response = await http()(config).request({ method, params });
@@ -67,7 +74,7 @@ test.describe('Buy Nft', () => {
       builderId: builder.id,
       chainId: 10,
       // This is the op mainnet real contract
-      contractAddress: '0x743ec903fe6d05e73b19a6db807271bb66100e83',
+      contractAddress: getBuilderContractAddress(),
       tokenId: 1
     });
 

@@ -2,7 +2,7 @@ import type { BuilderEvent, BuilderEventType, GithubRepo, Scout } from '@charmve
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { getCurrentWeek } from '../dates';
+import { currentSeason, getCurrentWeek } from '../dates';
 
 import { randomLargeInt, mockSeason } from './generators';
 
@@ -266,7 +266,7 @@ export async function mockBuilderNft({
   tokenId = Math.round(Math.random() * 10000000),
   contractAddress = '0x1',
   owners = [],
-  season = mockSeason
+  season = currentSeason
 }: {
   builderId: string;
   chainId?: number;
