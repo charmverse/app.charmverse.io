@@ -16,7 +16,7 @@ import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 import { LoadingTable } from '../common/LoadingTable';
 
-import { BuilderRewardsTable } from './BuilderRewardsTable';
+import { BuilderRewardsTableContainer } from './BuilderRewardsTableContainer';
 
 export function BuilderRewardsScreen({ period }: { period: string }) {
   const isSeason = period === 'season';
@@ -56,7 +56,7 @@ export function BuilderRewardsScreen({ period }: { period: string }) {
         </Link>
       </Stack>
       <Suspense fallback={<LoadingTable />}>
-        <BuilderRewardsTable week={week} />
+        <BuilderRewardsTableContainer week={week} />
       </Suspense>
     </Stack>
   );

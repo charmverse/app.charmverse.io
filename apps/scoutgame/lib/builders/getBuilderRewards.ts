@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
-type BuilderReward = {
+export type BuilderReward = {
   username: string;
   avatar: string | null;
   points: number;

@@ -1,4 +1,6 @@
-import { Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+'use client';
+
+import { Paper, Table, TableCell, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { ReactNode } from 'react';
 
@@ -68,7 +70,10 @@ export function PointsTable({
           }}
         >
           {pointsReceiptRewards.map((pointsReceiptReward) => (
-            <PointsReceiptRewardRow key={pointsReceiptReward.period} pointsReceiptReward={pointsReceiptReward} />
+            <PointsReceiptRewardRow
+              key={`${pointsReceiptReward.period}-${pointsReceiptReward.type}`}
+              pointsReceiptReward={pointsReceiptReward}
+            />
           ))}
         </StyledTableBody>
       </Table>

@@ -7,14 +7,14 @@ export const StyledTableBody = styled(TableBody)`
   background-color: ${theme.palette.background.dark};
   & .MuiTableCell-root {
     padding: ${theme.spacing(1)};
-    border-bottom: none;
+    border-bottom: 4px solid ${theme.palette.background.default};
     padding-left: ${theme.spacing(1.5)};
     padding-right: ${theme.spacing(1.5)};
     & .MuiTypography-root {
-      [${theme.breakpoints.down('md')}]: {
+      ${theme.breakpoints.down('md')} {
         font-size: 13.5px;
-      },
-      [${theme.breakpoints.up('md')}]: {
+      }
+      ${theme.breakpoints.up('md')} {
         font-size: inherit;
       }
     }
@@ -27,16 +27,14 @@ export const StyledTableHead = styled(TableHead)`
   background-color: ${theme.palette.background.dark};
   & .MuiTableCell-root {
     padding: ${theme.spacing(1)};
-    border-bottom: none;
+    border-bottom: 4px solid ${theme.palette.background.default};
     padding-left: ${theme.spacing(1.5)};
     padding-right: ${theme.spacing(1.5)};
-    & .MuiTypography-root {
-      [${theme.breakpoints.down('md')}]: {
-        font-size: 13.5px;
-      },
-      [${theme.breakpoints.up('md')}]: {
-        font-size: inherit;
-      }
+    ${theme.breakpoints.down('md')} {
+      font-size: 13.5px;
+    }
+    ${theme.breakpoints.up('md')} {
+      font-size: inherit;
     }
   }
 `}
