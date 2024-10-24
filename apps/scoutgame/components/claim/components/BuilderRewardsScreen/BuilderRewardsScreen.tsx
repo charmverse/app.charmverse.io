@@ -16,7 +16,7 @@ import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 import { LoadingTable } from '../common/LoadingTable';
 
-import { BuilderRewardsTable } from './BuilderRewardsTable';
+import { BuilderRewardsTableContainer } from './BuilderRewardsTableContainer';
 
 export function BuilderRewardsScreen({ period }: { period: string }) {
   const isSeason = period === 'season';
@@ -30,6 +30,7 @@ export function BuilderRewardsScreen({ period }: { period: string }) {
       <Typography color='secondary' variant='h6'>
         Builder Rewards
       </Typography>
+      <Typography textAlign='center'>See how many Scout Points your Builders have earned for you!</Typography>
       <TabsMenu
         tabs={[
           { value: week || lastWeek, label: 'Weekly' },
@@ -55,7 +56,7 @@ export function BuilderRewardsScreen({ period }: { period: string }) {
         </Link>
       </Stack>
       <Suspense fallback={<LoadingTable />}>
-        <BuilderRewardsTable week={week} />
+        <BuilderRewardsTableContainer week={week} />
       </Suspense>
     </Stack>
   );

@@ -1,7 +1,5 @@
 import { Skeleton, Table, TableBody, TableCell, TableRow } from '@mui/material';
 
-import { DividerRow } from './DividerRow';
-
 function TableRowSkeleton() {
   return (
     <TableRow>
@@ -28,10 +26,7 @@ export function LoadingTable() {
         }}
       >
         {new Array(5).fill('').map(() => (
-          <>
-            <DividerRow key={Math.random() * 1000} />
-            <TableRowSkeleton key={Math.random() * 1000} />
-          </>
+          <TableRowSkeleton key={Math.random() * 1000} />
         ))}
       </TableBody>
     </Table>

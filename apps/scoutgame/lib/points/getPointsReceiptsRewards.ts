@@ -5,7 +5,7 @@ import { currentSeason, getPreviousSeason, getSeasonWeekFromISOWeek, seasonStart
 export type PointsReceiptRewardType = 'builder' | 'sold_nfts' | 'leaderboard_rank';
 
 type PointsReceiptRewardBase = {
-  period: string;
+  week: number;
   points: number;
   type: PointsReceiptRewardType;
 };
@@ -25,10 +25,17 @@ export type LeaderboardRankPointsReceiptReward = PointsReceiptRewardBase & {
   rank: number;
 };
 
+export type SeasonPointsReceiptsReward = {
+  points: number;
+  season: string;
+  type: 'season';
+};
+
 export type PointsReceiptReward =
   | BuilderPointsReceiptReward
   | SoldNftsPointsReceiptReward
-  | LeaderboardRankPointsReceiptReward;
+  | LeaderboardRankPointsReceiptReward
+  | SeasonPointsReceiptsReward;
 
 export async function getPointsReceiptsRewards({
   isClaimed,
@@ -111,67 +118,89 @@ export async function getPointsReceiptsRewards({
 
   const bonusPartners: Set<string> = new Set();
 
-  for (const receipt of pointsReceipts) {
+  const devSeasonPointsReceipts = pointsReceipts.filter((pr) => seasonStarts.indexOf(pr.event.season as Season) === 0);
+  const preSeasonPointsReceipts = pointsReceipts.filter((pr) => seasonStarts.indexOf(pr.event.season as Season) === 1);
+  const seasonPointsReceipts = pointsReceipts.filter((pr) => seasonStarts.indexOf(pr.event.season as Season) === 2);
+
+  const devSeasonTotalPoints = devSeasonPointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
+  const preSeasonTotalPoints = preSeasonPointsReceipts.reduce((acc, receipt) => acc + receipt.value, 0);
+
+  for (const receipt of seasonPointsReceipts) {
     const points = receipt.value;
     const week = receipt.event.week;
     const weeklyRank = weeklyRankRecord[week];
-    const seasonIndex = seasonStarts.indexOf(receipt.event.season as Season);
     const weekNumber = getSeasonWeekFromISOWeek({
       season: receipt.event.season,
       week
     });
 
-    const period = seasonIndex < 2 ? `S${seasonIndex - 1} W1` : `S1 W${weekNumber}`;
-
     if (receipt.event.type === 'nft_purchase' && receipt.event.nftPurchaseEvent) {
-      if (!soldNftRewards[period]) {
-        soldNftRewards[period] = {
+      if (!soldNftRewards[week]) {
+        soldNftRewards[week] = {
           points: 0,
           quantity: 0,
-          period,
+          week: weekNumber,
           type: 'sold_nfts'
         };
       }
-      soldNftRewards[period].points += receipt.value;
-      soldNftRewards[period].quantity += receipt.event.nftPurchaseEvent.tokensPurchased;
+      soldNftRewards[week].points += receipt.value;
+      soldNftRewards[week].quantity += receipt.event.nftPurchaseEvent.tokensPurchased;
     } else if (receipt.event.type === 'gems_payout') {
       if (receipt.event.builderId !== receipt.recipientId) {
-        if (!builderRewards[period]) {
-          builderRewards[period] = {
+        if (!builderRewards[week]) {
+          builderRewards[week] = {
             points: 0,
-            period,
+            week: weekNumber,
             type: 'builder',
             bonusPartners: []
           };
         }
-        builderRewards[period].points += points;
+        builderRewards[week].points += points;
         const bonusPartner = receipt.event.bonusPartner;
         if (bonusPartner) {
-          builderRewards[period].bonusPartners.push(bonusPartner);
+          builderRewards[week].bonusPartners.push(bonusPartner);
           bonusPartners.add(bonusPartner);
         }
       } else if (weeklyRank) {
-        if (!leaderboardRankRewards[period]) {
-          leaderboardRankRewards[period] = {
+        if (!leaderboardRankRewards[week]) {
+          leaderboardRankRewards[week] = {
             points: 0,
             rank: weeklyRank,
-            period,
+            week: weekNumber,
             type: 'leaderboard_rank'
           };
         }
-        leaderboardRankRewards[period].points += points;
+        leaderboardRankRewards[week].points += points;
       }
     }
   }
 
   return [
+    {
+      points: devSeasonTotalPoints,
+      type: 'season',
+      season: seasonStarts[0]
+    } as SeasonPointsReceiptsReward,
+    {
+      points: preSeasonTotalPoints,
+      type: 'season',
+      season: seasonStarts[1]
+    } as SeasonPointsReceiptsReward,
     ...Object.values(builderRewards),
     ...Object.values(soldNftRewards),
     ...Object.values(leaderboardRankRewards)
-  ].sort((a, b) => {
-    if (a.period === b.period) {
-      return b.points - a.points;
-    }
-    return b.period.localeCompare(a.period);
-  });
+  ]
+    .filter((reward) => reward.points)
+    .sort((a, b) => {
+      if (a.type === 'season' && b.type === 'season') {
+        return b.season.localeCompare(a.season);
+      }
+      if (a.type === 'season' || b.type === 'season') {
+        return -1;
+      }
+      if (a.week === b.week) {
+        return b.points - a.points;
+      }
+      return b.week - a.week;
+    });
 }

@@ -23,7 +23,6 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
       <Stack
         gap={8}
         mt={2}
-        mb={2}
         flexDirection={{
           xs: 'column',
           md: 'row'
@@ -35,9 +34,11 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
             username={username}
             bonusPartners={bonusPartners}
           />
-          <Suspense fallback={<LoadingTable />}>
-            <UnclaimedPointsTable />
-          </Suspense>
+          {totalUnclaimedPoints === 0 ? null : (
+            <Suspense fallback={<LoadingTable />}>
+              <UnclaimedPointsTable />
+            </Suspense>
+          )}
           <Stack
             sx={{
               display: {

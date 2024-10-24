@@ -9,17 +9,20 @@ export const seasons = [
   // dev season
   {
     start: '2024-W38',
-    end: '2024-W40'
+    end: '2024-W40',
+    title: 'Dev Season'
   },
   // pre-release season
   {
     start: '2024-W40',
-    end: '2024-W41'
+    end: '2024-W41',
+    title: 'Pre Season'
   },
   // 1st season
   {
     start: '2024-W41',
-    end: '2025-W02'
+    end: '2025-W02',
+    title: 'Season 1'
   }
 ] as const;
 
