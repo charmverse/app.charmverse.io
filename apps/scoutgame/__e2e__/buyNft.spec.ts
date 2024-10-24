@@ -11,9 +11,6 @@ import { expect, test } from './test';
 
 test.describe('Buy Nft', () => {
   test.beforeEach(async ({ page }) => {
-    await prisma.scout.deleteMany({});
-    await prisma.builderNft.deleteMany({});
-
     await installMockWallet({
       page,
       account: privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'),
@@ -65,6 +62,7 @@ test.describe('Buy Nft', () => {
       bio: 'Software Engineer @charmverse. Building @scoutgamexyz',
       builderStatus: 'approved',
       sendMarketing: false,
+      farcasterId: 23,
       agreedToTermsAt: new Date('2024-10-03T11:03:00.308Z'),
       onboardedAt: new Date('2024-10-03T11:03:02.071Z'),
       currentBalance: 200
@@ -78,46 +76,22 @@ test.describe('Buy Nft', () => {
       tokenId: 1
     });
 
+    // Used for catching all the requests
     // await page.route('**', (route) => {
     //   console.log('Intercepted URL:', route.request().url());
-    //   const body = route.request().postDataJSON();
-    //   console.log('body', body);
     //   route.continue();
     // });
-    // await page.route('https://mainnet.optimism.io/**', async (route) => {
-    //   await route.fulfill({
-    //     status: 200,
-    //     json: {
-    //       jsonrpc: '2.0',
-    //       id: 9,
-    //       method: 'eth_call',
-    //       params: [
-    //         {
-    //           data: '0x2eeca3a0000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000001',
-    //           to: '0x743ec903FE6D05E73b19a6DB807271bb66100e83'
-    //         },
-    //         'latest'
-    //       ]
-    //     }
-    //   });
+    // await page.route(`**/u/${builder.username}`, async (route, request) => {
+    //   const method = request.method();
+    //   if (method !== 'POST') {
+    //     await route.continue();
+    //   }
+    // console.log('body', body);
+    // await route.continue();
+    // await route.fulfill({
+    //   status: 200,
+    //   json: { success: true }
     // });
-
-    // await page.route(' https://cloudflare-eth.com/**', async (route) => {
-    //   await route.fulfill({
-    //     status: 200,
-    //     json: {
-    //       jsonrpc: '2.0',
-    //       id: 9,
-    //       method: 'eth_call',
-    //       params: [
-    //         {
-    //           data: '0x2eeca3a0000000000000000000000000000000000000000000000000000000000000001a0000000000000000000000000000000000000000000000000000000000000001',
-    //           to: '0x743ec903FE6D05E73b19a6DB807271bb66100e83'
-    //         },
-    //         'latest'
-    //       ]
-    //     }
-    //   });
     // });
 
     await page.route('**/api/getTokens**', async (route) => {
@@ -280,16 +254,10 @@ test.describe('Buy Nft', () => {
     const scoutButton = page.locator('data-test=scout-button').first();
     await scoutButton.click();
 
-    // Rainbow modal
-    // const metamaskButton = page.getByText('MetaMask');
-    // await metamaskButton.click();
+    const buyButton = page.locator('data-test=purchase-button').first();
+    await buyButton.click();
 
-    // await Promise.all([wallet.approve(), wallet.confirmNetworkSwitch()]);
-
-    await delay(100000);
-
-    await page.pause();
-
-    // await expect(homePage.container).toBeVisible();
+    const successView = page.locator('data-test=success-view');
+    await expect(successView).toBeVisible();
   });
 });

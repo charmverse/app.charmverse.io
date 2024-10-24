@@ -11,7 +11,7 @@ export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: 
   const farcasterUsername = farcasterUser?.username || builder.username;
 
   return (
-    <Stack gap={2} textAlign='center'>
+    <Stack gap={2} textAlign='center' data-test='success-view'>
       <Typography color='secondary' variant='h5' fontWeight={600}>
         Congratulations!
       </Typography>

@@ -538,6 +538,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             (paymentMethod === 'points' && notEnoughPoints) ||
             isExecutingPointsPurchase
           }
+          data-test='purchase-button'
         >
           Buy
         </LoadingButton>
