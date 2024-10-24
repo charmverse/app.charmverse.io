@@ -10,7 +10,7 @@ import { log } from '@charmverse/core/log';
 process.env.DOMAIN = 'https://scoutgame.xyz';
 
 async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: string }) {
-  if (process.env.BUILDER_SMART_CONTRACT_MINTER_PRIVKEY) {
+  if (!process.env.BUILDER_SMART_CONTRACT_MINTER_PRIVKEY) {
     throw new Error('BUILDER_SMART_CONTRACT_MINTER_PRIVKEY is not set');
   }
   const githubUser = await octokit.rest.users.getByUsername({ username: githubLogin });
@@ -63,23 +63,25 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   });
   console.log('Created a builder record', builder);
   await approveBuilder({ builderId: builder.id, season: currentSeason });
-  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/builder/' + builder.username);
+  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/u/' + builder.username);
+  process.exit(0);
 }
 
 // search farcaster id by username
 // (async () => {
-//   console.log(await getFarcasterUserByUsername('mattcasey')));
+//   console.log(await getFarcasterUserByUsername('username'));
 // })();
 
 // search waitlist to find github login and farcaster id
 // (async () => {
 //   console.log(
-//   await prisma.connectWaitlistSlot.findFirst({
-//     where: {
-//       username: 'mattcasey
-//     }
-//   })
-// );
+//     await prisma.connectWaitlistSlot.findFirst({
+//       where: {
+//         username: 'username'
+//       }
+//     })
+//   );
 // })();
 
-createBuilder({ fid: 866880, githubLogin: 'Ansonhkg' });
+// run script to create builder
+// createBuilder({ fid: 240720, githubLogin: 'username' });
