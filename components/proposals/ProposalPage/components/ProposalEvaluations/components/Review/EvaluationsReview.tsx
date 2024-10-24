@@ -41,6 +41,7 @@ export type Props = {
     ProposalWithUsersAndRubric,
     | 'archived'
     | 'id'
+    | 'createdBy'
     | 'isPublic'
     | 'authors'
     | 'evaluations'

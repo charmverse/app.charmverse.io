@@ -1,4 +1,4 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { TextField, Box } from '@mui/material';
 import type { UseFormSetValue } from 'react-hook-form';
 

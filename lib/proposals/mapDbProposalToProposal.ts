@@ -4,6 +4,7 @@ import type {
   Page,
   Proposal,
   ProposalAuthor,
+  ProposalEvaluationType,
   ProposalReviewer,
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
@@ -26,6 +27,7 @@ import { getProposalFormFields } from '@root/lib/proposals/form/getProposalFormF
 
 import { getProposalProjectFormAnswers } from './form/getProposalProjectFormAnswers';
 import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
+import { showRubricAnswersToAuthor } from './showRubricAnswersToAuthor';
 
 type FormFieldsIncludeType = {
   form: {
@@ -110,8 +112,13 @@ export function mapDbProposalToProposal({
     const proposalFailed = currentEvaluation?.result === ProposalEvaluationResult.fail;
 
     if (!stepPermissions?.evaluate) {
-      const showReviewsToAuthor =
-        isAuthor && proposalFailed && evaluation.type === 'rubric' && !!evaluation.showAuthorResultsOnRubricFail;
+      const showReviewsToAuthor = showRubricAnswersToAuthor({
+        evaluationType: evaluation.type as ProposalEvaluationType,
+        isAuthor,
+        proposalFailed: !!proposalFailed,
+        isCurrentEvaluationStep: evaluation.id === currentEvaluation?.id,
+        showAuthorResultsOnRubricFail: !!evaluation.showAuthorResultsOnRubricFail
+      });
       draftRubricAnswers = [];
       if (!evaluation.shareReviews && !showReviewsToAuthor) {
         rubricAnswers = [];
