@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { Box, Stack, Paper } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';

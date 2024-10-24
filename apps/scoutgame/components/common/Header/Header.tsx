@@ -97,6 +97,7 @@ export function Header() {
                     disabled={isExecutingLogout}
                     onClick={handleOpenUserMenu}
                     sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
+                    data-test='user-menu-pill'
                   >
                     <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-testid='user-points-balance'>
                       {user.currentBalance}
@@ -133,7 +134,9 @@ export function Header() {
                     <MenuItem>
                       <Link href='/profile'>{user.username}</Link>
                     </MenuItem>
-                    <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
+                    <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
+                      Sign Out
+                    </MenuItem>
                     {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
                   </Menu>
                 </Box>
