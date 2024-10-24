@@ -62,7 +62,7 @@ runs:
     - name: Calculate Build ID
       shell: bash
       run: |
-        build_id=${{ hashFiles(format('apps/{}/*.ts', inputs.app_name), format('apps/{}/*.tsx', inputs.app_name)) }}
+        build_id=${{ hashFiles(format('apps/{0}/*.ts', inputs.app_name), format('apps/{0}/*.tsx', inputs.app_name)) }}
         echo $'\nREACT_APP_BUILD_ID=$build_id' >> ./.ebstalk.apps.env/${{ inputs.app_name }}.env
 
     - name: Configure AWS credentials
