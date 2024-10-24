@@ -25,7 +25,7 @@ export function BuilderCardStats({
         </Tooltip>
       )}
       {typeof rank === 'number' && (
-        <Tooltip title='Current rank'>
+        <Tooltip title='Current week’s rank'>
           <Stack flexDirection='row' gap={0.2} alignItems='center'>
             <Typography variant='body2' component='span' color='text.secondary'>
               #{rank}
@@ -34,7 +34,7 @@ export function BuilderCardStats({
         </Tooltip>
       )}
       {typeof nftsSold === 'number' && (
-        <Tooltip title='Total # of Builder NFTs sold to date'>
+        <Tooltip title='Total # of cards sold this season to date'>
           <Stack flexDirection='row' gap={0.2} alignItems='center'>
             <Typography variant='body2' component='span' color='orange.main'>
               {nftsSold}
