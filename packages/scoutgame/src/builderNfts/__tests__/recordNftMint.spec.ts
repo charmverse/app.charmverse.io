@@ -20,7 +20,7 @@ jest.unstable_mockModule('../clients/builderContractReadClient', () => ({
   }
 }));
 
-const { recordNftMint } = await import('../mintNFT');
+const { recordNftMint } = await import('../recordNftMint');
 
 describe('recordNftMint', () => {
   it('should record a new NFT mint', async () => {
