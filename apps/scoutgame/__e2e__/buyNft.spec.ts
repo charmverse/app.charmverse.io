@@ -21,9 +21,15 @@ test.describe('Buy Nft', () => {
         [optimism.id]: (config) => {
           return custom({
             request: async ({ method, params }) => {
+              // console.log('method inside metamask method', method);
+              // console.log('method inside metamask params', params);
               // Mock only this RPC call
               if (method === 'eth_estimateGas') {
-                return '500000';
+                return 500000;
+              }
+
+              if (method === 'eth_sendTransaction') {
+                return '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
               }
 
               const response = await http()(config).request({ method, params });
@@ -37,7 +43,7 @@ test.describe('Buy Nft', () => {
             request: async ({ method, params }) => {
               // Mock only this RPC call
               if (method === 'eth_estimateGas') {
-                return '500000';
+                return 500000;
               }
 
               const response = await http()(config).request({ method, params });
