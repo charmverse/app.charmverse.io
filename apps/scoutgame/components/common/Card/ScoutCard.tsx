@@ -20,7 +20,7 @@ function useDynamicFontSize(text: string, maxWidth: number, minFontSize: number,
     let currentFontSize = maxFontSize;
     span.style.fontSize = `${currentFontSize}px`;
 
-    while (span.offsetWidth - 10 > maxWidth && currentFontSize > minFontSize) {
+    while (span.offsetWidth > maxWidth && currentFontSize > minFontSize) {
       currentFontSize -= 0.5;
       span.style.fontSize = `${currentFontSize}px`;
     }
@@ -32,7 +32,7 @@ function useDynamicFontSize(text: string, maxWidth: number, minFontSize: number,
 }
 
 export function ScoutCard({ scout }: { scout: ScoutInfo }) {
-  const { fontSize, spanRef } = useDynamicFontSize(scout.displayName, 150, 10, 18);
+  const { fontSize, spanRef } = useDynamicFontSize(scout.displayName, 150, 8, 18);
 
   return (
     <Paper sx={{ p: 1, py: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
