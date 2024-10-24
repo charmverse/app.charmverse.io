@@ -12,14 +12,7 @@ import { StyledTableBody, StyledTableHead } from '../common/StyledTable';
 function BuilderRewardsTableRow({ reward }: { reward: BuilderReward }) {
   return (
     <TableRow>
-      <TableCell
-        sx={{
-          maxWidth: {
-            xs: 150,
-            md: 'none'
-          }
-        }}
-      >
+      <TableCell>
         <Link href={`/u/${reward.username}`}>
           <Stack direction='row' alignItems='center' gap={1}>
             <Avatar src={reward.avatar} name={reward.username} size='small' />
@@ -63,7 +56,13 @@ export function BuilderRewardsTable({
           <TableCell align='right'>POINTS</TableCell>
         </TableRow>
       </StyledTableHead>
-      <StyledTableBody>
+      <StyledTableBody
+        sx={{
+          '& .MuiTableCell-root': {
+            width: !week ? '33.33%' : '25%'
+          }
+        }}
+      >
         {builderRewards.map((reward) => (
           <BuilderRewardsTableRow key={reward.username} reward={reward} />
         ))}
