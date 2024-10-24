@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
-import { getWeekFromDate, getStartOfSeason, streakWindow, isToday } from '@packages/scoutgame/dates';
+import { getStartOfSeason, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
