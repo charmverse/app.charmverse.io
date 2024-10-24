@@ -2,7 +2,7 @@
 
 import { Paper, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState, useLayoutEffect } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
 import type { BasicUserInfo } from 'lib/users/interfaces';
@@ -15,7 +15,7 @@ function useDynamicFontSize(text: string, maxWidth: number, minFontSize: number,
   const [fontSize, setFontSize] = useState(maxFontSize);
   const spanRef = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const span = spanRef.current;
     if (!span) return;
 
