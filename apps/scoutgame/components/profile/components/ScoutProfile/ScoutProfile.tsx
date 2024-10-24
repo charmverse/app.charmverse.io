@@ -10,7 +10,7 @@ import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { ScoutStats } from './ScoutStats';
 
-export async function ScoutProfile({ userId, isMobile }: { userId: string; isMobile?: boolean }) {
+export async function ScoutProfile({ userId }: { userId: string }) {
   const [error, data] = await safeAwaitSSRData(
     Promise.all([getUserSeasonStats(userId), getScoutedBuilders({ scoutId: userId })])
   );

@@ -12,8 +12,8 @@ export type PointMetrics = {
 export type BuilderMetrics = {
   // scoutedBy: number;
   nftsSold: number;
-  gemsCollected: number;
   price: bigint;
+  rank: number;
   builderPoints: number;
   isBanned?: boolean;
 };

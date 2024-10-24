@@ -4,13 +4,13 @@ import Image from 'next/image';
 import { GemsIcon, PointsIcon } from 'components/common/Icons';
 
 export function BuilderCardStats({
-  gemsCollected,
   builderPoints,
-  nftsSold
+  nftsSold,
+  rank
 }: {
-  gemsCollected?: number;
   builderPoints?: number;
   nftsSold?: number;
+  rank?: number;
 }) {
   return (
     <Stack flexDirection='row' alignItems='center' justifyContent='space-between' gap={1}>
@@ -22,12 +22,11 @@ export function BuilderCardStats({
           <PointsIcon size={15} color='green' />
         </Stack>
       )}
-      {typeof gemsCollected === 'number' && (
+      {typeof rank === 'number' && (
         <Stack flexDirection='row' gap={0.2} alignItems='center'>
           <Typography variant='body2' component='span' color='text.secondary'>
-            {gemsCollected}
+            #{rank}
           </Typography>
-          <GemsIcon size={15} />
         </Stack>
       )}
       {typeof nftsSold === 'number' && (
