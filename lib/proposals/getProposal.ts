@@ -15,10 +15,12 @@ type PermissionsMap = Awaited<
 
 export async function getProposal({
   id,
-  permissionsByStep
+  permissionsByStep,
+  userId
 }: {
   id: string;
   permissionsByStep: PermissionsMap;
+  userId?: string;
 }): Promise<ProposalWithUsersAndRubric> {
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -117,6 +119,7 @@ export async function getProposal({
     proposal: { ...proposal, issuedCredentials: credentials },
     permissions: currentPermissions,
     isPublicPage,
-    permissionsByStep
+    permissionsByStep,
+    userId
   });
 }

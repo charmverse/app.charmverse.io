@@ -98,7 +98,8 @@ export async function applyProposalWorkflow({
           appealRequiredReviews,
           notificationLabels: evaluation.notificationLabels || undefined,
           actionLabels: evaluation.actionLabels || undefined,
-          finalStep: evaluation.finalStep
+          finalStep: evaluation.finalStep,
+          showAuthorResultsOnRubricFail: evaluation.showAuthorResultsOnRubricFail
         }
       });
     }

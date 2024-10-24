@@ -27,7 +27,7 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     userId
   });
 
-  const proposal = await getProposal({ id: proposalId, permissionsByStep });
+  const proposal = await getProposal({ id: proposalId, permissionsByStep, userId });
 
   if (!proposal.permissions?.view) {
     throw new NotFoundError();
