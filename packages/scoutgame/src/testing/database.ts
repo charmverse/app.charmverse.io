@@ -12,6 +12,7 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
+  id = uuid(),
   createdAt,
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
@@ -23,6 +24,7 @@ export async function mockBuilder({
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
+      id,
       createdAt,
       username,
       displayName: 'Test User',
@@ -261,6 +263,7 @@ export async function mockNFTPurchaseEvent({
 export async function mockBuilderNft({
   builderId,
   chainId = 1,
+  tokenId = Math.round(Math.random() * 10000000),
   contractAddress = '0x1',
   owners = [],
   season = mockSeason
@@ -270,6 +273,7 @@ export async function mockBuilderNft({
   contractAddress?: string;
   owners?: (string | { id: string })[];
   season?: string;
+  tokenId?: number;
 }) {
   const nft = await prisma.builderNft.create({
     data: {
@@ -279,7 +283,7 @@ export async function mockBuilderNft({
       currentPrice: 0,
       season,
       imageUrl: 'https://placehold.co/600x400',
-      tokenId: Math.round(Math.random() * 10000000),
+      tokenId,
       nftSoldEvents: {
         createMany: {
           data: owners.map((owner) => ({

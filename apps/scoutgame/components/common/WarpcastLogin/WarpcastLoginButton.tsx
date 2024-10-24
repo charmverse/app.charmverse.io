@@ -126,6 +126,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
           }
         }}
         startIcon={<WarpcastIcon />}
+        data-test='sign-in-with-warpcast'
       >
         {children || 'Sign in with Warpcast'}
       </Button>
