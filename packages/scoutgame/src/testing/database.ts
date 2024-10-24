@@ -20,7 +20,8 @@ export async function mockBuilder({
   username = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
-  createNft = false
+  createNft = false,
+  farcasterId
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
@@ -31,6 +32,7 @@ export async function mockBuilder({
       builderStatus,
       onboardedAt,
       agreedToTermsAt,
+      farcasterId,
       githubUser: {
         create: {
           id: githubUserId,
