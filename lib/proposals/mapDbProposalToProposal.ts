@@ -90,7 +90,7 @@ export function mapDbProposalToProposal({
       })
     : null;
 
-  const isAuthor = !!userId && proposal.createdBy === userId && proposal.authors.some((a) => a.userId === userId);
+  const isAuthor = !!userId && proposal.authors.some((a) => a.userId === userId);
 
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const workflowEvaluation = workflow?.evaluations.find(

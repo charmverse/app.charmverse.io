@@ -13,10 +13,7 @@ import { RubricDecision } from './components/RubricDecision';
 import { RubricResults } from './components/RubricResults';
 
 export type Props = {
-  proposal: Pick<
-    ProposalWithUsersAndRubric,
-    'id' | 'createdBy' | 'evaluations' | 'permissions' | 'status' | 'archived' | 'authors'
-  >;
+  proposal: Pick<ProposalWithUsersAndRubric, 'id' | 'evaluations' | 'permissions' | 'status' | 'archived' | 'authors'>;
   evaluation: PopulatedEvaluation;
   isCurrent: boolean;
   refreshProposal: VoidFunction;
@@ -38,7 +35,7 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
     [user?.id, !!evaluation?.draftRubricAnswers?.length]
   );
 
-  const isAuthor = proposal.createdBy === user?.id || proposal.authors.some((a) => a.userId === user?.id);
+  const isAuthor = proposal.authors.some((a) => a.userId === user?.id);
 
   const authorCanViewFailedEvaluationResults = showRubricAnswersToAuthor({
     isAuthor,
