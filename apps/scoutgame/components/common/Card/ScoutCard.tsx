@@ -1,5 +1,6 @@
 import { Paper, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import React, { useRef, useEffect, useState } from 'react';
 
 import { Avatar } from 'components/common/Avatar';
 import type { BasicUserInfo } from 'lib/users/interfaces';
@@ -8,12 +9,44 @@ export type ScoutInfo = BasicUserInfo & {
   nfts: number;
 };
 
+function useDynamicFontSize(text: string, maxWidth: number, minFontSize: number, maxFontSize: number) {
+  const [fontSize, setFontSize] = useState(maxFontSize);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const span = spanRef.current;
+    if (!span) return;
+
+    let currentFontSize = maxFontSize;
+    span.style.fontSize = `${currentFontSize}px`;
+
+    while (span.offsetWidth > maxWidth && currentFontSize > minFontSize) {
+      currentFontSize -= 0.5;
+      span.style.fontSize = `${currentFontSize}px`;
+    }
+
+    setFontSize(currentFontSize);
+  }, [text, maxWidth, minFontSize, maxFontSize]);
+
+  return { fontSize, spanRef };
+}
+
 export function ScoutCard({ scout }: { scout: ScoutInfo }) {
+  const { fontSize, spanRef } = useDynamicFontSize(scout.displayName, 150, 12, 18);
+
   return (
     <Paper sx={{ p: 1, py: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
       <Avatar src={scout.avatar} variant='circular' size='large' />
-      <Typography variant='h6' textAlign='center'>
-        {scout.displayName}
+      <Typography
+        variant='h6'
+        textAlign='center'
+        sx={{
+          fontSize: `${fontSize}px`,
+          width: '100%',
+          lineHeight: 1.2
+        }}
+      >
+        <span ref={spanRef}>{scout.displayName}</span>
       </Typography>
       <Typography
         variant='body2'
