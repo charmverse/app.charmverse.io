@@ -178,7 +178,7 @@ It looks like this Pull Request was closed by the maintainer. As a result, you'v
 
 Please note that if you reach 3 strikes, your account will be suspended from the Scout Game.
 
-If you believe this was a mistake and wish to appeal now or after 3 strikes, you can submit an appeal at: app.charmverse.io.
+If you believe this was a mistake and wish to appeal now or after 3 strikes, you can submit an appeal at: https://app.charmverse.io/scout-game-appeal/scout-game-appeals-3853798695994546.
 `,
         owner: repo.owner,
         repo: repo.name
