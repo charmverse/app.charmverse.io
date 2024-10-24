@@ -54,8 +54,7 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
       />
       <BottomNavigationAction
         label='Contract'
-        href='https://optimism.blockscout.com/token/0x743ec903FE6D05E73b19a6DB807271bb66100e83'
-        target='_blank'
+        href='/contract'
         value='contract'
         icon={<MdLaunch size='24px' />}
         LinkComponent={Link}

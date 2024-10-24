@@ -7,7 +7,7 @@ import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
 
 type MintNFTParams = {
   builderNftId: string;
@@ -25,7 +25,7 @@ export async function mintNFT(params: MintNFTParams) {
       id: builderNftId
     }
   });
-  const apiClient = getBuilderContractAdminClient();
+  const apiClient = getBuilderContractMinterClient();
 
   // Proceed with minting
   const txResult = await apiClient.mintTo({
