@@ -73,18 +73,14 @@ export function ContractDashboard(data: BuilderNFTContractData) {
         <SectionTitle title='Data' />
       </Grid2>
       <Grid2 size={{ xs: 12, md: 4 }}>
-        <Typography variant='h6' fontWeight='bold'>
-          Registered builder NFTs
-        </Typography>
+        <Typography variant='h6'>Registered builder NFTs</Typography>
         <Typography variant='body1' fontWeight='bold'>
           {data.totalSupply.toString()}
         </Typography>
       </Grid2>
       <Grid2 size={{ xs: 12, md: 4 }}>
         {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6' fontWeight='bold'>
-          Sales
-        </Typography>
+        <Typography variant='h6'>Sales</Typography>
         <Typography variant='body1' fontWeight='bold'>
           {Number(data.receiverUsdcBalance).toLocaleString('en-US')} USD
         </Typography>
