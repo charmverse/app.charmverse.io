@@ -5,16 +5,32 @@ type Params = { [key: string]: any };
 export function GET<T = Response>(
   _requestUrl: string,
   data: Params = {},
-  { headers = {}, credentials = 'include' }: { credentials?: RequestCredentials; headers?: any } = {}
+  {
+    headers = {},
+    timeout = 30000,
+    credentials = 'include'
+  }: { credentials?: RequestCredentials; headers?: any; timeout?: number } = {}
 ): Promise<T> {
   const requestUrl = _appendQuery(_requestUrl, data);
+
+  const controller = new AbortController();
+  // Getting signal from the controller
+  const signal = controller.signal;
+
+  // Setting timeout to automatically abort after 30 seconds
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
   return fetch<T>(requestUrl, {
     method: 'GET',
     headers: new Headers({
       Accept: 'application/json',
       ...headers
     }),
+    signal,
     credentials
+  }).then((response) => {
+    clearTimeout(timeoutId);
+    return response;
   });
 }
 

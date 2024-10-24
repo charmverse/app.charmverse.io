@@ -43,7 +43,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
             week: getCurrentWeek()
           },
           select: {
-            gemsCollected: true
+            rank: true
           }
         },
         builderNfts: {
@@ -68,8 +68,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           price: builder.builderNfts[0]?.currentPrice ?? 0,
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
           nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
-          gemsCollected: builder.userWeeklyStats[0]?.gemsCollected || 0,
-          builderStatus: builder.builderStatus
+          builderStatus: builder.builderStatus,
+          rank: builder.userWeeklyStats[0]?.rank || -1
         };
       })
       .sort((a, b) => preselectedBuilderIds.indexOf(a.id) - preselectedBuilderIds.indexOf(b.id));
@@ -103,6 +103,14 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
             select: {
               pointsEarnedAsBuilder: true,
               nftsSold: true
+            }
+          },
+          userWeeklyStats: {
+            where: {
+              week: getCurrentWeek()
+            },
+            select: {
+              rank: true
             }
           },
           nftPurchaseEvents: {
@@ -140,7 +148,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       price: user.builderNfts[0]?.currentPrice ?? 0,
       nftImageUrl: user.builderNfts[0]?.imageUrl,
       nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
-      gemsCollected: builder.gemsCollected,
+      rank: user.userWeeklyStats[0]?.rank || -1,
       scoutedBy: user.nftPurchaseEvents.length,
       builderStatus: user.builderStatus
     };

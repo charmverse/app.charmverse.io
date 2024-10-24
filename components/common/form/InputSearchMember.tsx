@@ -125,6 +125,14 @@ function InputSearchMemberBase({
         />
       )}
       {...props}
+      onClose={(e, reason) => {
+        if (props.onClose) {
+          // HACK to defer close so the change event can fire
+          setTimeout(() => {
+            props.onClose!(e, reason);
+          }, 200);
+        }
+      }}
     />
   );
 }

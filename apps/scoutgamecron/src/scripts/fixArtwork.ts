@@ -3,14 +3,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { uploadMetadata } from '@packages/scoutgame/builderNfts/artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
-import { uploadArtwork } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
+import { uploadArtwork, uploadArtworkCongrats } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 async function refreshArtworks() {
   const builderNfts = await prisma.builderNft.findMany({
     where: {
-      season: currentSeason,
-      contractAddress: getBuilderContractAddress().toLowerCase()
+      season: currentSeason
     },
     include: {
       builder: {
@@ -22,7 +21,8 @@ async function refreshArtworks() {
     },
     orderBy: {
       tokenId: 'asc'
-    }
+    },
+    skip: 124
   });
 
   console.log('Contract ', getBuilderContractAddress());
@@ -33,7 +33,7 @@ async function refreshArtworks() {
 
   for (let i = 0; i < totalNfts; i++) {
     const nft = builderNfts[i];
-    log.info(`Updating artwork for NFT ${nft.tokenId} of ${totalNfts}`);
+    log.info(`[tokenId: ${nft.tokenId}] Updating artwork for NFT ${i+1} of ${totalNfts} `);
 
     const avatar = nft.builder.avatar;
 
@@ -65,13 +65,17 @@ async function refreshArtworks() {
       }
     });
 
-    await uploadMetadata({
+    const metadataPath = await uploadMetadata({
       season: currentSeason,
       tokenId: BigInt(tokenId),
       username: nft.builder.username,
       attributes: []
     });
+
+    log.info('Artwork uploaded', filePath);
+    log.info('Metadata uploaded', metadataPath);
   }
 }
 
-refreshArtworks().then(console.log);
+// refreshArtworks().then(console.log);
+

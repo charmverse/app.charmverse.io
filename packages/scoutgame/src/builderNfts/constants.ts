@@ -38,7 +38,7 @@ export const optimismUsdcContractAddress = useTestnets
   ? usdcOptimismSepoliaContractAddress
   : usdcOptimismMainnetContractAddress;
 
-export const builderSmartContractOwnerKey = process.env.BUILDER_SMART_CONTRACT_OWNER_PRIVKEY as string;
+export const builderSmartContractMinterKey = process.env.BUILDER_SMART_CONTRACT_MINTER_PRIVKEY as string;
 
 // Actual target wallet - Scoutgame.eth
 export const treasuryAddress = '0x93326D53d1E8EBf0af1Ff1B233c46C67c96e4d8D';
@@ -54,7 +54,7 @@ export const builderPointsShare = 0.2;
 // Selecting the top 100 builders
 export const weeklyRewardableBuilders = 100;
 
-// const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractOwnerKey });
+// const serverClient = getWalletClient({ chainId: builderNftChain.id, privateKey: builderSmartContractMinterKey });
 
 // const apiClient = new BuilderNFTSeasonOneClient({
 //   chain: builderNftChain,

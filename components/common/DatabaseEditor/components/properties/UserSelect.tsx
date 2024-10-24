@@ -208,6 +208,8 @@ export function UserSelect({
     (newMemberIds: string[]) => {
       if (!readOnly && ((disallowEmpty && newMemberIds.length !== 0) || !disallowEmpty)) {
         onChange(newMemberIds);
+      } else {
+        throw new Error('Cannot change value of read-only user select');
       }
     },
     [readOnly, onChange, disallowEmpty]

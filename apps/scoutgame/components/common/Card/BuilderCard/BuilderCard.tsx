@@ -9,6 +9,8 @@ import { ScoutButton } from '../../ScoutButton/ScoutButton';
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
 
+type RequiredBuilderInfoFields = 'username' | 'displayName' | 'id';
+
 export function BuilderCard({
   builder,
   showPurchaseButton = false,
@@ -17,7 +19,7 @@ export function BuilderCard({
   size = 'medium'
 }: {
   size?: 'x-small' | 'small' | 'medium' | 'large';
-  builder: BuilderInfo;
+  builder: Omit<Partial<BuilderInfo>, RequiredBuilderInfoFields> & Pick<BuilderInfo, RequiredBuilderInfoFields>;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;

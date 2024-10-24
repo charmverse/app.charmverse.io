@@ -1,10 +1,26 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { uniqBy } from 'lodash-es';
 
+import type { Commit } from './github/getCommitsByUser';
 import { getCommitsByUser } from './github/getCommitsByUser';
+import type { PullRequest } from './github/getPullRequestsByUser';
 import { getPullRequestsByUser } from './github/getPullRequestsByUser';
 
-export async function getBuilderActivity({ login, after }: { login: string; after: Date }) {
+export type BuilderActivities = {
+  commits: Commit[];
+  pullRequests: PullRequest[];
+  newOwnerRepos: {
+    id: number;
+    name: string;
+    default_branch?: string | null;
+    owner: {
+      login: string;
+    };
+    full_name?: string | null;
+  }[];
+};
+
+export async function getBuilderActivity({ login, after }: { login: string; after: Date }): Promise<BuilderActivities> {
   const commits = await getCommitsByUser({
     login,
     after

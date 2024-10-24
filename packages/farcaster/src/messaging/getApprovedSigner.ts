@@ -3,10 +3,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Signer } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
-import { GET, POST } from '@root/adapters/http';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
-import { getWalletClient } from '@root/lib/blockchain/walletClient';
-import { sleep } from '@root/lib/utils/sleep';
+import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { getWalletClient } from '@packages/onchain/getWalletClient';
+import { GET, POST } from '@packages/utils/http';
+import { sleep } from '@packages/utils/sleep';
+import type { Address } from 'viem';
 import { encodeAbiParameters } from 'viem';
 import { mnemonicToAccount } from 'viem/accounts';
 import { optimism } from 'viem/chains';
@@ -220,7 +221,7 @@ export async function getApprovedSignerId(): Promise<{ signerId: string; signerP
       abi: keyGatewayAbi, // ABI of the contract
       functionName: 'addFor', // Function to call
       args: [
-        farcasterDeveloper.custody_address as `0x${string}`, // fidOwner address
+        farcasterDeveloper.custody_address as Address, // fidOwner address
         1, // keyType (uint32)
         signerPublicKey as `0x${string}`, // key (bytes)
         1, // metadataType (uint8)

@@ -1,15 +1,22 @@
-// docs.neynar.com/reference/publish-message
-
 import { ExternalServiceError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Cast } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
-import { POST } from '@root/adapters/http';
-import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '@root/lib/farcaster/constants';
+import { POST } from '@packages/utils/http';
 
-// TBD - https://github.com/neynarxyz/farcaster-examples/tree/main/managed-signers
+import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from '../constants';
 
-// https://docs.neynar.com/reference/post-cast
-// https://github.com/neynarxyz/farcaster-examples/tree/main/gm-bot
+// Copied from @neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster - Fails in CI so ported the type here
+type Cast = {
+  hash: string;
+  parent_hash: string | null;
+  parent_url: string | null;
+  root_parent_url: string | null;
+  parent_author: any;
+  author: any;
+  text: string;
+  timestamp: string;
+  embeds: any[];
+  type?: any;
+};
 
 export async function writeToFarcaster({
   neynarSignerId,

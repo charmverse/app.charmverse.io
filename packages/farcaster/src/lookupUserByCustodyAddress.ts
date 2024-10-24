@@ -1,5 +1,5 @@
 import type { User as FarcasterUserProfileFromNeynar } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
-import { GET } from '@root/adapters/http';
+import { GET } from '@packages/utils/http';
 
 import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from './constants';
 

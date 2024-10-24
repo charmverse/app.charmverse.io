@@ -9,5 +9,5 @@ export async function GET() {
     return NextResponse.json({ points: 0 });
   }
   const claimablePoints = await getClaimablePoints({ userId: user.id });
-  return NextResponse.json({ points: claimablePoints });
+  return NextResponse.json({ points: claimablePoints.points });
 }

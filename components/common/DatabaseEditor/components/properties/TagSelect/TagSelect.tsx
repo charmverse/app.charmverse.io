@@ -206,7 +206,12 @@ export function TagSelect({
       onUpdateOption={onUpdate}
       onDeleteOption={onDelete}
       onCreateOption={onCreate}
-      onBlur={() => setIsOpened(false)}
+      onBlur={() => {
+        // HACK to defer close so the change event can fire
+        setTimeout(() => {
+          setIsOpened(false);
+        }, 200);
+      }}
       forcePopupIcon={false}
       displayType={displayType}
       fluidWidth={fluidWidth}
