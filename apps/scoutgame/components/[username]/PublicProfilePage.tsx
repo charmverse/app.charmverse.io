@@ -1,9 +1,10 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';
 import { Hidden } from 'components/common/Hidden';
 import { UserProfile } from 'components/common/Profile/UserProfile';
-import type { BasicUserInfo } from 'lib/users/interfaces';
+import type { BasicUserInfo, BuilderUserInfo } from 'lib/users/interfaces';
 
 import { PageContainer } from '../layout/PageContainer';
 
@@ -11,7 +12,9 @@ import { PublicBuilderProfile } from './components/PublicBuilderProfile/PublicBu
 import { PublicScoutProfile } from './components/PublicScoutProfile/PublicScoutProfile';
 import { PublicProfileTabsMenu } from './PublicProfileTabsMenu';
 
-export function PublicProfilePage({ user, tab }: { user: BasicUserInfo; tab: string }) {
+type UserProfile = BasicUserInfo & { displayName: string; builderStatus: BuilderStatus | null };
+
+export function PublicProfilePage({ user, tab }: { user: UserProfile; tab: string }) {
   return (
     <PageContainer>
       <Box gap={2} display='flex' flexDirection='column' margin='auto'>
@@ -30,10 +33,10 @@ export function PublicProfilePage({ user, tab }: { user: BasicUserInfo; tab: str
         <PublicProfileTabsMenu
           tab={tab}
           username={user.username}
-          isApprovedBuilder={user.builderStatus === 'approved'}
+          isApprovedBuilder={user.builderStatus === 'approved' || user.builderStatus === 'banned'}
         />
-        {tab === 'builder' && user.builderStatus === 'approved' ? (
-          <PublicBuilderProfile publicUser={user} />
+        {tab === 'builder' ? (
+          <PublicBuilderProfile builder={user as BuilderUserInfo} />
         ) : (
           <PublicScoutProfile publicUser={user} />
         )}

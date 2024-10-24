@@ -11,9 +11,10 @@ import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 
 // Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
-export type UserProfileData = Pick<Scout, 'id' | 'username' | 'displayName'> & {
+export type UserProfileData = Pick<Scout, 'id' | 'username'> & {
   bio?: string | null;
   avatar?: string | null;
+  displayName?: string | null;
   githubLogin?: string;
 };
 

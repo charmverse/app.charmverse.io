@@ -1,3 +1,5 @@
+import type { BuilderStatus } from '@charmverse/core/prisma';
+
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 export type PointMetrics = {
@@ -15,11 +17,11 @@ export type BuilderMetrics = {
   price: bigint;
   rank: number;
   builderPoints: number;
-  isBanned?: boolean;
 };
 
 export type BuilderInfo = BasicUserInfo &
   BuilderMetrics & {
+    builderStatus: BuilderStatus;
     nftImageUrl?: string | null;
     nftsSoldToScout?: number;
   };

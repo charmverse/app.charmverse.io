@@ -35,7 +35,10 @@ export async function getBuilderActivities({
 }): Promise<BuilderActivity[]> {
   const builderEvents = await prisma.builderEvent.findMany({
     where: {
-      builderId,
+      builder: {
+        id: builderId,
+        builderStatus: 'approved'
+      },
       type: {
         in: ['nft_purchase', 'merged_pull_request', 'daily_commit']
       }

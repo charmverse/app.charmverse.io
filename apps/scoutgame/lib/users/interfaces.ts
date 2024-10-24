@@ -4,11 +4,14 @@ export type MinimalUserInfo = {
   id: string;
   username: string;
   avatar?: string | null;
-  displayName: string;
 };
 
 export type BasicUserInfo = MinimalUserInfo & {
   bio?: string | null;
   githubLogin?: string;
-  builderStatus: BuilderStatus | null;
+};
+
+export type BuilderUserInfo = MinimalUserInfo & {
+  githubLogin?: string;
+  builderStatus: BuilderStatus;
 };
