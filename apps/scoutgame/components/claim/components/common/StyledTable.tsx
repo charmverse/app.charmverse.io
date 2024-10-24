@@ -15,7 +15,7 @@ export const StyledTableBody = styled(TableBody)`
         font-size: 13.5px;
       }
       ${theme.breakpoints.up('md')} {
-        font-size: inherit;
+        font-size: 16px;
       }
     }
   }
@@ -34,7 +34,7 @@ export const StyledTableHead = styled(TableHead)`
       font-size: 13.5px;
     }
     ${theme.breakpoints.up('md')} {
-      font-size: inherit;
+      font-size: 16px;
     }
   }
 `}

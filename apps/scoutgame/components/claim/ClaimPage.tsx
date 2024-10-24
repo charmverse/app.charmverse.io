@@ -23,7 +23,6 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
       <Stack
         gap={8}
         mt={2}
-        mb={2}
         flexDirection={{
           xs: 'column',
           md: 'row'

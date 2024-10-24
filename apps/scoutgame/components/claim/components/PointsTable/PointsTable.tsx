@@ -71,7 +71,7 @@ export function PointsTable({
         >
           {pointsReceiptRewards.map((pointsReceiptReward) => (
             <PointsReceiptRewardRow
-              key={`${pointsReceiptReward.period}-${pointsReceiptReward.type}`}
+              key={`${pointsReceiptReward.type === 'season' ? pointsReceiptReward.season : pointsReceiptReward.week}-${pointsReceiptReward.type}`}
               pointsReceiptReward={pointsReceiptReward}
             />
           ))}

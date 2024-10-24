@@ -1,10 +1,12 @@
 import { Stack, TableCell, TableRow, Typography } from '@mui/material';
+import { seasons } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
 import type {
   BuilderPointsReceiptReward,
   LeaderboardRankPointsReceiptReward,
   PointsReceiptReward,
+  SeasonPointsReceiptsReward,
   SoldNftsPointsReceiptReward
 } from 'lib/points/getPointsReceiptsRewards';
 
@@ -23,7 +25,7 @@ function BuilderRewardRow({ builderReward }: { builderReward: BuilderPointsRecei
         <Typography>Builder rewards</Typography>
       </TableCell>
       <TableCell align='center'>
-        <Typography>{builderReward.period}</Typography>
+        <Typography>{builderReward.week}</Typography>
       </TableCell>
       <TableCell align='right'>
         <PointsCell points={builderReward.points} />
@@ -43,7 +45,7 @@ function LeaderboardRankRewardRow({
         <Typography>Finished {getOrdinal(leaderboardRankReward.rank)}</Typography>
       </TableCell>
       <TableCell align='center'>
-        <Typography>{leaderboardRankReward.period}</Typography>
+        <Typography>{leaderboardRankReward.week}</Typography>
       </TableCell>
       <TableCell align='right'>
         <PointsCell points={leaderboardRankReward.points} />
@@ -62,10 +64,27 @@ function SoldNftsRewardRow({ soldNftsReward }: { soldNftsReward: SoldNftsPointsR
         </Stack>
       </TableCell>
       <TableCell align='center'>
-        <Typography>{soldNftsReward.period}</Typography>
+        <Typography>{soldNftsReward.week}</Typography>
       </TableCell>
       <TableCell align='right'>
         <PointsCell points={soldNftsReward.points} />
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function SeasonRewardRow({ seasonReward }: { seasonReward: SeasonPointsReceiptsReward }) {
+  const seasonTitle = seasons.find((season) => season.start === seasonReward.season)?.title;
+  return (
+    <TableRow>
+      <TableCell align='left'>
+        <Typography>{seasonTitle}</Typography>
+      </TableCell>
+      <TableCell align='center'>
+        <Typography>-</Typography>
+      </TableCell>
+      <TableCell align='right'>
+        <PointsCell points={seasonReward.points} />
       </TableCell>
     </TableRow>
   );
@@ -78,6 +97,8 @@ export function PointsReceiptRewardRow({ pointsReceiptReward }: { pointsReceiptR
     return <LeaderboardRankRewardRow leaderboardRankReward={pointsReceiptReward} />;
   } else if (pointsReceiptReward.type === 'sold_nfts') {
     return <SoldNftsRewardRow soldNftsReward={pointsReceiptReward} />;
+  } else if (pointsReceiptReward.type === 'season') {
+    return <SeasonRewardRow seasonReward={pointsReceiptReward} />;
   }
 
   return null;
