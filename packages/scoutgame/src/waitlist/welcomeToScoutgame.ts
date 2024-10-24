@@ -4,8 +4,6 @@ import { writeToFarcaster } from '@packages/farcaster/messaging/writeToFarcaster
 import type { ConnectWaitlistTier } from './scoring/constants';
 import { getTier } from './scoring/constants';
 
-const embedUrl = 'https://scoutgame.xyz';
-
 const pastTierMessage1 =
   '@username The Scout Game has started! You earned EARLY ENTRY by joining our Waitlist. Check out the action now and begin your Scout journey!';
 const pastTierMessage2 =
@@ -34,8 +32,8 @@ const messages: { tier: ConnectWaitlistTier | 'builder'; messages: string[] }[] 
   {
     tier: 'common',
     messages: [
-      '@username The Scout Game begins now for Common Scouts. You earned the Rare level from the Waitilist game and have been given 10 points to start scouting with. Check it out now.',
-      '@username The Scout Game begins now for Common Scouts. You earned the Rare level from the Watilist game and have been given 10 points to start scouting with. Lets go!'
+      '@username The Scout Game begins now for Common Scouts. You earned the Common level from the Waitilist game and have been given 10 points to start scouting with. Check it out now.',
+      '@username The Scout Game begins now for Common Scouts. You earned the Common level from the Waitlist game and have been given 10 points to start scouting with. Lets go!'
     ]
   },
   {
