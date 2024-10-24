@@ -2,6 +2,9 @@ import { log } from "@charmverse/core/log";
 import { Prisma, prisma } from "@charmverse/core/prisma-client";
 import { ConnectWaitlistTier, getWaitlistRange } from "@packages/scoutgame/waitlist/scoring/constants";
 import { welcomeFromWaitlistToScoutgame } from '@packages/scoutgame/waitlist/welcomeToScoutgame';
+import {RateLimit} from 'async-sema';
+
+const limiter = RateLimit(1);
 
 
 async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
@@ -43,7 +46,7 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
     orderBy: {
       fid: 'asc'
     },
-    skip: 4995
+    skip: 5436
   });
 
   const totalUsersInTier = users.length;
@@ -57,6 +60,7 @@ async function welcomeWaitlistTier(tier: ConnectWaitlistTier) {
   for (let i = 0; i < limit; i++) {
     const user = users[i];
     console.log(`Processing FID:${user.fid} ${user.username} user ${i + 1} of ${totalUsersInTier}`);
+    await limiter();
     await welcomeFromWaitlistToScoutgame({fid: user.fid});
   }
 
