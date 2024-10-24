@@ -23,6 +23,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
   if (isProdEnv) {
     const builders = await prisma.scout.findMany({
       where: {
+        builderStatus: 'approved',
         id: {
           in: preselectedBuilderIds
         }
@@ -68,7 +69,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           price: builder.builderNfts[0]?.currentPrice ?? 0,
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
           nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
-          builderStatus: builder.builderStatus,
+          builderStatus: builder.builderStatus!,
           rank: builder.userWeeklyStats[0]?.rank || -1
         };
       })
@@ -150,7 +151,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
       rank: user.userWeeklyStats[0]?.rank || -1,
       scoutedBy: user.nftPurchaseEvents.length,
-      builderStatus: user.builderStatus
+      builderStatus: user.builderStatus!
     };
   });
 

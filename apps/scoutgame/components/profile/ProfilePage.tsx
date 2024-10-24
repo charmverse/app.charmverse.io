@@ -1,10 +1,11 @@
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import type { UserStats } from 'lib/users/getUserStats';
-import type { BasicUserInfo } from 'lib/users/interfaces';
+import type { BuilderUserInfo } from 'lib/users/interfaces';
 
 import { PageContainer } from '../layout/PageContainer';
 
@@ -16,9 +17,11 @@ import { ScoutProfileLoading } from './components/ScoutProfile/ScoutProfileLoadi
 
 export type ProfileTab = 'build' | 'scout' | 'scout-build';
 
-export type UserProfileWithPoints = BasicUserInfo &
+export type UserProfileWithPoints = Omit<BuilderUserInfo, 'builderStatus'> &
   UserStats & {
     currentBalance: number;
+    displayName: string;
+    builderStatus: BuilderStatus | null;
   };
 
 export type ProfilePageProps = {
@@ -81,7 +84,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
           {tab === 'scout' ? (
             <ScoutProfile userId={user.id} />
           ) : tab === 'build' ? (
-            <BuilderProfile builder={user} />
+            <BuilderProfile builder={user as BuilderUserInfo} />
           ) : (
             <Stack flexDirection='row' gap={2}>
               <Paper
@@ -106,7 +109,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
                 <Typography variant='h6' color='text.secondary'>
                   Build
                 </Typography>
-                <BuilderProfile builder={user} />
+                <BuilderProfile builder={user as BuilderUserInfo} />
               </Paper>
             </Stack>
           )}

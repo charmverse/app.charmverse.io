@@ -1,5 +1,6 @@
 'use client';
 
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 
 import { BackButton } from 'components/common/Button/BackButton';
@@ -15,8 +16,9 @@ import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicBuilderStats } from './PublicBuilderStats';
 
-type BuilderProfileProps = {
+export type BuilderProfileProps = {
   builder: BasicUserInfo & {
+    builderStatus: BuilderStatus;
     price?: bigint;
     nftImageUrl?: string;
   };
@@ -79,8 +81,7 @@ export function PublicBuilderProfileContainer({
                   <UserProfile
                     user={{
                       ...builder,
-                      avatar: null,
-                      githubLogin: builder.githubLogin
+                      avatar: null
                     }}
                   />
                   <PublicBuilderStats

@@ -92,7 +92,7 @@ export async function getSortedBuilders({
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             rank: scout.userWeeklyStats[0]?.rank ?? -1,
             nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: scout.builderStatus
+            builderStatus: scout.builderStatus!
           }));
         });
       const userId = builders[builders.length - 1]?.id;
@@ -174,7 +174,7 @@ export async function getSortedBuilders({
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!
           }))
         );
       const userId = builders[builders.length - 1]?.id;
@@ -254,7 +254,7 @@ export async function getSortedBuilders({
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!
           }))
         );
       const userId = builders[builders.length - 1]?.id;

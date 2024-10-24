@@ -1,12 +1,19 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { cache } from 'react';
 
 import type { BasicUserInfo } from './interfaces';
 import { BasicUserInfoSelect } from './queries';
 
-export async function getUserByUsernamePath(
-  username: string
-): Promise<(BasicUserInfo & { nftImageUrl?: string; congratsImageUrl?: string | null }) | null> {
+export async function getUserByUsernamePath(username: string): Promise<
+  | (BasicUserInfo & {
+      nftImageUrl?: string;
+      congratsImageUrl?: string | null;
+      builderStatus: BuilderStatus | null;
+      displayName: string;
+    })
+  | null
+> {
   const user = await prisma.scout.findFirst({
     where: {
       username
