@@ -18,7 +18,7 @@ export async function getUserByUsernamePath(username: string): Promise<
     where: {
       username
     },
-    select: { ...BasicUserInfoSelect, builderNfts: true }
+    select: { ...BasicUserInfoSelect, displayName: true, builderNfts: true }
   });
 
   if (!user) {

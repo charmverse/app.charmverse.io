@@ -64,7 +64,6 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
         return {
           id: builder.id,
           username: builder.username,
-          displayName: builder.displayName,
           builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
           price: builder.builderNfts[0]?.currentPrice ?? 0,
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
@@ -144,7 +143,6 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
     return {
       id: user.id,
       username: user.username,
-      displayName: user.displayName,
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: user.builderNfts[0]?.currentPrice ?? 0,
       nftImageUrl: user.builderNfts[0]?.imageUrl,
