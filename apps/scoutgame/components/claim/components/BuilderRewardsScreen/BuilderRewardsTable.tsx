@@ -1,4 +1,4 @@
-import { Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Paper, Stack, Table, TableCell, TableRow, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -8,6 +8,7 @@ import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { DividerRow } from '../common/DividerRow';
 import { PointsCell } from '../common/PointsCell';
+import { StyledTableBody, StyledTableHead } from '../common/StyledTable';
 
 export async function BuilderRewardsTable({ week }: { week: string | null }) {
   const user = await getUserFromSession();
@@ -24,35 +25,34 @@ export async function BuilderRewardsTable({ week }: { week: string | null }) {
   return (
     <>
       <Table>
-        <TableHead
-          sx={{
-            backgroundColor: 'background.dark',
-            '& .MuiTableCell-root': { padding: 1, borderBottom: 'none', px: 1.5 }
-          }}
-        >
+        <StyledTableHead>
           <TableRow>
             <TableCell align='left'>BUILDER</TableCell>
             <TableCell align='center'>CARDS HELD</TableCell>
             {week ? <TableCell align='center'>RANK</TableCell> : null}
             <TableCell align='right'>POINTS</TableCell>
           </TableRow>
-        </TableHead>
+        </StyledTableHead>
         {builderRewards.length ? (
-          <TableBody
-            sx={{
-              backgroundColor: 'background.dark',
-              '& .MuiTableCell-root': { padding: 1, borderBottom: 'none', px: 1.5 }
-            }}
-          >
+          <StyledTableBody>
             {builderRewards.map((reward) => (
               <>
                 <DividerRow />
                 <TableRow key={reward.username}>
-                  <TableCell>
+                  <TableCell
+                    sx={{
+                      maxWidth: {
+                        xs: 150,
+                        md: 'none'
+                      }
+                    }}
+                  >
                     <Link href={`/u/${reward.username}`}>
                       <Stack direction='row' alignItems='center' gap={1}>
                         <Avatar src={reward.avatar} name={reward.username} size='small' />
-                        <Typography>{reward.username}</Typography>
+                        <Typography noWrap overflow='hidden'>
+                          {reward.username}
+                        </Typography>
                       </Stack>
                     </Link>
                   </TableCell>
@@ -79,7 +79,7 @@ export async function BuilderRewardsTable({ week }: { week: string | null }) {
                 <PointsCell points={totalPoints} />
               </TableCell>
             </TableRow>
-          </TableBody>
+          </StyledTableBody>
         ) : null}
       </Table>
       {builderRewards.length ? null : (

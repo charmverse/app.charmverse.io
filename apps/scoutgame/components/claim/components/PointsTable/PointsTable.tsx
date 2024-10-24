@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 
 import type { PointsReceiptReward } from 'lib/points/getPointsReceiptsRewards';
 
+import { StyledTableBody, StyledTableHead } from '../common/StyledTable';
+
 import { PointsReceiptRewardRow } from './PointsReceiptRewardRow';
 
 export function PointsTable({
@@ -15,45 +17,12 @@ export function PointsTable({
   title: ReactNode | string;
   emptyMessage: string;
 }) {
-  return (
-    <Stack gap={0.5} alignItems='center'>
-      <Typography variant='h6' color='secondary'>
-        {title}
-      </Typography>
-      <Table>
-        <TableHead
-          sx={{
-            backgroundColor: 'background.dark',
-            '& .MuiTableCell-root': { padding: 1, px: 1.5, borderBottom: 'none', width: '33.33%' }
-          }}
-        >
-          <TableRow>
-            <TableCell
-              align='left'
-              sx={{
-                minWidth: 150
-              }}
-            >
-              ACTION
-            </TableCell>
-            <TableCell align='center'>WEEK</TableCell>
-            <TableCell align='right'>POINTS</TableCell>
-          </TableRow>
-        </TableHead>
-        {pointsReceiptRewards.length ? (
-          <TableBody
-            sx={{
-              backgroundColor: 'background.dark',
-              '& .MuiTableCell-root': { p: 1, borderBottom: 'none', px: 1.5, width: '33.33%' }
-            }}
-          >
-            {pointsReceiptRewards.map((pointsReceiptReward) => (
-              <PointsReceiptRewardRow key={pointsReceiptReward.period} pointsReceiptReward={pointsReceiptReward} />
-            ))}
-          </TableBody>
-        ) : null}
-      </Table>
-      {pointsReceiptRewards.length ? null : (
+  if (pointsReceiptRewards.length === 0) {
+    return (
+      <Stack gap={0.5} alignItems='center'>
+        <Typography variant='h6' color='secondary'>
+          {title}
+        </Typography>
         <Paper
           sx={{
             width: '100%',
@@ -70,7 +39,39 @@ export function PointsTable({
             {emptyMessage}
           </Typography>
         </Paper>
-      )}
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack gap={0.5} alignItems='center'>
+      <Typography variant='h6' color='secondary'>
+        {title}
+      </Typography>
+      <Table>
+        <StyledTableHead
+          sx={{
+            '& .MuiTableCell-root': { width: '33.33%' }
+          }}
+        >
+          <TableRow>
+            <TableCell align='left'>ACTION</TableCell>
+            <TableCell align='center'>WEEK</TableCell>
+            <TableCell align='right'>POINTS</TableCell>
+          </TableRow>
+        </StyledTableHead>
+        <StyledTableBody
+          sx={{
+            '& .MuiTableCell-root': {
+              width: '33.33%'
+            }
+          }}
+        >
+          {pointsReceiptRewards.map((pointsReceiptReward) => (
+            <PointsReceiptRewardRow key={pointsReceiptReward.period} pointsReceiptReward={pointsReceiptReward} />
+          ))}
+        </StyledTableBody>
+      </Table>
     </Stack>
   );
 }

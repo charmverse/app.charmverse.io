@@ -30,6 +30,7 @@ export function BuilderRewardsScreen({ period }: { period: string }) {
       <Typography color='secondary' variant='h6'>
         Builder Rewards
       </Typography>
+      <Typography textAlign='center'>See how many Scout Points your Builders have earned for you!</Typography>
       <TabsMenu
         tabs={[
           { value: week || lastWeek, label: 'Weekly' },
