@@ -1,4 +1,4 @@
-import { Stack, TableHead } from '@mui/material';
+import { Stack, TableHead, Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,17 +7,82 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { getRelativeTime } from '@packages/utils/dates';
 import Link from 'next/link';
+import { BiLike } from 'react-icons/bi';
+import { LuBookMarked } from 'react-icons/lu';
 
 import { Avatar } from 'components/common/Avatar';
 import { GemsIcon } from 'components/common/Icons';
 import {
-  BuilderActivityAction,
   BuilderActivityBonusPartner,
-  BuilderActivityGems
+  BuilderActivityGems,
+  getActivityLabel
 } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { TableCellText } from './TableCellText';
+
+export function BuilderActivityAction({ activity }: { activity: BuilderActivity }) {
+  return (
+    <Stack component='span' direction='row' spacing={0.5} alignItems='flex-start'>
+      {activity.type === 'github_event' ? (
+        <LuBookMarked size='15px' style={{ flexShrink: 0, marginTop: '2.5px' }} />
+      ) : activity.type === 'nft_purchase' ? (
+        <BiLike size='15px' style={{ flexShrink: 0, marginTop: '2.5px' }} />
+      ) : null}
+      <Typography
+        variant='body2'
+        component='span'
+        sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {getActivityLabel(activity)}
+        {activity.type === 'nft_purchase' && (
+          <Typography
+            component='span'
+            variant='caption'
+            sx={{
+              whiteSpace: 'nowrap',
+              marginLeft: {
+                xs: -0.5,
+                md: '4px'
+              },
+              display: {
+                xs: 'block',
+                md: 'initial'
+              }
+            }}
+          >
+            <Link href={`/u/${activity.scout}`} style={{ marginLeft: '4px' }}>
+              {activity.scout}
+            </Link>
+          </Typography>
+        )}
+        {activity.type === 'github_event' && (
+          <Typography
+            component='span'
+            variant='caption'
+            sx={{
+              whiteSpace: 'nowrap',
+              marginLeft: {
+                xs: -0.15,
+                md: '4px'
+              },
+              display: {
+                xs: 'block',
+                md: 'initial'
+              }
+            }}
+          >
+            <Link href={activity.url}>({activity.repo})</Link>
+          </Typography>
+        )}
+      </Typography>
+    </Stack>
+  );
+}
 
 export function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (

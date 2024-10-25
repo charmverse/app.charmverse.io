@@ -30,53 +30,19 @@ export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }
   return <Typography component='span'>{getActivityLabel(activity)}</Typography>;
 }
 
-export function BuilderActivityAction({ activity }: { activity: BuilderActivity }) {
+export function BuilderActivityDetail({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack
-      component='span'
-      direction='row'
-      spacing={0.5}
-      alignItems='center'
-      sx={{
-        minWidth: 0,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap'
-      }}
-    >
+    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'github_event' ? (
-        <LuBookMarked size='15px' style={{ flexShrink: 0 }} />
+        <LuBookMarked size='15px' />
       ) : activity.type === 'nft_purchase' ? (
-        <BiLike size='15px' style={{ flexShrink: 0 }} />
+        <BiLike size='15px' />
       ) : null}
-      <Typography
-        variant='body2'
-        component='span'
-        sx={{
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}
-      >
-        {getActivityLabel(activity)}
-        {activity.type === 'nft_purchase' && (
-          <Link href={`/u/${activity.scout}`} style={{ marginLeft: '4px' }}>
-            {activity.scout}
-          </Link>
-        )}
-        {activity.type === 'github_event' && (
-          <Typography
-            component='span'
-            variant='caption'
-            sx={{
-              whiteSpace: 'nowrap',
-              marginLeft: '4px'
-            }}
-          >
-            <Link href={activity.url}>({activity.repo})</Link>
-          </Typography>
-        )}
-      </Typography>
+      {activity.type === 'nft_purchase' ? (
+        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
+      ) : activity.type === 'github_event' ? (
+        <Link href={activity.url}>{activity.repo}</Link>
+      ) : null}
     </Stack>
   );
 }
@@ -92,18 +58,8 @@ export function BuilderActivityGems({
     <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'github_event' ? (
         <>
-          <Typography
-            component='span'
-            sx={{
-              fontSize: {
-                xs: '14px',
-                md: '16px'
-              }
-            }}
-          >
-            {activity.gems}
-          </Typography>
-          <GemsIcon size={16} />
+          <Typography component='span'>+{activity.gems}</Typography>
+          <GemsIcon />
         </>
       ) : showEmpty ? (
         '-'
@@ -146,7 +102,8 @@ export function BuilderActivitiesList({ activities }: { activities: BuilderActiv
           >
             <Stack direction='row' justifyContent='space-between'>
               <Stack width='60%'>
-                <BuilderActivityAction activity={activity} />
+                <BuilderActivityLabel activity={activity} />
+                <BuilderActivityDetail activity={activity} />
               </Stack>
               <Stack justifyContent='center' alignItems='center' gap={1}>
                 <BuilderActivityGems activity={activity} />
