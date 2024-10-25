@@ -1,4 +1,4 @@
-import { Box, Stack, TableHead } from '@mui/material';
+import { Stack, TableHead } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,10 +11,9 @@ import Link from 'next/link';
 import { Avatar } from 'components/common/Avatar';
 import { GemsIcon } from 'components/common/Icons';
 import {
+  BuilderActivityAction,
   BuilderActivityBonusPartner,
-  BuilderActivityDetail,
-  BuilderActivityGems,
-  getActivityLabel
+  BuilderActivityGems
 } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
@@ -34,16 +33,19 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
               }
             }}
           >
-            <TableCell />
+            <TableCell>BUILDER</TableCell>
             <TableCell>ACTION</TableCell>
-            <TableCell width='100px'>DETAIL</TableCell>
             <TableCell align='right'>
               <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
                 EARNED <GemsIcon />
               </Stack>
             </TableCell>
             <TableCell align='center'>BONUS</TableCell>
-            <TableCell />
+            <TableCell
+              sx={{
+                display: { xs: 'none', md: 'table-cell' }
+              }}
+            />
           </TableRow>
         </TableHead>
         <TableBody>
@@ -69,14 +71,11 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
                 </Stack>
               </TableCell>
               <TableCell>
-                <TableCellText>{getActivityLabel(activity)}</TableCellText>
+                <Stack maxWidth={{ xs: '150px', md: 'initial' }}>
+                  <BuilderActivityAction activity={activity} />
+                </Stack>
               </TableCell>
-              <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <TableCellText>
-                  <BuilderActivityDetail activity={activity} />
-                </TableCellText>
-              </TableCell>
-              <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+              <TableCell align='right'>
                 <TableCellText display='inline-flex'>
                   <BuilderActivityGems activity={activity} showEmpty />
                 </TableCellText>
@@ -84,7 +83,12 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
               <TableCell align='center'>
                 <BuilderActivityBonusPartner activity={activity} />
               </TableCell>
-              <TableCell align='right'>
+              <TableCell
+                align='right'
+                sx={{
+                  display: { xs: 'none', md: 'table-cell' }
+                }}
+              >
                 <TableCellText>{getRelativeTime(activity.createdAt)}</TableCellText>
               </TableCell>
             </TableRow>
