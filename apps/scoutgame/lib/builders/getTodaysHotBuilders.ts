@@ -6,17 +6,17 @@ import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import type { BuilderInfo } from './interfaces';
 
-const preselectedBuilderIds = [
-  '9a7d9dd6-298d-4e92-9f71-ff972abd1132',
-  '1b152457-fec5-482e-98da-39c78ceca130',
-  'e9d39cf3-ac24-404c-9561-6d10ce2c59f5',
-  'd5ca4ab2-5290-4f77-896f-d855f8eea9b5',
-  '1552d2e0-4a2f-4090-be59-36d60c81a9c4',
-  'db14b362-fa80-4c73-9b84-1473785fc8db',
-  '78af5174-0d51-4c46-bd03-b93906ea59db',
-  '1fb7b66d-3250-481c-bdde-d20dda223b8b',
-  'e387f960-ff07-40fa-abc3-f8adacc994a1',
-  '9320d5fd-0557-49ae-8bae-6da6f4af0634'
+const preselectedBuilderUsernames = [
+  'samkuhlmann',
+  'earth2travis',
+  'dan13ram.eth',
+  'andreitr.eth',
+  'stephancill',
+  'piesrtasty',
+  'thecreative.eth',
+  'gregfromstl',
+  'millzdoteth',
+  'icemonkey'
 ];
 
 export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
@@ -24,8 +24,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
     const builders = await prisma.scout.findMany({
       where: {
         builderStatus: 'approved',
-        id: {
-          in: preselectedBuilderIds
+        username: {
+          in: preselectedBuilderUsernames
         }
       },
       select: {
@@ -72,7 +72,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           rank: builder.userWeeklyStats[0]?.rank || -1
         };
       })
-      .sort((a, b) => preselectedBuilderIds.indexOf(a.id) - preselectedBuilderIds.indexOf(b.id));
+      .sort((a, b) => preselectedBuilderUsernames.indexOf(a.id) - preselectedBuilderUsernames.indexOf(b.id));
   }
 
   const builders = await prisma.userWeeklyStats.findMany({

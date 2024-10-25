@@ -12,7 +12,7 @@ export async function ScoutPageBuildersGallery({ sort, showHotIcon }: { sort: Bu
   const [error, data] = await safeAwaitSSRData(
     getSortedBuilders({
       sort: sort as BuildersSort,
-      limit: 15,
+      limit: 30,
       week: getCurrentWeek(),
       season: currentSeason,
       cursor: null

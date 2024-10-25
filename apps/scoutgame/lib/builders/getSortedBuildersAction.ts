@@ -26,7 +26,7 @@ export const getSortedBuildersAction = actionClient
     const { sort, cursor } = parsedInput;
     const { builders, nextCursor } = await getSortedBuilders({
       sort,
-      limit: 15,
+      limit: 30, // 6 rows per page
       week: getCurrentWeek(),
       season: currentSeason,
       cursor
