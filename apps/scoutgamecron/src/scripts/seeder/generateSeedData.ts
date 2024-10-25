@@ -135,7 +135,7 @@ export async function generateSeedData() {
       totalNftsPurchasedEvents += dailyNftsPurchased;
     }
 
-    await updateBuilderCardActivity(date);
+    await updateBuilderCardActivity(date.minus({ days: 1 }));
 
     // Check if we are at the end of the week
     if (date.weekday === 7) {

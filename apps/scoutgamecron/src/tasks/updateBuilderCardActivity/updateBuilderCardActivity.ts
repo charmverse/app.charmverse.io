@@ -15,8 +15,8 @@ export async function updateBuilderCardActivity(date: DateTime) {
       builderCardActivities: true,
       events: {
         where: {
-          type: {
-            in: ['daily_commit', 'merged_pull_request']
+          gemsReceipt: {
+            isNot: null
           },
           createdAt: {
             gte: date.startOf('day').toISO(),
