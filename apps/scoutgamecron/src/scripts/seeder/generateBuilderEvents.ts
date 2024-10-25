@@ -34,7 +34,7 @@ async function processBuilderActivity({
     if (repo) {
       try {
         if (pullRequest.state === 'CLOSED') {
-          await recordClosedPullRequest({ pullRequest, repo, season, prClosedBy: v4() });
+          await recordClosedPullRequest({ pullRequest, repo, season, prClosedBy: v4(), skipSendingComment: true });
         } else {
           await recordMergedPullRequest({ pullRequest, repo, season, skipFirstMergedPullRequestCheck: true });
         }
