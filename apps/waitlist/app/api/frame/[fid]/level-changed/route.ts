@@ -8,6 +8,7 @@ import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInter
 
 import { JoinWaitlistFrame } from 'components/frame/JoinWaitlistFrame';
 import { LevelChangedFrame } from 'components/frame/LevelChangedFrame';
+import { ScoutGameLaunchedFrame } from 'components/frame/ScoutGameLaunchedFrame';
 import { getReferrerFidFromUrl } from 'lib/frame/getInfoFromUrl';
 import { trackWaitlistMixpanelEvent } from 'lib/mixpanel/trackWaitlistMixpanelEvent';
 
@@ -18,10 +19,8 @@ export async function GET(req: Request) {
   const tierChange = reqAsURL.searchParams.get('tierChange') as Extract<TierChange, 'up' | 'down'>;
   const percentile = parseInt(reqAsURL.searchParams.get('percentile') as string);
 
-  const frame = LevelChangedFrame({
-    referrerFid,
-    percentile,
-    tierChange
+  const frame = ScoutGameLaunchedFrame({
+    referrerFid
   });
 
   trackWaitlistMixpanelEvent('frame_impression', {
@@ -69,7 +68,7 @@ export async function POST(req: Request) {
     referrerUserId: deterministicV4UUIDFromFid(referrerFid),
     frame: `join_waitlist_info`
   });
-  return new Response(JoinWaitlistFrame({ referrerFid }), {
+  return new Response(ScoutGameLaunchedFrame({ referrerFid }), {
     status: 200,
     headers: {
       'Content-Type': 'text/html'

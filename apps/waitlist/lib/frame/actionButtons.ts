@@ -78,3 +78,14 @@ export function waitlistGotoBuilders({ referrerFid, currentFrame }: FrameReferre
     })
   };
 }
+
+export function gotoScoutGame({ referrerFid, currentFrame }: FrameReferrer): FrameButtonPostRedirect {
+  return {
+    label: 'Start Scouting',
+    action: 'post_redirect',
+    target: encodeCurrentFrame({
+      url: `${baseUrl}/api/frame/${referrerFid}/actions/goto-scoutgame`,
+      frame: currentFrame
+    })
+  };
+}
