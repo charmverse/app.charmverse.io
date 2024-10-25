@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
             },
             data: {
               // Re-enable this once Neynar fixes their caching mechanism
-              // avatar: profile.body.avatarUrl,
+              // avatar: profile.pfp_url,
               bio,
               displayName,
               username
