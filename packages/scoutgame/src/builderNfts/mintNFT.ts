@@ -1,5 +1,3 @@
-'use server';
-
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';

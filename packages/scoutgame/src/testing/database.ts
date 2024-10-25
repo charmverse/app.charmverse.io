@@ -2,7 +2,7 @@ import type { BuilderEvent, BuilderEventType, GithubRepo, Scout } from '@charmve
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { currentSeason, getCurrentWeek } from '../dates';
+import { getCurrentWeek } from '../dates';
 
 import { randomLargeInt, mockSeason } from './generators';
 
