@@ -24,7 +24,10 @@ export function BuilderCardStats({
     <Stack
       alignItems='center'
       pt={0.25}
-      gap={size === 'medium' || size === 'large' ? 0.25 : 0.1}
+      gap={{
+        xs: 0,
+        md: size === 'medium' || size === 'large' ? 0.25 : 0.1
+      }}
       width='100%'
       height='100%'
     >
@@ -43,17 +46,35 @@ export function BuilderCardStats({
         {typeof builderPoints === 'number' && (
           <Tooltip title='Total # of Scout Points earned this season to date'>
             <Stack flexDirection='row' gap={0.25} alignItems='center'>
-              <Typography variant='body2' component='span' color='green.main'>
+              <Typography
+                sx={{
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px'
+                  }
+                }}
+                component='span'
+                color='green.main'
+              >
                 {builderPoints}
               </Typography>
-              <PointsIcon size={18} color='green' />
+              <PointsIcon size={16} color='green' />
             </Stack>
           </Tooltip>
         )}
         {typeof rank === 'number' && (
           <Tooltip title='Current week’s rank'>
             <Stack flexDirection='row' gap={0.2} alignItems='center'>
-              <Typography variant='body2' component='span' color='text.secondary'>
+              <Typography
+                sx={{
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px'
+                  }
+                }}
+                component='span'
+                color='text.secondary'
+              >
                 #{rank}
               </Typography>
             </Stack>
@@ -62,7 +83,16 @@ export function BuilderCardStats({
         {typeof nftsSold === 'number' && (
           <Tooltip title='Total # of cards sold this season to date'>
             <Stack flexDirection='row' gap={0.25} alignItems='center'>
-              <Typography variant='body2' component='span' color='orange.main'>
+              <Typography
+                sx={{
+                  fontSize: {
+                    xs: '12px',
+                    md: '14px'
+                  }
+                }}
+                component='span'
+                color='orange.main'
+              >
                 {nftsSold}
               </Typography>
               <Image width={14} height={14} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
@@ -70,22 +100,15 @@ export function BuilderCardStats({
           </Tooltip>
         )}
       </Stack>
-      <Stack
-        flexDirection='row'
-        gap={1}
-        width='100%'
-        px={1}
-        alignItems='center'
-        display={{
-          xs: 'none',
-          md: 'flex'
-        }}
-      >
+      <Stack flexDirection='row' gap={1} width='100%' px={1} alignItems='center'>
         <Stack sx={{ backgroundColor: 'text.secondary', height: '1px', flex: 1 }} />
         <Typography
           sx={{
             color: 'text.secondary',
-            fontSize: '10px'
+            fontSize: {
+              xs: '7.5px',
+              md: '10px'
+            }
           }}
         >
           7 DAY ACTIVITY

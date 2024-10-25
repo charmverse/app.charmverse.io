@@ -17,7 +17,10 @@ export function BuilderCardActivity({
 }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'), { noSsr: true });
-  const gemHeight = size === 'x-small' ? 12 : size === 'small' ? 13.5 : size === 'medium' ? 14.5 : 16;
+  let gemHeight = size === 'x-small' ? 12 : size === 'small' ? 13.5 : size === 'medium' ? 14.5 : 16;
+  if (isMobile) {
+    gemHeight *= 0.75;
+  }
   return (
     <>
       <Tooltip title={<BuilderCardActivityTooltip />}>
