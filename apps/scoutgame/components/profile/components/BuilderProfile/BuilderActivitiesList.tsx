@@ -73,7 +73,7 @@ export function BuilderActivityAction({ activity }: { activity: BuilderActivity 
               marginLeft: '4px'
             }}
           >
-            ({activity.repo})
+            <Link href={activity.url}>({activity.repo})</Link>
           </Typography>
         )}
       </Typography>
