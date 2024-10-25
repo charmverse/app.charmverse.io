@@ -9,8 +9,8 @@ export function BuilderCardActivityTooltip() {
         <Stack width={50} alignItems='center'>
           <Stack
             sx={{
-              width: 25,
-              height: 25,
+              width: 20,
+              height: 20,
               borderRadius: '50%',
               backgroundColor: 'text.secondary'
             }}
@@ -18,15 +18,15 @@ export function BuilderCardActivityTooltip() {
         </Stack>
         <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
           <Typography>= Scored 30+ </Typography>
-          <GemsIcon />
+          <GemsIcon size={16} />
         </Stack>
       </Stack>
       <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>
         <Stack width={50} alignItems='center'>
           <Stack
             sx={{
-              width: 15,
-              height: 15,
+              width: 10,
+              height: 10,
               borderRadius: '50%',
               backgroundColor: 'text.secondary'
             }}
@@ -34,7 +34,7 @@ export function BuilderCardActivityTooltip() {
         </Stack>
         <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
           <Typography>= Scored 1 to 29 </Typography>
-          <GemsIcon />
+          <GemsIcon size={16} />
         </Stack>
       </Stack>
       <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>

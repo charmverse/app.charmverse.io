@@ -43,7 +43,7 @@ export function BuilderCardActivity({
           }}
         >
           {last7DaysGems?.map((gem, index) => {
-            const height = gem === 0 ? gemHeight * 0.25 : gem <= 29 ? gemHeight * 0.5 : gemHeight;
+            const height = gem === 0 ? gemHeight * 0.35 : gem <= 29 ? gemHeight * 0.65 : gemHeight;
 
             return (
               <Stack
