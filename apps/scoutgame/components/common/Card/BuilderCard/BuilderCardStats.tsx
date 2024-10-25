@@ -28,7 +28,15 @@ export function BuilderCardStats({
       width='100%'
       height='100%'
     >
-      <Typography component='span' variant='body2'>
+      <Typography
+        component='span'
+        sx={{
+          fontSize: {
+            xs: '11.5px',
+            md: '14px'
+          }
+        }}
+      >
         @{username}
       </Typography>
       <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between' gap={1}>

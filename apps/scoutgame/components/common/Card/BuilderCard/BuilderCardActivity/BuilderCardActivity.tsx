@@ -23,7 +23,10 @@ export function BuilderCardActivity({
       <Tooltip title={<BuilderCardActivityTooltip />}>
         <Stack
           flexDirection='row'
-          gap={1.25}
+          gap={{
+            xs: 0.75,
+            md: 1.25
+          }}
           width='100%'
           height={gemHeight}
           px={1}
