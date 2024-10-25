@@ -1,7 +1,7 @@
 import { Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { PointsIcon } from 'components/common/Icons';
+import { GemsIcon, PointsIcon } from 'components/common/Icons';
 
 export function BuilderCardStats({
   username,
@@ -84,33 +84,95 @@ export function BuilderCardStats({
         </Typography>
         <Stack sx={{ backgroundColor: 'text.secondary', height: '1px', flex: 1 }} />
       </Stack>
-      <Stack flexDirection='row' gap={1.25} width='100%' height={gemHeight} px={1} mt={0.5} alignItems='center'>
-        {last7DaysGems?.map((gem, index) => {
-          const height = gem === 0 ? gemHeight * 0.25 : gem <= 29 ? gemHeight * 0.5 : gemHeight;
-
-          return (
-            <Stack
-              key={`${index.toString()}-${gem}`}
-              sx={{
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%'
-              }}
-            >
-              <Stack
-                sx={{
-                  borderRadius: '50%',
-                  width: height,
-                  height,
-                  backgroundColor: 'text.secondary'
-                }}
-              />
+      <Tooltip
+        title={
+          <Stack flexDirection='column' gap={0.5} py={1} width='fit-content'>
+            <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>
+              <Stack width={50} alignItems='center'>
+                <Stack
+                  sx={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: '50%',
+                    backgroundColor: 'text.secondary'
+                  }}
+                />
+              </Stack>
+              <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
+                <Typography>= Scored 30+ </Typography>
+                <GemsIcon />
+              </Stack>
             </Stack>
-          );
-        })}
-      </Stack>
+            <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>
+              <Stack width={50} alignItems='center'>
+                <Stack
+                  sx={{
+                    width: 15,
+                    height: 15,
+                    borderRadius: '50%',
+                    backgroundColor: 'text.secondary'
+                  }}
+                />
+              </Stack>
+              <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
+                <Typography>= Scored 1 to 29 </Typography>
+                <GemsIcon />
+              </Stack>
+            </Stack>
+            <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>
+              <Stack width={50} alignItems='center'>
+                <Stack
+                  sx={{
+                    width: 5,
+                    height: 5,
+                    borderRadius: '50%',
+                    backgroundColor: 'text.secondary'
+                  }}
+                />
+              </Stack>
+              <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
+                <Typography>= No activity </Typography>
+              </Stack>
+            </Stack>
+            <Stack flexDirection='row' gap={2} justifyContent='space-between' alignItems='center'>
+              <Stack width={50} alignItems='center'>
+                <Typography color='text.secondary'>Empty</Typography>
+              </Stack>
+              <Stack flexDirection='row' gap={0.5} flex={1} alignItems='center'>
+                <Typography>= No data </Typography>
+              </Stack>
+            </Stack>
+          </Stack>
+        }
+      >
+        <Stack flexDirection='row' gap={1.25} width='100%' height={gemHeight} px={1} mt={0.5} alignItems='center'>
+          {last7DaysGems?.map((gem, index) => {
+            const height = gem === 0 ? gemHeight * 0.25 : gem <= 29 ? gemHeight * 0.5 : gemHeight;
+
+            return (
+              <Stack
+                key={`${index.toString()}-${gem}`}
+                sx={{
+                  flex: 1,
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: '100%'
+                }}
+              >
+                <Stack
+                  sx={{
+                    borderRadius: '50%',
+                    width: height,
+                    height,
+                    backgroundColor: 'text.secondary'
+                  }}
+                />
+              </Stack>
+            );
+          })}
+        </Stack>
+      </Tooltip>
     </Stack>
   );
 }
