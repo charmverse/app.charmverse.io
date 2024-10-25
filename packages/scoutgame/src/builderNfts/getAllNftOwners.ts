@@ -11,6 +11,7 @@ export async function getAllNftOwners({ builderId, season }: { builderId: string
     },
     select: {
       nftSoldEvents: {
+        distinct: 'scoutId',
         select: {
           scoutId: true
         }
@@ -18,5 +19,5 @@ export async function getAllNftOwners({ builderId, season }: { builderId: string
     }
   });
 
-  return arrayUtils.uniqueValues(builderNft?.nftSoldEvents.map((ev) => ev.scoutId) ?? []) || [];
+  return builderNft?.nftSoldEvents.map((ev) => ev.scoutId) || [];
 }
