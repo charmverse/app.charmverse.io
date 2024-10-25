@@ -64,9 +64,9 @@ export function BuilderCardStats({
         </Typography>
         <Stack sx={{ backgroundColor: 'text.secondary', height: '1px', flex: 1 }} />
       </Stack>
-      <Stack flexDirection='row' gap={1.25} width='100%' height='100%' px={1} mt={0.5} mb={1} alignItems='center'>
+      <Stack flexDirection='row' gap={1.25} width='100%' height='18px' px={1} mt={0.5} mb={1} alignItems='center'>
         {last7DaysGems?.map((gem, index) => {
-          const percentage = gem === 0 ? '25%' : gem <= 29 ? '50%' : '100%';
+          const size = gem === 0 ? 18 * 0.25 : gem <= 29 ? 18 * 0.5 : 18;
 
           return (
             <Stack
@@ -82,8 +82,8 @@ export function BuilderCardStats({
               <Stack
                 sx={{
                   borderRadius: '50%',
-                  width: percentage,
-                  height: percentage,
+                  width: size,
+                  height: size,
                   backgroundColor: 'text.secondary'
                 }}
               />
