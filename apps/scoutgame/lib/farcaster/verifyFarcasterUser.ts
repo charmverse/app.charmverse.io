@@ -1,5 +1,4 @@
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
-import { getChainById } from '@root/connectors/chains';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { optimism } from 'viem/chains';
 
@@ -8,7 +7,7 @@ import type { AuthSchema } from './config';
 
 const appClient = createAppClient({
   ethereum: viemConnector({
-    rpcUrl: getChainById(optimism.id)!.rpcUrls[0]
+    rpcUrl: optimism.rpcUrls.default.http[0]
   })
 });
 

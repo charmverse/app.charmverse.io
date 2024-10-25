@@ -12,12 +12,12 @@ import { BuilderActivitiesList } from 'components/profile/components/BuilderProf
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
-import type { BasicUserInfo } from 'lib/users/interfaces';
+import type { BuilderUserInfo } from 'lib/users/interfaces';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
-export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
+export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) {
   const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}] =
     builder.builderStatus === 'approved'
       ? await Promise.all([

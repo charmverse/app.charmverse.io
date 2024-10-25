@@ -8,6 +8,7 @@ import { Avatar } from 'components/common/Avatar';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 export type ScoutInfo = BasicUserInfo & {
+  displayName: string;
   nfts: number;
 };
 

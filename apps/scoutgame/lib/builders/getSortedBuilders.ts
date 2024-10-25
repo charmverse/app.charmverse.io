@@ -86,13 +86,12 @@ export async function getSortedBuilders({
             id: scout.id,
             nftImageUrl: scout.builderNfts[0]?.imageUrl,
             username: scout.username,
-            displayName: scout.username,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             rank: scout.userWeeklyStats[0]?.rank ?? -1,
             nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: scout.builderStatus
+            builderStatus: scout.builderStatus!
           }));
         });
       const userId = builders[builders.length - 1]?.id;
@@ -169,12 +168,11 @@ export async function getSortedBuilders({
             rank: stat.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
-            displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!
           }))
         );
       const userId = builders[builders.length - 1]?.id;
@@ -250,11 +248,10 @@ export async function getSortedBuilders({
             rank: stat.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
-            displayName: stat.user.username,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!
           }))
         );
       const userId = builders[builders.length - 1]?.id;

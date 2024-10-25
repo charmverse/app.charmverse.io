@@ -1,6 +1,5 @@
 'use client';
 
-import { CanvasQRCode } from '@connect-shared/components/common/CanvasQrCode';
 import PhoneAndroidIcon from '@mui/icons-material/PhoneAndroid';
 import { Paper } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -8,6 +7,8 @@ import Link from '@mui/material/Link';
 import type { ModalProps } from '@mui/material/Modal';
 import Dialog from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+
+import { CanvasQRCode } from 'components/common/CanvasQrCode';
 
 const sx = {
   position: 'absolute' as const,

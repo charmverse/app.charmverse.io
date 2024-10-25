@@ -1,4 +1,4 @@
-import { mockBuilder, mockScout, mockBuilderNft } from '../../testing/database';
+import { mockBuilder, mockScout, mockNFTPurchaseEvent, mockBuilderNft } from '../../testing/database';
 import { getAllNftOwners } from '../getAllNftOwners';
 
 describe('getAllNftOwners', () => {
@@ -8,6 +8,9 @@ describe('getAllNftOwners', () => {
     const scouts = await Promise.all([mockScout(), mockScout(), mockScout()]);
 
     const builderNft = await mockBuilderNft({ builderId: builder.id, owners: scouts });
+
+    // 2nd scout buys 2 nfts
+    await mockNFTPurchaseEvent({ builderId: builder.id, scoutId: scouts[0].id, season: builderNft.season });
 
     // Call the function
     const result = await getAllNftOwners({ builderId: builder.id, season: builderNft.season });
