@@ -32,29 +32,51 @@ export function BuilderActivityLabel({ activity }: { activity: BuilderActivity }
 
 export function BuilderActivityAction({ activity }: { activity: BuilderActivity }) {
   return (
-    <Stack component='span' flexDirection='row' gap={0.5} alignItems='center' textOverflow='ellipsis'>
+    <Stack
+      component='span'
+      direction='row'
+      spacing={0.5}
+      alignItems='center'
+      sx={{
+        minWidth: 0,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+      }}
+    >
       {activity.type === 'github_event' ? (
-        <LuBookMarked size='15px' />
+        <LuBookMarked size='15px' style={{ flexShrink: 0 }} />
       ) : activity.type === 'nft_purchase' ? (
-        <BiLike size='15px' />
+        <BiLike size='15px' style={{ flexShrink: 0 }} />
       ) : null}
       <Typography
+        variant='body2'
+        component='span'
         sx={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
           whiteSpace: 'nowrap'
         }}
-        variant='body2'
       >
         {getActivityLabel(activity)}
-      </Typography>
-      {activity.type === 'nft_purchase' ? (
-        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
-      ) : activity.type === 'github_event' ? (
-        <Link href={activity.url}>
-          <Typography variant='caption' sx={{ whiteSpace: 'nowrap' }}>
+        {activity.type === 'nft_purchase' && (
+          <Link href={`/u/${activity.scout}`} style={{ marginLeft: '4px' }}>
+            {activity.scout}
+          </Link>
+        )}
+        {activity.type === 'github_event' && (
+          <Typography
+            component='span'
+            variant='caption'
+            sx={{
+              whiteSpace: 'nowrap',
+              marginLeft: '4px'
+            }}
+          >
             ({activity.repo})
           </Typography>
-        </Link>
-      ) : null}
+        )}
+      </Typography>
     </Stack>
   );
 }
@@ -70,8 +92,18 @@ export function BuilderActivityGems({
     <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'github_event' ? (
         <>
-          <Typography component='span'>{activity.gems}</Typography>
-          <GemsIcon />
+          <Typography
+            component='span'
+            sx={{
+              fontSize: {
+                xs: '14px',
+                md: '16px'
+              }
+            }}
+          >
+            {activity.gems}
+          </Typography>
+          <GemsIcon size={16} />
         </>
       ) : showEmpty ? (
         '-'

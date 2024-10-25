@@ -70,10 +70,15 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
                   <TableCellText noWrap>{activity.username}</TableCellText>
                 </Stack>
               </TableCell>
-              <TableCell>
-                <Stack maxWidth={{ xs: '150px', md: 'initial' }}>
-                  <BuilderActivityAction activity={activity} />
-                </Stack>
+              <TableCell
+                sx={{
+                  maxWidth: { xs: '150px', md: 'initial' },
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <BuilderActivityAction activity={activity} />
               </TableCell>
               <TableCell align='right'>
                 <TableCellText display='inline-flex'>
