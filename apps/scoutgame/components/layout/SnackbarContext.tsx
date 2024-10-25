@@ -43,6 +43,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
         open={snackbarOpen}
         onClose={handleClose}
         autoHideDuration={6000}
+        data-test={`snackbar-${snackbarSeverity}`}
       >
         <Alert onClose={handleClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}

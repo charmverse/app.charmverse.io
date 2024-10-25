@@ -1,102 +1,20 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { installMockWallet } from '@johanneskares/wallet-mock';
-import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
-import { currentSeason } from '@packages/scoutgame/dates';
-import { mockBuilder, mockBuilderNft } from '@packages/scoutgame/testing/database';
-import { delay } from '@root/lib/utils/async';
-import { custom, http } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
-import { optimism, sepolia } from 'viem/chains';
+import type { Page } from '@playwright/test';
 
-import { expect, test } from './test';
+import { GeneralPageLayout } from './GeneralPageLayout.po';
 
-test.describe('Buy Nft', () => {
-  test.beforeEach(async ({ page }) => {
-    await installMockWallet({
-      page,
-      account: privateKeyToAccount('0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'),
-      defaultChain: optimism,
-      transports: {
-        [optimism.id]: (config) => {
-          return custom({
-            request: async ({ method, params }) => {
-              // console.log('method inside metamask method', method);
-              // console.log('method inside metamask params', params);
-              // Mock only this RPC call
-              if (method === 'eth_estimateGas') {
-                return 500000;
-              }
+export class UserPage extends GeneralPageLayout {
+  constructor(protected page: Page) {
+    super(page);
+  }
 
-              if (method === 'eth_sendRawTransaction') {
-                return '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-              }
-
-              const response = await http()(config).request({ method, params });
-
-              return response;
-            }
-          })(config);
-        },
-        [sepolia.id]: (config) => {
-          return custom({
-            request: async ({ method, params }) => {
-              // Mock only this RPC call
-              if (method === 'eth_estimateGas') {
-                return 500000;
-              }
-
-              const response = await http()(config).request({ method, params });
-
-              return response;
-            }
-          })(config);
-        }
-      }
-    });
-  });
-
-  test('Should be able to buy an nft', async ({ utils, page }) => {
-    const builder = await mockBuilder({
-      nftSeason: currentSeason,
-      id: '10216fd1-e437-44ee-acb8-ba1813017c26',
-      avatar:
-        'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg',
-      bio: 'Software Engineer @charmverse. Building @scoutgamexyz',
-      builderStatus: 'approved',
-      sendMarketing: false,
-      farcasterId: 23,
-      agreedToTermsAt: new Date('2024-10-03T11:03:00.308Z'),
-      onboardedAt: new Date('2024-10-03T11:03:02.071Z'),
-      currentBalance: 200
-    });
-
-    const builderNft = await mockBuilderNft({
-      builderId: builder.id,
-      chainId: 10,
-      // This is the op mainnet real contract
-      contractAddress: getBuilderContractAddress(),
-      tokenId: 1
-    });
-
-    // Used for catching all the requests
+  async mockNftAPIs({ builder, isSuccess }: { builder: { id: string; username: string }; isSuccess: boolean }) {
+    // Used for debugging all routes. Keep caution as the next page.route() function will not run anymore.
     // await page.route('**', (route) => {
     //   console.log('Intercepted URL:', route.request().url());
     //   route.continue();
     // });
-    // await page.route(`**/u/${builder.username}`, async (route, request) => {
-    //   const method = request.method();
-    //   if (method !== 'POST') {
-    //     await route.continue();
-    //   }
-    // console.log('body', body);
-    // await route.continue();
-    // await route.fulfill({
-    //   status: 200,
-    //   json: { success: true }
-    // });
-    // });
 
-    await page.route('**/api/getTokens**', async (route) => {
+    await this.page.route('**/**/api/getTokens**', async (route) => {
       await route.fulfill({
         status: 200,
         json: [
@@ -124,55 +42,11 @@ test.describe('Buy Nft', () => {
           },
           {
             chainId: 10,
-            address: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
-            name: 'USD Coin',
-            symbol: 'USDC',
-            decimals: 6,
-            logo: 'https://box-v2.api.decent.xyz/tokens/usdc.png',
-            isNative: false,
-            balanceFloat: 0.004414,
-            balance: '4414n'
-          },
-          {
-            chainId: 10,
-            address: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
-            name: 'Dai Stablecoin',
-            symbol: 'DAI',
-            decimals: 18,
-            logo: 'https://static.alchemyapi.io/images/assets/4943.png',
-            isNative: false,
-            balanceFloat: 0,
-            balance: '0n'
-          },
-          {
-            chainId: 10,
             address: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
             name: 'Tether USD',
             symbol: 'USDT',
             decimals: 6,
             logo: 'https://static.alchemyapi.io/images/assets/825.png',
-            isNative: false,
-            balanceFloat: 0,
-            balance: '0n'
-          },
-          {
-            chainId: 10,
-            address: '0x4200000000000000000000000000000000000006',
-            name: 'Wrapped Ether',
-            symbol: 'WETH',
-            decimals: 18,
-            logo: 'https://static.alchemyapi.io/images/assets/2396.png',
-            isNative: false,
-            balanceFloat: 5.631566611e-9,
-            balance: '5631566611n'
-          },
-          {
-            chainId: 10,
-            address: '0x68f180fcCe6836688e9084f035309E29Bf0A2095',
-            name: 'Wrapped BTC',
-            symbol: 'WBTC',
-            decimals: 8,
-            logo: 'https://static.alchemyapi.io/images/assets/3717.png',
             isNative: false,
             balanceFloat: 0,
             balance: '0n'
@@ -192,7 +66,7 @@ test.describe('Buy Nft', () => {
       });
     });
 
-    await page.route('**/**/api/getBoxAction**', async (route) => {
+    await this.page.route('**/**/api/getBoxAction**', async (route) => {
       await route.fulfill({
         status: 200,
         json: {
@@ -245,21 +119,26 @@ test.describe('Buy Nft', () => {
       });
     });
 
-    await utils.loginAsUserId(builder.id);
-    await page.goto(`/home`);
-    await page.waitForURL('**/home');
+    // Mocking server action to handle the pending transaction and mint the NFT without calling decent
+    await this.page.route(`**/u/${builder.username}`, async (route) => {
+      const method = route.request().method();
+      const body = route.request().postDataJSON()?.[0];
 
-    await page.goto(`/u/${builder.username}`);
-    await page.waitForURL(`**/u/${builder.username}`);
-
-    // Card buy NFT button
-    const scoutButton = page.locator('data-test=scout-button').first();
-    await scoutButton.click();
-
-    const buyButton = page.locator('data-test=purchase-button').first();
-    await buyButton.click();
-
-    const successView = page.locator('data-test=success-view');
-    await expect(successView).toBeVisible();
-  });
-});
+      if (method === 'POST' && body?.pendingTransactionId) {
+        if (isSuccess) {
+          await route.fulfill({
+            status: 200,
+            json: { success: true }
+          });
+        } else {
+          await route.fulfill({
+            status: 500,
+            json: { success: false }
+          });
+        }
+      } else {
+        await route.continue();
+      }
+    });
+  }
+}
