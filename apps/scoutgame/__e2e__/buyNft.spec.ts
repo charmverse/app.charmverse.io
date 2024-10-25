@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { installMockWallet } from '@johanneskares/wallet-mock';
 import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { mockBuilder, mockBuilderNft } from '@packages/scoutgame/testing/database';
 import { delay } from '@root/lib/utils/async';
 import { custom, http } from 'viem';
@@ -56,6 +57,7 @@ test.describe('Buy Nft', () => {
 
   test('Should be able to buy an nft', async ({ utils, page }) => {
     const builder = await mockBuilder({
+      nftSeason: currentSeason,
       id: '10216fd1-e437-44ee-acb8-ba1813017c26',
       avatar:
         'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg',
