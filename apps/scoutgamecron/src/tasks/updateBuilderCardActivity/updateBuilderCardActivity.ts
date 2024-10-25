@@ -1,14 +1,15 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/utils/types';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 
 export type Last7DaysGems = { date: string; gemsCount: number }[];
 
 export async function updateBuilderCardActivity(date: DateTime) {
   const builders = await prisma.scout.findMany({
     where: {
-      builderStatus: 'approved'
+      builderStatus: {
+        in: ['approved', 'banned']
+      }
     },
     select: {
       id: true,
@@ -19,11 +20,12 @@ export async function updateBuilderCardActivity(date: DateTime) {
             isNot: null
           },
           createdAt: {
-            gte: date.startOf('day').toISO(),
-            lte: date.endOf('day').toISO()
+            gte: date.minus({ days: 7 }).startOf('day').toISO(),
+            lte: date.minus({ days: 1 }).endOf('day').toISO()
           }
         },
         select: {
+          createdAt: true,
           gemsReceipt: {
             select: {
               value: true
@@ -38,20 +40,16 @@ export async function updateBuilderCardActivity(date: DateTime) {
 
   for (const builder of builders) {
     try {
-      const gemsCount = builder.events
-        .map((event) => event.gemsReceipt?.value)
-        .filter(isTruthy)
-        .reduce((acc, curr) => acc + curr, 0);
-      let last7Days = (builder.builderCardActivities[0]?.last7Days ?? []) as Last7DaysGems;
-      const currentDay = last7Days.find((day) => day.date === date.toFormat('yyyy-MM-dd'));
-      if (currentDay) {
-        currentDay.gemsCount += gemsCount;
-      } else {
-        last7Days.push({ date: date.toFormat('yyyy-MM-dd'), gemsCount });
-      }
-      if (last7Days.length > 7) {
-        last7Days = last7Days.slice(-7);
-      }
+      const dayGemsRecord: Record<string, number> = {};
+      builder.events.forEach((event) => {
+        const formattedDate = DateTime.fromJSDate(event.createdAt).toFormat('yyyy-MM-dd');
+        dayGemsRecord[formattedDate] = (dayGemsRecord[formattedDate] ?? 0) + (event.gemsReceipt?.value ?? 0);
+      });
+
+      const last7Days = Object.entries(dayGemsRecord)
+        .map(([formattedDate, gemsCount]) => ({ date: formattedDate, gemsCount }))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
       await prisma.builderCardActivity.upsert({
         where: { builderId: builder.id },
         update: { last7Days },
@@ -61,6 +59,7 @@ export async function updateBuilderCardActivity(date: DateTime) {
     } catch (error) {
       log.error(`Error updating builder card activity for builder`, {
         builderId: builder.id,
+        date,
         error
       });
     }

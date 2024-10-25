@@ -27,5 +27,5 @@ cron:
 
   - name: 'update-builder-card-activity'
     url: '/update-builder-card-activity'
-    # Every 10 minutes
-    schedule: '*/10 * * * *'
+    # Every hour
+    schedule: '0 * * * *'
