@@ -53,6 +53,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
               currentPrice: true,
               imageUrl: true,
               nftSoldEvents: {
+                distinct: 'scoutId',
                 select: {
                   id: true
                 }
