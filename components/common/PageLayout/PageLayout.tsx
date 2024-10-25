@@ -108,6 +108,17 @@ function PageLayout({ children }: PageLayoutProps) {
               >
                 Fantasy Sports for Developers. Join waitlist
               </AnnouncementBanner>
+              {space?.domain === 'sporkdao---ethdenver' && (
+                <AnnouncementBanner
+                  errorBackground={true}
+                  forceShow={true}
+                  spaceId={space?.id}
+                  actionLabel='Contact'
+                  actionHref='https://discord.gg/ACYCzBGC2M'
+                >
+                  Your subscription has expired. Please contact your admin for renewal
+                </AnnouncementBanner>
+              )}
             </AppBar>
             <NavigationSidebarDrawer
               enabled={enableSidebar}
