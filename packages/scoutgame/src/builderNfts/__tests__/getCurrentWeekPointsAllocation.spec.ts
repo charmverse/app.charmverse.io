@@ -44,3 +44,9 @@ describe('getCurrentWeekPointsAllocation', () => {
     );
   });
 });
+
+describe('constants', () => {
+  it('pointsPerActiveBuilder should be 2500', () => {
+    expect(pointsPerActiveBuilder).toEqual(2500);
+  });
+});

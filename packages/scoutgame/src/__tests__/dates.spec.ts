@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { getWeekFromDate, getWeekStartEnd, getSeasonWeekFromISOWeek, weeklyAllocatedPoints } from '../dates';
+import { getWeekFromDate, getWeekStartEnd, getSeasonWeekFromISOWeek } from '../dates';
 
 describe('date utils', () => {
   describe('getWeekFromDate', () => {
@@ -51,11 +51,5 @@ describe('date utils', () => {
       const formattedWeek = getWeekFromDate(currentSeasonDate.toJSDate());
       expect(getSeasonWeekFromISOWeek({ week: formattedWeek, season })).toEqual(seasonWeek);
     });
-  });
-});
-
-describe('constants', () => {
-  it('weeklyAllocatedPoints should be 100,000 (change this test over time to reflect updated values)', () => {
-    expect(weeklyAllocatedPoints).toEqual(1e5);
   });
 });

@@ -12,7 +12,8 @@ export async function processScoutPointsPayout({
   week,
   season,
   createdAt,
-  normalisationFactor = 1
+  normalisationFactor = 1,
+  weeklyAllocatedPoints
 }: {
   builderId: string;
   rank: number;
@@ -21,6 +22,7 @@ export async function processScoutPointsPayout({
   season: string;
   createdAt?: Date;
   normalisationFactor?: number;
+  weeklyAllocatedPoints: number;
 }) {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
@@ -49,7 +51,9 @@ export async function processScoutPointsPayout({
     return;
   }
 
-  const earnableScoutPoints = Math.floor(calculateEarnableScoutPointsForRank(rank) * normalisationFactor);
+  const earnableScoutPoints = Math.floor(
+    calculateEarnableScoutPointsForRank({ rank, weeklyAllocatedPoints }) * normalisationFactor
+  );
 
   const existingGemsPayoutEvent = await prisma.gemsPayoutEvent.findUnique({
     where: {

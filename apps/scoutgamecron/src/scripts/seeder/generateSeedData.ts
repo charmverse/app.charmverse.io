@@ -145,7 +145,9 @@ export async function generateSeedData() {
             gemsCollected,
             week,
             season: currentSeason,
-            createdAt: date.toJSDate()
+            createdAt: date.toJSDate(),
+            // We started with 100k points per week
+            weeklyAllocatedPoints: 1e5
           });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);
