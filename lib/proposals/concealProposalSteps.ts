@@ -1,5 +1,10 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { ProposalAppealReviewer, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma-client';
+import type {
+  ProposalAppealReviewer,
+  ProposalAuthor,
+  ProposalEvaluationType,
+  ProposalReviewer
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { privateEvaluationSteps } from '@charmverse/core/proposals';
 import { getAssignedRoleIds } from '@root/lib/roles/getAssignedRoleIds';
@@ -13,6 +18,7 @@ export type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'work
 } & {
   evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &
     Partial<ProposalWithUsersAndRubric['evaluations'][0]>)[];
+  authors: Pick<ProposalAuthor, 'userId'>[];
 };
 
 export async function concealProposalSteps<T extends MinimalProposal = MinimalProposal>({
@@ -88,12 +94,20 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
 
   const stepsWithCollapsedEvaluations: MinimalProposal['evaluations'][number][] = [];
 
+  const isAuthor = proposal.authors.some((author) => author.userId === userId);
+
   for (let i = 0; i < proposal.evaluations.length; i++) {
     const previousStep = stepsWithCollapsedEvaluations[stepsWithCollapsedEvaluations.length - 1];
     const currentStep = proposal.evaluations[i];
 
     const isConcealableEvaluation = privateEvaluationSteps.includes(currentStep.type as ProposalEvaluationType);
-    if (!isConcealableEvaluation) {
+    if (
+      !isConcealableEvaluation ||
+      (isAuthor &&
+        currentStep.type === 'rubric' &&
+        currentStep.result === 'fail' &&
+        currentStep.showAuthorResultsOnRubricFail)
+    ) {
       stepsWithCollapsedEvaluations.push(currentStep);
     } else if (previousStep?.type !== 'private_evaluation') {
       stepsWithCollapsedEvaluations.push({

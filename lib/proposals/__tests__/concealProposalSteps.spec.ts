@@ -41,6 +41,7 @@ describe('concealProposalSteps', () => {
       workflowId: privateProposalWorkflow.id,
       id: proposalId,
       workflow: { privateEvaluations: true },
+      authors: [{ userId: author.id }],
       evaluations: [
         {
           id: uuid(),
@@ -128,6 +129,67 @@ describe('concealProposalSteps', () => {
     expect(result).toEqual(proposalWithSteps);
   });
 
+  it('should return the step where the proposal failed despite being hidden, if the step is configured to show rubric results on fail, and the user is the author', async () => {
+    const proposalWithShowUserResultsOnFail: MinimalProposal = {
+      ...proposalWithSteps,
+      evaluations: [
+        {
+          id: uuid(),
+          type: 'feedback',
+          result: null,
+          index: 0,
+          reviewers: [
+            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+          ]
+        },
+        {
+          id: uuid(),
+          type: 'rubric',
+          result: 'fail',
+          index: 1,
+          reviewers: [
+            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+          ],
+          showAuthorResultsOnRubricFail: true
+        },
+        {
+          id: uuid(),
+          type: 'pass_fail',
+          result: null,
+          index: 2,
+          reviewers: [
+            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+          ],
+          appealReviewers: [
+            {
+              userId: appealReviewerUser.id,
+              roleId: null,
+              id: '',
+              proposalId: '',
+              evaluationId: ''
+            }
+          ]
+        }
+      ]
+    };
+
+    const result = await concealProposalSteps({
+      proposal: proposalWithShowUserResultsOnFail,
+      userId: author.id
+    });
+    expect(result.evaluations).toEqual([
+      { ...proposalWithShowUserResultsOnFail.evaluations[0] },
+      { ...proposalWithShowUserResultsOnFail.evaluations[1] },
+      expect.objectContaining({
+        ...proposalWithShowUserResultsOnFail.evaluations[2],
+        type: 'private_evaluation',
+        title: 'Evaluation',
+        reviewers: [],
+        permissions: []
+      })
+    ]);
+  });
+
   it('should correctly conceal and collapse evaluations', async () => {
     const result = await concealProposalSteps({
       proposal: { ...proposalWithSteps },
@@ -150,6 +212,7 @@ describe('concealProposalSteps', () => {
       spaceId: space.id,
       workflowId: privateProposalWorkflow.id,
       id: proposalId,
+      authors: [{ userId: author.id }],
       evaluations: [
         {
           id: uuid(),
