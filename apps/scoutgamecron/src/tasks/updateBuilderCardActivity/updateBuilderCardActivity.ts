@@ -3,6 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from '@packages/utils/types';
 import type { DateTime } from 'luxon';
 
+export type Last7DaysGems = { date: string; gemsCount: number }[];
+
 export async function updateBuilderCardActivity(date: DateTime) {
   const builders = await prisma.scout.findMany({
     where: {
@@ -40,7 +42,7 @@ export async function updateBuilderCardActivity(date: DateTime) {
         .map((event) => event.gemsReceipt?.value)
         .filter(isTruthy)
         .reduce((acc, curr) => acc + curr, 0);
-      let last7Days = (builder.builderCardActivities[0]?.last7Days ?? []) as { date: string; gemsCount: number }[];
+      let last7Days = (builder.builderCardActivities[0]?.last7Days ?? []) as Last7DaysGems;
       const currentDay = last7Days.find((day) => day.date === date.toFormat('yyyy-MM-dd'));
       if (currentDay) {
         currentDay.gemsCount += gemsCount;

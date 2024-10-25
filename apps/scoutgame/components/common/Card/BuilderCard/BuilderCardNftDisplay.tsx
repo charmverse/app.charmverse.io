@@ -80,25 +80,13 @@ export function BuilderCardNftDisplay({
         </Box>
         <Box
           sx={{
-            px:
-              size === 'small'
-                ? 0.5
-                : {
-                    xs: 0.5,
-                    md: 1
-                  },
-            height: 'fit-content',
+            height: '33.33%',
             position: 'absolute',
             width: 'calc(100% - 10px)',
             left: '50%',
+            backgroundColor: '#000',
             transform: 'translateX(-50%)',
-            bottom:
-              size === 'small'
-                ? 7.5
-                : {
-                    xs: 7.5,
-                    md: 10
-                  }
+            bottom: 5
           }}
         >
           {nftImageUrl ? null : (

@@ -6,6 +6,8 @@ import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import type { BuilderInfo } from './interfaces';
 
+export type Last7DaysGems = { date: string; gemsCount: number }[];
+
 const preselectedBuilderUsernames = [
   'samkuhlmann',
   'earth2travis',
@@ -39,6 +41,11 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
             nftsSold: true
           }
         },
+        builderCardActivities: {
+          select: {
+            last7Days: true
+          }
+        },
         userWeeklyStats: {
           where: {
             week: getCurrentWeek()
@@ -69,7 +76,10 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
           nftImageUrl: builder.builderNfts[0]?.imageUrl,
           nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
           builderStatus: builder.builderStatus!,
-          rank: builder.userWeeklyStats[0]?.rank || -1
+          rank: builder.userWeeklyStats[0]?.rank || -1,
+          last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+            .map((gem) => gem.gemsCount)
+            .slice(-7)
         };
       })
       .sort((a, b) => preselectedBuilderUsernames.indexOf(a.id) - preselectedBuilderUsernames.indexOf(b.id));
@@ -96,6 +106,11 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       user: {
         select: {
           ...BasicUserInfoSelect,
+          builderCardActivities: {
+            select: {
+              last7Days: true
+            }
+          },
           userSeasonStats: {
             where: {
               season: currentSeason
@@ -149,7 +164,10 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       nftsSold: user.userSeasonStats[0]?.nftsSold || 0,
       rank: user.userWeeklyStats[0]?.rank || -1,
       scoutedBy: user.nftPurchaseEvents.length,
-      builderStatus: user.builderStatus!
+      builderStatus: user.builderStatus!,
+      last7DaysGems: ((user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+        .map((gem) => gem.gemsCount)
+        .slice(-7)
     };
   });
 
