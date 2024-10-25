@@ -65,7 +65,8 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             appealable: workflowEvaluation.appealable,
             appealRequiredReviews: workflowEvaluation.appealRequiredReviews,
             finalStep: workflowEvaluation.finalStep,
-            requiredReviews: workflowEvaluation.requiredReviews || 1
+            requiredReviews: workflowEvaluation.requiredReviews || 1,
+            showAuthorResultsOnRubricFail: workflowEvaluation.showAuthorResultsOnRubricFail
           }
         });
         processedIds.push(originalTemplateEvaluation.id);
