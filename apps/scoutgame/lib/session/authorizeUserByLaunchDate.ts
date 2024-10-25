@@ -2,7 +2,7 @@ import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
-import { tierDistributionMap, getTier } from '@packages/scoutgame/waitlist/scoring/constants';
+import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { isDevEnv, isStagingEnv } from '@root/config/constants';
 import { DateTime } from 'luxon';
 

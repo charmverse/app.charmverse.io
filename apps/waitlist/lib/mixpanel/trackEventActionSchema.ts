@@ -12,7 +12,8 @@ type FrameAction =
   | 'click_share'
   | 'goto_app_home'
   | 'goto_app_score'
-  | 'goto_app_builders';
+  | 'goto_app_builders'
+  | 'goto_scoutgame';
 
 type ReferrerEvent = {
   referrerUserId: string;
