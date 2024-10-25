@@ -1,6 +1,6 @@
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 
-function generateWallet() {
+export function generateWallet() {
   const key = generatePrivateKey();
 
   const account = privateKeyToAccount(key);

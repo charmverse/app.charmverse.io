@@ -79,7 +79,8 @@ describe('applyProposalTemplate', () => {
             { title: 'Test Criteria 1', description: 'Description 1', parameters: { type: 'score', min: 0, max: 20 } }
           ],
           permissions: [{ assignee: { group: 'current_reviewer' }, operation: 'move' }],
-          reviewers: [{ group: 'user', id: user.id }]
+          reviewers: [{ group: 'user', id: user.id }],
+          showAuthorResultsOnRubricFail: true
         },
         {
           evaluationType: 'vote',
@@ -140,6 +141,7 @@ describe('applyProposalTemplate', () => {
           userId: template.evaluations[2].reviewers[0].userId
         })
       ],
+      showAuthorResultsOnRubricFail: true,
       rubricCriteria: [
         expect.objectContaining({
           title: template.evaluations[2].rubricCriteria[0].title,
