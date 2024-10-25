@@ -242,6 +242,19 @@ export class BuilderNFTSeasonOneImplementation01Client {
       ],
       stateMutability: 'view',
       type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'getMinter',
+      outputs: [
+        {
+          internalType: 'address',
+          name: '',
+          type: 'address'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
     }
   ];
 
@@ -318,6 +331,29 @@ export class BuilderNFTSeasonOneImplementation01Client {
     const result = decodeFunctionResult({
       abi: this.abi,
       functionName: 'getBuilderIdForToken',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as string;
+  }
+
+  async getMinter(): Promise<string> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'getMinter',
+      args: []
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'getMinter',
       data: data as `0x${string}`
     });
 

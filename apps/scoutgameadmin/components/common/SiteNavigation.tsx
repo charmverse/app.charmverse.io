@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaGithubAlt } from 'react-icons/fa';
 import { HiOutlineUsers } from 'react-icons/hi2';
-import { MdLaunch } from 'react-icons/md';
+import { MdDocumentScanner } from 'react-icons/md';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -56,7 +56,7 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
         label='Contract'
         href='/contract'
         value='contract'
-        icon={<MdLaunch size='24px' />}
+        icon={<MdDocumentScanner size='24px' />}
         LinkComponent={Link}
       />
     </StyledBottomNavigation>
