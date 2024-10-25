@@ -68,6 +68,8 @@ function getActiveButton(pathname: string) {
     return 'repos';
   } else if (pathname.startsWith('/transactions')) {
     return 'transactions';
+  } else if (pathname.startsWith('/contract')) {
+    return 'contract';
   } else if (pathname.startsWith('/users')) {
     return 'users';
   }
