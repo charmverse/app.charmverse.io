@@ -325,6 +325,7 @@ jobs:
           datadog-ci sourcemaps upload apps/scoutgame/.next/static       \
             --service=scoutgame                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --project-path=apps/scoutgame/ \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
 
   deploy-production:
