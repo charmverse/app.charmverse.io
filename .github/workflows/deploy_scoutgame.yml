@@ -298,7 +298,7 @@ jobs:
       - name: Calculate Build ID
         id: get_build_id
         run: |
-          build_id=${{ hashFiles('package-lock.json', 'apps/**/*.[jt]s', 'lib/**/*.[jt]s') }}
+          build_id=${{ hashFiles(format('apps/{0}/*.ts', 'scoutgame'), format('apps/{0}/*.tsx', 'scoutgame')) }}
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Restore app from cache
