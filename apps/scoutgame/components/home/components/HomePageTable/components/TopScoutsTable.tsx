@@ -1,14 +1,4 @@
-import {
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  tableCellClasses
-} from '@mui/material';
+import { Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -20,15 +10,16 @@ import { TableCellText } from './TableCellText';
 
 export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
   return (
-    <TableContainer data-test='top-scouts-table' component={Paper} sx={{ px: { md: 6 } }}>
+    <TableContainer data-test='top-scouts-table' component={Paper} sx={{ px: { md: 10 } }}>
       <Table aria-label='Top scouts table' size='small'>
         <TableHead>
           <TableRow
             sx={{
-              [`& .${tableCellClasses.root}`]: {
-                borderBottom: 'none',
+              '& .MuiTableCell-root': {
                 paddingLeft: '6px',
-                paddingRight: '6px'
+                paddingRight: '6px',
+                width: '16.67%',
+                borderBottom: 'none'
               }
             }}
           >
@@ -56,7 +47,12 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
               key={scout.username}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
-                '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
+                '& .MuiTableCell-root': {
+                  p: '6px',
+                  borderBottom: '1px solid',
+                  borderBottomColor: 'background.default',
+                  width: '16.67%'
+                }
               }}
             >
               <TableCell align='center'>

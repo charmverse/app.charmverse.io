@@ -1,9 +1,14 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { styled } from '@mui/material';
 import QRCode from 'qrcode';
 import { useEffect, useRef } from 'react';
 
+const StyledCanvas = styled('canvas')`
+  border: 6px solid white;
+  box-sizing: content-box;
+`;
 export function CanvasQRCode({ uri, scale = 4.5 }: { uri: string; scale?: number }) {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
@@ -16,7 +21,8 @@ export function CanvasQRCode({ uri, scale = 4.5 }: { uri: string; scale?: number
         uri,
         {
           margin: 0,
-          scale
+          scale,
+          width: 200
         },
         (error) => {
           if (error) log.error('Error generating the QRCode', { error });
@@ -25,5 +31,5 @@ export function CanvasQRCode({ uri, scale = 4.5 }: { uri: string; scale?: number
     }
   }, [uri, scale]);
 
-  return <canvas ref={ref} />;
+  return <StyledCanvas ref={ref} />;
 }

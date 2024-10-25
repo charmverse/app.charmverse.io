@@ -1,5 +1,6 @@
 'use client';
 
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import { LoadingButton } from '@mui/lab';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import dynamic from 'next/dynamic';
@@ -21,7 +22,7 @@ const NFTPurchaseDialog = dynamic(
   }
 );
 
-export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] }) {
+export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus } }) {
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
   const [dialogLoadingStatus, setDialogLoadingStatus] = useState<boolean>(false);
@@ -37,6 +38,14 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
   };
 
   const purchaseCostInPoints = convertCostToPoints(builder?.price || BigInt(0));
+
+  if (builder.builderStatus === 'banned') {
+    return (
+      <LoadingButton disabled variant='buy'>
+        SUSPENDED
+      </LoadingButton>
+    );
+  }
 
   return (
     <div>

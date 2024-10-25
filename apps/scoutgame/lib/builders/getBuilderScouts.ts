@@ -15,7 +15,10 @@ export async function getBuilderScouts(builderId: string) {
     },
     select: {
       scout: {
-        select: BasicUserInfoSelect
+        select: {
+          displayName: true,
+          ...BasicUserInfoSelect
+        }
       },
       tokensPurchased: true
     }

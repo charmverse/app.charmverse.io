@@ -4,8 +4,8 @@ import { jest } from '@jest/globals';
 import { mockBuilder, mockScout, mockBuilderNft } from '../../testing/database';
 import { randomLargeInt } from '../../testing/generators';
 
-jest.unstable_mockModule('../clients/builderContractAdminWriteClient', () => ({
-  getBuilderContractAdminClient: () => ({
+jest.unstable_mockModule('../clients/builderContractMinterWriteClient', () => ({
+  getBuilderContractMinterClient: () => ({
     getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
     registerBuilderToken: jest.fn(),
     getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())

@@ -1,25 +1,27 @@
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import type { UserStats } from 'lib/users/getUserStats';
-import type { BasicUserInfo } from 'lib/users/interfaces';
+import type { BuilderUserInfo } from 'lib/users/interfaces';
 
 import { PageContainer } from '../layout/PageContainer';
 
 import { BuilderProfile } from './components/BuilderProfile/BuilderProfile';
-import { PointsClaimScreen } from './components/PointsClaimScreen/PointsClaimScreen';
 import { ProfileStats } from './components/ProfileStats';
 import { ProfileTabsMenu } from './components/ProfileTabsMenu';
 import { ScoutProfile } from './components/ScoutProfile/ScoutProfile';
 import { ScoutProfileLoading } from './components/ScoutProfile/ScoutProfileLoading';
 
-export type ProfileTab = 'build' | 'scout' | 'win' | 'scout-build';
+export type ProfileTab = 'build' | 'scout' | 'scout-build';
 
-export type UserProfileWithPoints = BasicUserInfo &
+export type UserProfileWithPoints = Omit<BuilderUserInfo, 'builderStatus'> &
   UserStats & {
     currentBalance: number;
+    displayName: string;
+    builderStatus: BuilderStatus | null;
   };
 
 export type ProfilePageProps = {
@@ -79,12 +81,10 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
         </Stack>
 
         <Suspense fallback={tab === 'scout' ? <ScoutProfileLoading /> : <LoadingComponent isLoading />}>
-          {tab === 'win' ? (
-            <PointsClaimScreen userId={user.id} username={user.username} />
-          ) : tab === 'scout' ? (
+          {tab === 'scout' ? (
             <ScoutProfile userId={user.id} />
           ) : tab === 'build' ? (
-            <BuilderProfile builder={user} />
+            <BuilderProfile builder={user as BuilderUserInfo} />
           ) : (
             <Stack flexDirection='row' gap={2}>
               <Paper
@@ -109,7 +109,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
                 <Typography variant='h6' color='text.secondary'>
                   Build
                 </Typography>
-                <BuilderProfile builder={user} />
+                <BuilderProfile builder={user as BuilderUserInfo} />
               </Paper>
             </Stack>
           )}

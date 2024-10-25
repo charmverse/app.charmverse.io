@@ -57,7 +57,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           week: getCurrentWeek()
         },
         select: {
-          gemsCollected: true
+          rank: true
         }
       }
     }
@@ -71,13 +71,11 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       id: builder.id,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
       username: builder.username,
-      displayName: builder.displayName,
-      builderStatus: builder.builderStatus,
+      builderStatus: builder.builderStatus!,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
-      gemsCollected: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       nftsSold: builder.userSeasonStats[0]?.nftsSold ?? 0,
       nftsSoldToScout,
-      isBanned: builder.builderStatus === 'banned',
+      rank: builder.userWeeklyStats[0]?.rank ?? -1,
       price: builder.builderNfts[0]?.currentPrice ?? 0
     };
   });

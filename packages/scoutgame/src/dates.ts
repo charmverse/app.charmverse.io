@@ -9,21 +9,25 @@ export const seasons = [
   // dev season
   {
     start: '2024-W38',
-    end: '2024-W40'
+    end: '2024-W40',
+    title: 'Dev Season'
   },
   // pre-release season
   {
     start: '2024-W40',
-    end: '2024-W41'
+    end: '2024-W41',
+    title: 'Pre Season'
   },
   // 1st season
   {
     start: '2024-W41',
-    end: '2025-W02'
+    end: '2025-W02',
+    title: 'Season 1'
   }
 ] as const;
 
 export type Season = (typeof seasons)[number]['start'];
+export const seasonStarts = seasons.map((s) => s.start);
 
 export const currentSeason: Season = '2024-W41';
 
@@ -46,6 +50,10 @@ export function getLastWeek(now: DateTime = DateTime.utc()): ISOWeek {
 
 export function getPreviousWeek(week: ISOWeek): ISOWeek {
   return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
+}
+
+export function getNextWeek(week: ISOWeek): ISOWeek {
+  return _formatWeek(getDateFromISOWeek(week).plus({ week: 1 }));
 }
 
 export function getPreviousSeason(season: Season): Season {

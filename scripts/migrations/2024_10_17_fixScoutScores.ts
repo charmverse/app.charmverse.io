@@ -5,7 +5,6 @@ import { DateTime } from 'luxon';
 import { getPointStatsFromHistory } from '@packages/scoutgame/points/getPointStatsFromHistory';
 import { refreshPointStatsFromHistory } from '@packages/scoutgame/points/refreshPointStatsFromHistory';
 import { log } from '@charmverse/core/log';
-import { getNotifications } from '@packages/scoutgame/notifications/getNotifications';
 import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 const tierByPoints = {
   60: 'Legendary',
@@ -242,7 +241,7 @@ async function fixEvents({
     }
   });
   console.log('Updated balance for', scout.username, 'to', scout.currentBalance, 'Receipt:', r[1].id);
-  const notifications = await getNotifications({ userId });
+  // const notifications = await getNotifications({ userId });
   // log.info('Notifications', notifications);
 }
 

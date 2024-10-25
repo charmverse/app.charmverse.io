@@ -1,9 +1,9 @@
 'use client';
 
 import { usePageView } from '@connect-shared/hooks/usePageView';
-import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 
 import { useRefreshUserProfiles } from 'hooks/api/session';
+import { useDatadogLogger } from 'hooks/useDatadogLogger';
 
 import WelcomeModal from './WelcomeModal';
 

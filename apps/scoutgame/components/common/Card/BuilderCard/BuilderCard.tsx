@@ -9,6 +9,8 @@ import { ScoutButton } from '../../ScoutButton/ScoutButton';
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
 
+type RequiredBuilderInfoFields = 'username' | 'builderStatus' | 'id';
+
 export function BuilderCard({
   builder,
   showPurchaseButton = false,
@@ -17,7 +19,7 @@ export function BuilderCard({
   size = 'medium'
 }: {
   size?: 'x-small' | 'small' | 'medium' | 'large';
-  builder: BuilderInfo;
+  builder: Omit<Partial<BuilderInfo>, RequiredBuilderInfoFields> & Pick<BuilderInfo, RequiredBuilderInfoFields>;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;
@@ -26,7 +28,7 @@ export function BuilderCard({
     <Card
       sx={{
         border: 'none',
-        opacity: builder.isBanned ? 0.25 : 1,
+        opacity: builder.builderStatus === 'banned' ? 0.25 : 1,
         width: 'fit-content',
         height: 'fit-content',
         margin: '0 auto'
@@ -38,8 +40,8 @@ export function BuilderCard({
         showHotIcon={showHotIcon}
         size={size}
       >
-        {builder.isBanned ? (
-          <Typography textAlign='center'>BANNED</Typography>
+        {builder.builderStatus === 'banned' ? (
+          <Typography textAlign='center'>SUSPENDED</Typography>
         ) : hideDetails ? null : (
           <BuilderCardStats {...builder} />
         )}

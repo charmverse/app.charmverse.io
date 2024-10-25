@@ -129,7 +129,7 @@ export async function uploadMetadata({
     name: `ScoutGame Builders NFT #${tokenId}`,
     description: '',
     external_url: `${process.env.DOMAIN}/u/${username}`,
-    image: `${imageDomain}/${metadataPath}`,
+    image: `${imageDomain}/${getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' })}`,
     attributes: attributes || []
   };
 

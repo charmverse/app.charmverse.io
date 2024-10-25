@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
 import { builderNftChain } from './constants';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
@@ -21,7 +21,7 @@ export async function registerBuilderNFT({
     throw new InvalidInputError('Invalid builderId. Must be a uuid');
   }
 
-  const contractClient = getBuilderContractAdminClient();
+  const contractClient = getBuilderContractMinterClient();
 
   const existingBuilderNft = await prisma.builderNft.findFirst({
     where: {

@@ -1,3 +1,4 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 
@@ -5,7 +6,7 @@ export type LeaderBoardRow = {
   id: string;
   avatar: string | null;
   username: string;
-  displayName: string;
+  builderStatus: BuilderStatus;
   progress: number;
   gemsCollected: number;
   price: bigint;
@@ -20,6 +21,9 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
       week: currentWeek,
       rank: {
         not: null
+      },
+      user: {
+        builderStatus: 'approved'
       }
     },
     orderBy: {
@@ -33,7 +37,7 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
           id: true,
           avatar: true,
           username: true,
-          displayName: true,
+          builderStatus: true,
           builderNfts: {
             select: {
               currentPrice: true,
@@ -56,7 +60,7 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
         id: weeklyTopBuilder.user.id,
         avatar: weeklyTopBuilder.user.avatar,
         username: weeklyTopBuilder.user.username,
-        displayName: weeklyTopBuilder.user.displayName,
+        builderStatus: weeklyTopBuilder.user.builderStatus!,
         gemsCollected: weeklyTopBuilder.gemsCollected,
         progress,
         price,
