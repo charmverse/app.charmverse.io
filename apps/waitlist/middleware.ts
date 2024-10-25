@@ -11,6 +11,8 @@ export async function middleware(request: NextRequest) {
   const session = await getSession();
   let farcasterUser = session.farcasterUser;
 
+  return NextResponse.redirect(new URL('https://scoutgame.xyz'));
+
   const url = request.nextUrl.clone(); // Clone the request URL to modify it
 
   const sealedFarcasterUser = url.searchParams.get('farcaster_user');
