@@ -27,9 +27,6 @@ export const loginWithFarcasterAction = actionClient
         await sealData({ inviteCode: parsedInput.inviteCode }, { password: authSecret as string })
       );
       log.info(`Builder logged in with invite code: ${parsedInput.inviteCode}`, { fid });
-    } else {
-      // throws an error if user does not have access
-      await authorizeUserByLaunchDate({ fid });
     }
 
     const user = await findOrCreateFarcasterUser({ fid });
