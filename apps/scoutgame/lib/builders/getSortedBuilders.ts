@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
 
+import type { Last7DaysGems } from './getTodaysHotBuilders';
 import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
@@ -58,6 +59,11 @@ export async function getSortedBuilders({
                 }
               }
             },
+            builderCardActivities: {
+              select: {
+                last7Days: true
+              }
+            },
             userWeeklyStats: {
               where: {
                 week
@@ -91,7 +97,10 @@ export async function getSortedBuilders({
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             rank: scout.userWeeklyStats[0]?.rank ?? -1,
             nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: scout.builderStatus!
+            builderStatus: scout.builderStatus!,
+            last7DaysGems: ((scout.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }));
         });
       const userId = builders[builders.length - 1]?.id;
@@ -145,6 +154,11 @@ export async function getSortedBuilders({
                     }
                   }
                 },
+                builderCardActivities: {
+                  select: {
+                    last7Days: true
+                  }
+                },
                 userAllTimeStats: {
                   select: {
                     pointsEarnedAsBuilder: true
@@ -172,7 +186,10 @@ export async function getSortedBuilders({
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus!
+            builderStatus: stat.user.builderStatus!,
+            last7DaysGems: ((stat.user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }))
         );
       const userId = builders[builders.length - 1]?.id;
@@ -221,6 +238,11 @@ export async function getSortedBuilders({
                     pointsEarnedAsBuilder: true
                   }
                 },
+                builderCardActivities: {
+                  select: {
+                    last7Days: true
+                  }
+                },
                 userSeasonStats: {
                   where: {
                     season
@@ -251,7 +273,10 @@ export async function getSortedBuilders({
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus!
+            builderStatus: stat.user.builderStatus!,
+            last7DaysGems: ((stat.user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }))
         );
       const userId = builders[builders.length - 1]?.id;

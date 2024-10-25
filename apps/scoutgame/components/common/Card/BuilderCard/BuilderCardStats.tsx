@@ -8,16 +8,26 @@ export function BuilderCardStats({
   builderPoints,
   nftsSold,
   rank,
-  last7DaysGems
+  last7DaysGems,
+  size
 }: {
   username: string;
   builderPoints?: number;
   nftsSold?: number;
   rank?: number;
   last7DaysGems?: number[];
+  size: 'x-small' | 'small' | 'medium' | 'large';
 }) {
+  const gemHeight = size === 'x-small' ? 12 : size === 'small' ? 13.5 : size === 'medium' ? 14.5 : 16;
+
   return (
-    <Stack alignItems='center' pt={0.5} gap={0.1} width='100%' height='100%'>
+    <Stack
+      alignItems='center'
+      pt={0.25}
+      gap={size === 'medium' || size === 'large' ? 0.25 : 0.1}
+      width='100%'
+      height='100%'
+    >
       <Typography component='span' variant='body2'>
         @{username}
       </Typography>
@@ -52,7 +62,17 @@ export function BuilderCardStats({
           </Tooltip>
         )}
       </Stack>
-      <Stack flexDirection='row' gap={1} width='100%' px={1} alignItems='center'>
+      <Stack
+        flexDirection='row'
+        gap={1}
+        width='100%'
+        px={1}
+        alignItems='center'
+        display={{
+          xs: 'none',
+          md: 'flex'
+        }}
+      >
         <Stack sx={{ backgroundColor: 'text.secondary', height: '1px', flex: 1 }} />
         <Typography
           sx={{
@@ -64,9 +84,9 @@ export function BuilderCardStats({
         </Typography>
         <Stack sx={{ backgroundColor: 'text.secondary', height: '1px', flex: 1 }} />
       </Stack>
-      <Stack flexDirection='row' gap={1.25} width='100%' height='18px' px={1} mt={0.5} mb={1} alignItems='center'>
+      <Stack flexDirection='row' gap={1.25} width='100%' height={gemHeight} px={1} mt={0.5} alignItems='center'>
         {last7DaysGems?.map((gem, index) => {
-          const size = gem === 0 ? 18 * 0.25 : gem <= 29 ? 18 * 0.5 : 18;
+          const height = gem === 0 ? gemHeight * 0.25 : gem <= 29 ? gemHeight * 0.5 : gemHeight;
 
           return (
             <Stack
@@ -82,8 +102,8 @@ export function BuilderCardStats({
               <Stack
                 sx={{
                   borderRadius: '50%',
-                  width: size,
-                  height: size,
+                  width: height,
+                  height,
                   backgroundColor: 'text.secondary'
                 }}
               />
