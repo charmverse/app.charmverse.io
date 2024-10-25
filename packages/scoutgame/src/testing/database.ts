@@ -12,7 +12,7 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
-  id = uuid(),
+  id,
   createdAt,
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
@@ -25,7 +25,6 @@ export async function mockBuilder({
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
-      id,
       createdAt,
       username,
       displayName: 'Test User',
