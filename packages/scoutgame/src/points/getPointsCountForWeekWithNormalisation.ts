@@ -1,5 +1,5 @@
 import { weeklyRewardableBuilders } from '../builderNfts/constants';
-import { weeklyAllocatedPoints } from '../dates';
+import { getCurrentWeekPointsAllocation } from '../builderNfts/getCurrentWeekPointsAllocation';
 import type { LeaderboardBuilder } from '../getBuildersLeaderboard';
 import { getBuildersLeaderboard } from '../getBuildersLeaderboard';
 
@@ -12,9 +12,11 @@ export async function getPointsCountForWeekWithNormalisation({ week }: { week: s
 }> {
   const leaderboard = await getBuildersLeaderboard({ week, quantity: weeklyRewardableBuilders });
 
+  const weeklyAllocatedPoints = await getCurrentWeekPointsAllocation({ week });
+
   const pointsQuotas = leaderboard.map((builder, index) => ({
     builder,
-    earnablePoints: calculateEarnableScoutPointsForRank(builder.rank)
+    earnablePoints: calculateEarnableScoutPointsForRank({ rank: builder.rank, weeklyAllocatedPoints })
   }));
 
   const points = pointsQuotas.reduce((acc, val) => acc + val.earnablePoints, 0);
