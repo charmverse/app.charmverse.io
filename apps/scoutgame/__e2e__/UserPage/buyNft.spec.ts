@@ -32,24 +32,16 @@ test.describe('Buy Nft', () => {
   });
 
   test('Should be able to buy an nft', async ({ utils, page, userPage }) => {
-    const builderId = '10216fd1-e437-44ee-acb8-ba1813017c26';
-
-    // Ensure that the builder is deleted in case we are using it in another place or just running it locally multiple times.
-    await prisma.scout.delete({
-      where: {
-        id: builderId
-      }
-    });
-
+    // Only for testing locally. Ensure the database is clean
+    // await prisma.scout.deleteMany({});
     const builder = await mockBuilder({
       nftSeason: currentSeason,
-      id: builderId,
       avatar:
         'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg',
       bio: 'Software Engineer @charmverse. Building @scoutgamexyz',
       builderStatus: 'approved',
       sendMarketing: false,
-      farcasterId: 23,
+      farcasterId: Math.floor(Math.random() * 1000000),
       agreedToTermsAt: new Date('2024-10-03T11:03:00.308Z'),
       onboardedAt: new Date('2024-10-03T11:03:02.071Z'),
       currentBalance: 200
@@ -60,7 +52,7 @@ test.describe('Buy Nft', () => {
       chainId: 10,
       // This is the op mainnet real contract
       contractAddress: getBuilderContractAddress(),
-      tokenId: 1
+      tokenId: Math.floor(Math.random() * 1000000)
     });
 
     await userPage.mockNftAPIs({
