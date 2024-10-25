@@ -263,11 +263,13 @@ export async function mockBuilderNft({
   chainId = 1,
   contractAddress = '0x1',
   owners = [],
+  currentPrice = 100,
   season = mockSeason
 }: {
   builderId: string;
   chainId?: number;
   contractAddress?: string;
+  currentPrice?: number;
   owners?: (string | { id: string })[];
   season?: string;
 }) {
@@ -276,7 +278,7 @@ export async function mockBuilderNft({
       builderId,
       chainId,
       contractAddress,
-      currentPrice: 0,
+      currentPrice,
       season,
       imageUrl: 'https://placehold.co/600x400',
       tokenId: Math.round(Math.random() * 10000000),

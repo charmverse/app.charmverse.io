@@ -1,5 +1,6 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Season } from '@packages/scoutgame/dates';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
@@ -15,17 +16,15 @@ export type TopBuilderInfo = {
   nftImageUrl: string;
 };
 
-export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilderInfo[]> {
+export async function getTopBuilders({
+  limit,
+  season = currentSeason
+}: { limit?: number; season?: Season } = {}): Promise<TopBuilderInfo[]> {
   const topBuilders = await prisma.userSeasonStats.findMany({
     where: {
-      season: currentSeason,
+      season,
       user: {
-        builderStatus: 'approved',
-        builderNfts: {
-          some: {
-            season: currentSeason
-          }
-        }
+        builderStatus: 'approved'
       }
     },
     orderBy: {
@@ -47,7 +46,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
           },
           builderNfts: {
             where: {
-              season: currentSeason
+              season
             },
             select: {
               currentPrice: true,
