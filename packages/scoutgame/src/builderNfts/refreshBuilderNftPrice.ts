@@ -33,7 +33,7 @@ export async function refreshBuilderNftPrice({
       }
     });
 
-    return prisma.builderNft.update({
+    const updatedNft = await prisma.builderNft.update({
       where: {
         id: existingNft.id
       },
@@ -41,6 +41,8 @@ export async function refreshBuilderNftPrice({
         currentPrice: Number(currentPrice)
       }
     });
+
+    return updatedNft;
   } catch (error) {
     log.error('Error refreshing builder nft price', { builderId, season, error });
     throw error;
