@@ -9,6 +9,7 @@ import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
+import { updateAllBuilderCardActivities } from './tasks/updateBuilderCardActivity';
 import { updateMixpanelUserProfilesTask } from './tasks/updateMixpanelProfilesTask';
 
 const app = new Koa();
@@ -56,6 +57,8 @@ addTask('/process-nft-mints', processNftMints);
 addTask('/update-mixpanel-user-profiles', updateMixpanelUserProfilesTask);
 
 addTask('/alert-low-wallet-gas-balance', alertLowWalletGasBalance);
+
+addTask('/update-builder-card-activity', updateAllBuilderCardActivities);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);

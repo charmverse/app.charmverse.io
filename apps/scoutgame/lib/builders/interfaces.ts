@@ -17,6 +17,7 @@ export type BuilderMetrics = {
   price: bigint;
   rank: number;
   builderPoints: number;
+  last7DaysGems: number[];
 };
 
 export type BuilderInfo = BasicUserInfo &

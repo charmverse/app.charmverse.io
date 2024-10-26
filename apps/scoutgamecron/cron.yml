@@ -24,3 +24,8 @@ cron:
     url: '/alert-low-wallet-gas-balance'
     # Every 5 minutes
     schedule: '*/5 * * * *'
+
+  - name: 'update-builder-card-activity'
+    url: '/update-builder-card-activity'
+    # Every hour
+    schedule: '0 * * * *'
