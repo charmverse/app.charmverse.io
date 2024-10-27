@@ -114,7 +114,10 @@ export async function recordMergedPullRequest({
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
     });
-    if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
+    if (
+      prs.filter((pr) => pr.number !== pullRequest.number || pr.repository.owner.login === pullRequest.author.login)
+        .length > 0
+    ) {
       isFirstMergedPullRequest = false;
     }
   }
