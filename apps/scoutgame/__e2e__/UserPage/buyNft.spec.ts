@@ -10,25 +10,7 @@ import { expect, test } from '../test';
 
 test.describe('Buy Nft', () => {
   test.beforeEach(async ({ utils }) => {
-    utils.initMockWallet({
-      [optimism.id]: (config) => {
-        return custom({
-          request: async ({ method, params }) => {
-            if (method === 'eth_estimateGas') {
-              return 500000;
-            }
-
-            if (method === 'eth_sendRawTransaction') {
-              return '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
-            }
-
-            const response = await http()(config).request({ method, params });
-
-            return response;
-          }
-        })(config);
-      }
-    });
+    utils.initMockWallet();
   });
 
   test('Should be able to buy an nft', async ({ utils, page, userPage }) => {
@@ -38,7 +20,7 @@ test.describe('Buy Nft', () => {
       nftSeason: currentSeason,
       avatar:
         'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg',
-      bio: 'Software Engineer @charmverse. Building @scoutgamexyz',
+      bio: 'Software Engineer @charmverse.',
       builderStatus: 'approved',
       sendMarketing: false,
       farcasterId: Math.floor(Math.random() * 1000000),
@@ -50,7 +32,6 @@ test.describe('Buy Nft', () => {
     const builderNft = await mockBuilderNft({
       builderId: builder.id,
       chainId: 10,
-      // This is the op mainnet real contract
       contractAddress: getBuilderContractAddress(),
       tokenId: Math.floor(Math.random() * 1000000)
     });
