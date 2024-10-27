@@ -200,8 +200,8 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
     data: {
       ...fields,
       id: fields.id ?? randomLargeInt(),
-      name: fields.name ?? `test_repo_${+Math.random()}`,
-      owner: fields.owner ?? `test_owner_${Math.random()}`,
+      name: fields.name ?? `test_repo_${Math.floor(Math.random() * 1000) + 1}`,
+      owner: fields.owner ?? `test_owner_${Math.floor(Math.random() * 1000) + 1}`,
       ownerType: fields.ownerType ?? 'org',
       defaultBranch: fields.defaultBranch ?? 'main'
     }
