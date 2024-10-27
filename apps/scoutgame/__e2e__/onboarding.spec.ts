@@ -15,7 +15,8 @@ test.describe('Onboarding flow', () => {
     await homePage.signInButton.click();
 
     await page.waitForURL('**/login');
-    await expect(loginPage.container).toBeVisible();
+    const container = page.locator('data-test=login-page');
+    await expect(container).toBeVisible();
   });
 
   test('Save new user preferences and get through onboarding', async ({ welcomePage, homePage, page, utils }) => {

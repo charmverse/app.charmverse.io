@@ -13,7 +13,7 @@ test.describe('Login page', () => {
     await utils.loginAsUserId(builder.id);
 
     const signInWithWarpcast = page.locator('data-test=sign-in-with-warpcast');
-    await signInWithWarpcast.click();
+    await signInWithWarpcast.click({ delay: 100 });
 
     const warpcastModal = page.locator('data-test=farcaster-modal');
     await expect(warpcastModal).toBeVisible();
