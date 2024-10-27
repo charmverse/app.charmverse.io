@@ -14,6 +14,7 @@ import { generateBuilderEvents } from './generateBuilderEvents';
 import { generateGithubRepos } from './generateGithubRepos';
 import { generateNftPurchaseEvents } from './generateNftPurchaseEvents';
 import { generateScout } from './generateScout';
+import { updateBuilderCardActivity } from '../../tasks/updateBuilderCardActivity/updateBuilderCardActivity';
 
 export type BuilderInfo = {
   id: string;
@@ -134,6 +135,8 @@ export async function generateSeedData() {
       totalNftsPurchasedEvents += dailyNftsPurchased;
     }
 
+    await updateBuilderCardActivity(date.minus({ days: 1 }));
+
     // Check if we are at the end of the week
     if (date.weekday === 7) {
       const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
@@ -145,7 +148,9 @@ export async function generateSeedData() {
             gemsCollected,
             week,
             season: currentSeason,
-            createdAt: date.toJSDate()
+            createdAt: date.toJSDate(),
+            // We started with 100k points per week
+            weeklyAllocatedPoints: 1e5
           });
         } catch (error) {
           log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);

@@ -39,11 +39,12 @@ export function BuilderCard({
         username={builder.username}
         showHotIcon={showHotIcon}
         size={size}
+        hideDetails={hideDetails}
       >
         {builder.builderStatus === 'banned' ? (
           <Typography textAlign='center'>SUSPENDED</Typography>
         ) : hideDetails ? null : (
-          <BuilderCardStats {...builder} />
+          <BuilderCardStats {...builder} size={size} />
         )}
       </BuilderCardNftDisplay>
       {typeof builder.price !== 'undefined' && showPurchaseButton && (

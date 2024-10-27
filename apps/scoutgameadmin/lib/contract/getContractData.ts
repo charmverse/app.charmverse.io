@@ -9,6 +9,8 @@ import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContract
 import type { Address } from 'viem';
 import { optimism } from 'viem/chains';
 
+import { aggregateNftSalesData, type NftSalesData } from './aggregateNftSalesData';
+
 export type BuilderNFTContractData = {
   currentAdmin: Address;
   currentMinter: Address;
@@ -17,16 +19,19 @@ export type BuilderNFTContractData = {
   totalSupply: bigint;
   contractAddress: Address;
   receiverUsdcBalance: number;
+  nftSalesData: NftSalesData;
 };
 
 export async function getContractData(): Promise<BuilderNFTContractData> {
-  const [currentAdmin, currentMinter, currentImplementation, proceedsReceiver, totalSupply] = await Promise.all([
-    builderProxyContractReadonlyApiClient.admin(),
-    builderContractReadonlyApiClient.getMinter(),
-    builderProxyContractReadonlyApiClient.implementation(),
-    builderProxyContractReadonlyApiClient.getProceedsReceiver(),
-    builderContractReadonlyApiClient.totalBuilderTokens()
-  ]);
+  const [currentAdmin, currentMinter, currentImplementation, proceedsReceiver, totalSupply, nftSalesData] =
+    await Promise.all([
+      builderProxyContractReadonlyApiClient.admin(),
+      builderContractReadonlyApiClient.getMinter(),
+      builderProxyContractReadonlyApiClient.implementation(),
+      builderProxyContractReadonlyApiClient.getProceedsReceiver(),
+      builderContractReadonlyApiClient.totalBuilderTokens(),
+      aggregateNftSalesData()
+    ]);
 
   const balance = await new UsdcErc20ABIClient({
     chain: optimism,
@@ -41,6 +46,7 @@ export async function getContractData(): Promise<BuilderNFTContractData> {
     proceedsReceiver: proceedsReceiver as Address,
     totalSupply,
     contractAddress: getBuilderContractAddress(),
-    receiverUsdcBalance: Number(balance / BigInt(1e6))
+    receiverUsdcBalance: Number(balance / BigInt(1e6)),
+    nftSalesData
   };
 }

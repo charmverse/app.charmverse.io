@@ -50,6 +50,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   appealReviewers?: Partial<Pick<ProposalAppealReviewer, 'userId' | 'roleId'>>[] | null;
   shareReviews?: boolean | null;
   dueDate?: Date | null;
+  showAuthorResultsOnRubricFail?: boolean | null;
 };
 
 export type CreateProposalInput = {
@@ -221,7 +222,8 @@ export async function createProposal({
                 appealable: evaluation.appealable,
                 appealRequiredReviews: evaluation.appealRequiredReviews,
                 shareReviews: evaluation.shareReviews,
-                dueDate: evaluation.dueDate
+                dueDate: evaluation.dueDate,
+                showAuthorResultsOnRubricFail: evaluation.showAuthorResultsOnRubricFail
               }))
             }
           },

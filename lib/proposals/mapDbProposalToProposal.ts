@@ -4,15 +4,17 @@ import type {
   Page,
   Proposal,
   ProposalAuthor,
+  ProposalEvaluationType,
   ProposalReviewer,
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
-import type {
-  ProposalAppealReviewer,
-  ProposalEvaluation,
-  ProposalEvaluationAppealReview,
-  ProposalEvaluationReview
+import {
+  ProposalEvaluationResult,
+  type ProposalAppealReviewer,
+  type ProposalEvaluation,
+  type ProposalEvaluationAppealReview,
+  type ProposalEvaluationReview
 } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
@@ -25,6 +27,7 @@ import { getProposalFormFields } from '@root/lib/proposals/form/getProposalFormF
 
 import { getProposalProjectFormAnswers } from './form/getProposalProjectFormAnswers';
 import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
+import { showRubricAnswersToAuthor } from './showRubricAnswersToAuthor';
 
 type FormFieldsIncludeType = {
   form: {
@@ -40,7 +43,8 @@ export function mapDbProposalToProposal({
   proposalEvaluationReviews,
   workflow,
   proposalEvaluationAppealReviews,
-  isPublicPage
+  isPublicPage,
+  userId
 }: {
   workflow: {
     evaluations: WorkflowEvaluationJson[];
@@ -68,6 +72,7 @@ export function mapDbProposalToProposal({
     };
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
+  userId?: string;
 }): ProposalWithUsersAndRubric {
   const { rewards, form, evaluations, fields, page, issuedCredentials, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
@@ -84,6 +89,8 @@ export function mapDbProposalToProposal({
         fieldConfig: projectFormFieldConfig
       })
     : null;
+
+  const isAuthor = !!userId && proposal.authors.some((a) => a.userId === userId);
 
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const workflowEvaluation = workflow?.evaluations.find(
@@ -102,9 +109,18 @@ export function mapDbProposalToProposal({
           arrayUtils.uniqueValues(evaluation.rubricAnswers.map((a) => a.userId)).length
         : evaluation.reviews.length;
 
+    const proposalFailed = currentEvaluation?.result === ProposalEvaluationResult.fail;
+
     if (!stepPermissions?.evaluate) {
+      const showReviewsToAuthor = showRubricAnswersToAuthor({
+        evaluationType: evaluation.type as ProposalEvaluationType,
+        isAuthor,
+        proposalFailed: !!proposalFailed,
+        isCurrentEvaluationStep: evaluation.id === currentEvaluation?.id,
+        showAuthorResultsOnRubricFail: !!evaluation.showAuthorResultsOnRubricFail
+      });
       draftRubricAnswers = [];
-      if (!evaluation.shareReviews) {
+      if (!evaluation.shareReviews && !showReviewsToAuthor) {
         rubricAnswers = [];
         reviews = [];
       }

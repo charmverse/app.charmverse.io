@@ -26,13 +26,15 @@ export function BuilderCardNftDisplay({
   children,
   username,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  hideDetails = false
 }: {
   username: string;
   nftImageUrl?: string | null;
   showHotIcon?: boolean;
   children?: React.ReactNode;
   size?: 'x-small' | 'small' | 'medium' | 'large';
+  hideDetails?: boolean;
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
@@ -80,25 +82,13 @@ export function BuilderCardNftDisplay({
         </Box>
         <Box
           sx={{
-            px:
-              size === 'small'
-                ? 0.5
-                : {
-                    xs: 0.5,
-                    md: 1
-                  },
-            height: 'fit-content',
+            height: hideDetails ? 'fit-content' : '33.33%',
             position: 'absolute',
             width: 'calc(100% - 10px)',
             left: '50%',
+            backgroundColor: hideDetails ? 'transparent' : '#000',
             transform: 'translateX(-50%)',
-            bottom:
-              size === 'small'
-                ? 7.5
-                : {
-                    xs: 7.5,
-                    md: 10
-                  }
+            bottom: 7.5
           }}
         >
           {nftImageUrl ? null : (

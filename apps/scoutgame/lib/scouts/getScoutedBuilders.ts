@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
+import type { Last7DaysGems } from 'lib/builders/getTodaysHotBuilders';
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import type { BuilderInfo } from '../builders/interfaces';
@@ -51,6 +52,11 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           currentPrice: true
         }
       },
+      builderCardActivities: {
+        select: {
+          last7Days: true
+        }
+      },
       builderStatus: true,
       userWeeklyStats: {
         where: {
@@ -76,7 +82,10 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       nftsSold: builder.userSeasonStats[0]?.nftsSold ?? 0,
       nftsSoldToScout,
       rank: builder.userWeeklyStats[0]?.rank ?? -1,
-      price: builder.builderNfts[0]?.currentPrice ?? 0
+      price: builder.builderNfts[0]?.currentPrice ?? 0,
+      last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+        .map((gem) => gem.gemsCount)
+        .slice(-7)
     };
   });
 }

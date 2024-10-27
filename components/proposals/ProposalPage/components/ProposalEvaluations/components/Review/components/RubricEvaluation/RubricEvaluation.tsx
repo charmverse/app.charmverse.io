@@ -1,10 +1,12 @@
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposals/interfaces';
+import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import { showRubricAnswersToAuthor } from 'lib/proposals/showRubricAnswersToAuthor';
 
 import { RubricAnswersForm } from './components/RubricAnswersForm';
 import { RubricDecision } from './components/RubricDecision';
@@ -33,8 +35,18 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
     [user?.id, !!evaluation?.draftRubricAnswers?.length]
   );
 
-  const canViewRubricAnswers = isAdmin || canAnswerRubric || evaluation.shareReviews;
+  const isAuthor = proposal.authors.some((a) => a.userId === user?.id);
 
+  const authorCanViewFailedEvaluationResults = showRubricAnswersToAuthor({
+    isAuthor,
+    evaluationType: evaluation.type as ProposalEvaluationType,
+    isCurrentEvaluationStep: isCurrent,
+    proposalFailed: isCurrent && evaluation.result === 'fail',
+    showAuthorResultsOnRubricFail: !!evaluation.showAuthorResultsOnRubricFail
+  });
+
+  const canViewRubricAnswers =
+    isAdmin || canAnswerRubric || evaluation.shareReviews || authorCanViewFailedEvaluationResults;
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
     if (proposal) {
       await refreshProposal();
@@ -58,7 +70,7 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
   return (
     <>
       <Alert severity='info'>
-        {evaluation.shareReviews
+        {evaluation.shareReviews || authorCanViewFailedEvaluationResults
           ? 'Evaluation results are anonymous'
           : evaluation.isReviewer
             ? 'Evaluation results are only visible to Reviewers'
