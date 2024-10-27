@@ -27,6 +27,7 @@ import {
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
+import { isTestEnv } from '@root/config/constants';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -63,12 +64,12 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
 
-  if (!apiKey) {
+  if (!apiKey && !isTestEnv) {
     return <Typography color='error'>Decent API key not found</Typography>;
   }
 
   return (
-    <BoxHooksContextProvider apiKey={apiKey}>
+    <BoxHooksContextProvider apiKey={apiKey || '1234'}>
       <NFTPurchaseFormContent {...props} />
     </BoxHooksContextProvider>
   );
