@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
-import { getStartOfSeason, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
+import { getStartOfSeason, getWeekStartEnd, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
@@ -43,6 +43,7 @@ export async function recordMergedPullRequest({
     throw new Error('Pull request was not merged');
   }
   const week = getWeekFromDate(now.toJSDate());
+  const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
   const start = getStartOfSeason(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
@@ -95,18 +96,19 @@ export async function recordMergedPullRequest({
     }
   });
 
-  const recentFirstPRInNewRepo = await prisma.githubEvent.findFirst({
+  const recentFirstMergedPullRequests = await prisma.githubEvent.count({
     where: {
       createdBy: pullRequest.author.id,
       type: 'merged_pull_request',
       isFirstPullRequest: true,
       createdAt: {
-        gte: new Date(new Date(pullRequest.createdAt).getTime() - streakWindow)
+        gte: startOfWeek.toJSDate()
       }
     }
   });
+  const hasFirstMergedPullRequestAlreadyThisWeek = recentFirstMergedPullRequests > 0;
 
-  let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !recentFirstPRInNewRepo;
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !hasFirstMergedPullRequestAlreadyThisWeek;
   if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
