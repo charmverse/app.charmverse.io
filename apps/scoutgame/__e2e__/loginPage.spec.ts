@@ -20,7 +20,9 @@ test.describe('Login page', () => {
 
     await page.reload();
     await page.waitForURL('**/home');
-    await expect(homePage.container).toBeVisible();
+
+    const homePageContainer = page.locator('data-test=home-page');
+    await expect(homePageContainer).toBeVisible();
 
     const userPill = page.locator('data-test=user-menu-pill');
     await expect(userPill).toBeVisible();

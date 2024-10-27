@@ -7,7 +7,7 @@ test.describe('Profile page', () => {
     await page.goto('/profile');
 
     await page.waitForURL('**/login');
-    const container = page.locator('data-test=profile-page');
+    const container = page.locator('data-test=login-page');
     await expect(container).toBeVisible();
   });
 
@@ -22,7 +22,7 @@ test.describe('Profile page', () => {
     await signInModalButton.click();
 
     await page.waitForURL('**/login?redirectUrl=profile');
-    const container = page.locator('data-test=profile-page');
+    const container = page.locator('data-test=login-page');
     await expect(container).toBeVisible();
   });
 
