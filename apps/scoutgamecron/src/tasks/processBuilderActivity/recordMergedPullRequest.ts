@@ -86,7 +86,7 @@ export async function recordMergedPullRequest({
     return;
   }
 
-  // check our data to see if this is the first merged PR, and if so, check the Github API to confirm
+  // check our data to see if this is the first merged PR in a repo in the last 7 days, and if so, check the Github API to confirm
   const totalMergedPullRequests = await prisma.githubEvent.count({
     where: {
       createdBy: pullRequest.author.id,
@@ -95,7 +95,18 @@ export async function recordMergedPullRequest({
     }
   });
 
-  let isFirstMergedPullRequest = totalMergedPullRequests === 0;
+  const recentFirstPRInNewRepo = await prisma.githubEvent.findFirst({
+    where: {
+      createdBy: pullRequest.author.id,
+      type: 'merged_pull_request',
+      isFirstPullRequest: true,
+      createdAt: {
+        gte: new Date(new Date(pullRequest.createdAt).getTime() - streakWindow)
+      }
+    }
+  });
+
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !recentFirstPRInNewRepo;
   if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
