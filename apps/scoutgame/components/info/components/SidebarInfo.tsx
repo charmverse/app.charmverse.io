@@ -28,9 +28,8 @@ const partners = [
 ];
 
 export function SidebarInfo({ handleClose }: Readonly<{ handleClose?: () => void }>) {
-  const [open, setOpen] = useState(false);
-
   const pathname = usePathname();
+  const [open, setOpen] = useState(pathname.startsWith('/info/partner-rewards'));
 
   function handleClick() {
     setOpen((prevState) => !prevState);
