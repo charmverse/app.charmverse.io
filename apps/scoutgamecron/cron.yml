@@ -25,6 +25,11 @@ cron:
     # Every 5 minutes
     schedule: '*/5 * * * *'
 
+  - name: 'resync-nft-purchases'
+    url: '/resync-nft-purchases'
+    # Every 5 minutes
+    schedule: '*/5 * * * *'
+
   - name: 'update-builder-card-activity'
     url: '/update-builder-card-activity'
     # Every hour
