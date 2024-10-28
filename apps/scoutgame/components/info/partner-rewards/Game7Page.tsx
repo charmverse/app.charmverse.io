@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
@@ -28,19 +28,19 @@ function Document() {
       </Typography>
       <List>
         <ListItem>
-          <a href='https://github.com/G7DAO/protocol' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/G7DAO/protocol' target='_blank' rel='noreferrer'>
             https://github.com/G7DAO/protocol
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/G7DAO/safes' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/G7DAO/safes' target='_blank' rel='noreferrer'>
             https://github.com/G7DAO/safes
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/G7DAO/seer' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/G7DAO/seer' target='_blank' rel='noreferrer'>
             https://github.com/G7DAO/seer
-          </a>
+          </Link>
         </ListItem>
       </List>
     </InfoCard>
