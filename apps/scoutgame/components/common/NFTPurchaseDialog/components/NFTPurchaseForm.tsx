@@ -554,7 +554,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       )}
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
-          {(decentSdkError as Error).message}
+          There was an error communicating with Decent API
         </Typography>
       ) : null}
       {submitError && (

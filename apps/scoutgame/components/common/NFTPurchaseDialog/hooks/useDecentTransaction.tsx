@@ -95,7 +95,7 @@ export function useDecentTransaction({
       prepareDecentTransaction({
         txConfig: decentAPIParams
       }).catch((error) => {
-        log.error(`Error preparing decent transaction`, { error, decentAPIParams });
+        log.error(`There was an error communicating with Decent API`, { error, decentAPIParams });
         throw error;
       }),
     {
