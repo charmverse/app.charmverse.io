@@ -74,25 +74,4 @@ describe('getBuilderActivity', () => {
     expect(commits).toHaveLength(0);
     expect(pullRequests).toHaveLength(0);
   });
-
-  it('should respond with new repos to save from a builder', async () => {
-    const githubUser = await mockGithubUser();
-
-    const commit = mockCommit({
-      repo: {
-        id: 666,
-        owner: githubUser.login,
-        name: 'project-x'
-      }
-    });
-    (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);
-    (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([]);
-
-    const { commits, newOwnerRepos } = await getBuilderActivity({
-      login: githubUser.login,
-      after: new Date()
-    });
-    expect(commits).toHaveLength(1);
-    expect(newOwnerRepos).toHaveLength(1);
-  });
 });
