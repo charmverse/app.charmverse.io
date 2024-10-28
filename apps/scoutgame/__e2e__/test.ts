@@ -4,6 +4,7 @@ import { HomePage } from './po/HomePage.po';
 import { InfoPage } from './po/InfoPage.po';
 import { LoginPage } from './po/LoginPage.po';
 import { ProfilePage } from './po/ProfilePage.po';
+import { UserPage } from './po/UserPage.po';
 import { Utilities } from './po/Utilities.po';
 import { WelcomePage } from './po/WelcomePage.po';
 
@@ -14,6 +15,7 @@ type Fixtures = {
   welcomePage: WelcomePage;
   utils: Utilities;
   infoPage: InfoPage;
+  userPage: UserPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -43,7 +45,8 @@ export const test = base.extend<Fixtures>({
   profilePage: ({ page }, use) => use(new ProfilePage(page)),
   welcomePage: ({ page }, use) => use(new WelcomePage(page)),
   utils: ({ page }, use) => use(new Utilities(page)),
-  infoPage: ({ page }, use) => use(new InfoPage(page))
+  infoPage: ({ page }, use) => use(new InfoPage(page)),
+  userPage: ({ page }, use) => use(new UserPage(page))
 });
 
 export { chromium, expect } from '@playwright/test';

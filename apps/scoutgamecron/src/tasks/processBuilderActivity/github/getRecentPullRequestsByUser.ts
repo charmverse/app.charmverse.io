@@ -14,6 +14,11 @@ type PullRequestByUser = {
   createdAt: string;
   mergedAt?: string;
   state: 'CLOSED' | 'MERGED';
+  repository: {
+    owner: {
+      login: string;
+    };
+  };
 };
 
 const getPrsByUser = `
@@ -29,7 +34,12 @@ const getPrsByUser = `
             closedAt
             createdAt
             mergedAt
-            state
+            state,
+            repository {
+              owner {
+                login
+              }
+            }
           }
         }
       }

@@ -56,6 +56,7 @@ export function ERC20ApproveButton({
           color='primary'
           onClick={approveSpender}
           disabled={isApprovingSpender}
+          data-test='approve-spending-nft-purchase-button'
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
         </LoadingButton>

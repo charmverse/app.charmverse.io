@@ -12,6 +12,7 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
+  id,
   createdAt,
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
@@ -19,7 +20,8 @@ export async function mockBuilder({
   username = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
-  createNft = false
+  createNft = false,
+  farcasterId
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
@@ -29,6 +31,7 @@ export async function mockBuilder({
       builderStatus,
       onboardedAt,
       agreedToTermsAt,
+      farcasterId,
       githubUser: {
         create: {
           id: githubUserId,
@@ -200,8 +203,8 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
     data: {
       ...fields,
       id: fields.id ?? randomLargeInt(),
-      name: fields.name ?? `test_repo_${+Math.random()}`,
-      owner: fields.owner ?? `test_owner_${Math.random()}`,
+      name: fields.name ?? `test_repo_${Math.floor(Math.random() * 1000) + 1}`,
+      owner: fields.owner ?? `test_owner_${Math.floor(Math.random() * 1000) + 1}`,
       ownerType: fields.ownerType ?? 'org',
       defaultBranch: fields.defaultBranch ?? 'main'
     }
@@ -261,10 +264,11 @@ export async function mockNFTPurchaseEvent({
 export async function mockBuilderNft({
   builderId,
   chainId = 1,
+  tokenId = Math.round(Math.random() * 10000000),
   contractAddress = '0x1',
   owners = [],
-  currentPrice = 100,
-  season = mockSeason
+  season = mockSeason,
+  currentPrice = 100
 }: {
   builderId: string;
   chainId?: number;
@@ -272,6 +276,7 @@ export async function mockBuilderNft({
   currentPrice?: number;
   owners?: (string | { id: string })[];
   season?: string;
+  tokenId?: number;
 }) {
   const nft = await prisma.builderNft.create({
     data: {
@@ -281,7 +286,7 @@ export async function mockBuilderNft({
       currentPrice,
       season,
       imageUrl: 'https://placehold.co/600x400',
-      tokenId: Math.round(Math.random() * 10000000),
+      tokenId,
       nftSoldEvents: {
         createMany: {
           data: owners.map((owner) => ({

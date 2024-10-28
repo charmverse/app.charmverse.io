@@ -17,7 +17,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
           <ListItemAvatar>
             <img src='/images/number_icon_1.png' alt='1' />
           </ListItemAvatar>
-          <Typography fontSize='1.1rem'>
+          <Typography>
             <strong>Discover builders who are contributing to cool onchain projects.</strong> Choose from the Hot
             Builders section or explore the Scout page to find hidden gems.
           </Typography>
@@ -27,7 +27,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
             <img src='/images/number_icon_2.png' alt='2' />
           </ListItemAvatar>
           <Stack display='flex' gap={2}>
-            <Typography fontSize='1.1rem'>
+            <Typography>
               <strong>
                 Scout them by buying their Builder Cards with{' '}
                 <Typography
@@ -42,20 +42,20 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
               </strong>{' '}
               or <strong>ETH / USDC</strong> on
             </Typography>
-            <Stack flexDirection='row' gap={2} width='100%' justifyContent='center'>
-              <img src='/images/crypto/ethereum-circle.png' alt='Ethereum' title='Ethereum' width='24' height='24' />
-              <img src='/images/crypto/op64.png' alt='OP' title='Optimism' width='24' height='24' />
-              <img src='/images/crypto/arbitrum.png' alt='Arbitrum' title='Arbitrum' width='24' height='24' />
-              <img src='/images/crypto/base64.png' alt='Base' title='Base' width='24' height='24' />
-              <img src='/images/crypto/zora64.png' alt='Zora' title='Zora' width='24' height='24' />
-            </Stack>
           </Stack>
         </ListItem>
+        <Stack flexDirection='row' gap={2} width='100%' justifyContent='center' my={2}>
+          <img src='/images/crypto/ethereum-circle.png' alt='Ethereum' title='Ethereum' width='24' height='24' />
+          <img src='/images/crypto/op64.png' alt='OP' title='Optimism' width='24' height='24' />
+          <img src='/images/crypto/arbitrum.png' alt='Arbitrum' title='Arbitrum' width='24' height='24' />
+          <img src='/images/crypto/base64.png' alt='Base' title='Base' width='24' height='24' />
+          <img src='/images/crypto/zora64.png' alt='Zora' title='Zora' width='24' height='24' />
+        </Stack>
         <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>
             <img src='/images/number_icon_3.png' alt='3' />
           </ListItemAvatar>
-          <Typography fontSize='1.1rem'>
+          <Typography>
             <strong>
               Watch your{' '}
               <Typography
