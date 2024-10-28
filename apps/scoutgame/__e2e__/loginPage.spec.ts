@@ -10,15 +10,16 @@ test.describe('Login page', () => {
     const signInButton = page.locator('data-test=sign-in-button');
     await signInButton.click();
     await page.waitForURL('**/login');
-    await utils.loginAsUserId(builder.id);
 
     const signInWithWarpcast = page.locator('data-test=sign-in-with-warpcast');
-    await signInWithWarpcast.click({ delay: 100 });
+    await signInWithWarpcast.click();
 
     const warpcastModal = page.locator('data-test=farcaster-modal');
     await expect(warpcastModal).toBeVisible();
 
-    await page.reload();
+    await utils.loginAsUserId(builder.id);
+
+    await page.goto('/home');
     await page.waitForURL('**/home');
 
     const homePageContainer = page.locator('data-test=home-page');
