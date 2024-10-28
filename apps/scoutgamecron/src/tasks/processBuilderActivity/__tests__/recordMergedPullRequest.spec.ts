@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
+import { getWeekStartEnd } from '@packages/scoutgame/dates';
 import {
   mockBuilder,
   mockBuilderNft,
@@ -11,7 +12,7 @@ import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
 
-import { mockPullRequest } from '@/testing/generators';
+import { mockPullRequest } from '../../../testing/generators';
 
 const currentSeason = '2024-W40';
 
@@ -517,6 +518,8 @@ describe('recordMergedPullRequest', () => {
     const repo1 = await mockRepo();
     const repo2 = await mockRepo();
     const scout = await mockScout();
+    const now = DateTime.now();
+    const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
 
     await mockBuilderNft({
       builderId: builder.id,
@@ -526,8 +529,8 @@ describe('recordMergedPullRequest', () => {
 
     // First PR in repo1
     const firstPR = mockPullRequest({
-      mergedAt: DateTime.now().minus({ days: 2 }).toISO(),
-      createdAt: DateTime.now().minus({ days: 2 }).toISO(),
+      mergedAt: startOfWeek.plus({ days: 3 }).toISO(),
+      createdAt: startOfWeek.plus({ days: 2 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo: repo1
@@ -539,8 +542,8 @@ describe('recordMergedPullRequest', () => {
 
     // Second PR in repo2
     const secondPR = mockPullRequest({
-      mergedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      mergedAt: startOfWeek.plus({ days: 4 }).toISO(),
+      createdAt: startOfWeek.plus({ days: 3 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo: repo2
@@ -571,6 +574,8 @@ describe('recordMergedPullRequest', () => {
     const repo1 = await mockRepo();
     const repo2 = await mockRepo();
     const scout = await mockScout();
+    const now = DateTime.now();
+    const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
 
     await mockBuilderNft({
       builderId: builder.id,
@@ -580,8 +585,8 @@ describe('recordMergedPullRequest', () => {
 
     // First PR in repo1
     const firstPR = mockPullRequest({
-      mergedAt: DateTime.now().minus({ days: 10 }).toISO(),
-      createdAt: DateTime.now().minus({ days: 10 }).toISO(),
+      mergedAt: startOfWeek.minus({ days: 10 }).toISO(),
+      createdAt: startOfWeek.minus({ days: 11 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo: repo1
@@ -593,8 +598,8 @@ describe('recordMergedPullRequest', () => {
 
     // Second PR in repo2, more than 7 days later
     const secondPR = mockPullRequest({
-      mergedAt: new Date().toISOString(),
-      createdAt: new Date().toISOString(),
+      mergedAt: startOfWeek.toISO(),
+      createdAt: startOfWeek.toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo: repo2
