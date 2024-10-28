@@ -99,7 +99,7 @@ export function Header() {
                     sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
                     data-test='user-menu-pill'
                   >
-                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-testid='user-points-balance'>
+                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-test='user-points-balance'>
                       {user.currentBalance}
                     </Typography>
                     <Image

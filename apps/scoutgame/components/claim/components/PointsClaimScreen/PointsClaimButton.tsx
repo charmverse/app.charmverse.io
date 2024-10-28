@@ -14,7 +14,7 @@ export function PointsClaimButton({ isExecuting, handleClaim }: { isExecuting: b
         }
       }}
       loading={isExecuting}
-      data-testid='claim-points-button'
+      data-test='claim-points-button'
       disabled={isExecuting}
       onClick={handleClaim}
     >
