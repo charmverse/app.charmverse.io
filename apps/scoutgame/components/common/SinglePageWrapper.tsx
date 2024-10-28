@@ -11,7 +11,7 @@ export function SinglePageWrapper({ children, ...props }: BoxProps) {
       height='100%'
       textAlign='left'
       mx='auto'
-      p={3}
+      p={{ xs: 2, md: 3 }}
       {...props}
     >
       {children}
