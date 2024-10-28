@@ -54,7 +54,8 @@ const client = createPublicClient({
 // Contract address and the event signature for filtering logs
 const contractAddress = realOptimismMainnetBuildersContract;
 
-const startBlockNumber = 126062456;
+// This is the block number where the OP Mainnet contract for the BuilderNFT was deployed
+const startBlockNumber = 126_062_456;
 
 export type ParsedLog = Awaited<ReturnType<typeof parseEventLogs>>[number] & {
   eventName: 'TransferSingle' | 'BuilderScouted';
