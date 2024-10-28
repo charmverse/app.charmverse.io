@@ -9,7 +9,7 @@ export default function Layout({
   children: ReactNode;
 }>) {
   return (
-    <Box component='main' bgcolor='background.default' p={3} minHeight='100svh'>
+    <Box component='main' bgcolor='background.default' p={{ xs: 2, md: 3 }} minHeight='100svh'>
       <Box maxWidth='700px' margin='auto'>
         {children}
       </Box>
