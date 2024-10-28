@@ -6,7 +6,7 @@ import { InfoPageContainer } from 'components/info/components/InfoPageContainer'
 
 export function LitProtocolPage() {
   return (
-    <InfoPageContainer data-test='partner-game7-page' image='/images/info/rewards-partner-lit.png' title='Game7'>
+    <InfoPageContainer data-test='partner-lit-page' image='/images/info/rewards-partner-lit.png' title='Lit Protocol'>
       <Document />
     </InfoPageContainer>
   );
