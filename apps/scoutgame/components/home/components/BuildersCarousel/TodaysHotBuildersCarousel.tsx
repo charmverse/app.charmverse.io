@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
 import { getTodaysHotBuilders } from 'lib/builders/getTodaysHotBuilders';

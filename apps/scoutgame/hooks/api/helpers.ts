@@ -13,7 +13,7 @@ export function useGET<T = unknown>(path: MaybeString, query: any = {}, swrOptio
 }
 
 // eslint-disable-next-line default-param-last
-export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
+export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration<T>) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWRImmutable<T>(requestUrl, http.GET, swrOptions);
 }

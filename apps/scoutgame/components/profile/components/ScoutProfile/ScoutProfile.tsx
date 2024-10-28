@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { Typography, Stack } from '@mui/material';
 

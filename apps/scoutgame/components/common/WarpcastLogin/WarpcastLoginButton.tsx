@@ -66,13 +66,16 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     popupState.close();
   }, []);
 
-  const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    if (res.message && res.signature) {
-      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
-    } else {
-      log.error('Did not receive message or signature from Farcaster', res);
-    }
-  }, []);
+  const onSuccessCallback = useCallback(
+    async (res: StatusAPIResponse) => {
+      if (res.message && res.signature) {
+        await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
+      } else {
+        log.error('Did not receive message or signature from Farcaster', res);
+      }
+    },
+    [inviteCode]
+  );
 
   const onClick = useCallback(() => {
     popupState.open();
@@ -123,6 +126,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
           }
         }}
         startIcon={<WarpcastIcon />}
+        data-test='sign-in-with-warpcast'
       >
         {children || 'Sign in with Warpcast'}
       </Button>

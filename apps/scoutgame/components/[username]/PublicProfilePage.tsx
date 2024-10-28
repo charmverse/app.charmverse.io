@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper } from '@mui/material';
 
