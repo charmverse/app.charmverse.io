@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { createPublicClient, http, parseEventLogs } from 'viem';
 import { optimism } from 'viem/chains';
 
@@ -28,14 +29,14 @@ const builderScouted = {
   type: 'event'
 };
 
-type TransferSingleEvent = {
+export type TransferSingleEvent = {
   eventName: 'TransferSingle';
   args: { operator: string; from: string; to: string; id: string; value: string };
   transactionHash: string;
   blockNumber: string;
 };
 
-type BuilderScoutedEvent = {
+export type BuilderScoutedEvent = {
   eventName: 'BuilderScouted';
   args: { tokenId: string; amount: string; scout: string };
   transactionHash: string;
@@ -53,20 +54,33 @@ const client = createPublicClient({
 // Contract address and the event signature for filtering logs
 const contractAddress = realOptimismMainnetBuildersContract;
 
+const startBlockNumber = 126062456;
+
+export type ParsedLog = Awaited<ReturnType<typeof parseEventLogs>>[number] & {
+  eventName: 'TransferSingle' | 'BuilderScouted';
+  args: BuilderScoutedEvent['args'] | TransferSingleEvent['args'];
+};
+
 // Function to get logs for the contract and parse them against the ABI
-async function getAndParseLogs() {
+export async function getAndParseNftMintLogs(
+  {
+    fromBlock = startBlockNumber,
+    toBlock = 'latest'
+  }: { fromBlock?: number | bigint; toBlock?: number | bigint | 'latest' } = {
+    fromBlock: startBlockNumber
+  }
+): Promise<ParsedLog[]> {
   const logs = await client.getLogs({
     address: contractAddress,
-    fromBlock: BigInt(126062456),
-    toBlock: 'latest'
+    fromBlock: typeof fromBlock === 'bigint' ? fromBlock : BigInt(fromBlock),
+    toBlock: typeof toBlock === 'number' ? BigInt(toBlock) : toBlock,
+    events: [transferSingle, builderScouted]
   });
 
   const parsedLogs = parseEventLogs({ abi: contractAbi, logs, eventName: ['BuilderScouted', 'TransferSingle'] });
 
-  return parsedLogs;
+  return parsedLogs as ParsedLog[];
 }
-
-type ParsedLogs = Awaited<ReturnType<typeof getAndParseLogs>>;
 
 type SimplifiedGroupedEvent = {
   scoutId: string;
@@ -86,14 +100,11 @@ type SimplifiedGroupedEvent = {
   };
 };
 
-function groupEventsByTransactionHash(events: ParsedLogs): SimplifiedGroupedEvent[] {
+function groupEventsByTransactionHash(events: ParsedLog[]): SimplifiedGroupedEvent[] {
   const eventMap: Record<string, Partial<SimplifiedGroupedEvent>> = {};
 
   for (const baseEvent of events) {
-    const event = baseEvent as ParsedLogs[number] & {
-      eventName: 'TransferSingle' | 'BuilderScouted';
-      args: BuilderScoutedEvent['args'] | TransferSingleEvent['args'];
-    };
+    const event = baseEvent;
     const { transactionHash, blockNumber } = event;
 
     if (!eventMap[transactionHash]) {
@@ -131,14 +142,33 @@ function groupEventsByTransactionHash(events: ParsedLogs): SimplifiedGroupedEven
   }));
 }
 
-export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string }) {
-  const logs = await getAndParseLogs();
+export async function getOnchainPurchaseEvents({
+  scoutId,
+  fromBlock,
+  toBlock
+}: {
+  scoutId: string;
+  fromBlock?: number;
+  toBlock?: number;
+}) {
+  const logs = await getAndParseNftMintLogs({ fromBlock });
 
   const groupedEvents = groupEventsByTransactionHash(logs as any);
 
+  const purchasesFromDate = fromBlock
+    ? await getPublicClient(optimism.id)
+        .getBlock({ blockNumber: BigInt(fromBlock), includeTransactions: false })
+        .then((block) => new Date(Number(block.timestamp) * 1000))
+    : undefined;
+
   const nftPurchases = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      scoutId
+      scoutId,
+      createdAt: purchasesFromDate
+        ? {
+            gte: purchasesFromDate
+          }
+        : undefined
     },
     select: {
       txHash: true,
@@ -150,7 +180,8 @@ export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string })
 
   const pendingTransactions = await prisma.pendingNftTransaction.findMany({
     where: {
-      userId: scoutId
+      userId: scoutId,
+      createdAt: purchasesFromDate ? { gte: purchasesFromDate } : undefined
     },
     select: {
       id: true,
@@ -176,5 +207,3 @@ export async function getOnchainPurchaseEvents({ scoutId }: { scoutId: string })
 
   return mappedEvents;
 }
-
-// getOnchainPurchaseEvents({ scoutId: 'bb2e2785-ebbb-441c-9909-df87f0cac5c4' }).then(prettyPrint);
