@@ -34,6 +34,9 @@ function Document() {
         <ListItem>
           <Link href='/info/partner-rewards/bountycaster'>BountyCaster</Link>
         </ListItem>
+        <ListItem>
+          <Link href='/info/partner-rewards/lit'>Lit Protocol</Link>
+        </ListItem>
       </List>
     </InfoCard>
   );
