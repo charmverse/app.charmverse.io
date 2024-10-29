@@ -1,4 +1,14 @@
-import { Link, Typography } from '@mui/material';
+import {
+  Link,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
 import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
@@ -23,7 +33,7 @@ function Document() {
         Summary
       </Typography>
       <Typography>
-        Optimism is rewarding builders who help grow the{' '}
+        Optimism is rewarding builders, from a pool of 5,000 OP, who help grow the{' '}
         <Link href='https://github.com/ethereum-optimism/supersim' target='_blank'>
           Supersim
         </Link>{' '}
@@ -38,8 +48,9 @@ function Document() {
       <Typography variant='h6' color='secondary' mt={2}>
         How it works
       </Typography>
+      <Typography>Merge PRs to address issues in the Supersim repository to earn rewards.</Typography>
       <Typography>
-        Merge PRs to address issues in the Supersim repository labeled as{' '}
+        Earn 200 OP for a PR addressing an issue labeled as{' '}
         <Link
           href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
           target='_blank'
@@ -56,9 +67,9 @@ function Document() {
         .
       </Typography>
       <Typography>
-        For those more adventurous, a builder can create an issue in the repository detailing their proposed
-        contribution before starting work. OP will respond to new issues and let the builder know if a PR would be
-        accepted! Here are high priority additional desired features:
+        For those more adventurous, earn 200 to 500 OP for merging a PR addressing a new issue. Create an issue in the
+        repository detailing your proposed contribution before starting work. OP will respond to new issues and let the
+        you know if a PR would be accepted! Here are high priority additional desired features:
       </Typography>
       <List>
         <ListItem>Additional examples (see /examples/tic-tac-toe) showcasing projects to build with Supersim</ListItem>
@@ -68,6 +79,46 @@ function Document() {
           Supersim to provide an even better local development experience
         </ListItem>
       </List>
+      <TableContainer component={Paper}>
+        <Table sx={{ '& th, & td': { px: 0 } }} aria-label='Celo tiers table'>
+          <TableHead>
+            <TableRow>
+              <TableCell>Issue</TableCell>
+              <TableCell align='right'>Reward</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ '& td, & th': { border: 0 } }}>
+            <TableRow>
+              <TableCell>
+                <Link
+                  href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
+                  target='_blank'
+                >
+                  good first issue
+                </Link>
+              </TableCell>
+              <TableCell align='right'>200 OP</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <Link
+                  href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
+                  target='_blank'
+                >
+                  help wanted
+                </Link>
+              </TableCell>
+              <TableCell align='right'>200 OP</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Create your own*</TableCell>
+              <TableCell align='right'>200 to 500 OP**</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Typography>*See list of high priority additional features above for inspiration.</Typography>
+      <Typography>**Optimism will determine the reward based on the complexity and priority of the issue.</Typography>
     </InfoCard>
   );
 }
