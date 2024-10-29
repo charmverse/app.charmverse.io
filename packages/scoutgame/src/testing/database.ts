@@ -60,7 +60,8 @@ export async function mockScout({
   onboardedAt = new Date(),
   builderId,
   season,
-  email
+  email,
+  currentBalance
 }: {
   username?: string;
   agreedToTermsAt?: Date | null;
@@ -69,6 +70,7 @@ export async function mockScout({
   builderId?: string; // automatically "scout" a builder
   season?: string;
   email?: string;
+  currentBalance?: number;
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
@@ -76,7 +78,8 @@ export async function mockScout({
       agreedToTermsAt,
       onboardedAt,
       displayName,
-      email
+      email,
+      currentBalance
     }
   });
   if (builderId) {

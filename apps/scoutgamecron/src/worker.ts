@@ -9,6 +9,7 @@ import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
+import { resolveBalanceIssues } from './tasks/resolveBalanceIssues/resolveBalanceIssues';
 import { resolveMissingPurchasesTask } from './tasks/resolveMissingPurchases';
 import { updateAllBuilderCardActivities } from './tasks/updateBuilderCardActivity';
 import { updateMixpanelUserProfilesTask } from './tasks/updateMixpanelProfilesTask';
@@ -62,6 +63,8 @@ addTask('/alert-low-wallet-gas-balance', alertLowWalletGasBalance);
 addTask('/update-builder-card-activity', updateAllBuilderCardActivities);
 
 addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
+
+addTask('/resolve-balance-issues', resolveBalanceIssues);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);
