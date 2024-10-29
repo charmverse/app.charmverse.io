@@ -16,16 +16,20 @@ async function query() {
       continue;
     }
 
-    const address = getAddress(user.walletAddress);
+    try {
+      const address = getAddress(user.walletAddress);
 
-    await prisma.scoutWallet.create({
-      data: { address: address, scoutId: user.id }
-    });
+      await prisma.scoutWallet.create({
+        data: { address: address.toLowerCase(), scoutId: user.id }
+      });
 
-    await prisma.scout.update({
-      where: { id: user.id },
-      data: { walletAddress: null }
-    });
+      await prisma.scout.update({
+        where: { id: user.id },
+        data: { walletAddress: null }
+      });
+    } catch (_err) {
+      console.log('Error', { error: _err, userId: user.id });
+    }
 
     console.log(`Migrated ${user.id} wallet address`);
   }
