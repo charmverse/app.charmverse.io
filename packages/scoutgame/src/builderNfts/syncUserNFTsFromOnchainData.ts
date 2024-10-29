@@ -35,37 +35,51 @@ export async function syncUserNFTsFromOnchainData({
   const txRequiringReconciliation = userPurchases.filter((p) => !p.nftPurchase);
 
   for (let i = 0; i < txRequiringReconciliation.length; i++) {
-    log.info(`Processing missing tx ${i + 1} / ${txRequiringReconciliation.length}`);
+    const txToReconcile = txRequiringReconciliation[i];
 
-    const tx = txRequiringReconciliation[i];
+    log.error(`Processing missing txToReconcile ${i + 1} / ${txRequiringReconciliation.length}`, {
+      sourceTransaction: txToReconcile.pendingTransaction?.sourceChainTxHash,
+      sourceChain: txToReconcile.pendingTransaction?.sourceChainId,
+      optimismTxHash: txToReconcile.txHash,
+      tokenId: txToReconcile.tokenId,
+      scoutId: txToReconcile.scoutId,
+      tokensToPurchase: txToReconcile.amount
+    });
     const expectedPrice =
-      tx.pendingTransaction?.targetAmountReceived ??
+      txToReconcile.pendingTransaction?.targetAmountReceived ??
       (await getTokenPurchasePrice({
         args: {
-          amount: BigInt(tx.amount),
-          tokenId: BigInt(tx.tokenId)
+          amount: BigInt(txToReconcile.amount),
+          tokenId: BigInt(txToReconcile.tokenId)
         },
-        blockNumber: BigInt(tx.blockNumber) - BigInt(1)
+        blockNumber: BigInt(txToReconcile.blockNumber) - BigInt(1)
       }));
 
+    if (!txToReconcile.pendingTransaction) {
+      log.error('No pending transaction found for txToReconcile', {
+        scoutId: txToReconcile.scoutId,
+        tokenId: txToReconcile.tokenId,
+        tokensToPurchase: txToReconcile.amount
+      });
+    }
     const pendingTx =
-      tx.pendingTransaction ??
+      txToReconcile.pendingTransaction ??
       (await savePendingTransaction({
         user: {
           scoutId: scout.id,
-          walletAddress: tx.transferEvent.to
+          walletAddress: txToReconcile.transferEvent.to
         },
         transactionInfo: {
           destinationChainId: 10,
           sourceChainId: 10,
-          sourceChainTxHash: tx.txHash
+          sourceChainTxHash: txToReconcile.txHash
         },
         purchaseInfo: {
           quotedPriceCurrency: optimismUsdcContractAddress,
           builderContractAddress: realOptimismMainnetBuildersContract,
-          tokenId: parseInt(tx.tokenId),
+          tokenId: parseInt(txToReconcile.tokenId),
           quotedPrice: Number(expectedPrice.toString()),
-          tokenAmount: Number(tx.amount)
+          tokenAmount: Number(txToReconcile.amount)
         }
       }));
 
