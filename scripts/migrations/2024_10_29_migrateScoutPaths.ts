@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 async function migrateScoutPaths() {
@@ -17,6 +18,7 @@ async function migrateScoutPaths() {
         path: scout.username
       }
     });
+    log.info(`Updated path for ${scout.username}`);
   }
 }
 

@@ -7,6 +7,7 @@ import { log } from '@charmverse/core/log';
 async function uploadNFTArtwork() {
   const builders = await prisma.scout.findMany({
     where: {
+      username: 'safwan',
       builderStatus: {
         in: ['approved', 'banned']
       }
@@ -26,10 +27,10 @@ async function uploadNFTArtwork() {
     const builderNft = builder.builderNfts[0];
     try {
       const imageUrl = await uploadArtwork({
-        displayName: builder.displayName,
+        displayName: 'safwan 🎩🚨',
         season: currentSeason,
         avatar: builder.avatar,
-        tokenId: builderNft.tokenId
+        tokenId: builderNft.tokenId,
       });
       const congratsImageUrl = await uploadArtworkCongrats({
         season: currentSeason,

@@ -82,6 +82,74 @@ function calculateFontSize(text: string, maxWidth: number, initialFontSize: numb
   return minFontSize;
 }
 
+export async function updateNftImage({
+  displayName,
+  currentNftImage
+}: {
+  currentNftImage: string;
+  displayName: string;
+}): Promise<Buffer> {
+  const cutoutWidth = 300;
+  const cutoutHeight = 400;
+
+  const baseImage = new ImageResponse(
+    (
+      <div
+        style={{
+          height: cutoutHeight,
+          width: cutoutWidth,
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          backgroundColor: 'white'
+        }}
+      >
+        <img
+          src={currentNftImage}
+          width={cutoutWidth}
+          height={cutoutHeight}
+          style={{ position: 'absolute', top: 0, left: 0 }}
+        />
+        <div
+          style={{
+            width: cutoutWidth - 20,
+            display: 'flex',
+            justifyContent: 'center',
+            backgroundColor: 'black',
+            flexDirection: 'row',
+            bottom: 40,
+            position: 'absolute',
+            paddingLeft: 10,
+            paddingRight: 10
+          }}
+        >
+          <p
+            style={{
+              color: 'white',
+              textAlign: 'center',
+              fontSize: `${calculateFontSize(displayName, 280, 24)}px`,
+              whiteSpace: 'nowrap',
+              maxWidth: `${280}px`
+            }}
+          >
+            {displayName}
+          </p>
+        </div>
+      </div>
+    ),
+    {
+      width: cutoutWidth,
+      height: cutoutHeight
+    }
+  );
+
+  const baseImageBuffer = await baseImage.arrayBuffer();
+  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+
+  return imageBuffer;
+}
+
 export async function generateNftImage({
   avatar,
   displayName,
