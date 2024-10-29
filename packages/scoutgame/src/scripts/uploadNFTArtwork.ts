@@ -2,9 +2,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { uploadArtwork, uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
 import { currentSeason } from '../dates';
+import { log } from '@charmverse/core/log';
 
 async function uploadNFTArtwork() {
-  const scouts = await prisma.scout.findMany({
+  const builders = await prisma.scout.findMany({
     where: {
       builderStatus: {
         in: ['approved', 'banned']
@@ -20,39 +21,40 @@ async function uploadNFTArtwork() {
       }
     }
   });
-  
-  const mappedWithimage = await Promise.all(
-    scouts.map(async (scout) => {
+
+  for (const builder of builders) {
+    const builderNft = builder.builderNfts[0];
+    try {
       const imageUrl = await uploadArtwork({
-        displayName: scout.displayName,
+        displayName: builder.displayName,
         season: currentSeason,
-        avatar: scout.avatar,
-        tokenId: scout.builderNfts[0].tokenId
+        avatar: builder.avatar,
+        tokenId: builderNft.tokenId
       });
       const congratsImageUrl = await uploadArtworkCongrats({
         season: currentSeason,
-        tokenId: scout.builderNfts[0].tokenId,
+        tokenId: builderNft.tokenId,
         userImage: imageUrl
       });
-      return {
-        nft: scout.builderNfts[0],
-        scout,
-        imageUrl,
-        congratsImageUrl
-      };
-    })
-  );
 
-  for (const image of mappedWithimage) {
-    await prisma.builderNft.update({
-      where: {
-        id: image.nft!.id
-      },
-      data: {
-        imageUrl: image.imageUrl,
-        congratsImageUrl: image.congratsImageUrl
-      }
-    });
+      await prisma.builderNft.update({
+        where: {
+          id: builderNft.id
+        },
+        data: {
+          imageUrl,
+          congratsImageUrl
+        }
+      });
+      log.info(`Updated ${builderNft.tokenId}`, {
+        tokenId: builderNft.tokenId
+      });
+    } catch (error) {
+      log.error(`Error updating ${builderNft.tokenId}`, {
+        error,
+        tokenId: builderNft.tokenId
+      });
+    }
   }
 }
 
