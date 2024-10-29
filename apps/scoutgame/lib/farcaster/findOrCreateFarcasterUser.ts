@@ -23,8 +23,8 @@ export async function findOrCreateFarcasterUser({
     avatar: profile.pfp_url,
     bio: profile.profile.bio.text,
     walletAddress: profile.verifications[0],
-    displayName: profile.display_name || profile.username,
-    username: profile.username,
+    displayName: profile.display_name,
+    path: profile.username,
     tierOverride
   });
 }

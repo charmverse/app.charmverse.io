@@ -84,11 +84,11 @@ function calculateFontSize(text: string, maxWidth: number, initialFontSize: numb
 
 export async function generateNftImage({
   avatar,
-  username,
+  displayName,
   imageHostingBaseUrl
 }: {
   avatar: string | null;
-  username: string;
+  displayName: string;
   imageHostingBaseUrl?: string; // when running inside of next.js, we need to use the server url
 }): Promise<Buffer> {
   const { overlaysBase64, noPfpAvatarBase64, font } = await getAssets(imageHostingBaseUrl);
@@ -145,13 +145,13 @@ export async function generateNftImage({
             style={{
               color: 'white',
               textAlign: 'center',
-              fontSize: `${calculateFontSize(username, 280, 24)}px`,
+              fontSize: `${calculateFontSize(displayName, 280, 24)}px`,
               whiteSpace: 'nowrap',
               maxWidth: `${280}px`,
               fontFamily: 'K2D'
             }}
           >
-            {username}
+            {displayName}
           </p>
         </div>
       </div>

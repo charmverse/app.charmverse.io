@@ -7,16 +7,16 @@ import { getPointStatsFromHistory, type PointStats } from './getPointStatsFromHi
 import { setPointsEarnedStats } from './updatePointsEarned';
 
 export async function refreshPointStatsFromHistory({
-  userIdOrUsername,
+  userIdOrPath,
   season = currentSeason,
   tx
 }: {
-  userIdOrUsername: string;
+  userIdOrPath: string;
   season?: string;
   tx?: Prisma.TransactionClient;
 }): Promise<PointStats> {
   async function txHandler(_tx: Prisma.TransactionClient) {
-    const stats = await getPointStatsFromHistory({ userIdOrUsername, tx: _tx });
+    const stats = await getPointStatsFromHistory({ userIdOrPath, tx: _tx });
 
     await setPointsEarnedStats({
       season,

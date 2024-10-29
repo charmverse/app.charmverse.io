@@ -9,24 +9,24 @@ import { getTokenPurchasePrice } from './getTokenPurchasePrice';
 import { handlePendingTransaction } from './handlePendingTransaction';
 
 export async function syncUserNFTsFromOnchainData({
-  username,
+  path,
   scoutId,
   fromBlock
 }: {
-  username?: string;
+  path?: string;
   scoutId?: string;
   fromBlock?: number;
 }): Promise<void> {
-  if (!username && !scoutId) {
-    throw new Error('Either username or scoutId must be provided');
-  } else if (username && scoutId) {
-    throw new Error('Only one of username or scoutId can be provided');
+  if (!path && !scoutId) {
+    throw new Error('Either path or scoutId must be provided');
+  } else if (path && scoutId) {
+    throw new Error('Only one of path or scoutId can be provided');
   }
 
   const scout = await prisma.scout.findFirstOrThrow({
     where: {
       id: scoutId,
-      username
+      path
     }
   });
 

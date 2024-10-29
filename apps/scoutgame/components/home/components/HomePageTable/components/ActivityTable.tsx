@@ -125,14 +125,14 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
               <TableCell component='th' scope='activity'>
                 <Stack
                   component={Link}
-                  href={`/u/${activity.username}`}
+                  href={`/u/${activity.path}`}
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
                   maxWidth={{ xs: '120px', md: 'initial' }}
                 >
-                  <Avatar src={activity.avatar} name={activity.username} size='small' />
-                  <TableCellText noWrap>{activity.username}</TableCellText>
+                  <Avatar src={activity.avatar} name={activity.displayName} size='small' />
+                  <TableCellText noWrap>{activity.displayName}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell

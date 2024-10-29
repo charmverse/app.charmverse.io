@@ -9,7 +9,7 @@ async function uploadNFTArtwork() {
     },
     select: {
       avatar: true,
-      username: true,
+      displayName: true,
       builderNfts: true
     }
   });
@@ -17,7 +17,7 @@ async function uploadNFTArtwork() {
   const mappedWithimage = await Promise.all(
     scouts.map(async (scout) => {
       const imageUrl = await uploadArtwork({
-        username: scout.username,
+        displayName: scout.displayName,
         season: scout.builderNfts[0].season,
         avatar: scout.avatar,
         tokenId: scout.builderNfts[0].tokenId

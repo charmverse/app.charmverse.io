@@ -97,7 +97,7 @@ export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) 
       ) : null}
       <BuilderStats
         nftImageUrl={builderNft?.imageUrl}
-        username={builder.username}
+        path={builder.path}
         builderPoints={builderStats?.seasonPoints}
         totalScouts={totalScouts}
         totalNftsSold={totalNftsSold}

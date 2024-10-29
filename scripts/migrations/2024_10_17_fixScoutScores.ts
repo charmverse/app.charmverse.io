@@ -54,7 +54,7 @@ async function query() {
         select: {
           id: true,
           farcasterId: true,
-          username: true,
+          path: true,
           currentBalance: true,
           nftPurchaseEvents: true
         }
@@ -83,14 +83,14 @@ async function query() {
     //   console.log(event.builder.username, event.pointsReceipts[0].value, event.builder.nftPurchaseEvents.length);
     // }
     // await refreshPointStatsFromHistory({ userIdOrUsername: event.builder.id });
-    const stats = await getPointStatsFromHistory({ userIdOrUsername: event.builder.id });
+    const stats = await getPointStatsFromHistory({ userIdOrPath: event.builder.id });
     const currentbalance = event.builder.currentBalance;
     const newBalance = stats.balance + event.pointsReceipts[0].value;
     if (newBalance === currentbalance) {
-      unchanged.push(event.builder.username);
+      unchanged.push(event.builder.path!);
     }
     if (friendIds.includes(event.builder.id)) {
-      _friends.push(event.builder.username);
+      _friends.push(event.builder.path!);
     }
     if (currentbalance === newBalance) {
       // good to go
@@ -102,12 +102,12 @@ async function query() {
         userId: event.builder.id,
         builderEventId: event.id
       });
-      fixable.push(event.builder.username);
+      fixable.push(event.builder.path!);
     } else if (newBalance < 0) {
       // good to go
       // console.log('Good to go:', event);
       console.log('Negative balance:', {
-        username: event.builder.username,
+        path: event.builder.path!,
         allpointsReceived: stats.unclaimedPoints + stats.claimedPoints,
         // unclaimedPoints: stats.unclaimedPoints,
         ...stats,
@@ -122,11 +122,11 @@ async function query() {
         builderEventId: event.id
       });
       // break;
-      needsFix.push(event.builder.username);
+      needsFix.push(event.builder.path!);
     } else {
       console.log('Good to go:', event);
       console.log('Will fix but check update:', {
-        username: event.builder.username,
+        path: event.builder.path!,
         allpointsReceived: stats.unclaimedPoints + stats.claimedPoints,
         // unclaimedPoints: stats.unclaimedPoints,
         ...stats,
@@ -162,7 +162,7 @@ async function query() {
         userId: event.builder.id,
         builderEventId: event.id
       });
-      fixableButCHeck.push(event.builder.username);
+      fixableButCHeck.push(event.builder.path!);
     }
   }
   console.log({
@@ -231,7 +231,7 @@ async function fixEvents({
       }
     })
   ]);
-  const stats = await getPointStatsFromHistory({ userIdOrUsername: userId });
+  const stats = await getPointStatsFromHistory({ userIdOrPath: userId });
   const scout = await prisma.scout.update({
     where: {
       id: userId

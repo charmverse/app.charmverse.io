@@ -6,7 +6,7 @@ import { getApiKey } from './mixpanel';
 export type MixPanelUserProfile = {
   $name: string;
   $email: string | null;
-  username: string;
+  path: string;
   onboarded: boolean;
   'Agreed To TOS': boolean;
   'Enable Marketing': boolean;

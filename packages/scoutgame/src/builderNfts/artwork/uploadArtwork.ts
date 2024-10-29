@@ -26,17 +26,17 @@ export async function uploadArtwork({
   avatar,
   tokenId,
   season,
-  username
+  displayName
 }: {
   imageHostingBaseUrl?: string;
-  username: string;
+  displayName: string;
   season: string;
   avatar: string | null;
   tokenId: bigint | number;
 }) {
   const imageBuffer = await generateNftImage({
     avatar,
-    username,
+    displayName,
     imageHostingBaseUrl
   });
 

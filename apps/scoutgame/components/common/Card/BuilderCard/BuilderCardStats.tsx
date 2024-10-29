@@ -6,14 +6,14 @@ import { PointsIcon } from 'components/common/Icons';
 import { BuilderCardActivity } from './BuilderCardActivity/BuilderCardActivity';
 
 export function BuilderCardStats({
-  username,
+  displayName,
   builderPoints,
   nftsSold,
   rank,
   last7DaysGems,
   size
 }: {
-  username: string;
+  displayName: string;
   builderPoints?: number;
   nftsSold?: number;
   rank?: number;
@@ -40,7 +40,7 @@ export function BuilderCardStats({
           }
         }}
       >
-        @{username}
+        {displayName}
       </Typography>
       <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between' gap={1}>
         {typeof builderPoints === 'number' && (

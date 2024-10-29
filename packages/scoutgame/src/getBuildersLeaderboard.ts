@@ -3,7 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 export type LeaderboardBuilder = {
   builder: {
     id: string;
-    username: string;
+    path: string;
+    displayName: string;
   };
   gemsCollected: number;
   rank: number;
@@ -30,7 +31,8 @@ export async function getBuildersLeaderboard({
       user: {
         select: {
           id: true,
-          username: true,
+          path: true,
+          displayName: true,
           events: {
             where: {
               type: 'merged_pull_request'
@@ -57,7 +59,7 @@ export async function getBuildersLeaderboard({
         const userAEvent = a.user.events[0]?.createdAt.getTime() ?? 0;
         const userBEvent = b.user.events[0]?.createdAt.getTime() ?? 0;
         if (userBEvent === userAEvent) {
-          return a.user.username.localeCompare(b.user.username);
+          return a.user.displayName.localeCompare(b.user.displayName);
         }
 
         return userAEvent - userBEvent;
@@ -67,11 +69,12 @@ export async function getBuildersLeaderboard({
     .map((userWeeklyStat, index) => ({
       builder: {
         id: userWeeklyStat.user.id,
-        username: userWeeklyStat.user.username
+        path: userWeeklyStat.user.path,
+        displayName: userWeeklyStat.user.displayName
       },
       gemsCollected: userWeeklyStat.gemsCollected,
       rank: index + 1
-    }));
+    })) as LeaderboardBuilder[];
 
   if (quantity) {
     return topBuilders.slice(0, quantity);
