@@ -19,9 +19,9 @@ test.describe('Claim points', () => {
 
     await page.goto('/claim');
 
-    await page.locator('[data-testid="claim-points-button"]').click();
-    await page.locator('[data-testid="claim-points-success-modal"]').waitFor();
-    const balance = await page.locator('[data-testid="user-points-balance"]').textContent();
+    await page.locator('[data-test="claim-points-button"]').click();
+    await expect(page.locator('[data-test="claim-points-success-modal"]')).toBeVisible();
+    const balance = await page.locator('[data-test="user-points-balance"]').textContent();
     expect(balance).toEqual('10');
   });
 });

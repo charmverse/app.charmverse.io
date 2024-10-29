@@ -21,7 +21,7 @@ function PointsClaimSuccessModal({
   claimedPoints: number;
 }) {
   return (
-    <Dialog open={showModal} onClose={handleCloseModal} data-testid='claim-points-success-modal'>
+    <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
       <Stack gap={2} textAlign='center' my={2}>
         <Typography color='secondary' variant='h5' fontWeight={600}>
           Congratulations!
