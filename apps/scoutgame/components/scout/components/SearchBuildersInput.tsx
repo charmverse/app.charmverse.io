@@ -100,7 +100,7 @@ export function SearchBuildersInput() {
             }}
           />
         )}
-        noOptionsText='Search by username'
+        noOptionsText='Search'
       />
     </>
   );
