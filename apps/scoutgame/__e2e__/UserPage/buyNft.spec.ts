@@ -44,8 +44,8 @@ test.describe('Buy Nft', () => {
     await page.goto(`/home`);
     await page.waitForURL('**/home');
 
-    await page.goto(`/u/${builder.username}`);
-    await page.waitForURL(`**/u/${builder.username}`);
+    await page.goto(`/u/${builder.path}`);
+    await page.waitForURL(`**/u/${builder.path}`);
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();
