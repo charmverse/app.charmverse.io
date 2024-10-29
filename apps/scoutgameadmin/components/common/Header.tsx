@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
 
-export function Header({ user }: { user: Pick<Scout, 'username' | 'avatar'> | null }) {
+export function Header({ user }: { user: Pick<Scout, 'path' | 'avatar'> | null }) {
   const router = useRouter();
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
