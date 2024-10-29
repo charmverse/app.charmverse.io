@@ -13,25 +13,35 @@ export type BuilderSearchResult = {
 };
 
 export async function searchBuilders({
-  path,
+  search,
   limit = 10
 }: {
-  path: string;
+  search: string;
   limit?: number;
 }): Promise<BuilderSearchResult[]> {
   const builders = await prisma.scout.findMany({
     where: {
-      path: {
-        contains: path,
-        mode: 'insensitive'
-      }
+      OR: [
+        {
+          path: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          displayName: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ]
     },
     take: limit,
     orderBy: {
       // Sort by similarity to the query
       _relevance: {
-        fields: ['path'],
-        search: path,
+        fields: ['path', 'displayName'],
+        search,
         sort: 'desc'
       }
     },

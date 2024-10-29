@@ -172,6 +172,8 @@ export async function generateSeedData() {
     }
   }
 
+  await updateBuildersRank({ week: getWeekFromDate(endDate.toJSDate()) });
+
   log.info('generated seed data', {
     totalUsers,
     totalBuilders,

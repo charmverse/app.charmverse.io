@@ -55,33 +55,31 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         </Stack>
       ) : null}
       <Stack width='100%'>
-        <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
-          <Stack direction='row' gap={0.5} alignItems='center'>
-            <IconButton href={`https://warpcast.com/${path}`} target='_blank' rel='noopener noreferrer'>
+          <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
+          <IconButton href={`https://warpcast.com/${path}`} target='_blank' rel='noopener noreferrer'>
+            <Image
+              src='/images/profile/icons/warpcast-circle-icon.svg'
+              width={isDesktop ? '20' : '16'}
+              height={isDesktop ? '20' : '16'}
+              alt='warpcast icon'
+            />
+          </IconButton>
+          {githubLogin ? (
+            <IconButton
+              href={`https://github.com/${githubLogin}`}
+              target='_blank'
+              rel='noopener noreferrer'
+              sx={{ px: 0 }}
+            >
               <Image
-                src='/images/profile/icons/warpcast-circle-icon.svg'
+                src='/images/profile/icons/github-circle-icon.svg'
                 width={isDesktop ? '20' : '16'}
                 height={isDesktop ? '20' : '16'}
-                alt='warpcast icon'
+                alt='github icon'
               />
             </IconButton>
-            {githubLogin ? (
-              <IconButton
-                href={`https://github.com/${githubLogin}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                sx={{ px: 0 }}
-              >
-                <Image
-                  src='/images/profile/icons/github-circle-icon.svg'
-                  width={isDesktop ? '20' : '16'}
-                  height={isDesktop ? '20' : '16'}
-                  alt='github icon'
-                />
-              </IconButton>
-            ) : null}
-          </Stack>
+          ) : null}
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}

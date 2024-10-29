@@ -20,13 +20,14 @@ export function BuilderCardStats({
   last7DaysGems?: number[];
   size: 'x-small' | 'small' | 'medium' | 'large';
 }) {
+  const mdFontSize = size === 'medium' || size === 'large' ? '14px' : '12px';
   return (
     <Stack
       alignItems='center'
       pt={0.25}
       gap={{
         xs: 0,
-        md: size === 'medium' || size === 'large' ? 0.25 : 0.1
+        md: size === 'medium' || size === 'large' ? 0.25 : 0
       }}
       width='100%'
       height='100%'
@@ -36,7 +37,7 @@ export function BuilderCardStats({
         sx={{
           fontSize: {
             xs: '11.5px',
-            md: '14px'
+            md: mdFontSize
           }
         }}
       >
@@ -50,7 +51,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -69,7 +70,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -87,7 +88,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -107,7 +108,7 @@ export function BuilderCardStats({
             color: 'text.secondary',
             fontSize: {
               xs: '7.5px',
-              md: '10px'
+              md: size === 'medium' || size === 'large' ? '10px' : '8px'
             }
           }}
         >

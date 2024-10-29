@@ -55,8 +55,8 @@ export function BuilderActivityAction({ activity }: { activity: BuilderActivity 
               }
             }}
           >
-            <Link href={`/u/${activity.scout}`} style={{ marginLeft: '4px' }}>
-              {activity.scout}
+            <Link href={`/u/${activity.scout.path}`} style={{ marginLeft: '4px' }}>
+              {activity.scout.displayName}
             </Link>
           </Typography>
         )}
