@@ -12,7 +12,7 @@ describe('getPointStatsFromHistory', () => {
   let user: Scout;
 
   beforeAll(async () => {
-    user = await mockScout();
+    user = await mockScout({ path: uuid() });
   });
 
   it('should return point stats when valid UUID is provided', async () => {
@@ -29,6 +29,7 @@ describe('getPointStatsFromHistory', () => {
     });
   });
 
+  // @TODO: Redo the find by username logic
   it('should return point stats when valid username is provided', async () => {
     const stats = await getPointStatsFromHistory({ userIdOrPath: user.path! });
     expect(stats).toMatchObject({

@@ -32,7 +32,7 @@ export function SuccessView({
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
-            alt={builder.path || 'no nft image available'}
+            alt={builder.path}
             width={200}
             height={300}
             style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
