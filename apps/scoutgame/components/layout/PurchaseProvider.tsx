@@ -18,6 +18,8 @@ import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransacti
 import { useSnackbar } from './SnackbarContext';
 import { useUser } from './UserProvider';
 
+const purchaseLogPrefix = 'MINT_ACTION';
+
 type MintTransactionInput = {
   txData: {
     to: Address;
@@ -39,7 +41,7 @@ type PurchaseContext = {
   savedDecentTransaction: boolean;
   transactionHasSucceeded: boolean;
   checkDecentTransaction: (input: { pendingTransactionId: string; txHash: string }) => Promise<any>;
-  error: string;
+  purchaseError?: string;
   sendNftMintTransaction: (input: MintTransactionInput) => Promise<unknown>;
 };
 
@@ -48,7 +50,7 @@ export const PurchaseContext = createContext<Readonly<PurchaseContext | null>>(n
 export function PurchaseProvider({ children }: { children: ReactNode }) {
   const { showMessage } = useSnackbar();
   const { refreshUser } = useUser();
-  const { sendTransaction } = useSendTransaction();
+  const { sendTransactionAsync } = useSendTransaction();
 
   const {
     isExecuting: isExecutingTransaction,
@@ -60,7 +62,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       showMessage(`Transaction ${input.txHash || ''} was successful`, 'success');
     },
     onError({ error, input }) {
-      log.error('Error checking Decent transaction', { error, input });
+      log.error(`${purchaseLogPrefix} Error checking Decent transaction`, { error, input });
       showMessage(error.serverError?.message || 'Something went wrong', 'error');
     }
   });
@@ -68,19 +70,32 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
   const {
     executeAsync: saveDecentTransaction,
     isExecuting: isSavingDecentTransaction,
-    hasSucceeded: savedDecentTransaction
+    hasSucceeded: savedDecentTransaction,
+    result: saveTransactionResult
   } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
-        await checkDecentTransaction({ pendingTransactionId: res.data.id, txHash: res.data.txHash });
-        await refreshUser();
-        log.info('NFT minted', {
-          chainId: res.data.input.transactionInfo.sourceChainId,
-          builderTokenId: res.data.input.purchaseInfo.tokenId,
-          purchaseCost: res.data.input.purchaseInfo.quotedPrice
+        const checkResult = await checkDecentTransaction({
+          pendingTransactionId: res.data.id,
+          txHash: res.data.txHash
         });
+        await refreshUser();
+
+        if (checkResult?.serverError) {
+          log.error(`${purchaseLogPrefix} Error checking decent.xyz for transaction`, {
+            chainId: res.data.input.transactionInfo.sourceChainId,
+            builderTokenId: res.data.input.purchaseInfo.tokenId,
+            purchaseCost: res.data.input.purchaseInfo.quotedPrice
+          });
+        } else {
+          log.info(`${purchaseLogPrefix} NFT minted`, {
+            chainId: res.data.input.transactionInfo.sourceChainId,
+            builderTokenId: res.data.input.purchaseInfo.tokenId,
+            purchaseCost: res.data.input.purchaseInfo.quotedPrice
+          });
+        }
       } else {
-        log.warn('NFT minted but no transaction id returned', {
+        log.warn(`${purchaseLogPrefix} NFT minted but no transaction id returned`, {
           chainId: res.data?.input.transactionInfo.sourceChainId,
           builderTokenId: res.data?.input.purchaseInfo.tokenId,
           purchaseCost: res.data?.input.purchaseInfo.quotedPrice,
@@ -89,24 +104,13 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       }
     },
     onError({ error, input }) {
-      log.error('Error minting NFT', { chainId: input.transactionInfo.sourceChainId, input, error });
-      throw error;
+      log.error(`${purchaseLogPrefix} Error saving Decent NFT transaction`, {
+        chainId: input.transactionInfo.sourceChainId,
+        input,
+        error
+      });
     }
   });
-
-  // useGetPendingNftTransactions(!isExecutingTransaction, undefined, {
-  //   onSuccess(txs: TxResponse[]) {
-  //     for (const tx of txs) {
-  //       if (tx.status === 'completed') {
-  //         showMessage(`Transaction ${tx.destinationChainTxHash} was successful`, 'success');
-  //       } else if (tx.status === 'failed') {
-  //         showMessage(`Transaction ${tx.destinationChainTxHash} failed`, 'error');
-  //       }
-  //     }
-
-  //     refreshUser();
-  //   }
-  // });
 
   const sendNftMintTransaction = useCallback(
     async (input: MintTransactionInput) => {
@@ -114,7 +118,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
         txData: { to, data, value: _txValue },
         txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress }
       } = input;
-      return sendTransaction(
+      return sendTransactionAsync(
         {
           to,
           data,
@@ -122,8 +126,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
         },
         {
           onSuccess: async (_data) => {
-            log.info('Successfully sent mint transaction', { data: _data });
-            await saveDecentTransaction({
+            const output = await saveDecentTransaction({
               user: {
                 walletAddress: fromAddress
               },
@@ -140,27 +143,37 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
                 quotedPriceCurrency: optimismUsdcContractAddress
               }
             });
+
+            if (output?.serverError) {
+              log.error(`${purchaseLogPrefix} Saving mint transaction failed`, {});
+            } else {
+              log.info(`${purchaseLogPrefix} Successfully sent mint transaction`, { data: _data });
+            }
           },
           onError: (err: any) => {
-            log.error('Creating a mint transaction failed', {
+            log.error(`${purchaseLogPrefix} Creating a mint transaction failed`, {
               txData: input.txData,
               txMetadata: input.txMetadata,
               error: err
             });
-            throw err;
           }
         }
       );
     },
-    [sendTransaction]
+    [sendTransactionAsync, saveDecentTransaction]
   );
+
+  const purchaseError =
+    !isExecutingTransaction && !isSavingDecentTransaction
+      ? transactionResult.serverError?.message || saveTransactionResult.serverError?.message
+      : undefined;
 
   const value = useMemo(
     () => ({
       isExecutingTransaction,
       transactionHasSucceeded,
       checkDecentTransaction,
-      error: transactionResult.serverError?.message || 'Something went wrong',
+      purchaseError,
       sendNftMintTransaction,
       savedDecentTransaction,
       isSavingDecentTransaction
@@ -169,10 +182,10 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       isExecutingTransaction,
       transactionHasSucceeded,
       checkDecentTransaction,
-      transactionResult.serverError?.message,
       sendNftMintTransaction,
       savedDecentTransaction,
-      isSavingDecentTransaction
+      isSavingDecentTransaction,
+      purchaseError
     ]
   );
 

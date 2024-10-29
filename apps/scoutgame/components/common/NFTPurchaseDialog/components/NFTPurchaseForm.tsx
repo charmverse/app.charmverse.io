@@ -22,7 +22,6 @@ import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/b
 import {
   builderNftChain,
   getBuilderContractAddress,
-  optimismUsdcContractAddress,
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
@@ -34,7 +33,7 @@ import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
@@ -42,7 +41,6 @@ import { usePurchase } from 'components/layout/PurchaseProvider';
 import { useSnackbar } from 'components/layout/SnackbarContext';
 import { useUser } from 'components/layout/UserProvider';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
-import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { useDecentTransaction } from '../hooks/useDecentTransaction';
@@ -81,8 +79,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, savedDecentTransaction } =
-    usePurchase();
+  const {
+    isExecutingTransaction,
+    sendNftMintTransaction,
+    isSavingDecentTransaction,
+    savedDecentTransaction,
+    purchaseError
+  } = usePurchase();
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
@@ -104,6 +107,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [fetchError, setFetchError] = useState<any>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (purchaseError) {
+      setSubmitError(purchaseError);
+    }
+  }, [purchaseError]);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
