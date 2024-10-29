@@ -81,7 +81,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const { checkDecentTransaction, isExecutingTransaction } = usePurchase();
+  const { checkDecentTransaction, isExecutingTransaction, sendNftMintTransaction } = usePurchase();
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
@@ -156,8 +156,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setSubmitError(null);
     }
   });
-
-  const { sendTransaction } = useSendTransaction();
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
@@ -254,42 +252,28 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       }
 
       const _value = BigInt(String((decentTransactionInfo.tx as any).value || 0).replace('n', ''));
+      setSubmitError(null);
 
-      sendTransaction(
-        {
+      sendNftMintTransaction({
+        txData: {
           to: decentTransactionInfo.tx.to as Address,
           data: decentTransactionInfo.tx.data as any,
           value: _value
         },
-        {
-          onSuccess: async (data) => {
-            log.info('Successfully sent mint transaction', { data });
-            await saveDecentTransaction({
-              user: {
-                walletAddress: address as `0x${string}`
-              },
-              transactionInfo: {
-                destinationChainId: builderNftChain.id,
-                sourceChainId: selectedPaymentOption.chainId,
-                sourceChainTxHash: data
-              },
-              purchaseInfo: {
-                quotedPrice: Number(purchaseCost),
-                tokenAmount: tokensToBuy,
-                builderContractAddress: getBuilderContractAddress(),
-                tokenId: Number(builderTokenId),
-                quotedPriceCurrency: optimismUsdcContractAddress
-              }
-            });
-          },
-          onError: (err: any) => {
-            setSubmitError(
-              err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
-            );
-            log.error('Creating a mint transaction failed', { decentTransactionInfo, error: err });
-          }
+        txMetadata: {
+          fromAddress: address as Address,
+          sourceChainId: selectedPaymentOption.chainId,
+          builderTokenId: Number(builderTokenId),
+          purchaseCost: Number(purchaseCost),
+          tokensToBuy
         }
-      );
+      }).catch((error) => {
+        setSubmitError(
+          typeof error === 'string'
+            ? 'Error'
+            : error.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
+        );
+      });
     }
   };
 
