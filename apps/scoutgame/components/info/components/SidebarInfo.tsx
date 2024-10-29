@@ -24,7 +24,8 @@ const partners = [
   { href: '/info/partner-rewards/game7', text: 'Game7' },
   { href: '/info/partner-rewards/moxie', text: 'Moxie' },
   { href: '/info/partner-rewards/bountycaster', text: 'BountyCaster' },
-  { href: '/info/partner-rewards/lit', text: 'Lit Protocol' }
+  { href: '/info/partner-rewards/lit', text: 'Lit Protocol' },
+  { href: '/info/partner-rewards/op-supersim', text: 'OP Supersim' }
 ];
 
 export function SidebarInfo({ handleClose }: Readonly<{ handleClose?: () => void }>) {
