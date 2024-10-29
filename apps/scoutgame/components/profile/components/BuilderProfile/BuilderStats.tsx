@@ -36,7 +36,7 @@ export function BuilderStats({
       }}
     >
       <Stack justifyContent='center'>
-        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} path={path} size={isDesktop ? 'large' : 'small'} />
+        <BuilderCardNftDisplay hideDetails nftImageUrl={nftImageUrl} path={path} size={isDesktop ? 'large' : 'small'} />
       </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>
