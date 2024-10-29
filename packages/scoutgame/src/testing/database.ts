@@ -14,6 +14,7 @@ type RepoAddress = {
 export async function mockBuilder({
   id,
   createdAt,
+  displayName = 'Test User',
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
@@ -27,7 +28,7 @@ export async function mockBuilder({
     data: {
       createdAt,
       path,
-      displayName: 'Test User',
+      displayName,
       builderStatus,
       onboardedAt,
       agreedToTermsAt,

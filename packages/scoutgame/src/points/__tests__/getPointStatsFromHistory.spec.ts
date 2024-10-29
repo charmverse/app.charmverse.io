@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { PointsReceipt, Prisma, Scout } from '@charmverse/core/prisma-client';
+import type { PointsReceipt, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { jest } from '@jest/globals';
 import { v4 as uuid } from 'uuid';
@@ -16,7 +16,7 @@ describe('getPointStatsFromHistory', () => {
   });
 
   it('should return point stats when valid UUID is provided', async () => {
-    const stats = await getPointStatsFromHistory({ userIdOrUsername: user.id });
+    const stats = await getPointStatsFromHistory({ userIdOrPath: user.id });
     expect(stats).toMatchObject({
       userId: user.id,
       pointsSpent: expect.any(Number),
@@ -30,7 +30,7 @@ describe('getPointStatsFromHistory', () => {
   });
 
   it('should return point stats when valid username is provided', async () => {
-    const stats = await getPointStatsFromHistory({ userIdOrUsername: user.username });
+    const stats = await getPointStatsFromHistory({ userIdOrPath: user.path! });
     expect(stats).toMatchObject({
       userId: user.id,
       pointsSpent: expect.any(Number),
@@ -82,7 +82,7 @@ describe('getPointStatsFromHistory', () => {
 
     jest.spyOn(prisma.pointsReceipt, 'findMany').mockResolvedValueOnce(allPointsReceivedRecords as PointsReceipt[]);
 
-    const pointStats = await getPointStatsFromHistory({ userIdOrUsername: user.id });
+    const pointStats = await getPointStatsFromHistory({ userIdOrPath: user.id });
 
     // Sanity check that the points add up
     expect(pointStats.claimedPoints + pointStats.unclaimedPoints).toEqual(
@@ -102,12 +102,12 @@ describe('getPointStatsFromHistory', () => {
   });
 
   it('should throw InvalidInputError when userIdOrUsername is empty', async () => {
-    await expect(getPointStatsFromHistory({ userIdOrUsername: '' })).rejects.toThrow(InvalidInputError);
+    await expect(getPointStatsFromHistory({ userIdOrPath: '' })).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw an error when userIdOrUsername is invalid UUID and does not exist as a username', async () => {
     const nonExistentUserId = uuid();
-    await expect(getPointStatsFromHistory({ userIdOrUsername: nonExistentUserId })).rejects.toThrow();
+    await expect(getPointStatsFromHistory({ userIdOrPath: nonExistentUserId })).rejects.toThrow();
   });
 
   it('should throw an assertion error if point records for individual categories do not match the full list of point records', async () => {
@@ -133,6 +133,6 @@ describe('getPointStatsFromHistory', () => {
     jest.spyOn(prisma.pointsReceipt, 'findMany').mockResolvedValueOnce(bonusPointsReceivedRecords as PointsReceipt[]); // Mismatch points
 
     jest.spyOn(prisma.pointsReceipt, 'findMany').mockResolvedValueOnce(allPointsReceivedRecords as PointsReceipt[]); // Mismatch points
-    await expect(getPointStatsFromHistory({ userIdOrUsername: user.id })).rejects.toThrow();
+    await expect(getPointStatsFromHistory({ userIdOrPath: user.id })).rejects.toThrow();
   });
 });
