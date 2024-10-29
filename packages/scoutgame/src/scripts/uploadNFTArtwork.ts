@@ -1,29 +1,36 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { uploadArtwork, uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
+import { currentSeason } from '../dates';
 
 async function uploadNFTArtwork() {
   const scouts = await prisma.scout.findMany({
     where: {
-      builderStatus: 'approved'
+      builderStatus: {
+        in: ['approved', 'banned']
+      }
     },
     select: {
       avatar: true,
       displayName: true,
-      builderNfts: true
+      builderNfts: {
+        where: {
+          season: currentSeason
+        }
+      }
     }
   });
-  // const w = await prisma.builderNft.deleteMany({});
+  
   const mappedWithimage = await Promise.all(
     scouts.map(async (scout) => {
       const imageUrl = await uploadArtwork({
         displayName: scout.displayName,
-        season: scout.builderNfts[0].season,
+        season: currentSeason,
         avatar: scout.avatar,
         tokenId: scout.builderNfts[0].tokenId
       });
       const congratsImageUrl = await uploadArtworkCongrats({
-        season: scout.builderNfts[0].season,
+        season: currentSeason,
         tokenId: scout.builderNfts[0].tokenId,
         userImage: imageUrl
       });
