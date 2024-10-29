@@ -4,7 +4,11 @@ import Link from 'next/link';
 
 import { useGetFarcasterUser } from 'hooks/api/farcaster';
 
-export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: string | null; username: string } }) {
+export function SuccessView({
+  builder
+}: {
+  builder: { id: string; nftImageUrl?: string | null; username: string | null };
+}) {
   // retrieve the user's latest farcaster profile
   const { data: farcasterUser } = useGetFarcasterUser({ userId: builder.id });
 
@@ -35,7 +39,7 @@ export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: 
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
-            alt={builder.username}
+            alt={builder.username || ''}
             width={200}
             height={300}
             style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}

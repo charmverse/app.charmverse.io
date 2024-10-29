@@ -45,6 +45,7 @@ export async function getSortedBuilders({
           select: {
             id: true,
             username: true,
+            path: true,
             builderStatus: true,
             createdAt: true,
             builderNfts: {
@@ -92,6 +93,7 @@ export async function getSortedBuilders({
             id: scout.id,
             nftImageUrl: scout.builderNfts[0]?.imageUrl,
             username: scout.username,
+            path: scout.path,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
@@ -141,6 +143,7 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
+                path: true,
                 builderStatus: true,
                 builderNfts: {
                   where: {
@@ -182,6 +185,7 @@ export async function getSortedBuilders({
             rank: stat.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
+            path: stat.user.path,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
@@ -232,6 +236,7 @@ export async function getSortedBuilders({
               select: {
                 id: true,
                 username: true,
+                path: true,
                 builderStatus: true,
                 userAllTimeStats: {
                   select: {
@@ -270,6 +275,7 @@ export async function getSortedBuilders({
             rank: stat.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             username: stat.user.username,
+            path: stat.user.path,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,

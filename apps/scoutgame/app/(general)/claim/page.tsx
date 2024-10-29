@@ -25,7 +25,7 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   return (
     <ClaimPage
       period={searchParams.tab}
-      username={user.username}
+      username={user.username ?? ''}
       totalUnclaimedPoints={points}
       bonusPartners={bonusPartners}
     />
