@@ -14,10 +14,10 @@ type RepoAddress = {
 export async function mockBuilder({
   id,
   createdAt,
+  displayName = 'Test User',
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
-  username = uuid(),
   path = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
@@ -27,9 +27,8 @@ export async function mockBuilder({
   const result = await prisma.scout.create({
     data: {
       createdAt,
-      username,
       path,
-      displayName: 'Test User',
+      displayName,
       builderStatus,
       onboardedAt,
       agreedToTermsAt,
@@ -37,7 +36,7 @@ export async function mockBuilder({
       githubUser: {
         create: {
           id: githubUserId,
-          login: username!
+          login: path!
         }
       }
     },
@@ -56,7 +55,7 @@ export async function mockBuilder({
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
-  username = `user-${uuid()}`,
+  path = `user-${uuid()}`,
   displayName = 'Test Scout',
   agreedToTermsAt = new Date(),
   onboardedAt = new Date(),
@@ -64,7 +63,7 @@ export async function mockScout({
   season,
   email
 }: {
-  username?: string;
+  path?: string;
   agreedToTermsAt?: Date | null;
   onboardedAt?: Date | null;
   displayName?: string;
@@ -74,7 +73,7 @@ export async function mockScout({
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
-      username,
+      path,
       agreedToTermsAt,
       onboardedAt,
       displayName,

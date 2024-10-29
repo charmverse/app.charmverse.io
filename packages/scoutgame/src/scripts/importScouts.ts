@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@charmverse/core/log';
 
 import { getFarcasterUserByIds } from '@packages/farcaster/getFarcasterUserById';
 
@@ -15,7 +16,7 @@ async function query() {
     }
   });
   const newUsers = FIDS.filter((fid) => !w.some((scout) => scout.farcasterId === fid));
-  console.log('retrieved', newUsers);
+  log.info(`retrieved ${newUsers.length} new users`);
   const users = await getFarcasterUserByIds(newUsers);
   for (const user of users) {
     const scout = await prisma.scout.findFirst({
@@ -24,20 +25,24 @@ async function query() {
       }
     });
     if (scout) {
-      console.log('scout already exists', scout.username);
+      log.info(`scout already exists`, {
+        path: scout.path,
+        fid: user.fid,
+        displayName: user.display_name
+      });
       continue;
     }
     const newScout = await prisma.scout.create({
       data: {
         farcasterId: user.fid,
-        username: user.username,
+        path: user.username,
         displayName: user.display_name || user.username,
         avatar: user.pfp_url,
         bio: user.profile.bio.text,
         currentBalance: startingBalance
       }
     });
-    console.log('created scout', newScout.username);
+    log.info(`created scout ${newScout.path}`);
   }
 }
 

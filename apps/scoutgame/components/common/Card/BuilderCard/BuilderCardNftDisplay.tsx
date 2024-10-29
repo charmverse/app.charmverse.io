@@ -24,12 +24,12 @@ const nftDisplaySize = {
 export function BuilderCardNftDisplay({
   nftImageUrl,
   children,
-  username,
+  path,
   showHotIcon = false,
   size = 'medium',
   hideDetails = false
 }: {
-  username: string | null;
+  path: string;
   nftImageUrl?: string | null;
   showHotIcon?: boolean;
   children?: React.ReactNode;
@@ -43,7 +43,7 @@ export function BuilderCardNftDisplay({
     <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark' }}>
       <CardActionArea
         LinkComponent={Link}
-        href={`/u/${username}`}
+        href={`/u/${path}`}
         sx={{
           position: 'relative',
           width: '100%',

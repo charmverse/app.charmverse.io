@@ -5,7 +5,7 @@ import { cache } from 'react';
 import type { BasicUserInfo } from './interfaces';
 import { BasicUserInfoSelect } from './queries';
 
-export async function getUserByUsernamePath(username: string): Promise<
+async function _getUserByPath(path: string): Promise<
   | (BasicUserInfo & {
       nftImageUrl?: string;
       congratsImageUrl?: string | null;
@@ -16,7 +16,7 @@ export async function getUserByUsernamePath(username: string): Promise<
 > {
   const user = await prisma.scout.findFirst({
     where: {
-      username
+      path
     },
     select: { ...BasicUserInfoSelect, displayName: true, builderNfts: true }
   });
@@ -27,10 +27,11 @@ export async function getUserByUsernamePath(username: string): Promise<
 
   return {
     ...user,
+    path: user.path!,
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
     githubLogin: user?.githubUser[0]?.login
   };
 }
 
-export const getUserByPath = cache(getUserByUsernamePath);
+export const getUserByPath = cache(_getUserByPath);

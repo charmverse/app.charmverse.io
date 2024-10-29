@@ -42,7 +42,7 @@ export async function getUser({ searchString }: { searchString: string }): Promi
   }
   const user = await prisma.scout.findUnique({
     where: {
-      username: searchString
+      path: searchString
     },
     include: {
       githubUser: true
