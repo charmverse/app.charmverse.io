@@ -37,6 +37,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
       builderId: true,
       builder: {
         select: {
+          username: true,
           displayName: true
         }
       }
@@ -169,6 +170,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
     userId: builderNft.builderId,
     amount,
     paidWithPoints,
+    builderPath: builderNft.builder.username,
     season: builderNft.season
   });
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });

@@ -1,5 +1,6 @@
 'use server';
 
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { authSecret } from '@root/config/constants';
 import { unsealData } from 'iron-session';
 import { cookies } from 'next/headers';
@@ -29,7 +30,11 @@ export const setupBuilderProfileAction = authActionClient
     }
 
     const { code, state } = parsedInput;
-    await setupBuilderProfile({ code, state, inviteCode });
+    const builder = await setupBuilderProfile({ code, state, inviteCode });
+
+    trackUserAction('connect_github_success', {
+      userId: builder.id
+    });
 
     if (inviteCode) {
       cookies().set('invite-code', '', {

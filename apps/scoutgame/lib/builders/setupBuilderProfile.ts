@@ -137,4 +137,5 @@ export async function setupBuilderProfile({
       season: currentSeason
     });
   }
+  return scout;
 }
