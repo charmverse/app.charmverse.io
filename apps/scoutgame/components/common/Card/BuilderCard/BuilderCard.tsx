@@ -9,7 +9,7 @@ import { ScoutButton } from '../../ScoutButton/ScoutButton';
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
 
-type RequiredBuilderInfoFields = 'username' | 'builderStatus' | 'id';
+type RequiredBuilderInfoFields = 'username' | 'builderStatus' | 'id' | 'path';
 
 export function BuilderCard({
   builder,

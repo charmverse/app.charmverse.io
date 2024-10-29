@@ -13,7 +13,7 @@ export function BuilderCardStats({
   last7DaysGems,
   size
 }: {
-  username: string;
+  username: string | null;
   builderPoints?: number;
   nftsSold?: number;
   rank?: number;

@@ -3,6 +3,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 export const BasicUserInfoSelect = {
   id: true,
   username: true,
+  path: true,
   avatar: true,
   bio: true,
   githubUser: {

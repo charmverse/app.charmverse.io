@@ -71,7 +71,7 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
     if (cardsHeld) {
       if (!builderRewardsRecord[builderId]) {
         builderRewardsRecord[builderId] = {
-          username: builder.username,
+          username: builder.username || '',
           avatar: builder.avatar,
           cardsHeld,
           points: 0,
@@ -167,7 +167,7 @@ export async function getWeeklyBuilderRewards({
       }
       return {
         rank,
-        username: builder.username,
+        username: builder.username || '',
         avatar: builder.avatar,
         points: receipt.value,
         cardsHeld

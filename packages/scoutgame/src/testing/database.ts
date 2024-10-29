@@ -18,6 +18,7 @@ export async function mockBuilder({
   githubUserId = randomLargeInt(),
   onboardedAt,
   username = uuid(),
+  path = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
   createNft = false,
@@ -27,6 +28,7 @@ export async function mockBuilder({
     data: {
       createdAt,
       username,
+      path,
       displayName: 'Test User',
       builderStatus,
       onboardedAt,
@@ -35,7 +37,7 @@ export async function mockBuilder({
       githubUser: {
         create: {
           id: githubUserId,
-          login: username
+          login: username!
         }
       }
     },

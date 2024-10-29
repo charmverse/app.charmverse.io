@@ -70,7 +70,7 @@ export async function registerBuilderNFT({
     tokenId: existingTokenId,
     builderId,
     avatar: builder.avatar,
-    username: builder.username
+    username: builder.username || ''
   });
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });

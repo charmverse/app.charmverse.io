@@ -343,7 +343,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
-            alt={builder.username}
+            alt={builder.username || ''}
             width={200}
             height={300}
             style={{ aspectRatio: '1/1.4', width: '40%', height: '50%' }}

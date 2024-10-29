@@ -109,7 +109,7 @@ export function Header() {
                       alt='Scout Game points icon'
                       priority={true}
                     />
-                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
+                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username || ''} />
                   </Button>
                   <Menu
                     sx={{ mt: 5 }}
