@@ -16,8 +16,6 @@ import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
 import { useUser } from 'components/layout/UserProvider';
 
-import { InstallAppMenuItem } from './components/InstallAppMenuItem';
-
 export function Header() {
   const router = useRouter();
   const { user, refreshUser } = useUser();
