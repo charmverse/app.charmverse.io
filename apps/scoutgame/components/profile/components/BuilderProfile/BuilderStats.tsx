@@ -16,7 +16,7 @@ export function BuilderStats({
   currentNftPrice
 }: {
   nftImageUrl?: string | null;
-  username: string;
+  username: string | null;
   builderPoints?: number;
   totalScouts?: number;
   totalNftsSold?: number;

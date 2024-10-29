@@ -29,7 +29,7 @@ export function BuilderCardNftDisplay({
   size = 'medium',
   hideDetails = false
 }: {
-  username: string;
+  username: string | null;
   nftImageUrl?: string | null;
   showHotIcon?: boolean;
   children?: React.ReactNode;

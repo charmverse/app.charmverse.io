@@ -131,7 +131,7 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
                   gap={1}
                   maxWidth={{ xs: '120px', md: 'initial' }}
                 >
-                  <Avatar src={activity.avatar} name={activity.username} size='small' />
+                  <Avatar src={activity.avatar} name={activity.username || ''} size='small' />
                   <TableCellText noWrap>{activity.username}</TableCellText>
                 </Stack>
               </TableCell>

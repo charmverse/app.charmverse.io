@@ -7,7 +7,13 @@ export class UserPage extends GeneralPageLayout {
     super(page);
   }
 
-  async mockNftAPIs({ builder, isSuccess }: { builder: { id: string; username: string }; isSuccess: boolean }) {
+  async mockNftAPIs({
+    builder,
+    isSuccess
+  }: {
+    builder: { id: string; username?: string | null; path?: string | null };
+    isSuccess: boolean;
+  }) {
     // Used for debugging all routes. Keep caution as the next page.route() function will not run anymore.
     // await page.route('**', (route) => {
     //   console.log('Intercepted URL:', route.request().url());

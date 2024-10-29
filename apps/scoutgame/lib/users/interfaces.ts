@@ -2,7 +2,8 @@ import type { BuilderStatus } from '@charmverse/core/prisma';
 
 export type MinimalUserInfo = {
   id: string;
-  username: string;
+  username: string | null;
+  path: string | null;
   avatar?: string | null;
 };
 
