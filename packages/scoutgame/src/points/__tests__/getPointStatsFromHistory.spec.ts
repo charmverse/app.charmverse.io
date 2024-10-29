@@ -12,7 +12,7 @@ describe('getPointStatsFromHistory', () => {
   let user: Scout;
 
   beforeAll(async () => {
-    user = await mockScout({ path: uuid() });
+    user = await mockScout({ path: `user-${uuid()}` });
   });
 
   it('should return point stats when valid UUID is provided', async () => {
