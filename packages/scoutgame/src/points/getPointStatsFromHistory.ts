@@ -34,7 +34,7 @@ export async function getPointStatsFromHistory({
 
   const userId = await tx.scout
     .findUniqueOrThrow({
-      where: isUuid(userIdOrUsername) ? { id: userIdOrUsername } : { username: userIdOrUsername },
+      where: { id: userIdOrUsername },
       select: {
         id: true
       }
