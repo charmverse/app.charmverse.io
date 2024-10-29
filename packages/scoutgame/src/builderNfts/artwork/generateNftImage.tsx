@@ -5,7 +5,80 @@ import { ImageResponse } from 'next/og';
 // Must be there otherwise React is not defined error is thrown
 import React from 'react';
 import type { Font } from 'satori';
+import satori from 'satori';
 import sharp from 'sharp';
+
+/**
+ * modified version of https://unpkg.com/twemoji@13.1.0/dist/twemoji.esm.js.
+ */
+
+/* ! Copyright Twitter Inc. and other contributors. Licensed under MIT */
+
+// this file added in: https://github.com/open-sauced/opengraph/issues/50
+
+const U200D = String.fromCharCode(8205);
+const UFE0Fg = /\uFE0F/g;
+
+export function getIconCode(char: string) {
+  return toCodePoint(!char.includes(U200D) ? char.replace(UFE0Fg, '') : char);
+}
+
+function toCodePoint(unicodeSurrogates: string) {
+  const r = [];
+  let c = 0;
+  let i = 0;
+  let p = 0;
+
+  while (i < unicodeSurrogates.length) {
+    c = unicodeSurrogates.charCodeAt(i);
+    i += 1;
+
+    if (p) {
+      // If we have a surrogate pair, combine them
+      if (c >= 0xdc00 && c <= 0xdfff) {
+        r.push(((p - 0xd800) << 10) + (c - 0xdc00) + 0x10000);
+      } else {
+        r.push(p);
+        i -= 1;
+      }
+      p = 0;
+    } else if (c >= 0xd800 && c <= 0xdbff) {
+      p = c;
+    } else {
+      r.push(c);
+    }
+  }
+
+  // Convert numbers to hex and join with hyphens
+  return r.map((n) => n.toString(16)).join('-');
+}
+
+export const apis = {
+  twemoji: (code: string) => `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/${code.toLowerCase()}.svg`
+};
+
+const emojiCache: Record<string, Promise<string>> = {};
+
+export async function loadEmoji(type: keyof typeof apis, code: string) {
+  const key = `${type}:${code}`;
+
+  if (key in emojiCache) {
+    return emojiCache[key];
+  }
+
+  if (!type || !apis[type]) {
+    type = 'twemoji';
+  }
+
+  const api = apis[type];
+
+  if (typeof api === 'function') {
+    emojiCache[key] = fetch(api(code)).then(async (r) => r.text());
+    return emojiCache[key];
+  }
+  emojiCache[key] = fetch(`${api}${code.toUpperCase()}.svg`).then(async (r) => r.text());
+  return emojiCache[key];
+}
 
 // fails inside of Next.js
 function getAssetsFromDisk() {
@@ -18,10 +91,10 @@ function getAssetsFromDisk() {
   });
   const noPfpAvatarFile = path.join(path.resolve(__dirname, '../../'), 'assets', 'no_pfp_avatar.png');
   const noPfpAvatarBase64 = `data:image/png;base64,${fs.readFileSync(noPfpAvatarFile).toString('base64')}`;
-  const fontPath = path.join(path.resolve(__dirname, '../../'), 'assets', 'fonts', 'K2D-Medium.ttf');
+  const fontPath = path.join(path.resolve(__dirname, '../../'), 'assets', 'fonts', 'Inter-Medium.otf');
   const fontBuffer = fs.readFileSync(fontPath);
   const font: Font = {
-    name: 'K2D',
+    name: 'Inter',
     data: fontBuffer,
     style: 'normal',
     weight: 400
@@ -91,64 +164,71 @@ export async function updateNftImage({
 }): Promise<Buffer> {
   const cutoutWidth = 300;
   const cutoutHeight = 400;
-
-  const baseImage = new ImageResponse(
-    (
+  const { font } = await getAssets();
+  const baseImage = await satori(
+    <div
+      style={{
+        height: cutoutHeight,
+        width: cutoutWidth,
+        position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        backgroundColor: 'white'
+      }}
+    >
+      <img
+        src={currentNftImage}
+        width={cutoutWidth}
+        height={cutoutHeight}
+        style={{ position: 'absolute', top: 0, left: 0 }}
+      />
       <div
         style={{
-          height: cutoutHeight,
-          width: cutoutWidth,
-          position: 'relative',
+          width: cutoutWidth - 20,
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'flex-start',
-          backgroundColor: 'white'
+          backgroundColor: 'black',
+          flexDirection: 'row',
+          bottom: 40,
+          position: 'absolute',
+          paddingLeft: 10,
+          paddingRight: 10
         }}
       >
-        <img
-          src={currentNftImage}
-          width={cutoutWidth}
-          height={cutoutHeight}
-          style={{ position: 'absolute', top: 0, left: 0 }}
-        />
-        <div
+        <p
           style={{
-            width: cutoutWidth - 20,
-            display: 'flex',
-            justifyContent: 'center',
-            backgroundColor: 'black',
-            flexDirection: 'row',
-            bottom: 40,
-            position: 'absolute',
-            paddingLeft: 10,
-            paddingRight: 10
+            color: 'white',
+            textAlign: 'center',
+            fontSize: `${calculateFontSize(displayName, 280, 24)}px`,
+            whiteSpace: 'nowrap',
+            maxWidth: `${280}px`,
+            fontFamily: 'Inter'
           }}
         >
-          <p
-            style={{
-              color: 'white',
-              textAlign: 'center',
-              fontSize: `${calculateFontSize(displayName, 280, 24)}px`,
-              whiteSpace: 'nowrap',
-              maxWidth: `${280}px`
-            }}
-          >
-            {displayName}
-          </p>
-        </div>
+          <img src={apis.twemoji(getIconCode('🚨'))} width={20} height={20} />
+        </p>
       </div>
-    ),
+    </div>,
     {
       width: cutoutWidth,
-      height: cutoutHeight
+      height: cutoutHeight,
+      fonts: [font],
+      embedFont: false
     }
   );
 
-  const baseImageBuffer = await baseImage.arrayBuffer();
-  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+  const baseImageBuffer = Buffer.from(baseImage);
+  const imageBuffer = await sharp(baseImageBuffer).png().toBuffer();
 
+  fs.writeFileSync('test.png', new Uint8Array(imageBuffer));
   return imageBuffer;
 }
+
+updateNftImage({
+  currentNftImage: 'https://nft.scoutgame.xyz/seasons/2024-W41/prd/3/artwork.png',
+  displayName: '👋 safwan ⌐◨-◨ 𓏲🎩🚨'
+});
 
 export async function generateNftImage({
   avatar,
@@ -216,7 +296,7 @@ export async function generateNftImage({
               fontSize: `${calculateFontSize(displayName, 280, 24)}px`,
               whiteSpace: 'nowrap',
               maxWidth: `${280}px`,
-              fontFamily: 'K2D'
+              fontFamily: 'Inter'
             }}
           >
             {displayName}

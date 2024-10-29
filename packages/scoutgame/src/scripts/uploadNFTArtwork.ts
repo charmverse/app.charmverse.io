@@ -27,10 +27,11 @@ async function uploadNFTArtwork() {
     const builderNft = builder.builderNfts[0];
     try {
       const imageUrl = await uploadArtwork({
-        displayName: 'safwan 🎩🚨',
+        displayName: 'safwan ⌐◨-◨ 𓏲🎩🚨',
         season: currentSeason,
         avatar: builder.avatar,
         tokenId: builderNft.tokenId,
+        currentNftImage: builderNft.imageUrl
       });
       const congratsImageUrl = await uploadArtworkCongrats({
         season: currentSeason,
