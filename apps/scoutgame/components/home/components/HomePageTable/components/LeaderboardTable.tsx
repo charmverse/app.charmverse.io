@@ -67,7 +67,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                   gap={1}
                   maxWidth={{ xs: '120px', md: '200px' }}
                 >
-                  <Avatar src={row.avatar} name={row.username} size='small' />
+                  <Avatar src={row.avatar} name={row.username || ''} size='small' />
                   <TableCellText noWrap>{row.username}</TableCellText>
                 </Stack>
               </TableCell>

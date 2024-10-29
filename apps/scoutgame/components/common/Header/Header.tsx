@@ -99,7 +99,7 @@ export function Header() {
                     sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
                     data-test='user-menu-pill'
                   >
-                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-testid='user-points-balance'>
+                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-test='user-points-balance'>
                       {user.currentBalance}
                     </Typography>
                     <Image
@@ -109,7 +109,7 @@ export function Header() {
                       alt='Scout Game points icon'
                       priority={true}
                     />
-                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
+                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username || ''} />
                   </Button>
                   <Menu
                     sx={{ mt: 5 }}

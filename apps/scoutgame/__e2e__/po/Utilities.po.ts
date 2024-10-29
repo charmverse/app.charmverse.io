@@ -32,7 +32,7 @@ export class Utilities {
             }
 
             if (method === 'eth_sendRawTransaction') {
-              return '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+              return `0x1234567890abcdef1234567890abcdef1234567890abcde${Math.random().toString(16).slice(2, 15)}`;
             }
 
             if (method === 'eth_blockNumber') {

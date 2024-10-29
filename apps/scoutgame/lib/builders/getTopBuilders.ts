@@ -6,7 +6,8 @@ import { isTruthy } from '@root/lib/utils/types';
 
 export type TopBuilderInfo = {
   id: string;
-  username: string;
+  username: string | null;
+  path: string | null;
   avatar: string | null;
   seasonPoints: number;
   builderStatus: BuilderStatus;
@@ -38,6 +39,7 @@ export async function getTopBuilders({
           id: true,
           builderStatus: true,
           username: true,
+          path: true,
           avatar: true,
           userAllTimeStats: {
             select: {
@@ -67,7 +69,7 @@ export async function getTopBuilders({
   return topBuilders
     .map((builder) => {
       const { user, pointsEarnedAsBuilder } = builder;
-      const { id, username, avatar } = user;
+      const { id, username, path, avatar } = user;
       const nft = user.builderNfts[0];
       if (!nft) {
         return null;
@@ -76,6 +78,7 @@ export async function getTopBuilders({
       return {
         id,
         username,
+        path,
         avatar,
         nftImageUrl: nft.imageUrl,
         seasonPoints: pointsEarnedAsBuilder,

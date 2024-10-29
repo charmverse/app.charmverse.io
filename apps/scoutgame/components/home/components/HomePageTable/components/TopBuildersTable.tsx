@@ -68,7 +68,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                   gap={1}
                   maxWidth={{ xs: '120px', md: 'initial' }}
                 >
-                  <Avatar src={builder.avatar} name={builder.username} size='small' />
+                  <Avatar src={builder.avatar} name={builder.username || ''} size='small' />
                   <TableCellText noWrap>{builder.username}</TableCellText>
                 </Stack>
               </TableCell>

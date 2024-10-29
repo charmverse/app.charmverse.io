@@ -59,7 +59,8 @@ export async function getBuilderActivities({
         select: {
           scout: {
             select: {
-              username: true
+              username: true,
+              path: true
             }
           },
           tokensPurchased: true
@@ -93,7 +94,7 @@ export async function getBuilderActivities({
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout.username
+          scout: event.nftPurchaseEvent.scout.username || ''
         };
       } else if (
         (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&

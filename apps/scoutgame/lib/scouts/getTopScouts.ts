@@ -68,7 +68,7 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       const seasonPoints = scout.pointsEarnedAsScout;
       return {
         id: scout.user.id,
-        username: scout.user.username,
+        username: scout.user.username || '',
         avatar: scout.user.avatar,
         buildersScouted,
         nftsHeld,

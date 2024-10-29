@@ -67,7 +67,7 @@ export async function searchBuilders({
 
   return builders.map((builder) => ({
     id: builder.id,
-    username: builder.username,
+    username: builder.username || '',
     avatar: builder.avatar,
     seasonPoints: builder.userSeasonStats?.[0]?.pointsEarnedAsBuilder ?? 0,
     allTimePoints: builder.userAllTimeStats?.[0]?.pointsEarnedAsBuilder ?? 0,
