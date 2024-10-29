@@ -81,7 +81,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const { checkDecentTransaction, isExecutingTransaction, sendNftMintTransaction } = usePurchase();
+  const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, savedDecentTransaction } =
+    usePurchase();
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
@@ -122,34 +123,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   } = useAction(purchaseWithPointsAction, {
     onError({ error, input }) {
       log.error('Error purchasing with points', { input, error });
-      setSubmitError(error.serverError?.message || 'Something went wrong');
-    },
-    onExecute() {
-      setSubmitError(null);
-    }
-  });
-
-  const {
-    isExecuting: isSavingDecentTransaction,
-    hasSucceeded: savedDecentTransaction,
-    executeAsync: saveDecentTransaction
-  } = useAction(saveDecentTransactionAction, {
-    async onSuccess(res) {
-      if (res.data?.id) {
-        await checkDecentTransaction({ pendingTransactionId: res.data.id, txHash: res.data.txHash });
-        await refreshUser();
-        log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
-      } else {
-        log.warn('NFT minted but no transaction id returned', {
-          chainId,
-          builderTokenId,
-          purchaseCost,
-          responseData: res.data
-        });
-      }
-    },
-    onError({ error, input }) {
-      log.error('Error minting NFT', { chainId, input, error });
       setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {

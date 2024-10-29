@@ -10,12 +10,10 @@ import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 import type { Address } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
+import { useSendTransaction } from 'wagmi';
 
-import { useGetPendingNftTransactions } from 'hooks/api/session';
 import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
-import type { TxResponse } from 'lib/session/getPendingNftTransactions';
 
 import { useSnackbar } from './SnackbarContext';
 import { useUser } from './UserProvider';
@@ -37,6 +35,8 @@ type MintTransactionInput = {
 
 type PurchaseContext = {
   isExecutingTransaction: boolean;
+  isSavingDecentTransaction: boolean;
+  savedDecentTransaction: boolean;
   transactionHasSucceeded: boolean;
   checkDecentTransaction: (input: { pendingTransactionId: string; txHash: string }) => Promise<any>;
   error: string;
@@ -65,7 +65,11 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  const { executeAsync: saveDecentTransaction } = useAction(saveDecentTransactionAction, {
+  const {
+    executeAsync: saveDecentTransaction,
+    isExecuting: isSavingDecentTransaction,
+    hasSucceeded: savedDecentTransaction
+  } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
         await checkDecentTransaction({ pendingTransactionId: res.data.id, txHash: res.data.txHash });
@@ -106,51 +110,47 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
 
   const sendNftMintTransaction = useCallback(
     async (input: MintTransactionInput) => {
-      return new Promise((resolve, reject) => {
-        const {
-          txData: { to, data, value: _txValue },
-          txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress }
-        } = input;
-        sendTransaction(
-          {
-            to,
-            data,
-            value: _txValue
+      const {
+        txData: { to, data, value: _txValue },
+        txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress }
+      } = input;
+      return sendTransaction(
+        {
+          to,
+          data,
+          value: _txValue
+        },
+        {
+          onSuccess: async (_data) => {
+            log.info('Successfully sent mint transaction', { data: _data });
+            await saveDecentTransaction({
+              user: {
+                walletAddress: fromAddress
+              },
+              transactionInfo: {
+                destinationChainId: builderNftChain.id,
+                sourceChainId,
+                sourceChainTxHash: _data
+              },
+              purchaseInfo: {
+                quotedPrice: Number(purchaseCost),
+                tokenAmount: tokensToBuy,
+                builderContractAddress: getBuilderContractAddress(),
+                tokenId: Number(builderTokenId),
+                quotedPriceCurrency: optimismUsdcContractAddress
+              }
+            });
           },
-          {
-            onSuccess: async (_data) => {
-              log.info('Successfully sent mint transaction', { data: _data });
-              await saveDecentTransaction({
-                user: {
-                  walletAddress: fromAddress
-                },
-                transactionInfo: {
-                  destinationChainId: builderNftChain.id,
-                  sourceChainId,
-                  sourceChainTxHash: _data
-                },
-                purchaseInfo: {
-                  quotedPrice: Number(purchaseCost),
-                  tokenAmount: tokensToBuy,
-                  builderContractAddress: getBuilderContractAddress(),
-                  tokenId: Number(builderTokenId),
-                  quotedPriceCurrency: optimismUsdcContractAddress
-                }
-              });
-
-              resolve(null);
-            },
-            onError: (err: any) => {
-              log.error('Creating a mint transaction failed', {
-                txData: input.txData,
-                txMetadata: input.txMetadata,
-                error: err
-              });
-              reject(err);
-            }
+          onError: (err: any) => {
+            log.error('Creating a mint transaction failed', {
+              txData: input.txData,
+              txMetadata: input.txMetadata,
+              error: err
+            });
+            throw err;
           }
-        );
-      });
+        }
+      );
     },
     [sendTransaction]
   );
@@ -161,14 +161,18 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       transactionHasSucceeded,
       checkDecentTransaction,
       error: transactionResult.serverError?.message || 'Something went wrong',
-      sendNftMintTransaction
+      sendNftMintTransaction,
+      savedDecentTransaction,
+      isSavingDecentTransaction
     }),
     [
       isExecutingTransaction,
       transactionHasSucceeded,
       checkDecentTransaction,
       transactionResult.serverError?.message,
-      sendNftMintTransaction
+      sendNftMintTransaction,
+      savedDecentTransaction,
+      isSavingDecentTransaction
     ]
   );
 
