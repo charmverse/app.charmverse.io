@@ -27,7 +27,6 @@ async function _getUserByPath(path: string): Promise<
 
   return {
     ...user,
-    path: user.path!,
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
     githubLogin: user?.githubUser[0]?.login

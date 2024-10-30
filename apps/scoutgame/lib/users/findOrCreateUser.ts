@@ -140,7 +140,7 @@ export async function findOrCreateUser({
 
   trackUserAction('sign_up', {
     userId: newScout.id,
-    path: userProps.path!,
+    path: userProps.path,
     displayName: userProps.displayName,
     fid: farcasterId
   });
