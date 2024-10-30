@@ -39,7 +39,4 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
       builderStatus: 'approved'
     }
   });
-
-  // Refresh builder ranks
-  await updateBuildersRank();
 }
