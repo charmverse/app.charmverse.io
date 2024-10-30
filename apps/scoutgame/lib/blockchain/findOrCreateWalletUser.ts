@@ -23,7 +23,7 @@ export async function findOrCreateWalletUser({
     newUserId,
     walletENS: ens || undefined,
     avatar: ensDetails?.avatar || undefined,
-    walletAddress: wallet,
+    walletAddresses: [wallet],
     displayName: ens || shortenHex(wallet),
     path: shortenHex(wallet)
   });

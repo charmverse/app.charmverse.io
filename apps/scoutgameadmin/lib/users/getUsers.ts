@@ -3,12 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 export type ScoutGameUser = Pick<
   Scout,
-  'builderStatus' | 'username' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterId' | 'currentBalance'
+  'builderStatus' | 'path' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterId' | 'currentBalance'
 > & { nftsPurchased: number };
 
 export type UserFilter = 'only-builders';
 
-export type SortField = 'username' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
+export type SortField = 'path' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
 export type SortOrder = 'asc' | 'desc';
 
 export async function getUsers({
@@ -31,7 +31,7 @@ export async function getUsers({
       !userFid && typeof searchString === 'string'
         ? {
             _relevance: {
-              fields: ['username', 'walletAddress', 'displayName', 'email', 'id'],
+              fields: ['path', 'displayName', 'email', 'id'],
               search: searchString,
               sort: 'desc'
             }
@@ -48,7 +48,7 @@ export async function getUsers({
       ? { farcasterId: userFid }
       : typeof searchString === 'string'
         ? {
-            username: {
+            path: {
               contains: searchString,
               mode: 'insensitive'
             }
