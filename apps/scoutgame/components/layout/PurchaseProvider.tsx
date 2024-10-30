@@ -8,7 +8,7 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { Address } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
@@ -43,6 +43,8 @@ type PurchaseContext = {
   checkDecentTransaction: (input: { pendingTransactionId: string; txHash: string }) => Promise<any>;
   purchaseError?: string;
   sendNftMintTransaction: (input: MintTransactionInput) => Promise<unknown>;
+  clearPurchaseSuccess: () => void;
+  purchaseSuccess: boolean;
 };
 
 export const PurchaseContext = createContext<Readonly<PurchaseContext | null>>(null);
@@ -51,6 +53,8 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
   const { showMessage } = useSnackbar();
   const { refreshUser } = useUser();
   const { sendTransactionAsync } = useSendTransaction();
+
+  const [purchaseSuccess, setPurchaseSuccess] = useState(false);
 
   const {
     isExecuting: isExecutingTransaction,
@@ -126,6 +130,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
         },
         {
           onSuccess: async (_data) => {
+            setPurchaseSuccess(true);
             const output = await saveDecentTransaction({
               user: {
                 walletAddress: fromAddress
@@ -163,6 +168,10 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     [sendTransactionAsync, saveDecentTransaction]
   );
 
+  const clearPurchaseSuccess = useCallback(() => {
+    setPurchaseSuccess(false);
+  }, [setPurchaseSuccess]);
+
   const purchaseError =
     !isExecutingTransaction && !isSavingDecentTransaction
       ? transactionResult.serverError?.message || saveTransactionResult.serverError?.message
@@ -176,7 +185,9 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       purchaseError,
       sendNftMintTransaction,
       savedDecentTransaction,
-      isSavingDecentTransaction
+      isSavingDecentTransaction,
+      clearPurchaseSuccess,
+      purchaseSuccess
     }),
     [
       isExecutingTransaction,
@@ -185,7 +196,9 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       sendNftMintTransaction,
       savedDecentTransaction,
       isSavingDecentTransaction,
-      purchaseError
+      purchaseError,
+      clearPurchaseSuccess,
+      purchaseSuccess
     ]
   );
 

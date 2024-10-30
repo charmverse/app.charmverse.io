@@ -83,7 +83,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     isExecutingTransaction,
     sendNftMintTransaction,
     isSavingDecentTransaction,
-    savedDecentTransaction,
+    clearPurchaseSuccess,
+    purchaseSuccess,
     purchaseError
   } = usePurchase();
   const { showMessage } = useSnackbar();
@@ -290,7 +291,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (hasPurchasedWithPoints || savedDecentTransaction) {
+  if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
   }
 
