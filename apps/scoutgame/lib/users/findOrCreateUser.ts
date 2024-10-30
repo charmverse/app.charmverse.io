@@ -39,6 +39,8 @@ export async function findOrCreateUser({
   bio?: string;
   displayName: string;
   path: string;
+  farcasterUsername?: string;
+  farcasterName?: string;
   tierOverride?: ConnectWaitlistTier;
 }): Promise<Scout & { scoutWallet?: ScoutWallet[] }> {
   if (!farcasterId && !walletAddresses?.length) {

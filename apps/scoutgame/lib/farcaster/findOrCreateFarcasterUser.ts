@@ -25,6 +25,8 @@ export async function findOrCreateFarcasterUser({
     walletAddresses: profile.verifications,
     displayName: profile.display_name,
     path: profile.username,
-    tierOverride
+    tierOverride,
+    farcasterUsername: profile.username,
+    farcasterName: profile.display_name
   });
 }
