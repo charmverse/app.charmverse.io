@@ -7,20 +7,20 @@ import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 export function PublicProfileTabsMenu({
   tab,
-  username,
+  path,
   isApprovedBuilder
 }: {
   tab: string;
-  username: string;
+  path: string;
   isApprovedBuilder?: boolean;
 }) {
   const router = useRouter();
 
   useEffect(() => {
     if (!isApprovedBuilder && tab === 'builder') {
-      router.push(`/u/${username}/?tab=scout`);
+      router.push(`/u/${path}/?tab=scout`);
     }
-  }, [isApprovedBuilder, tab, username]);
+  }, [isApprovedBuilder, tab, path]);
 
   return (
     <TabsMenu

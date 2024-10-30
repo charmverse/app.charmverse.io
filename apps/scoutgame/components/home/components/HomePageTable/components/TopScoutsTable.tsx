@@ -44,7 +44,7 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
         <TableBody>
           {scouts.map((scout, index) => (
             <TableRow
-              key={scout.username}
+              key={scout.path}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': {
@@ -61,14 +61,14 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
               <TableCell component='th'>
                 <Stack
                   component={Link}
-                  href={`/u/${scout.username}?tab=scout`}
+                  href={`/u/${scout.path}?tab=scout`}
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
                   maxWidth={{ xs: '100px', md: 'initial' }}
                 >
-                  <Avatar src={scout.avatar} name={scout.username} size='small' />
-                  <TableCellText noWrap>{scout.username}</TableCellText>
+                  <Avatar src={scout.avatar} name={scout.displayName} size='small' />
+                  <TableCellText noWrap>{scout.displayName}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell align='right'>

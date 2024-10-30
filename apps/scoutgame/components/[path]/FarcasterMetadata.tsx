@@ -18,7 +18,7 @@ export function FarcasterMetadata({
       {/* Button 1 */}
       <meta name='fc:frame:button:1' content='Scout Builder' />
       <meta name='fc:frame:button:1:action' content='link' />
-      <meta name='fc:frame:button:1:target' content={`${process.env.DOMAIN}/u/${user.username}`} />
+      <meta name='fc:frame:button:1:target' content={`${process.env.DOMAIN}/u/${user.path}`} />
     </>
   );
 }

@@ -43,7 +43,7 @@ function NFTPurchaseDialogComponent(props: NFTPurchaseDialogProps) {
       fullScreen={!isDesktop}
       open={props.open && !!address}
       onClose={props.onClose}
-      title={`Scout @${props.builder.username}`}
+      title={`Scout ${props.builder.displayName}`}
       maxWidth='md'
     >
       <NFTPurchaseForm builder={props.builder} />

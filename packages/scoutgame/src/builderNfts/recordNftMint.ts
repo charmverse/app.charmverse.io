@@ -9,23 +9,8 @@ import { getCurrentWeek } from '@packages/scoutgame/dates';
 
 import type { MintNFTParams } from './mintNFT';
 
-export async function recordNftMint(params: MintNFTParams & { mintTxHash: string }) {
-  const { amount, builderNftId, paidWithPoints, pointsValue, recipientAddress, scoutId, mintTxHash } = params;
-
-  if (!mintTxHash.trim().startsWith('0x')) {
-    throw new InvalidInputError(`Mint transaction hash is required`);
-  }
-
-  const existingTx = await prisma.nFTPurchaseEvent.findFirst({
-    where: {
-      txHash: mintTxHash
-    }
-  });
-
-  if (existingTx) {
-    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
-    return;
-  }
+export async function recordNftMintWithoutRefresh(params: MintNFTParams & { createdAt?: Date; mintTxHash: string }) {
+  const { createdAt, amount, builderNftId, paidWithPoints, pointsValue, scoutId, mintTxHash } = params;
 
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
@@ -44,17 +29,19 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
   });
 
   // The builder receives 20% of the points value, regardless of whether the purchase was paid with points or not
-  const pointsReceipts: { value: number; recipientId?: string; senderId?: string }[] = [
+  const pointsReceipts: { value: number; recipientId?: string; senderId?: string; createdAt?: Date }[] = [
     {
       value: Math.floor(pointsValue * 0.2),
-      recipientId: builderNft.builderId
+      recipientId: builderNft.builderId,
+      createdAt
     }
   ];
 
   if (paidWithPoints) {
     pointsReceipts.push({
       value: pointsValue,
-      senderId: scoutId
+      senderId: scoutId,
+      createdAt
     });
   }
 
@@ -81,6 +68,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
         nftPurchaseEvent: {
           create: {
             pointsValue,
+            createdAt,
             tokensPurchased: amount,
             paidInPoints: paidWithPoints,
             txHash: mintTxHash?.toLowerCase(),
@@ -90,7 +78,8 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
               create: {
                 recipientType: 'builder',
                 type: 'nft_purchase',
-                userId: builderNft.builderId
+                userId: builderNft.builderId,
+                createdAt
               }
             }
           }
@@ -164,6 +153,33 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
 
     return builderEvent.nftPurchaseEvent;
   });
+
+  return {
+    builderNft,
+    mintTxHash,
+    nftPurchaseEvent: nftPurchaseEvent as NFTPurchaseEvent
+  };
+}
+
+export async function recordNftMint(params: MintNFTParams & { mintTxHash: string }) {
+  const { amount, builderNftId, paidWithPoints, recipientAddress, scoutId, mintTxHash } = params;
+
+  if (!mintTxHash.trim().startsWith('0x')) {
+    throw new InvalidInputError(`Mint transaction hash is required`);
+  }
+
+  const existingTx = await prisma.nFTPurchaseEvent.findFirst({
+    where: {
+      txHash: mintTxHash
+    }
+  });
+
+  if (existingTx) {
+    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
+    return;
+  }
+
+  const { builderNft, nftPurchaseEvent } = await recordNftMintWithoutRefresh(params);
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
   trackUserAction('nft_purchase', {
     userId: builderNft.builderId,

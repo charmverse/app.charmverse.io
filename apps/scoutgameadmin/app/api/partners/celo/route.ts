@@ -25,7 +25,7 @@ export async function GET() {
       builder: {
         select: {
           email: true,
-          username: true
+          displayName: true
         }
       },
       githubEvent: {
@@ -43,7 +43,7 @@ export async function GET() {
     }
   });
   const rows = events.map((event) => ({
-    'Farcaster Name': event.builder.username,
+    'Farcaster Name': event.builder.displayName,
     Email: event.builder.email,
     Repo: `${event.githubEvent!.repo.owner}/${event.githubEvent!.repo.name}`,
     Date: event.createdAt.toDateString(),

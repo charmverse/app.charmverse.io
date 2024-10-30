@@ -45,18 +45,10 @@ export async function aggregateNftSalesData(): Promise<NftSalesData> {
   const mintEvents = await prisma.nFTPurchaseEvent.count();
 
   return {
-    totalNftsSold: 1311,
-    nftsPaidWithCrypto: 392,
-    nftsPaidWithPoints: 919,
-    uniqueHolders: 138,
-    mintEvents: 1091
+    totalNftsSold: nftsPaidWithPoints + nftsPaidWithCrypto,
+    nftsPaidWithCrypto,
+    nftsPaidWithPoints,
+    uniqueHolders: uniqueScoutIds._count.scoutId,
+    mintEvents
   };
-
-  // return {
-  //   totalNftsSold: nftsPaidWithPoints + nftsPaidWithCrypto,
-  //   nftsPaidWithCrypto,
-  //   nftsPaidWithPoints,
-  //   uniqueHolders: uniqueScoutIds._count.scoutId,
-  //   mintEvents
-  // };
 }

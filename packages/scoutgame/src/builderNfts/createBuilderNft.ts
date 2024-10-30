@@ -12,10 +12,12 @@ export async function createBuilderNft({
   avatar,
   tokenId,
   builderId,
-  username
+  displayName,
+  path
 }: {
   imageHostingBaseUrl?: string;
-  username: string;
+  displayName: string;
+  path: string;
   avatar: string | null;
   tokenId: bigint;
   builderId: string;
@@ -26,7 +28,7 @@ export async function createBuilderNft({
 
   const fileUrl = await uploadArtwork({
     imageHostingBaseUrl,
-    username,
+    displayName,
     season: currentSeason,
     avatar,
     tokenId
@@ -42,7 +44,7 @@ export async function createBuilderNft({
   await uploadMetadata({
     season: currentSeason,
     tokenId,
-    username
+    path
   });
 
   const builderNft = await prisma.builderNft.create({

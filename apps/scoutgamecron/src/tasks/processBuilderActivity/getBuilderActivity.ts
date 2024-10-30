@@ -41,21 +41,11 @@ export async function getBuilderActivity({ login, after }: { login: string; afte
       }
     }
   });
-  // automatically include new repos from the user
-  const newOwnerRepos = uniqBy(
-    commits
-      .map((node) => node.repository)
-      .filter((repository) => !reposToTrack.some((r) => r.id === repository.id) && repository.owner.login === login),
-    'id'
-  );
 
   return {
     // Filter out PRs we do not follow
     pullRequests: pullRequests.filter((node) => reposToTrack.some((r) => r.id === node.repository.id)),
-    commits: commits.filter(
-      (node) =>
-        reposToTrack.some((r) => r.id === node.repository.id) || newOwnerRepos.some((r) => r.id === node.repository.id)
-    ),
-    newOwnerRepos
+    commits: commits.filter((node) => reposToTrack.some((r) => r.id === node.repository.id)),
+    newOwnerRepos: []
   };
 }

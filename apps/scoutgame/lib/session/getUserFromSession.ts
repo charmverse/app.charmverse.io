@@ -6,7 +6,7 @@ import { cacheGetUser, getUser } from './getUser';
 export type SessionUser = Pick<
   Scout,
   | 'id'
-  | 'username'
+  | 'path'
   | 'displayName'
   | 'avatar'
   | 'builderStatus'

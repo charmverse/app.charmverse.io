@@ -2,7 +2,8 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 
 export const BasicUserInfoSelect = {
   id: true,
-  username: true,
+  path: true,
+  displayName: true,
   avatar: true,
   bio: true,
   githubUser: {
@@ -15,7 +16,7 @@ export const BasicUserInfoSelect = {
 
 export const MinimalScoutInfoSelect = {
   id: true,
-  username: true,
+  path: true,
   avatar: true,
   displayName: true
 } satisfies Prisma.ScoutSelect;

@@ -13,11 +13,11 @@ import { UnclaimedPointsTable } from './components/PointsTable/UnclaimedPointsTa
 export type ClaimPageProps = {
   totalUnclaimedPoints: number;
   bonusPartners: string[];
-  username: string;
+  displayName: string;
   period: string;
 };
 
-export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, period }: ClaimPageProps) {
+export function ClaimPage({ displayName, totalUnclaimedPoints, bonusPartners, period }: ClaimPageProps) {
   return (
     <PageContainer>
       <Stack
@@ -31,7 +31,7 @@ export function ClaimPage({ username, totalUnclaimedPoints, bonusPartners, perio
         <Stack flex={1} gap={4}>
           <PointsClaimScreen
             totalUnclaimedPoints={totalUnclaimedPoints}
-            username={username}
+            displayName={displayName}
             bonusPartners={bonusPartners}
           />
           {totalUnclaimedPoints === 0 ? null : (

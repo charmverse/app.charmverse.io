@@ -34,7 +34,7 @@ export async function findOrCreateUser({
   avatar?: string;
   bio?: string;
   displayName: string;
-  username: string;
+  path: string;
   tierOverride?: ConnectWaitlistTier;
 }): Promise<Scout> {
   if (!farcasterId && !walletAddress) {
@@ -130,7 +130,8 @@ export async function findOrCreateUser({
 
   trackUserAction('sign_up', {
     userId: newScout.id,
-    username: userProps.username,
+    path: userProps.path!,
+    displayName: userProps.displayName,
     fid: farcasterId
   });
 

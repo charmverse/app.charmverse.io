@@ -9,7 +9,8 @@ export interface BaseEventWithoutGroup {
 }
 
 export type UserSignupEvent = BaseEventWithoutGroup & {
-  username: string;
+  displayName: string;
+  path: string;
   fid?: number;
 };
 
