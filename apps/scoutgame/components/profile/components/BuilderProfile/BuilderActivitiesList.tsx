@@ -34,7 +34,7 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
   return (
     <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'nft_purchase' ? (
-        <Link href={`/u/${activity.scout}`}>{activity.scout}</Link>
+        <Link href={`/u/${activity.scout.path}`}>{activity.scout.displayName}</Link>
       ) : activity.type === 'github_event' ? (
         <Link href={activity.url}>{activity.repo}</Link>
       ) : null}

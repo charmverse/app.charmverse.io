@@ -9,7 +9,8 @@ export type BaseEvent = {
 };
 
 export type UserSignupEvent = BaseEvent & {
-  username: string;
+  displayName: string;
+  path: string;
   fid?: number;
 };
 

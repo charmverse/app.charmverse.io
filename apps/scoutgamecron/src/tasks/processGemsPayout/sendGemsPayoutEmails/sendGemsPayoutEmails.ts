@@ -15,7 +15,6 @@ export async function sendGemsPayoutEmails({ week }: { week: string }) {
     },
     select: {
       id: true,
-      username: true,
       displayName: true,
       email: true
     }

@@ -75,7 +75,7 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
             builder={builder}
           />
         )}
-        <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.username}`} />
+        <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.path}`} />
       </DynamicLoadingContext.Provider>
     </div>
   );

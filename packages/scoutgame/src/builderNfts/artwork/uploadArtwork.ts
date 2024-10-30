@@ -2,7 +2,7 @@ import { S3Client } from '@aws-sdk/client-s3';
 import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
-import { generateNftImage, generateNftCongrats } from './generateNftImage';
+import { generateNftImage, generateNftCongrats, updateNftImage } from './generateNftImage';
 import { getNftCongratsFilePath, getNftFilePath, imageDomain } from './utils';
 
 function getS3ClientConfig() {
@@ -26,19 +26,26 @@ export async function uploadArtwork({
   avatar,
   tokenId,
   season,
-  username
+  displayName,
+  currentNftImage
 }: {
   imageHostingBaseUrl?: string;
-  username: string;
+  displayName: string;
   season: string;
   avatar: string | null;
   tokenId: bigint | number;
+  currentNftImage?: string;
 }) {
-  const imageBuffer = await generateNftImage({
-    avatar,
-    username,
-    imageHostingBaseUrl
-  });
+  const imageBuffer = currentNftImage
+    ? await updateNftImage({
+        displayName,
+        currentNftImage
+      })
+    : await generateNftImage({
+        avatar,
+        displayName,
+        imageHostingBaseUrl
+      });
 
   const imagePath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' });
 

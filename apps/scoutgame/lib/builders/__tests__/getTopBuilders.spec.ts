@@ -43,7 +43,7 @@ describe('getTopBuilders', () => {
     expect(result).toHaveLength(1);
     const topBuilder = result[0] as TopBuilderInfo;
     expect(topBuilder.id).toBe(builder.id);
-    expect(topBuilder.username).toBe(builder.username);
+    expect(topBuilder.path).toBe(builder.path);
     expect(topBuilder.seasonPoints).toBe(100);
     expect(topBuilder.allTimePoints).toBe(500);
     expect(topBuilder.scoutedBy).toBe(2); // Should count unique scouts, not total sales

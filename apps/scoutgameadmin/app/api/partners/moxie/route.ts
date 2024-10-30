@@ -10,11 +10,11 @@ export const dynamic = 'force-dynamic';
 
 type MoxieBonusRow = {
   'Builder FID': number;
-  'Builder username': string;
+  'Builder path': string;
   'Builder event': string;
   'Scout FID': number;
   'Scout email': string;
-  'Scout username': string;
+  'Scout path': string;
 };
 
 export async function GET() {
@@ -27,7 +27,7 @@ export async function GET() {
     },
     select: {
       farcasterId: true,
-      username: true,
+      path: true,
       events: {
         where: {
           type: {
@@ -46,7 +46,7 @@ export async function GET() {
               scout: {
                 select: {
                   farcasterId: true,
-                  username: true
+                  path: true
                 }
               }
             }
@@ -82,9 +82,9 @@ export async function GET() {
               rows.push({
                 'Scout FID': scoutFid!,
                 'Scout email': scout.email || '',
-                'Scout username': scout.username,
+                'Scout path': scout.path!,
                 'Builder FID': builder.farcasterId,
-                'Builder username': builder.username,
+                'Builder path': builder.path!,
                 'Builder event':
                   (builder.events[0]!.type === 'merged_pull_request' ? `PR on ` : `Commit on `) +
                   builder.events[0]!.createdAt.toDateString()

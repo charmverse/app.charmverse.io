@@ -2,15 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 
-async function deleteBuilderAndRedistributePoints({ builderUsername }: { builderUsername: string }) {
+async function deleteBuilderAndRedistributePoints({ builderPath }: { builderPath: string }) {
   const builder = await prisma.scout.findUnique({
     where: {
-      username: builderUsername
+      path: builderPath
     }
   });
 
   if (!builder) {
-    throw new Error(`Builder with username ${builderUsername} not found`);
+    throw new Error(`Builder with path ${builderPath} not found`);
   }
 
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
@@ -18,7 +18,7 @@ async function deleteBuilderAndRedistributePoints({ builderUsername }: { builder
       builderNFT: {
         season: currentSeason,
         builder: {
-          username: builderUsername
+          path: builderPath
         }
       }
     },
@@ -46,7 +46,7 @@ async function deleteBuilderAndRedistributePoints({ builderUsername }: { builder
     async (tx) => {
       await prisma.scout.delete({
         where: {
-          username: builderUsername
+          path: builderPath
         }
       });
       await prisma.nFTPurchaseEvent.deleteMany({
@@ -88,5 +88,5 @@ async function deleteBuilderAndRedistributePoints({ builderUsername }: { builder
 }
 
 deleteBuilderAndRedistributePoints({
-  builderUsername: ''
+  builderPath: 'path'
 });

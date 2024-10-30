@@ -44,7 +44,8 @@ export async function registerBuilderNFT({
     select: {
       githubUser: true,
       avatar: true,
-      username: true,
+      path: true,
+      displayName: true,
       builderStatus: true
     }
   });
@@ -70,7 +71,8 @@ export async function registerBuilderNFT({
     tokenId: existingTokenId,
     builderId,
     avatar: builder.avatar,
-    username: builder.username || ''
+    path: builder.path!,
+    displayName: builder.displayName
   });
 
   const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
