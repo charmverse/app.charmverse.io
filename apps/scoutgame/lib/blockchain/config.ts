@@ -1,5 +1,8 @@
 import * as yup from 'yup';
 
-export const authSchema = yup.object({ message: yup.string().required(), signature: yup.string().required() });
+export const loginWithWalletSchema = yup.object({
+  message: yup.string().required(),
+  signature: yup.string().required()
+});
 
-export type AuthSchema = yup.InferType<typeof authSchema>;
+export type LoginWithWalletSchema = yup.InferType<typeof loginWithWalletSchema>;

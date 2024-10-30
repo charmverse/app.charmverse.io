@@ -47,7 +47,6 @@ export function WarpcastLoginButton() {
 
       await revalidatePath();
       router.push(nextPage);
-
       popupState.close();
     },
     onError(err) {
