@@ -28,7 +28,6 @@ describe('approveBuilder', () => {
     });
 
     expect(updatedBuilder?.builderStatus).toBe('approved');
-    expect(updatedBuilder?.onboardedAt).toBeDefined();
 
     // Check NFT was registered
     expect(registerBuilderNFT).toHaveBeenCalledWith(

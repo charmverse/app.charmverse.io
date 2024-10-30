@@ -12,12 +12,14 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
   if (!baseUrl) {
     throw new Error('DOMAIN is not set');
   }
+
+  // make sure scout exists
   const scout = await prisma.scout.findUniqueOrThrow({
     where: {
       id: builderId
     },
-    include: {
-      githubUser: true
+    select: {
+      id: true
     }
   });
 
@@ -34,8 +36,7 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
       id: builderId
     },
     data: {
-      builderStatus: 'approved',
-      onboardedAt: new Date()
+      builderStatus: 'approved'
     }
   });
 
