@@ -5,6 +5,7 @@ import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUs
 import { getENSDetails, getENSName } from '@root/lib/blockchain/getENSName';
 import { getAddress } from 'viem';
 
+import type { FindOrCreateUserResult } from 'lib/users/findOrCreateUser';
 import { findOrCreateUser } from 'lib/users/findOrCreateUser';
 import { generateUserPath } from 'lib/users/generateUserPath';
 import { generateRandomName } from 'lib/utils/generateRandomName';
@@ -15,7 +16,7 @@ export async function findOrCreateWalletUser({
 }: {
   wallet: string;
   newUserId?: string;
-}): Promise<Scout> {
+}): Promise<FindOrCreateUserResult> {
   const ens = await getENSName(wallet).catch((error) => {
     log.warn('Could not retrieve ENS while creating a user', { error, wallet });
     return null;

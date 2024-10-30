@@ -22,6 +22,7 @@ export async function recordNftMintWithoutRefresh(params: MintNFTParams & { crea
       builderId: true,
       builder: {
         select: {
+          path: true,
           displayName: true
         }
       }

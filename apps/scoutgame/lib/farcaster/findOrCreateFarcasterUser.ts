@@ -3,6 +3,7 @@ import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFr
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 
+import type { FindOrCreateUserResult } from 'lib/users/findOrCreateUser';
 import { findOrCreateUser } from 'lib/users/findOrCreateUser';
 
 export async function findOrCreateFarcasterUser({
@@ -11,7 +12,7 @@ export async function findOrCreateFarcasterUser({
 }: {
   fid: number;
   tierOverride?: ConnectWaitlistTier;
-}): Promise<Scout & { scoutWallet?: ScoutWallet[] }> {
+}): Promise<FindOrCreateUserResult> {
   const profile = await getFarcasterUserById(fid);
   if (!profile) {
     throw new Error('Could not find Farcaster profile');

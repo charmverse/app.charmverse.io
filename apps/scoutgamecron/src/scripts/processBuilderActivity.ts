@@ -4,17 +4,8 @@ import { getBuilderActivity } from '../tasks/processBuilderActivity/getBuilderAc
 import { DateTime } from 'luxon';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { prisma } from '@charmverse/core/prisma-client';
-(async () => {
-  const timer = DateTime.now();
-  const builders = await prisma.scout.findMany({
-    where: {
-      builderStatus: 'approved'
-    },
-    include: {
-      githubUser: true
-    }
-  });
 
+(async () => {
   // const events = await prisma.builderEvent.findMany({
   //   where: {
   //     builderId: builder.id,
@@ -27,9 +18,6 @@ import { prisma } from '@charmverse/core/prisma-client';
   // console.log(JSON.stringify(events, null, 2));
   // return;
 
-  for (const builder of builders) {
-    await deleteBuilderEvents(builder.id, builder.githubUser[0]!.id);
-  }
   // await processBuilderActivity({
   //   builderId: builder.id,
   //   githubUser: builder.githubUser[0]!,
@@ -37,17 +25,13 @@ import { prisma } from '@charmverse/core/prisma-client';
   //   season: '2024-W40'
   // });
   // return;
-  await processAllBuilderActivity(null, {
-    createdAfter: DateTime.fromISO('2024-09-27', { zone: 'utc' }).toJSDate()
-  });
-  return;
+  console.log('Getting builder activity');
   const { commits, pullRequests } = await getBuilderActivity({
-    login: 'mattcasey',
-    after: DateTime.fromISO('2024-10-03', { zone: 'utc' }).toJSDate()
+    login: 'eben619',
+    after: DateTime.fromISO('2024-10-28', { zone: 'utc' }).toJSDate()
   });
   console.log(commits.length);
   console.log(pullRequests.length);
-  console.log('Completed in', timer.diff(DateTime.now(), 'minutes'), 'minutes');
 })();
 
 async function deleteBuilderEvents(builderId: string, githubUserId: number) {
