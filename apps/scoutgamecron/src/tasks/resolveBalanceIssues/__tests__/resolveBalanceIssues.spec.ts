@@ -4,9 +4,11 @@ import { mockScout } from '@packages/scoutgame/testing/database';
 import { resolveBalanceIssues } from '../resolveBalanceIssues';
 
 describe('resolveBalanceIssues', () => {
-  it('should resolve balance issues by creating an event to adjust the balance, and refresh the balance', async () => {
+  it('should resolve balance issues by creating an event to adjust the balance, so that expected balance is in line with current balance', async () => {
+    const balance = 100;
+
     const scout = await mockScout({
-      currentBalance: 100
+      currentBalance: balance
     });
 
     const initialReceiptsCount = await prisma.pointsReceipt.count({
@@ -29,7 +31,7 @@ describe('resolveBalanceIssues', () => {
 
     const receipt = receipts[0];
 
-    expect(receipt.value).toBe(-100);
+    expect(receipt.value).toBe(100);
     expect(receipt.recipientId).toBe(scout.id);
 
     const updatedScout = await prisma.scout.findUniqueOrThrow({
@@ -38,6 +40,6 @@ describe('resolveBalanceIssues', () => {
       }
     });
 
-    expect(updatedScout.currentBalance).toBe(100);
+    expect(updatedScout.currentBalance).toBe(balance);
   });
 });
