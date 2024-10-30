@@ -72,14 +72,7 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
 
 // search farcaster id by username
 // (async () => {
-//   console.log(await getFarcasterUserByUsername('andrewkimjoseph'));
-//   console.log(await getFarcasterUserByUsername('johnnjuki'));
-//   console.log(await getFarcasterUserByUsername('philix'));
-//   console.log(await getFarcasterUserByUsername('blssngx'));
-//   console.log(await getFarcasterUserByUsername('lemonrr'));
-//   console.log(await getFarcasterUserByUsername('Chizaa'));
-//   console.log(await getFarcasterUserByUsername('eliashezron'));
-//   console.log(await getFarcasterUserByUsername('iamoracle'));
+//   console.log(await getFarcasterUserByUsername('username'));
 // })();
 
 // search waitlist to find github login and farcaster id
@@ -94,11 +87,4 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
 // })();
 
 // run script to create builder
-// createBuilder({ fid: 811044, githubLogin: 'andrewkimjoseph' });
-// createBuilder({ fid: 847063, githubLogin: 'johnnjuki' });
-// createBuilder({ fid: 854428, githubLogin: 'Philix27' });
-// createBuilder({ fid: 328851, githubLogin: 'Blssngx' });
-// createBuilder({ fid: 846364, githubLogin: 'RonexLemon' });
-// createBuilder({ fid: 264117, githubLogin: 'DennohKim' });
-//createBuilder({ fid: 860651, githubLogin: 'eliashezron' });
-createBuilder({ fid: 857281, githubLogin: 'iamoracle' });
+createBuilder({ fid: 111, githubLogin: 'username' });
