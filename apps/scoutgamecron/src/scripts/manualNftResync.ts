@@ -2,14 +2,14 @@ import { syncUserNFTsFromOnchainData } from "@packages/scoutgame/builderNfts/syn
 
 
 
-const username = ''
+const userPath = ''
 
 export async function manualNftResync() {
-  if (!username) {
+  if (!userPath) {
     throw new Error('Please provide a username');
   };
 
-  await syncUserNFTsFromOnchainData({username})
+  await syncUserNFTsFromOnchainData({path: userPath})
   console.log('manualNftResync');
 }
 
