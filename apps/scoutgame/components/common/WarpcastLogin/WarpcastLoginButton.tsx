@@ -44,7 +44,7 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         return;
       }
 
-      await refreshUser(data.user);
+      await refreshUser();
 
       await revalidatePath();
       router.push(nextPage);
