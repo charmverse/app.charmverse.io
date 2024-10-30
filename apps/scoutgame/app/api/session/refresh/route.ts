@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       },
       select: {
         bio: true,
-        displayName: true,
+        farcasterName: true,
         path: true,
         farcasterId: true
       }
@@ -35,12 +35,12 @@ export async function GET(req: NextRequest) {
       });
       if (profile) {
         const bio = profile.profile.bio.text;
-        const displayName = profile.display_name;
+        const farcasterName = profile.display_name;
 
         const hasProfileChanged =
           // Re-enable this once Neynar fixes their caching mechanism
           // scout.avatar !== profile.body.avatarUrl ||
-          scout.bio !== bio || scout.displayName !== displayName;
+          scout.bio !== bio || scout.farcasterName !== farcasterName;
 
         if (hasProfileChanged) {
           await prisma.scout.update({
@@ -48,10 +48,8 @@ export async function GET(req: NextRequest) {
               id: userId
             },
             data: {
-              // Re-enable this once Neynar fixes their caching mechanism
-              // avatar: profile.pfp_url,
               bio,
-              displayName
+              farcasterName
             }
           });
           log.info('Updated Farcaster profile', { userId, profile });

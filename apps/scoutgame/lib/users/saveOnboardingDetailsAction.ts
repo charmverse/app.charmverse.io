@@ -4,11 +4,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { authActionClient } from 'lib/actions/actionClient';
 
-import { schema } from './termsOfServiceSchema';
+import { saveOnboardingDetailsSchema } from './saveOnboardingDetailsSchema';
 
-export const saveTermsOfServiceAction = authActionClient
+export const saveOnboardingDetailsAction = authActionClient
   .metadata({ actionName: 'terms-of-service' })
-  .schema(schema)
+  .schema(saveOnboardingDetailsSchema)
   .action(async ({ parsedInput, ctx }) => {
     const userId = ctx.session.scoutId;
 
@@ -21,7 +21,9 @@ export const saveTermsOfServiceAction = authActionClient
       data: {
         email: parsedInput.email,
         sendMarketing: parsedInput.sendMarketing,
-        agreedToTermsAt: new Date()
+        agreedToTermsAt: new Date(),
+        avatar: parsedInput.avatar,
+        displayName: parsedInput.displayName
       }
     });
 

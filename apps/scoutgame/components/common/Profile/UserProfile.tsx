@@ -1,14 +1,15 @@
 'use client';
 
 import type { Scout } from '@charmverse/core/prisma';
-import { IconButton, Stack, Typography } from '@mui/material';
-import Image from 'next/image';
+import { Stack, Typography } from '@mui/material';
 
 import { useIsMounted } from 'hooks/useIsMounted';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
+
+import { ProfileLinks } from './ProfileLinks';
 
 // Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
 export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
@@ -58,31 +59,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       <Stack width='100%'>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          {farcasterUsername ? (
-            <IconButton href={`https://warpcast.com/${farcasterUsername}`} target='_blank' rel='noopener noreferrer'>
-              <Image
-                src='/images/profile/icons/warpcast-circle-icon.svg'
-                width={isDesktop ? '20' : '16'}
-                height={isDesktop ? '20' : '16'}
-                alt='warpcast icon'
-              />
-            </IconButton>
-          ) : null}
-          {githubLogin ? (
-            <IconButton
-              href={`https://github.com/${githubLogin}`}
-              target='_blank'
-              rel='noopener noreferrer'
-              sx={{ px: 0 }}
-            >
-              <Image
-                src='/images/profile/icons/github-circle-icon.svg'
-                width={isDesktop ? '20' : '16'}
-                height={isDesktop ? '20' : '16'}
-                alt='github icon'
-              />
-            </IconButton>
-          ) : null}
+          <ProfileLinks farcasterUsername={farcasterUsername} githubLogin={githubLogin} />
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}
