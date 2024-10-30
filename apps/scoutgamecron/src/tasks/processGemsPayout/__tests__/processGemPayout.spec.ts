@@ -46,10 +46,10 @@ describe('processGemsPayout', () => {
       { zone: 'utc' }
     );
 
-    jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
+    jest.unstable_mockModule('@packages/scoutgame/builders/getBuildersLeaderboard', () => ({
       getBuildersLeaderboard: jest.fn()
     }));
-    const { getBuildersLeaderboard } = await import('@packages/scoutgame/getBuildersLeaderboard');
+    const { getBuildersLeaderboard } = await import('@packages/scoutgame/builders/getBuildersLeaderboard');
     // mock the prisma count to return 1
     jest.spyOn(prisma.builderEvent, 'count').mockResolvedValue(1);
 
@@ -58,10 +58,10 @@ describe('processGemsPayout', () => {
   });
 
   it('should not run at other times', async () => {
-    jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
+    jest.unstable_mockModule('@packages/scoutgame/builders/getBuildersLeaderboard', () => ({
       getBuildersLeaderboard: jest.fn()
     }));
-    const { getBuildersLeaderboard } = await import('@packages/scoutgame/getBuildersLeaderboard');
+    const { getBuildersLeaderboard } = await import('@packages/scoutgame/builders/getBuildersLeaderboard');
     // Mock the current time to be Monday at 04:00:00 UTC (outside the 3-hour window)
     const mockNow = DateTime.fromObject(
       { year: 2024, month: 1, day: 1, hour: 4, minute: 0, second: 0 },

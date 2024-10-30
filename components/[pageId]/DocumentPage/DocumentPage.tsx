@@ -362,7 +362,7 @@ function DocumentPageComponent({
                 readOnly={readOnlyTitle}
               />
             )}
-            {(proposalId || rewardId) && !isMdScreen && (
+            {(proposalId || rewardId) && (insideModal || !isMdScreen) && (
               <Tabs
                 sx={{
                   mb: 1

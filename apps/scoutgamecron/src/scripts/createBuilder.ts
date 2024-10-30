@@ -1,4 +1,4 @@
-import { approveBuilder } from './approveBuilder';
+import { approveBuilder } from '@packages/scoutgame/builders/approveBuilder';
 
 import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
 import { octokit } from '@packages/github/client';
@@ -12,6 +12,9 @@ process.env.DOMAIN = 'https://scoutgame.xyz';
 async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: string }) {
   if (!process.env.BUILDER_SMART_CONTRACT_MINTER_PRIVKEY) {
     throw new Error('BUILDER_SMART_CONTRACT_MINTER_PRIVKEY is not set');
+  }
+  if (!process.env.REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS) {
+    throw new Error('REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS is not set');
   }
   const githubUser = await octokit.rest.users.getByUsername({ username: githubLogin });
   const profile = await getFarcasterUserById(fid);
@@ -63,7 +66,7 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   });
   console.log('Created a builder record', builder);
   await approveBuilder({ builderId: builder.id, season: currentSeason });
-  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/u/' + builder.path);
+  console.log('Builder profile approved:', 'https://scoutgame.xyz/u/' + builder.path);
   process.exit(0);
 }
 
@@ -84,4 +87,4 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
 // })();
 
 // run script to create builder
-// createBuilder({ fid: 240720, githubLogin: 'username' });
+createBuilder({ fid: 111, githubLogin: 'username' });
