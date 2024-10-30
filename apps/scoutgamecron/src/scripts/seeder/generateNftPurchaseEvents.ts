@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { currentSeason, getWeekFromDate } from '@packages/scoutgame/dates';
-import { BuilderInfo } from './generateSeedData';
-import { DateTime } from 'luxon';
-import { randomTimeOfDay } from './generator';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
+import { recordNftMintWithoutRefresh } from '@packages/scoutgame/builderNfts/recordNftMint';
+import { getWeekFromDate } from '@packages/scoutgame/dates';
+import { DateTime } from 'luxon';
+import { BuilderInfo } from './generateSeedData';
+import { randomTimeOfDay } from './generator';
 
 export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: BuilderInfo[], date: DateTime) {
   const week = getWeekFromDate(date.toJSDate());
@@ -25,47 +26,20 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
             id: builder.builderNftId
           },
           data: {
-            currentPrice: Math.ceil(nftPrice + nftPrice * 0.1)
+            currentPrice: Math.ceil(nftPrice + nftPrice * 0.1),
           }
-        }),
-          await tx.nFTPurchaseEvent.create({
-            data: {
-              id: faker.string.uuid(),
-              scoutId,
-              tokensPurchased: nftsPurchased,
-              txHash: faker.finance.ethereumAddress(),
-              // Converting points to fiat equivalent in order to reduce the number of points earned
-              pointsValue,
-              paidInPoints: false,
-              builderNftId,
-              activities: {
-                create: {
-                  recipientType: 'builder',
-                  type: 'nft_purchase',
-                  userId: builder.id,
-                  createdAt
-                }
-              },
-              builderEvent: {
-                create: {
-                  id: faker.string.uuid(),
-                  builderId: builder.id,
-                  season: currentSeason,
-                  week,
-                  type: 'nft_purchase',
-                  createdAt,
-                  pointsReceipts: {
-                    create: {
-                      id: faker.string.uuid(),
-                      recipientId: builder.id,
-                      value: pointsValue * 0.1,
-                      createdAt
-                    }
-                  }
-                }
-              }
-            }
-          });
+        })
+
+        await recordNftMintWithoutRefresh({
+          builderNftId,
+          amount: nftsPurchased,
+          paidWithPoints: false,
+          pointsValue,
+          scoutId,
+          mintTxHash: faker.finance.ethereumAddress(),
+          recipientAddress: faker.finance.ethereumAddress(),
+          createdAt
+        });
       });
     }
   }

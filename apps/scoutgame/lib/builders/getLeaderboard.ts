@@ -5,7 +5,8 @@ import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 export type LeaderBoardRow = {
   id: string;
   avatar: string | null;
-  username: string;
+  displayName: string;
+  path: string;
   builderStatus: BuilderStatus;
   progress: number;
   gemsCollected: number;
@@ -36,7 +37,8 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
         select: {
           id: true,
           avatar: true,
-          username: true,
+          path: true,
+          displayName: true,
           builderStatus: true,
           builderNfts: {
             select: {
@@ -59,7 +61,8 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
       return {
         id: weeklyTopBuilder.user.id,
         avatar: weeklyTopBuilder.user.avatar,
-        username: weeklyTopBuilder.user.username,
+        displayName: weeklyTopBuilder.user.displayName,
+        path: weeklyTopBuilder.user.path!,
         builderStatus: weeklyTopBuilder.user.builderStatus!,
         gemsCollected: weeklyTopBuilder.gemsCollected,
         progress,

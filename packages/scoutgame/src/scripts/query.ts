@@ -25,7 +25,7 @@ async function query() {
     const nft = nfts[i];
     console.log('Processing NFT', nft.tokenId, `--- ${i + 1} / ${nfts.length}`);
     await uploadArtwork({
-      username: nft.builder.username,
+      displayName: nft.builder.displayName,
       season: currentSeason,
       avatar: nft.builder.avatar as string,
       tokenId: nft.tokenId
@@ -34,7 +34,7 @@ async function query() {
     await uploadMetadata({
       season: currentSeason,
       tokenId: nft.tokenId,
-      username: nft.builder.username
+      path: nft.builder.path!
     });
   }
 }

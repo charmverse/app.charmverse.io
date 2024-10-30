@@ -123,8 +123,6 @@ export async function generateSeedData() {
       totalGithubEvents += dailyGithubEvents;
     }
 
-    await updateBuildersRank({ week });
-
     for (const scout of scouts) {
       // Do not purchase your own nft
       const dailyNftsPurchased = await generateNftPurchaseEvents(
@@ -136,9 +134,10 @@ export async function generateSeedData() {
     }
 
     await updateBuilderCardActivity(date.minus({ days: 1 }));
-
+    
     // Check if we are at the end of the week
     if (date.weekday === 7) {
+      await updateBuildersRank({ week });
       const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: 100, week });
       for (const { builder, gemsCollected, rank } of topWeeklyBuilders) {
         try {
@@ -172,6 +171,8 @@ export async function generateSeedData() {
       }
     }
   }
+
+  await updateBuildersRank({ week: getWeekFromDate(endDate.toJSDate()) });
 
   log.info('generated seed data', {
     totalUsers,

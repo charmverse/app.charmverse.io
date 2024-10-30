@@ -21,7 +21,7 @@ function PointsClaimSuccessModal({
   claimedPoints: number;
 }) {
   return (
-    <Dialog open={showModal} onClose={handleCloseModal} data-testid='claim-points-success-modal'>
+    <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
       <Stack gap={2} textAlign='center' my={2}>
         <Typography color='secondary' variant='h5' fontWeight={600}>
           Congratulations!
@@ -40,11 +40,11 @@ function PointsClaimSuccessModal({
 
 export function PointsClaimScreen({
   totalUnclaimedPoints,
-  username,
+  displayName,
   bonusPartners
 }: {
   totalUnclaimedPoints: number;
-  username: string;
+  displayName: string;
   bonusPartners: string[];
 }) {
   const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
@@ -98,7 +98,7 @@ export function PointsClaimScreen({
           >
             <Stack flexDirection='column' alignItems='center' gap={0.5}>
               <Typography variant='h6'>
-                <b>{username}</b> <span style={{ fontSize: '0.8em' }}>will receive</span>
+                <b>{displayName}</b> <span style={{ fontSize: '0.8em' }}>will receive</span>
               </Typography>
               <Stack flexDirection='row' alignItems='center' gap={1}>
                 <Typography variant='h4' fontWeight={500}>
@@ -123,7 +123,7 @@ export function PointsClaimScreen({
       ) : (
         <>
           <Typography textAlign='center' color='secondary' variant='h5'>
-            Hey {username},
+            Hey {displayName},
           </Typography>
           <Typography textAlign='center' variant='h6'>
             You have no rewards to claim.

@@ -44,6 +44,7 @@ export default async function Profile({
     <ProfilePage
       user={{
         ...user,
+        path: user.path!,
         ...userStats
       }}
       tab={tab}

@@ -15,10 +15,7 @@ export async function getBuilderScouts(builderId: string) {
     },
     select: {
       scout: {
-        select: {
-          displayName: true,
-          ...BasicUserInfoSelect
-        }
+        select: BasicUserInfoSelect
       },
       tokensPurchased: true
     }
@@ -32,6 +29,7 @@ export async function getBuilderScouts(builderId: string) {
     if (!existingScout) {
       scoutsRecord[event.scout.id] = {
         ...event.scout,
+        path: event.scout.path!,
         nfts: 0
       };
     }

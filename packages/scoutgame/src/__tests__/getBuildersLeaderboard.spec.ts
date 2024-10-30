@@ -100,14 +100,14 @@ describe('getBuildersLeaderboard', () => {
   it('should sort builders by username when gems collected and events are the same', async () => {
     const testWeek = v4();
     const builders = await Promise.all([
-      mockBuilder({ username: `charlie-${v4()}` }),
-      mockBuilder({ username: `alice-${v4()}` }),
-      mockBuilder({ username: `bob-${v4()}` }),
-      mockBuilder({ username: `david-${v4()}` }),
-      mockBuilder({ username: `eve-${v4()}` })
+      mockBuilder({ path: `charlie-${v4()}` }),
+      mockBuilder({ path: `alice-${v4()}` }),
+      mockBuilder({ path: `bob-${v4()}` }),
+      mockBuilder({ path: `david-${v4()}` }),
+      mockBuilder({ path: `eve-${v4()}` })
     ]);
 
-    const sortedBuilders = builders.sort((a, b) => a.username.localeCompare(b.username));
+    const sortedBuilders = builders.sort((a, b) => a.displayName.localeCompare(b.displayName));
 
     // Create weekly stats with 0 gems collected for all builders
     await Promise.all(
@@ -129,7 +129,7 @@ describe('getBuildersLeaderboard', () => {
 
     // Check if builders are sorted by username in ascending order
     sortedBuilders.forEach((builder, index) => {
-      expect(topBuilders[index].builder.username).toBe(builder.username);
+      expect(topBuilders[index].builder.displayName).toBe(builder.displayName);
     });
 
     // Verify that all builders have 0 gems collected
@@ -146,11 +146,12 @@ describe('getBuildersLeaderboard', () => {
   it('should only include builders with approved status', async () => {
     const testWeek = v4();
     const builders = await Promise.all([
-      mockBuilder({ username: `charlie-${v4()}`, builderStatus: 'approved' }),
-      mockBuilder({ username: `alice-${v4()}`, builderStatus: 'applied' }),
-      mockBuilder({ username: `bob-${v4()}`, builderStatus: 'rejected' }),
-      mockBuilder({ username: `david-${v4()}`, builderStatus: 'approved' }),
-      mockBuilder({ username: `eve-${v4()}`, builderStatus: 'approved' })
+      mockBuilder({ builderStatus: 'approved', displayName: 'Charlie' }),
+      mockBuilder({ builderStatus: 'approved', displayName: 'David' }),
+      mockBuilder({ builderStatus: 'approved', displayName: 'Eve' }),
+      mockBuilder({ builderStatus: 'applied', displayName: 'Alice' }),
+      mockBuilder({ builderStatus: 'banned', displayName: 'Foo' }),
+      mockBuilder({ builderStatus: 'rejected', displayName: 'Bob' })
     ]);
 
     // Create weekly stats with 0 gems collected for all builders

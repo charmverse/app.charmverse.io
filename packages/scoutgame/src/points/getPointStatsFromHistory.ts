@@ -22,19 +22,19 @@ const include: Prisma.PointsReceiptInclude = {
 };
 
 export async function getPointStatsFromHistory({
-  userIdOrUsername,
+  userIdOrPath,
   tx = prisma
 }: {
-  userIdOrUsername: string;
+  userIdOrPath: string;
   tx?: Prisma.TransactionClient;
 }): Promise<PointStats> {
-  if (!userIdOrUsername) {
-    throw new InvalidInputError('userIdOrUsername is required');
+  if (!userIdOrPath) {
+    throw new InvalidInputError('userIdOrPath is required');
   }
 
   const userId = await tx.scout
     .findUniqueOrThrow({
-      where: isUuid(userIdOrUsername) ? { id: userIdOrUsername } : { username: userIdOrUsername },
+      where: isUuid(userIdOrPath) ? { id: userIdOrPath } : { path: userIdOrPath },
       select: {
         id: true
       }

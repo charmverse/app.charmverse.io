@@ -3,7 +3,8 @@ import { currentSeason } from '@packages/scoutgame/dates';
 
 export type TopScout = {
   id: string;
-  username: string;
+  path: string;
+  displayName: string;
   avatar: string | null;
   buildersScouted: number;
   nftsHeld: number;
@@ -25,7 +26,8 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       user: {
         select: {
           id: true,
-          username: true,
+          path: true,
+          displayName: true,
           avatar: true,
           nftPurchaseEvents: {
             where: {
@@ -68,7 +70,8 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       const seasonPoints = scout.pointsEarnedAsScout;
       return {
         id: scout.user.id,
-        username: scout.user.username,
+        path: scout.user.path!,
+        displayName: scout.user.displayName,
         avatar: scout.user.avatar,
         buildersScouted,
         nftsHeld,

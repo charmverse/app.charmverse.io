@@ -35,21 +35,21 @@ async function createBuilders() {
           continue;
         }
         const displayName = profile.display_name;
-        const username = profile.username;
+        const path = profile.username;
         const avatarUrl = profile.pfp_url;
         const bio = profile.profile.bio.text;
-        if (!username) {
+        if (!path) {
           log.info(`No username found for ${login} with fid ${fid}`);
           continue;
         }
         const builder = await prisma.scout.upsert({
           where: {
-            username
+            path
           },
           update: {},
           create: {
             displayName,
-            username,
+            path,
             avatar: avatarUrl,
             bio,
             builderStatus: 'applied',

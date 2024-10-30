@@ -63,7 +63,7 @@ export async function processAllBuilderActivity(
     await processBuilderActivity({
       builderId: builder.id,
       githubUser: builder.githubUser[0]!,
-      createdAfter: newBuilder ? getDateFromISOWeek(season).toJSDate() : createdAfter,
+      createdAfter: newBuilder ? getDateFromISOWeek(getCurrentWeek()).toJSDate() : createdAfter,
       season
     });
 

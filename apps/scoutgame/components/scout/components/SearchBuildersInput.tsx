@@ -56,7 +56,7 @@ export function SearchBuildersInput() {
           }
           return (
             <li {...props}>
-              <Link href={`/u/${option.username}`} passHref legacyBehavior>
+              <Link href={`/u/${option.path}`} passHref legacyBehavior>
                 <Box
                   component='a'
                   sx={{
@@ -67,8 +67,8 @@ export function SearchBuildersInput() {
                     color: 'inherit'
                   }}
                 >
-                  <Avatar src={option.avatar} alt={option.username} sx={{ mr: 2 }} />
-                  <Typography variant='body1'>{option.username}</Typography>
+                  <Avatar src={option.avatar} alt={option.displayName} sx={{ mr: 2 }} />
+                  <Typography variant='body1'>{option.displayName}</Typography>
                 </Box>
               </Link>
             </li>
@@ -79,7 +79,7 @@ export function SearchBuildersInput() {
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         options={searchResults ?? []}
-        getOptionLabel={(option) => option.username}
+        getOptionLabel={(option) => option.displayName}
         onInputChange={(event, value) => setSearchTerm(value)}
         renderInput={(params) => (
           <TextField
@@ -100,7 +100,7 @@ export function SearchBuildersInput() {
             }}
           />
         )}
-        noOptionsText='Search by username'
+        noOptionsText='Search'
       />
     </>
   );

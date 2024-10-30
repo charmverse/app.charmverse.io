@@ -6,27 +6,28 @@ import { PointsIcon } from 'components/common/Icons';
 import { BuilderCardActivity } from './BuilderCardActivity/BuilderCardActivity';
 
 export function BuilderCardStats({
-  username,
+  displayName,
   builderPoints,
   nftsSold,
   rank,
   last7DaysGems,
   size
 }: {
-  username: string;
+  displayName: string;
   builderPoints?: number;
   nftsSold?: number;
   rank?: number;
   last7DaysGems?: number[];
   size: 'x-small' | 'small' | 'medium' | 'large';
 }) {
+  const mdFontSize = size === 'medium' || size === 'large' ? '14px' : '12px';
   return (
     <Stack
       alignItems='center'
       pt={0.25}
       gap={{
         xs: 0,
-        md: size === 'medium' || size === 'large' ? 0.25 : 0.1
+        md: size === 'medium' || size === 'large' ? 0.25 : 0
       }}
       width='100%'
       height='100%'
@@ -36,11 +37,11 @@ export function BuilderCardStats({
         sx={{
           fontSize: {
             xs: '11.5px',
-            md: '14px'
+            md: mdFontSize
           }
         }}
       >
-        @{username}
+        {displayName}
       </Typography>
       <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between' gap={1}>
         {typeof builderPoints === 'number' && (
@@ -50,7 +51,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -69,7 +70,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -87,7 +88,7 @@ export function BuilderCardStats({
                 sx={{
                   fontSize: {
                     xs: '12px',
-                    md: '14px'
+                    md: mdFontSize
                   }
                 }}
                 component='span'
@@ -107,7 +108,7 @@ export function BuilderCardStats({
             color: 'text.secondary',
             fontSize: {
               xs: '7.5px',
-              md: '10px'
+              md: size === 'medium' || size === 'large' ? '10px' : '8px'
             }
           }}
         >
