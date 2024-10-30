@@ -22,6 +22,8 @@ const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   common: 10
 };
 
+export type FindOrCreateUserResult = Pick<Scout, 'id' | 'onboardedAt'> & { scoutWallet?: ScoutWallet[] };
+
 export async function findOrCreateUser({
   newUserId,
   farcasterId,
@@ -38,7 +40,7 @@ export async function findOrCreateUser({
   displayName: string;
   path: string;
   tierOverride?: ConnectWaitlistTier;
-}): Promise<Scout & { scoutWallet?: ScoutWallet[] }> {
+}): Promise<FindOrCreateUserResult> {
   if (!farcasterId && !walletAddresses?.length) {
     throw new InvalidInputError('Missing required fields for user creation');
   }
@@ -49,7 +51,11 @@ export async function findOrCreateUser({
     : undefined;
 
   const scout = await prisma.scout.findFirst({
-    where: farcasterId ? { farcasterId } : { scoutWallet: { some: { address: { in: lowercaseAddresses } } } }
+    where: farcasterId ? { farcasterId } : { scoutWallet: { some: { address: { in: lowercaseAddresses } } } },
+    select: {
+      id: true,
+      onboardedAt: true
+    }
   });
 
   if (scout) {
