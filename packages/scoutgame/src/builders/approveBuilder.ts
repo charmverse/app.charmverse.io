@@ -12,6 +12,14 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
   if (!baseUrl) {
     throw new Error('DOMAIN is not set');
   }
+  const scout = await prisma.scout.findUniqueOrThrow({
+    where: {
+      id: builderId
+    },
+    include: {
+      githubUser: true
+    }
+  });
 
   // Register an NFT for the builder
   await registerBuilderNFT({
