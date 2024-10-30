@@ -112,9 +112,9 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'username'}
-                  direction={sortField === 'username' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('username')}
+                  active={sortField === 'path'}
+                  direction={sortField === 'path' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('path')}
                 >
                   Username
                 </TableSortLabel>
@@ -162,7 +162,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.username}</TableCell>
+                <TableCell>{user.path}</TableCell>
                 <TableCell>{user.id}</TableCell>
                 <TableCell>{user.farcasterId}</TableCell>
                 <TableCell>{user.builderStatus || 'N/A'}</TableCell>

@@ -81,8 +81,7 @@ export function PublicBuilderProfileContainer({
                   <UserProfile
                     user={{
                       ...builder,
-                      avatar: null,
-                      path: null
+                      avatar: null
                     }}
                   />
                   <PublicBuilderStats
