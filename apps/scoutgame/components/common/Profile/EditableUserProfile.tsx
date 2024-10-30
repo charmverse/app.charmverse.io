@@ -57,8 +57,9 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
       gap={2}
       alignItems='center'
       flexDirection='row'
+      my={1}
       p={{
-        xs: 0,
+        xs: 1,
         md: 2
       }}
     >
@@ -70,7 +71,9 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
             sx={{
               position: 'relative',
               width: 75,
+              minWidth: 75,
               height: 75,
+              minHeight: 75,
               borderRadius: '50%',
               backgroundColor: 'inputBackground.main'
             }}
@@ -101,6 +104,9 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
                 backgroundColor: 'white',
                 p: 0.25
               }}
+              onClick={() => {
+                inputRef.current?.click();
+              }}
               color='primary'
             >
               <EditIcon fontSize='small' />
@@ -115,6 +121,7 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
                 height={75}
                 sizes='100vw'
                 style={{
+                  objectFit: 'cover',
                   borderRadius: '50%'
                 }}
               />
@@ -122,8 +129,8 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
           </Box>
         )}
       />
-      <Stack direction='row' alignItems='center' flexWrap='wrap' justifyContent='space-between' width='100%'>
-        <Stack>
+      <Stack direction='row' alignItems='center' flexWrap='wrap' justifyContent='space-between' width='100%' gap={1}>
+        <Stack maxWidth='85%'>
           {isEditingName ? (
             <Controller
               name='displayName'
