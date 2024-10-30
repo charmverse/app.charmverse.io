@@ -186,7 +186,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
     userId: builderNft.builderId,
     amount,
     paidWithPoints,
-    builderPath: builderNft.builder.path,
+    builderPath: builderNft.builder.path!,
     season: builderNft.season
   });
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
