@@ -1,5 +1,6 @@
 'use client';
 
+import { usePageView } from '@connect-shared/hooks/usePageView';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -21,6 +22,7 @@ const desktopVariants = {
 export function Template({ children }: { children: ReactNode }) {
   const path = usePathname();
   const theme = useTheme();
+  usePageView();
   const matchesMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   if (path.startsWith('/info')) {
