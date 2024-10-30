@@ -31,7 +31,7 @@ export async function getUsers({
       !userFid && typeof searchString === 'string'
         ? {
             _relevance: {
-              fields: ['path', 'walletAddress', 'displayName', 'email', 'id'],
+              fields: ['path', 'displayName', 'email', 'id'],
               search: searchString,
               sort: 'desc'
             }
