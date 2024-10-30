@@ -28,6 +28,8 @@ export async function resolveMissingPurchases({ minutesAgoToNow }: { minutesAgoT
 
   const earliestBlock = await client.getBlock({ blockNumber: BigInt(earliestBlockNumber) });
 
+  log.info(`Resyncing mint transactions from block ${earliestBlock.number} to ${lastBlock.number}`);
+
   const onchainPurchaseData = await getAndParseNftMintLogs({
     fromBlock: earliestBlock.number,
     toBlock: lastBlock.number
