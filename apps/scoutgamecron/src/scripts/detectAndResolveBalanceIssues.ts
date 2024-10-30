@@ -1,5 +1,6 @@
 import { log } from "@charmverse/core/log";
 import { prisma } from "@charmverse/core/prisma-client";
+import { currentSeason, getCurrentWeek } from "@packages/scoutgame/dates";
 import { getPointStatsFromHistory } from "@packages/scoutgame/points/getPointStatsFromHistory";
 
 
@@ -41,6 +42,35 @@ async function detectBalanceIssues() {
         pointDetails: balances
       });
     }
+  }
+
+  return scoutsWithBalanceIssues;
+}
+
+async function resolveBalanceIssues() {
+  const balanceIssues = await detectBalanceIssues();
+
+  for (let i = 0; i < balanceIssues.length; i++) {
+    const balanceToResolve = balanceIssues[i];
+
+    await prisma.builderEvent.create({
+      data: {
+        season: currentSeason,
+        type: 'misc_event',
+        week: getCurrentWeek(),
+        builder: {
+          connect: {
+            id: balanceToResolve.scoutId
+          }
+        },
+        pointsReceipts: {
+          create: {
+            value: balanceToResolve.expectedBalance - balanceToResolve.currentBalance,
+            recipientId: balanceToResolve.scoutId
+          }
+        }
+      }
+    })
   }
 }
 
