@@ -145,7 +145,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
 
   const createdPageIds = (await Promise.all(rewardsPromises)).filter(isTruthy);
 
-  const updatedFields = { ...fields, pendingRewards: rewardsToCreate };
+  // keep a copy of the pending rewards that were published
+  const updatedFields = { ...fields, pendingRewards: rewardsToCreate, pendingRewardsPublished: pendingRewards };
 
   const updatedProposal = await prisma.proposal.update({
     where: {
