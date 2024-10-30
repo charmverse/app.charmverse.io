@@ -29,7 +29,7 @@ export function WalletLogin() {
 function WalletLoginButton() {
   const [isConnecting, setIsConnecting] = useState(false);
   const { openConnectModal } = useConnectModal();
-  const { address, chainId, isConnected } = useAccount();
+  const { address, chainId, isConnected, isConnecting: isConnectingAccount } = useAccount();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
   const inviteCode = searchParams.get('invite-code');
@@ -86,6 +86,8 @@ function WalletLoginButton() {
     }
   }, [address, isConnected, isConnecting]);
 
+  const isLoading = isExecuting || isConnectingAccount || isConnecting;
+
   return (
     <Box width='100%'>
       {errorWalletMessage && (
@@ -94,7 +96,7 @@ function WalletLoginButton() {
         </Typography>
       )}
       <LoadingButton
-        loading={isExecuting}
+        loading={isLoading}
         size='large'
         variant='contained'
         sx={{
@@ -116,7 +118,7 @@ function WalletLoginButton() {
               setIsConnecting(true);
             }}
           >
-            {isExecuting ? '' : 'Sign in with wallet'}
+            {isLoading ? '' : 'Sign in with wallet'}
           </Typography>
         </Stack>
       </LoadingButton>
