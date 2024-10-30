@@ -25,6 +25,6 @@ export async function findOrCreateWalletUser({
     avatar: ensDetails?.avatar || undefined,
     walletAddress: wallet,
     displayName: ens || shortenHex(wallet),
-    username: shortenHex(wallet)
+    path: shortenHex(wallet)
   });
 }

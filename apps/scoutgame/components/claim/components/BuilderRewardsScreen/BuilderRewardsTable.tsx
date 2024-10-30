@@ -13,11 +13,11 @@ function BuilderRewardsTableRow({ reward }: { reward: BuilderReward }) {
   return (
     <TableRow>
       <TableCell>
-        <Link href={`/u/${reward.username}`}>
+        <Link href={`/u/${reward.path}`}>
           <Stack direction='row' alignItems='center' gap={1}>
-            <Avatar src={reward.avatar} name={reward.username} size='small' />
+            <Avatar src={reward.avatar} name={reward.path!} size='small' />
             <Typography noWrap overflow='hidden'>
-              {reward.username}
+              {reward.displayName}
             </Typography>
           </Stack>
         </Link>
@@ -64,7 +64,7 @@ export function BuilderRewardsTable({
         }}
       >
         {builderRewards.map((reward) => (
-          <BuilderRewardsTableRow key={reward.username} reward={reward} />
+          <BuilderRewardsTableRow key={reward.path} reward={reward} />
         ))}
         <TableRow>
           <TableCell colSpan={week ? 3 : 2}>

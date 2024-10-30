@@ -9,7 +9,10 @@ export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
 type NftPurchaseActivity = {
   type: 'nft_purchase';
-  scout: string;
+  scout: {
+    path: string;
+    displayName: string;
+  };
 };
 
 type MergedPullRequestActivity = {
@@ -59,7 +62,8 @@ export async function getBuilderActivities({
         select: {
           scout: {
             select: {
-              username: true
+              path: true,
+              displayName: true
             }
           },
           tokensPurchased: true
@@ -90,10 +94,14 @@ export async function getBuilderActivities({
       if (event.type === 'nft_purchase' && event.nftPurchaseEvent) {
         return {
           ...event.builder,
+          path: event.builder.path!,
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout.username
+          scout: {
+            path: event.nftPurchaseEvent.scout.path!,
+            displayName: event.nftPurchaseEvent.scout.displayName
+          }
         };
       } else if (
         (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&
@@ -102,6 +110,7 @@ export async function getBuilderActivities({
       ) {
         return {
           ...event.builder,
+          path: event.builder.path!,
           id: event.id,
           createdAt: event.createdAt,
           type: 'github_event' as const,

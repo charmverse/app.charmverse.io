@@ -1,10 +1,6 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { mockBuilder, mockBuilderNft } from '@packages/scoutgame/testing/database';
-import { delay } from '@root/lib/utils/async';
-import { custom, http } from 'viem';
-import { optimism } from 'viem/chains';
 
 import { expect, test } from '../test';
 
@@ -37,7 +33,10 @@ test.describe('Buy Nft', () => {
     });
 
     await userPage.mockNftAPIs({
-      builder,
+      builder: {
+        id: builder.id,
+        path: builder.path!
+      },
       isSuccess: true
     });
 
@@ -45,8 +44,8 @@ test.describe('Buy Nft', () => {
     await page.goto(`/home`);
     await page.waitForURL('**/home');
 
-    await page.goto(`/u/${builder.username}`);
-    await page.waitForURL(`**/u/${builder.username}`);
+    await page.goto(`/u/${builder.path}`);
+    await page.waitForURL(`**/u/${builder.path}`);
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();

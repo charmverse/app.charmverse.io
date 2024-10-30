@@ -3,7 +3,8 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 export type BuilderReward = {
-  username: string;
+  path: string | null;
+  displayName: string;
   avatar: string | null;
   points: number;
   rank: number | null;
@@ -44,7 +45,8 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
               builder: {
                 select: {
                   id: true,
-                  username: true,
+                  path: true,
+                  displayName: true,
                   avatar: true
                 }
               }
@@ -71,7 +73,8 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
     if (cardsHeld) {
       if (!builderRewardsRecord[builderId]) {
         builderRewardsRecord[builderId] = {
-          username: builder.username,
+          path: builder.path,
+          displayName: builder.displayName,
           avatar: builder.avatar,
           cardsHeld,
           points: 0,
@@ -131,7 +134,8 @@ export async function getWeeklyBuilderRewards({
               builder: {
                 select: {
                   id: true,
-                  username: true,
+                  path: true,
+                  displayName: true,
                   avatar: true,
                   userWeeklyStats: {
                     where: {
@@ -167,10 +171,11 @@ export async function getWeeklyBuilderRewards({
       }
       return {
         rank,
-        username: builder.username,
+        path: builder.path,
         avatar: builder.avatar,
         points: receipt.value,
-        cardsHeld
+        cardsHeld,
+        displayName: builder.displayName
       };
     })
     .filter(isTruthy)

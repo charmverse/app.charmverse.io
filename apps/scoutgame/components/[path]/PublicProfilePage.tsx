@@ -34,7 +34,7 @@ export function PublicProfilePage({ user, tab }: { user: UserProfile; tab: strin
         </Hidden>
         <PublicProfileTabsMenu
           tab={tab}
-          username={user.username}
+          path={user.path}
           isApprovedBuilder={user.builderStatus === 'approved' || user.builderStatus === 'banned'}
         />
         {tab === 'builder' ? (

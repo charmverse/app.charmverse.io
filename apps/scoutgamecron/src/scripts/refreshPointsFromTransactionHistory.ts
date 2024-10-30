@@ -5,7 +5,7 @@ import { prettyPrint } from '@packages/utils/strings';
 
 async function refreshPointsFromTransactionHistory() {
   const scouts = await prisma.scout.findMany({
-    select: { id: true, username: true },
+    select: { id: true, path: true },
     orderBy: {
       id: 'asc'
     },
@@ -19,11 +19,11 @@ async function refreshPointsFromTransactionHistory() {
   for (let i = 0; i < scouts.length; i++) {
     const scout = scouts[i];
     try {
-      log.info(`Fixing points for ${scout.username} ${i + 1} / ${scouts.length}`);
-      const stats = await refreshPointStatsFromHistory({ userIdOrUsername: scout.id });
-      log.info(`Successfully fixed points for ${scout.username}. New balance: ${stats.balance}`);
+      log.info(`Fixing points for ${scout.path} ${i + 1} / ${scouts.length}`);
+      const stats = await refreshPointStatsFromHistory({ userIdOrPath: scout.id });
+      log.info(`Successfully fixed points for ${scout.path}. New balance: ${stats.balance}`);
     } catch (error) {
-      log.error(`Failed to fix points for ${scout.username}: ${prettyPrint(error)}`);
+      log.error(`Failed to fix points for ${scout.path}: ${prettyPrint(error)}`);
     }
   }
 }

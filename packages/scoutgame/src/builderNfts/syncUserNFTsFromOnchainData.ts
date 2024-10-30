@@ -1,35 +1,36 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import {
-  optimismUsdcContractAddress,
-  realOptimismMainnetBuildersContract
-} from '@packages/scoutgame/builderNfts/constants';
-import { getOnchainPurchaseEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
-import { getTokenPurchasePrice } from '@packages/scoutgame/builderNfts/getTokenPurchasePrice';
-import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
-import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 
-async function syncUserNFTsFromOnchainData({
-  username,
-  scoutId
+import { savePendingTransaction } from '../savePendingTransaction';
+
+import { optimismUsdcContractAddress, realOptimismMainnetBuildersContract } from './constants';
+import { getOnchainPurchaseEvents } from './getOnchainPurchaseEvents';
+import { getTokenPurchasePrice } from './getTokenPurchasePrice';
+import { handlePendingTransaction } from './handlePendingTransaction';
+
+export async function syncUserNFTsFromOnchainData({
+  path,
+  scoutId,
+  fromBlock
 }: {
-  username?: string;
+  path?: string;
   scoutId?: string;
+  fromBlock?: number;
 }): Promise<void> {
-  if (!username && !scoutId) {
-    throw new Error('Either username or scoutId must be provided');
-  } else if (username && scoutId) {
-    throw new Error('Only one of username or scoutId can be provided');
+  if (!path && !scoutId) {
+    throw new Error('Either path or scoutId must be provided');
+  } else if (path && scoutId) {
+    throw new Error('Only one of path or scoutId can be provided');
   }
 
   const scout = await prisma.scout.findFirstOrThrow({
     where: {
       id: scoutId,
-      username
+      path
     }
   });
 
-  const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id });
+  const userPurchases = await getOnchainPurchaseEvents({ scoutId: scout.id, fromBlock });
 
   const txRequiringReconciliation = userPurchases.filter((p) => !p.nftPurchase);
 

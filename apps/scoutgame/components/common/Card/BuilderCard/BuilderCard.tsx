@@ -9,7 +9,7 @@ import { ScoutButton } from '../../ScoutButton/ScoutButton';
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
 
-type RequiredBuilderInfoFields = 'username' | 'builderStatus' | 'id';
+type RequiredBuilderInfoFields = 'displayName' | 'builderStatus' | 'id' | 'path';
 
 export function BuilderCard({
   builder,
@@ -36,7 +36,7 @@ export function BuilderCard({
     >
       <BuilderCardNftDisplay
         nftImageUrl={builder.nftImageUrl}
-        username={builder.username}
+        path={builder.path}
         showHotIcon={showHotIcon}
         size={size}
         hideDetails={hideDetails}

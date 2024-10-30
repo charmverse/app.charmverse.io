@@ -30,7 +30,7 @@ export async function processBuilderActivity({
   const timer = DateTime.now();
   const week = getWeekFromDate(now.toJSDate());
 
-  const { commits, pullRequests, newOwnerRepos } = await getBuilderActivity({
+  const { commits, pullRequests } = await getBuilderActivity({
     login: githubUser.login,
     after: createdAfter
   });
@@ -57,25 +57,8 @@ export async function processBuilderActivity({
     newCommits: newCommits.length,
     prs: pullRequests.length,
     newPrs: newPullRequests.length,
-    newRepos: newOwnerRepos.map((r) => r.full_name),
     userId: builderId
   });
-
-  if (newOwnerRepos.length) {
-    await prisma.githubRepo.createMany({
-      data: newOwnerRepos.map((repo) => ({
-        id: repo.id,
-        owner: repo.owner.login,
-        name: repo.name,
-        ownerType: 'user',
-        defaultBranch: repo.default_branch || 'main'
-      }))
-    });
-    log.debug('Created new repos based on commit from owner', {
-      newRepos: newOwnerRepos.map((r) => r.full_name),
-      userId: builderId
-    });
-  }
 
   // Loop thru new pull requests
   for (const pullRequest of newPullRequests) {

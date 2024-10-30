@@ -38,12 +38,12 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   // }
   const builder = await prisma.scout.upsert({
     where: {
-      username
+      path: username
     },
     update: {},
     create: {
       displayName,
-      username,
+      path: username,
       avatar: avatarUrl,
       bio,
       builderStatus: 'applied',
@@ -63,7 +63,7 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   });
   console.log('Created a builder record', builder);
   await approveBuilder({ builderId: builder.id, season: currentSeason });
-  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/u/' + builder.username);
+  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/u/' + builder.path);
   process.exit(0);
 }
 
