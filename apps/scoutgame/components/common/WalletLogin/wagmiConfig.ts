@@ -18,6 +18,7 @@ import {
 
 export function getConfig() {
   const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
+
   const wagmiChains = [
     mainnet,
     sepolia,

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
 import { mockBuilder, mockUserWeeklyStats } from '@packages/scoutgame/testing/database';
-
-import { updateBuildersRank } from '../updateBuildersRank';
 
 const mockWeek = '2021-w21';
 

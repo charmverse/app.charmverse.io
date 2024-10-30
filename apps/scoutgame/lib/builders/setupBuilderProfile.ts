@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
-import { currentSeason } from '@packages/scoutgame/dates';
+import { approveBuilder } from '@packages/scoutgame/builders/approveBuilder';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
-import { authSecret, baseUrl } from '@root/config/constants';
+import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 
@@ -118,23 +117,19 @@ export async function setupBuilderProfile({
   });
 
   // mark builder as applied if they haven't been marked as such yet
-  if (scout.builderStatus === null || inviteCode) {
+  if (scout.builderStatus === null) {
     await prisma.scout.update({
       where: {
         id: unsealedUserId
       },
       data: {
-        builderStatus: inviteCode ? 'approved' : 'applied',
+        builderStatus: 'applied',
         onboardedAt: new Date()
       }
     });
   }
 
   if (inviteCode !== null) {
-    await registerBuilderNFT({
-      imageHostingBaseUrl: baseUrl,
-      builderId: unsealedUserId,
-      season: currentSeason
-    });
+    await approveBuilder({ builderId: unsealedUserId });
   }
 }

@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
 import type { Season } from '@packages/scoutgame/dates';
 import { getCurrentWeek, currentSeason, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import type Koa from 'koa';
 
 import { processBuilderActivity } from './processBuilderActivity';
-import { updateBuildersRank } from './updateBuildersRank';
 
 type ProcessPullRequestsOptions = {
   createdAfter?: Date;

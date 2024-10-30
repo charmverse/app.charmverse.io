@@ -3,11 +3,11 @@ import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
-import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
+import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
 
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
-import { updateBuildersRank } from '../../tasks/processBuilderActivity/updateBuildersRank';
+import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
 
 import { generateBuilder } from './generateBuilder';
 import { generateBuilderEvents } from './generateBuilderEvents';
@@ -111,15 +111,13 @@ export async function generateSeedData() {
     const week = getWeekFromDate(date.toJSDate());
 
     for (const builder of builders) {
-      const dailyGithubEvents = await generateBuilderEvents(
-        {
-          builderId: builder.id,
-          githubUser: builder.githubUser,
-          githubRepos: builder.assignedRepos,
-          repoPRCounters,
-          date
-        }
-      );
+      const dailyGithubEvents = await generateBuilderEvents({
+        builderId: builder.id,
+        githubUser: builder.githubUser,
+        githubRepos: builder.assignedRepos,
+        repoPRCounters,
+        date
+      });
       totalGithubEvents += dailyGithubEvents;
     }
 
@@ -134,7 +132,7 @@ export async function generateSeedData() {
     }
 
     await updateBuilderCardActivity(date.minus({ days: 1 }));
-    
+
     // Check if we are at the end of the week
     if (date.weekday === 7) {
       await updateBuildersRank({ week });
