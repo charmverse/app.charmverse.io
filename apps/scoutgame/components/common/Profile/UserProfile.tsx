@@ -27,7 +27,7 @@ type UserProfileProps = {
 
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const isDesktop = useMdScreen();
-  const { displayName, path, bio, avatar, githubLogin, farcasterUsername } = user;
+  const { displayName, bio, avatar, githubLogin, farcasterUsername } = user;
   const isMounted = useIsMounted();
 
   // We are using the mounted flag here because MUI media query returns false on the server and true on the client and it throws warnings

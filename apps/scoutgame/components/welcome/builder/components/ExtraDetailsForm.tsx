@@ -98,7 +98,6 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
               control={control}
               user={{
                 ...user,
-                bio: null,
                 avatar: user.avatar as string
               }}
             />

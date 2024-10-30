@@ -2,20 +2,16 @@
 
 import type { Scout } from '@charmverse/core/prisma';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, CircularProgress, IconButton, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, IconButton, Stack, TextField, Typography } from '@mui/material';
 import Image from 'next/image';
+import { useState } from 'react';
 import { Controller, useController, type Control } from 'react-hook-form';
 
 import { useIsMounted } from 'hooks/useIsMounted';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 
-import type { AvatarSize } from '../Avatar';
-
-import { ProfileLinks } from './ProfileLinks';
-
 export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
-  bio?: string | null;
   avatar: string;
   displayName: string;
   githubLogin?: string;
@@ -24,7 +20,6 @@ export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
 
 type UserProfileProps = {
   user: UserProfileData;
-  avatarSize?: AvatarSize;
   control: Control<
     {
       avatar: string;
@@ -34,10 +29,11 @@ type UserProfileProps = {
   >;
 };
 
-export function EditableUserProfile({ user, avatarSize = 'xLarge', control }: UserProfileProps) {
+export function EditableUserProfile({ user, control }: UserProfileProps) {
   const isDesktop = useMdScreen();
-  const { displayName, bio, githubLogin, farcasterUsername } = user;
+  const { displayName } = user;
   const isMounted = useIsMounted();
+  const [isEditingName, setIsEditingName] = useState(false);
 
   const { field } = useController({
     name: 'avatar',
@@ -126,21 +122,34 @@ export function EditableUserProfile({ user, avatarSize = 'xLarge', control }: Us
           </Box>
         )}
       />
-      <Stack>
-        <Stack direction='row' alignItems='center' flexWrap='wrap'>
-          <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <ProfileLinks farcasterUsername={farcasterUsername} githubLogin={githubLogin} />
+      <Stack direction='row' alignItems='center' flexWrap='wrap' justifyContent='space-between' width='100%'>
+        <Stack>
+          {isEditingName ? (
+            <Controller
+              name='displayName'
+              control={control}
+              render={({ field: displayNameField, fieldState: { error } }) => (
+                <TextField
+                  required
+                  {...displayNameField}
+                  fullWidth
+                  error={!!error?.message}
+                  sx={{
+                    '& .MuiInputBase-input': {
+                      padding: 1,
+                      fontSize: isDesktop
+                        ? (theme) => theme.typography.h5.fontSize
+                        : (theme) => theme.typography.h6.fontSize
+                    }
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
+          )}
         </Stack>
-        {bio ? (
-          <Typography
-            variant={isDesktop ? 'body2' : 'caption'}
-            overflow='hidden'
-            textOverflow='ellipsis'
-            maxWidth='500px'
-          >
-            {bio}
-          </Typography>
-        ) : null}
+        <EditIcon fontSize='small' onClick={() => setIsEditingName(true)} />
       </Stack>
     </Stack>
   );
