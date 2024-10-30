@@ -6,14 +6,16 @@ import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
 import { v4 } from 'uuid';
+import type { Address } from 'viem';
+import { isAddress } from 'viem/utils';
 
 export async function findOrCreateUser({
   newUserId,
   farcasterId,
-  walletAddress,
+  walletAddresses,
   ...userProps
 }: {
-  walletAddress?: string;
+  walletAddresses?: string[];
   farcasterId?: number;
   walletENS?: string;
   newUserId?: string;
@@ -22,14 +24,17 @@ export async function findOrCreateUser({
   displayName: string;
   username: string;
 }): Promise<Scout> {
-  if (!farcasterId && !walletAddress) {
+  if (!farcasterId && !walletAddresses?.length) {
     throw new InvalidInputError('Missing required fields for user creation');
   }
 
-  const lowercaseAddress = walletAddress?.toLowerCase();
+  // Only valid addresses are included
+  const lowercaseAddresses = walletAddresses
+    ? walletAddresses.map((a) => a.toLowerCase()).filter((a): a is Address => isAddress(a))
+    : undefined;
 
   const scout = await prisma.scout.findFirst({
-    where: farcasterId ? { farcasterId } : { walletAddress: lowercaseAddress }
+    where: farcasterId ? { farcasterId } : { scoutWallet: { some: { address: { in: lowercaseAddresses } } } }
   });
 
   if (scout) {
@@ -51,9 +56,8 @@ export async function findOrCreateUser({
   }
 
   // retrieve ENS name if wallet address is provided
-
-  if (walletAddress && !userProps.walletENS) {
-    const ens = await getENSName(walletAddress).catch((error) => {
+  if (walletAddresses?.length && !userProps.walletENS) {
+    const ens = await getENSName(walletAddresses[0]).catch((error) => {
       log.warn('Could not retrieve ENS while creating a user', { error });
       return null;
     });
@@ -64,7 +68,13 @@ export async function findOrCreateUser({
     data: {
       ...userProps,
       id: userId,
-      walletAddress: lowercaseAddress,
+      scoutWallet: lowercaseAddresses?.length
+        ? {
+            create: lowercaseAddresses?.map((address) => ({
+              address
+            }))
+          }
+        : undefined,
       farcasterId
     }
   });
