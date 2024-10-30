@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
 import { Dialog } from 'components/common/Dialog';
+import { usePurchase } from 'components/layout/PurchaseProvider';
 import { useSmScreen } from 'hooks/useMediaScreens';
 
 import type { NFTPurchaseProps } from './components/NFTPurchaseForm';
@@ -26,12 +27,19 @@ function NFTPurchaseDialogComponent(props: NFTPurchaseDialogProps) {
   // we need to keep track of this so we can close the modal when the user cancels
   const [isRainbowKitOpen, setIsRainbowKitOpen] = useState(false);
 
+  const { clearPurchaseSuccess } = usePurchase();
+
+  function onClose() {
+    clearPurchaseSuccess();
+    props.onClose();
+  }
+
   // open Rainbowkit modal if not connected
   useEffect(() => {
     // If rainbowkit modal was closed by user, but our state is not updated yet, update it so we reset the parent open state
     if (!connectModalOpen && isRainbowKitOpen && !address) {
       setIsRainbowKitOpen(false);
-      props.onClose();
+      onClose();
     } else if (props.open && !address) {
       openConnectModal?.();
       setIsRainbowKitOpen(true);
@@ -42,7 +50,7 @@ function NFTPurchaseDialogComponent(props: NFTPurchaseDialogProps) {
     <Dialog
       fullScreen={!isDesktop}
       open={props.open && !!address}
-      onClose={props.onClose}
+      onClose={onClose}
       title={`Scout ${props.builder.displayName}`}
       maxWidth='md'
     >
