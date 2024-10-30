@@ -4,6 +4,7 @@ import { getENSDetails, getENSName } from '@root/lib/blockchain/getENSName';
 import { shortenHex } from '@root/lib/utils/blockchain';
 
 import { findOrCreateUser } from 'lib/users/findOrCreateUser';
+import { generateRandomName } from 'lib/utils/generateRandomName';
 
 export async function findOrCreateWalletUser({
   wallet,
@@ -24,7 +25,7 @@ export async function findOrCreateWalletUser({
     walletENS: ens || undefined,
     avatar: ensDetails?.avatar || undefined,
     walletAddresses: [wallet],
-    displayName: ens || shortenHex(wallet),
+    displayName: ens || generateRandomName(),
     path: shortenHex(wallet)
   });
 }
