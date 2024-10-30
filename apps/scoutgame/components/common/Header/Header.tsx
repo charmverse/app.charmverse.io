@@ -139,7 +139,7 @@ export function Header() {
                   </Menu>
                 </Box>
               ) : (
-                <Button variant='gradient' LinkComponent={Link} href='/login' data-test='sign-in-button'>
+                <Button variant='gradient' href='/login' data-test='sign-in-button'>
                   Sign in
                 </Button>
               )}
