@@ -27,7 +27,7 @@ export async function detectBalanceIssues() {
     const scout = scouts[i];
 
     const balances = await getPointStatsFromHistory({
-      userIdOrUsername: scout.id
+      userIdOrPath: scout.id
     });
 
     if (balances.balance !== scout.currentBalance) {
