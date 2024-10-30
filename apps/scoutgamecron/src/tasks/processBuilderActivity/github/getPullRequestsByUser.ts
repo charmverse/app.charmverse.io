@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
 
-import { decodeGithubUserId } from './decodeGithubUserId';
 import { octokit } from './octokit';
 
 export type PullRequest = {
   author: {
-    id: number;
+    id: number | string;
     login: string;
   };
   baseRefName: string; // eg "main"
@@ -108,36 +107,14 @@ export async function getPullRequestsByUser({ login, after }: { login: string; a
     }
   }
 
-  return (
-    allItems
-
-      // Filter out PRs closed or merged in the last 24 hours
-
-      .filter((node) => {
-        // Some bots such as dependabot do not have an author id
-        if (!node.author.id) {
-          return false;
-        }
-
-        if (typeof node.author.id === 'string') {
-          const decodedId = decodeGithubUserId(node.author.id, node.author.login);
-          if (decodedId) {
-            node.author.id = decodedId;
-            return true;
-          }
-          return false;
-        }
-        return typeof node.author.id === 'number';
-      })
-      .map((node) => {
-        return {
-          ...node,
-          author: node.author,
-          repository: {
-            ...node.repository,
-            id: node.repository.databaseId
-          }
-        };
-      })
-  );
+  return allItems.map((node) => {
+    return {
+      ...node,
+      author: node.author,
+      repository: {
+        ...node.repository,
+        id: node.repository.databaseId
+      }
+    };
+  });
 }

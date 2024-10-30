@@ -32,6 +32,7 @@ export async function processBuilderActivity({
 
   const { commits, pullRequests } = await getBuilderActivity({
     login: githubUser.login,
+    githubuserId: githubUser.id,
     after: createdAfter
   });
 
@@ -81,10 +82,13 @@ export async function processBuilderActivity({
           await recordMergedPullRequest({ pullRequest, repo, season });
         }
       } catch (error) {
-        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
+        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, {
+          error,
+          userId: builderId
+        });
       }
     } else {
-      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
+      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`, { userId: builderId });
     }
   }
 
@@ -93,7 +97,7 @@ export async function processBuilderActivity({
     try {
       await recordCommit({ commit, season });
     } catch (error) {
-      log.error(`Error processing commit ${commit.sha}`, { error });
+      log.error(`Error processing commit ${commit.sha}`, { error, userId: builderId });
     }
   }
 

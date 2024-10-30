@@ -20,7 +20,15 @@ export type BuilderActivities = {
   }[];
 };
 
-export async function getBuilderActivity({ login, after }: { login: string; after: Date }): Promise<BuilderActivities> {
+export async function getBuilderActivity({
+  login,
+  githubuserId,
+  after
+}: {
+  login: string;
+  githubuserId?: number;
+  after: Date;
+}): Promise<BuilderActivities> {
   const commits = await getCommitsByUser({
     login,
     after
@@ -30,7 +38,6 @@ export async function getBuilderActivity({ login, after }: { login: string; afte
     login,
     after
   });
-
   const prRepoIds = pullRequests.map((node) => node.repository.id);
   const commitRepoIds = commits.map((node) => node.repository.id);
   const reposToTrack = await prisma.githubRepo.findMany({
