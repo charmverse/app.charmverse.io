@@ -98,6 +98,9 @@ function WalletLoginButton() {
         size='large'
         variant='contained'
         sx={{
+          '& .MuiLoadingButton-label': {
+            width: '100%'
+          },
           minWidth: '250px',
           px: 2.5,
           py: 1.5
@@ -113,7 +116,7 @@ function WalletLoginButton() {
               setIsConnecting(true);
             }}
           >
-            Sign in with wallet
+            {isExecuting ? '' : 'Sign in with wallet'}
           </Typography>
         </Stack>
       </LoadingButton>
