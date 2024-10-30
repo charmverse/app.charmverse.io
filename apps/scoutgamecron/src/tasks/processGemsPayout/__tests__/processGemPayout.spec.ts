@@ -46,7 +46,7 @@ describe('processGemsPayout', () => {
       { zone: 'utc' }
     );
 
-    jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
+    jest.unstable_mockModule('@packages/scoutgame/builders/getBuildersLeaderboard', () => ({
       getBuildersLeaderboard: jest.fn()
     }));
     const { getBuildersLeaderboard } = await import('@packages/scoutgame/builders/getBuildersLeaderboard');
@@ -58,7 +58,7 @@ describe('processGemsPayout', () => {
   });
 
   it('should not run at other times', async () => {
-    jest.unstable_mockModule('@packages/scoutgame/getBuildersLeaderboard', () => ({
+    jest.unstable_mockModule('@packages/scoutgame/builders/getBuildersLeaderboard', () => ({
       getBuildersLeaderboard: jest.fn()
     }));
     const { getBuildersLeaderboard } = await import('@packages/scoutgame/builders/getBuildersLeaderboard');
