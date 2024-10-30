@@ -22,6 +22,7 @@ export async function recordNftMintWithoutRefresh(params: MintNFTParams & { crea
       builderId: true,
       builder: {
         select: {
+          path: true,
           displayName: true
         }
       }
@@ -185,6 +186,7 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
     userId: builderNft.builderId,
     amount,
     paidWithPoints,
+    builderPath: builderNft.builder.path,
     season: builderNft.season
   });
   await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });

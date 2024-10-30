@@ -13,6 +13,9 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   if (!process.env.BUILDER_SMART_CONTRACT_MINTER_PRIVKEY) {
     throw new Error('BUILDER_SMART_CONTRACT_MINTER_PRIVKEY is not set');
   }
+  if (!process.env.REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS) {
+    throw new Error('REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS is not set');
+  }
   const githubUser = await octokit.rest.users.getByUsername({ username: githubLogin });
   const profile = await getFarcasterUserById(fid);
   if (!profile) {
@@ -63,13 +66,20 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
   });
   console.log('Created a builder record', builder);
   await approveBuilder({ builderId: builder.id, season: currentSeason });
-  console.log('Builder NFT created. View profile here:', 'https://scoutgame.xyz/u/' + builder.path);
+  console.log('Builder profile approved:', 'https://scoutgame.xyz/u/' + builder.path);
   process.exit(0);
 }
 
 // search farcaster id by username
 // (async () => {
-//   console.log(await getFarcasterUserByUsername('username'));
+//   console.log(await getFarcasterUserByUsername('andrewkimjoseph'));
+//   console.log(await getFarcasterUserByUsername('johnnjuki'));
+//   console.log(await getFarcasterUserByUsername('philix'));
+//   console.log(await getFarcasterUserByUsername('blssngx'));
+//   console.log(await getFarcasterUserByUsername('lemonrr'));
+//   console.log(await getFarcasterUserByUsername('Chizaa'));
+//   console.log(await getFarcasterUserByUsername('eliashezron'));
+//   console.log(await getFarcasterUserByUsername('iamoracle'));
 // })();
 
 // search waitlist to find github login and farcaster id
@@ -84,4 +94,11 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
 // })();
 
 // run script to create builder
-// createBuilder({ fid: 240720, githubLogin: 'username' });
+// createBuilder({ fid: 811044, githubLogin: 'andrewkimjoseph' });
+// createBuilder({ fid: 847063, githubLogin: 'johnnjuki' });
+// createBuilder({ fid: 854428, githubLogin: 'Philix27' });
+// createBuilder({ fid: 328851, githubLogin: 'Blssngx' });
+// createBuilder({ fid: 846364, githubLogin: 'RonexLemon' });
+// createBuilder({ fid: 264117, githubLogin: 'DennohKim' });
+//createBuilder({ fid: 860651, githubLogin: 'eliashezron' });
+createBuilder({ fid: 857281, githubLogin: 'iamoracle' });

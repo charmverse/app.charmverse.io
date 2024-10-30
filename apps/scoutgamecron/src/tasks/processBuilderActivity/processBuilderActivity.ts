@@ -32,7 +32,7 @@ export async function processBuilderActivity({
 
   const { commits, pullRequests } = await getBuilderActivity({
     login: githubUser.login,
-    githubuserId: githubUser.id,
+    githubUserId: githubUser.id,
     after: createdAfter
   });
 

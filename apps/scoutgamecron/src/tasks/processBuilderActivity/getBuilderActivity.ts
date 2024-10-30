@@ -22,11 +22,11 @@ export type BuilderActivities = {
 
 export async function getBuilderActivity({
   login,
-  githubuserId,
+  githubUserId,
   after
 }: {
   login: string;
-  githubuserId?: number;
+  githubUserId?: number;
   after: Date;
 }): Promise<BuilderActivities> {
   const commits = await getCommitsByUser({
@@ -36,6 +36,7 @@ export async function getBuilderActivity({
 
   const pullRequests = await getPullRequestsByUser({
     login,
+    githubUserId,
     after
   });
   const prRepoIds = pullRequests.map((node) => node.repository.id);

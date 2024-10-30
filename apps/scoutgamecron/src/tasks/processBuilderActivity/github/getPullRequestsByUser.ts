@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { octokit } from './octokit';
 
-export type PullRequest = {
+type GraphQLPullRequest = {
   author: {
     id: number | string;
     login: string;
@@ -30,9 +30,17 @@ export type PullRequest = {
   };
 };
 
+// we convert the author id to a number consistently to simplify consuming code
+export type PullRequest = Omit<GraphQLPullRequest, 'author'> & {
+  author: {
+    id: number;
+    login: string;
+  };
+};
+
 type GraphQLSearchResponse = {
   search: {
-    nodes: PullRequest[];
+    nodes: GraphQLPullRequest[];
   };
 };
 
@@ -81,9 +89,17 @@ const prSearchQuery = `
   }
 `;
 
-export async function getPullRequestsByUser({ login, after }: { login: string; after: Date }) {
+export async function getPullRequestsByUser({
+  login,
+  githubUserId,
+  after
+}: {
+  login: string;
+  githubUserId?: number;
+  after: Date;
+}): Promise<PullRequest[]> {
   const queryString = `is:pr author:${login} closed:>=${after.toISOString()}`;
-  let allItems: PullRequest[] = [];
+  let allItems: GraphQLPullRequest[] = [];
   let hasNextPage = true;
   let cursor: string | null = null;
 
@@ -96,7 +112,7 @@ export async function getPullRequestsByUser({ login, after }: { login: string; a
         after: cursor
       });
 
-      const items = search.nodes;
+      const items = search.nodes as GraphQLPullRequest[];
       allItems = allItems.concat(items);
 
       hasNextPage = search.pageInfo.hasNextPage;
@@ -107,14 +123,19 @@ export async function getPullRequestsByUser({ login, after }: { login: string; a
     }
   }
 
-  return allItems.map((node) => {
-    return {
-      ...node,
-      author: node.author,
-      repository: {
-        ...node.repository,
-        id: node.repository.databaseId
-      }
-    };
-  });
+  return allItems
+    .map((node) => {
+      return {
+        ...node,
+        author: {
+          id: githubUserId || (node.author.id as number),
+          login: node.author.login
+        },
+        repository: {
+          ...node.repository,
+          id: node.repository.databaseId
+        }
+      };
+    })
+    .filter((pr) => typeof pr.author.id === 'number');
 }
