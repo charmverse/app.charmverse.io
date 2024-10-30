@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Scout, ScoutWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
@@ -11,6 +11,8 @@ import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
 import { capitalize } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
+import type { Address } from 'viem';
+import { isAddress } from 'viem/utils';
 
 const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   legendary: 60,
@@ -23,11 +25,11 @@ const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
 export async function findOrCreateUser({
   newUserId,
   farcasterId,
-  walletAddress,
+  walletAddresses,
   tierOverride,
   ...userProps
 }: {
-  walletAddress?: string;
+  walletAddresses?: string[];
   farcasterId?: number;
   walletENS?: string;
   newUserId?: string;
@@ -36,15 +38,18 @@ export async function findOrCreateUser({
   displayName: string;
   path: string;
   tierOverride?: ConnectWaitlistTier;
-}): Promise<Scout> {
-  if (!farcasterId && !walletAddress) {
+}): Promise<Scout & { scoutWallet?: ScoutWallet[] }> {
+  if (!farcasterId && !walletAddresses?.length) {
     throw new InvalidInputError('Missing required fields for user creation');
   }
 
-  const lowercaseAddress = walletAddress?.toLowerCase();
+  // Only valid addresses are included
+  const lowercaseAddresses = walletAddresses
+    ? walletAddresses.map((a) => a.toLowerCase()).filter((a): a is Address => isAddress(a))
+    : undefined;
 
   const scout = await prisma.scout.findFirst({
-    where: farcasterId ? { farcasterId } : { walletAddress: lowercaseAddress }
+    where: farcasterId ? { farcasterId } : { scoutWallet: { some: { address: { in: lowercaseAddresses } } } }
   });
 
   if (scout) {
@@ -66,9 +71,8 @@ export async function findOrCreateUser({
   }
 
   // retrieve ENS name if wallet address is provided
-
-  if (walletAddress && !userProps.walletENS) {
-    const ens = await getENSName(walletAddress).catch((error) => {
+  if (!!lowercaseAddresses?.length && !userProps.walletENS) {
+    const ens = await getENSName(lowercaseAddresses[0]).catch((error) => {
       log.warn('Could not retrieve ENS while creating a user', { error });
       return null;
     });
@@ -97,7 +101,13 @@ export async function findOrCreateUser({
     data: {
       ...userProps,
       id: userId,
-      walletAddress: lowercaseAddress,
+      scoutWallet: lowercaseAddresses?.length
+        ? {
+            create: lowercaseAddresses?.map((address) => ({
+              address
+            }))
+          }
+        : undefined,
       farcasterId,
       currentBalance: points,
       pointsReceived:

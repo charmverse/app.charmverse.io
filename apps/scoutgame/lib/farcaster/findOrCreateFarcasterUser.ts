@@ -1,4 +1,4 @@
-import type { Scout } from '@charmverse/core/prisma-client';
+import type { Scout, ScoutWallet } from '@charmverse/core/prisma-client';
 import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
@@ -11,7 +11,7 @@ export async function findOrCreateFarcasterUser({
 }: {
   fid: number;
   tierOverride?: ConnectWaitlistTier;
-}): Promise<Scout> {
+}): Promise<Scout & { scoutWallet?: ScoutWallet[] }> {
   const profile = await getFarcasterUserById(fid);
   if (!profile) {
     throw new Error('Could not find Farcaster profile');
@@ -22,7 +22,7 @@ export async function findOrCreateFarcasterUser({
     farcasterId: fid,
     avatar: profile.pfp_url,
     bio: profile.profile.bio.text,
-    walletAddress: profile.verifications[0],
+    walletAddresses: profile.verifications,
     displayName: profile.display_name,
     path: profile.username,
     tierOverride

@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import {dirname, join} from 'path';
+import { dirname, join } from 'path';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
@@ -100,7 +100,11 @@ export async function generateBuilder({ index }: { index: number }) {
       bio: faker.lorem.paragraph(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
-      walletAddress: faker.finance.ethereumAddress(),
+      scoutWallet: {
+        create: {
+          address: faker.finance.ethereumAddress()
+        }
+      },
       farcasterId: faker.number.int({ min: 1, max: 5000000 }) + index,
       farcasterName: displayName,
       builderStatus,
