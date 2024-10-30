@@ -20,7 +20,7 @@ async function onboardScouts({ fids, tierOverride }: { fids: number[]; tierOverr
     const fid = fidsRequiringAccount[i];
     console.log(`Creating user ${i + 1} / ${totalFidsToProcess}`);
     const user = await findOrCreateFarcasterUser({ fid, tierOverride: 'mythic' });
-    console.log(`Created user ${user.id}. View: https://scoutgame.xyz/u/${user.username}`);
+    console.log(`Created user ${user.id}. View: https://scoutgame.xyz/u/${user.path}`);
   }
 }
 

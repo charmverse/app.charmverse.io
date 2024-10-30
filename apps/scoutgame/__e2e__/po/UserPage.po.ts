@@ -7,13 +7,7 @@ export class UserPage extends GeneralPageLayout {
     super(page);
   }
 
-  async mockNftAPIs({
-    builder,
-    isSuccess
-  }: {
-    builder: { id: string; username?: string | null; path?: string | null };
-    isSuccess: boolean;
-  }) {
+  async mockNftAPIs({ builder, isSuccess }: { builder: { id: string; path: string }; isSuccess: boolean }) {
     // Used for debugging all routes. Keep caution as the next page.route() function will not run anymore.
     // await page.route('**', (route) => {
     //   console.log('Intercepted URL:', route.request().url());
@@ -139,7 +133,7 @@ export class UserPage extends GeneralPageLayout {
     });
 
     // Mocking server action to handle the pending transaction and mint the NFT without calling decent
-    await this.page.route(`**/u/${builder.username}`, async (route) => {
+    await this.page.route(`**/u/${builder.path}`, async (route) => {
       const method = route.request().method();
       const body = route.request().postDataJSON()?.[0];
 

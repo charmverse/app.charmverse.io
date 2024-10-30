@@ -18,7 +18,13 @@ export function useGetUserTrigger() {
 }
 
 export function useGetClaimablePoints() {
-  return useGETImmutable<{ points: number }>('/api/session/claimable-points');
+  return useGETImmutable<{ points: number }>(
+    '/api/session/claimable-points',
+    {},
+    {
+      refreshInterval: 30000
+    }
+  );
 }
 
 export function useGetPendingNftTransactions<

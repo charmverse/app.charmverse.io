@@ -48,7 +48,7 @@ async function issuePoints({ points }: { points: number }) {
           tx
         });
 
-        await refreshPointStatsFromHistory({ userIdOrUsername: scout.id, tx });
+        await refreshPointStatsFromHistory({ userIdOrPath: scout.id, tx });
       },
       { timeout: 15000 }
     );

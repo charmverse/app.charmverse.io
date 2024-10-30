@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { uploadMetadata } from '@packages/scoutgame/builderNfts/artwork/uploadMetadata';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { getBuilderContractAddress } from '@packages/scoutgame/builderNfts/constants';
-import { uploadArtwork, uploadArtworkCongrats } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
+import { uploadArtwork } from '@packages/scoutgame/builderNfts/artwork/uploadArtwork';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 async function refreshArtworks() {
@@ -15,7 +15,8 @@ async function refreshArtworks() {
       builder: {
         select: {
           avatar: true,
-          username: true
+          path: true,
+          displayName: true
         }
       }
     },
@@ -53,7 +54,7 @@ async function refreshArtworks() {
       avatar,
       season: currentSeason,
       tokenId: BigInt(tokenId),
-      username: nft.builder.username
+      displayName: nft.builder.displayName
     });
 
     await prisma.builderNft.update({
@@ -68,7 +69,7 @@ async function refreshArtworks() {
     const metadataPath = await uploadMetadata({
       season: currentSeason,
       tokenId: BigInt(tokenId),
-      username: nft.builder.username,
+      path: nft.builder.path!,
       attributes: []
     });
 

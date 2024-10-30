@@ -60,15 +60,15 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
               </TableCell>
               <TableCell component='th'>
                 <Stack
-                  href={`/u/${row.username}`}
+                  href={`/u/${row.path}`}
                   component={Link}
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
                   maxWidth={{ xs: '120px', md: '200px' }}
                 >
-                  <Avatar src={row.avatar} name={row.username || ''} size='small' />
-                  <TableCellText noWrap>{row.username}</TableCellText>
+                  <Avatar src={row.avatar} name={row.displayName} size='small' />
+                  <TableCellText noWrap>{row.displayName}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell sx={{ width: { xs: '100%', md: '60%' } }}>

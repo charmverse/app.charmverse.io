@@ -100,7 +100,7 @@ const client = new S3Client(getS3ClientConfig());
  * Uploads OpenSea metadata to S3.
  *
  * @param {Object} params - Parameters for creating the OpenSea metadata.
- * @param {string} params.username - The username of the NFT owner.
+ * @param {string} params.path - The path of the NFT owner.
  * @param {string} params.season - The season of the NFT.
  * @param {string | null} params.avatar - The avatar image URL for the NFT.
  * @param {bigint | number} params.tokenId - The unique token ID of the NFT.
@@ -111,12 +111,12 @@ const client = new S3Client(getS3ClientConfig());
  * @returns {Promise<string>} - The URL of the uploaded metadata JSON.
  */
 export async function uploadMetadata({
-  username,
+  path,
   season,
   tokenId,
   attributes
 }: {
-  username: string;
+  path: string;
   season: string;
   tokenId: bigint | number;
   attributes?: { trait_type: string; value: string | number }[];
@@ -128,7 +128,7 @@ export async function uploadMetadata({
   const metadata: OpenSeaMetadata = {
     name: `ScoutGame Builders NFT #${tokenId}`,
     description: '',
-    external_url: `${process.env.DOMAIN}/u/${username}`,
+    external_url: `${process.env.DOMAIN}/u/${path}`,
     image: `${imageDomain}/${getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' })}`,
     attributes: attributes || []
   };

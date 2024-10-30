@@ -9,14 +9,14 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
   nftImageUrl,
-  username,
+  path,
   builderPoints,
   totalScouts,
   totalNftsSold,
   currentNftPrice
 }: {
   nftImageUrl?: string | null;
-  username: string | null;
+  path: string;
   builderPoints?: number;
   totalScouts?: number;
   totalNftsSold?: number;
@@ -36,7 +36,7 @@ export function BuilderStats({
       }}
     >
       <Stack justifyContent='center'>
-        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} username={username} size={isDesktop ? 'large' : 'small'} />
+        <BuilderCardNftDisplay hideDetails nftImageUrl={nftImageUrl} path={path} size={isDesktop ? 'large' : 'small'} />
       </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>

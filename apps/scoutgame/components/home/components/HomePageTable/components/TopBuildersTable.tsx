@@ -45,7 +45,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
         <TableBody>
           {builders.map((builder, index) => (
             <TableRow
-              key={builder.username}
+              key={builder.path}
               sx={{
                 '&:last-child td, &:last-child th': { border: 0 },
                 '& .MuiTableCell-root': {
@@ -62,14 +62,14 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
               <TableCell component='th'>
                 <Stack
                   component={Link}
-                  href={`/u/${builder.username}`}
+                  href={`/u/${builder.path}`}
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
                   maxWidth={{ xs: '120px', md: 'initial' }}
                 >
-                  <Avatar src={builder.avatar} name={builder.username || ''} size='small' />
-                  <TableCellText noWrap>{builder.username}</TableCellText>
+                  <Avatar src={builder.avatar} name={builder.displayName} size='small' />
+                  <TableCellText noWrap>{builder.displayName}</TableCellText>
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: 'table-cell' }}>

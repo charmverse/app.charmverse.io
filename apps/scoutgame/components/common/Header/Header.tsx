@@ -16,8 +16,6 @@ import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
 import { useUser } from 'components/layout/UserProvider';
 
-import { InstallAppMenuItem } from './components/InstallAppMenuItem';
-
 export function Header() {
   const router = useRouter();
   const { user, refreshUser } = useUser();
@@ -109,7 +107,7 @@ export function Header() {
                       alt='Scout Game points icon'
                       priority={true}
                     />
-                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username || ''} />
+                    <Avatar src={user?.avatar || undefined} size='medium' name={user.displayName} />
                   </Button>
                   <Menu
                     sx={{ mt: 5 }}
@@ -132,7 +130,7 @@ export function Header() {
                     onClick={handleCloseUserMenu}
                   >
                     <MenuItem>
-                      <Link href='/profile'>{user.username}</Link>
+                      <Link href='/profile'>{user.displayName}</Link>
                     </MenuItem>
                     <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
                       Sign Out
