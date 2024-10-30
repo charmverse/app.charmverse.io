@@ -9,6 +9,7 @@ export type SessionUser = Pick<
   | 'path'
   | 'displayName'
   | 'avatar'
+  | 'farcasterUsername'
   | 'builderStatus'
   | 'currentBalance'
   | 'onboardedAt'

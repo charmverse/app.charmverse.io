@@ -16,6 +16,7 @@ export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   avatar?: string | null;
   displayName: string;
   githubLogin?: string;
+  farcasterUsername?: string | null;
 };
 
 type UserProfileProps = {
@@ -25,7 +26,7 @@ type UserProfileProps = {
 
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const isDesktop = useMdScreen();
-  const { displayName, path, bio, avatar, githubLogin } = user;
+  const { displayName, path, bio, avatar, githubLogin, farcasterUsername } = user;
   const isMounted = useIsMounted();
 
   // We are using the mounted flag here because MUI media query returns false on the server and true on the client and it throws warnings
@@ -57,14 +58,16 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       <Stack width='100%'>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <IconButton href={`https://warpcast.com/${path}`} target='_blank' rel='noopener noreferrer'>
-            <Image
-              src='/images/profile/icons/warpcast-circle-icon.svg'
-              width={isDesktop ? '20' : '16'}
-              height={isDesktop ? '20' : '16'}
-              alt='warpcast icon'
-            />
-          </IconButton>
+          {farcasterUsername ? (
+            <IconButton href={`https://warpcast.com/${farcasterUsername}`} target='_blank' rel='noopener noreferrer'>
+              <Image
+                src='/images/profile/icons/warpcast-circle-icon.svg'
+                width={isDesktop ? '20' : '16'}
+                height={isDesktop ? '20' : '16'}
+                alt='warpcast icon'
+              />
+            </IconButton>
+          ) : null}
           {githubLogin ? (
             <IconButton
               href={`https://github.com/${githubLogin}`}

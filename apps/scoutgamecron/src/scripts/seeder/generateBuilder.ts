@@ -107,6 +107,7 @@ export async function generateBuilder({ index }: { index: number }) {
       },
       farcasterId: faker.number.int({ min: 1, max: 5000000 }) + index,
       farcasterName: displayName,
+      farcasterUsername: path,
       builderStatus,
       githubUser: {
         create: githubUser

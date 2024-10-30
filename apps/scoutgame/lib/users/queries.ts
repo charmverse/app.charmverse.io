@@ -11,7 +11,8 @@ export const BasicUserInfoSelect = {
       login: true
     }
   },
-  builderStatus: true
+  builderStatus: true,
+  farcasterUsername: true
 } satisfies Prisma.ScoutSelect;
 
 export const MinimalScoutInfoSelect = {
