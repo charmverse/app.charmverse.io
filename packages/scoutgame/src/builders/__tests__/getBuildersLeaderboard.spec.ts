@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { mockBuilder } from '../../testing/database';
 import { getBuildersLeaderboard } from '../getBuildersLeaderboard';
-import { mockBuilder } from '../testing/database';
 
 describe('getBuildersLeaderboard', () => {
   it('should return top builders sorted by gems collected, handle ties, and respect quantity parameter', async () => {
@@ -11,7 +11,7 @@ describe('getBuildersLeaderboard', () => {
     const builders = await Promise.all(
       Array(10)
         .fill(null)
-        .map(() => mockBuilder({ username: `user-${v4()}`, createNft: true }))
+        .map(() => mockBuilder({ path: `user-${v4()}`, createNft: true }))
     );
 
     await Promise.all(

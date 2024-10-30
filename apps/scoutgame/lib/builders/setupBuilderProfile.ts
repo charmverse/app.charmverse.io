@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
+import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
 import { authSecret, baseUrl } from '@root/config/constants';
@@ -136,5 +137,7 @@ export async function setupBuilderProfile({
       builderId: unsealedUserId,
       season: currentSeason
     });
+    // refresh builder ranks
+    await updateBuildersRank();
   }
 }
