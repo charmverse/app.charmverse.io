@@ -91,8 +91,8 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 <Typography variant='h6'>Scout Game profile found</Typography>
                 <Typography>
                   <span style={{ fontWeight: 'bold' }}>Profile:</span>{' '}
-                  <Link href={`https://scoutgame.xyz/u/${user.scout.username}`} target='_blank'>
-                    https://scoutgame.xyz/u/{user.scout.username}
+                  <Link href={`https://scoutgame.xyz/u/${user.scout.path}`} target='_blank'>
+                    https://scoutgame.xyz/u/{user.scout.path}
                   </Link>
                 </Typography>
                 <Typography>
@@ -101,8 +101,8 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 {user.scout.farcasterId && (
                   <Typography>
                     <span style={{ fontWeight: 'bold' }}>Farcaster:</span>{' '}
-                    <Link href={`https://warpcast.com/${user.scout.username}`} target='_blank'>
-                      {user.scout.username}
+                    <Link href={`https://warpcast.com/${user.scout.path}`} target='_blank'>
+                      {user.scout.path}
                     </Link>
                   </Typography>
                 )}

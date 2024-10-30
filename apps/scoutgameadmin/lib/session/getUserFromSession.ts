@@ -4,7 +4,7 @@ import { replaceS3Domain } from '@root/lib/utils/url';
 
 import { getSession } from './getSession';
 
-export type SessionUser = Pick<Scout, 'id' | 'username' | 'displayName' | 'avatar'>;
+export type SessionUser = Pick<Scout, 'id' | 'path' | 'displayName' | 'avatar'>;
 
 export async function getUserFromSession(): Promise<SessionUser | null> {
   const session = await getSession();
@@ -15,7 +15,7 @@ export async function getUserFromSession(): Promise<SessionUser | null> {
       },
       select: {
         id: true,
-        username: true,
+        path: true,
         displayName: true,
         avatar: true
       }
