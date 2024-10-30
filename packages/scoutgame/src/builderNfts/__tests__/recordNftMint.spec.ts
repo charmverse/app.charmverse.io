@@ -20,9 +20,9 @@ jest.unstable_mockModule('../clients/builderContractReadClient', () => ({
   }
 }));
 
-const { recordNftMint } = await import('../recordNftMint');
+const { recordNftMintWithoutRefresh } = await import('../recordNftMint');
 
-describe('recordNftMint', () => {
+describe('recordNftMintWithoutRefresh', () => {
   it('should record a new NFT mint', async () => {
     const builder = await mockBuilder();
     const scout = await mockScout();
@@ -30,7 +30,7 @@ describe('recordNftMint', () => {
 
     const amount = 10;
 
-    await recordNftMint({
+    await recordNftMintWithoutRefresh({
       builderNftId: builderNft.id,
       amount,
       mintTxHash: `0x123${Math.random().toString()}`,

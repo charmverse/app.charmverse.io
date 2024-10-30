@@ -9,8 +9,35 @@ import { getCurrentWeek } from '@packages/scoutgame/dates';
 
 import type { MintNFTParams } from './mintNFT';
 
-export async function recordNftMintWithoutRefresh(params: MintNFTParams & { createdAt?: Date; mintTxHash: string }) {
-  const { createdAt, amount, builderNftId, paidWithPoints, pointsValue, scoutId, mintTxHash } = params;
+export async function recordNftMintWithoutRefresh(
+  params: MintNFTParams & { createdAt?: Date; mintTxHash: string; skipMixpanel?: boolean }
+) {
+  const {
+    amount,
+    builderNftId,
+    paidWithPoints,
+    recipientAddress,
+    scoutId,
+    pointsValue,
+    createdAt,
+    mintTxHash,
+    skipMixpanel
+  } = params;
+
+  if (!mintTxHash.trim().startsWith('0x')) {
+    throw new InvalidInputError(`Mint transaction hash is required`);
+  }
+
+  const existingTx = await prisma.nFTPurchaseEvent.findFirst({
+    where: {
+      txHash: mintTxHash
+    }
+  });
+
+  if (existingTx) {
+    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
+    return;
+  }
 
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
@@ -155,40 +182,16 @@ export async function recordNftMintWithoutRefresh(params: MintNFTParams & { crea
     return builderEvent.nftPurchaseEvent;
   });
 
-  return {
-    builderNft,
-    mintTxHash,
-    nftPurchaseEvent: nftPurchaseEvent as NFTPurchaseEvent
-  };
-}
-
-export async function recordNftMint(params: MintNFTParams & { mintTxHash: string }) {
-  const { amount, builderNftId, paidWithPoints, recipientAddress, scoutId, mintTxHash } = params;
-
-  if (!mintTxHash.trim().startsWith('0x')) {
-    throw new InvalidInputError(`Mint transaction hash is required`);
-  }
-
-  const existingTx = await prisma.nFTPurchaseEvent.findFirst({
-    where: {
-      txHash: mintTxHash
-    }
-  });
-
-  if (existingTx) {
-    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
-    return;
-  }
-
-  const { builderNft, nftPurchaseEvent } = await recordNftMintWithoutRefresh(params);
   log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
-  trackUserAction('nft_purchase', {
-    userId: builderNft.builderId,
-    amount,
-    paidWithPoints,
-    season: builderNft.season
-  });
-  await refreshBuilderNftPrice({ builderId: builderNft.builderId, season: builderNft.season });
+
+  if (!skipMixpanel) {
+    trackUserAction('nft_purchase', {
+      userId: builderNft.builderId,
+      amount,
+      paidWithPoints,
+      season: builderNft.season
+    });
+  }
 
   return {
     builderNft,
@@ -198,10 +201,12 @@ export async function recordNftMint(params: MintNFTParams & { mintTxHash: string
 }
 
 export async function recordNftMintAndRefreshPrice(params: MintNFTParams & { mintTxHash: string }): Promise<void> {
-  const minted = await recordNftMint(params);
+  const minted = await recordNftMintWithoutRefresh(params);
 
-  await refreshBuilderNftPrice({
-    builderId: minted?.builderNft.builderId as string,
-    season: minted?.builderNft.season as Season
-  });
+  if (minted?.builderNft) {
+    await refreshBuilderNftPrice({
+      builderId: minted?.builderNft.builderId as string,
+      season: minted?.builderNft.season as Season
+    });
+  }
 }
