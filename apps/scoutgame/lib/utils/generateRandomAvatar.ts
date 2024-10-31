@@ -3,17 +3,14 @@ const randomColors = ['#85FF9E', '#F4D06F', '#FFA69E', '#FFAC81', '#96CDFF', '#C
 export function generateRandomAvatar() {
   const randomColorsDuplicate = [...randomColors];
 
-  // Get first random color and remove it from duplicate array
   const randomColor1Index = Math.floor(Math.random() * randomColorsDuplicate.length);
   const randomColor1 = randomColorsDuplicate[randomColor1Index];
   randomColorsDuplicate.splice(randomColor1Index, 1);
 
-  // Get second random color and remove it
   const randomColor2Index = Math.floor(Math.random() * randomColorsDuplicate.length);
   const randomColor2 = randomColorsDuplicate[randomColor2Index];
   randomColorsDuplicate.splice(randomColor2Index, 1);
 
-  // Get third random color
   const randomColor3Index = Math.floor(Math.random() * randomColorsDuplicate.length);
   const randomColor3 = randomColorsDuplicate[randomColor3Index];
 

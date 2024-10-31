@@ -10,6 +10,7 @@ import { getUserS3FilePath, uploadFileToS3, uploadUrlToS3 } from '@root/lib/aws/
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
 import { capitalize } from '@root/lib/utils/strings';
+import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';
 import { isAddress } from 'viem/utils';
@@ -70,13 +71,14 @@ export async function findOrCreateUser({
 
   if (!userProps?.avatar) {
     const randomAvatarSvg = generateRandomAvatar();
-    const avatarFile = Buffer.from(randomAvatarSvg);
-    const pathInS3 = getUserS3FilePath({ userId, url: 'avatar.svg' });
+    const imageBuffer = await sharp(Buffer.from(randomAvatarSvg)).png().toBuffer();
+
+    const pathInS3 = getUserS3FilePath({ userId, url: 'avatar.png' });
     try {
       const { fileUrl } = await uploadFileToS3({
         pathInS3,
-        content: avatarFile,
-        contentType: 'image/svg+xml'
+        content: imageBuffer,
+        contentType: 'image/png'
       });
       userProps.avatar = fileUrl;
     } catch (e) {
