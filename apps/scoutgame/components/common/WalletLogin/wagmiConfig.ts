@@ -1,5 +1,6 @@
 'use client';
 
+import env from '@beam-australia/react-env';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 import type { Chain, Transport } from 'viem';
@@ -18,7 +19,7 @@ import {
 } from 'wagmi/chains';
 
 export function getConfig() {
-  const walletConnectProjectId = process.env.REACT_APP_WALLETCONNECT_PROJECTID || '';
+  const walletConnectProjectId = env('WALLETCONNECT_PROJECTID') || process.env.REACT_APP_WALLETCONNECT_PROJECTID || '';
 
   const wagmiChains = [
     mainnet,
