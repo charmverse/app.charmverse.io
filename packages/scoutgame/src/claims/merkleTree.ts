@@ -16,15 +16,22 @@ function claimToString(claim: ProvableClaim): string {
   return `${claim.address}:${claim.amount}`;
 }
 
-export function generateTree(claims: ProvableClaim[]): MerkleTree {
-  return new MerkleTree(claims.map(claimToString), SHA256);
+export function generateMerkleTree(claims: ProvableClaim[]): { tree: MerkleTree; rootHash: string } {
+  const tree = new MerkleTree(claims.map(claimToString), SHA256, {
+    sort: true
+  });
+
+  return {
+    tree,
+    rootHash: tree.getRoot().toString('hex')
+  };
 }
 
-export function getProofs(tree: MerkleTree, claim: ProvableClaim): any {
+export function getMerkleProofs(tree: MerkleTree, claim: ProvableClaim): any {
   return tree.getProof(claimToString(claim));
 }
 
-export function verifyClaim(tree: MerkleTree, claim: ProvableClaim, proof: string[]): boolean {
+export function verifyMerkleClaim(tree: MerkleTree, claim: ProvableClaim, proof: string[]): boolean {
   const root = tree.getRoot().toString('hex');
   return tree.verify(proof, claimToString(claim), root);
 }

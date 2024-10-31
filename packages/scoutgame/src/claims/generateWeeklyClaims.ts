@@ -1,3 +1,4 @@
+import type { WeeklyClaims } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Address } from 'viem';
 
@@ -5,11 +6,20 @@ import { currentSeason } from '../dates';
 import { dividePointsBetweenBuilderAndScouts } from '../points/dividePointsBetweenBuilderAndScouts';
 import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAndBuilders';
 
-import type { ProvableClaim } from './root';
+import { generateMerkleTree, type ProvableClaim } from './merkleTree';
 
-export async function generateWeeklyClaims({ week }: { week: string }): Promise<ProvableClaim[]> {
-  const { normalisationFactor, topWeeklyBuilders, totalPoints, weeklyAllocatedPoints } =
-    await getWeeklyPointsPoolAndBuilders({ week });
+type ClaimsBody = {
+  leaves: ProvableClaim[];
+};
+
+type WeeklyClaimsTyped = Omit<WeeklyClaims, 'claims'> & {
+  claims: ClaimsBody;
+};
+
+export async function calculateWeeklyClaims({ week }: { week: string }): Promise<ProvableClaim[]> {
+  const { normalisationFactor, topWeeklyBuilders, weeklyAllocatedPoints } = await getWeeklyPointsPoolAndBuilders({
+    week
+  });
 
   const allClaims = await Promise.all(
     topWeeklyBuilders.map(async (builder) => {
@@ -83,4 +93,36 @@ export async function generateWeeklyClaims({ week }: { week: string }): Promise<
   }
 
   return claimsByAddress;
+}
+
+export async function generateWeeklyClaims({ week }: { week: string }): Promise<WeeklyClaimsTyped> {
+  const existingClaim = await prisma.weeklyClaims.findUnique({
+    where: {
+      week
+    }
+  });
+
+  if (existingClaim) {
+    throw new Error(`Claims for week ${week} already exist`);
+  }
+
+  const claims = await calculateWeeklyClaims({ week });
+
+  const { rootHash } = generateMerkleTree(claims);
+
+  const claimsBody: ClaimsBody = {
+    leaves: claims
+  };
+
+  const weeklyClaim = await prisma.weeklyClaims.create({
+    data: {
+      week,
+      merkleTreeRoot: rootHash,
+      season: currentSeason,
+      totalClaimable: claims.reduce((acc, claim) => acc + claim.amount, 0),
+      claims: claimsBody
+    }
+  });
+
+  return weeklyClaim as WeeklyClaimsTyped;
 }
