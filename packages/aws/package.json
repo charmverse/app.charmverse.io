@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.682.0",
-    "@aws-sdk/lib-storage": "^3.682.0"
+    "@aws-sdk/lib-storage": "^3.682.0",
+    "@aws-sdk/xhr-http-handler": "^3.679.0"
   }
 }
