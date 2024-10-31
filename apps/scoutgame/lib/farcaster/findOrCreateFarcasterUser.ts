@@ -27,7 +27,6 @@ export async function findOrCreateFarcasterUser({
     displayName: profile.display_name,
     path: profile.username,
     tierOverride,
-    farcasterUsername: profile.username,
-    farcasterName: profile.display_name
+    farcasterName: profile.username
   });
 }

@@ -35,8 +35,7 @@ export async function findOrCreateWalletUser({
     log.warn('Could not retrieve Farcaster user', { error, wallet });
   }
 
-  const farcasterUsername = farcasterUser?.username;
-  const farcasterName = farcasterUser?.display_name;
+  const farcasterName = farcasterUser?.username;
   const farcasterId = farcasterUser?.fid;
 
   return findOrCreateUser({
@@ -47,7 +46,6 @@ export async function findOrCreateWalletUser({
     displayName,
     path,
     farcasterName,
-    farcasterUsername,
     farcasterId
   });
 }

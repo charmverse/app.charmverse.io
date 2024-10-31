@@ -4,17 +4,17 @@ import Image from 'next/image';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function ProfileLinks({
-  farcasterUsername,
+  farcasterName,
   githubLogin
 }: {
-  farcasterUsername?: string | null;
+  farcasterName?: string | null;
   githubLogin?: string | null;
 }) {
   const isDesktop = useMdScreen();
   return (
     <>
-      {farcasterUsername ? (
-        <IconButton href={`https://warpcast.com/${farcasterUsername}`} target='_blank' rel='noopener noreferrer'>
+      {farcasterName ? (
+        <IconButton href={`https://warpcast.com/${farcasterName}`} target='_blank' rel='noopener noreferrer'>
           <Image
             src='/images/profile/icons/warpcast-circle-icon.svg'
             width={isDesktop ? '20' : '16'}

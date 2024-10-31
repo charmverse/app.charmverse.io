@@ -33,8 +33,7 @@ export async function generateScout({ index }: { index: number }) {
         }
       },
       farcasterId: faker.number.int({ min: 1, max: 500000 }) + index,
-      farcasterName: displayName,
-      farcasterUsername: path
+      farcasterName: path
     }
   });
 

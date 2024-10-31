@@ -17,7 +17,7 @@ export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   avatar?: string | null;
   displayName: string;
   githubLogin?: string;
-  farcasterUsername?: string | null;
+  farcasterName?: string | null;
 };
 
 type UserProfileProps = {
@@ -27,7 +27,7 @@ type UserProfileProps = {
 
 export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
   const isDesktop = useMdScreen();
-  const { displayName, bio, avatar, githubLogin, farcasterUsername } = user;
+  const { displayName, bio, avatar, githubLogin, farcasterName } = user;
   const isMounted = useIsMounted();
 
   // We are using the mounted flag here because MUI media query returns false on the server and true on the client and it throws warnings
@@ -59,7 +59,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       <Stack width='100%'>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <ProfileLinks farcasterUsername={farcasterUsername} githubLogin={githubLogin} />
+          <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}

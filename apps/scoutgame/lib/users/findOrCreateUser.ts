@@ -41,7 +41,6 @@ export async function findOrCreateUser({
   bio?: string;
   displayName: string;
   path: string;
-  farcasterUsername?: string;
   farcasterName?: string;
   tierOverride?: ConnectWaitlistTier;
 }): Promise<FindOrCreateUserResult> {

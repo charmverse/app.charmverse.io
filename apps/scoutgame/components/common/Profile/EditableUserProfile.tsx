@@ -15,7 +15,7 @@ export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   avatar: string;
   displayName: string;
   githubLogin?: string;
-  farcasterUsername?: string | null;
+  farcasterName?: string | null;
 };
 
 type UserProfileProps = {
