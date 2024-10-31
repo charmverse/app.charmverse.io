@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
+import { getENSDetails, getENSName } from '@packages/blockchain/getENSName';
 import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUsersByAddresses';
 import { findOrCreateUser } from '@packages/scoutgame/users/findOrCreateUser';
 import type { FindOrCreateUserResult } from '@packages/scoutgame/users/findOrCreateUser';
-import { getENSDetails, getENSName } from '@root/lib/blockchain/getENSName';
 import { getAddress } from 'viem';
 
 import { generateUserPath } from 'lib/users/generateUserPath';
