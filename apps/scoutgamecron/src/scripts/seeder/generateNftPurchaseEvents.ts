@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
-import { recordNftMintWithoutRefresh } from '@packages/scoutgame/builderNfts/recordNftMint';
+import { recordNftMint } from '@packages/scoutgame/builderNfts/recordNftMint';
 import { getWeekFromDate } from '@packages/scoutgame/dates';
 import { DateTime } from 'luxon';
 import { BuilderInfo } from './generateSeedData';
@@ -30,7 +30,7 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
           }
         })
 
-        await recordNftMintWithoutRefresh({
+        await recordNftMint({
           builderNftId,
           amount: nftsPurchased,
           paidWithPoints: false,
@@ -38,7 +38,9 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
           scoutId,
           mintTxHash: faker.finance.ethereumAddress(),
           recipientAddress: faker.finance.ethereumAddress(),
-          createdAt
+          createdAt,
+          skipMixpanel: true,
+          skipPriceRefresh: true
         });
       });
     }

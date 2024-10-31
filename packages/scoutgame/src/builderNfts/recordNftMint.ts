@@ -9,8 +9,8 @@ import { getCurrentWeek } from '@packages/scoutgame/dates';
 
 import type { MintNFTParams } from './mintNFT';
 
-export async function recordNftMintWithoutRefresh(
-  params: MintNFTParams & { createdAt?: Date; mintTxHash: string; skipMixpanel?: boolean }
+export async function recordNftMint(
+  params: MintNFTParams & { createdAt?: Date; mintTxHash: string; skipMixpanel?: boolean; skipPriceRefresh?: boolean }
 ) {
   const {
     amount,
@@ -21,7 +21,8 @@ export async function recordNftMintWithoutRefresh(
     pointsValue,
     createdAt,
     mintTxHash,
-    skipMixpanel
+    skipMixpanel,
+    skipPriceRefresh
   } = params;
 
   if (!mintTxHash.trim().startsWith('0x')) {
@@ -193,20 +194,16 @@ export async function recordNftMintWithoutRefresh(
     });
   }
 
+  if (!skipPriceRefresh) {
+    await refreshBuilderNftPrice({
+      builderId: builderNft.builderId,
+      season: builderNft.season as Season
+    });
+  }
+
   return {
     builderNft,
     mintTxHash,
     nftPurchaseEvent: nftPurchaseEvent as NFTPurchaseEvent
   };
-}
-
-export async function recordNftMintAndRefreshPrice(params: MintNFTParams & { mintTxHash: string }): Promise<void> {
-  const minted = await recordNftMintWithoutRefresh(params);
-
-  if (minted?.builderNft) {
-    await refreshBuilderNftPrice({
-      builderId: minted?.builderNft.builderId as string,
-      season: minted?.builderNft.season as Season
-    });
-  }
 }

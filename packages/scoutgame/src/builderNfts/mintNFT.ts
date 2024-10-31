@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
-import { recordNftMintAndRefreshPrice } from './recordNftMint';
+import { recordNftMint } from './recordNftMint';
 
 export type MintNFTParams = {
   builderNftId: string;
@@ -31,5 +31,5 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
-  await recordNftMintAndRefreshPrice({ ...params, mintTxHash: txResult.transactionHash });
+  await recordNftMint({ ...params, mintTxHash: txResult.transactionHash });
 }

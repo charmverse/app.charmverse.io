@@ -11,7 +11,7 @@ import {
 } from '@packages/onchain/waitForDecentTransactionSettlement';
 import { currentSeason } from '@packages/scoutgame/dates';
 
-import { recordNftMintAndRefreshPrice } from './recordNftMint';
+import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
 
 export async function handlePendingTransaction({
@@ -83,7 +83,7 @@ export async function handlePendingTransaction({
       }
     });
 
-    await recordNftMintAndRefreshPrice({
+    await recordNftMint({
       amount: pendingTx.tokenAmount,
       builderNftId: builderNft.id,
       mintTxHash: txHash,
