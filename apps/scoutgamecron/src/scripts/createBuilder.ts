@@ -1,4 +1,4 @@
-import { approveBuilder } from './approveBuilder';
+import { approveBuilder } from '@packages/scoutgame/builders/approveBuilder';
 
 import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
 import { octokit } from '@packages/github/client';

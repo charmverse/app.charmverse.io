@@ -21,6 +21,7 @@ export function BuilderCardStats({
   size: 'x-small' | 'small' | 'medium' | 'large';
 }) {
   const mdFontSize = size === 'medium' || size === 'large' ? '14px' : '12px';
+  const isValidRank = typeof rank === 'number' && rank !== -1;
   return (
     <Stack
       alignItems='center'
@@ -43,10 +44,10 @@ export function BuilderCardStats({
       >
         {displayName}
       </Typography>
-      <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between' gap={1}>
+      <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between'>
         {typeof builderPoints === 'number' && (
           <Tooltip title='Total # of Scout Points earned this season to date'>
-            <Stack flexDirection='row' gap={0.25} alignItems='center'>
+            <Stack flexDirection='row' gap={0.25} alignItems='center' width='33%'>
               <Typography
                 sx={{
                   fontSize: {
@@ -63,27 +64,25 @@ export function BuilderCardStats({
             </Stack>
           </Tooltip>
         )}
-        {typeof rank === 'number' && (
-          <Tooltip title='Current week’s rank'>
-            <Stack flexDirection='row' gap={0.2} alignItems='center'>
-              <Typography
-                sx={{
-                  fontSize: {
-                    xs: '12px',
-                    md: mdFontSize
-                  }
-                }}
-                component='span'
-                color='text.secondary'
-              >
-                #{rank}
-              </Typography>
-            </Stack>
-          </Tooltip>
-        )}
+        <Tooltip title='Current week’s rank'>
+          <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center' width='33%'>
+            <Typography
+              sx={{
+                fontSize: {
+                  xs: '12px',
+                  md: mdFontSize
+                }
+              }}
+              component='span'
+              color='text.secondary'
+            >
+              {isValidRank ? `#${rank}` : <>&ndash;</>}
+            </Typography>
+          </Stack>
+        </Tooltip>
         {typeof nftsSold === 'number' && (
           <Tooltip title='Total # of cards sold this season to date'>
-            <Stack flexDirection='row' gap={0.25} alignItems='center'>
+            <Stack flexDirection='row' gap={0.25} alignItems='center' justifyContent='flex-end' width='33%'>
               <Typography
                 sx={{
                   fontSize: {

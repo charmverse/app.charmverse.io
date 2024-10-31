@@ -7,8 +7,10 @@ test.describe('Login page', () => {
     const builder = await mockBuilder({});
 
     await page.goto('/');
-    const signInButton = page.locator('data-test=sign-in-button');
-    await signInButton.click();
+    await page.waitForURL('**/home');
+    await expect(homePage.container).toBeVisible();
+
+    await homePage.signInButton.click();
     await page.waitForURL('**/login');
 
     const signInWithWarpcast = page.locator('data-test=sign-in-with-warpcast');
@@ -22,9 +24,7 @@ test.describe('Login page', () => {
 
     await page.goto('/home');
     await page.waitForURL('**/home');
-
-    const homePageContainer = page.locator('data-test=home-page');
-    await expect(homePageContainer).toBeVisible();
+    await expect(homePage.container).toBeVisible();
 
     const userPill = page.locator('data-test=user-menu-pill');
     await expect(userPill).toBeVisible();
