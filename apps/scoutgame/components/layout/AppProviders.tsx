@@ -3,6 +3,7 @@ import 'server-only';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 
 import { WagmiProvider } from 'components/common/WalletLogin/WagmiProvider';
@@ -19,7 +20,7 @@ export function AppProviders({ children, user }: { children: ReactNode; user: Se
     <AppRouterCacheProvider options={{ key: 'css' }}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
-        <WagmiProvider>
+        <WagmiProvider cookie={headers().get('cookie') ?? ''}>
           <SWRProvider>
             <UserProvider userSession={user}>
               <SnackbarProvider>
