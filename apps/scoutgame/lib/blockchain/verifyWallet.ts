@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { SiweMessage } from 'siwe';
 
-import type { LoginWithWalletSchema } from './config';
+import type { LoginWithWalletSchema } from './schema';
 
 export async function verifyWalletSignature({
   message,

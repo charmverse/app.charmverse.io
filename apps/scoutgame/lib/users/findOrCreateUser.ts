@@ -71,7 +71,11 @@ export async function findOrCreateUser({
 
   if (!userProps?.avatar) {
     const randomAvatarSvg = generateRandomAvatar();
-    const imageBuffer = await sharp(Buffer.from(randomAvatarSvg)).png().toBuffer();
+    const imageBuffer = await sharp(Buffer.from(randomAvatarSvg))
+      // Increase size for better quality
+      .resize(256, 256)
+      .png()
+      .toBuffer();
 
     const pathInS3 = getUserS3FilePath({ userId, url: 'avatar.png' });
     try {

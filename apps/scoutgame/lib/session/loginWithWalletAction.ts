@@ -1,8 +1,8 @@
 'use server';
 
 import { actionClient } from 'lib/actions/actionClient';
-import { loginWithWalletSchema } from 'lib/blockchain/config';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
+import { loginWithWalletSchema } from 'lib/blockchain/schema';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
 
 import type { SessionUser } from './getUserFromSession';
