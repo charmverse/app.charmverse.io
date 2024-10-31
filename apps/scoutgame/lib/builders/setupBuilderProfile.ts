@@ -132,4 +132,5 @@ export async function setupBuilderProfile({
   if (inviteCode !== null) {
     await approveBuilder({ builderId: unsealedUserId });
   }
+  return scout;
 }
