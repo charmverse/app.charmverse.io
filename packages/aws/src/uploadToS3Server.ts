@@ -10,12 +10,9 @@ import { getS3ClientConfig } from './getS3ClientConfig';
 
 const client = new S3Client(getS3ClientConfig());
 
-export async function uploadFileToS3(file: {
-  awsS3Bucket: string;
-  pathInS3: string;
-  content: Buffer;
-  contentType?: string;
-}) {
+const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
+
+export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; contentType?: string }) {
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
     Bucket: awsS3Bucket,

@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const tokenData = await uploadToken(filename, userId);
+    const tokenData = await uploadToken({ filename, userId });
 
     return Response.json(tokenData);
   } catch (error) {

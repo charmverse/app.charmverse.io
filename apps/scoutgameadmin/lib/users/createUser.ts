@@ -3,6 +3,7 @@ import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { octokit } from '@packages/github/client';
+import { findOrCreateFarcasterUser } from '@packages/scoutgame/users/findOrCreateFarcasterUser';
 
 import type { SearchUserResult } from './getUser';
 
@@ -58,19 +59,13 @@ export async function createUser({ scout, waitlistUser, farcasterUser }: SearchU
       }
     });
   } else if (farcasterUser) {
-    // create new scout from farcaster user
-    const avatarUrl = farcasterUser.pfp_url;
-    return prisma.scout.create({
-      data: {
-        displayName: farcasterUser.display_name,
-        path: farcasterUser.username,
-        avatar: avatarUrl,
-        bio: farcasterUser.profile.bio.text,
-        builderStatus: 'applied',
-        farcasterId: farcasterUser.fid,
-        farcasterName: farcasterUser.username
+    const result = await findOrCreateFarcasterUser({ fid: farcasterUser.fid });
+    const newScout = await prisma.scout.findUniqueOrThrow({
+      where: {
+        id: result.id
       }
     });
+    return newScout;
   }
   throw new Error('Unknown scenario when creating user');
 }
