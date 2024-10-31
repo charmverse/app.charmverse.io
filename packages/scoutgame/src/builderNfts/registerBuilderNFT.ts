@@ -54,14 +54,10 @@ export async function registerBuilderNFT({
     throw new InvalidInputError('Scout profile does not have a github user');
   }
 
-  if (builder.builderStatus !== 'approved') {
-    throw new InvalidInputError('Scout profile not marked as a builder');
-  }
-
   let tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } }).catch(() => null);
 
   if (!tokenId) {
-    log.info(`Registering builder token for builderId: ${builderId}`);
+    log.info(`Registering builder token for builder`, { userId: builderId });
     await contractClient.registerBuilderToken({ args: { builderId } });
     tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
   }
@@ -75,7 +71,7 @@ export async function registerBuilderNFT({
     displayName: builder.displayName
   });
 
-  log.info(`Registered builder NFT for builderId: ${builderId}`, {
+  log.info(`Registered builder NFT for builder`, {
     userId: builderId,
     builderPath: builder.path,
     tokenId,
