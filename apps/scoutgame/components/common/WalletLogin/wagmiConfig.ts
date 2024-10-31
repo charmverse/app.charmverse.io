@@ -18,8 +18,8 @@ import {
   baseSepolia
 } from 'wagmi/chains';
 
-export function getConfig() {
-  const walletConnectProjectId = env('WALLETCONNECT_PROJECTID') || process.env.REACT_APP_WALLETCONNECT_PROJECTID || '';
+export function getConfig(options?: Partial<Parameters<typeof getDefaultConfig>[0]>) {
+  const projectId = options?.projectId || env('WALLETCONNECT_PROJECTID') || '';
 
   const wagmiChains = [
     mainnet,
@@ -46,7 +46,7 @@ export function getConfig() {
 
   const config = getDefaultConfig({
     appName: 'Scout Game',
-    projectId: walletConnectProjectId,
+    projectId,
     chains: wagmiChains,
     ssr: true,
     storage: createStorage({ storage: cookieStorage }),

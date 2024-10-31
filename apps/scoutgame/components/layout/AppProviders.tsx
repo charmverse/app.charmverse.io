@@ -20,7 +20,10 @@ export function AppProviders({ children, user }: { children: ReactNode; user: Se
     <AppRouterCacheProvider options={{ key: 'css' }}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
-        <WagmiProvider cookie={headers().get('cookie') ?? ''}>
+        <WagmiProvider
+          cookie={headers().get('cookie') ?? ''}
+          walletConnectProjectId={process.env.REACT_APP_WALLETCONNECT_PROJECTID}
+        >
           <SWRProvider>
             <UserProvider userSession={user}>
               <SnackbarProvider>

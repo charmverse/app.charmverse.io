@@ -23,9 +23,6 @@ const nextConfig = {
   images: {
     unoptimized: true
   },
-  env: {
-    REACT_APP_WALLETCONNECT_PROJECTID: process.env.REACT_APP_WALLETCONNECT_PROJECTID
-  },
   productionBrowserSourceMaps: true,
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   webpack(_config) {
