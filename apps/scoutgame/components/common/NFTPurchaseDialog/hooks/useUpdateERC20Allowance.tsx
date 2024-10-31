@@ -1,9 +1,8 @@
+import { getChainById } from '@packages/blockchain/chains';
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import useSWRMutation from 'swr/mutation';
 import { publicActions, type Address, type Chain } from 'viem';
 import { useWalletClient } from 'wagmi';
-
-import { getChainById } from '../../../../../../packages/blockchain/src/chains';
 
 // Define a hook for checking allowances
 export type UseERC20AllowanceProps = {

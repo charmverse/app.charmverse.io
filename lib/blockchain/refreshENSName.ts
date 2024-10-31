@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getENSName } from '@packages/blockchain/getENSName';
 import { getUserProfile } from '@root/lib/profile/getUser';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { matchWalletAddress, shortWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
-
-import { getENSName } from '../../packages/blockchain/src/getENSName';
 
 export type ENSUserNameRefresh = {
   userId: string;

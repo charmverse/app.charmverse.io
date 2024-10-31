@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { arrayUtils } from '@charmverse/core/utilities';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import type { BuilderScoutedEvent } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
 import { getAndParseNftMintLogs } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
 import { syncUserNFTsFromOnchainData } from '@packages/scoutgame/builderNfts/syncUserNFTsFromOnchainData';
-
-import { getPublicClient } from '../../../../../packages/blockchain/src/getPublicClient';
 
 const averageOptimismBlockTimeInSeconds = 2;
 

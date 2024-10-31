@@ -1,8 +1,7 @@
 import type { PendingNftTransaction, TransactionStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { getPublicClient } from '../../../../packages/blockchain/src/getPublicClient';
-import { waitForDecentTransactionSettlement } from '../../../../packages/blockchain/src/waitForDecentTransactionSettlement';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { waitForDecentTransactionSettlement } from '@packages/blockchain/waitForDecentTransactionSettlement';
 
 export type TxResponse = Pick<PendingNftTransaction, 'id' | 'sourceChainTxHash' | 'destinationChainTxHash' | 'status'>;
 

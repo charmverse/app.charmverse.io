@@ -1,7 +1,6 @@
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { decodeFunctionResult, encodeFunctionData } from 'viem';
 import { optimism } from 'viem/chains';
-
-import { getPublicClient } from '../../../blockchain/src/getPublicClient';
 
 import { getBuilderContractAddress } from './constants';
 
