@@ -1,6 +1,7 @@
 'use client';
 
 import type { Scout } from '@charmverse/core/prisma';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, CircularProgress, IconButton, Stack, TextField, Typography } from '@mui/material';
 import Image from 'next/image';
@@ -8,7 +9,6 @@ import { useState } from 'react';
 import { Controller, useController, type Control } from 'react-hook-form';
 
 import { useIsMounted } from 'hooks/useIsMounted';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 
 export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
@@ -30,11 +30,9 @@ type UserProfileProps = {
 };
 
 export function EditableUserProfile({ user, control }: UserProfileProps) {
-  const isDesktop = useMdScreen();
-  const { displayName } = user;
   const isMounted = useIsMounted();
   const [isEditingName, setIsEditingName] = useState(false);
-
+  const [isDisplayNameDirty, setIsDisplayNameDirty] = useState(false);
   const { field } = useController({
     name: 'avatar',
     control
@@ -129,35 +127,63 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
           </Box>
         )}
       />
-      <Stack direction='row' alignItems='center' flexWrap='wrap' justifyContent='space-between' width='100%' gap={1}>
-        <Stack maxWidth='85%'>
-          {isEditingName ? (
-            <Controller
-              name='displayName'
-              control={control}
-              render={({ field: displayNameField, fieldState: { error } }) => (
+      <Controller
+        name='displayName'
+        control={control}
+        render={({ field: displayNameField, fieldState: { error } }) => (
+          <Stack
+            direction='row'
+            alignItems='center'
+            flexWrap='wrap'
+            justifyContent='space-between'
+            width='100%'
+            gap={1}
+          >
+            <Stack maxWidth='85%'>
+              {isEditingName ? (
                 <TextField
                   required
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && displayNameField.value) {
+                      setIsEditingName(false);
+                      setIsDisplayNameDirty(false);
+                    }
+                  }}
                   {...displayNameField}
+                  onChange={(...args) => {
+                    setIsDisplayNameDirty(true);
+                    displayNameField.onChange(...args);
+                  }}
                   fullWidth
                   error={!!error?.message}
                   sx={{
                     '& .MuiInputBase-input': {
                       padding: 1,
-                      fontSize: isDesktop
-                        ? (theme) => theme.typography.h5.fontSize
-                        : (theme) => theme.typography.h6.fontSize
+                      fontSize: (theme) => theme.typography.h5.fontSize
                     }
                   }}
                 />
+              ) : (
+                <Typography variant='h6'>{displayNameField.value}</Typography>
               )}
-            />
-          ) : (
-            <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          )}
-        </Stack>
-        <EditIcon fontSize='small' onClick={() => setIsEditingName(true)} />
-      </Stack>
+            </Stack>
+            {isEditingName ? (
+              isDisplayNameDirty && !error?.message && displayNameField.value ? (
+                <CheckCircleIcon
+                  sx={{ cursor: 'pointer' }}
+                  color='success'
+                  onClick={() => {
+                    setIsEditingName(false);
+                    setIsDisplayNameDirty(false);
+                  }}
+                />
+              ) : null
+            ) : (
+              <EditIcon sx={{ cursor: 'pointer' }} fontSize='small' onClick={() => setIsEditingName(true)} />
+            )}
+          </Stack>
+        )}
+      />
     </Stack>
   );
 }
