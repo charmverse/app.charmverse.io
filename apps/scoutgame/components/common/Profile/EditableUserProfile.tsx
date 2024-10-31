@@ -134,7 +134,7 @@ export function EditableUserProfile({ user, control }: UserProfileProps) {
           <Stack
             direction='row'
             alignItems='center'
-            flexWrap='wrap'
+            flexWrap='nowrap'
             justifyContent='space-between'
             width='100%'
             gap={1}
