@@ -51,7 +51,7 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
       bio,
       builderStatus: 'applied',
       farcasterId: fid,
-      farcasterName: displayName,
+      farcasterName: username,
       githubUser: githubUserDB
         ? { connect: { id: githubUserDB.id } }
         : {

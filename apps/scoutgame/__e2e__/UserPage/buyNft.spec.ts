@@ -35,7 +35,7 @@ test.describe('Buy Nft', () => {
     await userPage.mockNftAPIs({
       builder: {
         id: builder.id,
-        path: builder.path!
+        path: builder.path
       },
       isSuccess: true
     });

@@ -62,7 +62,7 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
         id: weeklyTopBuilder.user.id,
         avatar: weeklyTopBuilder.user.avatar,
         displayName: weeklyTopBuilder.user.displayName,
-        path: weeklyTopBuilder.user.path!,
+        path: weeklyTopBuilder.user.path,
         builderStatus: weeklyTopBuilder.user.builderStatus!,
         gemsCollected: weeklyTopBuilder.gemsCollected,
         progress,

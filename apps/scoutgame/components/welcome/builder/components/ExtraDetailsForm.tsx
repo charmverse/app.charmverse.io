@@ -12,7 +12,8 @@ import {
   Link,
   Stack,
   TextField,
-  Typography
+  Typography,
+  Box
 } from '@mui/material';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
@@ -21,19 +22,20 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
+import { EditableUserProfile } from 'components/common/Profile/EditableUserProfile';
 import { useUser } from 'components/layout/UserProvider';
 import { useIsMounted } from 'hooks/useIsMounted';
 import type { SessionUser } from 'lib/session/getUserFromSession';
-import { saveTermsOfServiceAction } from 'lib/users/saveTermsOfServiceAction';
-import { schema } from 'lib/users/termsOfServiceSchema';
-import type { FormValues } from 'lib/users/termsOfServiceSchema';
+import { saveOnboardingDetailsAction } from 'lib/users/saveOnboardingDetailsAction';
+import { saveOnboardingDetailsSchema } from 'lib/users/saveOnboardingDetailsSchema';
+import type { SaveOnboardingDetailsFormValues } from 'lib/users/saveOnboardingDetailsSchema';
 
 export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   const router = useRouter();
   const { refreshUser } = useUser();
   const [errors, setErrors] = useState<string[] | null>(null);
 
-  const { execute, isExecuting } = useAction(saveTermsOfServiceAction, {
+  const { execute, isExecuting } = useAction(saveOnboardingDetailsAction, {
     async onSuccess() {
       // update the user object with the new terms of service agreement
       await refreshUser();
@@ -56,13 +58,19 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
     }
   });
 
-  const { control, getValues, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema),
+  const { control, getValues, handleSubmit } = useForm<SaveOnboardingDetailsFormValues>({
+    resolver: yupResolver(saveOnboardingDetailsSchema),
     mode: 'onChange',
-    defaultValues: { email: '', agreedToTOS: false, sendMarketing: true }
+    defaultValues: {
+      email: '',
+      agreedToTOS: false,
+      sendMarketing: true,
+      avatar: user.avatar ?? undefined,
+      displayName: user.displayName
+    }
   });
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = (data: SaveOnboardingDetailsFormValues) => {
     execute(data);
   };
 
@@ -79,74 +87,88 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
-      <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
-        <FormLabel id='form-email' required>
-          Email
-        </FormLabel>
-        <Controller
-          control={control}
-          name='email'
-          render={({ field, fieldState: { error } }) => (
-            <TextField
-              data-test='onboarding-email'
-              placeholder='Your email'
-              autoFocus
-              aria-labelledby='form-email'
-              required
-              type='email'
-              error={!!error?.message}
-              {...field}
-              sx={{ mb: 2 }}
+    <Box display='flex' gap={3} flexDirection='column' alignItems='flex-start' data-test='welcome-page'>
+      <Stack>
+        <Typography variant='h5' color='text.secondary'>
+          Your Profile
+        </Typography>
+        <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
+          <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
+            <EditableUserProfile
+              control={control}
+              user={{
+                ...user,
+                avatar: user.avatar as string
+              }}
             />
-          )}
-        />
-        <Controller
-          control={control}
-          name='sendMarketing'
-          render={({ field: { onChange, value } }) => (
-            <FormControlLabel
-              control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
-              label={
-                <Typography variant='body2'>Notify me of new opportunities (grants, accelerators, etc)</Typography>
-              }
-              sx={{ fontSize: 12 }}
+            <FormLabel id='form-email' required>
+              Email
+            </FormLabel>
+            <Controller
+              control={control}
+              name='email'
+              render={({ field, fieldState: { error } }) => (
+                <TextField
+                  data-test='onboarding-email'
+                  placeholder='Your email'
+                  autoFocus
+                  aria-labelledby='form-email'
+                  required
+                  type='email'
+                  error={!!error?.message}
+                  {...field}
+                  sx={{ mb: 2 }}
+                />
+              )}
             />
-          )}
-        />
-        <Controller
-          control={control}
-          name='agreedToTOS'
-          render={({ field: { onChange, value } }) => (
-            <FormControlLabel
-              control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
-              label={
-                <Typography variant='body2'>
-                  I agree to the
-                  <Link href='/info/terms' target='_blank'>
-                    {' '}
-                    Terms and Service
-                  </Link>
-                </Typography>
-              }
-              sx={{ mb: 2 }}
+            <Controller
+              control={control}
+              name='sendMarketing'
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  control={<Checkbox data-test='onboarding-notify-grants' onChange={onChange} checked={!!value} />}
+                  label={
+                    <Typography variant='body2'>Notify me of new opportunities (grants, accelerators, etc)</Typography>
+                  }
+                  sx={{ fontSize: 12 }}
+                />
+              )}
             />
-          )}
-        />
-      </FormControl>
-      <Stack display='flex' alignItems='center' gap={1} width='100%'>
-        <Button
-          data-test='submit-extra-details'
-          size='medium'
-          type='submit'
-          disabled={isExecuting}
-          fullWidth
-          sx={{ flexShrink: 0, py: 1, px: 2 }}
-        >
-          Next
-        </Button>
-        <FormErrors errors={errors} />
+            <Controller
+              control={control}
+              name='agreedToTOS'
+              render={({ field: { onChange, value } }) => (
+                <FormControlLabel
+                  control={<Checkbox data-test='onboarding-accept-terms' onChange={onChange} checked={!!value} />}
+                  label={
+                    <Typography variant='body2'>
+                      I agree to the
+                      <Link href='/info/terms' target='_blank'>
+                        {' '}
+                        Terms and Service
+                      </Link>
+                    </Typography>
+                  }
+                  sx={{ mb: 2 }}
+                />
+              )}
+            />
+          </FormControl>
+          <Stack display='flex' alignItems='center' gap={1} width='100%'>
+            <Button
+              data-test='submit-extra-details'
+              size='medium'
+              type='submit'
+              disabled={isExecuting}
+              fullWidth
+              sx={{ flexShrink: 0, py: 1, px: 2 }}
+            >
+              Next
+            </Button>
+            <FormErrors errors={errors} />
+          </Stack>
+        </form>
       </Stack>
-    </form>
+    </Box>
   );
 }

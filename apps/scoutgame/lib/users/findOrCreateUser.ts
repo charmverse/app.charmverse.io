@@ -6,13 +6,16 @@ import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
-import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadFileToS3, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getENSName } from '@root/lib/blockchain/getENSName';
 import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
 import { capitalize } from '@root/lib/utils/strings';
+import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';
 import { isAddress } from 'viem/utils';
+
+import { generateRandomAvatar } from 'lib/utils/generateRandomAvatar';
 
 const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   legendary: 60,
@@ -39,6 +42,7 @@ export async function findOrCreateUser({
   bio?: string;
   displayName: string;
   path: string;
+  farcasterName?: string;
   tierOverride?: ConnectWaitlistTier;
 }): Promise<FindOrCreateUserResult> {
   if (!farcasterId && !walletAddresses?.length) {
@@ -65,8 +69,26 @@ export async function findOrCreateUser({
 
   const userId = newUserId || v4();
 
-  // upload avatars in case they are hosted on IPFS
-  if (userProps?.avatar) {
+  if (!userProps?.avatar) {
+    const randomAvatarSvg = generateRandomAvatar();
+    const imageBuffer = await sharp(Buffer.from(randomAvatarSvg))
+      // Increase size for better quality
+      .resize(256, 256)
+      .png()
+      .toBuffer();
+
+    const pathInS3 = getUserS3FilePath({ userId, url: 'avatar.png' });
+    try {
+      const { fileUrl } = await uploadFileToS3({
+        pathInS3,
+        content: imageBuffer,
+        contentType: 'image/png'
+      });
+      userProps.avatar = fileUrl;
+    } catch (e) {
+      log.error('Failed to save avatar', { error: e, pathInS3, userId });
+    }
+  } else if (userProps?.avatar) {
     const pathInS3 = getUserS3FilePath({ userId, url: getFilenameWithExtension(userProps?.avatar) });
     try {
       const { url } = await uploadUrlToS3({ pathInS3, url: userProps?.avatar });
@@ -85,11 +107,13 @@ export async function findOrCreateUser({
     userProps.walletENS = ens || undefined;
   }
 
-  const waitlistRecord = await prisma.connectWaitlistSlot.findUnique({
-    where: {
-      fid: farcasterId
-    }
-  });
+  const waitlistRecord = farcasterId
+    ? await prisma.connectWaitlistSlot.findUnique({
+        where: {
+          fid: farcasterId
+        }
+      })
+    : undefined;
 
   let points = 0;
   let tier: ConnectWaitlistTier | undefined;
@@ -146,7 +170,7 @@ export async function findOrCreateUser({
 
   trackUserAction('sign_up', {
     userId: newScout.id,
-    path: userProps.path!,
+    path: userProps.path,
     displayName: userProps.displayName,
     fid: farcasterId
   });

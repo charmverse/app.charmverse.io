@@ -3,7 +3,7 @@ import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 export type BuilderReward = {
-  path: string | null;
+  path: string;
   displayName: string;
   avatar: string | null;
   points: number;

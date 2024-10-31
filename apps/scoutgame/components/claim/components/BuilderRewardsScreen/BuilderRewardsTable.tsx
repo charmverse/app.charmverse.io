@@ -15,7 +15,7 @@ function BuilderRewardsTableRow({ reward }: { reward: BuilderReward }) {
       <TableCell>
         <Link href={`/u/${reward.path}`}>
           <Stack direction='row' alignItems='center' gap={1}>
-            <Avatar src={reward.avatar} name={reward.path!} size='small' />
+            <Avatar src={reward.avatar} name={reward.path} size='small' />
             <Typography noWrap overflow='hidden'>
               {reward.displayName}
             </Typography>

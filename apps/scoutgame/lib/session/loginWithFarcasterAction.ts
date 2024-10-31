@@ -1,6 +1,5 @@
 'use server';
 
-import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { authSecret } from '@root/config/constants';
 import { sealData } from 'iron-session';
@@ -12,7 +11,6 @@ import { verifyFarcasterUser } from 'lib/farcaster/verifyFarcasterUser';
 
 import { authSchema } from '../farcaster/config';
 
-import { authorizeUserByLaunchDate } from './authorizeUserByLaunchDate';
 import { saveSession } from './saveSession';
 
 export const loginWithFarcasterAction = actionClient

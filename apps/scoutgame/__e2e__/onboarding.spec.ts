@@ -21,7 +21,8 @@ test.describe('Onboarding flow', () => {
   test('Save new user preferences and get through onboarding', async ({ welcomePage, homePage, page, utils }) => {
     const newUser = await mockScout({
       onboardedAt: null,
-      agreedToTermsAt: null
+      agreedToTermsAt: null,
+      avatar: 'https://placehold.co/256'
     });
     await utils.loginAsUserId(newUser.id);
 

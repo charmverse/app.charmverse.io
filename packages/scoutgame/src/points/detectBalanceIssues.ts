@@ -22,7 +22,7 @@ export async function detectBalanceIssues() {
 
   for (let i = 0; i < totalScouts; i++) {
     log.info(
-      `Checking scout ${i + 1} of ${totalScouts}: fid=${scouts[i].farcasterId}, name=${scouts[i].farcasterName}`
+      `Checking scout ${i + 1} of ${totalScouts}: fid=${scouts[i].farcasterId}, username=${scouts[i].farcasterName}`
     );
     const scout = scouts[i];
 
