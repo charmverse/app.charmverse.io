@@ -1,7 +1,7 @@
+import { resolveENSName } from '@packages/blockchain/getENSName';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { resolveENSName } from 'lib/blockchain';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
