@@ -28,6 +28,7 @@ import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
 import { AddUserButton } from './AddUserButton/AddUserButton';
+import { SocialLinks } from './SocialLinks';
 import { ViewTransactionsButton } from './ViewTransactionsButton/ViewTransactionsButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
@@ -86,7 +87,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             input: {
               endAdornment: (
                 <InputAdornment position='end'>
-                  {(isLoading || isValidating) && <CircularProgress size={20} />}
+                  {(isLoading || isValidating) && filterString && <CircularProgress size={20} />}
                   {filterString && (
                     <IconButton aria-label='clear search' size='small' onClick={() => setFilter('')} edge='end'>
                       <ClearIcon fontSize='small' />
@@ -112,15 +113,15 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'path'}
-                  direction={sortField === 'path' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('path')}
+                  active={sortField === 'displayName'}
+                  direction={sortField === 'displayName' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('displayName')}
                 >
-                  Username
+                  User
                 </TableSortLabel>
               </TableCell>
               <TableCell>ID</TableCell>
-              <TableCell>Farcaster ID</TableCell>
+              <TableCell>Links</TableCell>
               <TableCell>
                 <TableSortLabel
                   active={sortField === 'builderStatus'}
@@ -162,9 +163,15 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.path}</TableCell>
+                <TableCell>
+                  <Link target='_blank' href={`https://scoutgame.xyz/u/${user.path}`}>
+                    {user.displayName}
+                  </Link>
+                </TableCell>
                 <TableCell>{user.id}</TableCell>
-                <TableCell>{user.farcasterId}</TableCell>
+                <TableCell>
+                  <SocialLinks farcasterName={user.farcasterName} githubLogin={user.githubLogin} />
+                </TableCell>
                 <TableCell>{user.builderStatus || 'N/A'}</TableCell>
                 <TableCell>{user.currentBalance}</TableCell>
                 <TableCell>

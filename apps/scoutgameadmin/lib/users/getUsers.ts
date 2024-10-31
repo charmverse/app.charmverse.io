@@ -3,12 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 export type ScoutGameUser = Pick<
   Scout,
-  'builderStatus' | 'path' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterId' | 'currentBalance'
-> & { nftsPurchased: number };
+  'builderStatus' | 'path' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterName' | 'currentBalance'
+> & { githubLogin: string | null; nftsPurchased: number };
 
 export type UserFilter = 'only-builders';
 
-export type SortField = 'path' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
+export type SortField = 'displayName' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
 export type SortOrder = 'asc' | 'desc';
 
 export async function getUsers({
@@ -57,11 +57,13 @@ export async function getUsers({
           ? { builderStatus: { not: null } }
           : undefined,
     include: {
+      githubUser: true,
       userSeasonStats: true
     }
   });
   return users.map((user) => ({
     ...user,
+    githubLogin: user.githubUser[0]?.login || null,
     nftsPurchased: user.userSeasonStats.find(({ season }) => season === '2024-W41')?.nftsPurchased || 0
   }));
 }

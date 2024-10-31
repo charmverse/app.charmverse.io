@@ -53,6 +53,18 @@ export async function getUser({ searchString }: { searchString: string }): Promi
   if (user) {
     return { scout: { ...user, githubLogin: user.githubUser[0]?.login } };
   }
+  // check for scout by name
+  const userByName = await prisma.scout.findFirst({
+    where: {
+      displayName: searchString
+    },
+    include: {
+      githubUser: true
+    }
+  });
+  if (userByName) {
+    return { scout: { ...userByName, githubLogin: userByName.githubUser[0]?.login } };
+  }
   // check for waitlist by github login or farcaster username
   const waitlistUser = await prisma.connectWaitlistSlot.findFirst({
     where: {
