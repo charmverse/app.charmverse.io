@@ -5,7 +5,6 @@ export type MinimalUserInfo = {
   displayName: string;
   path: string;
   avatar?: string | null;
-  farcasterName?: string | null;
 };
 
 export type BasicUserInfo = MinimalUserInfo & {

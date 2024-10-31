@@ -7,6 +7,9 @@ export async function findScoutOrThrow(scoutId: string) {
     where: {
       id: scoutId
     },
-    select: BasicUserInfoSelect
+    select: {
+      ...BasicUserInfoSelect,
+      farcasterName: true
+    }
   });
 }

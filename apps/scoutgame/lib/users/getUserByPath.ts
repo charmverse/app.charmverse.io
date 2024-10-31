@@ -18,7 +18,7 @@ async function _getUserByPath(path: string): Promise<
     where: {
       path
     },
-    select: { ...BasicUserInfoSelect, displayName: true, builderNfts: true }
+    select: { ...BasicUserInfoSelect, displayName: true, builderNfts: true, farcasterName: true }
   });
 
   if (!user) {
