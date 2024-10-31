@@ -1,0 +1,16 @@
+{
+  "name": "@packages/aws",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.682.0",
+    "@aws-sdk/lib-storage": "^3.682.0"
+  }
+}
