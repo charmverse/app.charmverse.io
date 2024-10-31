@@ -5,6 +5,7 @@ import { getCurrentWeekPointsAllocation } from '@packages/scoutgame/builderNfts/
 import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
 import { currentSeason, getLastWeek } from '@packages/scoutgame/dates';
 import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/points/getPointsCountForWeekWithNormalisation';
+import { getWeeklyPointsPoolAndBuilders } from '@packages/scoutgame/points/getWeeklyPointsPoolAndBuilders';
 import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
@@ -35,11 +36,8 @@ export async function processGemsPayout(
     return;
   }
 
-  const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: weeklyRewardableBuilders, week });
-
-  const { normalisationFactor, totalPoints } = await getPointsCountForWeekWithNormalisation({ week });
-
-  const weeklyAllocatedPoints = await getCurrentWeekPointsAllocation({ week });
+  const { normalisationFactor, topWeeklyBuilders, totalPoints, weeklyAllocatedPoints } =
+    await getWeeklyPointsPoolAndBuilders({ week });
 
   log.debug(`Allocation: ${weeklyAllocatedPoints} -- Total points for week ${week}: ${totalPoints}`, {
     topWeeklyBuilders: topWeeklyBuilders.length,
