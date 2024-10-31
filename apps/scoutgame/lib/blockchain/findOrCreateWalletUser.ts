@@ -1,6 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { Scout } from '@charmverse/core/prisma-client';
-import type { User as FarcasterUserProfile } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
 import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUsersByAddresses';
 import { getENSDetails, getENSName } from '@root/lib/blockchain/getENSName';
 import { getAddress } from 'viem';
@@ -26,17 +24,17 @@ export async function findOrCreateWalletUser({
   });
   const displayName = ens || generateRandomName();
   const path = await generateUserPath(displayName);
-  let farcasterUser: null | FarcasterUserProfile = null;
+  let farcasterName: string | undefined;
+  let farcasterId: number | undefined;
   try {
     const address = getAddress(wallet).toLowerCase();
     const response = await getFarcasterUsersByAddresses({ addresses: [address] });
-    farcasterUser = response[address]?.[0];
+    const farcasterUser = response[address]?.[0];
+    farcasterName = farcasterUser?.username;
+    farcasterId = farcasterUser?.fid;
   } catch (error) {
     log.warn('Could not retrieve Farcaster user', { error, wallet });
   }
-
-  const farcasterName = farcasterUser?.username;
-  const farcasterId = farcasterUser?.fid;
 
   return findOrCreateUser({
     newUserId,

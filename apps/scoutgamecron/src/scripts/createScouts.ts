@@ -26,7 +26,7 @@ async function createScouts(farcasterUsernames: string[]) {
           avatar: avatarUrl,
           bio,
           farcasterId: fid,
-          farcasterUsername,
+          farcasterName: farcasterUsername,
           currentBalance: 10
         }
       });
