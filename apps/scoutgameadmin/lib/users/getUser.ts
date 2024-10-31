@@ -56,7 +56,10 @@ export async function getUser({ searchString }: { searchString: string }): Promi
   // check for scout by name
   const userByName = await prisma.scout.findFirst({
     where: {
-      displayName: searchString
+      displayName: {
+        equals: searchString,
+        mode: 'insensitive'
+      }
     },
     include: {
       githubUser: true
