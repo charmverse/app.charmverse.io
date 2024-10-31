@@ -17,6 +17,7 @@ export async function getUser({ searchString }: { searchString: string }): Promi
     return null;
   }
   // assume farcaster id if search string is a number
+  // look for scout, then waitlist, then farcaster for a profile
   const userFid = getNumberFromString(searchString);
   if (userFid) {
     const scout = await prisma.scout.findUnique({
@@ -40,6 +41,7 @@ export async function getUser({ searchString }: { searchString: string }): Promi
       return { farcasterUser: farcasterUser[0] };
     }
   }
+  // check for scout by path
   const user = await prisma.scout.findUnique({
     where: {
       path: searchString
@@ -51,9 +53,10 @@ export async function getUser({ searchString }: { searchString: string }): Promi
   if (user) {
     return { scout: { ...user, githubLogin: user.githubUser[0]?.login } };
   }
+  // check for waitlist by github login or farcaster username
   const waitlistUser = await prisma.connectWaitlistSlot.findFirst({
     where: {
-      githubLogin: searchString
+      OR: [{ githubLogin: searchString }, { username: searchString }]
     }
   });
   if (waitlistUser) {

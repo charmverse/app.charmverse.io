@@ -5,7 +5,7 @@ import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { matchWalletAddress, shortWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
 
-import { getENSName } from './getENSName';
+import { getENSName } from '../../packages/blockchain/src/getENSName';
 
 export type ENSUserNameRefresh = {
   userId: string;

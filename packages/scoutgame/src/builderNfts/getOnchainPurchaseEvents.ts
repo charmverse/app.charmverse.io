@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { createPublicClient, http, parseEventLogs } from 'viem';
 import { optimism } from 'viem/chains';
+
+import { getPublicClient } from '../../../blockchain/src/getPublicClient';
 
 import { realOptimismMainnetBuildersContract } from './constants';
 

@@ -1,5 +1,7 @@
 'use server';
 
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+
 import { actionClient } from 'lib/actions/actionClient';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { loginWithWalletSchema } from 'lib/blockchain/schema';
@@ -19,6 +21,16 @@ export const loginWithWalletAction = actionClient
     const user = await findOrCreateWalletUser({ wallet: walletAddress, newUserId });
     await saveSession(ctx, { scoutId: user.id });
     const sessionUser = (await getUserFromSession()) as SessionUser;
+
+    if (user.isNew) {
+      trackUserAction('sign_up', {
+        userId: user.id
+      });
+    } else {
+      trackUserAction('sign_in', {
+        userId: user.id
+      });
+    }
 
     return {
       user: sessionUser,

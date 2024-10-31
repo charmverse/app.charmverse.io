@@ -4,12 +4,13 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { currentSeason } from '@packages/scoutgame/dates';
+
+import { getPublicClient } from '../../../blockchain/src/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
-} from '@packages/onchain/waitForDecentTransactionSettlement';
-import { currentSeason } from '@packages/scoutgame/dates';
+} from '../../../blockchain/src/waitForDecentTransactionSettlement';
 
 import { recordNftMintAndRefreshPrice } from './recordNftMint';
 import { convertCostToPoints } from './utils';

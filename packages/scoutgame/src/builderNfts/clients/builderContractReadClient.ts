@@ -1,5 +1,4 @@
-import { getPublicClient } from '@packages/onchain/getPublicClient';
-
+import { getPublicClient } from '../../../../blockchain/src/getPublicClient';
 import { getBuilderContractAddress, builderNftChain } from '../constants';
 
 import { BuilderNFTSeasonOneImplementation01Client } from './builderNFTSeasonOneClient';

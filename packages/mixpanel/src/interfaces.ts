@@ -8,12 +8,6 @@ export type BaseEvent = {
   userId: string;
 };
 
-export type UserSignupEvent = BaseEvent & {
-  displayName: string;
-  path: string;
-  fid?: number;
-};
-
 export type NftPurchaseEvent = BaseEvent & {
   amount: number;
   builderPath: string;
@@ -28,7 +22,7 @@ export type OpenCheckoutEvent = BaseEvent & {
 };
 
 export interface UserEventMap {
-  sign_up: UserSignupEvent;
+  sign_up: BaseEvent;
   sign_in: BaseEvent;
   nft_purchase: NftPurchaseEvent;
   connect_github_success: BaseEvent;

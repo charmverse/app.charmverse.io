@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import React from 'react';
 
-import { useGetScoutEvents } from 'hooks/api/onchain';
+import { useGetScoutEvents } from 'hooks/api/blockchain';
 
 type Props = {
   open: boolean;

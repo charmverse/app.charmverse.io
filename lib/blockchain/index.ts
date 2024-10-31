@@ -1,1 +1,1 @@
-export * from './getENSName';
+export * from '../../packages/blockchain/src/getENSName';

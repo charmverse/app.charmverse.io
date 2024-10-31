@@ -1,8 +1,9 @@
-import { getChainById } from '@packages/onchain/chains';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import useSWR from 'swr';
 import type { Address, Chain } from 'viem';
+
+import { getChainById } from '../../../../../../packages/blockchain/src/chains';
+import { getPublicClient } from '../../../../../../packages/blockchain/src/getPublicClient';
 
 // Define a hook for checking allowances
 export type UseERC20AllowanceProps = {

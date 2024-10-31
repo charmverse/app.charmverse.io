@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function AddUserModal({ open, onClose, onAdd }: Props) {
-  const [repoInput, setRepoInput] = useState('');
+  const [repoInput, setTextInput] = useState('');
   const { trigger: createUser, isMutating: isCreating } = useCreateUser();
   const debouncedFilterString = useDebouncedValue(repoInput);
   const { data: user, error, isValidating, isLoading } = useGetUser(debouncedFilterString);
@@ -35,7 +35,7 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
     await createUser({ searchString: repoInput });
     onAdd();
     onClose();
-    setRepoInput('');
+    setTextInput('');
     // clear SWR cache
     mutate(
       (key) => true, // which cache keys are updated
@@ -48,15 +48,15 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>Add or manage user</DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ pt: 0 }}>
+        <DialogContent>
           <TextField
             autoFocus
-            margin='dense'
             label='User identifier'
             type='text'
+            placeholder='Farcaster id, username or Github username'
             fullWidth
             value={repoInput}
-            onChange={(e) => setRepoInput(e.target.value)}
+            onChange={(e) => setTextInput(e.target.value)}
             required
             slotProps={{
               input: {
@@ -126,7 +126,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 </Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 {user.scout.builderStatus === 'applied' && (
                   <LoadingButton disabled loading={isCreating} type='submit' color='primary' variant='contained'>
                     Approve builder
@@ -164,7 +166,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 </Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 <LoadingButton loading={isCreating} type='submit' color='primary' variant='contained'>
                   Add {user.waitlistUser.githubLogin ? 'builder' : 'scout'}
                 </LoadingButton>
@@ -186,7 +190,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 <Typography>Following: {user.farcasterUser.following_count}</Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 <LoadingButton loading={isCreating} type='submit' color='primary' variant='contained'>
                   Add scout
                 </LoadingButton>

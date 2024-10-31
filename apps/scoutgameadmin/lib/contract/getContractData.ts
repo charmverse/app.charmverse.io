@@ -1,4 +1,3 @@
-import { getPublicClient } from '@packages/onchain/getPublicClient';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { builderProxyContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderProxyContractReadClient';
 import {
@@ -8,6 +7,8 @@ import {
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import type { Address } from 'viem';
 import { optimism } from 'viem/chains';
+
+import { getPublicClient } from '../../../../packages/blockchain/src/getPublicClient';
 
 import { aggregateNftSalesData, type NftSalesData } from './aggregateNftSalesData';
 

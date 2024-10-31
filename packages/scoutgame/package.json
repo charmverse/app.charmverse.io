@@ -11,9 +11,9 @@
     "./builderNfts/artwork/generateNftImage": "./src/builderNfts/artwork/generateNftImage.tsx"
   },
   "dependencies": {
+    "@packages/blockchain": "^0.0.0",
     "@packages/farcaster": "^0.0.0",
-    "@packages/onchain": "^0.0.0",
-    "@packages/utils": "^1.0.0",
-    "@packages/github": "^0.0.0"
+    "@packages/github": "^0.0.0",
+    "@packages/utils": "^1.0.0"
   }
 }
