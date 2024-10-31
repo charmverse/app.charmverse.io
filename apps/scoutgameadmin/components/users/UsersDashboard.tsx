@@ -28,6 +28,7 @@ import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
 import { AddUserButton } from './AddUserButton/AddUserButton';
+import { BuilderStatusButton } from './BuilderStatusButton/BuilderStatusButton';
 import { SocialLinks } from './SocialLinks';
 import { ViewTransactionsButton } from './ViewTransactionsButton/ViewTransactionsButton';
 
@@ -122,16 +123,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
               </TableCell>
               <TableCell>ID</TableCell>
               <TableCell>Links</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'builderStatus'}
-                  direction={sortField === 'builderStatus' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('builderStatus')}
-                >
-                  Builder Status
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
+              <TableCell align='center'>
                 <TableSortLabel
                   active={sortField === 'currentBalance'}
                   direction={sortField === 'currentBalance' ? sortOrder : 'asc'}
@@ -142,6 +134,15 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
               </TableCell>
               <TableCell>
                 <TableSortLabel
+                  active={sortField === 'createdAt'}
+                  direction={sortField === 'createdAt' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('createdAt')}
+                >
+                  Created At
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align='center'>
+                <TableSortLabel
                   active={sortField === 'nftsPurchased'}
                   direction={sortField === 'nftsPurchased' ? sortOrder : 'asc'}
                   onClick={() => handleSort('nftsPurchased')}
@@ -149,13 +150,13 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   NFTs Purchased
                 </TableSortLabel>
               </TableCell>
-              <TableCell>
+              <TableCell align='center'>
                 <TableSortLabel
-                  active={sortField === 'createdAt'}
-                  direction={sortField === 'createdAt' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('createdAt')}
+                  active={sortField === 'builderStatus'}
+                  direction={sortField === 'builderStatus' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('builderStatus')}
                 >
-                  Created At
+                  Builder Status
                 </TableSortLabel>
               </TableCell>
             </TableRow>
@@ -172,14 +173,16 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                 <TableCell>
                   <SocialLinks farcasterName={user.farcasterName} githubLogin={user.githubLogin} />
                 </TableCell>
-                <TableCell>{user.builderStatus || 'N/A'}</TableCell>
-                <TableCell>{user.currentBalance}</TableCell>
-                <TableCell>
+                <TableCell align='center'>{user.currentBalance}</TableCell>
+                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell align='center'>
                   <ViewTransactionsButton size='small' variant='outlined' scoutId={user.id}>
                     {user.nftsPurchased}
                   </ViewTransactionsButton>
                 </TableCell>
-                <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell align='center'>
+                  <BuilderStatusButton builderStatus={user.builderStatus} userId={user.id} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

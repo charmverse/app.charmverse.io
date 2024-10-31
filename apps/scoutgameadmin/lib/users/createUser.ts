@@ -5,7 +5,7 @@ import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { octokit } from '@packages/github/client';
 import { findOrCreateFarcasterUser } from '@packages/scoutgame/users/findOrCreateFarcasterUser';
 
-import type { SearchUserResult } from './getUser';
+import type { SearchUserResult } from './searchForUser';
 
 export async function createUser({ scout, waitlistUser, farcasterUser }: SearchUserResult): Promise<Scout> {
   if (scout) {

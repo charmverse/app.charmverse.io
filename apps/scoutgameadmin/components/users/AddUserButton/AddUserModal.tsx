@@ -16,7 +16,7 @@ import {
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useCreateUser, useGetUser } from 'hooks/api/users';
+import { useCreateUser, useSearchForUser } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 type Props = {
@@ -29,7 +29,7 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
   const [repoInput, setTextInput] = useState('');
   const { trigger: createUser, isMutating: isCreating } = useCreateUser();
   const debouncedFilterString = useDebouncedValue(repoInput);
-  const { data: user, error, isValidating, isLoading } = useGetUser(debouncedFilterString);
+  const { data: user, error, isValidating, isLoading } = useSearchForUser(debouncedFilterString);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await createUser({ searchString: repoInput });
@@ -98,11 +98,11 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 <Typography>
                   <span style={{ fontWeight: 'bold' }}>Points Balance:</span> {user.scout.currentBalance}
                 </Typography>
-                {user.scout.farcasterId && (
+                {user.scout.farcasterName && (
                   <Typography>
                     <span style={{ fontWeight: 'bold' }}>Farcaster:</span>{' '}
-                    <Link href={`https://warpcast.com/${user.scout.path}`} target='_blank'>
-                      {user.scout.path}
+                    <Link href={`https://warpcast.com/${user.scout.farcasterName}`} target='_blank'>
+                      {user.scout.farcasterName}
                     </Link>
                   </Typography>
                 )}

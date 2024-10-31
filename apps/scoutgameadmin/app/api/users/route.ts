@@ -3,9 +3,9 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { createUser } from 'lib/users/createUser';
-import { getUser } from 'lib/users/getUser';
 import type { SortOrder, SortField } from 'lib/users/getUsers';
 import { getUsers } from 'lib/users/getUsers';
+import { searchForUser } from 'lib/users/searchForUser';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const params = await request.json();
-  const user = await getUser(params);
+  const user = await searchForUser(params);
   if (!user) {
     throw new Error(`User not found: ${params.searchString}`);
   }
