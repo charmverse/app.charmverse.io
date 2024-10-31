@@ -18,7 +18,7 @@ export async function registerBuilderNFT({
   imageHostingBaseUrl?: string;
 }) {
   if (!stringUtils.isUUID(builderId)) {
-    throw new InvalidInputError('Invalid builderId. Must be a uuid');
+    throw new InvalidInputError(`Invalid builderId. Must be a uuid: ${builderId}`);
   }
 
   const contractClient = getBuilderContractMinterClient();

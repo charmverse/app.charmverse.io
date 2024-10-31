@@ -13,5 +13,5 @@ export async function getUser(userId: string): Promise<UserResult | null> {
       githubUser: true
     }
   });
-  return user;
+  return user ? { ...user, githubLogin: user?.githubUser[0]?.login } : null;
 }

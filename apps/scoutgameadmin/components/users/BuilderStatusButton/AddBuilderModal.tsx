@@ -28,8 +28,8 @@ type Props = {
 
 export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
   const [githubLogin, setTextInput] = useState('');
-  const { trigger: createUser, isMutating: isCreating } = useCreateBuilder();
-  const { data: user, error, isValidating, isLoading } = useGetUser(open ? userId : undefined);
+  const { trigger: createUser, error: createBuilderError, isMutating: isCreating } = useCreateBuilder();
+  const { data: user, error: useGetUserError, isValidating, isLoading } = useGetUser(open ? userId : undefined);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await createUser({ userId, githubLogin });
@@ -44,26 +44,26 @@ export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
     );
   };
 
-  const action = user?.builderStatus === 'applied' ? 'Approve' : 'Add';
+  const error = createBuilderError || useGetUserError;
+
+  const didApply = user?.builderStatus === 'applied';
+  const action = didApply ? 'Approve' : 'Add';
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>
-        Add or approve builder
+        {action} builder
         <br />
         <Typography variant='caption'>Register an NFT and mark the builder as approved</Typography>
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          <Stack spacing={2}>
+          <Stack spacing={1}>
             <Typography>
               <span style={{ fontWeight: 'bold' }}>Scout Profile:</span>{' '}
               <Link href={`https://scoutgame.xyz/u/${user?.path}`} target='_blank'>
                 {user?.displayName}
               </Link>
-            </Typography>
-            <Typography>
-              <span style={{ fontWeight: 'bold' }}>Current Builder Status:</span> {user?.builderStatus || 'N/A'}
             </Typography>
             {user && user.githubLogin && (
               <Typography>
@@ -102,7 +102,7 @@ export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
                 color='primary'
                 variant='contained'
               >
-                {action} builder
+                {action}
               </LoadingButton>
             </Stack>
           </Stack>
