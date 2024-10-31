@@ -5,7 +5,7 @@ import type { Address } from 'viem';
 
 export type ProvableClaim = {
   address: Address;
-  amount: string;
+  amount: number;
 };
 
 function SHA256(data: string): string {

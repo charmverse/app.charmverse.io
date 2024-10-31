@@ -8,7 +8,7 @@ import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/
  * @param season - Season identifier
  * @param rank - Rank of the builder
  * @param weeklyAllocatedPoints - Points allocated for the week
- * @param normalisationFactor - Normalisation factor for points
+ * @param normalisationFactor - Normalisation factor for points to ensure we hit the full quota allocated
  * @returns {Promise<{ totalNftsPurchased: number, nftsByScout: Record<string, number>, earnableScoutPoints: number }>}
  */
 export async function dividePointsBetweenBuilderAndScouts({
