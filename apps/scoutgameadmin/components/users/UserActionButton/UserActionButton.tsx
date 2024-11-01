@@ -1,5 +1,6 @@
 import { MoreHoriz as MoreHorizIcon } from '@mui/icons-material';
-import { Menu, MenuItem, IconButton } from '@mui/material';
+import type { TypographyProps } from '@mui/material';
+import { Menu, ListItem, Divider, Typography, MenuItem, IconButton } from '@mui/material';
 import { useState } from 'react';
 
 import type { ScoutGameUser } from 'lib/users/getUsers';
@@ -37,9 +38,20 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
         {(user.builderStatus === 'applied' || user.builderStatus === 'rejected') && (
           <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Review builder profile</MenuItem>
         )}
-        {!user.builderStatus && <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Add builder profile</MenuItem>}
+        {!user.builderStatus && (
+          <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Register builder profile</MenuItem>
+        )}
         <MenuItem onClick={() => setIsTransactionsModalOpen(true)}>View NFT transactions</MenuItem>
-        <MenuItem disabled>Id: {user.id}</MenuItem>
+        <Divider />
+        <MenuItemNoAction>
+          Scout Id: <strong>{user.id}</strong>
+        </MenuItemNoAction>
+        <MenuItemNoAction>
+          Fid: <strong>{user.farcasterId || '--'}</strong>
+        </MenuItemNoAction>
+        <MenuItemNoAction>
+          Github: <strong>{user.githubLogin || '--'}</strong>
+        </MenuItemNoAction>
       </Menu>
       <AddBuilderModal
         user={user}
@@ -53,5 +65,15 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
         scoutId={user.id}
       />
     </>
+  );
+}
+
+function MenuItemNoAction({ children, ...props }: { children: React.ReactNode } & TypographyProps) {
+  return (
+    <ListItem dense onClick={(e) => e.stopPropagation()}>
+      <Typography color='text.secondary' variant='caption' {...props}>
+        {children}
+      </Typography>
+    </ListItem>
   );
 }

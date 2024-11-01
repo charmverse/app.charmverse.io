@@ -13,6 +13,7 @@ export type ScoutGameUser = Pick<
   | 'farcasterName'
   | 'currentBalance'
   | 'email'
+  | 'farcasterId'
 > & { githubLogin: string | null; nftsPurchased: number };
 
 export type UserFilter = 'only-builders';
