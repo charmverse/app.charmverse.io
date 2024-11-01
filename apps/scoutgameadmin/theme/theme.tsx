@@ -91,8 +91,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
     MuiFormLabel: {
       styleOverrides: {
         root: ({ theme }) => ({
-          color: theme.palette.text.primary,
-          marginBottom: 5
+          color: theme.palette.text.primary
         })
       }
     },
@@ -176,6 +175,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       }
     },
     MuiIconButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          '&:hover': {
+            backgroundColor: theme.vars.palette.inputBackground.main
+          }
+        })
+      },
       defaultProps: {
         disableRipple: true
       }
@@ -232,11 +238,6 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         }
       }
     },
-    MuiInput: {
-      defaultProps: {
-        size: 'small'
-      }
-    },
     MuiSkeleton: {
       styleOverrides: {
         root: {
@@ -245,9 +246,6 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       }
     },
     MuiOutlinedInput: {
-      defaultProps: {
-        size: 'small'
-      },
       styleOverrides: {
         root: ({ theme }) => ({
           backgroundColor: inputBackgroundDarkMode,

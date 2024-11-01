@@ -9,7 +9,7 @@ import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { refreshENSName } from '../refreshENSName';
 
-jest.mock('../getENSName', () => {
+jest.mock('@packages/blockchain/getENSName', () => {
   return {
     getENSName: (address: string) => {
       if (address.match('different')) {

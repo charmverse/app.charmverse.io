@@ -1,23 +1,24 @@
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import { MissingDataError } from '@charmverse/core/errors';
-import { awsS3Bucket as bucket } from '@root/config/constants';
-import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
-import { getUserS3FilePath } from '@root/lib/aws/uploadToS3Server';
 import { v4 as uuid } from 'uuid';
 
-const uploadRegion = process.env.S3_UPLOAD_REGION;
-const missingKeys: string[] = [];
-if (!process.env.S3_UPLOAD_REGION) {
-  missingKeys.push('S3_UPLOAD_REGION');
-}
-if (!bucket) {
-  missingKeys.push('S3_UPLOAD_BUCKET');
-}
+import { getS3ClientConfig } from './getS3ClientConfig';
+import { getUserS3FilePath } from './uploadToS3Server';
+
+const uploadRegion = process.env.S3_UPLOAD_REGION as string;
+const s3bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // @ts-ignore
 const validCharacters = /^[\000-\177]*$/;
 
-export async function uploadToken(filename: string, userId: string) {
+export async function uploadToken({ filename, userId }: { filename: string; userId: string }) {
+  const missingKeys: string[] = [];
+  if (!uploadRegion) {
+    missingKeys.push('S3_UPLOAD_REGION');
+  }
+  if (!s3bucket) {
+    missingKeys.push('S3_UPLOAD_BUCKET');
+  }
   if (missingKeys.length > 0) {
     throw new MissingDataError(`S3 Upload: Missing ENVs ${missingKeys.join(', ')}`);
   }
@@ -37,7 +38,7 @@ export async function uploadToken(filename: string, userId: string) {
         Sid: 'Stmt1S3UploadAssets',
         Effect: 'Allow',
         Action: ['s3:PutObject', 's3:PutObjectAcl'],
-        Resource: [`arn:aws:s3:::${bucket}/${key}`]
+        Resource: [`arn:aws:s3:::${s3bucket}/${key}`]
       }
     ]
   };
@@ -55,7 +56,7 @@ export async function uploadToken(filename: string, userId: string) {
   return {
     token,
     key,
-    bucket,
-    region: process.env.S3_UPLOAD_REGION
+    bucket: s3bucket,
+    region: uploadRegion
   };
 }

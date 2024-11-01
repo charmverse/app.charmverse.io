@@ -2,20 +2,24 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { BuilderEventType, Scout, ScoutWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/mixpanel/trackUserAction';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
-import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
-import { getTier } from '@packages/scoutgame/waitlist/scoring/constants';
-import { getUserS3FilePath, uploadFileToS3, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
-import { getENSName } from '@root/lib/blockchain/getENSName';
-import { getFilenameWithExtension } from '@root/lib/utils/getFilenameWithExtension';
+import {
+  getUserS3FilePath,
+  uploadFileToS3,
+  uploadUrlToS3,
+  getFilenameWithExtension
+} from '@packages/aws/uploadToS3Server';
+import { getENSName } from '@packages/blockchain/getENSName';
 import { capitalize } from '@root/lib/utils/strings';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';
 import { isAddress } from 'viem/utils';
 
-import { generateRandomAvatar } from 'lib/utils/generateRandomAvatar';
+import { currentSeason, getCurrentWeek } from '../dates';
+import { getTier } from '../waitlist/scoring/constants';
+import type { ConnectWaitlistTier } from '../waitlist/scoring/constants';
+
+import { generateRandomAvatar } from './generateRandomAvatar';
 
 const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   legendary: 60,
@@ -25,7 +29,9 @@ const waitlistTierPointsRecord: Record<ConnectWaitlistTier, number> = {
   common: 10
 };
 
-export type FindOrCreateUserResult = Pick<Scout, 'id' | 'onboardedAt'> & { scoutWallet?: ScoutWallet[] };
+export type FindOrCreateUserResult = Pick<Scout, 'id' | 'onboardedAt'> & {
+  isNew: boolean;
+};
 
 export async function findOrCreateUser({
   newUserId,
@@ -63,8 +69,7 @@ export async function findOrCreateUser({
   });
 
   if (scout) {
-    trackUserAction('sign_in', { userId: scout.id });
-    return scout;
+    return { ...scout, isNew: false };
   }
 
   const userId = newUserId || v4();
@@ -168,12 +173,5 @@ export async function findOrCreateUser({
     }
   });
 
-  trackUserAction('sign_up', {
-    userId: newScout.id,
-    path: userProps.path,
-    displayName: userProps.displayName,
-    fid: farcasterId
-  });
-
-  return newScout;
+  return { ...newScout, isNew: true };
 }

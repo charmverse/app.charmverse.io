@@ -1,12 +1,17 @@
 'use client';
 
-import { ArrowDropDown as ArrowDropDownIcon, Add as AddIcon, Clear as ClearIcon } from '@mui/icons-material';
+import {
+  MoreHoriz as MoreHorizIcon,
+  ArrowDropDown as ArrowDropDownIcon,
+  Add as AddIcon,
+  Clear as ClearIcon
+} from '@mui/icons-material';
 import {
   CircularProgress,
   Container,
   InputAdornment,
   Link,
-  Typography,
+  Avatar,
   Paper,
   Stack,
   Table,
@@ -18,6 +23,7 @@ import {
   TextField,
   Box,
   IconButton,
+  Typography,
   TableSortLabel
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
@@ -28,7 +34,7 @@ import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
 import { AddUserButton } from './AddUserButton/AddUserButton';
-import { ViewTransactionsButton } from './ViewTransactionsButton/ViewTransactionsButton';
+import { UserActionButton } from './UserActionButton/UserActionButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');
@@ -86,7 +92,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             input: {
               endAdornment: (
                 <InputAdornment position='end'>
-                  {(isLoading || isValidating) && <CircularProgress size={20} />}
+                  {(isLoading || isValidating) && filterString && <CircularProgress size={20} />}
                   {filterString && (
                     <IconButton aria-label='clear search' size='small' onClick={() => setFilter('')} edge='end'>
                       <ClearIcon fontSize='small' />
@@ -112,40 +118,28 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             <TableRow>
               <TableCell>
                 <TableSortLabel
-                  active={sortField === 'path'}
-                  direction={sortField === 'path' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('path')}
-                >
-                  Username
-                </TableSortLabel>
+                  active={sortField === 'displayName'}
+                  direction={sortField === 'displayName' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('displayName')}
+                ></TableSortLabel>
               </TableCell>
               <TableCell>ID</TableCell>
-              <TableCell>Farcaster ID</TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'builderStatus'}
-                  direction={sortField === 'builderStatus' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('builderStatus')}
-                >
-                  Builder Status
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
-                <TableSortLabel
-                  active={sortField === 'currentBalance'}
-                  direction={sortField === 'currentBalance' ? sortOrder : 'asc'}
-                  onClick={() => handleSort('currentBalance')}
-                >
-                  Points Balance
-                </TableSortLabel>
-              </TableCell>
-              <TableCell>
+              <TableCell align='center'>
                 <TableSortLabel
                   active={sortField === 'nftsPurchased'}
                   direction={sortField === 'nftsPurchased' ? sortOrder : 'asc'}
                   onClick={() => handleSort('nftsPurchased')}
                 >
                   NFTs Purchased
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align='center'>
+                <TableSortLabel
+                  active={sortField === 'currentBalance'}
+                  direction={sortField === 'currentBalance' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('currentBalance')}
+                >
+                  Points Balance
                 </TableSortLabel>
               </TableCell>
               <TableCell>
@@ -157,22 +151,45 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   Created At
                 </TableSortLabel>
               </TableCell>
+              <TableCell align='center'>
+                <TableSortLabel
+                  active={sortField === 'builderStatus'}
+                  direction={sortField === 'builderStatus' ? sortOrder : 'asc'}
+                  onClick={() => handleSort('builderStatus')}
+                >
+                  Builder Status
+                </TableSortLabel>
+              </TableCell>
+              <TableCell>{/** Actions */}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredAndSortedUsers.map((user) => (
               <TableRow key={user.id}>
-                <TableCell>{user.path}</TableCell>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.farcasterId}</TableCell>
-                <TableCell>{user.builderStatus || 'N/A'}</TableCell>
-                <TableCell>{user.currentBalance}</TableCell>
                 <TableCell>
-                  <ViewTransactionsButton size='small' variant='outlined' scoutId={user.id}>
-                    {user.nftsPurchased}
-                  </ViewTransactionsButton>
+                  <Link
+                    target='_blank'
+                    href={`https://scoutgame.xyz/u/${user.path}`}
+                    sx={{ display: 'flex', alignItems: 'center', gap: 2 }}
+                  >
+                    <Avatar src={user.avatar || undefined} sx={{ width: 36, height: 36 }} />
+                    {user.displayName}
+                  </Link>
                 </TableCell>
+                <TableCell>{user.id}</TableCell>
+                <TableCell align='center'>{user.nftsPurchased}</TableCell>
+                <TableCell align='center'>{user.currentBalance}</TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell align='center'>
+                  {user?.builderStatus === 'approved' && <Typography color='success'>Approved</Typography>}
+                  {user?.builderStatus === 'rejected' && <Typography color='error'>Rejected</Typography>}
+                  {user?.builderStatus === 'banned' && <Typography color='error'>Suspended</Typography>}
+                  {user?.builderStatus === 'applied' && <Typography color='warning'>Applied</Typography>}
+                  {!user?.builderStatus && <Typography color='secondary'>&ndash;</Typography>}
+                </TableCell>
+                <TableCell align='center'>
+                  <UserActionButton user={user} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

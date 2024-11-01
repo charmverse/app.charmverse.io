@@ -1,10 +1,10 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { registerBuilderNFT } from '../builderNfts/registerBuilderNFT';
 import type { Season } from '../dates';
 import { currentSeason } from '../dates';
-
-import { updateBuildersRank } from './updateBuildersRank';
+import { importReposByUser } from '../importReposByUser';
 
 const baseUrl = process.env.DOMAIN as string;
 
@@ -19,7 +19,8 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
       id: builderId
     },
     select: {
-      id: true
+      id: true,
+      githubUser: true
     }
   });
 
@@ -38,5 +39,14 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
     data: {
       builderStatus: 'approved'
     }
+  });
+
+  // do not wait for git to complete
+  importReposByUser(scout.githubUser[0]?.login).catch((error) => {
+    log.error('Error importing repos for new builder', {
+      error,
+      githubLogin: scout.githubUser[0]?.login,
+      userId: builderId
+    });
   });
 }
