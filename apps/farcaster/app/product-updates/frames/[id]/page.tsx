@@ -23,7 +23,6 @@ export default async function FramesPage({
   if (!previousFrameId && !nextFrameId) {
     return (
       <>
-        o
         <Image content={image} />
         {/* <meta name='fc:frame:button:1' content='Manage' />
         <meta name='fc:frame:button:1:action' content='post' />
