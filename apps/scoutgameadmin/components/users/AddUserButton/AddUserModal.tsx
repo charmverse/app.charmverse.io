@@ -53,7 +53,7 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
             autoFocus
             label='User identifier'
             type='text'
-            placeholder='Farcaster id, username or Github username'
+            placeholder='Farcaster id or username'
             fullWidth
             value={repoInput}
             onChange={(e) => setTextInput(e.target.value)}
