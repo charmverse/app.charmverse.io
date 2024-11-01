@@ -2,6 +2,7 @@ import { Box, Divider, Grid2, IconButton, Typography } from '@mui/material';
 import Link from 'next/link';
 import { MdLaunch } from 'react-icons/md';
 
+import type { ProtocolData } from 'lib/contract/aggregateProtocolData';
 import type { BuilderNFTContractData } from 'lib/contract/getContractData';
 
 function ContractLink({
@@ -45,7 +46,7 @@ function GridDivider() {
   );
 }
 
-export function ProtocolContractDashboard(data: BuilderNFTContractData) {
+export function ProtocolContractDashboard(data: ProtocolData) {
   const itemSizeTwoColumnMd = { xs: 12, md: 6 };
   const itemSizeThreeColumnMd = { xs: 12, md: 4 };
 
@@ -56,7 +57,7 @@ export function ProtocolContractDashboard(data: BuilderNFTContractData) {
       </Grid2>
       <Grid2 size={itemSizeTwoColumnMd}>
         <ContractLink
-          address={data.contractAddress}
+          address={data.proxy}
           title='Proxy address'
           linkType='token'
           subtitle='Long term contract for interacting with the protocol'
@@ -64,7 +65,7 @@ export function ProtocolContractDashboard(data: BuilderNFTContractData) {
       </Grid2>
       <Grid2 size={itemSizeTwoColumnMd}>
         <ContractLink
-          address={data.currentImplementation}
+          address={data.implementation}
           title='Current Implementation'
           subtitle='This contract is called by the proxy and contains the main protocol logic'
         />
@@ -73,70 +74,28 @@ export function ProtocolContractDashboard(data: BuilderNFTContractData) {
       <Grid2 size={12}>
         <SectionTitle title='Data' />
       </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        <Typography variant='h6'>Registered builder NFTs</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {data.totalSupply.toString()}
-        </Typography>
-      </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6'>Sales</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {Number(data.receiverUsdcBalance).toLocaleString('en-US')} USD
-        </Typography>
-      </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6'>Unique NFT holders</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {Number(data.nftSalesData.uniqueHolders).toLocaleString('en-US')}
-        </Typography>
-      </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6'>Total NFTs minted</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {Number(data.nftSalesData.totalNftsSold).toLocaleString('en-US')}
-        </Typography>
-      </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6'>NFTs paid with points</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {Number(data.nftSalesData.nftsPaidWithPoints).toLocaleString('en-US')}
-        </Typography>
-      </Grid2>
-      <Grid2 size={itemSizeThreeColumnMd}>
-        {/* Currently, this is the balance of the proceeds receiver wallet. Once we start moving funds, we should look at logs instead */}
-        <Typography variant='h6'>NFTs paid with crypto</Typography>
-        <Typography variant='body1' fontWeight='bold'>
-          {Number(data.nftSalesData.nftsPaidWithCrypto).toLocaleString('en-US')}
-        </Typography>
-      </Grid2>
+      {data.merkleRoots.map((root) => (
+        <Grid2 size={itemSizeThreeColumnMd} key={root.week}>
+          <Typography variant='h6'>Merkle Root for week {root.week}</Typography>
+          <Typography variant='body1'>{root.root}</Typography>
+        </Grid2>
+      ))}
       <GridDivider />
       <Grid2 size={12}>
         <SectionTitle title='Roles & Permissions' />
       </Grid2>
       <Grid2 size={itemSizeTwoColumnMd}>
         <ContractLink
-          address={data.currentAdmin}
+          address={data.admin}
           title='Admin'
           subtitle='Admin wallet can upgrade the contract, update the wallet that receives proceeds from NFT sales, modify pricing, register builders and mint tokens.'
         />
       </Grid2>
       <Grid2 size={itemSizeTwoColumnMd}>
         <ContractLink
-          address={data.currentMinter}
-          title='Minter'
-          subtitle='Minter wallet can register new builder nfts and mint tokens to any address.'
-        />
-      </Grid2>
-      <Grid2 size={itemSizeTwoColumnMd}>
-        <ContractLink
-          address={data.proceedsReceiver}
-          title='Proceeds Receiver'
-          subtitle='This is the wallet address that receives funds paid to mint builder NFTs.'
+          address={data.claimsManager}
+          title='Claims Manager'
+          subtitle='The wallet that can register weekly merkle roots'
         />
       </Grid2>
     </Grid2>
