@@ -14,7 +14,7 @@ export type ScoutGameUser = Pick<
   | 'currentBalance'
   | 'email'
   | 'farcasterId'
-> & { githubLogin: string | null; nftsPurchased: number };
+> & { githubLogin: string | null; nftsPurchased: number; wallets: string[] };
 
 export type UserFilter = 'only-builders';
 
@@ -70,13 +70,15 @@ export async function getUsers({
             : undefined,
     include: {
       githubUser: true,
-      userSeasonStats: true
+      userSeasonStats: true,
+      scoutWallet: true
     }
   });
-  return users.map((user) => ({
+  return users.map(({ githubUser, userSeasonStats, scoutWallet, ...user }) => ({
     ...user,
-    githubLogin: user.githubUser[0]?.login || null,
-    nftsPurchased: user.userSeasonStats.find(({ season }) => season === '2024-W41')?.nftsPurchased || 0
+    githubLogin: githubUser[0]?.login || null,
+    nftsPurchased: userSeasonStats.find(({ season }) => season === '2024-W41')?.nftsPurchased || 0,
+    wallets: scoutWallet.map((wallet) => wallet.address)
   }));
 }
 

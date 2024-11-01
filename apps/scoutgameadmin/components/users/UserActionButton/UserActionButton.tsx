@@ -52,6 +52,9 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
         <MenuItemNoAction>
           Github: <strong>{user.githubLogin || '--'}</strong>
         </MenuItemNoAction>
+        <MenuItemNoAction>
+          Wallets: <strong>{user.wallets.join(', ')}</strong>
+        </MenuItemNoAction>
       </Menu>
       <AddBuilderModal
         user={user}
