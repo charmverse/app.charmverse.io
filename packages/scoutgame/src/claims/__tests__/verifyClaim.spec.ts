@@ -2,15 +2,18 @@ import { generateMerkleTree, getMerkleProofs, verifyMerkleClaim, type ProvableCl
 
 const claimsInput: ProvableClaim[] = [
   {
-    address: '0x36446eF671954753801f9d73C415a80C0e550b32',
+    // Key here so we can copy to other tests: 57b7b9b29419b66ac8156f844a7b0eb18d94f729699b3f15a3d8817d3f5980a3
+    address: '0x3F2A655d4e39E6c4470703e1063e9a843586886A',
     amount: 100
   },
   {
-    address: '0xC82ee528AC8BFd7087e0DE6548955601dFcac99d',
+    // Key here so we can copy to other tests: aa03d22263ff3e4df4105a20d08f62873f5e100974862fdc1f99083ba11e6adc
+    address: '0x2Fe1B8C9C8722f0D3e5B9a9D4115559bB8f04931',
     amount: 200
   },
   {
-    address: '0xB20C9b7e6b9cbcDed9819F88D68938D0B149887f',
+    // Key here so we can copy to other tests: c674865dde0163f480f818a78fc4d316c64d60b05666600734df8e8f37147f64
+    address: '0x03F8B139fF6dbbb7475bAA5A71c16fcDD9495cc4',
     amount: 300
   },
   {
@@ -28,6 +31,7 @@ describe('verifyMerkleClaim', () => {
     const { tree } = generateMerkleTree(claimsInput);
     const claim = claimsInput[0];
     const proofs = getMerkleProofs(tree, claim);
+
     expect(verifyMerkleClaim(tree, claim, proofs)).toBe(true);
   });
 
