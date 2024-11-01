@@ -4,9 +4,10 @@ import { log } from '@charmverse/core/log';
 import { Box, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { createContext, useEffect, useContext, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
 import { SinglePageLayout } from 'components/common/Layout';
+import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 import { useGetUserTrigger } from 'hooks/api/session';
@@ -44,11 +45,20 @@ export function LoginPage() {
           }}
           alt='ScoutGame'
         />
-        <Typography variant='h5' fontWeight='700'>
+        <Typography
+          variant='h5'
+          sx={{
+            mb: 4,
+            fontWeight: 700,
+            backgroundColor: 'black',
+            px: 1
+          }}
+        >
           Fantasy sports for onchain builders
         </Typography>
         <LaunchDate />
         <Box display='flex' flexDirection='column' gap={2} width='100%'>
+          <WalletLogin />
           <WarpcastLogin />
         </Box>
       </SinglePageLayout>

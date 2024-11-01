@@ -1,9 +1,9 @@
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { resolveENSName } from '@packages/blockchain/getENSName';
 import { ethers } from 'ethers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { resolveENSName } from 'lib/blockchain';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { isTruthy } from 'lib/utils/types';

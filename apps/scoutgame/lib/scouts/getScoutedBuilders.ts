@@ -76,7 +76,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     return {
       id: builder.id,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
-      path: builder.path!,
+      path: builder.path,
       displayName: builder.displayName,
       builderStatus: builder.builderStatus!,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,

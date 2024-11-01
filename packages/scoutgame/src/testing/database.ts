@@ -62,8 +62,10 @@ export async function mockScout({
   builderId,
   season,
   email,
-  currentBalance
+  currentBalance,
+  avatar
 }: {
+  avatar?: string;
   path?: string;
   agreedToTermsAt?: Date | null;
   onboardedAt?: Date | null;
@@ -80,7 +82,8 @@ export async function mockScout({
       onboardedAt,
       displayName,
       email,
-      currentBalance
+      currentBalance,
+      avatar
     }
   });
   if (builderId) {

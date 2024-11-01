@@ -70,7 +70,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       .map((builder) => {
         return {
           id: builder.id,
-          path: builder.path!,
+          path: builder.path,
           displayName: builder.displayName,
           builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
           price: builder.builderNfts[0]?.currentPrice ?? 0,
@@ -158,7 +158,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
     const user = builder.user;
     return {
       id: user.id,
-      path: user.path!,
+      path: user.path,
       displayName: user.displayName,
       builderPoints: user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: user.builderNfts[0]?.currentPrice ?? 0,
