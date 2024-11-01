@@ -12,7 +12,7 @@ import { Avatar } from '../Avatar';
 import { ProfileLinks } from './ProfileLinks';
 
 // Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
-export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
+type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   bio?: string | null;
   avatar?: string | null;
   displayName: string;
