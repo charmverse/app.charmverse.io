@@ -6,7 +6,7 @@ import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getEnsProfile } from '../getEnsProfile';
 
-jest.mock('../../blockchain/getENSName', () => ({
+jest.mock('@packages/blockchain/getENSName', () => ({
   getENSDetails: jest.fn().mockResolvedValue({
     avatar: 'https://test-avatar.png',
     description: 'my bio',
