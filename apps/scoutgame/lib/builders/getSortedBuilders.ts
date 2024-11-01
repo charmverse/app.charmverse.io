@@ -67,7 +67,8 @@ export async function getSortedBuilders({
             },
             userWeeklyStats: {
               where: {
-                week
+                week,
+                season
               },
               select: {
                 rank: true
@@ -231,7 +232,6 @@ export async function getSortedBuilders({
               }
             : undefined,
           select: {
-            rank: true,
             user: {
               select: {
                 id: true,
@@ -240,7 +240,8 @@ export async function getSortedBuilders({
                 builderStatus: true,
                 userWeeklyStats: {
                   where: {
-                    week
+                    week,
+                    season
                   },
                   select: {
                     rank: true
