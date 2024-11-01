@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import { BuilderInfo } from './generateSeedData';
 import { randomTimeOfDay } from './generator';
 
-export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: BuilderInfo[], date: DateTime) {
+export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: Pick<BuilderInfo, 'builderNftId' | 'nftPrice'>[], date: DateTime) {
   const week = getWeekFromDate(date.toJSDate());
   let totalNftsPurchasedToday = 0;
   for (let nftCount = 0; nftCount < faker.number.int({ min: 0, max: 3 }); nftCount++) {

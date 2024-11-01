@@ -3,7 +3,7 @@ import type { WeeklyClaims } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Address } from 'viem';
 
-import { currentSeason, getCurrentWeek } from '../dates';
+import { currentSeason } from '../dates';
 import { dividePointsBetweenBuilderAndScouts } from '../points/dividePointsBetweenBuilderAndScouts';
 import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAndBuilders';
 
