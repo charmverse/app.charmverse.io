@@ -16,23 +16,25 @@ import {
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useCreateBuilder, useGetUser } from 'hooks/api/users';
+import { useCreateBuilder } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import type { ScoutGameUser } from 'lib/users/getUsers';
 
 type Props = {
   open: boolean;
-  userId: string;
+  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin'>;
   onClose: () => void;
   onAdd: () => void;
 };
 
-export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
+export function AddBuilderModal({ user, open, onClose, onAdd }: Props) {
   const [githubLogin, setTextInput] = useState('');
   const { trigger: createUser, error: createBuilderError, isMutating: isCreating } = useCreateBuilder();
-  const { data: user, error: useGetUserError, isValidating, isLoading } = useGetUser(open ? userId : undefined);
+  const githubLoginDebounced = useDebouncedValue(githubLogin);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await createUser({ userId, githubLogin });
+    await createUser({ userId: user.id, githubLogin });
     onAdd();
     onClose();
     setTextInput('');
@@ -44,36 +46,21 @@ export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
     );
   };
 
-  const error = createBuilderError || useGetUserError;
-
   const didApply = user?.builderStatus === 'applied';
   const action = didApply ? 'Approve' : 'Add';
+  const requireGithubLogin = !user.githubLogin;
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>
-        {action} builder
+        {action} builder profile
         <br />
         <Typography variant='caption'>Register an NFT and mark the builder as approved</Typography>
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
-          <Stack spacing={1}>
-            <Typography>
-              <span style={{ fontWeight: 'bold' }}>Scout Profile:</span>{' '}
-              <Link href={`https://scoutgame.xyz/u/${user?.path}`} target='_blank'>
-                {user?.displayName}
-              </Link>
-            </Typography>
-            {user && user.githubLogin && (
-              <Typography>
-                <span style={{ fontWeight: 'bold' }}>Github:</span>{' '}
-                <Link href={`https://github.com/${user.githubLogin}`} target='_blank'>
-                  {user.githubLogin}
-                </Link>
-              </Typography>
-            )}
-            {user && !user.githubLogin && (
+          <Stack gap={2}>
+            {requireGithubLogin && (
               <TextField
                 autoFocus
                 label='Provide a Github login'
@@ -84,10 +71,10 @@ export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
                 required
               />
             )}
-            {error && (
+            {createBuilderError && (
               <Box p={1}>
                 <Typography variant='caption' color='error'>
-                  {error.message || error.status || error.toString()}
+                  {createBuilderError.message || 'Failed to save builder'}
                 </Typography>
               </Box>
             )}
@@ -95,13 +82,7 @@ export function AddBuilderModal({ open, onClose, onAdd, userId }: Props) {
               <Button variant='outlined' color='secondary' onClick={onClose}>
                 Cancel
               </Button>
-              <LoadingButton
-                disabled={user?.builderStatus === 'approved'}
-                loading={isCreating}
-                type='submit'
-                color='primary'
-                variant='contained'
-              >
+              <LoadingButton loading={isCreating} type='submit' color='primary' variant='contained'>
                 {action}
               </LoadingButton>
             </Stack>

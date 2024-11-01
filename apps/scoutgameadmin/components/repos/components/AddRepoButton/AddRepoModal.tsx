@@ -15,7 +15,7 @@ import {
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useCreateRepo, useSearchReposByOwnerFromGithub } from 'hooks/api/repos';
+import { useCreateRepos, useSearchReposByOwnerFromGithub } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
 
 export function AddRepoModal({ open, onClose, onAdd }: Props) {
   const [repoInput, setRepoInput] = useState('');
-  const { trigger: addGithubRepo, isMutating: isImporting } = useCreateRepo();
+  const { trigger: createRepos, isMutating: isImporting } = useCreateRepos();
   const debouncedFilterString = useDebouncedValue(repoInput);
   const {
     data: reposFromGithub,
@@ -39,7 +39,7 @@ export function AddRepoModal({ open, onClose, onAdd }: Props) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await addGithubRepo({ owner: repoInput });
+    await createRepos({ owner: repoInput });
     onAdd();
     onClose();
     setRepoInput('');

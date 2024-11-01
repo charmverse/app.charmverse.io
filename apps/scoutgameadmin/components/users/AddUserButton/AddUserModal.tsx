@@ -46,7 +46,7 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
-      <DialogTitle>Add or manage user</DialogTitle>
+      <DialogTitle>Add scout</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <TextField

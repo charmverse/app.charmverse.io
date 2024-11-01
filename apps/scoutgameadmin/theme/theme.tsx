@@ -175,6 +175,13 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       }
     },
     MuiIconButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          '&:hover': {
+            backgroundColor: theme.vars.palette.inputBackground.main
+          }
+        })
+      },
       defaultProps: {
         disableRipple: true
       }
