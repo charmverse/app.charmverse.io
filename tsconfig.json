@@ -31,7 +31,7 @@
       "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
       "@packages/utils/*": ["./packages/utils/src/*"],
       "@packages/github/*": ["./packages/github/src/*"],
-      "@packages/blockchain/*": ["packages/blockchain/src/*"],
+      "@packages/onchain/*": ["./packages/blockchain/src/*"],
       "@packages/scoutgame/*": ["./packages/scoutgame/src/*"],
       "@packages/testing/*": ["./packages/testing/src/*"],
       "@root/abis/*": ["./abis/*"],

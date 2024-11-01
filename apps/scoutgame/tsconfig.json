@@ -41,6 +41,6 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/scoutgame/src/users/generateRandomAvatar.ts", "../../packages/scoutgame/src/users/findOrCreateUser.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }
