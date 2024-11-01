@@ -16,7 +16,9 @@ export async function refreshBuilderNftPrice({
 }): Promise<BuilderNft> {
   try {
     if (!stringUtils.isUUID(builderId)) {
-      throw new InvalidInputError('Invalid builderId. Must be a uuid');
+      throw new InvalidInputError(
+        `Invalid builderId. Must be a uuid Received value of ${typeof builderId}:${builderId}`
+      );
     }
 
     const contractClient = getBuilderContractMinterClient();
