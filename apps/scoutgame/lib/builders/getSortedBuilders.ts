@@ -238,6 +238,14 @@ export async function getSortedBuilders({
                 path: true,
                 displayName: true,
                 builderStatus: true,
+                userWeeklyStats: {
+                  where: {
+                    week
+                  },
+                  select: {
+                    rank: true
+                  }
+                },
                 userAllTimeStats: {
                   select: {
                     pointsEarnedAsBuilder: true
@@ -272,7 +280,7 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            rank: stat.rank ?? -1,
+            rank: stat.user.userWeeklyStats[0]?.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
             path: stat.user.path,
             displayName: stat.user.displayName,
