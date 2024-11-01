@@ -1,8 +1,9 @@
+import { log } from '@charmverse/core/log';
 import type { WeeklyClaims } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Address } from 'viem';
 
-import { currentSeason } from '../dates';
+import { currentSeason, getCurrentWeek } from '../dates';
 import { dividePointsBetweenBuilderAndScouts } from '../points/dividePointsBetweenBuilderAndScouts';
 import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAndBuilders';
 
@@ -68,7 +69,11 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
     .then((_scouts) =>
       _scouts.reduce(
         (acc, val) => {
-          acc[val.id] = val.scoutWallet[0].address as Address;
+          const address = val.scoutWallet[0]?.address as Address;
+
+          if (address) {
+            acc[val.id] = address;
+          }
           return acc;
         },
         {} as Record<string, Address>
@@ -81,15 +86,15 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
     const walletAddress = scoutsWithWallet[scoutId];
 
     if (!walletAddress) {
-      throw new Error(`Scout ${scoutId} does not have a wallet address`);
+      log.warn(`Scout ${scoutId} does not have a wallet address`);
+    } else {
+      const claim: ProvableClaim = {
+        address: walletAddress,
+        amount: claimsMap[scoutId]
+      };
+
+      claimsByAddress.push(claim);
     }
-
-    const claim: ProvableClaim = {
-      address: walletAddress,
-      amount: claimsMap[scoutId]
-    };
-
-    claimsByAddress.push(claim);
   }
 
   return claimsByAddress;
