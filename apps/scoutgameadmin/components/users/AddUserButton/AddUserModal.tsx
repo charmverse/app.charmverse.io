@@ -16,7 +16,7 @@ import {
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useCreateUser, useGetUser } from 'hooks/api/users';
+import { useCreateUser, useSearchForUser } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 type Props = {
@@ -26,16 +26,16 @@ type Props = {
 };
 
 export function AddUserModal({ open, onClose, onAdd }: Props) {
-  const [repoInput, setRepoInput] = useState('');
+  const [repoInput, setTextInput] = useState('');
   const { trigger: createUser, isMutating: isCreating } = useCreateUser();
   const debouncedFilterString = useDebouncedValue(repoInput);
-  const { data: user, error, isValidating, isLoading } = useGetUser(debouncedFilterString);
+  const { data: user, error, isValidating, isLoading } = useSearchForUser(debouncedFilterString);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await createUser({ searchString: repoInput });
     onAdd();
     onClose();
-    setRepoInput('');
+    setTextInput('');
     // clear SWR cache
     mutate(
       (key) => true, // which cache keys are updated
@@ -46,17 +46,17 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
-      <DialogTitle>Add or manage user</DialogTitle>
+      <DialogTitle>Add scout</DialogTitle>
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ pt: 0 }}>
+        <DialogContent>
           <TextField
             autoFocus
-            margin='dense'
             label='User identifier'
             type='text'
+            placeholder='Farcaster id, username or Github username'
             fullWidth
             value={repoInput}
-            onChange={(e) => setRepoInput(e.target.value)}
+            onChange={(e) => setTextInput(e.target.value)}
             required
             slotProps={{
               input: {
@@ -98,11 +98,11 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 <Typography>
                   <span style={{ fontWeight: 'bold' }}>Points Balance:</span> {user.scout.currentBalance}
                 </Typography>
-                {user.scout.farcasterId && (
+                {user.scout.farcasterName && (
                   <Typography>
                     <span style={{ fontWeight: 'bold' }}>Farcaster:</span>{' '}
-                    <Link href={`https://warpcast.com/${user.scout.path}`} target='_blank'>
-                      {user.scout.path}
+                    <Link href={`https://warpcast.com/${user.scout.farcasterName}`} target='_blank'>
+                      {user.scout.farcasterName}
                     </Link>
                   </Typography>
                 )}
@@ -126,7 +126,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 </Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 {user.scout.builderStatus === 'applied' && (
                   <LoadingButton disabled loading={isCreating} type='submit' color='primary' variant='contained'>
                     Approve builder
@@ -164,7 +166,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 </Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 <LoadingButton loading={isCreating} type='submit' color='primary' variant='contained'>
                   Add {user.waitlistUser.githubLogin ? 'builder' : 'scout'}
                 </LoadingButton>
@@ -186,7 +190,9 @@ export function AddUserModal({ open, onClose, onAdd }: Props) {
                 <Typography>Following: {user.farcasterUser.following_count}</Typography>
               </Box>
               <Stack direction='row' spacing={2} justifyContent='flex-end'>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button variant='outlined' color='secondary' onClick={onClose}>
+                  Cancel
+                </Button>
                 <LoadingButton loading={isCreating} type='submit' color='primary' variant='contained'>
                   Add scout
                 </LoadingButton>

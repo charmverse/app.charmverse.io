@@ -1,5 +1,5 @@
-import { getChainById } from '@packages/onchain/chains';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { getChainById } from '@packages/blockchain/chains';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { UsdcErc20ABIClient } from '@packages/scoutgame/builderNfts/usdcContractApiClient';
 import useSWR from 'swr';
 import type { Address, Chain } from 'viem';

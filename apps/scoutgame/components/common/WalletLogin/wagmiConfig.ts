@@ -1,3 +1,5 @@
+'use client';
+
 import env from '@beam-australia/react-env';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
@@ -16,8 +18,9 @@ import {
   baseSepolia
 } from 'wagmi/chains';
 
-export function getConfig() {
-  const walletConnectProjectId = env('WALLETCONNECT_PROJECTID');
+export function getConfig(options?: Partial<Parameters<typeof getDefaultConfig>[0]>) {
+  const projectId = options?.projectId || env('WALLETCONNECT_PROJECTID') || '';
+
   const wagmiChains = [
     mainnet,
     sepolia,
@@ -43,7 +46,7 @@ export function getConfig() {
 
   const config = getDefaultConfig({
     appName: 'Scout Game',
-    projectId: walletConnectProjectId,
+    projectId,
     chains: wagmiChains,
     ssr: true,
     storage: createStorage({ storage: cookieStorage }),

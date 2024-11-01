@@ -1,4 +1,4 @@
-import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { builderProxyContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderProxyContractReadClient';
 import {

@@ -2,9 +2,12 @@ import { log } from '@charmverse/core/log';
 import { InvalidStateError } from '@root/lib/middleware/errors';
 import { SiweMessage } from 'siwe';
 
-import type { AuthSchema } from './config';
+import type { LoginWithWalletSchema } from './schema';
 
-export async function verifyWalletSignature({ message, signature }: AuthSchema): Promise<{ walletAddress: string }> {
+export async function verifyWalletSignature({
+  message,
+  signature
+}: LoginWithWalletSchema): Promise<{ walletAddress: string }> {
   try {
     const siweMessage = new SiweMessage(message);
     const verifiedMessage = await siweMessage.verify({ signature });

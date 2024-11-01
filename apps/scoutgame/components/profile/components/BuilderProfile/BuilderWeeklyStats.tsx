@@ -27,7 +27,7 @@ export function BuilderWeeklyStats({ gemsCollected, rank }: { gemsCollected?: nu
           RANK
         </Typography>
         <Typography variant='h4' align='center'>
-          {rank || 'N/A'}
+          {rank && rank !== -1 ? rank : <>&ndash;</>}
         </Typography>
       </Stack>
     </Paper>

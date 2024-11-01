@@ -8,8 +8,8 @@ afterAll(() => {
 
 // Mock external requests globally
 
-jest.mock('lib/blockchain/getENSName', () => ({
-  ...jest.requireActual('lib/blockchain/getENSName'),
+jest.mock('@packages/blockchain/getENSName', () => ({
+  ...jest.requireActual('@packages/blockchain/getENSName'),
   __esModule: true,
   getENSName: jest.fn().mockImplementation(() => Promise.resolve(null)),
   getENSDetails: jest.fn().mockImplementation(() => Promise.resolve(null)),

@@ -5,8 +5,9 @@ import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { awsS3Bucket } from '@root/config/constants';
-import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
 import { v4 as uuid } from 'uuid';
+
+import { getS3ClientConfig } from './getS3ClientConfig';
 
 const client = new S3Client(getS3ClientConfig());
 
@@ -67,3 +68,11 @@ export function getUserS3FilePath({ userId, url }: { userId: string; url: string
 export function getFarcasterAppFilePath({ url }: { url: string }) {
   return `farcaster-app/${uuid()}/${generateFilename(url)}`;
 }
+
+export const getFilenameWithExtension = (path: string, fallbackExtension = 'jpg'): string => {
+  const pathParts = path.split('/');
+  const rawName = pathParts.pop() || '';
+  const [name, extension] = rawName.split('.');
+
+  return `${pathParts.join('/')}/${name}.${extension?.toLowerCase() || fallbackExtension}`;
+};

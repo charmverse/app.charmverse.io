@@ -94,14 +94,10 @@ export async function getBuilderActivities({
       if (event.type === 'nft_purchase' && event.nftPurchaseEvent) {
         return {
           ...event.builder,
-          path: event.builder.path!,
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: {
-            path: event.nftPurchaseEvent.scout.path!,
-            displayName: event.nftPurchaseEvent.scout.displayName
-          }
+          scout: event.nftPurchaseEvent.scout
         };
       } else if (
         (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&
@@ -110,7 +106,6 @@ export async function getBuilderActivities({
       ) {
         return {
           ...event.builder,
-          path: event.builder.path!,
           id: event.id,
           createdAt: event.createdAt,
           type: 'github_event' as const,

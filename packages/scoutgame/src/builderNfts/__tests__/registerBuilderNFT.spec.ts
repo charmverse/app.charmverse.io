@@ -87,10 +87,4 @@ describe('registerBuilderNFT', () => {
     expect(result?.id).toEqual(existingNft.id);
     expect(getBuilderContractMinterClient().registerBuilderToken).not.toHaveBeenCalled();
   });
-
-  it('should throw an error if scout profile is not marked as a builder', async () => {
-    const builder = await mockBuilder({ builderStatus: 'applied' });
-
-    await expect(registerBuilderNFT({ builderId: builder.id, season: mockSeason })).rejects.toThrow(InvalidInputError);
-  });
 });

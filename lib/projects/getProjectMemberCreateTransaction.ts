@@ -1,7 +1,7 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getENSName } from '@root/lib/blockchain';
+import { getENSName } from '@packages/blockchain/getENSName';
 import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
 import { uid } from '@root/lib/utils/strings';

@@ -1,4 +1,4 @@
-import { approveBuilder } from './approveBuilder';
+import { approveBuilder } from '@packages/scoutgame/builders/approveBuilder';
 
 import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
 import { octokit } from '@packages/github/client';
@@ -51,7 +51,7 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
       bio,
       builderStatus: 'applied',
       farcasterId: fid,
-      farcasterName: displayName,
+      farcasterName: username,
       githubUser: githubUserDB
         ? { connect: { id: githubUserDB.id } }
         : {

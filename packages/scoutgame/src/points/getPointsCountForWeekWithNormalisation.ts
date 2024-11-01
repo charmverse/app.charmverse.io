@@ -1,7 +1,7 @@
 import { weeklyRewardableBuilders } from '../builderNfts/constants';
 import { getCurrentWeekPointsAllocation } from '../builderNfts/getCurrentWeekPointsAllocation';
-import type { LeaderboardBuilder } from '../getBuildersLeaderboard';
-import { getBuildersLeaderboard } from '../getBuildersLeaderboard';
+import type { LeaderboardBuilder } from '../builders/getBuildersLeaderboard';
+import { getBuildersLeaderboard } from '../builders/getBuildersLeaderboard';
 
 import { calculateEarnableScoutPointsForRank } from './calculatePoints';
 

@@ -4,11 +4,11 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
-} from '@packages/onchain/waitForDecentTransactionSettlement';
+} from '@packages/blockchain/waitForDecentTransactionSettlement';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 import { recordNftMint } from './recordNftMint';

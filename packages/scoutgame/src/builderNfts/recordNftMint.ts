@@ -190,6 +190,7 @@ export async function recordNftMint(
       userId: builderNft.builderId,
       amount,
       paidWithPoints,
+      builderPath: builderNft.builder.path!,
       season: builderNft.season
     });
   }
