@@ -38,7 +38,8 @@ export async function createBuilderNft({
     imageHostingBaseUrl,
     season: currentSeason,
     tokenId,
-    userImage: fileUrl
+    userImage: fileUrl,
+    builderId
   });
 
   await uploadMetadata({

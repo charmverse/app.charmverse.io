@@ -1,5 +1,6 @@
 import { Paper, Stack, Typography } from '@mui/material';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
+import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,7 +9,6 @@ import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
 import { GemsIcon } from 'components/common/Icons';
-import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 export function getActivityLabel(activity: BuilderActivity) {
   return activity.type === 'github_event'

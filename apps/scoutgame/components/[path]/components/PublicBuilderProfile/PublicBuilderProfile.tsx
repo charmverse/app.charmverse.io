@@ -1,11 +1,9 @@
 import 'server-only';
 
-import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
-
-import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
-import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
-import { getBuilderStats } from 'lib/builders/getBuilderStats';
+import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+import { getBuilderNft } from '@packages/scoutgame/builders/getBuilderNft';
+import { getBuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
+import { getBuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
 
 import type { BuilderProfileProps } from './PublicBuilderProfileContainer';
 import { PublicBuilderProfileContainer } from './PublicBuilderProfileContainer';
@@ -19,18 +17,7 @@ export async function PublicBuilderProfile({ builder }: { builder: BuilderProfil
     builderActivities = [],
     { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}
   ] = await Promise.all([
-    prisma.builderNft.findUnique({
-      where: {
-        builderId_season: {
-          builderId,
-          season: currentSeason
-        }
-      },
-      select: {
-        imageUrl: true,
-        currentPrice: true
-      }
-    }),
+    getBuilderNft(builderId),
     getBuilderStats(builderId),
     getBuilderActivities({ builderId, limit: 200 }),
     getBuilderScouts(builderId)

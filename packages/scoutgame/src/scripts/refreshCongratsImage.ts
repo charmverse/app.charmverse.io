@@ -17,7 +17,9 @@ export async function refreshCongratsImages() {
     const congratsImageUrl = await uploadArtworkCongrats({
       season: currentSeason,
       tokenId: builderNft.tokenId,
-      userImage: builderNft?.imageUrl || null
+      userImage: builderNft.imageUrl || null,
+      builderId: builderNft.builderId,
+      imageHostingBaseUrl: process.env.DOMAIN
     });
 
     const updatedBuilderNft = await prisma.builderNft.update({
