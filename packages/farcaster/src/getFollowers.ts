@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import * as http from '@packages/utils/http';
 
 import type { FarcasterUser } from './interfaces';
@@ -17,20 +18,25 @@ export async function getFollowers(fid: number) {
   let allUsers: FarcasterUser[] = [];
   let cursor: string | undefined;
 
-  do {
-    const { next, users } = await http.GET<FollowersResponse>(
-      `${userApiUrl}?fid=${fid}&limit=100${cursor ? `&cursor=${cursor}` : ''}`,
-      {},
-      {
-        credentials: 'omit',
-        headers: {
-          'X-Api-Key': process.env.NEYNAR_API_KEY as string
+  try {
+    do {
+      const { next, users } = await http.GET<FollowersResponse>(
+        `${userApiUrl}?fid=${fid}&limit=100${cursor ? `&cursor=${cursor}` : ''}`,
+        {},
+        {
+          credentials: 'omit',
+          headers: {
+            'X-Api-Key': process.env.NEYNAR_API_KEY as string
+          }
         }
-      }
-    );
+      );
 
-    allUsers = [...allUsers, ...users.map((user) => user.user)];
-    cursor = next?.cursor;
-  } while (cursor);
-  return allUsers;
+      allUsers = [...allUsers, ...users.map((user) => user.user)];
+      cursor = next?.cursor;
+    } while (cursor);
+    return allUsers;
+  } catch (error) {
+    log.error('Error fetching followers', { usersSoFar: allUsers.length, fid, cursor, error });
+    return allUsers;
+  }
 }
