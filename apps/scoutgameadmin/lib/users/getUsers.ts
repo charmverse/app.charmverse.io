@@ -4,7 +4,15 @@ import { validate } from 'uuid';
 
 export type ScoutGameUser = Pick<
   Scout,
-  'builderStatus' | 'path' | 'id' | 'avatar' | 'displayName' | 'createdAt' | 'farcasterName' | 'currentBalance'
+  | 'builderStatus'
+  | 'path'
+  | 'id'
+  | 'avatar'
+  | 'displayName'
+  | 'createdAt'
+  | 'farcasterName'
+  | 'currentBalance'
+  | 'email'
 > & { githubLogin: string | null; nftsPurchased: number };
 
 export type UserFilter = 'only-builders';

@@ -50,6 +50,8 @@ export function AddBuilderModal({ user, open, onClose, onAdd }: Props) {
   const action = didApply ? 'Approve' : 'Add';
   const requireGithubLogin = !user.githubLogin;
 
+  const githubLoginDisplayed = githubLogin || user.githubLogin;
+
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
       <DialogTitle>
@@ -70,6 +72,14 @@ export function AddBuilderModal({ user, open, onClose, onAdd }: Props) {
                 onChange={(e) => setTextInput(e.target.value)}
                 required
               />
+            )}
+            {githubLoginDisplayed && (
+              <Stack>
+                <Typography variant='caption'>Github profile</Typography>
+                <Link href={`https://github.com/${githubLoginDisplayed}`} target='_blank'>
+                  https://github.com/{githubLoginDisplayed}
+                </Link>
+              </Stack>
             )}
             {createBuilderError && (
               <Box p={1}>

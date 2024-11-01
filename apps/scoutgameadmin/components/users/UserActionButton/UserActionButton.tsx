@@ -33,22 +33,13 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
       >
         <MoreHorizIcon />
       </IconButton>
-      <Menu
-        id='user-menu'
-        anchorEl={anchorEl}
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
-        anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right'
-        }}
-      >
+      <Menu id='user-menu' anchorEl={anchorEl} open={open} onClose={handleClose} onClick={handleClose}>
         {(user.builderStatus === 'applied' || user.builderStatus === 'rejected') && (
-          <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Approve builder profile</MenuItem>
+          <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Review builder profile</MenuItem>
         )}
         {!user.builderStatus && <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Add builder profile</MenuItem>}
         <MenuItem onClick={() => setIsTransactionsModalOpen(true)}>View NFT transactions</MenuItem>
+        <MenuItem disabled>Id: {user.id}</MenuItem>
       </Menu>
       <AddBuilderModal
         user={user}

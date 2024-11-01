@@ -123,7 +123,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   onClick={() => handleSort('displayName')}
                 ></TableSortLabel>
               </TableCell>
-              <TableCell>ID</TableCell>
+              <TableCell>Email</TableCell>
               <TableCell align='center'>
                 <TableSortLabel
                   active={sortField === 'nftsPurchased'}
@@ -176,7 +176,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                     {user.displayName}
                   </Link>
                 </TableCell>
-                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.email}</TableCell>
                 <TableCell align='center'>{user.nftsPurchased}</TableCell>
                 <TableCell align='center'>{user.currentBalance}</TableCell>
                 <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
