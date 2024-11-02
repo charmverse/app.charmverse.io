@@ -1,5 +1,5 @@
-import { uploadToken } from '@connect-shared/lib/aws/uploadToken';
 import { getSession } from '@connect-shared/lib/session/getSession';
+import { uploadToken } from '@packages/aws/uploadToken';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const tokenData = await uploadToken(filename, userId);
+    const tokenData = await uploadToken({ filename, userId });
 
     return Response.json(tokenData);
   } catch (error) {

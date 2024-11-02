@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { createPublicClient, http, parseEventLogs } from 'viem';
 import { optimism } from 'viem/chains';
 

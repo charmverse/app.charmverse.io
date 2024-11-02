@@ -86,15 +86,17 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
-        <BottomNavigationAction
-          LinkComponent={Link}
-          label='Profile'
-          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-          href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
-          value='profile'
-          icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
-          onClick={(e) => openAuthModal?.(e, 'profile')}
-        />
+        {user ? (
+          <BottomNavigationAction
+            LinkComponent={Link}
+            label='Profile'
+            // This makes sure the UI doesn't flicker from single column to double column for desktop screens
+            href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
+            value='profile'
+            icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
+            onClick={(e) => openAuthModal?.(e, 'profile')}
+          />
+        ) : null}
         <BottomNavigationAction
           LinkComponent={Link}
           label='Info'
@@ -106,7 +108,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
       </StyledBottomNavigation>
       <SignInModalMessage
         open={authPopup.open}
-        onClose={() => setAuthPopup({ open: false, path: '/home' })}
+        onClose={() => setAuthPopup({ open: false, path: authPopup.path })}
         path={authPopup.path}
       />
     </>

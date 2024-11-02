@@ -22,24 +22,32 @@ export function SignInModalMessage({
     router.push(`/login?redirectUrl=${encodeURIComponent(path)}`);
   };
 
+  const title =
+    path === 'claim'
+      ? 'Please sign in to view your very own Claim page and collect your rewards!'
+      : 'Please sign in to scout this builder!';
+  const src = path === 'claim' ? '/images/profile/purple-unicorn.png' : '/images/profile/builder-dog.png';
+
   return (
     <Dialog
-      title='Hi there! Have we met?'
+      title='Hi, there! Have we met?'
       open={open}
       onClose={onClose}
       PaperProps={{ sx: { maxWidth: 400 } }}
       fullWidth
     >
-      <Stack gap={2} alignItems='center' mt={2}>
+      <Stack alignItems='center' mt={2} gap={2}>
+        <Typography textAlign='center' fontWeight={600}>
+          {title}
+        </Typography>
         <Image
-          src='/images/profile/please-login.png'
+          src={src}
           alt='Please login'
-          width={200}
-          height={200}
+          width={300}
+          height={300}
           sizes='100vw'
-          style={{ height: 200, width: 'auto' }}
+          style={{ height: 300, width: 'auto' }}
         />
-        <Typography fontWeight={600}>Please sign in to continue</Typography>
         <Button data-test='modal-sign-in-button' fullWidth onClick={handleClose}>
           Continue
         </Button>

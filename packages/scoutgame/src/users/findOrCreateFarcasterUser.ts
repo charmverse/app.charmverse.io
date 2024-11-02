@@ -1,10 +1,9 @@
-import type { Scout, ScoutWallet } from '@charmverse/core/prisma-client';
-import { deterministicV4UUIDFromFid } from '@connect-shared/lib/farcaster/uuidFromFid';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
+import { uuidFromNumber } from '@packages/utils/uuid';
 
-import type { FindOrCreateUserResult } from 'lib/users/findOrCreateUser';
-import { findOrCreateUser } from 'lib/users/findOrCreateUser';
+import { findOrCreateUser } from './findOrCreateUser';
+import type { FindOrCreateUserResult } from './findOrCreateUser';
 
 export async function findOrCreateFarcasterUser({
   fid,
@@ -18,8 +17,7 @@ export async function findOrCreateFarcasterUser({
     throw new Error('Could not find Farcaster profile');
   }
   return findOrCreateUser({
-    // This ensures the id is aligned with ids from the connect waitlist
-    newUserId: deterministicV4UUIDFromFid(fid),
+    newUserId: uuidFromNumber(fid),
     farcasterId: fid,
     avatar: profile.pfp_url,
     bio: profile.profile.bio.text,

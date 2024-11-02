@@ -3,8 +3,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Signer } from '@neynar/nodejs-sdk/build/neynar-api/v2/openapi-farcaster';
-import { getPublicClient } from '@packages/onchain/getPublicClient';
-import { getWalletClient } from '@packages/onchain/getWalletClient';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { getWalletClient } from '@packages/blockchain/getWalletClient';
 import { GET, POST } from '@packages/utils/http';
 import { sleep } from '@packages/utils/sleep';
 import type { Address } from 'viem';

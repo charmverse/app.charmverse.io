@@ -1,4 +1,4 @@
-import { getWalletClient } from '@packages/onchain/getWalletClient';
+import { getWalletClient } from '@packages/blockchain/getWalletClient';
 
 import { builderNftChain, builderSmartContractMinterKey } from './constants';
 

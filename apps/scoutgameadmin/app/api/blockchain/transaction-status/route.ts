@@ -1,4 +1,4 @@
-import { getTransactionStatusFromDecent } from '@packages/onchain/waitForDecentTransactionSettlement';
+import { getTransactionStatusFromDecent } from '@packages/blockchain/waitForDecentTransactionSettlement';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
