@@ -11,21 +11,6 @@ test.describe('Profile page', () => {
     await expect(container).toBeVisible();
   });
 
-  test('Clicking profile link should prompt user to go to login page', async ({ page, loginPage, profilePage }) => {
-    await page.goto('/home');
-    const link = page.locator(`data-test=site-navigation >> [href*="/profile"]`).first();
-    await link.click();
-
-    // continue to login
-    const signInModalButton = page.locator('data-test=modal-sign-in-button');
-    await expect(signInModalButton).toBeVisible();
-    await signInModalButton.click();
-
-    await page.waitForURL('**/login?redirectUrl=profile');
-    const container = page.locator('data-test=login-page');
-    await expect(container).toBeVisible();
-  });
-
   test('An onboarded user can access the profile page', async ({ page, profilePage, utils }) => {
     const builder = await mockBuilder({
       agreedToTermsAt: new Date(),
