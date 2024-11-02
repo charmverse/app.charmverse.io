@@ -3,7 +3,6 @@ import { Box, Paper, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 
 import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
-import { UserProfile } from 'components/common/Profile/UserProfile';
 import type { UserStats } from 'lib/users/getUserStats';
 import type { BuilderUserInfo } from 'lib/users/interfaces';
 
@@ -14,6 +13,7 @@ import { ProfileStats } from './components/ProfileStats';
 import { ProfileTabsMenu } from './components/ProfileTabsMenu';
 import { ScoutProfile } from './components/ScoutProfile/ScoutProfile';
 import { ScoutProfileLoading } from './components/ScoutProfile/ScoutProfileLoading';
+import { UserProfileForm } from './components/UserProfileForm';
 
 export type ProfileTab = 'build' | 'scout' | 'scout-build';
 
@@ -68,7 +68,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
             elevation={0}
           >
             <Stack justifyContent='center' flex={1}>
-              <UserProfile user={user} />
+              <UserProfileForm user={user} />
             </Stack>
             <Box flex={1}>
               <ProfileStats

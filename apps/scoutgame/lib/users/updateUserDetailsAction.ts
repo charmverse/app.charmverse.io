@@ -5,11 +5,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { authActionClient } from 'lib/actions/actionClient';
 
 import { generateUserPath } from './generateUserPath';
-import { saveOnboardingDetailsSchema } from './saveOnboardingDetailsSchema';
+import { updateUserDetailsSchema } from './updateUserDetailsSchema';
 
-export const saveOnboardingDetailsAction = authActionClient
-  .metadata({ actionName: 'save-onboarding-details' })
-  .schema(saveOnboardingDetailsSchema)
+export const updateUserDetailsAction = authActionClient
+  .metadata({ actionName: 'update-user-details' })
+  .schema(updateUserDetailsSchema)
   .action(async ({ parsedInput, ctx }) => {
     const userId = ctx.session.scoutId;
     const existingUser = await prisma.scout.findUniqueOrThrow({
@@ -19,26 +19,19 @@ export const saveOnboardingDetailsAction = authActionClient
       }
     });
 
-    if (!parsedInput.agreedToTOS) {
-      throw new Error('You need to accept the terms and conditions.');
-    }
-
     const path =
       existingUser.displayName === parsedInput.displayName
         ? undefined
         : await generateUserPath(parsedInput.displayName);
 
-    await prisma.scout.update({
+    const updatedUser = await prisma.scout.update({
       where: { id: userId },
       data: {
-        email: parsedInput.email,
-        sendMarketing: parsedInput.sendMarketing,
-        agreedToTermsAt: new Date(),
         avatar: parsedInput.avatar,
         displayName: parsedInput.displayName,
         path
       }
     });
 
-    return { success: true };
+    return updatedUser;
   });
