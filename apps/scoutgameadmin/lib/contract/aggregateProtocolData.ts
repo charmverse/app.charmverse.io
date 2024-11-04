@@ -1,3 +1,4 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import { getAllISOWeeksFromSeasonStart } from '@packages/scoutgame/dates';
 import {
   protocolImplementationReadonlyApiClient,
@@ -8,7 +9,8 @@ import type { Address } from 'viem';
 
 type MerkleRoot = {
   week: string;
-  root: string;
+  publishedOnchain: boolean;
+  root: string | null;
 };
 
 export type ProtocolData = {
@@ -28,13 +30,25 @@ export async function aggregateProtocolData(): Promise<ProtocolData> {
 
   const weeks = getAllISOWeeksFromSeasonStart();
 
-  const merkleRoots = await Promise.all(
+  const weeklyClaims = await prisma.weeklyClaims.findMany({
+    where: {
+      week: {
+        in: weeks
+      }
+    }
+  });
+
+  const merkleRoots = await Promise.all<MerkleRoot>(
     weeks.map((week) =>
       protocolImplementationReadonlyApiClient
         .getMerkleRoot({ args: { week } })
-        .then((root) => ({ week, root }))
+        .then((root) => ({ week, root, publishedOnchain: true }) as MerkleRoot)
         .catch(() => {
-          return { week, root: 'No root found' };
+          return {
+            week,
+            root: weeklyClaims.find((claim) => claim.week === week)?.merkleTreeRoot || null,
+            publishedOnchain: false
+          } as MerkleRoot;
         })
     )
   );

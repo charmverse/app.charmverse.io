@@ -1,4 +1,4 @@
-import { Box, Divider, Grid2, IconButton, Typography } from '@mui/material';
+import { Box, Button, Divider, Grid2, IconButton, Typography } from '@mui/material';
 import Link from 'next/link';
 import { MdLaunch } from 'react-icons/md';
 
@@ -77,9 +77,23 @@ export function ProtocolContractDashboard(data: ProtocolData) {
       {data.merkleRoots.map((root) => (
         <Grid2 size={itemSizeThreeColumnMd} key={root.week}>
           <Typography variant='h6'>Merkle Root for week {root.week}</Typography>
-          <Typography variant='body1'>{root.root}</Typography>
+          {!root.root && <Typography>Week not processed</Typography>}
+          {root.root &&
+            (root.publishedOnchain ? (
+              <Typography>Published onchain</Typography>
+            ) : (
+              <Typography>Awaiting publication</Typography>
+            ))}
         </Grid2>
       ))}
+      <GridDivider />
+      <Grid2 size={12}>
+        <SectionTitle title='Governance' />
+      </Grid2>
+      <Grid2 size={itemSizeTwoColumnMd}>
+        <Typography variant='h6'>Upgrade contract</Typography>
+        <Button>Upgrade contract</Button>
+      </Grid2>
       <GridDivider />
       <Grid2 size={12}>
         <SectionTitle title='Roles & Permissions' />

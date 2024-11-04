@@ -131,3 +131,5 @@ export async function generateWeeklyClaims({ week }: { week: string }): Promise<
 
   return weeklyClaim as WeeklyClaimsTyped;
 }
+
+// generateWeeklyClaims({ week: '2024-W44' }).then(console.log);
