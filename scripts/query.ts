@@ -7,7 +7,7 @@ const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
 async function query() {
-  const w = await prisma.scout.findFirst({ where: { path: 'mattcasey' } });
+  const w = await prisma.scout.update({ where: { path: 'mattcasey' }, data: { builderStatus: 'rejected' } });
 
   console.log(w);
 }

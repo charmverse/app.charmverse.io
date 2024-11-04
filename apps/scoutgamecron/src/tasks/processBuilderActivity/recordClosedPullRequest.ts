@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 import { getClosedPullRequest } from './github/getClosedPullRequest';
 import type { PullRequest } from './github/getPullRequestsByUser';
 
+const appealUrl = 'https://app.charmverse.io/scout-game-appeal/scout-game-appeals-3853798695994546';
+
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
 export type ClosedPullRequestMeta = Pick<
@@ -162,7 +164,7 @@ export async function recordClosedPullRequest({
 
 It looks like this Pull Request was closed by the maintainer. As a result, you've received your third strike in the Scout Game. Your current strike count is 3, and your account has been suspended from further participation in the Scout Game.
 
-If you believe this was a mistake and wish to appeal, you can submit an appeal at: app.charmverse.io.
+If you believe this was a mistake and wish to appeal, you can submit an appeal at: ${appealUrl}.
 `,
           owner: repo.owner,
           repo: repo.name
@@ -178,7 +180,7 @@ It looks like this Pull Request was closed by the maintainer. As a result, you'v
 
 Please note that if you reach 3 strikes, your account will be suspended from the Scout Game.
 
-If you believe this was a mistake and wish to appeal now or after 3 strikes, you can submit an appeal at: https://app.charmverse.io/scout-game-appeal/scout-game-appeals-3853798695994546.
+If you believe this was a mistake and wish to appeal now or after 3 strikes, you can submit an appeal at: ${appealUrl}.
 `,
         owner: repo.owner,
         repo: repo.name
