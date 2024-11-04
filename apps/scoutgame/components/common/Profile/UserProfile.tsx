@@ -57,7 +57,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         </Stack>
       ) : null}
       <Stack width='100%'>
-        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
+        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' gap={1}>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
           <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
         </Stack>
