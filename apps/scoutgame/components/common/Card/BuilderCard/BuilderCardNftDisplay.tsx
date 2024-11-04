@@ -88,7 +88,7 @@ export function BuilderCardNftDisplay({
             left: '50%',
             backgroundColor: hideDetails ? 'transparent' : '#000',
             transform: 'translateX(-50%)',
-            bottom: 3.75
+            bottom: 3.5
           }}
         >
           {nftImageUrl ? null : (

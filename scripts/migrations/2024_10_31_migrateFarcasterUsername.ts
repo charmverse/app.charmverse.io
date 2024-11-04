@@ -4,7 +4,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 async function migrateFarcasterUsername() {
   const scouts = await prisma.scout.findMany({
     where: {
-      farcasterName: null
+      farcasterId: {
+        not: null
+      }
     },
     select: {
       id: true,

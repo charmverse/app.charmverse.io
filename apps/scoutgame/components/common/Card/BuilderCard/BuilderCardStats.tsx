@@ -32,7 +32,7 @@ export function BuilderCardStats({
       }}
       gap={{
         xs: 0,
-        md: size === 'medium' || size === 'large' ? 0.25 : 0
+        md: size === 'medium' || size === 'large' ? 0.1 : 0
       }}
       width='100%'
       height='100%'
