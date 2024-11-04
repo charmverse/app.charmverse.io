@@ -101,13 +101,15 @@ function PageLayout({ children }: PageLayoutProps) {
             <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
-              <AnnouncementBanner
-                actionLabel='Go to Scout Game'
-                actionHref='https://waitlist.scoutgame.xyz'
-                expiryDate='2024-09-30'
-              >
-                Fantasy Sports for Developers. Join waitlist
-              </AnnouncementBanner>
+              {space?.domain !== 'ef' && space?.customDomain !== 'ethrangers.com' ? (
+                <AnnouncementBanner
+                  actionLabel='Play'
+                  actionHref='https://scoutgame.xyz/login'
+                  bannerId='scout-game-banner'
+                >
+                  Scout Game, fantasy sports for onchain builders, now open for everyone
+                </AnnouncementBanner>
+              ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
                 <AnnouncementBanner
                   errorBackground={true}
