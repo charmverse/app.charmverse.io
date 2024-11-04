@@ -89,12 +89,12 @@ export async function getBuilderActivities({
       if (event.type === 'nft_purchase' && event.nftPurchaseEvent) {
         return {
           ...event.builder,
-          path: event.builder.path!,
+          path: event.builder.path,
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
           scout: {
-            path: event.nftPurchaseEvent.scout.path!,
+            path: event.nftPurchaseEvent.scout.path,
             displayName: event.nftPurchaseEvent.scout.displayName
           }
         };
