@@ -33,7 +33,7 @@ export function BuilderShareImage({
 
   const domain = process.env.DOMAIN || 'http://localhost:3000';
 
-  const random = randomInt(0, 4);
+  const random = randomInt(0, 3);
 
   const { rank = 0, seasonPoints = 0, allTimePoints = 0, gemsCollected = 0 } = stats;
 
@@ -41,7 +41,7 @@ export function BuilderShareImage({
 
   const purchaseCostInPoints = convertCostToPoints(builderPrice);
 
-  const randomOverlay = overlays[random];
+  const randomOverlay = overlays[random] || overlays[0];
 
   const box: CSSProperties = {
     backgroundColor: randomOverlay.color,
@@ -281,5 +281,5 @@ export function getActivityDetail(activity: BuilderActivity) {
 }
 
 function randomInt(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min)) + min;
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
