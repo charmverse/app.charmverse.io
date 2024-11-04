@@ -31,7 +31,7 @@ export function BuilderShareImage({
     { name: 'blue', src: '/images/profile/builder/blue-sky.jpg', color: '#02143C' }
   ];
 
-  const domain = 'http://localhost:3000' || process.env.DOMAIN;
+  const domain = process.env.DOMAIN || 'http://localhost:3000';
 
   const random = randomInt(0, 4);
 
