@@ -1,10 +1,10 @@
 // useProposeSetImplementation.ts
 import type {} from '@safe-global/api-kit';
 import { ProposeTransactionProps } from '@safe-global/api-kit';
-import { useNetwork } from '@wagmi/core';
 import { ethers } from 'ethers';
 import { useState, useCallback } from 'react';
 import { encodeFunctionData } from 'viem';
+import { use } from 'wagmi';
 
 /**
  * Hook to propose a transaction to call setImplementation on a contract using Gnosis Safe SDK.
