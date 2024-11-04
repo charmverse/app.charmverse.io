@@ -25,7 +25,14 @@ export function WarpcastLogin() {
           trackEvent('click_dont_have_farcaster_account');
         }}
       >
-        <Typography fontWeight={600} color='primary'>
+        <Typography
+          fontWeight={600}
+          color='primary'
+          sx={{
+            textShadow:
+              '2px 2px 8px rgba(0, 0, 0, .7),-2px -2px 8px rgba(0, 0, 0, .7),2px -2px 8px rgba(0, 0, 0, .7),-2px 2px 8px rgba(0, 0, 0, .7);'
+          }}
+        >
           Join Farcaster
         </Typography>
       </Link>

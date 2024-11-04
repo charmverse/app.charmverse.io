@@ -29,7 +29,7 @@ export function WalletLogin() {
 function WalletLoginButton() {
   const [isConnecting, setIsConnecting] = useState(false);
   const { openConnectModal } = useConnectModal();
-  const { address, chainId, isConnected, isConnecting: isConnectingAccount } = useAccount();
+  const { address, chainId, isConnected } = useAccount();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
   const inviteCode = searchParams.get('invite-code');
@@ -46,7 +46,11 @@ function WalletLoginButton() {
 
   const { executeAsync: revalidatePath } = useAction(revalidatePathAction);
 
-  const { executeAsync, result, isExecuting } = useAction(loginWithWalletAction, {
+  const {
+    executeAsync,
+    result,
+    isExecuting: isLoggingIn
+  } = useAction(loginWithWalletAction, {
     onSuccess: async ({ data }) => {
       const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/home';
 
@@ -86,7 +90,7 @@ function WalletLoginButton() {
     }
   }, [address, isConnected, isConnecting]);
 
-  const isLoading = isExecuting || isConnectingAccount || isConnecting;
+  const isLoading = isConnecting || isLoggingIn;
 
   return (
     <Box width='100%'>
