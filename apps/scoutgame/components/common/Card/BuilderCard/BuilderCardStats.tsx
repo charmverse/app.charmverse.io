@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { PointsIcon } from 'components/common/Icons';
 
 import { BuilderCardActivity } from './BuilderCardActivity/BuilderCardActivity';
+import { BuilderCardName } from './BuilderCardName';
 
 export function BuilderCardStats({
   displayName,
@@ -25,7 +26,10 @@ export function BuilderCardStats({
   return (
     <Stack
       alignItems='center'
-      pt={0.25}
+      pt={{
+        xs: 0.15,
+        md: 0.25
+      }}
       gap={{
         xs: 0,
         md: size === 'medium' || size === 'large' ? 0.25 : 0
@@ -33,17 +37,7 @@ export function BuilderCardStats({
       width='100%'
       height='100%'
     >
-      <Typography
-        component='span'
-        sx={{
-          fontSize: {
-            xs: '11.5px',
-            md: mdFontSize
-          }
-        }}
-      >
-        {displayName}
-      </Typography>
+      <BuilderCardName name={displayName} size={size} />
       <Stack flexDirection='row' width='100%' px={1} alignItems='center' justifyContent='space-between'>
         {typeof builderPoints === 'number' && (
           <Tooltip title='Total # of Scout Points earned this season to date'>
@@ -51,7 +45,7 @@ export function BuilderCardStats({
               <Typography
                 sx={{
                   fontSize: {
-                    xs: '12px',
+                    xs: '11px',
                     md: mdFontSize
                   }
                 }}
@@ -60,7 +54,7 @@ export function BuilderCardStats({
               >
                 {builderPoints}
               </Typography>
-              <PointsIcon size={16} color='green' />
+              <PointsIcon size={14} color='green' />
             </Stack>
           </Tooltip>
         )}

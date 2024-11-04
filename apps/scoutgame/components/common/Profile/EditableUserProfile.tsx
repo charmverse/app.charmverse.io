@@ -181,7 +181,7 @@ export function EditableUserProfile({
               width='100%'
               gap={1}
             >
-              <Stack width='80%'>
+              <Stack width={isEditingName ? '80%' : '100%'}>
                 {isEditingName ? (
                   <TextField
                     required
@@ -210,7 +210,7 @@ export function EditableUserProfile({
                     }}
                   />
                 ) : (
-                  <Stack direction='row' alignItems='center' gap={0.5}>
+                  <Stack direction='row' alignItems='center' gap={1}>
                     <Typography variant='h6'>{displayNameField.value}</Typography>
                     {farcasterName || githubLogin ? (
                       <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
