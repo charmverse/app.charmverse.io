@@ -2,13 +2,12 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GithubRepo, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
+import { appealUrl } from '@packages/scoutgame/constants';
 import { isTruthy } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './github/getClosedPullRequest';
 import type { PullRequest } from './github/getPullRequestsByUser';
-
-const appealUrl = 'https://app.charmverse.io/scout-game-appeal/scout-game-appeals-3853798695994546';
 
 type RepoInput = Pick<GithubRepo, 'owner' | 'name'>;
 
