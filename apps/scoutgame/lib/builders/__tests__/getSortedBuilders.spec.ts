@@ -65,12 +65,21 @@ describe('getSortedBuilders', () => {
     await mockUserWeeklyStats({
       userId: builders[0].id,
       week: getPreviousWeek(mockWeek),
+      season: mockSeason,
       rank: 5
     });
     await mockUserWeeklyStats({
       userId: builders[1].id,
       week: getPreviousWeek(mockWeek),
+      season: mockSeason,
       rank: 2
+    });
+    // rank should be pulled from the current week
+    await mockUserWeeklyStats({
+      userId: builders[1].id,
+      week: mockWeek,
+      season: mockSeason,
+      rank: 999
     });
     const { builders: paginatedBuilders } = await getSortedBuilders({
       sort: 'top',
@@ -80,6 +89,7 @@ describe('getSortedBuilders', () => {
       cursor: null
     });
     expect(paginatedBuilders.map((r) => r.id)).toEqual([builders[1].id, builders[0].id]);
+    expect(paginatedBuilders[0].rank).toEqual(999);
   });
 
   it('should skip builders without nfts', async () => {

@@ -12,7 +12,7 @@ import { Avatar } from '../Avatar';
 import { ProfileLinks } from './ProfileLinks';
 
 // Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
-export type UserProfileData = Pick<Scout, 'id' | 'path'> & {
+type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   bio?: string | null;
   avatar?: string | null;
   displayName: string;
@@ -57,7 +57,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         </Stack>
       ) : null}
       <Stack width='100%'>
-        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap'>
+        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' gap={1}>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
           <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
         </Stack>

@@ -59,7 +59,7 @@ function Document() {
         </Link>{' '}
         and/or{' '}
         <Link
-          href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
+          href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+'
           target='_blank'
         >
           help wanted
@@ -102,7 +102,7 @@ function Document() {
             <TableRow>
               <TableCell>
                 <Link
-                  href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22'
+                  href='https://github.com/ethereum-optimism/supersim/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+'
                   target='_blank'
                 >
                   help wanted
