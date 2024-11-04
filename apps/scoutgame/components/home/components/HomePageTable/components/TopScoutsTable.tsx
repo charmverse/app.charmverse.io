@@ -37,7 +37,7 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
             </TableCell>
             <TableCell align='center'>SCOUTED</TableCell>
             <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-              NFTs HELD
+              CARDS HELD
             </TableCell>
           </TableRow>
         </TableHead>
@@ -73,21 +73,21 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <TableCellText color='orange.main'>{scout.seasonPoints || 0}</TableCellText>
-                  <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
+                  <TableCellText color='green.main'>{scout.seasonPoints || 0}</TableCellText>
+                  <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <TableCellText color='orange.main'>{scout.allTimePoints || 0}</TableCellText>
-                  <Image width={15} height={15} src='/images/profile/scout-game-orange-icon.svg' alt='season icon ' />
+                  <TableCellText color='green.main'>{scout.allTimePoints || 0}</TableCellText>
+                  <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
-                <TableCellText color='orange.main'>{scout.buildersScouted || 0}</TableCellText>
+                <TableCellText color='green.main'>{scout.buildersScouted || 0}</TableCellText>
               </TableCell>
               <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <TableCellText color='orange.main'>{scout.nftsHeld || 0}</TableCellText>
+                <TableCellText color='green.main'>{scout.nftsHeld || 0}</TableCellText>
               </TableCell>
             </TableRow>
           ))}

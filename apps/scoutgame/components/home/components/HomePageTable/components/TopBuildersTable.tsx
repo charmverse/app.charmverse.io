@@ -74,30 +74,30 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
               </TableCell>
               <TableCell align='right' sx={{ display: 'table-cell' }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <TableCellText color='green.main'>{builder.seasonPoints || 0}</TableCellText>
+                  <TableCellText color='orange.main'>{builder.seasonPoints || 0}</TableCellText>
                   <Image
                     width={15}
                     height={15}
-                    src='/images/profile/scout-game-green-icon.svg'
+                    src='/images/profile/scout-game-orange-icon.svg'
                     alt='scout game icon '
                   />
                 </Stack>
               </TableCell>
               <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                  <TableCellText color='green.main'>{builder.allTimePoints || 0}</TableCellText>
+                  <TableCellText color='orange.main'>{builder.allTimePoints || 0}</TableCellText>
                   <Image
                     width={15}
                     height={15}
-                    src='/images/profile/scout-game-green-icon.svg'
+                    src='/images/profile/scout-game-orange-icon.svg'
                     alt='scout game icon '
                   />
                 </Stack>
               </TableCell>
               <TableCell align='center'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='center'>
-                  <TableCellText color='green.main'>{builder.scoutedBy || 0}</TableCellText>
-                  <Image width={15} height={15} src='/images/profile/icons/like-green-icon.svg' alt='like icon ' />
+                  <TableCellText color='orange.main'>{builder.scoutedBy || 0}</TableCellText>
+                  <Image width={15} height={15} src='/images/profile/icons/like-orange-icon.svg' alt='like icon ' />
                 </Stack>
               </TableCell>
               <TableCell align='center' width='150px'>

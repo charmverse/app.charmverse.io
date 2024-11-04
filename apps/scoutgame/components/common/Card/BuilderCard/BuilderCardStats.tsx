@@ -89,7 +89,7 @@ export function BuilderCardStats({
               >
                 {nftsSold}
               </Typography>
-              <Image width={14} height={14} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
+              <Image width={12} height={12} src='/images/profile/icons/cards-orange.svg' alt='Cards' />
             </Stack>
           </Tooltip>
         )}

@@ -31,8 +31,8 @@ export function ScoutCard({ scout }: { scout: ScoutInfo }) {
         <span ref={spanRef}>{scout.displayName}</span>
       </Typography>
       <Stack direction='row' gap={0.5} alignItems='center' justifyContent='space-between'>
-        <Typography color='orange.main'>{scout.nfts}</Typography>
-        <Image width={20} height={20} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
+        <Typography color='green.main'>{scout.nfts}</Typography>
+        <Image width={20} height={20} src='/images/profile/icons/cards-green.svg' alt='Cards' />
       </Stack>
     </Paper>
   );
