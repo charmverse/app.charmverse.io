@@ -80,6 +80,7 @@ describe('recordNftMint', () => {
     expect(trackUserAction).toHaveBeenCalledWith('nft_purchase', {
       userId: builderNft.builderId,
       amount,
+      builderPath: builder.path,
       paidWithPoints: true,
       season: builderNft.season
     });
