@@ -9,8 +9,8 @@ export default function Layout({
   children: ReactNode;
 }>) {
   return (
-    <Box component='main' bgcolor='background.default' p={{ xs: 2, md: 3 }} minHeight='100svh'>
-      <Box maxWidth='700px' margin='auto'>
+    <Box component='main' bgcolor='background.default' p={{ md: 3 }} height='100%' minHeight='100dvh'>
+      <Box maxWidth='700px' margin='auto' height='100%'>
         {children}
       </Box>
     </Box>
