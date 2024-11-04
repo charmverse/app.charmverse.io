@@ -30,7 +30,10 @@ export function BuilderCardActivity({
           width='100%'
           height={gemHeight}
           px={1}
-          mt={0.5}
+          mt={{
+            xs: 0.1,
+            md: 0.5
+          }}
           alignItems='center'
           onClick={(e) => {
             if (isMobile) {
