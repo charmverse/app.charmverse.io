@@ -45,6 +45,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const {
     data: filteredUsers,
     isValidating,
+    mutate: refreshUsers,
     isLoading
   } = useSearchUsers({ searchString: debouncedFilterString, sortField, sortOrder });
   const showFilteredResults = Boolean(debouncedFilterString || filteredUsers || isValidating || isLoading);
@@ -188,7 +189,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   {!user?.builderStatus && <Typography color='secondary'>&ndash;</Typography>}
                 </TableCell>
                 <TableCell align='center'>
-                  <UserActionButton user={user} />
+                  <UserActionButton user={user} onChange={refreshUsers} />
                 </TableCell>
               </TableRow>
             ))}
