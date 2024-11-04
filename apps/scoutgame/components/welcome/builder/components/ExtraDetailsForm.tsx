@@ -95,11 +95,15 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
         <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)}>
           <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
             <EditableUserProfile
-              control={control}
               user={{
                 ...user,
-                avatar: user.avatar as string
+                bio: null,
+                githubLogin: undefined,
+                farcasterName: undefined
               }}
+              avatarSize={75}
+              isLoading={isExecuting}
+              control={control}
             />
             <FormLabel id='form-email' required>
               Email

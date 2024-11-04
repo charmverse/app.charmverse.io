@@ -22,7 +22,7 @@ import type { ScoutGameUser } from 'lib/users/getUsers';
 
 type Props = {
   open: boolean;
-  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin'>;
+  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin' | 'farcasterName'>;
   onClose: () => void;
   onAdd: () => void;
 };
@@ -47,8 +47,10 @@ export function AddBuilderModal({ user, open, onClose, onAdd }: Props) {
   };
 
   const didApply = user?.builderStatus === 'applied';
-  const action = didApply ? 'Approve' : 'Add';
+  const action = didApply ? 'Review' : 'Register';
   const requireGithubLogin = !user.githubLogin;
+
+  const githubLoginDisplayed = githubLogin || user.githubLogin;
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
@@ -70,6 +72,22 @@ export function AddBuilderModal({ user, open, onClose, onAdd }: Props) {
                 onChange={(e) => setTextInput(e.target.value)}
                 required
               />
+            )}
+            {githubLoginDisplayed && (
+              <Stack>
+                <Typography variant='caption'>Github profile</Typography>
+                <Link href={`https://github.com/${githubLoginDisplayed}`} target='_blank'>
+                  https://github.com/{githubLoginDisplayed}
+                </Link>
+              </Stack>
+            )}
+            {user.farcasterName && (
+              <Stack>
+                <Typography variant='caption'>Farcaster profile</Typography>
+                <Link href={`https://warpcast.com/${user.farcasterName}`} target='_blank'>
+                  https://warpcast.com/{githubLoginDisplayed}
+                </Link>
+              </Stack>
             )}
             {createBuilderError && (
               <Box p={1}>
