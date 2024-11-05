@@ -1,11 +1,10 @@
 import 'server-only';
 
-import { Box, Stack, TableHead, Typography } from '@mui/material';
-import Paper from '@mui/material/Paper';
+import type { SxProps } from '@mui/material';
+import { Box, Stack, TableHead } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
@@ -18,22 +17,35 @@ import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { TableCellText } from './TableCellText';
 
+const tableRowSx: SxProps = {
+  boxShadow: '2px 2px 2px 0px rgba(0, 0, 0, 0.25)',
+  [`& .${tableCellClasses.root}`]: {
+    paddingLeft: '6px',
+    paddingRight: '6px',
+    borderBottom: '1px solid',
+    borderBottomColor: 'background.default',
+    '&:first-of-type': {
+      paddingLeft: {
+        xs: '10px',
+        md: '50px'
+      }
+    },
+    '&:last-child': {
+      paddingRight: {
+        xs: '10px',
+        md: '75px'
+      }
+    }
+  }
+};
+
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <Table aria-label='Leaderboard table' size='small' component={Paper} sx={{ px: { md: 6 } }}>
+    <Table aria-label='Leaderboard table' size='small' sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}>
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
-        <TableRow
-          sx={{
-            boxShadow: '2px 2px 2px 0px rgba(0, 0, 0, 0.25)',
-            [`& .${tableCellClasses.root}`]: {
-              borderBottom: 'none',
-              paddingLeft: '6px',
-              paddingRight: '6px'
-            }
-          }}
-        >
+        <TableRow sx={tableRowSx}>
           <TableCell align='center'>RANK</TableCell>
           <TableCell>BUILDER</TableCell>
           <TableCell>WEEK {getCurrentSeasonWeekNumber()}</TableCell>
@@ -48,17 +60,11 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
       </TableHead>
       <TableBody>
         {sorted.map((row, index) => (
-          <TableRow
-            key={row.id}
-            sx={{
-              '&:last-child td, &:last-child th': { border: 0 },
-              '& .MuiTableCell-root': { p: '6px', borderBottom: '1px solid', borderBottomColor: 'background.default' }
-            }}
-          >
+          <TableRow key={row.id} sx={tableRowSx}>
             <TableCell align='center'>
               <TableCellText color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</TableCellText>
             </TableCell>
-            <TableCell component='th'>
+            <TableCell>
               <Stack
                 href={`/u/${row.path}`}
                 component={Link}
@@ -71,7 +77,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 <TableCellText noWrap>{row.displayName}</TableCellText>
               </Stack>
             </TableCell>
-            <TableCell sx={{ width: { xs: '100%', md: '60%' } }}>
+            <TableCell sx={{ width: { xs: '100%', md: '50%' } }}>
               <Box
                 sx={{
                   background:
@@ -89,7 +95,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
                 <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
               </Stack>
             </TableCell>
-            <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='150px'>
+            <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='200px'>
               <ScoutButton builder={row} />
             </TableCell>
           </TableRow>
