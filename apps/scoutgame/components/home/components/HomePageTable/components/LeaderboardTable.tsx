@@ -15,29 +15,8 @@ import { getSXProps } from 'components/common/Hidden';
 import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
+import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
-
-const tableRowSx: SxProps = {
-  boxShadow: '2px 2px 2px 0px rgba(0, 0, 0, 0.25)',
-  [`& .${tableCellClasses.root}`]: {
-    paddingLeft: '6px',
-    paddingRight: '6px',
-    borderBottom: '1px solid',
-    borderBottomColor: 'background.default',
-    '&:first-of-type': {
-      paddingLeft: {
-        xs: '10px',
-        md: '50px'
-      }
-    },
-    '&:last-child': {
-      paddingRight: {
-        xs: '10px',
-        md: '75px'
-      }
-    }
-  }
-};
 
 export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
@@ -45,7 +24,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   return (
     <Table aria-label='Leaderboard table' size='small' sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}>
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
-        <TableRow sx={tableRowSx}>
+        <CommonTableRow>
           <TableCell align='center'>RANK</TableCell>
           <TableCell>BUILDER</TableCell>
           <TableCell>WEEK {getCurrentSeasonWeekNumber()}</TableCell>
@@ -56,11 +35,11 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
             GEMS
           </TableCell>
           <TableCell />
-        </TableRow>
+        </CommonTableRow>
       </TableHead>
       <TableBody>
         {sorted.map((row, index) => (
-          <TableRow key={row.id} sx={tableRowSx}>
+          <CommonTableRow key={row.id}>
             <TableCell align='center'>
               <TableCellText color={index + 1 <= 3 ? 'text.secondary' : undefined}>{index + 1}</TableCellText>
             </TableCell>
@@ -98,7 +77,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
             <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='200px'>
               <ScoutButton builder={row} />
             </TableCell>
-          </TableRow>
+          </CommonTableRow>
         ))}
       </TableBody>
     </Table>

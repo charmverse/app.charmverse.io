@@ -27,7 +27,7 @@ export function HomePage({ tab }: { tab: string }) {
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense key={currentTab} fallback={<LoadingCards />}>
+        <Suspense key='todays-hot-builders' fallback={<LoadingCards />}>
           <TodaysHotBuildersCarousel />
         </Suspense>
         <Box
