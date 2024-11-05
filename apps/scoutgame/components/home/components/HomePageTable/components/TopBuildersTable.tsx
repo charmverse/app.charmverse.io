@@ -15,22 +15,34 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
     <Table aria-label='Top scouts table' size='small' sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }}>
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
-          <TableCell align='center'>RANK</TableCell>
-          <TableCell align='left'>BUILDER</TableCell>
-          <TableCell align='right'>
+          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+            RANK
+          </TableCell>
+          <TableCell align='left' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+            BUILDER
+          </TableCell>
+          <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
               SEASON <PointsIcon />
             </Stack>
           </TableCell>
-          <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+          <TableCell
+            align='right'
+            sx={{ display: { xs: 'none', md: 'table-cell' }, fontSize: { xs: '12px', md: 'initial' } }}
+          >
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
               ALL TIME <PointsIcon />
             </Stack>
           </TableCell>
-          <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: 'table-cell' }}>
+          <TableCell
+            align='center'
+            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
+          >
             SCOUTED BY
           </TableCell>
-          <TableCell align='center'>PRICE</TableCell>
+          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+            PRICE
+          </TableCell>
         </CommonTableRow>
       </TableHead>
       <TableBody>
@@ -46,7 +58,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
                 alignItems='center'
                 flexDirection='row'
                 gap={1}
-                maxWidth={{ xs: '120px', md: 'initial' }}
+                maxWidth={{ xs: '100px', md: 'initial' }}
               >
                 <Avatar src={builder.avatar} name={builder.displayName} size='small' />
                 <TableCellText noWrap>{builder.displayName}</TableCellText>
