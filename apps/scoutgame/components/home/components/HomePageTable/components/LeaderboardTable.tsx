@@ -22,7 +22,12 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
-    <Table aria-label='Leaderboard table' size='small' sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}>
+    <Table
+      aria-label='Leaderboard table'
+      size='small'
+      sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}
+      data-test='leaderboard-table'
+    >
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
           <TableCell align='center'>RANK</TableCell>

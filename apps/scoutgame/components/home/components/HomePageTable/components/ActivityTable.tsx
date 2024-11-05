@@ -84,7 +84,12 @@ export function BuilderActivityAction({ activity }: { activity: BuilderActivity 
 
 export function ActivityTable({ activities }: { activities: BuilderActivity[] }) {
   return (
-    <Table aria-label='Leaderboard table' size='small' sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}>
+    <Table
+      aria-label='Leaderboard table'
+      size='small'
+      sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}
+      data-test='activity-table'
+    >
       <TableHead
         sx={{
           display: { xs: 'none', md: 'table-header-group' },

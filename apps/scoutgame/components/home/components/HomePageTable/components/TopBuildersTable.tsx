@@ -12,7 +12,12 @@ import { TableCellText } from './TableCellText';
 
 export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
   return (
-    <Table aria-label='Top scouts table' size='small' sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }}>
+    <Table
+      aria-label='Top scouts table'
+      size='small'
+      sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }}
+      data-test='top-builders-table'
+    >
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
           <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
