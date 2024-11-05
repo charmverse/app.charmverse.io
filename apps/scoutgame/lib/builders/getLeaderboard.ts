@@ -14,12 +14,17 @@ export type LeaderBoardRow = {
   nftImageUrl?: string;
 };
 
-export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise<LeaderBoardRow[]> {
-  const currentWeek = getCurrentWeek();
+export async function getLeaderboard({
+  limit = 10,
+  week = getCurrentWeek()
+}: {
+  limit?: number;
+  week?: string;
+}): Promise<LeaderBoardRow[]> {
   const season = currentSeason;
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {
-      week: currentWeek,
+      week,
       rank: {
         not: null
       },
