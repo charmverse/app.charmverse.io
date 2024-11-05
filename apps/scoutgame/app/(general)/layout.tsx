@@ -12,13 +12,7 @@ export default async function Layout({
   return (
     <Box display='grid' gridTemplateRows='auto 1fr auto' minHeight='100vh' bgcolor='background.default'>
       <Header />
-      <Box
-        component='main'
-        minHeight='100%'
-        sx={{
-          overflowY: 'hidden'
-        }}
-      >
+      <Box component='main' minHeight='100%'>
         {children}
       </Box>
       <StickyFooter />
