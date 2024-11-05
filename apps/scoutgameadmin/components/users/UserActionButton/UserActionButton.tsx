@@ -8,7 +8,7 @@ import type { ScoutGameUser } from 'lib/users/getUsers';
 import { AddBuilderModal } from './AddBuilderModal';
 import { ViewTransactionsModal } from './ViewTransactionsModal';
 
-export function UserActionButton({ user }: { user: ScoutGameUser }) {
+export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onChange: () => void }) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isBuilderModalOpen, setIsBuilderModalOpen] = useState(false);
   const [isTransactionsModalOpen, setIsTransactionsModalOpen] = useState(false);
@@ -38,9 +38,7 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
         {(user.builderStatus === 'applied' || user.builderStatus === 'rejected') && (
           <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Review builder profile</MenuItem>
         )}
-        {!user.builderStatus && (
-          <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Register builder profile</MenuItem>
-        )}
+        {!user.builderStatus && <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Add builder profile</MenuItem>}
         <MenuItem onClick={() => setIsTransactionsModalOpen(true)}>View NFT transactions</MenuItem>
         <Divider />
         <MenuItemNoAction>
@@ -60,7 +58,7 @@ export function UserActionButton({ user }: { user: ScoutGameUser }) {
         user={user}
         open={isBuilderModalOpen}
         onClose={() => setIsBuilderModalOpen(false)}
-        onAdd={() => {}}
+        onSave={onChange}
       />
       <ViewTransactionsModal
         open={isTransactionsModalOpen}

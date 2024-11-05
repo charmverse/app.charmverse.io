@@ -389,7 +389,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       <Stack>
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
           <Typography color='secondary'>Total cost</Typography>
-          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
+          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder cards are priced'>
             <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
           </Link>
         </Stack>
@@ -402,7 +402,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography sx={{ width: '50%' }}>{tokensToBuy} NFT</Typography>
+          <Typography sx={{ width: '50%' }}>{tokensToBuy} Card</Typography>
           <Typography align='left' flexGrow={1}>
             {purchaseCost && (
               <>

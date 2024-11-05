@@ -5,6 +5,7 @@ import { Alert, Box, Stack, Typography } from '@mui/material';
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
 import { getBuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
 import { getBuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
+import { appealUrl } from '@packages/scoutgame/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -74,7 +75,7 @@ export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) 
         <Typography>
           Your Builder account was not approved. Submit an appeal for review{' '}
           <Typography color='secondary' component='span'>
-            <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+            <Link href={appealUrl}>here</Link>
           </Typography>{' '}
           if you think this was a mistake.
         </Typography>
@@ -89,7 +90,7 @@ export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) 
           <Typography>
             Your builder account has been banned. Submit an appeal for review{' '}
             <Typography color='secondary' component='span'>
-              <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+              <Link href={appealUrl}>here</Link>
             </Typography>
             to get unbanned.
           </Typography>

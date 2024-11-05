@@ -17,13 +17,13 @@ export function ScoutStats({
       </Typography>
       <Stack flexDirection='row' justifyContent='space-between'>
         <Stack flexDirection='row' gap={1}>
-          <Typography color='orange.main'>{scoutPoints || 0}</Typography>
-          <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout game icon' />
+          <Typography color='green.main'>{scoutPoints || 0}</Typography>
+          <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout game icon' />
         </Stack>
-        <Typography color='orange.main'>{buildersScouted} Builders</Typography>
-        <Stack flexDirection='row' gap={1}>
-          <Typography color='orange.main'>{nftsPurchased}</Typography>
-          <Image src='/images/profile/icons/nft-orange-icon.svg' width='25' height='25' alt='nft icon' />
+        <Typography color='green.main'>{buildersScouted} Builders</Typography>
+        <Stack flexDirection='row' gap={1} alignItems='center'>
+          <Typography color='green.main'>{nftsPurchased}</Typography>
+          <Image src='/images/profile/icons/cards-green.svg' width='20' height='20' alt='cards icon' />
         </Stack>
       </Stack>
     </Paper>
