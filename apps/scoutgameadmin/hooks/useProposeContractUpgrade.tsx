@@ -1,10 +1,12 @@
 // useProposeSetImplementation.ts
 import type {} from '@safe-global/api-kit';
-import { ProposeTransactionProps } from '@safe-global/api-kit';
+import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { getScoutProtocolAddress, scoutProtocolChainId } from '@packages/scoutgame/protocol/constants';
+import SafeApiKit, { ProposeTransactionProps } from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { useState, useCallback } from 'react';
 import { encodeFunctionData } from 'viem';
-import { use } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 /**
  * Hook to propose a transaction to call setImplementation on a contract using Gnosis Safe SDK.
@@ -16,8 +18,7 @@ import { use } from 'wagmi';
 const useProposeSetImplementation = (safeAddress: string, contractAddress: string) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { data: signer } = useSigner();
-  const { chain } = useNetwork();
+  const { address: account, chain } = useAccount();
 
   const proposeTransaction = useCallback(
     async (newImplementationAddress: string) => {
@@ -38,11 +39,7 @@ const useProposeSetImplementation = (safeAddress: string, contractAddress: strin
         const signerAddress = await signer.getAddress();
 
         // Initialize Safe API Kit
-        const apiKit = new SafeApiKit({
-          txServiceUrl: getTxServiceUrl(chain.id),
-          ethAdapter: new ethers.providers.Web3Provider((window as any).ethereum),
-          safeAddress
-        });
+        const safeApiClient = await getSafeApiClient({ chainId: scoutProtocolChainId });
 
         // Encode the setImplementation call using viem
         const data = encodeFunctionData({
@@ -63,16 +60,17 @@ const useProposeSetImplementation = (safeAddress: string, contractAddress: strin
         });
 
         // Prepare transaction data
-        const safeTx: SafeTransactionData = {
-          to: contractAddress,
-          value: '0',
-          data,
-          operation: 0 // 0 for CALL, 1 for DELEGATECALL
-        };
+        const safeTx: SafeTransactionData = {};
 
         // Create the Safe transaction
-        const safeTransaction = await apiKit.createTransaction({
-          safeTransactionData: safeTx
+        const safeTransaction = safeApiClient.proposeTransaction({
+          safeTransactionData: {
+            to: getScoutProtocolAddress(),
+            value: '0',
+            data,
+
+            operation: 0 // 0 for CALL, 1 for DELEGATECALL,
+          }
         });
 
         // Get the transaction hash for signing

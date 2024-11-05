@@ -10,11 +10,12 @@ import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAnd
 import { generateMerkleTree, type ProvableClaim } from './merkleTree';
 
 type ClaimsBody = {
-  leaves: ProvableClaim[];
+  leaves: ;
 };
 
-type WeeklyClaimsTyped = Omit<WeeklyClaims, 'claims'> & {
-  claims: ClaimsBody;
+type WeeklyClaimsTyped = Omit<WeeklyClaims, 'claims' | 'proofs'> & {
+  claims: ProvableClaim[];
+  proofs: Record<string, string[]>;
 };
 
 export async function calculateWeeklyClaims({ week }: { week: string }): Promise<ProvableClaim[]> {
@@ -35,6 +36,8 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
       return { pointsPerScout, pointsForBuilder, builderId: builder.builder.id };
     })
   );
+
+  // Create the token receipts here
 
   const claimsMap: Record<string, number> = {};
 

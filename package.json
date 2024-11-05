@@ -141,7 +141,7 @@
     "@bangle.dev/pm-commands": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.93.1-rc-weekly-claims.0",
+    "@charmverse/core": "^0.93.2-rc-weekly-claims.0",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",

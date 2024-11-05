@@ -4,6 +4,7 @@ import { keccak256, encodePacked } from 'viem/utils';
 
 export type ProvableClaim = {
   address: Address;
+  scoutId: string;
   amount: number;
 };
 
@@ -11,10 +12,6 @@ function hashLeaf(claim: ProvableClaim): string {
   // Mimic Solidity's keccak256(abi.encodePacked(address, amount))
   const packedData = encodePacked(['address', 'uint256'], [claim.address, BigInt(claim.amount)]);
   return keccak256(packedData);
-}
-
-function claimToString(claim: ProvableClaim): string {
-  return Buffer.from(`${claim.address}:${claim.amount}`).toString('hex');
 }
 
 export function generateMerkleTree(claims: ProvableClaim[]): { tree: MerkleTree; rootHash: string } {
@@ -31,7 +28,7 @@ export function generateMerkleTree(claims: ProvableClaim[]): { tree: MerkleTree;
   };
 }
 
-export function getMerkleProofs(tree: MerkleTree, claim: ProvableClaim): any {
+export function getMerkleProofs(tree: MerkleTree, claim: ProvableClaim): string[] {
   return tree.getHexProof(hashLeaf(claim));
 }
 
