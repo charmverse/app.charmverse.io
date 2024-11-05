@@ -40,11 +40,9 @@ export function HomePage({ tab }: { tab: string }) {
         >
           <HomeTabsMenu tab={currentTab} />
         </Box>
-        <Box px={{ xs: 1, md: 0 }} mb={2}>
-          <Suspense key={currentTab} fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
-          </Suspense>
-        </Box>
+        <Suspense key={currentTab} fallback={<LoadingTable />}>
+          <HomeTab tab={currentTab} />
+        </Suspense>
       </Container>
     </>
   );
