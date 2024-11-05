@@ -79,13 +79,7 @@ export async function processBuilderActivity({
         if (pullRequest.state === 'CLOSED') {
           await recordClosedPullRequest({ pullRequest, repo, season });
         } else {
-          const { githubEvent, builderEvent } = await recordMergedPullRequest({ pullRequest, repo, season });
-          log.info('Recorded a merged PR', {
-            eventId: builderEvent?.id,
-            userId: builderEvent.builderId,
-            week,
-            url: pullRequest.url
-          });
+          await recordMergedPullRequest({ pullRequest, repo, season });
         }
       } catch (error) {
         log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, {
