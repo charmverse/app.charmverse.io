@@ -8,7 +8,7 @@ import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
-import { getNftFilePath, imageDomain } from './utils';
+import { getNftTokenUrlPath, imageDomain } from './utils';
 
 type OpenSeaMetadata = {
   /**
@@ -122,14 +122,14 @@ export async function uploadMetadata({
   attributes?: { trait_type: string; value: string | number }[];
 }): Promise<string> {
   // Define the S3 path for metadata
-  const metadataPath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'metadata.json' });
+  const metadataPath = getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'metadata.json' });
 
   // Generate the metadata object
   const metadata: OpenSeaMetadata = {
     name: `ScoutGame Builders NFT #${tokenId}`,
     description: '',
     external_url: `${process.env.DOMAIN}/u/${path}`,
-    image: `${imageDomain}/${getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' })}`,
+    image: `${imageDomain}/${getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'artwork.png' })}`,
     attributes: attributes || []
   };
 

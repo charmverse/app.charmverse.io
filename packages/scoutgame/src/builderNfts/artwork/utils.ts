@@ -1,19 +1,19 @@
-const prefix = process.env.NFT_ARTWORK_S3_PATH || 'dev-nft-artwork';
+const contractName = process.env.SCOUTGAME_CONTRACT_NAME || 'dev';
 
-export function getNftFilePath({
+export function getNftTokenUrlPath({
   season,
   tokenId,
-  type
+  filename
 }: {
   season: string;
-  type: 'artwork.png' | 'metadata.json';
+  filename: 'artwork.png' | 'metadata.json';
   tokenId: number;
 }) {
-  return `seasons/${season}/${prefix}/${tokenId}/${type}`;
+  return `seasons/${season}/${contractName}/${tokenId}/${filename}`;
 }
 
-export function getNftCongratsFilePath({ season, tokenId }: { season: string; tokenId: number }) {
-  return `seasons/${season}/nft-congrats/${tokenId}/congrats.png`;
+export function getNftCongratsPath({ season, tokenId }: { season: string; tokenId: number }) {
+  return `seasons/${season}/${contractName}/${tokenId}/congrats.png`;
 }
 
 export const imageDomain = 'https://nft.scoutgame.xyz';
