@@ -20,23 +20,23 @@ export function PublicScoutProfileStats({
         </Typography>
         <Stack flexDirection='row' justifyContent='space-between' gap={2}>
           <Stack flexDirection='row' gap={0.5}>
-            <Typography color='orange.main' variant='subtitle2'>
+            <Typography color='green.main' variant='subtitle2'>
               {seasonPoints || 0}
             </Typography>
-            <Image src='/images/profile/scout-game-orange-icon.svg' width='20' height='20' alt='scout game icon' />
-            <Typography color='orange.main' variant='subtitle2'>
+            <Image src='/images/profile/scout-game-green-icon.svg' width='20' height='20' alt='scout game icon' />
+            <Typography color='green.main' variant='subtitle2'>
               ({allTimePoints || 0})
             </Typography>
           </Stack>
-          <Typography color='orange.main' variant='subtitle2'>
+          <Typography color='green.main' variant='subtitle2'>
             {buildersScouted || 0} Builders
           </Typography>
           <Stack flexDirection='row' gap={0.5}>
-            <Typography color='orange.main' variant='subtitle2'>
+            <Typography color='green.main' variant='subtitle2'>
               {nftsPurchased || 0}
             </Typography>
-            <Image src='/images/profile/icons/nft-orange-icon.svg' width='20' height='20' alt='nft icon' />
-            <Typography color='orange.main' variant='subtitle2'>
+            <Image src='/images/profile/icons/cards-green.svg' width='20' height='20' alt='cards icon' />
+            <Typography color='green.main' variant='subtitle2'>
               Held
             </Typography>
           </Stack>
