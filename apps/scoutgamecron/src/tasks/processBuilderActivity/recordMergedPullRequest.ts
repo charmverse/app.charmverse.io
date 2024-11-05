@@ -84,7 +84,7 @@ export async function recordMergedPullRequest({
 
   if (existingGithubEvent) {
     // already processed
-    return;
+    return { githubEvent: null, builderEvent: null };
   }
 
   // check our data to see if this is the first merged PR in a repo in the last 7 days, and if so, check the Github API to confirm
