@@ -1,3 +1,4 @@
+// something to differentiate between different deployments of a contract
 const contractName = process.env.SCOUTGAME_CONTRACT_NAME || 'dev';
 
 export function getNftTokenUrlPath({
