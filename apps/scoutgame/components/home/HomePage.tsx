@@ -27,7 +27,7 @@ export function HomePage({ tab }: { tab: string }) {
           <TodaysHotBuildersCarousel />
         </Suspense>
         <HomeTabsMenu tab={currentTab} />
-        <Box px={{ xs: 1, md: 0 }} mb={2} maxHeight={{ md: '400px' }} overflow='auto'>
+        <Box px={{ xs: 1, md: 0 }} mb={2}>
           <Suspense key={currentTab} fallback={<LoadingTable />}>
             <HomeTab tab={currentTab} />
           </Suspense>
