@@ -11,6 +11,7 @@ import type { SessionUser } from 'lib/session/interfaces';
 type UserContext = {
   user: SessionUser | null;
   refreshUser: (_user?: SessionUser | null) => Promise<SessionUser | null | undefined>;
+  isLoading: boolean;
 };
 
 export const UserContext = createContext<Readonly<UserContext | null>>(null);
@@ -18,7 +19,7 @@ export const UserContext = createContext<Readonly<UserContext | null>>(null);
 const agreeToTermsPaths = ['/welcome', '/info'];
 
 export function UserProvider({ children, userSession }: { children: ReactNode; userSession: SessionUser | null }) {
-  const { data: user = userSession, mutate: mutateUser } = useGetUser();
+  const { data: user = userSession, mutate: mutateUser, isLoading, isValidating } = useGetUser();
   const pathname = usePathname();
   const refreshUser = useCallback(
     async (_user?: SessionUser | null) => {
@@ -34,7 +35,10 @@ export function UserProvider({ children, userSession }: { children: ReactNode; u
     }
   }, [user, pathname]);
 
-  const value = useMemo(() => ({ user, refreshUser }), [user, refreshUser]);
+  const value = useMemo(
+    () => ({ user, refreshUser, isLoading: isLoading || isValidating }),
+    [user, refreshUser, isLoading, isValidating]
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

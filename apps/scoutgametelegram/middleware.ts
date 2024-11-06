@@ -17,6 +17,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/welcome', request.url));
   }
 
+  if (!isLoggedIn && path !== '/welcome') {
+    return NextResponse.redirect(new URL('/welcome', request.url));
+  }
+
   return response;
 }
 
@@ -30,6 +34,6 @@ export const config = {
      * - images (image files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest|sw.js).*)'
+    '/((?!api|_next/static|_next/image|images|favicon.ico|robots.txt|__ENV.js|manifest.webmanifest).*)'
   ]
 };

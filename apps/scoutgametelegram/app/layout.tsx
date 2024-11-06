@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
 import 'theme/styles.scss';
+import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false
@@ -66,15 +67,15 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const user = undefined;
+  const user = await getUserFromSession();
 
   return (
     <html lang='en' dir='ltr' suppressHydrationWarning>
       <body>
         {/* load env vars for the frontend - note that the parent body tag is required for React to not complain */}
         <Script strategy='beforeInteractive' src='/__ENV.js' />
-        <AppProviders user={null}>
-          <ClientGlobals userId={user} />
+        <AppProviders user={user}>
+          <ClientGlobals userId={user?.id} />
           {children}
         </AppProviders>
       </body>
