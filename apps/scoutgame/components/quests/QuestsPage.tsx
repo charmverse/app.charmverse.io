@@ -1,4 +1,6 @@
-import { PageContainer } from 'components/layout/PageContainer';
+import { Container } from '@mui/material';
+
+import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 import type { DailyClaim } from 'lib/users/getDailyClaims';
 import type { QuestInfo } from 'lib/users/getUserQuests';
 
@@ -7,9 +9,12 @@ import { QuestsList } from './components/QuestsList/QuestsList';
 
 export function QuestsPage({ dailyClaims, quests }: { dailyClaims: DailyClaim[]; quests: QuestInfo[] }) {
   return (
-    <PageContainer>
-      <DailyClaimGallery dailyClaims={dailyClaims} />
-      <QuestsList quests={quests} />
-    </PageContainer>
+    <>
+      <InfoBackgroundImage />
+      <Container maxWidth='lg' sx={{ px: 5 }}>
+        <DailyClaimGallery dailyClaims={dailyClaims} />
+        <QuestsList quests={quests} />
+      </Container>
+    </>
   );
 }
