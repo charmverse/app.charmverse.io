@@ -36,7 +36,8 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
         paddingBottom: 0.25,
         borderRadius: 1,
         alignItems: 'center',
-        position: 'relative'
+        position: 'relative',
+        cursor: canClaim ? 'pointer' : 'default'
       }}
       onClick={() => {
         if (canClaim) {
@@ -73,7 +74,11 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
           <Image src='/images/scout-game-profile-icon.png' alt='Scout game icon' width={18} height={10} />
         </Stack>
       </Stack>
-      <Typography variant='body2' color={isClaimToday && !isClaimed ? 'secondary.dark' : 'initial'} fontWeight={600}>
+      <Typography
+        variant='body2'
+        color={isClaimToday && !isClaimed ? 'secondary.dark' : 'text.primary'}
+        fontWeight={600}
+      >
         {buttonLabel}
       </Typography>
     </Stack>
