@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, getDateFromISOWeek, getWeekStartEnd, isToday } from '@packages/scoutgame/dates';
-import type { DateTime } from 'luxon';
 
 export type DailyClaim = {
-  date: DateTime;
+  date: Date;
   day: number;
   claimed: boolean;
   isBonus?: boolean;
@@ -13,8 +12,8 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
   const currentWeek = getCurrentWeek();
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
+      recipientId: userId,
       event: {
-        builderId: userId,
         type: 'daily_claim',
         week: currentWeek
       }
@@ -36,7 +35,7 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
       const date = start.plus({ days: index });
       const receipt = pointsReceipts.find((_receipt) => isToday(_receipt.createdAt, date));
       const dailyClaimInfo = {
-        date,
+        date: date.toJSDate(),
         day: index + 1,
         claimed: !!receipt,
         isBonus: false

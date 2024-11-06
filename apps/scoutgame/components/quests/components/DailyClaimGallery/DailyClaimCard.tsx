@@ -1,19 +1,25 @@
+'use client';
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
+import { useAction } from 'next-safe-action/hooks';
 
+import { claimDailyRewardAction } from 'lib/users/claimDailyRewardAction';
 import type { DailyClaim } from 'lib/users/getDailyClaims';
 
 import { DailyClaimGift } from './DailyClaimGift';
 
 export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
-  const todayDate = DateTime.now().startOf('day');
-  const claimDateDay = DateTime.fromJSDate(dailyClaim.date.toJSDate(), { zone: 'utc' }).startOf('day');
+  const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction);
+  const todayDate = DateTime.fromJSDate(new Date(), { zone: 'utc' }).startOf('day');
+  const claimDateDay = DateTime.fromJSDate(dailyClaim.date, { zone: 'utc' }).startOf('day');
   const isClaimToday = claimDateDay.equals(todayDate);
   const isPastDate = todayDate > claimDateDay;
-  const buttonLabel = isClaimToday ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
   const isClaimed = dailyClaim.claimed;
+  const buttonLabel = isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
+  const canClaim = isClaimToday && !isClaimed && !isExecuting;
 
   return (
     <Stack
@@ -30,6 +36,11 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
         borderRadius: 1,
         alignItems: 'center',
         position: 'relative'
+      }}
+      onClick={() => {
+        if (canClaim) {
+          claimDailyReward({ isBonus: dailyClaim.isBonus });
+        }
       }}
     >
       <Stack flex={1} position='relative' alignItems='center' justifyContent='center' width='100%'>
@@ -61,7 +72,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
           <Image src='/images/profile/scout-game-profile-icon.png' alt='Scout game icon' width={18} height={10} />
         </Stack>
       </Stack>
-      <Typography variant='body2' color={isClaimToday ? 'secondary.dark' : 'initial'} fontWeight={600}>
+      <Typography variant='body2' color={isClaimToday && !isClaimed ? 'secondary.dark' : 'initial'} fontWeight={600}>
         {buttonLabel}
       </Typography>
     </Stack>
