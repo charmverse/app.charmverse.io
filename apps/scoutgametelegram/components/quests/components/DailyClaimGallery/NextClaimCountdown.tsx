@@ -1,10 +1,9 @@
 'use client';
 
 import { Stack, Typography } from '@mui/material';
+import { timeUntilFuture } from '@packages/utils/time';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
-
-import { timeUntilFuture } from 'lib/utils/time';
 
 export function NextClaimCountdown() {
   const currentDate = DateTime.now().toFormat('dd-MM-yyyy');

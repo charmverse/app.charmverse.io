@@ -87,7 +87,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../scoutgametelegram/lib/utils/time.ts",
+    "../../packages/utils/src/time.ts",
     "../scoutgametelegram/lib/claims/claimDailyReward.ts",
     "../scoutgametelegram/lib/claims/claimDailyRewardAction.ts",
     "../scoutgametelegram/lib/claims/claimDailyRewardSchema.ts",

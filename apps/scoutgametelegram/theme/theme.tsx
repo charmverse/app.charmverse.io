@@ -14,7 +14,8 @@ import {
   purpleDisabled,
   secondaryText,
   secondaryLightText,
-  blackText
+  blackText,
+  secondaryDarkText
 } from './colors';
 
 const interFont = Inter({
@@ -60,7 +61,8 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         },
         secondary: {
           main: secondaryText,
-          light: secondaryLightText
+          light: secondaryLightText,
+          dark: secondaryDarkText
         },
         inputBackground: {
           main: inputBackgroundDarkMode

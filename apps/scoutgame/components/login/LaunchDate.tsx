@@ -2,12 +2,11 @@
 
 import { Box, Stack, Typography } from '@mui/material';
 import { tierDistributionMap } from '@packages/scoutgame/waitlist/scoring/constants';
+import { timeUntilFuture } from '@packages/utils/time';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { launchDates } from 'lib/session/authorizeUserByLaunchDate';
-
-import { timeUntilFuture } from '../../../scoutgametelegram/lib/utils/time';
 
 export function LaunchDate() {
   const closestFutureLaunchDate = getClosestFutureLaunchDate();
