@@ -12,7 +12,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const claimDateDay = DateTime.fromJSDate(dailyClaim.date.toJSDate(), { zone: 'utc' }).startOf('day');
   const isClaimToday = claimDateDay.equals(todayDate);
   const isPastDate = todayDate > claimDateDay;
-  const buttonLabel = isClaimToday ? 'Claim' : `Day ${dailyClaim.day}`;
+  const buttonLabel = isClaimToday ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
   const isClaimed = dailyClaim.claimed;
 
   return (
@@ -35,7 +35,15 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
       <Stack flex={1} position='relative' alignItems='center' justifyContent='center' width='100%'>
         {!isClaimed ? (
           <Stack sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={68} />
+            {dailyClaim.isBonus ? (
+              <Stack direction='row' gap={0.5} alignItems='flex-end'>
+                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={44} />
+                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={70} />
+                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={44} />
+              </Stack>
+            ) : (
+              <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={68} />
+            )}
           </Stack>
         ) : (
           <CheckCircleIcon
@@ -49,7 +57,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
           />
         )}
         <Stack direction='row' gap={0.5} alignItems='center' zIndex={1} top={7.5} position='relative'>
-          <Typography fontWeight={600}>+1</Typography>
+          <Typography fontWeight={600}>{dailyClaim.isBonus ? '+3' : '+1'}</Typography>
           <Image src='/images/profile/scout-game-profile-icon.png' alt='Scout game icon' width={18} height={10} />
         </Stack>
       </Stack>

@@ -14,13 +14,10 @@ export function DailyClaimGallery({ dailyClaims }: { dailyClaims: DailyClaim[] }
       <NextClaimCountdown />
       <Grid container spacing={1} width='100%'>
         {dailyClaims.map((dailyClaim) => (
-          <Grid size={4} key={dailyClaim.date.toString()}>
+          <Grid size={dailyClaim.isBonus ? 8 : 4} key={dailyClaim.date.toString()}>
             <DailyClaimCard dailyClaim={dailyClaim} />
           </Grid>
         ))}
-        <Grid size={8}>
-          <DailyClaimCard dailyClaim={dailyClaims[0]} />
-        </Grid>
       </Grid>
     </Stack>
   );
