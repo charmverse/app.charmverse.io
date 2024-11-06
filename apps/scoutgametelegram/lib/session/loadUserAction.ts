@@ -10,7 +10,7 @@ import { replaceS3Domain } from '@root/lib/utils/url';
 
 import { validateTelegramData } from 'lib/telegram/validate';
 
-import { userActionSchema } from './getUserActionSchema';
+import { userActionSchema } from './loadUserActionSchema';
 
 export type LoggedInUser = Scout & {
   farcasterUser?: FarcasterUser | null;
@@ -23,7 +23,6 @@ export const loadUser = actionClient
   .schema(userActionSchema)
   .action<LoggedInUser | null>(async ({ parsedInput }) => {
     const session = await getSession();
-    let user: undefined | Scout;
     const initData = parsedInput.initData;
 
     if (!TELEGRAM_BOT_TOKEN) {
@@ -36,16 +35,11 @@ export const loadUser = actionClient
       throw new DataNotFoundError('No telegram user id found');
     }
 
-    const telegramUser = await prisma.scoutTelegramUser.findFirst({
+    const user = await prisma.scout.findFirst({
       where: {
         telegramId: validatedData?.user?.id
-      },
-      include: {
-        scout: true
       }
     });
-
-    user = telegramUser?.scout;
 
     if (!user) {
       const telegramUsername =
@@ -55,25 +49,23 @@ export const loadUser = actionClient
 
       const newUser = await prisma.scout.create({
         data: {
-          displayName: validatedData?.user?.username || '',
+          displayName: telegramUsername,
           path: telegramUsername,
-          telegramUser: {
-            create: {
-              telegramId: validatedData?.user?.id,
-              username: validatedData?.user?.username || ''
-            }
-          }
+          telegramId: validatedData?.user?.id
         }
       });
 
-      user = newUser;
+      session.scoutId = newUser.id;
+      await session.save();
+
+      return newUser;
     }
 
     if (user?.avatar) {
       user.avatar = replaceS3Domain(user.avatar);
     }
 
-    session.scoutId = user.id;
+    session.scoutId = user?.id;
     await session.save();
 
     return user;
