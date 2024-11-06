@@ -33,8 +33,8 @@ import { useSearchUsers } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
-import { AddUserButton } from './AddUserButton/AddUserButton';
-import { UserActionButton } from './UserActionButton/UserActionButton';
+import { AddUserButton } from './components/AddUserButton/AddUserButton';
+import { UserActionButton } from './components/UserActions/UserActionButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');

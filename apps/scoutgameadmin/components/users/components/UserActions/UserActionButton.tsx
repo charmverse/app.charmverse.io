@@ -25,13 +25,7 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
 
   return (
     <>
-      <IconButton
-        size='small'
-        onClick={handleClick}
-        aria-controls={open ? 'user-menu' : undefined}
-        aria-haspopup='true'
-        aria-expanded={open ? 'true' : undefined}
-      >
+      <IconButton size='small' onClick={handleClick}>
         <MoreHorizIcon />
       </IconButton>
       <Menu id='user-menu' anchorEl={anchorEl} open={open} onClose={handleClose} onClick={handleClose}>
