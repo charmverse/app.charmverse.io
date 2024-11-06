@@ -62,8 +62,8 @@
       "@root/lib/*": [
         "../../lib/*"
       ],
-      "@root/charmclient/hooks/helpers": [
-        "../../charmclient/hooks/helpers"
+      "@root/charmClient/hooks/helpers": [
+        "../../charmClient/hooks/helpers"
       ],
       "@charmverse/core/prisma": [
         "../../node_modules/@charmverse/core/dist/cjs/prisma"
