@@ -25,7 +25,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
     <Stack
       sx={{
         backgroundColor: isClaimed
-          ? 'background.paper'
+          ? 'background.light'
           : isPastDate
             ? 'background.dark'
             : isClaimToday
