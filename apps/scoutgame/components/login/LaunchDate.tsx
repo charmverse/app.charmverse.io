@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 import { launchDates } from 'lib/session/authorizeUserByLaunchDate';
-import { timeUntilFuture } from 'lib/utils/time';
+
+import { timeUntilFuture } from '../../../scoutgametelegram/lib/utils/time';
 
 export function LaunchDate() {
   const closestFutureLaunchDate = getClosestFutureLaunchDate();

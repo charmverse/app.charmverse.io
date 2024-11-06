@@ -1,7 +1,7 @@
 import { Container } from '@mui/material';
 
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
-import type { DailyClaim } from 'lib/users/getDailyClaims';
+import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 import { DailyClaimGallery } from './components/DailyClaimGallery/DailyClaimGallery';
 

@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation';
 
 import { QuestsPage } from 'components/quests/QuestsPage';
+import { getDailyClaims } from 'lib/claims/getDailyClaims';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
-import { getDailyClaims } from 'lib/users/getDailyClaims';
 
 export default async function Quests() {
   const user = await getUserFromSession();

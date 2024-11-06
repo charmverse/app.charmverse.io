@@ -3,8 +3,8 @@
 import { revalidatePath } from 'next/cache';
 
 import { actionClient } from 'lib/actions/actionClient';
-import type { SessionUser } from 'lib/session/getUserFromSession';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
+import type { SessionUser } from 'lib/session/interfaces';
 
 import { claimDailyReward } from './claimDailyReward';
 import { claimDailyRewardSchema } from './claimDailyRewardSchema';

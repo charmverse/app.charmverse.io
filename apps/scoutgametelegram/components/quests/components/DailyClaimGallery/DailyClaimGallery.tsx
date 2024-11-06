@@ -1,6 +1,6 @@
 import { Grid2 as Grid, Stack, Typography } from '@mui/material';
 
-import type { DailyClaim } from 'lib/users/getDailyClaims';
+import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 import { DailyClaimCard } from './DailyClaimCard';
 import { NextClaimCountdown } from './NextClaimCountdown';

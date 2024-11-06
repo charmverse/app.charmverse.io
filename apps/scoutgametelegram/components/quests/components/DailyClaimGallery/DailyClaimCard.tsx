@@ -6,8 +6,8 @@ import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 
-import { claimDailyRewardAction } from 'lib/users/claimDailyRewardAction';
-import type { DailyClaim } from 'lib/users/getDailyClaims';
+import { claimDailyRewardAction } from 'lib/claims/claimDailyRewardAction';
+import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 import { DailyClaimGift } from './DailyClaimGift';
 
@@ -20,6 +20,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const isClaimed = dailyClaim.claimed;
   const buttonLabel = isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
   const canClaim = isClaimToday && !isClaimed && !isExecuting;
+  const variant = isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary';
 
   return (
     <Stack
@@ -48,12 +49,12 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
           <Stack sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
             {dailyClaim.isBonus ? (
               <Stack direction='row' gap={0.5} alignItems='flex-end'>
-                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={44} />
-                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={70} />
-                <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={44} />
+                <DailyClaimGift variant={variant} size={44} />
+                <DailyClaimGift variant={variant} size={70} />
+                <DailyClaimGift variant={variant} size={44} />
               </Stack>
             ) : (
-              <DailyClaimGift variant={isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary'} size={68} />
+              <DailyClaimGift variant={variant} size={68} />
             )}
           </Stack>
         ) : (
