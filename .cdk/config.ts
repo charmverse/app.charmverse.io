@@ -75,5 +75,10 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       sslCert: charmverseCert,
       instanceType: 't3.medium'
     }
+  },
+  scoutgametelegram: {
+    prd: {
+      sslCert: scoutgameCert
+    }
   }
 };

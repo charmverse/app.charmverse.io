@@ -1,0 +1,26 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  height: 100%;
+  // DO NOT ADD overflow-x: hidden here. It will break the position sticky option in other components
+}
+body header,
+body main {
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Make Wallet Connect modal appear about MUI modals */
+body {
+  --wcm-z-index: 1500;
+}
