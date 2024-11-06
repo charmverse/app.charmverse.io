@@ -17,7 +17,7 @@ export function useInitTelegramData() {
       if (data) {
         await refreshUser(data.data);
         // @TODO: Enable this when we will have an onboarding page
-        // if (data.data?.onboardedAt) {
+        // if (data.data?.onboardedAt && data.data?.agreedToTermsAt) {
         //   redirect('/home');
         // } else {
         //   redirect('/welcome/onboarding');
