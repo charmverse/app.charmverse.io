@@ -32,11 +32,13 @@ export function PublicProfilePage({ user, tab }: { user: UserProfile; tab: strin
             </Stack>
           </Paper>
         </Hidden>
-        <PublicProfileTabsMenu
-          tab={tab}
-          path={user.path}
-          isApprovedBuilder={user.builderStatus === 'approved' || user.builderStatus === 'banned'}
-        />
+        <Box position='sticky' top={0} zIndex={1} bgcolor='background.default'>
+          <PublicProfileTabsMenu
+            tab={tab}
+            path={user.path}
+            isApprovedBuilder={user.builderStatus === 'approved' || user.builderStatus === 'banned'}
+          />
+        </Box>
         {tab === 'builder' ? (
           <PublicBuilderProfile builder={user as BuilderUserInfo} />
         ) : (
