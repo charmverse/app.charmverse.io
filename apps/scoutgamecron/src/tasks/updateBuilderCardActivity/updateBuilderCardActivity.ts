@@ -59,10 +59,10 @@ export async function updateBuilderCardActivity(date: DateTime) {
         create: { builderId: builder.id, last7Days: last7DaysGems }
       });
       updatedBuilders += 1;
-      log.info(`Updated builder card activity for builder`, {
-        builderId: builder.id,
-        date
-      });
+      // log.debug(`Upserted builder card activity for builder`, {
+      //   userId: builder.id,
+      //   date
+      // });
     } catch (error) {
       log.error(`Error updating builder card activity for builder`, {
         builderId: builder.id,

@@ -17,6 +17,8 @@ describe('resolveBalanceIssues', () => {
       }
     });
 
+    const now = new Date();
+
     expect(initialReceiptsCount).toBe(0);
 
     await resolveBalanceIssues();
@@ -30,6 +32,9 @@ describe('resolveBalanceIssues', () => {
     expect(receipts.length).toBe(1);
 
     const receipt = receipts[0];
+
+    // Asserting claimed at is a date
+    expect(receipt.claimedAt?.valueOf()).toBeGreaterThan(now.valueOf());
 
     expect(receipt.value).toBe(100);
     expect(receipt.recipientId).toBe(scout.id);

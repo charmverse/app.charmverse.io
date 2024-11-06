@@ -8,6 +8,9 @@ import { BuilderInfo } from './generateSeedData';
 import { randomTimeOfDay } from './generator';
 
 export async function generateNftPurchaseEvents(scoutId: string, assignedBuilders: BuilderInfo[], date: DateTime) {
+  if (assignedBuilders.length === 0) {
+    return 0;
+  }
   const week = getWeekFromDate(date.toJSDate());
   let totalNftsPurchasedToday = 0;
   for (let nftCount = 0; nftCount < faker.number.int({ min: 0, max: 3 }); nftCount++) {
@@ -26,9 +29,9 @@ export async function generateNftPurchaseEvents(scoutId: string, assignedBuilder
             id: builder.builderNftId
           },
           data: {
-            currentPrice: Math.ceil(nftPrice + nftPrice * 0.1),
+            currentPrice: Math.ceil(nftPrice + nftPrice * 0.1)
           }
-        })
+        });
 
         await recordNftMint({
           builderNftId,

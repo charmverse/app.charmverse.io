@@ -1,4 +1,3 @@
-import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 import { mockBuilder, mockUserWeeklyStats } from '@packages/scoutgame/testing/database';
 
 import { expect, test } from './test';

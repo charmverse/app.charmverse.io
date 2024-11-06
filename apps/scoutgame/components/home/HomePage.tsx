@@ -16,22 +16,33 @@ export function HomePage({ tab }: { tab: string }) {
   return (
     <>
       <HeaderMessage />
-      <Container sx={{ px: '0 !important' }} maxWidth='xl' data-test='home-page'>
+      <Container
+        sx={{ px: '0 !important', height: 'calc(100vh - 100px)', overflowY: 'scroll' }}
+        maxWidth='xl'
+        data-test='home-page'
+      >
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
           <Image src='/images/profile/icons/blue-fire-icon.svg' width='30' height='30' alt='title icon' />
           <Typography variant='h5' textAlign='center'>
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense key={currentTab} fallback={<LoadingCards />}>
+        <Suspense key='todays-hot-builders' fallback={<LoadingCards />}>
           <TodaysHotBuildersCarousel />
         </Suspense>
-        <HomeTabsMenu tab={currentTab} />
-        <Box px={{ xs: 1, md: 0 }} mb={2} maxHeight={{ md: '400px' }} overflow='auto'>
-          <Suspense key={currentTab} fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
-          </Suspense>
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            backgroundColor: 'background.default',
+            zIndex: 1000
+          }}
+        >
+          <HomeTabsMenu tab={currentTab} />
         </Box>
+        <Suspense key={currentTab} fallback={<LoadingTable />}>
+          <HomeTab tab={currentTab} />
+        </Suspense>
       </Container>
     </>
   );
