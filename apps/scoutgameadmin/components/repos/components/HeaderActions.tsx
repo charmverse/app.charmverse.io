@@ -1,11 +1,12 @@
 'use client';
 
 import { ArrowDropDown as ArrowDropDownIcon, Add as AddIcon } from '@mui/icons-material';
-import { Menu, MenuItem, ListItemButton, Stack, Button } from '@mui/material';
+import { Box, Divider, Menu, MenuItem, Stack, Button } from '@mui/material';
 import { getLastWeek, getWeekStartEndFormatted, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import React, { useState } from 'react';
 
-import { ExportButton } from 'components/common/ExportButton';
+import { FileDownloadButton } from 'components/common/FileDownloadButton';
+import { MenuItemNoAction } from 'components/common/MenuItemNoAction';
 
 import { AddRepoButton } from './AddRepoButton/AddRepoButton';
 
@@ -25,19 +26,46 @@ export function HeaderActions() {
       </Button>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         <MenuItem>
-          <ExportButton filename='github_repos.tsv' src='/api/repos/export' onComplete={closeMenu}>
-            All repositories
-          </ExportButton>
+          <FileDownloadButton size='small' filename='github_repos.tsv' src='/api/repos/export' onComplete={closeMenu}>
+            Export repositories
+          </FileDownloadButton>
         </MenuItem>
+        <Divider />
+        <MenuItemNoAction>
+          <Box px={0.5}>Partner exports</Box>
+        </MenuItemNoAction>
         <MenuItem>
-          <ExportButton filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
+          <FileDownloadButton size='small' filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
             Celo Report ({lastWeek})
-          </ExportButton>
+          </FileDownloadButton>
         </MenuItem>
         <MenuItem>
-          <ExportButton filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
+          <FileDownloadButton size='small' filename={`Game7 Weekly Report (${lastWeek}).tsv`} src='/api/partners/game7'>
+            Game7 Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            size='small'
+            filename={`Lit Protocol Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/lit_protocol'
+          >
+            Lit Protocol Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            size='small'
+            filename={`OP Supersim Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/op_supersim'
+          >
+            OP Supersim Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton size='small' filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
             Moxie Report ({lastWeek})
-          </ExportButton>
+          </FileDownloadButton>
         </MenuItem>
       </Menu>
     </Stack>
