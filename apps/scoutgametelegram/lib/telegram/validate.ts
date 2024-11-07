@@ -3,6 +3,8 @@ import crypto from 'node:crypto';
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import type { WebAppInitData } from '@twa-dev/types/index';
 
+import { TELEGRAM_BOT_TOKEN } from './config';
+
 function parseInitData(initData: string) {
   const params = new URLSearchParams(initData);
   const data: { [key: string]: string } = {};
@@ -32,7 +34,7 @@ function generateSecretKey(botToken: string) {
  * @throws {InvalidInputError} "auth_date" is empty or not found
  * @throws {InvalidInputError} Init data expired
  */
-export function validateTelegramData(value: string, token: string, options?: { expiresIn: number }): WebAppInitData {
+export function validateInitData(value: string, token: string, options?: { expiresIn: number }): WebAppInitData {
   const data = parseInitData(value);
   const dataCheckString = createDataCheckString(data);
   const secretKey = generateSecretKey(token);
@@ -82,4 +84,12 @@ export function validateTelegramData(value: string, token: string, options?: { e
   };
 
   return response;
+}
+
+export function validateTelegramData(initData: string, options?: { expiresIn: number }) {
+  if (!TELEGRAM_BOT_TOKEN) {
+    throw new Error('TELEGRAM_BOT_TOKEN was not found');
+  }
+
+  return validateInitData(initData, TELEGRAM_BOT_TOKEN, options);
 }
