@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import XIcon from '@mui/icons-material/X';
 import Image from 'next/image';
+import React from 'react';
 
 export type QuestInfo = {
   type: string;
