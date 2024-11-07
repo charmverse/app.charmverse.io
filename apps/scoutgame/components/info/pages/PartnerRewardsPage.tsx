@@ -2,7 +2,7 @@ import { Link, Typography } from '@mui/material';
 import NextLink from 'next/link';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 
 import { InfoPageContainer } from '../components/InfoPageContainer';
 
@@ -45,6 +45,11 @@ function Document() {
         <ListItem>
           <Link component={NextLink} href='/info/partner-rewards/lit'>
             Lit Protocol
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link component={NextLink} href='/info/partner-rewards/optimism'>
+            Optimism
           </Link>
         </ListItem>
         <ListItem>
