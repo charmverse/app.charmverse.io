@@ -1,6 +1,6 @@
-import type { SessionUser } from 'lib/session/getUserFromSession';
+import { useGETImmutable, useGETtrigger } from '@packages/scoutgame/hooks/helpers';
 
-import { useGETImmutable, useGETtrigger } from './helpers';
+import type { SessionUser } from 'lib/session/getUserFromSession';
 
 export function useGetUser() {
   return useGETImmutable<SessionUser | null>('/api/session/user');
