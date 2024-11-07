@@ -18,7 +18,7 @@ export async function sendPoints({
   currentDate = new Date(),
   eventType = 'misc_event'
 }: {
-  eventType: BuilderEventType;
+  eventType?: BuilderEventType;
   builderId: string;
   points: number;
   season?: ISOWeek;

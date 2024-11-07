@@ -59,7 +59,7 @@ describe('claimDailyReward', () => {
   it('should claim daily reward streak', async () => {
     const builder = await mockBuilder();
     const userId = builder.id;
-    const currentDate = DateTime.now().startOf('day');
+    const currentDate = DateTime.utc().startOf('day');
     // Move to the next monday
     const weekEndDate = currentDate.plus({ days: 7 - (currentDate.weekday - 1) }).startOf('day');
 

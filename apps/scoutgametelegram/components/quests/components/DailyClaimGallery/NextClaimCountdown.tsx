@@ -33,7 +33,9 @@ export function NextClaimCountdown() {
         <Typography variant='h5' fontWeight={600}>
           {timeStr.hours}
         </Typography>
-        <Typography fontWeight={600}>h</Typography>
+        <Typography fontWeight={600} mr={0.5}>
+          h
+        </Typography>
         <Typography variant='h5' fontWeight={600}>
           {timeStr.minutes}
         </Typography>

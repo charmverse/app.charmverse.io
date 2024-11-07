@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 export async function claimDailyReward({
   userId,
   isBonus,
-  currentDate = DateTime.now()
+  currentDate = DateTime.utc()
 }: {
   userId: string;
   isBonus?: boolean;
@@ -32,8 +32,8 @@ export async function claimDailyReward({
         week: getCurrentWeek()
       },
       createdAt: {
-        gte: DateTime.now().startOf('day').toJSDate(),
-        lte: DateTime.now().endOf('day').toJSDate()
+        gte: DateTime.utc().startOf('day').toJSDate(),
+        lte: DateTime.utc().endOf('day').toJSDate()
       }
     },
     select: undefined
