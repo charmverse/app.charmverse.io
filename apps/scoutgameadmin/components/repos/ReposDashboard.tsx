@@ -29,11 +29,11 @@ import React, { useState, useMemo } from 'react';
 import { ExportButton } from 'components/common/ExportButton';
 import { useSearchRepos } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import { revalidatePathAction } from 'lib/actions/revalidatePathAction';
 import type { Repo } from 'lib/repos/getRepos';
 
-import { AddRepoButton } from './components/AddRepoButton/AddRepoButton';
-import { DeleteRepoButton } from './components/DeleteRepoButton/DeleteRepoButton';
 import { HeaderActions } from './components/HeaderActions';
+import { RepoActionButton } from './components/RepoActions/RepoActionButton';
 
 type SortField = 'commits' | 'prs' | 'closedPrs' | 'contributors' | 'owner' | 'createdAt' | 'bonusPartner';
 type SortOrder = 'asc' | 'desc';
@@ -70,6 +70,15 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
       setSortOrder('desc');
     }
   };
+
+  function refreshData() {
+    if (filterString) {
+      mutate();
+    } else {
+      revalidatePathAction();
+    }
+  }
+
   return (
     <Container maxWidth='xl'>
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
@@ -156,7 +165,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                   Bonus Partner
                 </TableSortLabel>
               </TableCell>
-              <TableCell align='center'>Status</TableCell>
+              <TableCell align='center'>{/** Actions */}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -180,7 +189,12 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                   {repo.bonusPartner ? <BonusPartnersDisplay bonusPartner={repo.bonusPartner} /> : ''}
                 </TableCell>
                 <TableCell align='center'>
-                  <DeleteRepoButton onDelete={() => mutate()} repoId={repo.id} deletedAt={repo.deletedAt} />
+                  <RepoActionButton
+                    repo={repo}
+                    onChange={() => {
+                      refreshData();
+                    }}
+                  />
                 </TableCell>
               </TableRow>
             ))}
