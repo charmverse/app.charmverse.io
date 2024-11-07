@@ -1,10 +1,11 @@
 'use client';
 
 import { Stack } from '@mui/material';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 
-export function BonusPartnersDisplay({ bonusPartners, size = 20 }: { bonusPartners?: string[]; size?: number }) {
+export function BonusPartnersDisplay({ bonusPartners, size = 20 }: { bonusPartners?: BonusPartner[]; size?: number }) {
   const bonusPartnerIcons = (bonusPartners ?? [])
     .filter((partner) => !!bonusPartnersRecord[partner])
     .map((partner) => bonusPartnersRecord[partner].icon);

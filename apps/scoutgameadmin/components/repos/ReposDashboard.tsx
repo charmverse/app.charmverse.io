@@ -186,7 +186,7 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
                 <TableCell>{repo.closedPrs}</TableCell>
                 <TableCell>{repo.contributors}</TableCell>
                 <TableCell>
-                  {repo.bonusPartner ? <BonusPartnersDisplay bonusPartner={repo.bonusPartner} /> : ''}
+                  {repo.bonusPartner ? <BonusPartnersDisplay bonusPartner={repo.bonusPartner as BonusPartner} /> : ''}
                 </TableCell>
                 <TableCell align='center'>
                   <RepoActionButton

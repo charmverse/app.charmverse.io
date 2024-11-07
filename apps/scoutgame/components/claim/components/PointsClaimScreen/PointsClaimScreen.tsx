@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -45,7 +46,7 @@ export function PointsClaimScreen({
 }: {
   totalUnclaimedPoints: number;
   displayName: string;
-  bonusPartners: string[];
+  bonusPartners: BonusPartner[];
 }) {
   const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
   const { refreshUser } = useUser();

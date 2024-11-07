@@ -1,4 +1,5 @@
 import { Stack } from '@mui/material';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
@@ -12,7 +13,7 @@ import { UnclaimedPointsTable } from './components/PointsTable/UnclaimedPointsTa
 
 export type ClaimPageProps = {
   totalUnclaimedPoints: number;
-  bonusPartners: string[];
+  bonusPartners: BonusPartner[];
   displayName: string;
   period: string;
 };
