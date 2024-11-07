@@ -48,6 +48,11 @@ function Document() {
           </Link>
         </ListItem>
         <ListItem>
+          <Link component={NextLink} href='/info/partner-rewards/optimism'>
+            Optimism
+          </Link>
+        </ListItem>
+        <ListItem>
           <Link component={NextLink} href='/info/partner-rewards/op-supersim'>
             Optimism Supersim
           </Link>
