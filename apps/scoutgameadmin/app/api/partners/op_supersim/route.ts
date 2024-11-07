@@ -9,8 +9,8 @@ export async function GET() {
   const lastWeek = getLastWeek();
   const rows = await getBuildersForPartner({
     week: lastWeek,
-    bonusPartner: 'op-supersim'
+    bonusPartner: 'op_supersim'
   });
 
-  return respondWithTSV(rows, `partners-export_op-supersim_${lastWeek}.tsv`);
+  return respondWithTSV(rows, `partners-export_supersim_${lastWeek}.tsv`);
 }

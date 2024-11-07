@@ -8,7 +8,6 @@ import {
   Container,
   InputAdornment,
   Link,
-  Typography,
   Paper,
   Table,
   TableBody,
@@ -17,10 +16,8 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Box,
   IconButton,
-  TableSortLabel,
-  Button
+  TableSortLabel
 } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
@@ -213,7 +210,7 @@ function BonusPartnersDisplay({ bonusPartner, size = 20 }: { bonusPartner: strin
   }
   return (
     <Stack flexDirection='row' gap={1} alignItems='center'>
-      <Image width={size} height={size} src={info.icon} alt='Bonus partner' />
+      <Image width={size} height={size} src={info.icon} alt='' />
       {info.name}
     </Stack>
   );

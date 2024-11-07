@@ -17,7 +17,11 @@ export const bonusPartnersRecord = {
     name: 'Game7',
     icon: 'https://yt3.googleusercontent.com/KHNdF-AtNsZDH0efEdZnVA4O4BjLKAkgeszsZ11mTUgjtbmc0EYfp23Y5MnIK9-tQ94M7Lu4nQ=s160-c-k-c0x00ffffff-no-rj'
   },
-  'op-supersim': {
+  lit_protocol: {
+    name: 'Lit Protocol',
+    icon: '/images/logos/lit-protocol.png'
+  },
+  op_supersim: {
     name: 'OP Supersim',
     icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.png'
   }

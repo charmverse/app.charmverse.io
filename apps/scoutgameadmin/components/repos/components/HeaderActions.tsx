@@ -47,8 +47,17 @@ export function HeaderActions() {
         <MenuItem>
           <FileDownloadButton
             size='small'
+            filename={`Lit Protocol Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/lit_protocol'
+          >
+            Lit Protocol Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            size='small'
             filename={`OP Supersim Weekly Report (${lastWeek}).tsv`}
-            src='/api/partners/op-supersim'
+            src='/api/partners/op_supersim'
           >
             OP Supersim Report ({lastWeek})
           </FileDownloadButton>
