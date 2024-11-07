@@ -16,14 +16,13 @@ export async function completeQuest(userId: string, questType: string) {
     });
 
     if (quest) {
-      return null;
+      throw new Error('Quest already completed');
     }
 
     await tx.scoutSocialQuest.create({
       data: {
         type: questType,
-        userId,
-        completedAt: new Date()
+        userId
       }
     });
 
