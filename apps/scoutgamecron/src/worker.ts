@@ -7,6 +7,7 @@ import * as middleware from './middleware';
 import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
+import { processOnchainGemsPayout } from './tasks/processGemsPayout/processOnchainGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 import { resolveBalanceIssues } from './tasks/resolveBalanceIssues/resolveBalanceIssues';
@@ -53,6 +54,8 @@ addTask('/process-builder-activity', processAllBuilderActivity);
 addTask('/send-push-notifications', sendNotifications);
 
 addTask('/process-gems-payout', processGemsPayout);
+
+addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
 
 addTask('/process-nft-mints', processNftMints);
 

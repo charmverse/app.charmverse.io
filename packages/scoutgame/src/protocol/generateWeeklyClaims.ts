@@ -1,16 +1,22 @@
 import { log } from '@charmverse/core/log';
-import type { WeeklyClaims } from '@charmverse/core/prisma-client';
+import type { Prisma, WeeklyClaims } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateMerkleTree, getMerkleProofs } from '@charmverse/core/protocol';
+import type { ProvableClaim } from '@charmverse/core/protocol';
+import { v4 as uuid } from 'uuid';
 import type { Address } from 'viem';
 
 import { currentSeason } from '../dates';
 import { dividePointsBetweenBuilderAndScouts } from '../points/dividePointsBetweenBuilderAndScouts';
 import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAndBuilders';
 
-import { generateMerkleTree, type ProvableClaim } from './merkleTree';
+type ProvableClaimWithUserId = ProvableClaim & {
+  userId: string;
+};
 
 type ClaimsBody = {
-  leaves: ;
+  leaves: ProvableClaim[];
+  leavesWithUserId: ProvableClaimWithUserId[];
 };
 
 type WeeklyClaimsTyped = Omit<WeeklyClaims, 'claims' | 'proofs'> & {
@@ -18,10 +24,22 @@ type WeeklyClaimsTyped = Omit<WeeklyClaims, 'claims' | 'proofs'> & {
   proofs: Record<string, string[]>;
 };
 
-export async function calculateWeeklyClaims({ week }: { week: string }): Promise<ProvableClaim[]> {
+type WeeklyClaimsCalculated = {
+  claims: ProvableClaim[];
+  claimsWithUserId: ProvableClaimWithUserId[];
+  builderEvents: Prisma.BuilderEventCreateManyInput[];
+  tokenReceipts: Prisma.TokensReceiptCreateManyInput[];
+  weeklyClaimId: string;
+};
+
+export async function calculateWeeklyClaims({ week }: { week: string }): Promise<WeeklyClaimsCalculated> {
   const { normalisationFactor, topWeeklyBuilders, weeklyAllocatedPoints } = await getWeeklyPointsPoolAndBuilders({
     week
   });
+
+  const builderEvents: Prisma.BuilderEventCreateManyInput[] = [];
+  const tokenReceipts: Prisma.TokensReceiptCreateManyInput[] = [];
+  const weeklyClaimId = uuid();
 
   const allClaims = await Promise.all(
     topWeeklyBuilders.map(async (builder) => {
@@ -32,6 +50,33 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
         rank: builder.rank,
         season: currentSeason
       });
+
+      const builderEventId = uuid();
+
+      const builderEventInput: Prisma.BuilderEventCreateManyInput = {
+        id: builderEventId,
+        builderId: builder.builder.id,
+        week,
+        season: currentSeason,
+        type: 'gems_payout',
+        weeklyClaimId
+      };
+
+      builderEvents.push(builderEventInput);
+
+      const builderTokenReceiptInput: Prisma.TokensReceiptCreateManyInput = {
+        eventId: builderEventId,
+        value: pointsForBuilder,
+        recipientId: builder.builder.id
+      };
+
+      const scoutTokenReceipts: Prisma.TokensReceiptCreateManyInput[] = pointsPerScout.map((scoutClaim) => ({
+        eventId: builderEventId,
+        value: scoutClaim.scoutPoints,
+        recipientId: scoutClaim.scoutId
+      }));
+
+      tokenReceipts.push(builderTokenReceiptInput, ...scoutTokenReceipts);
 
       return { pointsPerScout, pointsForBuilder, builderId: builder.builder.id };
     })
@@ -83,7 +128,8 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
       )
     );
 
-  const claimsByAddress: ProvableClaim[] = [];
+  const claimsWithUserId: ProvableClaimWithUserId[] = [];
+  const claims: ProvableClaim[] = [];
 
   for (const scoutId of allScoutIds) {
     const walletAddress = scoutsWithWallet[scoutId];
@@ -96,14 +142,19 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
         amount: claimsMap[scoutId]
       };
 
-      claimsByAddress.push(claim);
+      claims.push(claim);
+      claimsWithUserId.push({ ...claim, userId: scoutId });
     }
   }
 
-  return claimsByAddress;
+  return { claims, claimsWithUserId, builderEvents, weeklyClaimId, tokenReceipts };
 }
 
-export async function generateWeeklyClaims({ week }: { week: string }): Promise<WeeklyClaimsTyped> {
+export async function generateWeeklyClaims({
+  week
+}: {
+  week: string;
+}): Promise<{ weeklyClaims: WeeklyClaimsTyped; totalBuilders: number; totalPoints: number }> {
   const existingClaim = await prisma.weeklyClaims.findUnique({
     where: {
       week
@@ -114,25 +165,48 @@ export async function generateWeeklyClaims({ week }: { week: string }): Promise<
     throw new Error(`Claims for week ${week} already exist`);
   }
 
-  const claims = await calculateWeeklyClaims({ week });
-
-  const { rootHash } = generateMerkleTree(claims);
-
-  const claimsBody: ClaimsBody = {
-    leaves: claims
-  };
-
-  const weeklyClaim = await prisma.weeklyClaims.create({
-    data: {
-      week,
-      merkleTreeRoot: rootHash,
-      season: currentSeason,
-      totalClaimable: claims.reduce((acc, claim) => acc + claim.amount, 0),
-      claims: claimsBody
-    }
+  const { claims, claimsWithUserId, builderEvents, tokenReceipts, weeklyClaimId } = await calculateWeeklyClaims({
+    week
   });
 
-  return weeklyClaim as WeeklyClaimsTyped;
-}
+  const { rootHash, tree } = generateMerkleTree(claims);
 
-// generateWeeklyClaims({ week: '2024-W44' }).then(console.log);
+  const proofsMap: Record<string, string[]> = {};
+
+  for (const claim of claimsWithUserId) {
+    const proof = getMerkleProofs(tree, { address: claim.address, amount: claim.amount });
+
+    proofsMap[claim.userId] = proof;
+  }
+
+  const claimsBody: ClaimsBody = {
+    leaves: claims,
+    leavesWithUserId: claimsWithUserId
+  };
+
+  const [weeklyClaim] = await prisma.$transaction([
+    prisma.weeklyClaims.create({
+      data: {
+        id: weeklyClaimId,
+        week,
+        merkleTreeRoot: rootHash,
+        season: currentSeason,
+        totalClaimable: claims.reduce((acc, claim) => acc + claim.amount, 0),
+        claims: claimsBody,
+        proofsMap
+      }
+    }),
+    prisma.builderEvent.createMany({
+      data: builderEvents
+    }),
+    prisma.tokensReceipt.createMany({
+      data: tokenReceipts
+    })
+  ]);
+
+  return {
+    weeklyClaims: weeklyClaim as WeeklyClaimsTyped,
+    totalBuilders: builderEvents.length,
+    totalPoints: tokenReceipts.length
+  };
+}

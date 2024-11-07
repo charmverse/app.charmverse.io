@@ -10,6 +10,11 @@ cron:
     # Start of every hour
     schedule: '0 * * * *'
 
+  - name: 'process-onchain-gems-payout'
+    url: '/process-onchain-gems-payout'
+    # Start of every hour
+    schedule: '0 * * * *'
+
   - name: 'process-nft-mints'
     url: '/process-nft-mints'
     # Every 5 minutes
