@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 
 import { useGETtrigger } from 'hooks/api/helpers';
 
-export function ExportButton({
+export function FileDownloadButton({
   children,
   src,
   filename,

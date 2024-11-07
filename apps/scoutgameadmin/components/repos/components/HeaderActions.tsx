@@ -5,7 +5,7 @@ import { Menu, MenuItem, ListItemButton, Stack, Button } from '@mui/material';
 import { getLastWeek, getWeekStartEndFormatted, getDateFromISOWeek } from '@packages/scoutgame/dates';
 import React, { useState } from 'react';
 
-import { ExportButton } from 'components/common/ExportButton';
+import { FileDownloadButton } from 'components/common/FileDownloadButton';
 
 import { AddRepoButton } from './AddRepoButton/AddRepoButton';
 
@@ -25,19 +25,29 @@ export function HeaderActions() {
       </Button>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         <MenuItem>
-          <ExportButton filename='github_repos.tsv' src='/api/repos/export' onComplete={closeMenu}>
+          <FileDownloadButton filename='github_repos.tsv' src='/api/repos/export' onComplete={closeMenu}>
             All repositories
-          </ExportButton>
+          </FileDownloadButton>
         </MenuItem>
         <MenuItem>
-          <ExportButton filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
+          <FileDownloadButton filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
             Celo Report ({lastWeek})
-          </ExportButton>
+          </FileDownloadButton>
         </MenuItem>
         <MenuItem>
-          <ExportButton filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
+          <FileDownloadButton filename={`Game7 Weekly Report (${lastWeek}).tsv`} src='/api/partners/game7'>
+            Game7 Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton filename={`OP Supersim Weekly Report (${lastWeek}).tsv`} src='/api/partners/op-supersim'>
+            OP Supersim Report ({lastWeek})
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
             Moxie Report ({lastWeek})
-          </ExportButton>
+          </FileDownloadButton>
         </MenuItem>
       </Menu>
     </Stack>

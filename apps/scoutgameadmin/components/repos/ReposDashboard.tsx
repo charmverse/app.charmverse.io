@@ -22,11 +22,11 @@ import {
   TableSortLabel,
   Button
 } from '@mui/material';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 import React, { useState, useMemo } from 'react';
 
-import { ExportButton } from 'components/common/ExportButton';
 import { useSearchRepos } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { revalidatePathAction } from 'lib/actions/revalidatePathAction';
@@ -206,14 +206,14 @@ export function ReposDashboard({ repos }: { repos: Repo[] }) {
 }
 
 function BonusPartnersDisplay({ bonusPartner, size = 20 }: { bonusPartner: string; size?: number }) {
-  const info = bonusPartnersRecord[bonusPartner];
+  const info = bonusPartnersRecord[bonusPartner as BonusPartner];
   if (!info) {
-    log.warn(`No partner info found for ${bonusPartner}`);
-    return null;
+    log.warn(`No bonus partner info found for ${bonusPartner}`);
+    return bonusPartner;
   }
   return (
     <Stack flexDirection='row' gap={1} alignItems='center'>
-      <Image width={20} height={20} src={info.icon} alt='Bonus partner' />
+      <Image width={size} height={size} src={info.icon} alt='Bonus partner' />
       {info.name}
     </Stack>
   );
