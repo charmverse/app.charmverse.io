@@ -1,4 +1,4 @@
-import { GET } from '@root/adapters/http';
+import { GET } from '@packages/utils/http';
 
 import { TELEGRAM_BOT_TOKEN } from './config';
 

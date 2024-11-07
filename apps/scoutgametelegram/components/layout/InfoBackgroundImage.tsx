@@ -12,8 +12,8 @@ export function InfoBackgroundImage(props: BoxProps) {
       left={0}
       sx={{
         backgroundImage: {
-          xs: 'url(/images/mobile_login_background.png)',
-          md: 'url(/images/desktop_login_background.png)'
+          xs: 'url(/images/mobile_login_background.jpg)',
+          md: 'url(/images/desktop_login_background.jpg)'
         },
         backgroundSize: 'cover',
         backgroundPosition: 'center',

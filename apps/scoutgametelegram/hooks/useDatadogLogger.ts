@@ -1,7 +1,7 @@
 import env from '@beam-australia/react-env';
 import { datadogLogs } from '@datadog/browser-logs';
 import { datadogRum } from '@datadog/browser-rum';
-import { isProdEnv, isStagingEnv } from '@root/config/constants';
+import { isProdEnv, isStagingEnv } from '@packages/utils/constants';
 import { useEffect } from 'react';
 
 const DD_SITE = 'datadoghq.com';

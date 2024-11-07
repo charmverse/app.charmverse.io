@@ -1,4 +1,4 @@
-import { useGETImmutable, useGETtrigger } from '@root/charmClient/hooks/helpers';
+import { useGETImmutable, useGETtrigger } from '@packages/scoutgame/hooks/helpers';
 
 import type { SessionUser } from 'lib/session/interfaces';
 
