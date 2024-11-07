@@ -1,5 +1,7 @@
 import { SvgIcon } from '@mui/material';
 
+import { brandColor, disabledTextColorDarkMode, secondaryDarkText } from 'theme/colors';
+
 export function DailyClaimGift({
   variant = 'primary',
   size = 64
@@ -7,9 +9,9 @@ export function DailyClaimGift({
   variant: 'disabled' | 'primary' | 'secondary';
   size: number;
 }) {
-  const primaryColor = '#A06CD5';
-  const secondaryColor = '#0580A4';
-  const disabledColor = '#4D4D4D';
+  const primaryColor = brandColor;
+  const secondaryColor = secondaryDarkText;
+  const disabledColor = disabledTextColorDarkMode;
 
   const fillColor = variant === 'primary' ? primaryColor : variant === 'secondary' ? secondaryColor : disabledColor;
 

@@ -1,4 +1,4 @@
-import type { Prisma } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ISOWeek } from '@packages/scoutgame/dates';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
@@ -14,13 +14,15 @@ export async function sendPoints({
   earnedAs,
   claimed,
   hideFromNotifications = false,
-  tx
+  tx,
+  eventType = 'misc_event'
 }: {
+  eventType: BuilderEventType;
   builderId: string;
   points: number;
   season?: ISOWeek;
   week?: ISOWeek;
-  description: string;
+  description?: string;
   claimed: boolean;
   earnedAs?: 'builder' | 'scout';
   hideFromNotifications?: boolean;
@@ -30,7 +32,7 @@ export async function sendPoints({
     await _tx.builderEvent.create({
       data: {
         builderId,
-        type: 'misc_event',
+        type: eventType,
         week,
         season,
         description,

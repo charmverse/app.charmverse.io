@@ -1,24 +1,22 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
-import { incrementPointsEarnedStats } from '@packages/scoutgame/points/updatePointsEarned';
+import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 
 import { QuestsRecord } from './getQuests';
 
 export async function completeQuest(userId: string, questType: string) {
   const points = QuestsRecord[questType].points;
+  const quest = await prisma.scoutSocialQuest.findFirst({
+    where: {
+      type: questType,
+      userId
+    }
+  });
+
+  if (quest) {
+    throw new Error('Quest already completed');
+  }
 
   await prisma.$transaction(async (tx) => {
-    const quest = await tx.scoutSocialQuest.findFirst({
-      where: {
-        type: questType,
-        userId
-      }
-    });
-
-    if (quest) {
-      throw new Error('Quest already completed');
-    }
-
     await tx.scoutSocialQuest.create({
       data: {
         type: questType,
@@ -26,34 +24,12 @@ export async function completeQuest(userId: string, questType: string) {
       }
     });
 
-    await tx.pointsReceipt.create({
-      data: {
-        recipient: {
-          connect: {
-            id: userId
-          }
-        },
-        claimedAt: new Date(),
-        value: points,
-        event: {
-          create: {
-            type: 'social_quest',
-            week: getCurrentWeek(),
-            season: currentSeason,
-            builder: {
-              connect: {
-                id: userId
-              }
-            }
-          }
-        }
-      }
-    });
-
-    await incrementPointsEarnedStats({
-      userId,
-      season: currentSeason,
-      builderPoints: points,
+    await sendPoints({
+      builderId: userId,
+      eventType: 'social_quest',
+      points,
+      claimed: true,
+      earnedAs: 'builder',
       tx
     });
   });
