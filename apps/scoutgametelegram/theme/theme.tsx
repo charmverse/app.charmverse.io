@@ -11,7 +11,7 @@ import {
   inputBackgroundDarkMode,
   inputBorderDarkMode,
   primaryTextColorDarkMode,
-  purpleDisabled,
+  brandColorDark,
   secondaryText,
   secondaryLightText,
   blackText,
@@ -57,7 +57,7 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         },
         primary: {
           main: brandColor,
-          dark: purpleDisabled
+          dark: brandColorDark
         },
         secondary: {
           main: secondaryText,

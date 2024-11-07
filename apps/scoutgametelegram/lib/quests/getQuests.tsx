@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import TelegramIcon from '@mui/icons-material/Telegram';
 import XIcon from '@mui/icons-material/X';
 import Image from 'next/image';
 
@@ -24,9 +23,9 @@ export const QuestsRecord: Record<
     label: 'Follow @scoutgamexyz',
     link: 'https://x.com/@scoutgamexyz'
   },
-  'share-tg-chanel': {
+  'share-x-channel': {
     points: 50,
-    icon: <TelegramIcon fontSize='large' />,
+    icon: <XIcon fontSize='large' />,
     label: 'Share this channel'
   },
   'watch-gameplay-video': {

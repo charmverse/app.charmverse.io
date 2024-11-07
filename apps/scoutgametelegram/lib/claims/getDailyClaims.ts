@@ -10,20 +10,20 @@ export type DailyClaim = {
 
 export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
   const currentWeek = getCurrentWeek();
-  const pointsReceipts = await prisma.pointsReceipt.findMany({
+  const builderEvents = await prisma.builderEvent.findMany({
     where: {
-      recipientId: userId,
-      event: {
-        type: 'daily_claim',
-        week: currentWeek
-      }
+      builderId: userId,
+      type: {
+        in: ['daily_claim', 'daily_claim_streak']
+      },
+      week: currentWeek
     },
     orderBy: {
       createdAt: 'desc'
     },
     select: {
       createdAt: true,
-      value: true
+      type: true
     }
   });
 
@@ -33,19 +33,20 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
     .fill(null)
     .map((_, index) => {
       const date = start.plus({ days: index });
-      const receipt = pointsReceipts.find((_receipt) => isToday(_receipt.createdAt, date));
+      const builderEvent = builderEvents.find((_builderEvent) => isToday(_builderEvent.createdAt, date));
       const dailyClaimInfo = {
         date: date.toJSDate(),
         day: index + 1,
-        claimed: !!receipt,
+        claimed: !!builderEvent,
         isBonus: false
       };
 
+      // For the last day of the week, return 2 claims: one for the daily claim and one for the bonus claim
       if (index === 6) {
-        const bonusReceipt = pointsReceipts.find(
-          (_receipt) => isToday(_receipt.createdAt, date) && _receipt.value === 3
+        const bonusBuilderEvent = builderEvents.find(
+          (_builderEvent) => isToday(_builderEvent.createdAt, date) && _builderEvent.type === 'daily_claim_streak'
         );
-        return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!bonusReceipt, isBonus: true }];
+        return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!bonusBuilderEvent, isBonus: true }];
       }
 
       return [dailyClaimInfo];

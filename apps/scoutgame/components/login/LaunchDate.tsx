@@ -2,7 +2,7 @@
 
 import { Box, Stack, Typography } from '@mui/material';
 import { tierDistributionMap } from '@packages/scoutgame/waitlist/scoring/constants';
-import { timeUntilFuture } from '@packages/utils/time';
+import { timeUntilFuture } from '@packages/utils/dates';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 

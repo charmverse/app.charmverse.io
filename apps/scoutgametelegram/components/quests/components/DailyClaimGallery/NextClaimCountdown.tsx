@@ -1,7 +1,7 @@
 'use client';
 
 import { Stack, Typography } from '@mui/material';
-import { timeUntilFuture } from '@packages/utils/time';
+import { timeUntilFuture } from '@packages/utils/dates';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 

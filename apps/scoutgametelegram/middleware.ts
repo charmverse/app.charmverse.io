@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
