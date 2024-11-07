@@ -3,10 +3,33 @@ import { githubAccessToken } from '@root/config/constants';
 import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
 import { uniq, uniqBy } from 'lodash';
 import { Octokit } from '@octokit/core';
+import { throttling } from '@octokit/plugin-throttling';
 import { paginateGraphQL } from '@octokit/plugin-paginate-graphql';
 
-const MyOctokit = Octokit.plugin(paginateGraphQL);
-const octokit = new MyOctokit({ auth: githubAccessToken });
+const MyOctokit = Octokit.plugin(throttling, paginateGraphQL);
+export const octokit = new MyOctokit({
+  auth: githubAccessToken,
+  throttle: {
+    onRateLimit: (retryAfter, options, _octokit, retryCount) => {
+      //log.warn(`[Octokit] Request quota exhausted for request ${options.method} ${options.url}`);
+
+      log.info(`[Octokit] Retrying after ${retryAfter} seconds!`);
+      return true;
+      // if (retryCount < 2) {
+      //   // only retries twice
+      //   return true;
+      // }
+    },
+    onSecondaryRateLimit: (retryAfter, options, _octokit) => {
+      // does not retry, only logs a warning
+      log.warn(
+        `[Octokit] SecondaryRateLimit detected for request ${options.method} ${options.url}. Retrying after ${retryAfter} seconds!`
+      );
+      // try again
+      return true;
+    }
+  }
+});
 
 type RepositoryData = {
   id: string;
@@ -39,7 +62,7 @@ type RepositoryData = {
   // };
 };
 
-type FlatRepositoryData = {
+export type FlatRepositoryData = {
   id: string;
   url: string;
   assignableUserCount: number;
@@ -58,8 +81,8 @@ const queryPullRequests = (repo: string) =>
   octokit.graphql.paginate<{
     search: { edges: { node: RepositoryData['pullRequests']['edges'][number]['node'] }[] };
   }>(
-    `query ($repo: String!, $cursor: String) {
-      search(query: $repo, type: ISSUE, first: 100, after: $cursor) {
+    `query ($searchStr: String!, $cursor: String) {
+      search(query: $searchStr, type: ISSUE, first: 100, after: $cursor) {
         edges {
           node {
             ... on PullRequest {
@@ -70,6 +93,11 @@ const queryPullRequests = (repo: string) =>
               title
               author {
                 login
+                ... on User {
+                  id
+                  email
+                  name
+                }
               }
             }
           }
@@ -81,11 +109,11 @@ const queryPullRequests = (repo: string) =>
       }
     }`,
     {
-      repo: repo + ' is:pr is:merged updated:2024-06-01..2024-09-01'
+      searchStr: repo + ' is:pr is:merged updated:2024-06-01..2024-11-05'
     }
   );
 
-const queryRepos = (repos: string[]) =>
+export const queryRepos = (repos: string[]) =>
   octokit.graphql<{ search: { edges: { node: RepositoryData }[] } }>(
     `
   query ($repos: String!) {
@@ -109,6 +137,11 @@ const queryRepos = (repos: string[]) =>
                   title
                   author {
                     login
+                    ... on User {
+                      id
+                      email
+                      name
+                    }
                   }
                 }
               }
@@ -178,14 +211,19 @@ export async function getRepositoryActivity({ cutoffDate, repos }: { cutoffDate:
     }
 
     const results = await queryRepos(repoList).then(async (data) => {
-      const repos = data.search.edges.map((edge) => edge.node);
+      const repos = data?.search?.edges.map((edge) => edge.node) || [];
+      if (!data?.search) {
+        console.log('No search data', data);
+      }
       const _results: FlatRepositoryData[] = [];
       for (let repo of repos) {
-        if (repo.pullRequests.edges.length >= 50) {
+        const prs = repo.pullRequests.edges.filter((edge) => edge.node.updatedAt >= cutoffDate.toISOString());
+        // compensate for the limit of 50 PRs from the initial query
+        if (prs.length >= 50) {
           const extra = await queryPullRequests(repo.url.replace('https://github.com/', ''));
           repo.pullRequests.edges = extra.search.edges;
           _results.push(mapToFlatObject(repo, cutoffDate));
-          console.log('paginated PRs', repo.pullRequests.edges.length);
+          console.log('requested additional PRs', prs.length, repo.pullRequests.edges.length);
         }
       }
       return _results;
