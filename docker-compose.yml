@@ -263,6 +263,36 @@ services:
     profiles:
       - stg-farcaster
 
+  prd-scoutgametelegram:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npx react-env --path .env --dest ./apps/scoutgametelegram/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/scoutgametelegram --keepAliveTimeout 70000'
+      ]
+    profiles:
+      - prd-scoutgametelegram
+
+  stg-scoutgametelegram:
+    extends:
+      service: defaults
+    ports:
+      - '80:3000'
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/scoutgametelegram/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/scoutgametelegram --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+    profiles:
+      - stg-scoutgametelegram
+
   devapp:
     build:
       context: .
@@ -332,4 +362,5 @@ services:
       - prd-scoutgame
       - prd-scoutgamecron
       - prd-waitlist
+      - prd-scoutgametelegram
       - ddtst

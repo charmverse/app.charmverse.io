@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 import { InfoPageContainer } from 'components/info/components/InfoPageContainer';
 
 export function OptimismSupersimPage() {

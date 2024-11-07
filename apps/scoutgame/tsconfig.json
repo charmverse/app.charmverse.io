@@ -36,7 +36,6 @@
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       "@charmverse/core/log": ["../../node_modules/@charmverse/core/dist/cjs/lib/log"],
-      "@charmverse/core/http": ["../../node_modules/@charmverse/core/dist/cjs/http"],
       "@charmverse/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }

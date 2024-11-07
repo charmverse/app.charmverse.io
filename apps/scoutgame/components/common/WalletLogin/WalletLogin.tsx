@@ -47,7 +47,7 @@ function WalletLoginButton() {
   const { executeAsync: revalidatePath } = useAction(revalidatePathAction);
 
   const {
-    executeAsync,
+    executeAsync: loginUser,
     result,
     isExecuting: isLoggingIn
   } = useAction(loginWithWalletAction, {
@@ -79,7 +79,7 @@ function WalletLoginButton() {
     const siweMessage = new SiweMessage(preparedMessage);
     const message = siweMessage.prepareMessage();
     const signature = await signMessageAsync({ message });
-    executeAsync({ message, signature });
+    loginUser({ message, signature, inviteCode });
   };
 
   useEffect(() => {

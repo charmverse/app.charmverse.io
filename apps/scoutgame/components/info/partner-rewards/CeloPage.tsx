@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 import { InfoPageContainer } from 'components/info/components/InfoPageContainer';
 
 export function CeloPage() {
@@ -61,9 +61,22 @@ function Document() {
         </Table>
       </TableContainer>
       <Typography variant='h6' color='secondary' mt={2}>
+        How to contribute
+      </Typography>
+      <Typography>
+        <Link href='https://docs.celo.org/general/ecosystem/contributors' target='_blank' rel='noreferrer'>
+          Learn how to contribute to Celo
+        </Link>
+      </Typography>
+      <Typography variant='h6' color='secondary' mt={2}>
         Qualified Celo Projects:
       </Typography>
       <List>
+        <ListItem>
+          <Link href='https://github.com/celo-org/faucet' target='_blank' rel='noreferrer'>
+            https://github.com/celo-org/faucet
+          </Link>
+        </ListItem>
         <ListItem>
           <Link href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
             https://github.com/mento-protocol/mento-web
