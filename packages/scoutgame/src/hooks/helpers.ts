@@ -1,4 +1,4 @@
-import * as http from '@root/adapters/http';
+import * as http from '@packages/utils/http';
 import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
@@ -13,7 +13,7 @@ export function useGET<T = unknown>(path: MaybeString, query: any = {}, swrOptio
 }
 
 // eslint-disable-next-line default-param-last
-export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration<T>) {
+export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWRImmutable<T>(requestUrl, http.GET, swrOptions);
 }
