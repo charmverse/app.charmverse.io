@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 
 import * as middleware from './middleware';
 import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
+import { nftCongratsImageTask } from './tasks/nftCongratsImage';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
@@ -65,6 +66,8 @@ addTask('/update-builder-card-activity', updateAllBuilderCardActivities);
 addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
+
+addTask('/nft-congrats-image', nftCongratsImageTask);
 
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);
