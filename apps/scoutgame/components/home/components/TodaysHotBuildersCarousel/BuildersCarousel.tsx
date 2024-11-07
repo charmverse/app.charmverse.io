@@ -1,11 +1,12 @@
 'use client';
 
+import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
 import { Carousel } from 'components/common/Carousel/Carousel';
 import { useIsMounted } from 'hooks/useIsMounted';
 import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
 import type { BuilderInfo } from 'lib/builders/interfaces';
 
-import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';
+import { AdCard } from './AdCard';
 
 export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
   const isMdScreen = useMdScreen();
@@ -19,6 +20,8 @@ export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
 
   return (
     <Carousel>
+      <AdCard path='/info' src='/images/home/op-new-scout-ad.png' />
+      <AdCard path='/info' src='/images/home/moxie-fan-reward-ad.png' />
       {builders.map((builder) => (
         <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
       ))}

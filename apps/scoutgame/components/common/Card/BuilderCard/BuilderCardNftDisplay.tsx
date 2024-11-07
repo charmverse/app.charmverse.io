@@ -2,7 +2,7 @@ import { CardActionArea, CardMedia, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
 // Maintain a 3:4 aspect ratio for the NFT display
-const nftDisplaySize = {
+export const nftDisplaySize = {
   'x-small': {
     width: 140,
     height: 186
