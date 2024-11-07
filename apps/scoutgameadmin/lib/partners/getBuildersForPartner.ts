@@ -19,6 +19,7 @@ export async function getBuildersForPartner({ week, bonusPartner }: { week: stri
       createdAt: true,
       builder: {
         select: {
+          path: true,
           email: true,
           displayName: true
         }
@@ -38,7 +39,8 @@ export async function getBuildersForPartner({ week, bonusPartner }: { week: stri
     }
   });
   return events.map((event) => ({
-    'Display Name': event.builder.displayName,
+    'User Name': event.builder.displayName,
+    'Profile Link': `https://scoutgame.xyz/u/${event.builder.path}`,
     Email: event.builder.email,
     Repo: `${event.githubEvent!.repo.owner}/${event.githubEvent!.repo.name}`,
     Date: event.createdAt.toDateString(),
