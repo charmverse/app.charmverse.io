@@ -16,6 +16,8 @@
     "./sleep": "./src/sleep.ts",
     "./env": "./src/env.ts",
     "./strings": "./src/strings.ts",
-    "./uuid": "./src/uuid.ts"
+    "./uuid": "./src/uuid.ts",
+    "./constants": "./src/constants.ts",
+    "./url": "./src/url.ts"
   }
 }

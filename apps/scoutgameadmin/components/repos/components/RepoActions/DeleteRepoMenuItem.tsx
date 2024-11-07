@@ -1,11 +1,10 @@
-'use client';
-
 import { log } from '@charmverse/core/log';
 import { DeleteOutlined as Delete } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Button,
-  IconButton,
+  MenuItem,
+  ListItemIcon,
   Dialog,
   Tooltip,
   DialogActions,
@@ -24,11 +23,12 @@ type DeleteRepoButtonProps = {
   onDelete: () => void;
 };
 
-export function DeleteRepoButton({ repoId, deletedAt, onDelete }: DeleteRepoButtonProps) {
+export function DeleteRepoMenuItem({ repoId, deletedAt, onDelete }: DeleteRepoButtonProps) {
   const [open, setOpen] = useState(false);
 
   const { executeAsync: deleteRepo, hasErrored, isExecuting: isDeleting } = useAction(deleteRepoAction);
-  const handleClickOpen = () => {
+  const handleClickOpen = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     setOpen(true);
   };
 
@@ -39,8 +39,8 @@ export function DeleteRepoButton({ repoId, deletedAt, onDelete }: DeleteRepoButt
   const handleDelete = async () => {
     try {
       await deleteRepo({ repoId, deleteIt: !deletedAt });
-      onDelete();
       handleClose();
+      onDelete();
     } catch (error) {
       log.error('Failed to delete repo:', error);
     }
@@ -50,14 +50,20 @@ export function DeleteRepoButton({ repoId, deletedAt, onDelete }: DeleteRepoButt
     <>
       {deletedAt ? (
         <Tooltip title={deletedAt ? `Deleted on: ${new Date(deletedAt).toLocaleDateString()}` : ''}>
-          <Button size='small' variant='contained' color='primary' onClick={handleClickOpen}>
-            Restore
-          </Button>
+          <MenuItem onClick={handleClickOpen}>
+            <ListItemIcon>
+              <Delete fontSize='small' />
+            </ListItemIcon>{' '}
+            Undelete
+          </MenuItem>
         </Tooltip>
       ) : (
-        <IconButton size='small' color='error' onClick={handleClickOpen}>
-          <Delete fontSize='small' />
-        </IconButton>
+        <MenuItem sx={{ color: 'error.main' }} onClick={handleClickOpen}>
+          <ListItemIcon>
+            <Delete color='error' fontSize='small' />
+          </ListItemIcon>{' '}
+          Delete
+        </MenuItem>
       )}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Confirm Deletion</DialogTitle>

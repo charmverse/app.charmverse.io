@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { processMessages } from '../webhookSqs';
-import { POST } from '@charmverse/core/http';
+import { POST } from '@packages/utils/http';
 
 // use this file and run against production to generate api keys
 

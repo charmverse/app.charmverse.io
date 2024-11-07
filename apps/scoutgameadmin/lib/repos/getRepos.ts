@@ -17,51 +17,52 @@ export async function getRepos({ searchString }: { searchString?: string } = {})
   if (typeof searchString === 'string' && searchString.length < 2) {
     return [];
   }
+  const ownerAndName = typeof searchString === 'string' ? searchString.split('/') : undefined;
 
   const repos = await prisma.githubRepo.findMany({
     take: 500,
-    orderBy:
-      typeof searchString === 'string'
-        ? [
-            {
-              _relevance: {
-                fields: ['owner'],
-                search: searchString,
-                sort: 'desc'
-              }
-            },
-            { createdAt: 'desc' },
-            { name: 'asc' }
-          ]
-        : undefined,
-    where:
-      typeof searchString === 'string'
-        ? {
-            owner: {
-              contains: searchString,
-              mode: 'insensitive'
+    orderBy: ownerAndName
+      ? [
+          {
+            _relevance: {
+              fields: ['owner'],
+              search: ownerAndName[0],
+              sort: 'desc'
             }
-          }
-        : {
-            OR: [
-              {
-                events: {
-                  some: {
-                    githubUser: {
-                      builderId: {
-                        not: null
-                      }
+          },
+          { createdAt: 'desc' },
+          { name: 'asc' }
+        ]
+      : { createdAt: 'desc' },
+    where: ownerAndName
+      ? {
+          owner: {
+            contains: ownerAndName[0],
+            mode: 'insensitive'
+          },
+          name: ownerAndName[1] ? { contains: ownerAndName[1], mode: 'insensitive' } : undefined
+        }
+      : {
+          // filter for repos that have activity by default
+          OR: [
+            {
+              events: {
+                some: {
+                  githubUser: {
+                    builderId: {
+                      not: null
                     }
                   }
                 }
-              },
-              {
-                bonusPartner: {
-                  not: null
-                }
               }
-            ]
-          },
+            },
+            {
+              bonusPartner: {
+                not: null
+              }
+            }
+          ]
+        },
     include: {
       events: true
     }
