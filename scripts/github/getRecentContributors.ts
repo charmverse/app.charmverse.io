@@ -34,7 +34,7 @@ async function getAuthorsWithEmail() {
   const authorList = repos.map(({ authors }) => authors).flat();
   const prs = repos
     .map(({ pullRequests, ...repo }) =>
-      pullRequests.map((pr) => ({
+      pullRequests.map((pr: any) => ({
         repo,
         pr: pr.node
       }))
