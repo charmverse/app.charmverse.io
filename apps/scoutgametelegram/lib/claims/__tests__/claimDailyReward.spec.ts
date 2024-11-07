@@ -60,8 +60,7 @@ describe('claimDailyReward', () => {
     const builder = await mockBuilder();
     const userId = builder.id;
     const currentDate = DateTime.utc().startOf('day');
-    // Move to the next monday
-    const weekEndDate = currentDate.plus({ days: 7 - (currentDate.weekday - 1) }).startOf('day');
+    const weekEndDate = currentDate.plus({ days: 7 - currentDate.weekday }).startOf('day');
 
     await claimDailyReward({ userId, isBonus: true, currentDate: weekEndDate });
     const pointsReceipt = await prisma.pointsReceipt.findFirstOrThrow({
