@@ -48,6 +48,7 @@ export async function claimDailyReward({
     eventType,
     points: eventPoints,
     claimed: true,
-    earnedAs: 'builder'
+    earnedAs: 'builder',
+    currentDate: currentDate.toJSDate()
   });
 }

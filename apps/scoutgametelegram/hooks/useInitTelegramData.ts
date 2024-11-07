@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import WebApp from '@twa-dev/sdk';
-import { redirect } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 

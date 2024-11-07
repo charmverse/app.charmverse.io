@@ -7,7 +7,7 @@ export default async function Quests() {
   const user = await getUserFromSession();
 
   if (!user) {
-    throw new Error('User not found');
+    return null;
   }
 
   const dailyClaims = await getDailyClaims(user.id);

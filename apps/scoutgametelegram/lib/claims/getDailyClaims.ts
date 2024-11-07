@@ -33,7 +33,9 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
     .fill(null)
     .map((_, index) => {
       const date = start.plus({ days: index });
-      const builderEvent = builderEvents.find((_builderEvent) => isToday(_builderEvent.createdAt, date));
+      const builderEvent = builderEvents.find(
+        (_builderEvent) => isToday(_builderEvent.createdAt, date) && _builderEvent.type === 'daily_claim'
+      );
       const dailyClaimInfo = {
         date: date.toJSDate(),
         day: index + 1,

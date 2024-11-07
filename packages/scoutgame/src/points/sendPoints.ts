@@ -15,12 +15,14 @@ export async function sendPoints({
   claimed,
   hideFromNotifications = false,
   tx,
+  currentDate = new Date(),
   eventType = 'misc_event'
 }: {
   eventType: BuilderEventType;
   builderId: string;
   points: number;
   season?: ISOWeek;
+  currentDate?: Date;
   week?: ISOWeek;
   description?: string;
   claimed: boolean;
@@ -36,18 +38,21 @@ export async function sendPoints({
         week,
         season,
         description,
+        createdAt: currentDate,
         pointsReceipts: {
           create: {
             claimedAt: claimed ? new Date() : null,
             value: points,
             recipientId: builderId,
+            createdAt: currentDate,
             activities: hideFromNotifications
               ? undefined
               : {
                   create: {
                     type: 'points',
                     userId: builderId,
-                    recipientType: !earnedAs ? 'scout' : earnedAs
+                    recipientType: !earnedAs ? 'scout' : earnedAs,
+                    createdAt: currentDate
                   }
                 }
           }
