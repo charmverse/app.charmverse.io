@@ -29,7 +29,7 @@ async function getRecentContributions() {
 }
 
 async function getAuthorsWithEmail() {
-  const repos = JSON.parse((await readFile(sourceFile)).toString());
+  const repos: any[] = JSON.parse((await readFile(sourceFile)).toString());
   console.log(repos[0]);
   const authorList = repos.map(({ authors }) => authors).flat();
   const prs = repos
