@@ -12,6 +12,10 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies
 
+  if (isLoggedIn && path === '/') {
+    return NextResponse.redirect(new URL('/quests', request.url));
+  }
+
   // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {
     return NextResponse.redirect(new URL('/welcome', request.url));

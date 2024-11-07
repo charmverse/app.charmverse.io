@@ -32,7 +32,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
             : isClaimToday
               ? 'secondary.main'
               : 'primary.dark',
-        height: 100,
+        height: 90,
         paddingBottom: 0.25,
         borderRadius: 1,
         alignItems: 'center',
@@ -55,7 +55,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
                 <DailyClaimGift variant={variant} size={44} />
               </Stack>
             ) : (
-              <DailyClaimGift variant={variant} size={68} />
+              <DailyClaimGift variant={variant} size={64} />
             )}
           </Stack>
         ) : (
@@ -71,7 +71,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
         )}
         <Stack direction='row' gap={0.5} alignItems='center' zIndex={1} top={7.5} position='relative'>
           <Typography fontWeight={600}>{dailyClaim.isBonus ? '+3' : '+1'}</Typography>
-          <Image src='/images/scout-game-profile-icon.png' alt='Scout game icon' width={18} height={10} />
+          <Image src='/images/scout-game-profile-icon.png' alt='Scout game icon' width={15} height={8.5} />
         </Stack>
       </Stack>
       <Typography
