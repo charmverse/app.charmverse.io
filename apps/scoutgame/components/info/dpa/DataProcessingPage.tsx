@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
 import { DocumentPageContainer } from 'components/common/DocumentPageContainer/DocumentPageContainer';
+import { List, ListItem } from 'components/common/List';
 
 import { InfoPageContainer } from '../components/InfoPageContainer';
 
