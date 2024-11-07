@@ -33,7 +33,7 @@ export async function claimDailyReward({ userId, isBonus }: { userId: string; is
   }
 
   await prisma.$transaction(async (tx) => {
-    await prisma.pointsReceipt.create({
+    await tx.pointsReceipt.create({
       data: {
         recipient: {
           connect: {

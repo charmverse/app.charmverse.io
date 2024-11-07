@@ -4,10 +4,14 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import { useAction } from 'next-safe-action/hooks';
 
+import { completeQuestAction } from 'lib/quests/completeQuestAction';
 import { QuestsRecord, type QuestInfo } from 'lib/quests/getQuests';
 
 export function QuestCard({ quest }: { quest: QuestInfo }) {
+  const { execute, isExecuting } = useAction(completeQuestAction);
+
   return (
     <Stack
       sx={{
@@ -17,14 +21,17 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         gap: 1,
         cursor: !quest.completed ? 'pointer' : 'default',
         zIndex: 1,
-        bgcolor: quest.completed ? 'background.paper' : 'primary.main',
+        bgcolor: quest.completed ? 'background.light' : 'primary.main',
         borderRadius: 1,
         p: 1.5
       }}
       onClick={() => {
-        const link = QuestsRecord[quest.type].link;
-        if (link) {
-          window.open(link, link.startsWith('http') ? '_blank' : '_self');
+        if (!quest.completed && !isExecuting) {
+          execute({ questType: quest.type });
+          const link = QuestsRecord[quest.type].link;
+          if (link) {
+            window.open(link, link.startsWith('http') ? '_blank' : '_self');
+          }
         }
       }}
     >

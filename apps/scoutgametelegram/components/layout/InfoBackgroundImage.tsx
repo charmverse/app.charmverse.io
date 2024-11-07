@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 export function InfoBackgroundImage(props: BoxProps) {
   return (
     <Box
-      height='100vh'
+      height='100%'
       width='100%'
       zIndex={0}
       position='absolute'
