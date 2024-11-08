@@ -18,10 +18,6 @@ export function HomePage({ tab }: { tab: string }) {
       <HeaderMessage />
       <Stack
         sx={{
-          px: {
-            md: 20,
-            xs: 0
-          },
           width: '100%',
           height: 'calc(100vh - 100px)',
           overflowY: 'scroll'
