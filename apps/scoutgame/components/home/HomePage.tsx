@@ -1,4 +1,4 @@
-import { Box, Stack, Typography, Container } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
@@ -16,9 +16,16 @@ export function HomePage({ tab }: { tab: string }) {
   return (
     <>
       <HeaderMessage />
-      <Container
-        sx={{ px: '0 !important', height: 'calc(100vh - 100px)', overflowY: 'scroll' }}
-        maxWidth='xl'
+      <Stack
+        sx={{
+          px: {
+            md: 20,
+            xs: 0
+          },
+          width: '100%',
+          height: 'calc(100vh - 100px)',
+          overflowY: 'scroll'
+        }}
         data-test='home-page'
       >
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
@@ -43,7 +50,7 @@ export function HomePage({ tab }: { tab: string }) {
         <Suspense key={currentTab} fallback={<LoadingTable />}>
           <HomeTab tab={currentTab} />
         </Suspense>
-      </Container>
+      </Stack>
     </>
   );
 }
