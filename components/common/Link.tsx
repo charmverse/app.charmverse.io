@@ -69,6 +69,8 @@ export default function Link({ external, href, onClick, children, color = 'prima
   ) : (
     <StyledMuiLink
       href={getSubdomainPath(href, space ?? currentSpace ?? undefined)}
+      // Enables test to use the link after space is resolved
+      data-test-resolved={Boolean(space || currentSpace)}
       // @ts-ignore
       component={NextLink}
       onClick={onClick}

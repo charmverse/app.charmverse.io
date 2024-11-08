@@ -154,7 +154,7 @@ test.describe('Public pages', async () => {
     await expect(boardTitle).toHaveValue(boardPage?.title);
 
     // 3. Wait for the card, click on it
-    const cardToOpen = page.locator(`data-test=gallery-card-${cardPage.id}`);
+    const cardToOpen = page.locator(`data-test=gallery-card-${cardPage.id}`).and.locator('[data-test-resolved]');
     await expect(cardToOpen).toBeVisible();
 
     await cardToOpen.click();
