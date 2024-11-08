@@ -10,15 +10,11 @@ export async function getFarcasterUserById(fid: number) {
 }
 
 export async function getFarcasterUserByIds(fids: number[]) {
-  const { users } = await http.GET<{ users: FarcasterUser[] }>(
-    `${userApiUrl}?fids=${fids}`,
-    {},
-    {
-      credentials: 'omit',
-      headers: {
-        'X-Api-Key': process.env.NEYNAR_API_KEY as string
-      }
+  const { users } = await http.GET<{ users: FarcasterUser[] }>(`${userApiUrl}?fids=${fids}`, {
+    credentials: 'omit',
+    headers: {
+      'X-Api-Key': process.env.NEYNAR_API_KEY as string
     }
-  );
+  });
   return users;
 }

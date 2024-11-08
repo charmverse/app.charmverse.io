@@ -2,32 +2,40 @@ import fetch from './fetch';
 
 type Params = { [key: string]: any };
 
-export function GET<T = Response>(
-  _requestUrl: string,
-  data: Params = {},
-  {
-    headers = {},
-    timeout = 30000,
-    credentials = 'include'
-  }: { credentials?: RequestCredentials; headers?: any; timeout?: number } = {}
-): Promise<T> {
-  const requestUrl = _appendQuery(_requestUrl, data);
+type HttpConfig = {
+  credentials?: RequestCredentials;
+  headers?: any;
+  addBracketsToArrayValues?: boolean;
+  timeout?: number;
+};
+
+type ParamsOrHttpConfig = Params | HttpConfig;
+
+const httpConfigParams: (keyof HttpConfig)[] = ['credentials', 'headers', 'addBracketsToArrayValues', 'timeout'];
+
+export function GET<T = Response>(_requestUrl: string, params?: ParamsOrHttpConfig, config?: HttpConfig): Promise<T> {
+  // allow passing config as second or 3rd argument
+  if (_isConfigObject(params)) {
+    config = params;
+    params = {};
+  }
+  const requestUrl = _appendQuery(_requestUrl, params || {});
 
   const controller = new AbortController();
   // Getting signal from the controller
   const signal = controller.signal;
 
   // Setting timeout to automatically abort after 30 seconds
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  const timeoutId = setTimeout(() => controller.abort(), config?.timeout || 30000);
 
   return fetch<T>(requestUrl, {
     method: 'GET',
     headers: new Headers({
       Accept: 'application/json',
-      ...headers
+      ...config?.headers
     }),
     signal,
-    credentials
+    credentials: config?.credentials
   }).then((response) => {
     clearTimeout(timeoutId);
     return response;
@@ -108,4 +116,12 @@ function _appendQuery(path: string, data: Params) {
     })
     .join('&');
   return `${path}${queryString ? `?${queryString}` : ''}`;
+}
+
+function _isConfigObject(obj: ParamsOrHttpConfig | undefined): obj is HttpConfig {
+  if (!obj || typeof obj === 'string') {
+    return false;
+  }
+
+  return Object.keys.length > 0 && Object.keys(obj).every((key) => httpConfigParams.includes(key as keyof HttpConfig));
 }
