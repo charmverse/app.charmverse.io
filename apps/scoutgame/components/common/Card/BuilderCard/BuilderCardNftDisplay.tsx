@@ -40,7 +40,7 @@ export function BuilderCardNftDisplay({
   const height = nftDisplaySize[size].height;
 
   return (
-    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark' }}>
+    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
       <CardActionArea
         LinkComponent={Link}
         href={`/u/${path}`}

@@ -2,7 +2,17 @@ import { Button, Stack, Link, Box, Card, CardActionArea, CardMedia, Typography }
 
 import { nftDisplaySize } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
 
-export function AdCard({ src, path }: { src: string; path: string }) {
+export function AdCard({
+  src,
+  path,
+  size
+}: {
+  src: string;
+  path: string;
+  size: 'x-small' | 'small' | 'medium' | 'large';
+}) {
+  const width = nftDisplaySize[size].width;
+  const height = nftDisplaySize[size].height;
   return (
     <Card
       sx={{
@@ -12,12 +22,7 @@ export function AdCard({ src, path }: { src: string; path: string }) {
         margin: '0 auto'
       }}
     >
-      <Box
-        overflow='hidden'
-        width={nftDisplaySize.medium.width}
-        height={nftDisplaySize.medium.height}
-        sx={{ backgroundColor: 'black.dark' }}
-      >
+      <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
         <CardActionArea
           LinkComponent={Link}
           href={path}
@@ -44,7 +49,14 @@ export function AdCard({ src, path }: { src: string; path: string }) {
         </CardActionArea>
       </Box>
       <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-        <Button size='small'>Learn More</Button>
+        <Button
+          sx={{
+            borderRadius: '5px'
+          }}
+          size='small'
+        >
+          Learn More
+        </Button>
       </Stack>
     </Card>
   );
