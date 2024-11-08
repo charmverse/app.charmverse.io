@@ -9,6 +9,7 @@ import { findOrCreateTelegramUser } from '@packages/scoutgame/users/findOrCreate
 import { getUserAvatar } from 'lib/telegram/getUserAvatar';
 import { validateTelegramData } from 'lib/telegram/validate';
 
+import type { SessionUser } from './interfaces';
 import { userActionSchema } from './loadUserActionSchema';
 
 export const loadUser = actionClient
@@ -23,12 +24,8 @@ export const loadUser = actionClient
     if (!validatedData.user?.id) {
       throw new DataNotFoundError('No telegram user id found');
     }
-    const avatar = await getUserAvatar(validatedData.user.id).catch((error) => {
-      log.info('Error getting telegram avatar', { error });
-      return null;
-    });
 
-    const user = await findOrCreateTelegramUser(validatedData.user);
+    const user = (await findOrCreateTelegramUser(validatedData.user)) as unknown as SessionUser;
 
     session.scoutId = user?.id;
     session.anonymousUserId = undefined;

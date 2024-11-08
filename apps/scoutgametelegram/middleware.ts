@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
 const privateLinks: string[] = [];
 
 export async function middleware(request: NextRequest) {
-  const session = { scoutId: '756149e2-3334-4ede-a991-2afefe2ef10a' };
+  const session = await getSession();
   const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies

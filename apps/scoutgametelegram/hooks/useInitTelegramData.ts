@@ -15,7 +15,7 @@ export function useInitTelegramData() {
   const { executeAsync, isExecuting } = useAction(loadUser, {
     onSuccess: async (data) => {
       if (data.data) {
-        await refreshUser();
+        await refreshUser(data.data);
         // @TODO: Enable this when we will have an onboarding page
         // if (data.data?.onboardedAt && data.data?.agreedToTermsAt) {
         //   redirect('/home');
