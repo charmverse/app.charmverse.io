@@ -9,6 +9,8 @@ import type { BuilderInfo } from 'lib/builders/interfaces';
 
 import { PromoCard } from './PromoCard';
 
+const secondPromoInsertIndex = 4;
+
 export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
   const isMdScreen = useMdScreen();
   const isLgScreen = useLgScreen();
@@ -34,6 +36,11 @@ export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
             trackEvent('click_optimism_promo');
           }}
         />,
+        ...builders
+          .slice(0, secondPromoInsertIndex)
+          .map((builder) => (
+            <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
+          )),
         <PromoCard
           data-test='promo-card-moxie'
           key='moxie-fan-reward-ad'
@@ -44,9 +51,11 @@ export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
             trackEvent('click_moxie_promo');
           }}
         />,
-        ...builders.map((builder) => (
-          <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
-        ))
+        ...builders
+          .slice(secondPromoInsertIndex)
+          .map((builder) => (
+            <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
+          ))
       ]}
     </Carousel>
   );
