@@ -4,6 +4,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
+import { StickyFooter } from 'components/layout/StickyFooter';
 import 'theme/styles.scss';
 import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
@@ -77,6 +78,7 @@ export default async function RootLayout({
         <AppProviders user={user}>
           <ClientGlobals userId={user?.id} />
           {children}
+          <StickyFooter />
         </AppProviders>
       </body>
     </html>
