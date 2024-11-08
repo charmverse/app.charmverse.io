@@ -3,7 +3,6 @@
 import { log } from '@charmverse/core/log';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { v4 as uuid } from 'uuid';
-import * as yup from 'yup';
 
 import { actionClient } from '../actions/actionClient';
 
