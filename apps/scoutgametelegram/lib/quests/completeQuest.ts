@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { sendPoints } from '@packages/scoutgame/points/sendPoints';
+import { sendPointsForSocialQuest } from '@packages/scoutgame/points/builderEvents/sendPointsForSocialQuest';
 
 import { QuestsRecord } from './getQuests';
 
@@ -16,21 +16,9 @@ export async function completeQuest(userId: string, questType: string) {
     throw new Error('Quest already completed');
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.scoutSocialQuest.create({
-      data: {
-        type: questType,
-        userId
-      }
-    });
-
-    await sendPoints({
-      builderId: userId,
-      eventType: 'social_quest',
-      points,
-      claimed: true,
-      earnedAs: 'builder',
-      tx
-    });
+  await sendPointsForSocialQuest({
+    builderId: userId,
+    points,
+    type: questType
   });
 }

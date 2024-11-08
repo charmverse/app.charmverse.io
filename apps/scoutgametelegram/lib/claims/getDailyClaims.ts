@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, getDateFromISOWeek, getWeekStartEnd, isToday } from '@packages/scoutgame/dates';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type DailyClaim = {
-  date: Date;
   day: number;
   claimed: boolean;
   isBonus?: boolean;
@@ -10,45 +9,37 @@ export type DailyClaim = {
 
 export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
   const currentWeek = getCurrentWeek();
-  const builderEvents = await prisma.builderEvent.findMany({
+  const dailyClaimEvents = await prisma.scoutDailyClaimEvent.findMany({
     where: {
-      builderId: userId,
-      type: {
-        in: ['daily_claim', 'daily_claim_streak']
-      },
+      userId,
       week: currentWeek
     },
     orderBy: {
-      createdAt: 'desc'
-    },
-    select: {
-      createdAt: true,
-      type: true
+      dayOfWeek: 'asc'
     }
   });
 
-  const weekDate = getDateFromISOWeek(currentWeek);
-  const { start } = getWeekStartEnd(weekDate.toJSDate());
+  const dailyClaimStreakEvent = await prisma.scoutDailyClaimStreakEvent.findFirst({
+    where: {
+      userId,
+      week: currentWeek
+    }
+  });
+
   return new Array(7)
     .fill(null)
     .map((_, index) => {
-      const date = start.plus({ days: index });
-      const builderEvent = builderEvents.find(
-        (_builderEvent) => isToday(_builderEvent.createdAt, date) && _builderEvent.type === 'daily_claim'
-      );
+      const dailyClaimEvent = dailyClaimEvents.find((_dailyClaimEvent) => _dailyClaimEvent.dayOfWeek === index);
+
       const dailyClaimInfo = {
-        date: date.toJSDate(),
-        day: index + 1,
-        claimed: !!builderEvent,
+        day: index,
+        claimed: !!dailyClaimEvent,
         isBonus: false
       };
 
       // For the last day of the week, return 2 claims: one for the daily claim and one for the bonus claim
       if (index === 6) {
-        const bonusBuilderEvent = builderEvents.find(
-          (_builderEvent) => isToday(_builderEvent.createdAt, date) && _builderEvent.type === 'daily_claim_streak'
-        );
-        return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!bonusBuilderEvent, isBonus: true }];
+        return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!dailyClaimStreakEvent, isBonus: true }];
       }
 
       return [dailyClaimInfo];

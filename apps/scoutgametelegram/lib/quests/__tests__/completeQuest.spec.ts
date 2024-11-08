@@ -15,7 +15,7 @@ describe('completeQuest', () => {
     const builder = await mockBuilder();
     await completeQuest(builder.id, 'follow-x-account');
 
-    const quest = await prisma.scoutSocialQuest.findFirst({
+    const quest = await prisma.scoutSocialQuest.findFirstOrThrow({
       where: {
         userId: builder.id,
         type: 'follow-x-account'
@@ -28,6 +28,7 @@ describe('completeQuest', () => {
       where: {
         recipientId: builder.id,
         event: {
+          scoutSocialQuestId: quest.id,
           type: 'social_quest'
         }
       }

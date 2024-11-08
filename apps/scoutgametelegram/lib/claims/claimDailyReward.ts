@@ -1,54 +1,55 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentWeek, getDateFromISOWeek, getWeekStartEnd, isToday } from '@packages/scoutgame/dates';
-import { sendPoints } from '@packages/scoutgame/points/sendPoints';
+import { getCurrentWeek } from '@packages/scoutgame/dates';
+import { sendPointsForDailyClaim } from '@packages/scoutgame/points/builderEvents/sendPointsForDailyClaim';
+import { sendPointsForDailyClaimStreak } from '@packages/scoutgame/points/builderEvents/sendPointsForDailyClaimStreak';
 import { DateTime } from 'luxon';
 
 export async function claimDailyReward({
   userId,
   isBonus,
-  currentDate = DateTime.utc()
+  dayOfWeek
 }: {
   userId: string;
   isBonus?: boolean;
-  currentDate?: DateTime;
+  dayOfWeek: number;
 }) {
-  const currentWeek = getCurrentWeek();
-  const weekDate = getDateFromISOWeek(currentWeek);
-  const { end } = getWeekStartEnd(weekDate.toJSDate());
-  const isWeekEndDate = isToday(end.toJSDate(), currentDate);
-
-  if (!isWeekEndDate && isBonus) {
+  if (dayOfWeek !== 6 && isBonus) {
     throw new Error('Bonus reward can only be claimed on the last day of the week');
   }
 
-  const eventType = isBonus ? 'daily_claim_streak' : 'daily_claim';
-  const eventPoints = isBonus ? 3 : 1;
-
-  const existingDailyClaim = await prisma.pointsReceipt.findFirst({
-    where: {
-      recipientId: userId,
-      event: {
-        type: eventType,
+  if (isBonus) {
+    const existingEvent = await prisma.scoutDailyClaimStreakEvent.findFirst({
+      where: {
+        userId,
         week: getCurrentWeek()
-      },
-      createdAt: {
-        gte: DateTime.utc().startOf('day').toJSDate(),
-        lte: DateTime.utc().endOf('day').toJSDate()
       }
-    },
-    select: undefined
-  });
+    });
 
-  if (existingDailyClaim) {
-    throw new Error('Daily reward already claimed today');
+    if (existingEvent) {
+      throw new Error('Daily reward streak already claimed');
+    }
+
+    await sendPointsForDailyClaimStreak({
+      builderId: userId,
+      points: 3
+    });
+  } else {
+    const existingEvent = await prisma.scoutDailyClaimEvent.findFirst({
+      where: {
+        userId,
+        week: getCurrentWeek(),
+        dayOfWeek
+      }
+    });
+
+    if (existingEvent) {
+      throw new Error('Daily reward already claimed');
+    }
+
+    await sendPointsForDailyClaim({
+      builderId: userId,
+      points: 1,
+      dayOfWeek
+    });
   }
-
-  await sendPoints({
-    builderId: userId,
-    eventType,
-    points: eventPoints,
-    claimed: true,
-    earnedAs: 'builder',
-    currentDate: currentDate.toJSDate()
-  });
 }

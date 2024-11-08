@@ -10,6 +10,10 @@ import { claimDailyRewardSchema } from './claimDailyRewardSchema';
 export const claimDailyRewardAction = authActionClient
   .schema(claimDailyRewardSchema)
   .action(async ({ parsedInput, ctx }) => {
-    await claimDailyReward({ userId: ctx.session.scoutId, isBonus: parsedInput.isBonus });
+    await claimDailyReward({
+      userId: ctx.session.scoutId,
+      isBonus: parsedInput.isBonus,
+      dayOfWeek: parsedInput.dayOfWeek
+    });
     revalidatePath('/quests');
   });

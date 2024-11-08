@@ -1,4 +1,4 @@
-import { getLastWeek, getWeekStartEnd } from '@packages/scoutgame/dates';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockBuilderEvent } from '@packages/scoutgame/testing/database';
 
 import { claimDailyReward } from '../claimDailyReward';
@@ -8,7 +8,7 @@ describe('getDailyClaims', () => {
   it('should return the daily claims', async () => {
     const builder = await mockBuilder();
     const builder2 = await mockBuilder();
-    const { start, end } = getWeekStartEnd(new Date());
+    const userId = builder.id;
 
     // Mock a daily commit event
     mockBuilderEvent({
@@ -30,24 +30,30 @@ describe('getDailyClaims', () => {
     });
 
     await claimDailyReward({
-      userId: builder.id,
-      currentDate: start,
+      userId,
+      dayOfWeek: 0,
       isBonus: false
     });
 
     await claimDailyReward({
-      userId: builder.id,
-      currentDate: end,
+      userId,
+      dayOfWeek: 6,
+      isBonus: false
+    });
+
+    await claimDailyReward({
+      userId,
+      dayOfWeek: 6,
       isBonus: true
     });
 
-    const userId = builder.id;
     const claims = await getDailyClaims(userId);
     expect(claims).toHaveLength(8);
     const claimedEvents = claims.filter((claim) => claim.claimed);
     expect(claimedEvents.map((claim) => ({ day: claim.day, isBonus: claim.isBonus }))).toEqual([
-      { day: 1, isBonus: false },
-      { day: 7, isBonus: true }
+      { day: 0, isBonus: false },
+      { day: 6, isBonus: false },
+      { day: 6, isBonus: true }
     ]);
   });
 });
