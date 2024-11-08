@@ -223,7 +223,6 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
             paddingRight: 2,
             paddingLeft: 2,
             // fontSize: '0.9rem',
-            fontWeight: '600',
             color: theme.palette.secondary.main,
             borderStyle: 'solid',
             borderWidth: '1px',
@@ -237,10 +236,14 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
       ],
       styleOverrides: {
         root: {
-          borderRadius: 10,
+          borderRadius: '8px',
           fontWeight: 600,
           fontSize: '1rem',
-          textTransform: 'none'
+          textTransform: 'none',
+          paddingTop: 3,
+          paddingBottom: 3,
+          paddingRight: 3,
+          paddingLeft: 3
         }
       }
     },

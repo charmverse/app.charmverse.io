@@ -5,11 +5,10 @@ import { Suspense } from 'react';
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
-import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
-import { HomeTabsMenu } from 'components/home/components/HomePageTable/components/HomeTabsMenu';
 
-import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
+import { HomeTabsMenu, homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
+import { TodaysHotBuildersCarousel } from './components/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 
 export function HomePage({ tab }: { tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
