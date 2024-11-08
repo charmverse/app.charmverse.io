@@ -369,7 +369,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     <a
                       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
                       draggable="false"
-                      href="/test-space/1"
+                      href="/1"
                     >
                       <div
                         class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -416,7 +416,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     <a
                       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
                       draggable="false"
-                      href="/test-space/2"
+                      href="/2"
                     >
                       <div
                         class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -1663,7 +1663,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     <a
                       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
                       draggable="false"
-                      href="/test-space/1"
+                      href="/1"
                     >
                       <div
                         class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -1710,7 +1710,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     <a
                       class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
                       draggable="false"
-                      href="/test-space/2"
+                      href="/2"
                     >
                       <div
                         class="KanbanCard MuiBox-root css-1ck4zfx"

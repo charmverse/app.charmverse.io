@@ -206,7 +206,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id1"
+              href="/id1"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -253,7 +253,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id2"
+              href="/id2"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -330,7 +330,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id3"
+              href="/id3"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -642,7 +642,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id1"
+              href="/id1"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -689,7 +689,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id2"
+              href="/id2"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
@@ -766,7 +766,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/id3"
+              href="/id3"
             >
               <div
                 class="KanbanCard MuiBox-root css-1ck4zfx"
