@@ -1,6 +1,7 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+
+import { getSession } from 'lib/session/getSession';
 
 // Everything is private
 const privateLinks: string[] = [];
