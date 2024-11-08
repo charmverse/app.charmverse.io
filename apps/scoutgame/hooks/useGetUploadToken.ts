@@ -1,4 +1,4 @@
-import { useGETtrigger } from './api/helpers';
+import { useGETtrigger } from '@packages/scoutgame/hooks/helpers';
 
 export function useGetUploadToken() {
   return useGETtrigger<

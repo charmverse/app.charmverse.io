@@ -84,7 +84,7 @@ export async function recordMergedPullRequest({
 
   if (existingGithubEvent) {
     // already processed
-    return;
+    return { githubEvent: null, builderEvent: null };
   }
 
   // check our data to see if this is the first merged PR in a repo in the last 7 days, and if so, check the Github API to confirm
@@ -131,7 +131,7 @@ export async function recordMergedPullRequest({
     return isToday(event.createdAt, DateTime.fromISO(pullRequest.createdAt, { zone: 'utc' }));
   });
 
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
       where: {
         id: pullRequest.author.id
@@ -220,7 +220,7 @@ export async function recordMergedPullRequest({
             new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
           );
 
-          await tx.builderEvent.create({
+          const builderEvent = await tx.builderEvent.create({
             data: {
               builderId: githubUser.builderId,
               createdAt: builderEventDate,
@@ -256,15 +256,10 @@ export async function recordMergedPullRequest({
               }
             }
           });
+          return { builderEvent, githubEvent: event };
         }
-
-        log.info('Recorded a merged PR', {
-          eventId: event.id,
-          userId: githubUser.builderId,
-          week,
-          url: pullRequest.url
-        });
       }
     }
+    return { builderEvent: null, githubEvent: event };
   });
 }

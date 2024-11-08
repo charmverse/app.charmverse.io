@@ -23,23 +23,23 @@ export function PublicBuilderStats({
         THIS SEASON (ALL TIME)
       </Typography>
       <Stack flexDirection='row' gap={1} alignItems='center'>
-        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='green.main'>
+        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='orange.main'>
           {seasonPoints || 0}
         </Typography>
-        <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout game icon' />
-        <Typography fontWeight={500} variant={isDesktop ? 'h6' : 'body1'} color='green.main'>
+        <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout game icon' />
+        <Typography fontWeight={500} variant={isDesktop ? 'h6' : 'body1'} color='orange.main'>
           ({allTimePoints || 0})
         </Typography>
       </Stack>
-      <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='green.main'>
+      <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='orange.main'>
         {totalScouts || 0} Scouts
       </Typography>
       <Stack flexDirection='row' gap={1} alignItems='center'>
-        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='green.main'>
+        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='orange.main'>
           {totalNftsSold || 0}
         </Typography>
-        <Image src='/images/profile/icons/nft-green-icon.svg' width='25' height='25' alt='nft icon' />
-        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='green.main'>
+        <Image src='/images/profile/icons/cards-orange.svg' width='20' height='20' alt='cards icon' />
+        <Typography fontWeight={500} variant={isDesktop ? 'h5' : 'h6'} color='orange.main'>
           Sold
         </Typography>
       </Stack>

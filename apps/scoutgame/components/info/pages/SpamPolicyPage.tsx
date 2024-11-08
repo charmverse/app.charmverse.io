@@ -2,7 +2,7 @@ import { Typography } from '@mui/material';
 import Link from 'next/link';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 
 import { InfoPageContainer } from '../components/InfoPageContainer';
 

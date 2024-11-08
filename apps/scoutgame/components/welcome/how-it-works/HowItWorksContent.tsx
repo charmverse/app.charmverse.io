@@ -5,8 +5,11 @@ import Link from 'next/link';
 import React from 'react';
 
 import { PointsIcon } from 'components/common/Icons';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React.MouseEventHandler }) {
+  const isMdScreen = useMdScreen();
+  const iconSize = isMdScreen ? 24 : 18;
   return (
     <>
       <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>
@@ -17,7 +20,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
           <ListItemAvatar>
             <img src='/images/number_icon_1.png' alt='1' />
           </ListItemAvatar>
-          <Typography>
+          <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
             <strong>Discover builders who are contributing to cool onchain projects.</strong> Choose from the Hot
             Builders section or explore the Scout page to find hidden gems.
           </Typography>
@@ -27,7 +30,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
             <img src='/images/number_icon_2.png' alt='2' />
           </ListItemAvatar>
           <Stack display='flex' gap={2}>
-            <Typography>
+            <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
               <strong>
                 Scout them by buying their Builder Cards with{' '}
                 <Typography
@@ -37,7 +40,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
                   fontWeight='inherit'
                   style={{ display: 'inline-flex', gap: 4 }}
                 >
-                  points <PointsIcon color='blue' size={24} />
+                  points <PointsIcon color='blue' size={iconSize} />
                 </Typography>
               </strong>{' '}
               or <strong>ETH / USDC</strong> on
@@ -55,7 +58,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
           <ListItemAvatar>
             <img src='/images/number_icon_3.png' alt='3' />
           </ListItemAvatar>
-          <Typography>
+          <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
             <strong>
               Watch your{' '}
               <Typography
@@ -65,7 +68,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
                 fontWeight='inherit'
                 style={{ display: 'inline-flex', gap: 4 }}
               >
-                points <PointsIcon color='blue' size={24} />
+                points <PointsIcon color='blue' size={iconSize} />
               </Typography>
               {'  '}
               increase

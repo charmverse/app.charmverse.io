@@ -25,12 +25,12 @@ export type BuilderInfo = {
 };
 
 function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
-  const repoCount = faker.number.int({ min: 3, max: 5 });
+  const repoCount = faker.number.int({ min: 0, max: 3 });
   return faker.helpers.arrayElements(githubRepos, repoCount);
 }
 
 function assignBuildersToScout(builders: BuilderInfo[]) {
-  const builderCount = faker.number.int({ min: 3, max: 5 });
+  const builderCount = faker.number.int({ min: 0, max: 5 });
   return faker.helpers.arrayElements(
     builders.filter((builder) => builder.builderNftId),
     builderCount
@@ -43,8 +43,8 @@ type MinMaxRange = {
 }
 
 const defaultBuildersRange: MinMaxRange = {
-  min: 50,
-  max: 100
+  min: 10,
+  max: 20
 };
 
 /**
@@ -54,13 +54,11 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
   // Total number of users that are builders (should be less than totalUsers)
   const totalBuilders = faker.number.int(buildersRange);
   // Total number of github repos
-  const totalGithubRepos = faker.number.int({ min: 25, max: 50 });
+  const totalGithubRepos = faker.number.int({ min: 5, max: 10 });
 
-  const totalScoutBuilders = faker.number.int({ min: 5, max: 15 });
+  const totalScouts = faker.number.int({ min: 10, max: 20 });
 
-  const totalScouts = faker.number.int({ min: 50, max: 100 });
-
-  const totalUsers = totalBuilders + totalScouts + totalScoutBuilders;
+  const totalUsers = totalBuilders + totalScouts;
 
   const [githubRepos, repoPRCounters] = await generateGithubRepos(totalGithubRepos);
 
@@ -70,7 +68,7 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
   let totalGithubEvents = 0;
   let totalNftsPurchasedEvents = 0;
 
-  const builderPromises = Array.from({ length: totalBuilders + totalScoutBuilders }, async (_, i) => {
+  const builderPromises = Array.from({ length: totalBuilders }, async (_, i) => {
     const { githubUser, builder, builderNft } = await generateBuilder({ index: i });
     const assignedRepos = assignReposToBuilder(githubRepos);
     const isScout = i >= totalBuilders;
@@ -140,26 +138,27 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
     const date = startDate.plus({ days: i });
     const week = getWeekFromDate(date.toJSDate());
 
-    for (const builder of builders) {
-      const dailyGithubEvents = await generateBuilderEvents({
-        builderId: builder.id,
-        githubUser: builder.githubUser,
-        githubRepos: builder.assignedRepos,
-        repoPRCounters,
-        date
-      });
-      totalGithubEvents += dailyGithubEvents;
-    }
+    await Promise.all(
+      builders.map(async (builder) => {
+        const dailyGithubEvents = await generateBuilderEvents({
+          builderId: builder.id,
+          githubUser: builder.githubUser,
+          githubRepos: builder.assignedRepos,
+          repoPRCounters,
+          date
+        });
+        totalGithubEvents += dailyGithubEvents;
+      })
+    );
 
-    for (const scout of scouts) {
-      // Do not purchase your own nft
-      const dailyNftsPurchased = await generateNftPurchaseEvents(
-        scout.id,
-        scout.assignedBuilders.filter((builder) => builder.id !== scout.id),
-        date
-      );
-      totalNftsPurchasedEvents += dailyNftsPurchased;
-    }
+    await Promise.all(
+      scouts.map(async (scout) => {
+        // Do not purchase your own nft
+        const nfts = scout.assignedBuilders.filter((builder) => builder.id !== scout.id);
+        const dailyNftsPurchased = await generateNftPurchaseEvents(scout.id, nfts, date);
+        totalNftsPurchasedEvents += dailyNftsPurchased;
+      })
+    );
 
     await updateBuilderCardActivity(date.minus({ days: 1 }));
 
@@ -205,7 +204,6 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
   log.info('generated seed data', {
     totalUsers,
     totalBuilders,
-    totalScoutBuilders,
     totalScouts,
     totalGithubRepos: githubRepos.length,
     totalGithubEvents,

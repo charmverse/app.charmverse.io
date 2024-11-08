@@ -2,7 +2,7 @@
 
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen, useSmScreen } from 'hooks/useMediaScreens';
@@ -12,6 +12,7 @@ import { LoadingCards } from '../Loading/LoadingCards';
 import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
+import 'swiper/css/autoplay';
 
 export type CarouselProps = {
   children: React.ReactNode[];
@@ -37,10 +38,15 @@ export function Carousel({ children }: CarouselProps) {
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
       <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
+          autoplay={{
+            delay: 3000,
+            pauseOnMouseEnter: true
+          }}
+          loop
           className='swiper'
           slidesPerView={slidesPerView}
           autoHeight={true}
-          modules={[Navigation]}
+          modules={[Navigation, Autoplay]}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev'

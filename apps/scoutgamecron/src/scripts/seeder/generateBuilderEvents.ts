@@ -18,9 +18,9 @@ async function processBuilderActivity({
   pullRequests
 }: {
   builderId: string;
-  date: DateTime,
-  season: Season,
-  pullRequests: PullRequest[],
+  date: DateTime;
+  season: Season;
+  pullRequests: PullRequest[];
 }) {
   const week = getWeekFromDate(date.toJSDate());
 
@@ -84,29 +84,30 @@ async function processBuilderActivity({
       gemsCollected
     }
   });
-  log.debug(`Processed activity for builder`, {
-    userId: builderId,
-    week,
-    eventsWithWeek: thisWeekEvents.length,
-    gemsCollected
-  });
+  // log.debug(`Seeded activity for builder`, {
+  //   userId: builderId,
+  //   week,
+  //   eventsWithWeek: thisWeekEvents.length,
+  //   gemsCollected
+  // });
 }
 
-export async function generateBuilderEvents(
-  {
-    builderId,
-    date,
-    githubUser,
-    githubRepos,
-    repoPRCounters
-  }: {
-    builderId: string,
-    githubUser: Pick<GithubUser, 'id' | 'login'>,
-    githubRepos: GithubRepo[],
-    repoPRCounters: Map<number, number>,
-    date: DateTime
+export async function generateBuilderEvents({
+  builderId,
+  date,
+  githubUser,
+  githubRepos,
+  repoPRCounters
+}: {
+  builderId: string;
+  githubUser: Pick<GithubUser, 'id' | 'login'>;
+  githubRepos: GithubRepo[];
+  repoPRCounters: Map<number, number>;
+  date: DateTime;
+}) {
+  if (githubRepos.length === 0) {
+    return 0;
   }
-) {
   const builderPullRequests: PullRequest[] = [];
   const dailyGithubEvents = faker.number.int({ min: 0, max: 3 });
   for (let eventsCounter = 0; eventsCounter < dailyGithubEvents; eventsCounter++) {

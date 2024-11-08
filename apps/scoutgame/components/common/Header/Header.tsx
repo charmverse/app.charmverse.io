@@ -44,6 +44,7 @@ export function Header() {
     <AppBar
       position='static'
       sx={{
+        zIndex: 1,
         height: 58,
         backgroundColor: { xs: 'transparent', md: 'var(--mui-palette-AppBar-darkBg, var(--AppBar-background))' }
       }}

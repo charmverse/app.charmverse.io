@@ -121,7 +121,10 @@ export function WarpcastLoginButton() {
         data-test='sign-in-with-warpcast'
       >
         <Stack direction='row' alignItems='center' gap={1} justifyContent='flex-start' width='100%'>
-          <WarpcastIcon size='20px' />
+          {/** 24px is the size of the wallet button icon */}
+          <Box height='24px' width='24px' display='flex' alignItems='center' justifyContent='center'>
+            <WarpcastIcon size='20px' />
+          </Box>
           <Typography fontWeight={600} color='white'>
             Sign in with Warpcast
           </Typography>

@@ -74,29 +74,29 @@ export function ProfileStats({
         </Tabs>
         <Stack flexDirection='row' gap={2} justifyContent='space-between' px={1}>
           <Stack alignItems='center' gap={0.5}>
-            <Typography color='green.main' variant='subtitle2' fontWeight={500}>
-              BUILDING
-            </Typography>
-            <Stack flexDirection='row' gap={1} alignItems='center'>
-              <Typography variant='h4' color='green.main' fontWeight={400}>
-                {selectedDuration === 'season'
-                  ? seasonPoints?.pointsEarnedAsBuilder || 0
-                  : allTimePoints?.pointsEarnedAsBuilder || 0}
-              </Typography>
-              <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='build icon' />
-            </Stack>
-          </Stack>
-          <Stack alignItems='center' gap={0.5}>
             <Typography color='orange.main' variant='subtitle2' fontWeight={500}>
-              SCOUTING
+              BUILDING
             </Typography>
             <Stack flexDirection='row' gap={1} alignItems='center'>
               <Typography variant='h4' color='orange.main' fontWeight={400}>
                 {selectedDuration === 'season'
+                  ? seasonPoints?.pointsEarnedAsBuilder || 0
+                  : allTimePoints?.pointsEarnedAsBuilder || 0}
+              </Typography>
+              <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='build icon' />
+            </Stack>
+          </Stack>
+          <Stack alignItems='center' gap={0.5}>
+            <Typography color='green.main' variant='subtitle2' fontWeight={500}>
+              SCOUTING
+            </Typography>
+            <Stack flexDirection='row' gap={1} alignItems='center'>
+              <Typography variant='h4' color='green.main' fontWeight={400}>
+                {selectedDuration === 'season'
                   ? seasonPoints?.pointsEarnedAsScout || 0
                   : allTimePoints?.pointsEarnedAsScout || 0}
               </Typography>
-              <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout icon' />
+              <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout icon' />
             </Stack>
           </Stack>
         </Stack>

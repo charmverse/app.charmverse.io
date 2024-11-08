@@ -1,38 +1,50 @@
-import { Box, Stack, Typography, Container } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
-import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
-import { HomeTabsMenu } from 'components/home/components/HomePageTable/components/HomeTabsMenu';
 
-import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
+import { HomeTabsMenu, homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
+import { TodaysHotBuildersCarousel } from './components/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 
 export function HomePage({ tab }: { tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>
       <HeaderMessage />
-      <Container sx={{ px: '0 !important' }} maxWidth='xl' data-test='home-page'>
+      <Stack
+        sx={{
+          width: '100%',
+          height: 'calc(100vh - 100px)',
+          overflowY: 'scroll'
+        }}
+      >
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
           <Image src='/images/profile/icons/blue-fire-icon.svg' width='30' height='30' alt='title icon' />
           <Typography variant='h5' textAlign='center'>
             Scout Today's HOT Builders
           </Typography>
         </Stack>
-        <Suspense key={currentTab} fallback={<LoadingCards />}>
+        <Suspense key='todays-hot-builders' fallback={<LoadingCards />}>
           <TodaysHotBuildersCarousel />
         </Suspense>
-        <HomeTabsMenu tab={currentTab} />
-        <Box px={{ xs: 1, md: 0 }} mb={2} maxHeight={{ md: '400px' }} overflow='auto'>
-          <Suspense key={currentTab} fallback={<LoadingTable />}>
-            <HomeTab tab={currentTab} />
-          </Suspense>
+        <Box
+          sx={{
+            position: 'sticky',
+            top: 0,
+            backgroundColor: 'background.default',
+            zIndex: 1000
+          }}
+        >
+          <HomeTabsMenu tab={currentTab} />
         </Box>
-      </Container>
+        <Suspense key={currentTab} fallback={<LoadingTable />}>
+          <HomeTab tab={currentTab} />
+        </Suspense>
+      </Stack>
     </>
   );
 }

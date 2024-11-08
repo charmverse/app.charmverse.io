@@ -28,13 +28,13 @@ import {
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
 
-import { ExportButton } from 'components/common/ExportButton';
+import { FileDownloadButton } from 'components/common/FileDownloadButton';
 import { useSearchUsers } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
 
-import { AddUserButton } from './AddUserButton/AddUserButton';
-import { UserActionButton } from './UserActionButton/UserActionButton';
+import { AddUserButton } from './components/AddUserButton/AddUserButton';
+import { UserActionButton } from './components/UserActions/UserActionButton';
 
 export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');
@@ -45,6 +45,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const {
     data: filteredUsers,
     isValidating,
+    mutate: refreshUsers,
     isLoading
   } = useSearchUsers({ searchString: debouncedFilterString, sortField, sortOrder });
   const showFilteredResults = Boolean(debouncedFilterString || filteredUsers || isValidating || isLoading);
@@ -107,9 +108,9 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }} startIcon={<AddIcon />}>
             Add
           </AddUserButton>
-          <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
+          <FileDownloadButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
             Export
-          </ExportButton>
+          </FileDownloadButton>
         </Box>
       </Stack>
       <TableContainer component={Paper}>
@@ -188,7 +189,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
                   {!user?.builderStatus && <Typography color='secondary'>&ndash;</Typography>}
                 </TableCell>
                 <TableCell align='center'>
-                  <UserActionButton user={user} />
+                  <UserActionButton user={user} onChange={refreshUsers} />
                 </TableCell>
               </TableRow>
             ))}

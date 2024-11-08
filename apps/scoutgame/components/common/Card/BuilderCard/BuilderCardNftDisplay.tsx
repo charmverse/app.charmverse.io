@@ -2,7 +2,7 @@ import { CardActionArea, CardMedia, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
 // Maintain a 3:4 aspect ratio for the NFT display
-const nftDisplaySize = {
+export const nftDisplaySize = {
   'x-small': {
     width: 140,
     height: 186
@@ -40,7 +40,7 @@ export function BuilderCardNftDisplay({
   const height = nftDisplaySize[size].height;
 
   return (
-    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark' }}>
+    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
       <CardActionArea
         LinkComponent={Link}
         href={`/u/${path}`}

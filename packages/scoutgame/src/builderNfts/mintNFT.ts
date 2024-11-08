@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
-import { recordNftMintAndRefreshPrice } from './recordNftMint';
+import { recordNftMint } from './recordNftMint';
 
 export type MintNFTParams = {
   builderNftId: string;
@@ -13,7 +13,7 @@ export type MintNFTParams = {
 };
 
 export async function mintNFT(params: MintNFTParams) {
-  const { builderNftId, recipientAddress, amount, scoutId, pointsValue, paidWithPoints } = params;
+  const { builderNftId, recipientAddress, amount, scoutId } = params;
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       id: builderNftId
@@ -31,5 +31,5 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
 
-  await recordNftMintAndRefreshPrice({ ...params, mintTxHash: txResult.transactionHash });
+  await recordNftMint({ ...params, mintTxHash: txResult.transactionHash });
 }

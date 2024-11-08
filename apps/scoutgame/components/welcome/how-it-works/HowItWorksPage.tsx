@@ -1,6 +1,3 @@
-import { Button, List, ListItem, Typography } from '@mui/material';
-import Link from 'next/link';
-
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';

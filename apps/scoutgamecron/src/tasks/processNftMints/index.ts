@@ -29,6 +29,12 @@ export async function processNftMints() {
     const pendingTx = pending[i];
 
     try {
+      log.info(`Processing ${i + 1}/${totalPendingTxs} pending txs`, {
+        pendingTransactionId: pendingTx.id,
+        builderId: pendingTx.tokenId,
+        sourceChainTxHash: pendingTx.sourceChainTxHash,
+        scoutId: pendingTx.userId
+      });
       await handlePendingTransaction({ pendingTransactionId: pendingTx.id });
 
       log.info(`Processed ${i + 1}/${totalPendingTxs} pending txs`);
