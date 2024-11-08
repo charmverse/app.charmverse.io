@@ -148,7 +148,7 @@ export class DatabasePage extends GlobalPage {
   }
 
   getTableRowOpenLocator(cardId: string) {
-    return this.page.locator(`data-test=database-open-button-${cardId}`).and(page.locator('[data-test-resolved]'));
+    return this.page.locator(`data-test=database-open-button-${cardId}`).and(this.page.locator('[data-test-resolved]'));
   }
 
   async waitForBlocksUpdate() {
