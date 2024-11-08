@@ -45,7 +45,7 @@ export async function createOrGetUserProfile({
   };
 
   const attestationUid = await attestOnchain({
-    schemaId: scoutGameUserProfileSchemaUid,
+    schemaId: scoutGameUserProfileSchemaUid(),
     data: encodeScoutGameUserProfileAttestation(data)
   });
 

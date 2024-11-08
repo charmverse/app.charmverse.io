@@ -56,8 +56,6 @@ addTask('/send-push-notifications', sendNotifications);
 
 addTask('/process-gems-payout', processGemsPayout);
 
-addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
-
 addTask('/process-nft-mints', processNftMints);
 
 addTask('/update-mixpanel-user-profiles', updateMixpanelUserProfilesTask);
@@ -70,7 +68,11 @@ addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
 
+// Onchain tasks
+addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
+
 addTask('/issue-gems-onchain', issueGemsOnchain);
+
 // Standard health check used by Beanstalk
 router.get('/api/health', middleware.healthCheck);
 

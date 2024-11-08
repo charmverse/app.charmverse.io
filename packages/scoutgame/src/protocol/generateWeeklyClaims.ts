@@ -10,6 +10,8 @@ import { currentSeason } from '../dates';
 import { dividePointsBetweenBuilderAndScouts } from '../points/dividePointsBetweenBuilderAndScouts';
 import { getWeeklyPointsPoolAndBuilders } from '../points/getWeeklyPointsPoolAndBuilders';
 
+import { protocolImplementationWriteClient } from './clients/protocolWriteClients';
+
 type ProvableClaimWithUserId = ProvableClaim & {
   userId: string;
 };
@@ -183,6 +185,13 @@ export async function generateWeeklyClaims({
     leaves: claims,
     leavesWithUserId: claimsWithUserId
   };
+
+  await protocolImplementationWriteClient.setMerkleRoot({
+    args: {
+      merkleRoot: rootHash,
+      week
+    }
+  });
 
   const [weeklyClaim] = await prisma.$transaction([
     prisma.weeklyClaims.create({

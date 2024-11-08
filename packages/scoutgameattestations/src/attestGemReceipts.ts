@@ -81,7 +81,7 @@ export async function attestGemReceipts(): Promise<void> {
   }
 
   const onchainProfileAttestationUids = await multiAttestOnchain({
-    schemaId: scoutGameUserProfileSchemaUid,
+    schemaId: scoutGameUserProfileSchemaUid(),
     records: missingProfileInputs
   });
 
@@ -177,7 +177,7 @@ export async function attestGemReceipts(): Promise<void> {
   }));
 
   await multiAttestOnchain({
-    schemaId: scoutGameContributionReceiptSchemaUid,
+    schemaId: scoutGameContributionReceiptSchemaUid(),
     records: attestationInputs,
     onAttestSuccess: async ({ attestationUid, index }) => {
       const event = gemReceiptsWithoutAttestion[index];
