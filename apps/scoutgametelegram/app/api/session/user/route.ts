@@ -1,4 +1,3 @@
-import type { SessionOptions } from 'iron-session';
 import { NextResponse } from 'next/server';
 
 import { getUserFromSession } from 'lib/session/getUserFromSession';
