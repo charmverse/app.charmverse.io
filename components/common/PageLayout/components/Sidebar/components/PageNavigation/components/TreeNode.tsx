@@ -206,7 +206,7 @@ function DraggableTreeNode({
               !view.fields.inline && (
                 <BoardViewTreeItem
                   key={view.id}
-                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  href={`/${item.path}?viewId=${view.id}`}
                   label={view.title || formatViewTitle(view)}
                   itemId={view.id}
                   viewType={view.fields.viewType}
@@ -221,7 +221,6 @@ function DraggableTreeNode({
           <MemoizedTreeNode
             onDropAdjacent={onDropAdjacent}
             onDropChild={onDropChild}
-            pathPrefix={pathPrefix}
             key={childItem.id}
             item={childItem}
             addPage={addPage}

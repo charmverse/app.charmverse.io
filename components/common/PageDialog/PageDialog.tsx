@@ -71,7 +71,7 @@ function PageDialogBase(props: Props) {
         spaceId: page.spaceId,
         pageId: page.id,
         type: page.type,
-        spaceDomain: domain,
+        spaceDomain: space.domain,
         spaceCustomDomain: space.customDomain
       });
       if (space.domain === 'op-grants') {
