@@ -1,6 +1,7 @@
 'use client';
 
-import { Dialog, Stack, Typography } from '@mui/material';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { Dialog, IconButton, Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
@@ -20,6 +21,9 @@ export function PointsClaimBuilderScreen({
   const currentWeek = getCurrentSeasonWeekNumber();
   return (
     <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+      <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
+        <CancelOutlinedIcon color='primary' />
+      </IconButton>
       <Stack position='relative' width={600} height={600}>
         <Image
           style={{
