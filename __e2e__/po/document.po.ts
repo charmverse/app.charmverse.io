@@ -80,7 +80,9 @@ export class DocumentPage extends GlobalPage {
     this.proposalBanner = this.rootSelector.locator('data-test=proposal-banner');
     this.documentTitle = this.rootSelector.locator(`data-test=editor-page-title`);
     this.documentTitleInput = this.rootSelector.locator(`data-test=editor-page-title >> textarea`).first();
-    this.openAsPageButton = this.rootSelector.locator('data-test=open-as-page').and.locator('[data-test-resolved]');
+    this.openAsPageButton = this.rootSelector
+      .locator('data-test=open-as-page')
+      .and(this.page.locator('[data-test-resolved]'));
     this.joinSpaceButton = this.rootSelector.locator('data-test=public-bounty-space-action');
     this.cardDetailProperties = this.rootSelector.locator('data-test=card-detail-properties');
     this.addCustomPropertyButton = this.rootSelector.locator('data-test=add-custom-property');
