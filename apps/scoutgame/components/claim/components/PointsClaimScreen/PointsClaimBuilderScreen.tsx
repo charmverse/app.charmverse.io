@@ -5,6 +5,8 @@ import { Dialog, IconButton, Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
+import { PointsClaimSocialShare } from './PointsClaimSocialShare';
+
 export function PointsClaimBuilderScreen({
   showModal,
   handleCloseModal,
@@ -74,6 +76,7 @@ export function PointsClaimBuilderScreen({
           </Stack>
         </Stack>
       </Stack>
+      <PointsClaimSocialShare />
     </Dialog>
   );
 }
