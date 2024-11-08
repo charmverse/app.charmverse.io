@@ -1,4 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { log } from '@charmverse/core/log';
 import WebApp from '@twa-dev/sdk';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
@@ -22,6 +23,9 @@ export function useInitTelegramData() {
         //   redirect('/welcome/onboarding');
         // }
       }
+    },
+    onError: (error) => {
+      log.error('Error loading user', { error: error.error.serverError });
     }
   });
 
