@@ -1,18 +1,14 @@
 import { redirect } from 'next/navigation';
 
-import { WelcomePage } from 'components/welcome/WelcomePage';
+import { OnboardingPage } from 'components/welcome/onboarding/OnboardingPage';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
 
-export default async function Welcome() {
+export default async function Onboarding() {
   const user = await getUserFromSession();
 
   if (user?.onboardedAt && user?.agreedToTermsAt) {
     redirect('/quests');
   }
 
-  if (!user?.agreedToTermsAt && !user?.onboardedAt) {
-    redirect('/welcome/onboarding');
-  }
-
-  return <WelcomePage />;
+  return <OnboardingPage />;
 }

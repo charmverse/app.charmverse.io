@@ -1,11 +1,11 @@
 import { InfoPageContainer } from 'components/layout/InfoPageContainer';
 
-import { HowItWorksContent } from './HowItWorksContent';
+import { OnboardingForm } from './OnboardingForm';
 
-export function HowItWorksPage() {
+export function OnboardingPage() {
   return (
     <InfoPageContainer>
-      <HowItWorksContent />
+      <OnboardingForm />
     </InfoPageContainer>
   );
 }

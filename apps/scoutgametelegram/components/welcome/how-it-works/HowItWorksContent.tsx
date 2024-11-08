@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material';
+import { Button, List, ListItem, Typography } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
@@ -37,7 +37,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
         LinkComponent={Link}
         variant='contained'
         onClick={onClickContinue}
-        href='/'
+        href='/quests'
         data-test='continue-button'
         sx={{ margin: '0 auto', display: 'flex', width: 'fit-content' }}
       >
