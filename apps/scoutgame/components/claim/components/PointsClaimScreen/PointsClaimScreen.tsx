@@ -2,6 +2,7 @@
 
 import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
+import { getCurrentSeasonWeekNumber, getCurrentWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -15,25 +16,53 @@ import { PointsClaimButton } from './PointsClaimButton';
 function PointsClaimSuccessModal({
   showModal,
   handleCloseModal,
-  claimedPoints
+  claimedPoints,
+  displayName
 }: {
+  displayName: string;
   showModal: boolean;
   handleCloseModal: VoidFunction;
   claimedPoints: number;
 }) {
+  const currentWeek = getCurrentSeasonWeekNumber();
   return (
     <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
-      <Stack gap={2} textAlign='center' my={2}>
-        <Typography color='secondary' variant='h5' fontWeight={600}>
-          Congratulations!
-        </Typography>
-        <Typography>You claimed {claimedPoints.toLocaleString()} points</Typography>
-        <Image src='/images/trophy_sticker.jpg' alt='Success' width={300} height={300} />
-        <div>
-          <Button variant='outlined' color='primary' onClick={handleCloseModal}>
-            Return to app
-          </Button>
-        </div>
+      <Stack position='relative' width={500} height={500}>
+        <Image
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0
+          }}
+          width={500}
+          height={500}
+          src='/images/claim-share-background.png'
+          alt='Claim success modal'
+        />
+        <Stack
+          sx={{
+            transform: 'translate(-50%, -50%)',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '75%',
+            height: '75%',
+            alignItems: 'center',
+            zIndex: 1,
+            mt: 4
+          }}
+        >
+          <Typography variant='h4'>TOP SCOUT</Typography>
+          <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
+            {displayName}
+          </Typography>
+          <Typography variant='h6' textAlign='center'>
+            scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
+          </Typography>
+          <Typography fontWeight='bold' variant='h6' textAlign='center'>
+            SCOUT GAME!
+          </Typography>
+        </Stack>
       </Stack>
     </Dialog>
   );
@@ -134,7 +163,8 @@ export function PointsClaimScreen({
         </>
       )}
       <PointsClaimSuccessModal
-        showModal={showModal}
+        showModal
+        displayName={displayName}
         handleCloseModal={handleCloseModal}
         claimedPoints={result?.data?.claimedPoints ?? 0}
       />
