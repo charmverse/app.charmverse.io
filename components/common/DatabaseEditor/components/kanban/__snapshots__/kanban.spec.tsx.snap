@@ -205,6 +205,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id1"
             >
@@ -252,6 +253,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             </a>
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id2"
             >
@@ -329,6 +331,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id3"
             >
@@ -641,6 +644,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id1"
             >
@@ -688,6 +692,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
             </a>
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id2"
             >
@@ -765,6 +770,7 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-1ovaks8-MuiTypography-root-MuiLink-root"
+              data-test-resolved="false"
               draggable="false"
               href="/id3"
             >

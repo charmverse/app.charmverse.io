@@ -82,10 +82,11 @@ exports[`components/table/TableRow should match snapshot 1`] = `
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -192,10 +193,11 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -369,10 +371,11 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -455,10 +458,11 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -565,10 +569,11 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
@@ -724,10 +729,11 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
           </div>
           <div
             class="open-button"
-            data-test="database-open-button-card-1"
           >
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+              data-test="database-open-button-card-1"
+              data-test-resolved="false"
               href="/card-1"
               style="text-decoration: none;"
             >
