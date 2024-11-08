@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
+import { prisma, type GithubRepo, type GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
@@ -47,7 +47,10 @@ const defaultBuildersRange: MinMaxRange = {
   max: 100
 };
 
-export async function generateSeedData({buildersRange = defaultBuildersRange}: {buildersRange?: MinMaxRange} = {buildersRange: defaultBuildersRange}) {
+/**
+ * @fidToGenerate - Utility for including your own user id in the generated data
+ */
+export async function generateSeedData({buildersRange = defaultBuildersRange, includeFid}: {buildersRange?: MinMaxRange; includeFid?: number} = {buildersRange: defaultBuildersRange}) {
   // Total number of users that are builders (should be less than totalUsers)
   const totalBuilders = faker.number.int(buildersRange);
   // Total number of github repos
@@ -85,6 +88,22 @@ export async function generateSeedData({buildersRange = defaultBuildersRange}: {
 
   const builderResults = await Promise.all(builderPromises);
 
+  // Handle user account
+  if (includeFid) {
+    const scout = await prisma.scout.findFirstOrThrow({
+      where: {
+        farcasterId: includeFid
+      }
+    });
+
+    const assignedToMe = assignBuildersToScout(builders);
+
+    scouts.push({
+      id: scout.id,
+      assignedBuilders: assignedToMe
+    });
+  }
+
   // Process the results
   for (const { builderInfo, isScout } of builderResults) {
     builders.push(builderInfo);
@@ -107,6 +126,7 @@ export async function generateSeedData({buildersRange = defaultBuildersRange}: {
       assignedBuilders
     });
   }
+
 
   // Go through each day of the past two weeks
   const startDate = DateTime.now().minus({ weeks: 2 });
@@ -192,3 +212,6 @@ export async function generateSeedData({buildersRange = defaultBuildersRange}: {
     totalNftsPurchasedEvents
   });
 }
+
+
+// generateSeedData({buildersRange: {max: 5, min: 5}}).then(console.log)
