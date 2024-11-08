@@ -10,4 +10,4 @@ export const isDevEnv =
 // Session
 export const baseUrl = process.env.DOMAIN as string | undefined;
 export const authSecret = process.env.AUTH_SECRET as string | undefined;
-export const cookieName = process.env.AUTH_COOKIE || 'sgt';
+export const cookieName = process.env.AUTH_COOKIE || 'scoutgame-session';

@@ -16,9 +16,9 @@ COPY --parents @connect-shared   \
   packages/*/package.json        \
   node_modules                   \
   package.json                   \
-  apps/telegramapp/node_modules    \
-  apps/telegramapp/package.json    \
-  apps/telegramapp/next.config.mjs \
+  apps/scoutgametelegram/node_modules    \
+  apps/scoutgametelegram/package.json    \
+  apps/scoutgametelegram/next.config.mjs \
   .
 
 # Copy compiled code
