@@ -37,9 +37,19 @@ function assignBuildersToScout(builders: BuilderInfo[]) {
   );
 }
 
-export async function generateSeedData() {
+type MinMaxRange = {
+  min: number;
+  max: number;
+}
+
+const defaultBuildersRange: MinMaxRange = {
+  min: 50,
+  max: 100
+};
+
+export async function generateSeedData({buildersRange = defaultBuildersRange}: {buildersRange?: MinMaxRange} = {buildersRange: defaultBuildersRange}) {
   // Total number of users that are builders (should be less than totalUsers)
-  const totalBuilders = faker.number.int({ min: 50, max: 100 });
+  const totalBuilders = faker.number.int(buildersRange);
   // Total number of github repos
   const totalGithubRepos = faker.number.int({ min: 25, max: 50 });
 

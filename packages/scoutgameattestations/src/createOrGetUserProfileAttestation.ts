@@ -4,21 +4,11 @@ import {
   encodeScoutGameUserProfileAttestation,
   type ScoutGameUserProfileAttestation
 } from '@charmverse/core/protocol';
-import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 
 import { attestOnchain } from './attestOnchain';
-import {
-  SCOUTGAME_METADATA_PATH_PREFIX,
-  scoutGameAttestationChainId,
-  scoutGameUserProfileSchemaUid
-} from './constants';
+import { scoutGameAttestationChainId, scoutGameUserProfileSchemaUid } from './constants';
 import { getAttestion } from './getAttestation';
-import { getAttestationMetadataS3Path } from './getAttestationMetadataS3Path';
-
-type ScoutMetadata = {
-  path: string;
-  displayName: string;
-};
+import { uploadScoutProfileToS3 } from './uploadScoutProfileToS3';
 
 export async function createOrGetUserProfile({
   scoutId
@@ -26,7 +16,13 @@ export async function createOrGetUserProfile({
   scoutId: string;
 }): Promise<ScoutGameUserProfileAttestation> {
   const scout = await prisma.scout.findUniqueOrThrow({
-    where: { id: scoutId }
+    where: { id: scoutId },
+    select: {
+      onchainProfileAttestationChainId: true,
+      onchainProfileAttestationUid: true,
+      path: true,
+      displayName: true
+    }
   });
 
   if (scout.onchainProfileAttestationUid && scout.onchainProfileAttestationChainId === scoutGameAttestationChainId) {
@@ -35,25 +31,17 @@ export async function createOrGetUserProfile({
     return decodeScoutGameUserProfileAttestation(attestation.data);
   }
 
-  const profile: ScoutMetadata = {
-    displayName: scout.displayName,
-    path: scout.path
-  };
-
-  const { relativePath, fullPath } = getAttestationMetadataS3Path({
-    userId: scoutId,
-    metadataType: 'profile',
-    schemaId: scoutGameUserProfileSchemaUid
-  });
-
-  await uploadFileToS3({
-    pathInS3: relativePath,
-    content: Buffer.from(JSON.stringify(profile, null, 2))
+  const { metadataUrl } = await uploadScoutProfileToS3({
+    scoutId,
+    metadata: {
+      displayName: scout.displayName,
+      path: scout.path
+    }
   });
 
   const data: ScoutGameUserProfileAttestation = {
     id: scoutId,
-    metadataUrl: fullPath
+    metadataUrl
   };
 
   const attestationUid = await attestOnchain({

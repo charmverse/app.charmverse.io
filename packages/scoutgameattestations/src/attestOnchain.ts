@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { NULL_EVM_ADDRESS } from '@charmverse/core/protocol';
 import { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from '@packages/blockchain/chains';
@@ -6,6 +5,7 @@ import { Wallet, providers } from 'ethers';
 import type { Address } from 'viem';
 
 import { scoutGameAttestationChainId, scoutGameEasAttestationContractAddress } from './constants';
+import { attestationLogger } from './logger';
 
 export type ScoutGameAttestationInput = {
   schemaId: string;
@@ -56,7 +56,7 @@ export async function attestOnchain({ data, schemaId, refUID, recipient }: Scout
     )
     .then((tx) => tx.wait());
 
-  log.info(
+  attestationLogger.info(
     `Issued attestation for schema ${schemaId} on chain ${scoutGameAttestationChainId} with uid: ${attestationUid}`,
     {
       chainId: scoutGameAttestationChainId,
@@ -67,13 +67,31 @@ export async function attestOnchain({ data, schemaId, refUID, recipient }: Scout
   return attestationUid;
 }
 
-export async function multiAttestOnchain({
-  records,
-  schemaId
-}: {
+const maxPerBatch = 30;
+
+export async function multiAttestOnchain(params: {
   schemaId: string;
   records: Omit<ScoutGameAttestationInput, 'schemaId'>[];
-}): Promise<string[]> {
+  onAttestSuccess?: (input: { attestationUid: string; data: `0x${string}`; index: number }) => Promise<void>;
+  batchStartIndex?: number;
+}): Promise<`0x${string}`[]> {
+  if (params.records.length > maxPerBatch) {
+    const allUids: `0x${string}`[] = [];
+    for (let i = 0; i < params.records.length; i += maxPerBatch) {
+      const uids = await multiAttestOnchain({
+        schemaId: params.schemaId,
+        records: params.records.slice(i, i + maxPerBatch),
+        onAttestSuccess: params.onAttestSuccess,
+        batchStartIndex: i
+      });
+      allUids.push(...uids);
+    }
+
+    return allUids;
+  }
+
+  const { schemaId, records, onAttestSuccess, batchStartIndex = 0 } = params;
+
   const { eas, currentGasPrice } = await setupEAS();
 
   const attestationUids = await eas
@@ -91,10 +109,15 @@ export async function multiAttestOnchain({
       ],
       { gasPrice: currentGasPrice }
     )
-
     .then((tx) => tx.wait());
 
-  log.info(
+  if (onAttestSuccess) {
+    for (let i = 0; i < attestationUids.length; i++) {
+      await onAttestSuccess({ attestationUid: attestationUids[i], data: records[i].data, index: batchStartIndex + i });
+    }
+  }
+
+  attestationLogger.info(
     `Issued ${attestationUids.length} attestations for schema ${schemaId} on chain ${scoutGameAttestationChainId} with uids: ${attestationUids.join(', ')}`,
     {
       chainId: scoutGameAttestationChainId,
@@ -102,5 +125,5 @@ export async function multiAttestOnchain({
     }
   );
 
-  return attestationUids;
+  return attestationUids as `0x${string}`[];
 }
