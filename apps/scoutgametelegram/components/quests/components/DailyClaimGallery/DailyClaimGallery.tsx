@@ -14,7 +14,7 @@ export function DailyClaimGallery({ dailyClaims }: { dailyClaims: DailyClaim[] }
       <NextClaimCountdown />
       <Grid container spacing={1} width='100%'>
         {dailyClaims.map((dailyClaim) => (
-          <Grid size={dailyClaim.isBonus ? 8 : 4} key={dailyClaim.date.toString()}>
+          <Grid size={dailyClaim.isBonus ? 8 : 4} key={dailyClaim.day}>
             <DailyClaimCard dailyClaim={dailyClaim} />
           </Grid>
         ))}

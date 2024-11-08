@@ -13,21 +13,20 @@ import { DailyClaimGift } from './DailyClaimGift';
 
 export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction);
-  const todayDate = DateTime.fromJSDate(new Date(), { zone: 'utc' }).startOf('day');
-  const claimDateDay = DateTime.fromJSDate(dailyClaim.date, { zone: 'utc' }).startOf('day');
-  const isClaimToday = claimDateDay.equals(todayDate);
-  const isPastDate = todayDate > claimDateDay;
+  const currentWeekDay = DateTime.fromJSDate(new Date()).weekday;
+  const isPastDay = currentWeekDay > dailyClaim.day;
+  const isClaimToday = currentWeekDay === dailyClaim.day;
   const isClaimed = dailyClaim.claimed;
   const buttonLabel = isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
   const canClaim = isClaimToday && !isClaimed && !isExecuting;
-  const variant = isPastDate ? 'disabled' : isClaimToday ? 'secondary' : 'primary';
+  const variant = isPastDay ? 'disabled' : isClaimToday ? 'secondary' : 'primary';
 
   return (
     <Stack
       sx={{
         backgroundColor: isClaimed
           ? 'background.light'
-          : isPastDate
+          : isPastDay
             ? 'background.dark'
             : isClaimToday
               ? 'secondary.main'
@@ -41,7 +40,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
       }}
       onClick={() => {
         if (canClaim) {
-          claimDailyReward({ isBonus: dailyClaim.isBonus });
+          claimDailyReward({ isBonus: dailyClaim.isBonus, dayOfWeek: currentWeekDay });
         }
       }}
     >

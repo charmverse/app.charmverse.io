@@ -31,19 +31,19 @@ describe('getDailyClaims', () => {
 
     await claimDailyReward({
       userId,
-      dayOfWeek: 0,
+      dayOfWeek: 1,
       isBonus: false
     });
 
     await claimDailyReward({
       userId,
-      dayOfWeek: 6,
+      dayOfWeek: 7,
       isBonus: false
     });
 
     await claimDailyReward({
       userId,
-      dayOfWeek: 6,
+      dayOfWeek: 7,
       isBonus: true
     });
 
@@ -51,9 +51,9 @@ describe('getDailyClaims', () => {
     expect(claims).toHaveLength(8);
     const claimedEvents = claims.filter((claim) => claim.claimed);
     expect(claimedEvents.map((claim) => ({ day: claim.day, isBonus: claim.isBonus }))).toEqual([
-      { day: 0, isBonus: false },
-      { day: 6, isBonus: false },
-      { day: 6, isBonus: true }
+      { day: 1, isBonus: false },
+      { day: 7, isBonus: false },
+      { day: 7, isBonus: true }
     ]);
   });
 });

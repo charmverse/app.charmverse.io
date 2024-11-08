@@ -29,16 +29,16 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
   return new Array(7)
     .fill(null)
     .map((_, index) => {
-      const dailyClaimEvent = dailyClaimEvents.find((_dailyClaimEvent) => _dailyClaimEvent.dayOfWeek === index);
+      const dailyClaimEvent = dailyClaimEvents.find((_dailyClaimEvent) => _dailyClaimEvent.dayOfWeek === index + 1);
 
       const dailyClaimInfo = {
-        day: index,
+        day: index + 1,
         claimed: !!dailyClaimEvent,
         isBonus: false
       };
 
       // For the last day of the week, return 2 claims: one for the daily claim and one for the bonus claim
-      if (index === 6) {
+      if (index === 7) {
         return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!dailyClaimStreakEvent, isBonus: true }];
       }
 

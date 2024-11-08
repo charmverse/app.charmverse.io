@@ -71,7 +71,7 @@ describe('claimDailyReward', () => {
     const builder = await mockBuilder();
     const userId = builder.id;
 
-    await claimDailyReward({ userId, isBonus: true, dayOfWeek: 6 });
+    await claimDailyReward({ userId, isBonus: true, dayOfWeek: 7 });
 
     const dailyClaimStreakEvent = await prisma.scoutDailyClaimStreakEvent.findFirstOrThrow({
       where: {
