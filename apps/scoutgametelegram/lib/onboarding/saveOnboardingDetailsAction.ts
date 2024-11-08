@@ -20,7 +20,8 @@ export const saveOnboardingDetailsAction = authActionClient
       data: {
         email: parsedInput.email,
         sendMarketing: parsedInput.sendMarketing,
-        agreedToTermsAt: new Date()
+        agreedToTermsAt: new Date(),
+        onboardedAt: new Date()
       }
     });
 

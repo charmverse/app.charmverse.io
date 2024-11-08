@@ -11,7 +11,7 @@ export default async function Welcome() {
   }
 
   if (!user?.agreedToTermsAt && !user?.onboardedAt) {
-    redirect('/welcome/onboarding');
+    redirect('/onboarding');
   }
 
   return <WelcomePage />;

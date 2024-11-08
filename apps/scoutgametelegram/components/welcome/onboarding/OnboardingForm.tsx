@@ -37,7 +37,7 @@ export function OnboardingForm() {
   const { execute, isExecuting } = useAction(saveOnboardingDetailsAction, {
     async onSuccess() {
       await refreshUser();
-      router.push('/welcome/how-it-works');
+      router.push('/how-it-works');
     },
     onError(err) {
       const hasValidationErrors = err.error.validationErrors?.fieldErrors;
