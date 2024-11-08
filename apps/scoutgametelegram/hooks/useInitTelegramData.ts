@@ -9,7 +9,7 @@ import { useIsMounted } from 'hooks/useIsMounted';
 import { loadUser } from 'lib/session/loadUserAction';
 
 export function useInitTelegramData() {
-  const telegramInitData = WebApp.initData;
+  const telegramInitData = typeof window !== 'undefined' ? WebApp.initData : null;
   const isMounted = useIsMounted();
   const { refreshUser, isLoading } = useUser();
   const { executeAsync, isExecuting } = useAction(loadUser, {

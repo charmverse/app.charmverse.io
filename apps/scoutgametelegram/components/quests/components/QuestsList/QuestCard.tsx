@@ -38,9 +38,11 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
       <Stack direction='row' gap={3.5} alignItems='center'>
         {QuestsRecord[quest.type].icon}
         <Stack gap={1}>
-          <Typography>{QuestsRecord[quest.type].label}</Typography>
+          <Typography fontWeight={500}>{QuestsRecord[quest.type].label}</Typography>
           <Stack direction='row' gap={0.5} alignItems='center'>
-            <Typography variant='body2'>+{QuestsRecord[quest.type].points}</Typography>
+            <Typography variant='body2' fontWeight={500}>
+              +{QuestsRecord[quest.type].points}
+            </Typography>
             <Image src='/images/scout-game-profile-icon.png' alt='Scoutgame icon' width={18.5} height={12} />
           </Stack>
         </Stack>

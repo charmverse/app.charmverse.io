@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
+import { PageContainer } from 'components/layout/PageContainer';
 import type { DailyClaim } from 'lib/claims/getDailyClaims';
 import type { QuestInfo } from 'lib/quests/getQuests';
 
@@ -9,14 +9,13 @@ import { QuestsList } from './components/QuestsList/QuestsList';
 
 export function QuestsPage({ dailyClaims, quests }: { dailyClaims: DailyClaim[]; quests: QuestInfo[] }) {
   return (
-    <>
-      <InfoBackgroundImage />
+    <PageContainer>
       <Box sx={{ px: 5 }}>
         <DailyClaimGallery dailyClaims={dailyClaims} />
       </Box>
-      <Box sx={{ px: 1 }}>
+      <Box sx={{ px: 1, mb: 2 }}>
         <QuestsList quests={quests} />
       </Box>
-    </>
+    </PageContainer>
   );
 }
