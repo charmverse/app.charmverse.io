@@ -5,11 +5,13 @@ import { nftDisplaySize } from 'components/common/Card/BuilderCard/BuilderCardNf
 export function AdCard({
   src,
   path,
-  size
+  size,
+  'data-test': dataTest
 }: {
   src: string;
   path: string;
   size: 'x-small' | 'small' | 'medium' | 'large';
+  'data-test'?: string;
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
@@ -21,6 +23,7 @@ export function AdCard({
         height: 'fit-content',
         margin: '0 auto'
       }}
+      data-test={dataTest}
     >
       <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
         <CardActionArea

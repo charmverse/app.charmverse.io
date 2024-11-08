@@ -7,7 +7,9 @@ export class HomePage extends GeneralPageLayout {
 
   constructor(
     protected page: Page,
-    public container = page.locator('data-test=home-page')
+    public container = page.locator('data-test=home-page'),
+    public optimismAdCard = page.locator('data-test=ad-card-optimism'),
+    public moxieAdCard = page.locator('data-test=ad-card-moxie')
   ) {
     super(page);
   }

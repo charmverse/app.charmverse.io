@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen, useSmScreen } from 'hooks/useMediaScreens';
 
-import { LoadingCards } from '../../../common/Loading/LoadingCards';
+import { LoadingCards } from '../Loading/LoadingCards';
 
 import { NextArrow, PrevArrow } from './Arrows';
 
