@@ -3,30 +3,42 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Box, Dialog, IconButton, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
+import { revalidatePath } from 'next/cache';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { useUser } from 'components/layout/UserProvider';
 import { claimPointsAction } from 'lib/points/claimPointsAction';
+import { revalidateClaimPointsAction } from 'lib/points/revalidateClaimPointsAction';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
-import { PointsClaimModal } from './PointsClaimModal/PointsClaimModal';
+import { PointsClaimBuilderModal } from './PointsClaimModal/PointsClaimBuilderModal';
+import { PointsClaimScoutModal } from './PointsClaimModal/PointsClaimScoutModal';
 import { PointsClaimSocialShare } from './PointsClaimModal/PointsClaimSocialShare';
 
 export function PointsClaimScreen({
   totalUnclaimedPoints,
   displayName,
-  bonusPartners
+  bonusPartners,
+  builders,
+  builderPoints,
+  repos
 }: {
   totalUnclaimedPoints: number;
   displayName: string;
   bonusPartners: BonusPartner[];
+  builders: {
+    avatar: string | null;
+    displayName: string;
+  }[];
+  builderPoints: number;
+  repos: string[];
 }) {
   const { executeAsync, isExecuting } = useAction(claimPointsAction);
-  const { refreshUser, user } = useUser();
+  const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
+  const { refreshUser } = useUser();
   const [showModal, setShowModal] = useState(false);
 
   const handleClaim = async () => {
@@ -37,6 +49,7 @@ export function PointsClaimScreen({
 
   const handleCloseModal = () => {
     setShowModal(false);
+    revalidateClaimPoints();
   };
 
   return (
@@ -110,36 +123,30 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      {user ? (
-        <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
-          <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
-            <CancelOutlinedIcon color='primary' />
-          </IconButton>
-          <Stack position='relative' width={600} height={600}>
-            <Image
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0
-              }}
-              width={600}
-              height={600}
-              src='/images/claim-share-background.png'
-              alt='Claim success modal'
-            />
-            <Suspense
-              fallback={
-                <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
-                  <LoadingComponent />
-                </Box>
-              }
-            >
-              <PointsClaimModal userId={user.id} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
-            </Suspense>
-          </Stack>
-          <PointsClaimSocialShare />
-        </Dialog>
-      ) : null}
+      <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+        <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
+          <CancelOutlinedIcon color='primary' />
+        </IconButton>
+        <Stack position='relative' width={600} height={600}>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0
+            }}
+            width={600}
+            height={600}
+            src='/images/claim-share-background.png'
+            alt='Claim success modal'
+          />
+          {builderPoints ? (
+            <PointsClaimBuilderModal repos={repos} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
+          ) : (
+            <PointsClaimScoutModal claimedPoints={totalUnclaimedPoints} displayName={displayName} builders={builders} />
+          )}
+        </Stack>
+        <PointsClaimSocialShare />
+      </Dialog>
     </Paper>
   );
 }

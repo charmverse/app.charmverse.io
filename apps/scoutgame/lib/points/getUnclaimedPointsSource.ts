@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type UnclaimedPointsSource = {
   builders: {
@@ -18,6 +18,9 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
       recipientId: userId,
       claimedAt: { equals: null },
       event: {
+        type: {
+          in: ['nft_purchase', 'gems_payout']
+        },
         season: currentSeason
       },
       value: {
@@ -53,7 +56,6 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
   let scoutPoints = 0;
 
   const builderIdScoutPointsRecord: Record<string, number> = {};
-  const repos: string[] = [];
 
   for (const receipt of pointsReceipts) {
     const points = receipt.value;
@@ -70,12 +72,6 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
       } else {
         builderPoints += points;
       }
-    } else if (
-      (receipt.event.type === 'daily_commit' || receipt.event.type === 'merged_pull_request') &&
-      receipt.event.githubEvent
-    ) {
-      const repo = receipt.event.githubEvent.repo;
-      repos.push(`${repo.owner}/${repo.name}`);
     }
   }
 
@@ -94,10 +90,29 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
     }
   });
 
+  const repos = await prisma.githubEvent.findMany({
+    where: {
+      builderEvent: {
+        week: getCurrentWeek(),
+        builderId: userId
+      }
+    },
+    select: {
+      repo: {
+        select: {
+          name: true,
+          owner: true
+        }
+      }
+    }
+  });
+
+  const uniqueRepos = Array.from(new Set(repos.map((repo) => `${repo.repo.owner}/${repo.repo.name}`)));
+
   return {
-    builders,
+    builders: builders.slice(0, 3),
     builderPoints,
     scoutPoints,
-    repos
+    repos: uniqueRepos.slice(0, 3)
   };
 }
