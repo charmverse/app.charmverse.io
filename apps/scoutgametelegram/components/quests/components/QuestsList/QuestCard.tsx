@@ -6,11 +6,17 @@ import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 
+import { useUser } from 'components/layout/UserProvider';
 import { completeQuestAction } from 'lib/quests/completeQuestAction';
 import { QuestsRecord, type QuestInfo } from 'lib/quests/getQuests';
 
 export function QuestCard({ quest }: { quest: QuestInfo }) {
-  const { execute, isExecuting } = useAction(completeQuestAction);
+  const { refreshUser } = useUser();
+  const { execute, isExecuting } = useAction(completeQuestAction, {
+    onSuccess: () => {
+      refreshUser();
+    }
+  });
 
   return (
     <Stack
