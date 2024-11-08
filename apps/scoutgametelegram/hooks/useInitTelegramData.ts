@@ -15,7 +15,7 @@ export function useInitTelegramData() {
   const { executeAsync, isExecuting } = useAction(loadUser, {
     onSuccess: async (data) => {
       if (data.data) {
-        await refreshUser(data.data);
+        await refreshUser();
       }
     },
     onError: (error) => {

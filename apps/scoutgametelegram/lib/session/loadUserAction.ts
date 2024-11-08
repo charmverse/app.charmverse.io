@@ -1,13 +1,14 @@
 'use server';
 
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { actionClient } from '@connect-shared/lib/actions/actionClient';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { findOrCreateTelegramUser } from '@packages/scoutgame/users/findOrCreateTelegramUser';
 
+import { getUserAvatar } from 'lib/telegram/getUserAvatar';
 import { validateTelegramData } from 'lib/telegram/validate';
 
-import type { SessionUser } from './interfaces';
 import { userActionSchema } from './loadUserActionSchema';
 
 export const loadUser = actionClient
@@ -22,8 +23,15 @@ export const loadUser = actionClient
     if (!validatedData.user?.id) {
       throw new DataNotFoundError('No telegram user id found');
     }
+    const avatar = await getUserAvatar(validatedData.user.id).catch((error) => {
+      log.info('Error getting telegram avatar', { error });
+      return null;
+    });
 
-    const user = (await findOrCreateTelegramUser(validatedData.user)) as unknown as SessionUser;
+    const user = await findOrCreateTelegramUser({
+      ...validatedData.user,
+      photo_url: avatar ?? undefined
+    });
 
     session.scoutId = user?.id;
     session.anonymousUserId = undefined;
