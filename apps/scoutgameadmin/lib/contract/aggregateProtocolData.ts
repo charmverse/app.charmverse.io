@@ -1,16 +1,26 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProvableClaim } from '@charmverse/core/protocol';
 import { getAllISOWeeksFromSeasonStart } from '@packages/scoutgame/dates';
 import {
   protocolImplementationReadonlyApiClient,
   protocolProxyReadonlyApiClient
 } from '@packages/scoutgame/protocol/clients/protocolReadClients';
 import { getScoutProtocolAddress } from '@packages/scoutgame/protocol/constants';
+import type { WeeklyClaimsTyped } from '@packages/scoutgame/protocol/generateWeeklyClaims';
+import {
+  scoutGameContributionReceiptSchemaUid,
+  scoutGameUserProfileSchemaUid
+} from '@packages/scoutgameattestations/constants';
 import type { Address } from 'viem';
 
 type MerkleRoot = {
   week: string;
   publishedOnchain: boolean;
   root: string | null;
+  testClaim?: {
+    claim: ProvableClaim;
+    proofs: any[];
+  };
 };
 
 export type ProtocolData = {
@@ -19,9 +29,13 @@ export type ProtocolData = {
   implementation: Address;
   claimsManager: Address;
   merkleRoots: MerkleRoot[];
+  easSchemas: {
+    profile: string;
+    contributions: string;
+  };
 };
 
-export async function aggregateProtocolData(): Promise<ProtocolData> {
+export async function aggregateProtocolData({ userId }: { userId?: string }): Promise<ProtocolData> {
   const [implementation, admin, claimsManager] = await Promise.all([
     protocolProxyReadonlyApiClient.implementation(),
     protocolProxyReadonlyApiClient.admin(),
@@ -42,7 +56,26 @@ export async function aggregateProtocolData(): Promise<ProtocolData> {
     weeks.map((week) =>
       protocolImplementationReadonlyApiClient
         .getMerkleRoot({ args: { week } })
-        .then((root) => ({ week, root, publishedOnchain: true }) as MerkleRoot)
+        .then((root) => {
+          const returnValue: MerkleRoot = { week, root, publishedOnchain: true };
+
+          const weekFromDb = weeklyClaims.find((claim) => claim.week === week) as WeeklyClaimsTyped;
+
+          if (userId && weekFromDb) {
+            const userClaim = weekFromDb.claims.leavesWithUserId.find((_claim) => _claim.userId === userId);
+
+            const proofs = weekFromDb.proofsMap[userId];
+
+            if (userClaim && proofs) {
+              returnValue.testClaim = {
+                claim: userClaim,
+                proofs
+              };
+            }
+          }
+
+          return returnValue;
+        })
         .catch(() => {
           return {
             week,
@@ -58,6 +91,10 @@ export async function aggregateProtocolData(): Promise<ProtocolData> {
     admin: admin as Address,
     proxy: getScoutProtocolAddress(),
     implementation: implementation as Address,
-    claimsManager: claimsManager as Address
+    claimsManager: claimsManager as Address,
+    easSchemas: {
+      contributions: scoutGameContributionReceiptSchemaUid(),
+      profile: scoutGameUserProfileSchemaUid()
+    }
   };
 }

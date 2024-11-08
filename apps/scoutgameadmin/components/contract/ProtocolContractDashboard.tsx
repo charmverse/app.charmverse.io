@@ -1,4 +1,9 @@
+import { contributionSchemaDefinition, scoutGameUserProfileSchemaDefinition } from '@charmverse/core/protocol';
 import { Box, Button, Divider, Grid2, IconButton, Typography } from '@mui/material';
+import {
+  scoutGameContributionReceiptSchemaUid,
+  scoutGameUserProfileSchemaUid
+} from '@packages/scoutgameattestations/constants';
 import Link from 'next/link';
 import { MdLaunch } from 'react-icons/md';
 
@@ -22,6 +27,21 @@ function ContractLink({
       <Box sx={{ minHeight: '40px' }}>{subtitle && <Typography variant='body2'>{subtitle}</Typography>}</Box>
       <Link href={`https://optimism.blockscout.com/${linkType}/${address}`} target='_blank'>
         {address}
+        <IconButton size='small' color='primary'>
+          <MdLaunch size='16px' />
+        </IconButton>
+      </Link>
+    </Box>
+  );
+}
+
+function EASSchemaLink({ schemaId, title, subtitle }: { schemaId: string; title: string; subtitle?: string }) {
+  return (
+    <Box gap={1} display='flex' flexDirection='column'>
+      <Typography variant='h6'>{title}</Typography>
+      <Box sx={{ minHeight: '40px' }}>{subtitle && <Typography variant='body2'>{subtitle}</Typography>}</Box>
+      <Link href={`https://base-sepolia.easscan.org/schema/view/${schemaId}`} target='_blank'>
+        {schemaId}
         <IconButton size='small' color='primary'>
           <MdLaunch size='16px' />
         </IconButton>
@@ -84,15 +104,40 @@ export function ProtocolContractDashboard(data: ProtocolData) {
             ) : (
               <Typography>Awaiting publication</Typography>
             ))}
+
+          {root.testClaim && (
+            <Button>
+              Claim {root.testClaim.claim.amount} $SCOUT with {root.testClaim.claim.address.slice(0, 5)}..
+              {root.testClaim.claim.address.slice(root.testClaim.claim.address.length - 3)}
+            </Button>
+          )}
         </Grid2>
       ))}
       <GridDivider />
-      <Grid2 size={12}>
+      {/* <Grid2 size={12}>
         <SectionTitle title='Governance' />
       </Grid2>
       <Grid2 size={itemSizeTwoColumnMd}>
         <Typography variant='h6'>Upgrade contract</Typography>
         <Button>Upgrade contract</Button>
+      </Grid2>
+      <GridDivider /> */}
+      <Grid2 size={12}>
+        <SectionTitle title='Attestations' />
+      </Grid2>
+      <Grid2 size={itemSizeTwoColumnMd}>
+        <EASSchemaLink
+          schemaId={data.easSchemas.profile}
+          title={scoutGameUserProfileSchemaDefinition.name}
+          subtitle='Onchain profiles for ScoutGame participants'
+        />
+      </Grid2>
+      <Grid2 size={itemSizeTwoColumnMd}>
+        <EASSchemaLink
+          schemaId={data.easSchemas.contributions}
+          title={contributionSchemaDefinition.name}
+          subtitle='Onchain receipts for Github Activity'
+        />
       </Grid2>
       <GridDivider />
       <Grid2 size={12}>
