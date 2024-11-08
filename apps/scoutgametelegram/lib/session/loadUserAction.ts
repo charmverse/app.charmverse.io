@@ -1,12 +1,10 @@
 'use server';
 
 import { DataNotFoundError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { actionClient } from '@connect-shared/lib/actions/actionClient';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import { findOrCreateTelegramUser } from '@packages/scoutgame/users/findOrCreateTelegramUser';
 
-import { getUserAvatar } from 'lib/telegram/getUserAvatar';
 import { validateTelegramData } from 'lib/telegram/validate';
 
 import type { SessionUser } from './interfaces';
