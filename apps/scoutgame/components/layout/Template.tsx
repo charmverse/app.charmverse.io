@@ -1,11 +1,12 @@
 'use client';
 
-import { usePageView } from '@connect-shared/hooks/usePageView';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+
+import { usePageView } from 'hooks/usePageView';
 
 const mobileVariants = {
   hidden: { opacity: 0, x: 200, y: 0 },
