@@ -1,5 +1,6 @@
 import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
@@ -21,7 +22,7 @@ type MergedPullRequestActivity = {
   gems: number;
   repo: string;
   url: string;
-  bonusPartner: string | null;
+  bonusPartner: BonusPartner | null;
 };
 
 export type BuilderActivity = BasicUserInfo & {
@@ -113,7 +114,7 @@ export async function getBuilderActivities({
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
           url: event.githubEvent.url,
-          bonusPartner: event.bonusPartner
+          bonusPartner: event.bonusPartner as BonusPartner | null
         };
       } else {
         return null;

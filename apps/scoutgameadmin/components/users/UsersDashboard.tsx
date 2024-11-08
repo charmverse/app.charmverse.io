@@ -28,7 +28,7 @@ import {
 } from '@mui/material';
 import React, { useState, useMemo } from 'react';
 
-import { ExportButton } from 'components/common/ExportButton';
+import { FileDownloadButton } from 'components/common/FileDownloadButton';
 import { useSearchUsers } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { SortField, SortOrder, ScoutGameUser } from 'lib/users/getUsers';
@@ -108,9 +108,9 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
           <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }} startIcon={<AddIcon />}>
             Add
           </AddUserButton>
-          <ExportButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
+          <FileDownloadButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>
             Export
-          </ExportButton>
+          </FileDownloadButton>
         </Box>
       </Stack>
       <TableContainer component={Paper}>

@@ -18,6 +18,7 @@ type MoxieBonusRow = {
 };
 
 export async function GET() {
+  const lastWeek = getLastWeek();
   const builders = await prisma.scout.findMany({
     where: {
       builderStatus: 'approved'
@@ -33,7 +34,7 @@ export async function GET() {
           type: {
             in: ['merged_pull_request', 'daily_commit']
           },
-          week: getLastWeek()
+          week: lastWeek
         }
       },
       builderNfts: {
@@ -96,7 +97,7 @@ export async function GET() {
     })
   );
 
-  return respondWithTSV(rows, 'moxie_bonus_report.tsv');
+  return respondWithTSV(rows, `partners-export_moxie_${lastWeek}.tsv`);
 }
 
 type MoxieFanToken = {
