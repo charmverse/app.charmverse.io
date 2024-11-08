@@ -8,7 +8,7 @@ import { useIsMounted } from 'hooks/useIsMounted';
 import { loadUser } from 'lib/session/loadUserAction';
 
 export function useInitTelegramData() {
-  const telegramInitData = typeof window !== 'undefined' ? WebApp.initData : null;
+  const telegramInitData = WebApp.initData;
   const isMounted = useIsMounted();
   const { refreshUser, isLoading } = useUser();
   const { executeAsync, isExecuting } = useAction(loadUser, {
@@ -27,7 +27,7 @@ export function useInitTelegramData() {
 
   useEffect(() => {
     // Load the Telegram Web App SDK
-    if (isMounted) {
+    if (isMounted && typeof window !== 'undefined') {
       WebApp.ready();
     }
   }, [isMounted]);
