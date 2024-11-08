@@ -1,18 +1,20 @@
 'use client';
 
-import { Box, Paper, Stack, Typography } from '@mui/material';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { Box, Dialog, IconButton, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
+import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { useUser } from 'components/layout/UserProvider';
 import { claimPointsAction } from 'lib/points/claimPointsAction';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
-import { PointsClaimBuilderScreen } from './PointsClaimBuilderScreen';
 import { PointsClaimButton } from './PointsClaimButton';
-import { PointsClaimScoutScreen } from './PointsClaimScoutScreen';
+import { PointsClaimModal } from './PointsClaimModal/PointsClaimModal';
+import { PointsClaimSocialShare } from './PointsClaimModal/PointsClaimSocialShare';
 
 export function PointsClaimScreen({
   totalUnclaimedPoints,
@@ -23,8 +25,8 @@ export function PointsClaimScreen({
   displayName: string;
   bonusPartners: BonusPartner[];
 }) {
-  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
-  const { refreshUser } = useUser();
+  const { executeAsync, isExecuting } = useAction(claimPointsAction);
+  const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
 
   const handleClaim = async () => {
@@ -108,13 +110,36 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      <PointsClaimBuilderScreen
-        showModal
-        displayName={displayName}
-        handleCloseModal={handleCloseModal}
-        claimedPoints={result?.data?.claimedPoints ?? 0}
-        repos={['charmverse/charmverse', 'charmverse/charmverse-app']}
-      />
+      {user ? (
+        <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+          <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
+            <CancelOutlinedIcon color='primary' />
+          </IconButton>
+          <Stack position='relative' width={600} height={600}>
+            <Image
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0
+              }}
+              width={600}
+              height={600}
+              src='/images/claim-share-background.png'
+              alt='Claim success modal'
+            />
+            <Suspense
+              fallback={
+                <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                  <LoadingComponent />
+                </Box>
+              }
+            >
+              <PointsClaimModal userId={user.id} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
+            </Suspense>
+          </Stack>
+          <PointsClaimSocialShare />
+        </Dialog>
+      ) : null}
     </Paper>
   );
 }
