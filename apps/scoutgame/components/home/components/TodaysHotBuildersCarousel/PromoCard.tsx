@@ -2,16 +2,18 @@ import { Button, Stack, Link, Box, Card, CardActionArea, CardMedia, Typography }
 
 import { nftDisplaySize } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
 
-export function AdCard({
+export function PromoCard({
   src,
   path,
   size,
-  'data-test': dataTest
+  'data-test': dataTest,
+  onClick
 }: {
   src: string;
   path: string;
   size: 'x-small' | 'small' | 'medium' | 'large';
   'data-test'?: string;
+  onClick?: () => void;
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
@@ -24,6 +26,7 @@ export function AdCard({
         margin: '0 auto'
       }}
       data-test={dataTest}
+      onClick={onClick}
     >
       <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
         <CardActionArea

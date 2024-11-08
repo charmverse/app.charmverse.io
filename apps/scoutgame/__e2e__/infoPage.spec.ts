@@ -38,13 +38,13 @@ test.describe('Info page', () => {
 test.describe('Info page partners', () => {
   test('Open Optimism from the home page', async ({ page, homePage, infoPage }) => {
     await page.goto('/home');
-    await homePage.optimismAdCard.click();
+    await homePage.optimismPromoCard.click();
 
     await expect(infoPage.optimismContainer).toBeVisible();
   });
   test('Open Moxie from the home page', async ({ page, homePage, infoPage }) => {
     await page.goto('/home');
-    await homePage.moxieAdCard.click();
+    await homePage.moxiePromoCard.click();
 
     await expect(infoPage.moxieContainer).toBeVisible();
   });
