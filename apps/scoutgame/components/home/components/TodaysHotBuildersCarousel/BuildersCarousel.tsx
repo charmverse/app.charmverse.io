@@ -21,8 +21,18 @@ export function BuildersCarousel({ builders }: { builders: BuilderInfo[] }) {
   return (
     <Carousel>
       {[
-        <AdCard key='op-new-scout-ad' size={size} path='/info' src='/images/home/op-new-scout-ad.png' />,
-        <AdCard key='moxie-fan-reward-ad' size={size} path='/info' src='/images/home/moxie-fan-reward-ad.png' />,
+        <AdCard
+          key='op-new-scout-ad'
+          size={size}
+          path='/info/partner-rewards/optimism'
+          src='/images/home/op-new-scout-ad.png'
+        />,
+        <AdCard
+          key='moxie-fan-reward-ad'
+          size={size}
+          path='/info/partner-rewards/moxie'
+          src='/images/home/moxie-fan-reward-ad.png'
+        />,
         ...builders.map((builder) => (
           <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
         ))
