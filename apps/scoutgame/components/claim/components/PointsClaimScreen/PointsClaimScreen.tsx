@@ -1,8 +1,7 @@
 'use client';
 
-import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
+import { Box, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
-import { getCurrentSeasonWeekNumber, getCurrentWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -11,62 +10,9 @@ import { useUser } from 'components/layout/UserProvider';
 import { claimPointsAction } from 'lib/points/claimPointsAction';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
+import { PointsClaimBuilderScreen } from './PointsClaimBuilderScreen';
 import { PointsClaimButton } from './PointsClaimButton';
-
-function PointsClaimSuccessModal({
-  showModal,
-  handleCloseModal,
-  claimedPoints,
-  displayName
-}: {
-  displayName: string;
-  showModal: boolean;
-  handleCloseModal: VoidFunction;
-  claimedPoints: number;
-}) {
-  const currentWeek = getCurrentSeasonWeekNumber();
-  return (
-    <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
-      <Stack position='relative' width={500} height={500}>
-        <Image
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0
-          }}
-          width={500}
-          height={500}
-          src='/images/claim-share-background.png'
-          alt='Claim success modal'
-        />
-        <Stack
-          sx={{
-            transform: 'translate(-50%, -50%)',
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            width: '75%',
-            height: '75%',
-            alignItems: 'center',
-            zIndex: 1,
-            mt: 4
-          }}
-        >
-          <Typography variant='h4'>TOP SCOUT</Typography>
-          <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
-            {displayName}
-          </Typography>
-          <Typography variant='h6' textAlign='center'>
-            scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
-          </Typography>
-          <Typography fontWeight='bold' variant='h6' textAlign='center'>
-            SCOUT GAME!
-          </Typography>
-        </Stack>
-      </Stack>
-    </Dialog>
-  );
-}
+import { PointsClaimScoutScreen } from './PointsClaimScoutScreen';
 
 export function PointsClaimScreen({
   totalUnclaimedPoints,
@@ -162,11 +108,12 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      <PointsClaimSuccessModal
+      <PointsClaimBuilderScreen
         showModal
         displayName={displayName}
         handleCloseModal={handleCloseModal}
         claimedPoints={result?.data?.claimedPoints ?? 0}
+        repos={['charmverse/charmverse', 'charmverse/charmverse-app']}
       />
     </Paper>
   );
