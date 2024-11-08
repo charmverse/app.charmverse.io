@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { getSession } from '@connect-shared/lib/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -11,6 +10,10 @@ export async function middleware(request: NextRequest) {
   const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies
+
+  if (isLoggedIn && (path === '/' || path === '/welcome')) {
+    return NextResponse.redirect(new URL('/quests', request.url));
+  }
 
   // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {

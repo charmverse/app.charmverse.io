@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { log } from '@charmverse/core/log';
 import WebApp from '@twa-dev/sdk';
-import { redirect } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 
@@ -23,12 +23,15 @@ export function useInitTelegramData() {
         //   redirect('/welcome/onboarding');
         // }
       }
+    },
+    onError: (error) => {
+      log.error('Error loading user', { error: error.error.serverError });
     }
   });
 
   useEffect(() => {
     // Load the Telegram Web App SDK
-    if (isMounted) {
+    if (isMounted && typeof window !== 'undefined') {
       WebApp.ready();
     }
   }, [isMounted]);

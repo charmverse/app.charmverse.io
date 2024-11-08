@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { BuilderEventType, Scout, ScoutWallet } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import {
   getUserS3FilePath,

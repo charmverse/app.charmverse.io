@@ -13,7 +13,7 @@ export type MintNFTParams = {
 };
 
 export async function mintNFT(params: MintNFTParams) {
-  const { builderNftId, recipientAddress, amount, scoutId, pointsValue, paidWithPoints } = params;
+  const { builderNftId, recipientAddress, amount, scoutId } = params;
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
       id: builderNftId

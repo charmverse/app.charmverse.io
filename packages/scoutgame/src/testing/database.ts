@@ -139,13 +139,24 @@ export async function mockGemPayoutEvent({
   });
 }
 
-export async function mockBuilderEvent({ builderId, eventType }: { builderId: string; eventType: BuilderEventType }) {
+export async function mockBuilderEvent({
+  builderId,
+  eventType,
+  week = getCurrentWeek(),
+  createdAt = new Date()
+}: {
+  builderId: string;
+  eventType: BuilderEventType;
+  week?: string;
+  createdAt?: Date;
+}) {
   return prisma.builderEvent.create({
     data: {
+      createdAt,
       builderId,
       season: mockSeason,
       type: eventType,
-      week: getCurrentWeek()
+      week
     }
   });
 }

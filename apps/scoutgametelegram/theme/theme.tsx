@@ -11,10 +11,11 @@ import {
   inputBackgroundDarkMode,
   inputBorderDarkMode,
   primaryTextColorDarkMode,
-  purpleDisabled,
+  brandColorDark,
   secondaryText,
   secondaryLightText,
-  blackText
+  blackText,
+  secondaryDarkText
 } from './colors';
 
 const interFont = Inter({
@@ -56,11 +57,12 @@ const themeOptions: Parameters<typeof createTheme>[0] = {
         },
         primary: {
           main: brandColor,
-          dark: purpleDisabled
+          dark: brandColorDark
         },
         secondary: {
           main: secondaryText,
-          light: secondaryLightText
+          light: secondaryLightText,
+          dark: secondaryDarkText
         },
         inputBackground: {
           main: inputBackgroundDarkMode
