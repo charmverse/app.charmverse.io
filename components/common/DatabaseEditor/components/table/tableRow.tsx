@@ -329,8 +329,9 @@ function TableRow(props: Props) {
                   <TextInput {...commonProps} disablePopup={isMobile} multiline={wrapColumn} />
                 </div>
 
-                <div className='open-button' data-test={`database-open-button-${card.id}`}>
+                <div className='open-button'>
                   <Link
+                    data-test={`database-open-button-${card.id}`}
                     href={href}
                     style={{
                       textDecoration: 'none',
