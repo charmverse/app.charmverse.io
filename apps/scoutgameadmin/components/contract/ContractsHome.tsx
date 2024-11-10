@@ -3,6 +3,7 @@
 import { Tabs, Tab, Box } from '@mui/material';
 import { useState } from 'react';
 
+import { WagmiProvider } from 'components/providers/wagmi/WagmiProvider';
 import type { ProtocolData } from 'lib/contract/aggregateProtocolData';
 import type { BuilderNFTContractData } from 'lib/contract/getContractData';
 
@@ -24,7 +25,11 @@ export function ContractHome({ seasonOne, protocol }: { seasonOne: BuilderNFTCon
       </Tabs>
       <Box mt={2}>
         {selectedTab === 0 && <SeasonOneDashboard {...seasonOne} />}
-        {selectedTab === 1 && <ProtocolContractDashboard {...protocol} />}
+        {selectedTab === 1 && (
+          <WagmiProvider>
+            <ProtocolContractDashboard {...protocol} />
+          </WagmiProvider>
+        )}
       </Box>
     </Box>
   );

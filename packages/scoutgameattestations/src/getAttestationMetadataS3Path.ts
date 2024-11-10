@@ -1,10 +1,8 @@
-import { SCOUTGAME_METADATA_PATH_PREFIX } from './constants';
-
 const SCOUTGAME_S3_BUCKET = process.env.SCOUTGAME_S3_BUCKET ?? 'scoutgame.public';
 
 export function replaceS3Domain<T extends string | undefined | null>(url: T) {
   if (!url) return url;
-  return url.replace('https://s3.amazonaws.com/scoutgame.public/', 'https://nft.scoutgame.xyz/');
+  return url.replace('https://s3.amazonaws.com/scoutgame.public/', 'https://attestations.scoutgame.xyz/');
 }
 
 export function getAttestationMetadataS3Path({
@@ -18,7 +16,9 @@ export function getAttestationMetadataS3Path({
   key?: string;
   metadataType: 'profile' | 'github_contribution';
 }) {
-  const relativePath = `attestations/${SCOUTGAME_METADATA_PATH_PREFIX}/${userId}/${schemaId}-${metadataType}/${key}metadata.json`;
+  const formattedKey = key && !key.endsWith('-') ? `${key}-` : key;
+
+  const relativePath = `attestations/${schemaId}-${metadataType}/${userId}-${formattedKey}metadata.json`;
 
   const fullPath = `https://s3.amazonaws.com/${SCOUTGAME_S3_BUCKET}/${relativePath}`;
 

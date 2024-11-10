@@ -3,22 +3,24 @@ import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import { scoutGameUserProfileSchemaUid } from './constants';
 import { getAttestationMetadataS3Path } from './getAttestationMetadataS3Path';
 
-export type ScoutAttestionMetadata = {
-  path: string;
-  displayName: string;
+export type ContributionReceiptMetadata = {
+  description: string;
 };
 
-export async function uploadScoutProfileToS3({
+export async function uploadContributionReceiptToS3({
   metadata,
-  scoutId
+  scoutId,
+  gemReceiptId
 }: {
-  metadata: ScoutAttestionMetadata;
+  metadata: ContributionReceiptMetadata;
   scoutId: string;
+  gemReceiptId: string;
 }) {
   const { relativePath, fullPath } = getAttestationMetadataS3Path({
     userId: scoutId,
-    metadataType: 'profile',
-    schemaId: scoutGameUserProfileSchemaUid()
+    metadataType: 'github_contribution',
+    schemaId: scoutGameUserProfileSchemaUid(),
+    key: gemReceiptId
   });
 
   await uploadFileToS3({

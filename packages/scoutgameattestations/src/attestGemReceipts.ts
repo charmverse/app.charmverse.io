@@ -9,6 +9,7 @@ import {
   scoutGameUserProfileSchemaUid
 } from './constants';
 import { attestationLogger } from './logger';
+import { uploadContributionReceiptToS3 } from './uploadContributionReceiptToS3';
 import { uploadScoutProfileToS3 } from './uploadScoutProfileToS3';
 
 const minimumGemsDate = new Date('2024-11-04T00:00:00Z');
@@ -114,7 +115,7 @@ export async function attestGemReceipts(): Promise<void> {
     }
   };
 
-  const gemReceiptsWithoutAttestion = await prisma.gemsReceipt.findMany({
+  const gemReceiptsWithoutAttestation = await prisma.gemsReceipt.findMany({
     where: gemsReceiptWithValidUserQuery,
     select: {
       id: true,
@@ -146,7 +147,7 @@ export async function attestGemReceipts(): Promise<void> {
     }
   });
 
-  function getDescription(ev: (typeof gemReceiptsWithoutAttestion)[number]) {
+  function getDescription(ev: (typeof gemReceiptsWithoutAttestation)[number]) {
     return ev.type === 'daily_commit'
       ? `Contributed a regular commit to the repository`
       : ev.type === 'first_pr'
@@ -158,29 +159,41 @@ export async function attestGemReceipts(): Promise<void> {
             : '';
   }
 
-  function getUrl(ev: (typeof gemReceiptsWithoutAttestion)[number]) {
+  function getUrl(ev: (typeof gemReceiptsWithoutAttestation)[number]) {
     return ev.type === 'daily_commit'
       ? `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/commmit/${ev.event.githubEvent?.commitHash}`
       : `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/pulls/${ev.event.githubEvent?.pullRequestNumber}`;
   }
 
-  const attestationInputs: Omit<ScoutGameAttestationInput, 'schemaId'>[] = gemReceiptsWithoutAttestion.map((ev) => ({
-    refUID: ev.event.builder.onchainProfileAttestationUid as `0x${string}`,
-    data: encodeContributionReceiptAttestation({
-      value: ev.value,
-      type: ev.type,
-      metadataUrl: '',
-      userRefUID: ev.event.builder.onchainProfileAttestationUid as `0x${string}`,
-      description: getDescription(ev),
-      url: getUrl(ev)
-    })
-  }));
+  const attestationInputs: Omit<ScoutGameAttestationInput, 'schemaId'>[] = [];
+
+  for (const ev of gemReceiptsWithoutAttestation) {
+    const { metadataUrl } = await uploadContributionReceiptToS3({
+      scoutId: ev.event.builder.id,
+      gemReceiptId: ev.id,
+      metadata: {
+        description: getDescription(ev)
+      }
+    });
+
+    attestationInputs.push({
+      refUID: ev.event.builder.onchainProfileAttestationUid as `0x${string}`,
+      data: encodeContributionReceiptAttestation({
+        value: ev.value,
+        type: ev.type,
+        metadataUrl,
+        userRefUID: ev.event.builder.onchainProfileAttestationUid as `0x${string}`,
+        description: getDescription(ev),
+        url: getUrl(ev)
+      })
+    });
+  }
 
   await multiAttestOnchain({
     schemaId: scoutGameContributionReceiptSchemaUid(),
     records: attestationInputs,
     onAttestSuccess: async ({ attestationUid, index }) => {
-      const event = gemReceiptsWithoutAttestion[index];
+      const event = gemReceiptsWithoutAttestation[index];
 
       await prisma.gemsReceipt.update({
         where: {
@@ -194,5 +207,5 @@ export async function attestGemReceipts(): Promise<void> {
     }
   });
 
-  attestationLogger.info(`Attested ${gemReceiptsWithoutAttestion.length} gem receipts`);
+  attestationLogger.info(`Attested ${gemReceiptsWithoutAttestation.length} gem receipts`);
 }

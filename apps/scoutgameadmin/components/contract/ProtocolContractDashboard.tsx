@@ -1,14 +1,12 @@
 import { contributionSchemaDefinition, scoutGameUserProfileSchemaDefinition } from '@charmverse/core/protocol';
 import { Box, Button, Divider, Grid2, IconButton, Typography } from '@mui/material';
-import {
-  scoutGameContributionReceiptSchemaUid,
-  scoutGameUserProfileSchemaUid
-} from '@packages/scoutgameattestations/constants';
+import { ProtocolImplementationClient } from '@packages/scoutgame/protocol/clients/ProtocolImplementationClient';
+import { scoutGameAttestationChain } from '@packages/scoutgameattestations/constants';
 import Link from 'next/link';
 import { MdLaunch } from 'react-icons/md';
+import { useSendTransaction, useWalletClient } from 'wagmi';
 
 import type { ProtocolData } from 'lib/contract/aggregateProtocolData';
-import type { BuilderNFTContractData } from 'lib/contract/getContractData';
 
 function ContractLink({
   address,
@@ -70,6 +68,30 @@ export function ProtocolContractDashboard(data: ProtocolData) {
   const itemSizeTwoColumnMd = { xs: 12, md: 6 };
   const itemSizeThreeColumnMd = { xs: 12, md: 4 };
 
+  // const { sendTransactionAsync } = useSendTransaction();
+
+  const { data: walletClient } = useWalletClient();
+
+  async function claimTokens(claimData: ProtocolData['merkleRoots'][number]) {
+    if (!claimData.testClaim || !walletClient) {
+      return;
+    }
+
+    const client = new ProtocolImplementationClient({
+      contractAddress: data.proxy,
+      walletClient: walletClient as any,
+      chain: scoutGameAttestationChain
+    });
+
+    await client.claim({
+      args: {
+        week: claimData.week,
+        amount: BigInt(claimData.testClaim.claim.amount),
+        proofs: claimData.testClaim.proofs
+      }
+    });
+  }
+
   return (
     <Grid2 container spacing={2}>
       <Grid2 size={12}>
@@ -106,7 +128,7 @@ export function ProtocolContractDashboard(data: ProtocolData) {
             ))}
 
           {root.testClaim && (
-            <Button>
+            <Button onClick={() => claimTokens(root)}>
               Claim {root.testClaim.claim.amount} $SCOUT with {root.testClaim.claim.address.slice(0, 5)}..
               {root.testClaim.claim.address.slice(root.testClaim.claim.address.length - 3)}
             </Button>

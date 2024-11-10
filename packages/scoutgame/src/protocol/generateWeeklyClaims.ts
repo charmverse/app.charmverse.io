@@ -188,7 +188,7 @@ export async function generateWeeklyClaims({
 
   await protocolImplementationWriteClient.setMerkleRoot({
     args: {
-      merkleRoot: rootHash.slice(0, 32),
+      merkleRoot: `0x${rootHash}`,
       week
     }
   });
@@ -219,23 +219,3 @@ export async function generateWeeklyClaims({
     totalPoints: tokenReceipts.length
   };
 }
-
-// prisma.scout
-//   .update({
-//     where: {
-//       farcasterId: 4339
-//     },
-//     data: {
-//       scoutWallet: {
-//         create: {
-//           address: '0xCF1bAA2EE2d3427B4dB2EA5fa4A250E8b44e75d9'
-//         }
-//       }
-//     }
-//   })
-//   .then(console.log)
-//   .catch(console.error);
-
-// prisma.weeklyClaims
-//   .deleteMany()
-//   .then(generateWeeklyClaims({ week: '2024-W45' }).then(console.log).catch(console.error));
