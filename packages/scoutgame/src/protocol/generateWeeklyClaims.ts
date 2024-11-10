@@ -186,7 +186,7 @@ export async function generateWeeklyClaims({
     leavesWithUserId: claimsWithUserId
   };
 
-  await protocolImplementationWriteClient.setMerkleRoot({
+  await protocolImplementationWriteClient().setMerkleRoot({
     args: {
       merkleRoot: `0x${rootHash}`,
       week
