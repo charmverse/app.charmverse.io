@@ -10,7 +10,6 @@ export interface MixpanelTrackBase {
   isAnonymous?: boolean;
 }
 
-// a simpler method that is un-opinionated about types or event schema
 export function trackUserAction<T extends MixpanelEventName>(eventName: T, params: MixpanelEventMap[T]) {
   const { userId, ...restParams } = params;
   // map userId prop to distinct_id required by mixpanel to recognize the user
@@ -24,6 +23,10 @@ export function trackUserAction<T extends MixpanelEventName>(eventName: T, param
   try {
     mixpanel?.track(humanReadableEventName, mixpanelTrackParams);
   } catch (error) {
-    log.warn(`Failed to update mixpanel event ${eventName as string}`, { error });
+    log.warn(`Failed to track mixpanel event ${eventName as string}`, {
+      error,
+      humanReadableEventName,
+      params: mixpanelTrackParams
+    });
   }
 }

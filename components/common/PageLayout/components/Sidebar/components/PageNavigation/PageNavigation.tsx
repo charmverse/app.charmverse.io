@@ -279,7 +279,6 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
           item={item}
           onDropChild={isFavorites ? null : onDropChild}
           onDropAdjacent={onDropAdjacent}
-          pathPrefix={`/${router.query.domain}`}
           // pass down so parent databases can highlight themselves
           selectedNodeId={selectedNodeId}
           addPage={addPage}

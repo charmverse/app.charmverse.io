@@ -9,6 +9,7 @@ import { useState } from 'react';
 
 import type { NFTPurchaseProps } from 'components/common/NFTPurchaseDialog/components/NFTPurchaseForm';
 import { useUser } from 'components/layout/UserProvider';
+import { useTrackEvent } from 'hooks/useTrackEvent';
 
 import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
 
@@ -23,21 +24,23 @@ const NFTPurchaseDialog = dynamic(
 );
 
 export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus } }) {
+  const trackEvent = useTrackEvent();
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
   const [dialogLoadingStatus, setDialogLoadingStatus] = useState<boolean>(false);
   const { user } = useUser();
   const isAuthenticated = Boolean(user?.id);
 
+  const purchaseCostInPoints = convertCostToPoints(builder?.price || BigInt(0));
+
   const handleClick = () => {
+    trackEvent('click_scout_button', { builderPath: builder.path, price: purchaseCostInPoints });
     if (isAuthenticated) {
       setIsPurchasing(true);
     } else {
       setAuthPopup(true);
     }
   };
-
-  const purchaseCostInPoints = convertCostToPoints(builder?.price || BigInt(0));
 
   if (builder.builderStatus === 'banned') {
     return (

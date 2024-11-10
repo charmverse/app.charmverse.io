@@ -21,6 +21,7 @@ export function HomePage({ tab }: { tab: string }) {
           height: 'calc(100vh - 100px)',
           overflowY: 'scroll'
         }}
+        data-test='home-page'
       >
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
           <Image src='/images/profile/icons/blue-fire-icon.svg' width='30' height='30' alt='title icon' />

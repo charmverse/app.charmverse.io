@@ -32,16 +32,21 @@ export function HeaderActions() {
         </MenuItem>
         <Divider />
         <MenuItemNoAction>
-          <Box px={0.5}>Partner exports</Box>
+          <Box px={0.5}>Partner exports ({lastWeek})</Box>
         </MenuItemNoAction>
         <MenuItem>
-          <FileDownloadButton size='small' filename={`Celo Weekly Report (${lastWeek}).tsv`} src='/api/partners/celo'>
-            Celo Report ({lastWeek})
+          <FileDownloadButton
+            sx={{ justifyContent: 'flex-start' }}
+            size='small'
+            filename={`Celo Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/celo'
+          >
+            Celo
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
           <FileDownloadButton size='small' filename={`Game7 Weekly Report (${lastWeek}).tsv`} src='/api/partners/game7'>
-            Game7 Report ({lastWeek})
+            Game7
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
@@ -50,7 +55,7 @@ export function HeaderActions() {
             filename={`Lit Protocol Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/lit_protocol'
           >
-            Lit Protocol Report ({lastWeek})
+            Lit Protocol
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
@@ -59,12 +64,21 @@ export function HeaderActions() {
             filename={`OP Supersim Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/op_supersim'
           >
-            OP Supersim Report ({lastWeek})
+            OP Supersim
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
           <FileDownloadButton size='small' filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
-            Moxie Report ({lastWeek})
+            Moxie
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            size='small'
+            filename={`Talent Protocol Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/talent'
+          >
+            Talent Protocol
           </FileDownloadButton>
         </MenuItem>
       </Menu>

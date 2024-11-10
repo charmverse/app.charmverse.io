@@ -182,7 +182,7 @@ function ViewHeader(props: Props) {
 
           {/* Link to view embedded table in full - check that at least one view is created */}
           {props.embeddedBoardPath && !!views.length && (
-            <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
+            <Link href={`/${props.embeddedBoardPath}`}>
               <IconButton
                 tooltip='Open as full page'
                 icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}

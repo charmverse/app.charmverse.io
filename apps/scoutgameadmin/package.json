@@ -13,6 +13,7 @@
     "@mui/lab": "^6.0.0-beta.11",
     "@packages/blockchain": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
-    "@packages/scoutgameattestations": "^0.0.0"
+    "@packages/scoutgameattestations": "^0.0.0",
+    "@packages/utils": "^1.0.0"
   }
 }
