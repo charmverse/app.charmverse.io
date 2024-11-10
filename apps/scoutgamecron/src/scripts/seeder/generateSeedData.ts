@@ -212,4 +212,4 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
 }
 
 
- generateSeedData({buildersRange: {max: 5, min: 5}, includeFid: 4339}).then(console.log)
+//  generateSeedData({buildersRange: {max: 5, min: 5}, includeFid: 4339}).then(console.log)
