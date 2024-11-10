@@ -15,7 +15,7 @@ export async function uploadScoutProfileToS3({
   metadata: ScoutAttestionMetadata;
   scoutId: string;
 }) {
-  const { relativePath, fullPath } = getAttestationMetadataS3Path({
+  const { relativePath, fullPathWithCdn } = getAttestationMetadataS3Path({
     userId: scoutId,
     metadataType: 'profile',
     schemaId: scoutGameUserProfileSchemaUid()
@@ -28,7 +28,7 @@ export async function uploadScoutProfileToS3({
   });
 
   return {
-    metadataUrl: fullPath,
+    metadataUrl: fullPathWithCdn,
     metadataS3Path: relativePath
   };
 }

@@ -16,21 +16,23 @@ export async function uploadContributionReceiptToS3({
   scoutId: string;
   gemReceiptId: string;
 }) {
-  const { relativePath, fullPath } = getAttestationMetadataS3Path({
+  const { relativePath, fullPathWithCdn } = getAttestationMetadataS3Path({
     userId: scoutId,
     metadataType: 'github_contribution',
     schemaId: scoutGameUserProfileSchemaUid(),
-    key: gemReceiptId
+    key: `receiptid-${gemReceiptId}`
   });
+
+  const bucket = process.env.SCOUTGAME_S3_BUCKET ?? 'scoutgame.public';
 
   await uploadFileToS3({
     pathInS3: relativePath,
     content: Buffer.from(JSON.stringify(metadata, null, 2)),
-    bucket: process.env.SCOUTGAME_S3_BUCKET ?? 'scoutgame.public'
+    bucket
   });
 
   return {
-    metadataUrl: fullPath,
+    metadataUrl: fullPathWithCdn,
     metadataS3Path: relativePath
   };
 }

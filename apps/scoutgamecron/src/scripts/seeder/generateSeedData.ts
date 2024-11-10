@@ -5,6 +5,7 @@ import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
+import {findOrCreateFarcasterUser} from '@packages/scoutgame/users/findOrCreateFarcasterUser';
 
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
@@ -88,11 +89,9 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
 
   // Handle user account
   if (includeFid) {
-    const scout = await prisma.scout.findFirstOrThrow({
-      where: {
-        farcasterId: includeFid
-      }
-    });
+    const scout = await findOrCreateFarcasterUser({
+      fid: includeFid
+    })
 
     const assignedToMe = assignBuildersToScout(builders);
 
@@ -212,4 +211,4 @@ export async function generateSeedData({buildersRange = defaultBuildersRange, in
 }
 
 
-//  generateSeedData({buildersRange: {max: 5, min: 5}, includeFid: 4339}).then(console.log)
+// generateSeedData({buildersRange: {max: 5, min: 5}, includeFid: 4339}).then(console.log)

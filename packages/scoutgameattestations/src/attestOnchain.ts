@@ -75,6 +75,10 @@ export async function multiAttestOnchain(params: {
   onAttestSuccess?: (input: { attestationUid: string; data: `0x${string}`; index: number }) => Promise<void>;
   batchStartIndex?: number;
 }): Promise<`0x${string}`[]> {
+  if (params.records.length === 0) {
+    return [];
+  }
+
   if (params.records.length > maxPerBatch) {
     const allUids: `0x${string}`[] = [];
     for (let i = 0; i < params.records.length; i += maxPerBatch) {

@@ -207,5 +207,5 @@ export async function attestGemReceipts(): Promise<void> {
     }
   });
 
-  attestationLogger.info(`Attested ${gemReceiptsWithoutAttestation.length} gem receipts`);
+  attestationLogger.info(`Attested ${attestationInputs.length} gem receipts`);
 }
