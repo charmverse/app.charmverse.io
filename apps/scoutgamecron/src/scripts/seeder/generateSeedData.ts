@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
-import type { GithubRepo, GithubUser } from '@charmverse/core/prisma-client';
+import { prisma, type GithubRepo, type GithubUser } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { getWeekFromDate, currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
 import { DateTime } from 'luxon';
+import {findOrCreateFarcasterUser} from '@packages/scoutgame/users/findOrCreateFarcasterUser';
 
 import { processScoutPointsPayout } from '../../tasks/processGemsPayout/processScoutPointsPayout';
 import { updateBuildersRank } from '@packages/scoutgame/builders/updateBuildersRank';
@@ -37,9 +38,22 @@ function assignBuildersToScout(builders: BuilderInfo[]) {
   );
 }
 
-export async function generateSeedData() {
+type MinMaxRange = {
+  min: number;
+  max: number;
+}
+
+const defaultBuildersRange: MinMaxRange = {
+  min: 10,
+  max: 20
+};
+
+/**
+ * @fidToGenerate - Utility for including your own user id in the generated data
+ */
+export async function generateSeedData({buildersRange = defaultBuildersRange, includeFid}: {buildersRange?: MinMaxRange; includeFid?: number} = {buildersRange: defaultBuildersRange}) {
   // Total number of users that are builders (should be less than totalUsers)
-  const totalBuilders = faker.number.int({ min: 10, max: 20 });
+  const totalBuilders = faker.number.int(buildersRange);
   // Total number of github repos
   const totalGithubRepos = faker.number.int({ min: 5, max: 10 });
 
@@ -73,6 +87,20 @@ export async function generateSeedData() {
 
   const builderResults = await Promise.all(builderPromises);
 
+  // Handle user account
+  if (includeFid) {
+    const scout = await findOrCreateFarcasterUser({
+      fid: includeFid
+    })
+
+    const assignedToMe = assignBuildersToScout(builders);
+
+    scouts.push({
+      id: scout.id,
+      assignedBuilders: assignedToMe
+    });
+  }
+
   // Process the results
   for (const { builderInfo, isScout } of builderResults) {
     builders.push(builderInfo);
@@ -95,6 +123,7 @@ export async function generateSeedData() {
       assignedBuilders
     });
   }
+
 
   // Go through each day of the past two weeks
   const startDate = DateTime.now().minus({ weeks: 2 });
@@ -180,3 +209,6 @@ export async function generateSeedData() {
     totalNftsPurchasedEvents
   });
 }
+
+
+// generateSeedData({buildersRange: {max: 5, min: 5}, includeFid: 4339}).then(console.log)
