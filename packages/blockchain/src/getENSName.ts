@@ -2,8 +2,7 @@ import { log } from '@charmverse/core/log';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
 
-import { getAlchemyBaseUrl } from '../../../lib/blockchain/provider/alchemy/client';
-
+import { getAlchemyBaseUrl } from './getAlchemyBaseUrl';
 import { getPublicClient } from './getPublicClient';
 
 const isTestEnv = process.env.NODE_ENV === 'test';
