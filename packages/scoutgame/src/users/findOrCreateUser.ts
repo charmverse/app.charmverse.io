@@ -9,7 +9,7 @@ import {
   getFilenameWithExtension
 } from '@packages/aws/uploadToS3Server';
 import { getENSName } from '@packages/blockchain/getENSName';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';
