@@ -63,7 +63,7 @@ export async function attestGemReceipts(): Promise<void> {
 
   for (let i = 0; i < usersToProcess; i++) {
     const user = usersWithoutProfile[i];
-    attestationLogger.info(`Creating attestion for user ${user.id} ${i + 1} / ${usersToProcess}`);
+    attestationLogger.info(`Populating profile attestion for user ${user.id} ${i + 1} / ${usersToProcess}`);
 
     const { metadataUrl } = await uploadScoutProfileToS3({
       scoutId: user.id,
@@ -161,8 +161,8 @@ export async function attestGemReceipts(): Promise<void> {
 
   function getUrl(ev: (typeof gemReceiptsWithoutAttestation)[number]) {
     return ev.type === 'daily_commit'
-      ? `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/commmit/${ev.event.githubEvent?.commitHash}`
-      : `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/pulls/${ev.event.githubEvent?.pullRequestNumber}`;
+      ? `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/commit/${ev.event.githubEvent?.commitHash}`
+      : `https://github.com/${ev.event.githubEvent?.repo.owner}/${ev.event.githubEvent?.repo.name}/pull/${ev.event.githubEvent?.pullRequestNumber}`;
   }
 
   const attestationInputs: Omit<ScoutGameAttestationInput, 'schemaId'>[] = [];
