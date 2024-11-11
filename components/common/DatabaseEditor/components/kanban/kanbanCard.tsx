@@ -79,7 +79,7 @@ const KanbanCard = React.memo((props: Props) => {
 
   const router = useRouter();
   const domain = router.query.domain;
-  const fullPageUrl = `/${domain}/${card.id}`;
+  const fullPageUrl = `/${card.id}`;
   const { trigger: trashPages } = useTrashPages();
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);

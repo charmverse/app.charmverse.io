@@ -12,10 +12,17 @@ const client = new S3Client(getS3ClientConfig());
 
 const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
-export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; contentType?: string }) {
+export async function uploadFileToS3(file: {
+  pathInS3: string;
+  content: Buffer;
+  contentType?: string;
+  bucket?: string;
+}) {
+  const uploadBucket = file.bucket ?? awsS3Bucket;
+
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
-    Bucket: awsS3Bucket,
+    Bucket: uploadBucket,
     Key: file.pathInS3,
     Body: file.content,
     ContentType: file.contentType
@@ -28,7 +35,7 @@ export async function uploadFileToS3(file: { pathInS3: string; content: Buffer; 
 
   await s3Upload.done();
 
-  const fileUrl = `https://s3.amazonaws.com/${awsS3Bucket}/${file.pathInS3}`;
+  const fileUrl = `https://s3.amazonaws.com/${uploadBucket}/${file.pathInS3}`;
   return { fileUrl };
 }
 

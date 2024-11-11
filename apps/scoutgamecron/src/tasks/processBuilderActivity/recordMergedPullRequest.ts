@@ -101,7 +101,7 @@ export async function recordMergedPullRequest({
       createdBy: pullRequest.author.id,
       type: 'merged_pull_request',
       isFirstPullRequest: true,
-      createdAt: {
+      completedAt: {
         gte: startOfWeek.toJSDate()
       }
     }

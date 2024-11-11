@@ -60,6 +60,7 @@ export function PromoCard({
             borderRadius: '5px'
           }}
           size='small'
+          href={path}
         >
           Learn More
         </Button>

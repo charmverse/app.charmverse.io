@@ -9,19 +9,13 @@ import { useIsMounted } from 'hooks/useIsMounted';
 import { loadUser } from 'lib/session/loadUserAction';
 
 export function useInitTelegramData() {
-  const telegramInitData = typeof window !== 'undefined' ? WebApp.initData : undefined;
+  const telegramInitData = typeof window !== 'undefined' ? WebApp.initData : null;
   const isMounted = useIsMounted();
   const { refreshUser, isLoading } = useUser();
   const { executeAsync, isExecuting } = useAction(loadUser, {
     onSuccess: async (data) => {
       if (data.data) {
         await refreshUser();
-        // @TODO: Enable this when we will have an onboarding page
-        // if (data.data?.onboardedAt && data.data?.agreedToTermsAt) {
-        //   redirect('/home');
-        // } else {
-        //   redirect('/welcome/onboarding');
-        // }
       }
     },
     onError: (error) => {

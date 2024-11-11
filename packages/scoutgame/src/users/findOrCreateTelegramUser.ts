@@ -21,7 +21,7 @@ export async function findOrCreateTelegramUser(telegramUser: {
     newUserId: uuidFromNumber(telegramUser.id),
     telegramId: telegramUser.id,
     avatar: telegramUser.photo_url,
-    displayName: telegramUser.username,
+    displayName: `${telegramUser.first_name}${telegramUser.last_name ? ` ${telegramUser.last_name}` : ''}`,
     path: telegramUser.username
   });
 }

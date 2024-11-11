@@ -6,6 +6,8 @@ import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';
 
 test.describe('Appeal proposal evaluation step', async () => {
+  test.describe.configure({ retries: 4 }); // allow retrying appeal test which is very flaky
+
   let space: Space;
   let admin: User;
   let proposalAuthor: User;

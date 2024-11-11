@@ -65,6 +65,7 @@
       "@charmverse/core/proposals": ["node_modules/@charmverse/core/dist/cjs/proposals"],
       "@charmverse/core/bounties": ["node_modules/@charmverse/core/dist/cjs/bounties"],
       "@charmverse/core/utilities": ["node_modules/@charmverse/core/dist/cjs/utilities"],
+      "@charmverse/core/protocol": ["node_modules/@charmverse/core/dist/cjs/protocol"],
       "@charmverse/core/errors": ["node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },

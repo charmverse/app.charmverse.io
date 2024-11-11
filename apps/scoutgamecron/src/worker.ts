@@ -5,8 +5,10 @@ import { DateTime } from 'luxon';
 
 import * as middleware from './middleware';
 import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
+import { issueGemsOnchain } from './tasks/issueGemsOnchain';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
+import { processOnchainGemsPayout } from './tasks/processGemsPayout/processOnchainGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
 import { resolveBalanceIssues } from './tasks/resolveBalanceIssues/resolveBalanceIssues';
@@ -66,7 +68,15 @@ addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
 
-// Standard health check used by Beanstalk
+// Onchain tasks -------
+
+// Calculate merkle tree and write to protocol
+addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
+
+// Issue receipts for Github Activity via EAS
+addTask('/issue-gems-onchain', issueGemsOnchain);
+
+// Standard health check used by Beanstalk -------
 router.get('/api/health', middleware.healthCheck);
 
 app.use(middleware.errorHandler).use(router.routes()).use(router.allowedMethods());

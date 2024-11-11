@@ -6,7 +6,7 @@ import { QuestCard } from './QuestCard';
 
 export function QuestsList({ quests }: { quests: QuestInfo[] }) {
   return (
-    <Stack justifyContent='center' alignItems='center' gap={1} my={4}>
+    <Stack justifyContent='center' alignItems='center' gap={1} mt={4}>
       <Typography variant='h4' color='secondary' fontWeight={600} zIndex={1}>
         Quests
       </Typography>
