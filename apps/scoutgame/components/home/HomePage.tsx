@@ -1,24 +1,26 @@
-import { Box, Stack, Typography, Container } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
 import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
-import { TodaysHotBuildersCarousel } from 'components/home/components/BuildersCarousel/TodaysHotBuildersCarousel';
-import { HomeTabsMenu } from 'components/home/components/HomePageTable/components/HomeTabsMenu';
 
-import { homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
+import { HomeTabsMenu, homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
+import { TodaysHotBuildersCarousel } from './components/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 
 export function HomePage({ tab }: { tab: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>
       <HeaderMessage />
-      <Container
-        sx={{ px: '0 !important', height: 'calc(100vh - 100px)', overflowY: 'scroll' }}
-        maxWidth='xl'
+      <Stack
+        sx={{
+          width: '100%',
+          height: 'calc(100vh - 100px)',
+          overflowY: 'scroll'
+        }}
         data-test='home-page'
       >
         <Stack flexDirection='row' alignItems='center' justifyContent='center' px={2} py={3}>
@@ -43,7 +45,7 @@ export function HomePage({ tab }: { tab: string }) {
         <Suspense key={currentTab} fallback={<LoadingTable />}>
           <HomeTab tab={currentTab} />
         </Suspense>
-      </Container>
+      </Stack>
     </>
   );
 }

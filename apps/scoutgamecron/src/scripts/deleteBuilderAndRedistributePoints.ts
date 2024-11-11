@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { sendPoints } from '@packages/scoutgame/points/sendPoints';
+import { sendPointsForMiscEvent } from '@packages/scoutgame/points/builderEvents/sendPointsForMiscEvent';
 
 async function deleteBuilderAndRedistributePoints({ builderPath }: { builderPath: string }) {
   const builder = await prisma.scout.findUnique({
@@ -58,13 +58,13 @@ async function deleteBuilderAndRedistributePoints({ builderPath }: { builderPath
       });
       for (const [scoutId, tokensPurchased] of Object.entries(nftPurchaseEventsRecord)) {
         const points = tokensPurchased * 20;
-        await sendPoints({
+        await sendPointsForMiscEvent({
           tx,
           builderId: scoutId,
           points,
           description: `You received a ${points} point gift from Scout Game`,
           claimed: true,
-          earnedAs: 'scout'
+          earnedAs: 'scout',
         });
         await prisma.userSeasonStats.update({
           where: {

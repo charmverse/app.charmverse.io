@@ -3,6 +3,7 @@ import type { TypographyProps } from '@mui/material';
 import { Menu, ListItem, Divider, Typography, MenuItem, IconButton } from '@mui/material';
 import { useState } from 'react';
 
+import { MenuItemNoAction } from 'components/common/MenuItemNoAction';
 import type { ScoutGameUser } from 'lib/users/getUsers';
 
 import { AddBuilderModal } from './AddBuilderModal';
@@ -60,15 +61,5 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
         scoutId={user.id}
       />
     </>
-  );
-}
-
-function MenuItemNoAction({ children, ...props }: { children: React.ReactNode } & TypographyProps) {
-  return (
-    <ListItem dense onClick={(e) => e.stopPropagation()}>
-      <Typography color='text.secondary' variant='caption' {...props}>
-        {children}
-      </Typography>
-    </ListItem>
   );
 }

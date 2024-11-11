@@ -15,6 +15,7 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
     "@packages/farcaster": "file:../../packages/farcaster",
     "@packages/github": "file:../../packages/github",
     "@packages/mixpanel": "^0.0.0",

@@ -357,10 +357,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-1"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -553,10 +554,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-2"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -1157,10 +1159,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-1"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -1353,10 +1356,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-2"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -1957,10 +1961,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-1"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -2153,10 +2158,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-2"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >
@@ -2757,10 +2763,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-1"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
                     href="/card-id-1"
                     style="text-decoration: none;"
                   >
@@ -2953,10 +2960,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 </div>
                 <div
                   class="open-button"
-                  data-test="database-open-button-card-id-2"
                 >
                   <a
                     class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
                     href="/card-id-2"
                     style="text-decoration: none;"
                   >

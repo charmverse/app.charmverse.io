@@ -1,6 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
+import { log } from '@charmverse/core/log';
 import WebApp from '@twa-dev/sdk';
-import { redirect } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 
@@ -9,26 +9,23 @@ import { useIsMounted } from 'hooks/useIsMounted';
 import { loadUser } from 'lib/session/loadUserAction';
 
 export function useInitTelegramData() {
-  const telegramInitData = WebApp.initData;
+  const telegramInitData = typeof window !== 'undefined' ? WebApp.initData : null;
   const isMounted = useIsMounted();
   const { refreshUser, isLoading } = useUser();
   const { executeAsync, isExecuting } = useAction(loadUser, {
     onSuccess: async (data) => {
       if (data.data) {
         await refreshUser();
-        // @TODO: Enable this when we will have an onboarding page
-        // if (data.data?.onboardedAt && data.data?.agreedToTermsAt) {
-        //   redirect('/home');
-        // } else {
-        //   redirect('/welcome/onboarding');
-        // }
       }
+    },
+    onError: (error) => {
+      log.error('Error loading user', { error: error.error.serverError });
     }
   });
 
   useEffect(() => {
     // Load the Telegram Web App SDK
-    if (isMounted) {
+    if (isMounted && typeof window !== 'undefined') {
       WebApp.ready();
     }
   }, [isMounted]);

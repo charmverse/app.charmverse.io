@@ -35,7 +35,7 @@ describe('getSubdomainPath()', () => {
   });
 
   it('should not return the path with subdomain when on custom domain host', () => {
-    const result = getSubdomainPath('/foo', { domain: 'charmverse' }, 'charmverse.charmverse.io');
+    const result = getSubdomainPath('/foo', { domain: 'charmverse' }, 'charmverse.io');
     expect(result).toEqual('/foo');
   });
 

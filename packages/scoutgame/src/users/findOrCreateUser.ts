@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { BuilderEventType, Scout, ScoutWallet } from '@charmverse/core/prisma-client';
+import type { BuilderEventType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import {
   getUserS3FilePath,
@@ -9,7 +9,7 @@ import {
   getFilenameWithExtension
 } from '@packages/aws/uploadToS3Server';
 import { getENSName } from '@packages/blockchain/getENSName';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';

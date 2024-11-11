@@ -2,13 +2,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../../dates';
 import { mockBuilder } from '../../testing/database';
-import { sendPoints } from '../sendPoints';
+import { sendPointsForMiscEvent } from '../builderEvents/sendPointsForMiscEvent';
 
 describe('sendPoints', () => {
   it('should send points quietly', async () => {
     const builder = await mockBuilder();
     const mockPoints = 100;
-    await sendPoints({
+    await sendPointsForMiscEvent({
       builderId: builder.id,
       points: mockPoints,
       hideFromNotifications: true,
@@ -40,7 +40,7 @@ describe('sendPoints', () => {
   it('should send points earned as builder', async () => {
     const builder = await mockBuilder();
     const mockPoints = 100;
-    await sendPoints({
+    await sendPointsForMiscEvent({
       builderId: builder.id,
       points: mockPoints,
       description: 'Test description',

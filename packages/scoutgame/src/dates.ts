@@ -103,3 +103,19 @@ export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; we
   const weeksDiff = weekDate.diff(seasonDate, 'weeks').weeks;
   return weeksDiff + 1;
 }
+
+export function getAllISOWeeksFromSeasonStart(): string[] {
+  const seasonOneStart = '2024-W41';
+  const start = getStartOfSeason(seasonOneStart);
+  const end = DateTime.now();
+
+  let current = start;
+  const weeks: string[] = [];
+
+  while (current <= end) {
+    weeks.push(`${current.weekYear}-W${current.weekNumber}`);
+    current = current.plus({ weeks: 1 });
+  }
+
+  return weeks;
+}

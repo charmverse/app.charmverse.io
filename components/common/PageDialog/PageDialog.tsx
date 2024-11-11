@@ -44,8 +44,7 @@ function PageDialogBase(props: Props) {
   const { updatePage } = usePages();
   const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
-  const domain = router.query.domain as string;
-  const fullPageUrl = page?.path ? `/${domain}/${page?.path}` : null;
+  const fullPageUrl = page?.path ? `/${page?.path}` : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;
 
@@ -72,7 +71,7 @@ function PageDialogBase(props: Props) {
         spaceId: page.spaceId,
         pageId: page.id,
         type: page.type,
-        spaceDomain: domain,
+        spaceDomain: space.domain,
         spaceCustomDomain: space.customDomain
       });
       if (space.domain === 'op-grants') {
