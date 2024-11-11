@@ -1,4 +1,5 @@
 import { Paper, Stack, Typography } from '@mui/material';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
 import { getRelativeTime } from '@packages/utils/dates';
@@ -70,8 +71,15 @@ export function BuilderActivityBonusPartner({
   activity: BuilderActivity;
   showEmpty?: boolean;
 }) {
-  return activity.type === 'github_event' && activity.bonusPartner && bonusPartnersRecord[activity.bonusPartner] ? (
-    <Image width={20} height={20} src={bonusPartnersRecord[activity.bonusPartner].icon} alt='Bonus Partner' />
+  return activity.type === 'github_event' &&
+    activity.bonusPartner &&
+    bonusPartnersRecord[activity.bonusPartner as BonusPartner] ? (
+    <Image
+      width={20}
+      height={20}
+      src={bonusPartnersRecord[activity.bonusPartner as BonusPartner].icon}
+      alt='Bonus Partner'
+    />
   ) : showEmpty ? (
     '-'
   ) : null;
