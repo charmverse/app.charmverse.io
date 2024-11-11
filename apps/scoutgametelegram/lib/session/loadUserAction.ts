@@ -23,12 +23,16 @@ export const loadUser = actionClient
     if (!validatedData.user?.id) {
       throw new DataNotFoundError('No telegram user id found');
     }
+
     const avatar = await getUserAvatar(validatedData.user.id).catch((error) => {
       log.info('Error getting telegram avatar', { error });
       return null;
     });
 
-    const user = await findOrCreateTelegramUser(validatedData.user);
+    const user = await findOrCreateTelegramUser({
+      ...validatedData.user,
+      photo_url: avatar ?? undefined
+    });
 
     session.scoutId = user?.id;
     session.anonymousUserId = undefined;

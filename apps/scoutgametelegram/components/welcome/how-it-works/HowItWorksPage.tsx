@@ -1,5 +1,11 @@
+import { InfoPageContainer } from 'components/layout/InfoPageContainer';
+
 import { HowItWorksContent } from './HowItWorksContent';
 
 export function HowItWorksPage() {
-  return <HowItWorksContent />;
+  return (
+    <InfoPageContainer>
+      <HowItWorksContent />
+    </InfoPageContainer>
+  );
 }
