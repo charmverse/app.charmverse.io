@@ -68,12 +68,15 @@ addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
 
-// Onchain tasks
+// Onchain tasks -------
+
+// Calculate merkle tree and write to protocol
 addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
 
+// Issue receipts for Github Activity via EAS
 addTask('/issue-gems-onchain', issueGemsOnchain);
 
-// Standard health check used by Beanstalk
+// Standard health check used by Beanstalk -------
 router.get('/api/health', middleware.healthCheck);
 
 app.use(middleware.errorHandler).use(router.routes()).use(router.allowedMethods());
