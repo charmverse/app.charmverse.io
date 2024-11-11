@@ -1,9 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { currentSeason } from '../dates';
-
-import { refreshCongratsImage } from './refreshCongratsImage';
+import { refreshCongratsImage } from '@packages/scoutgame/builders/refreshCongratsImage';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function refreshCongratsImages() {
   const builderNfts = await prisma.builderNft.findMany({

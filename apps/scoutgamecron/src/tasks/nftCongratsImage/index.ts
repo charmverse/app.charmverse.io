@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
-import { refreshCongratsImages } from '@packages/scoutgame/builders/refreshCongratsImages';
 import type Koa from 'koa';
+
+import { refreshCongratsImages } from './refreshCongratsImages';
 
 export async function nftCongratsImageTask(ctx: Koa.Context) {
   log.info('Refreshing NFT congrats images for all builders');
