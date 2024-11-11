@@ -3,6 +3,7 @@ import { getRelativeTime } from '@packages/utils/dates';
 import React from 'react';
 import type { CSSProperties } from 'react';
 
+import type { BonusPartner } from '../../../bonus';
 import { bonusPartnersRecord } from '../../../bonus';
 import type { BuilderActivity } from '../../../builders/getBuilderActivities';
 import type { BuilderScouts } from '../../../builders/getBuilderScouts';
@@ -226,11 +227,11 @@ export function BuilderShareImage({
                   ) : null}
                   {activity.type === 'github_event' &&
                   activity.bonusPartner &&
-                  bonusPartnersRecord[activity.bonusPartner] ? (
+                  bonusPartnersRecord[activity.bonusPartner as BonusPartner] ? (
                     <img
                       width={20}
                       height={20}
-                      src={bonusPartnersRecord[activity.bonusPartner].icon}
+                      src={bonusPartnersRecord[activity.bonusPartner as BonusPartner].icon}
                       alt='Bonus Partner'
                     />
                   ) : null}
