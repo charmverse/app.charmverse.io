@@ -17,6 +17,7 @@ export type ClaimPageProps = {
   displayName: string;
   period: string;
   builderPoints: number;
+  scoutPoints: number;
   repos: string[];
   builders: {
     avatar: string | null;
@@ -31,6 +32,7 @@ export function ClaimPage({
   period,
   builders,
   builderPoints,
+  scoutPoints,
   repos
 }: ClaimPageProps) {
   return (
@@ -51,6 +53,7 @@ export function ClaimPage({
             builders={builders}
             builderPoints={builderPoints}
             repos={repos}
+            scoutPoints={scoutPoints}
           />
           {totalUnclaimedPoints === 0 ? null : (
             <Suspense fallback={<LoadingTable />}>

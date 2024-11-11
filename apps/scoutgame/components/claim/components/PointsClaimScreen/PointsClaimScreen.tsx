@@ -3,7 +3,6 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Box, Dialog, IconButton, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
-import { revalidatePath } from 'next/cache';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -24,6 +23,7 @@ export function PointsClaimScreen({
   bonusPartners,
   builders,
   builderPoints,
+  scoutPoints,
   repos
 }: {
   totalUnclaimedPoints: number;
@@ -33,6 +33,7 @@ export function PointsClaimScreen({
     avatar: string | null;
     displayName: string;
   }[];
+  scoutPoints: number;
   builderPoints: number;
   repos: string[];
 }) {
@@ -145,7 +146,11 @@ export function PointsClaimScreen({
             <PointsClaimScoutModal claimedPoints={totalUnclaimedPoints} displayName={displayName} builders={builders} />
           )}
         </Stack>
-        <PointsClaimSocialShare />
+        <PointsClaimSocialShare
+          builderPoints={builderPoints}
+          scoutPoints={scoutPoints}
+          builders={builders.map((b) => b.displayName)}
+        />
       </Dialog>
     </Paper>
   );

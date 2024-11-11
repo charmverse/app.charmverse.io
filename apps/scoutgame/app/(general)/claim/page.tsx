@@ -22,12 +22,13 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   }
 
   const { bonusPartners, points } = await getClaimablePoints({ userId: user.id });
-  const { builders, builderPoints, repos } = await getUnclaimedPointsSource(user.id);
+  const { builders, builderPoints, scoutPoints, repos } = await getUnclaimedPointsSource(user.id);
 
   return (
     <ClaimPage
       builders={builders}
       builderPoints={builderPoints}
+      scoutPoints={scoutPoints}
       repos={repos}
       period={searchParams.tab}
       displayName={user.displayName}
