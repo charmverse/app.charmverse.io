@@ -21,8 +21,6 @@
     ],
     "paths": {
       "@connect-shared/*": ["../../@connect-shared/*"],
-      "@packages/aws/*": ["./packages/aws/src/*"],
-      "@packages/blockchain/*": ["./packages/blockchain/src/*"],
       "apiClient/*": ["./apiClient/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
