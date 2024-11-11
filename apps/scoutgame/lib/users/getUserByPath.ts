@@ -1,5 +1,6 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { cache } from 'react';
 
 import type { BasicUserInfo } from './interfaces';
@@ -18,7 +19,16 @@ async function _getUserByPath(path: string): Promise<
     where: {
       path
     },
-    select: { ...BasicUserInfoSelect, displayName: true, builderNfts: true, farcasterName: true }
+    select: {
+      ...BasicUserInfoSelect,
+      displayName: true,
+      builderNfts: {
+        where: {
+          season: currentSeason
+        }
+      },
+      farcasterName: true
+    }
   });
 
   if (!user) {
