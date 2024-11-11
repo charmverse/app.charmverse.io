@@ -28,7 +28,7 @@ export function PointsClaimBuilderScreen({
       }}
       className='scoutgame-claim-screen'
     >
-      <Typography variant='h4' fontFamily='K2D' color='text.primary'>
+      <Typography variant='h4' fontFamily='K2D'>
         TOP BUILDER
       </Typography>
       <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
@@ -37,7 +37,7 @@ export function PointsClaimBuilderScreen({
       <Typography variant='h6' textAlign='center'>
         scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
       </Typography>
-      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='Posterama'>
+      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='K2D'>
         SCOUT GAME!
       </Typography>
       <img src={`${baseUrl}/images/diamond.png`} alt='Diamond' width={100} height={100} />

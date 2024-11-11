@@ -32,7 +32,6 @@ export async function captureClaimScreen({
 }: CaptureClaimScreenProps) {
   const cache = createCache({ key: 'css' });
   const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
-
   const component = (
     <ThemeProvider theme={serverTheme}>
       <CssBaseline />
@@ -53,23 +52,32 @@ export async function captureClaimScreen({
       <head>
         <style>
           @font-face {
-            font-family: 'K2D';
-            src: url('${baseUrl}/fonts/K2D-Regular.ttf');
-          }
-          @font-face {
             font-family: 'Posterama';
-            src: url('${baseUrl}/fonts/Posterama-Regular.ttf');
+            src: url('${baseUrl}/fonts/Posterama-Bold.ttf') format('truetype');
+            font-weight: bold;
+            font-style: normal;
+            font-display: swap;
           }
-          body { 
+
+          @font-face {
+            font-family: 'K2D';
+            src: url('${baseUrl}/fonts/K2D-Medium.ttf') format('truetype');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+          }
+          
+          body {
             margin: 0;
-            background: url('${baseUrl}/images/claim-share-background.png');
-            color: ${serverTheme.palette.text.primary};
           }
         </style>
         ${emotionCss}
       </head>
       <body>
-        <div id="root">${renderedHtml}</div>
+        <div id="root">
+          <img src="${baseUrl}/images/claim-share-background.png" alt="Claim share background" width="600" height="600" style="position: absolute; top: 0; left: 0;" />
+          ${renderedHtml}
+        </div>
       </body>
     </html>
   `;
@@ -85,7 +93,7 @@ export async function captureClaimScreen({
 
   const screenshot = await page.screenshot();
 
-  const fileName = `claim-screen-${Date.now()}.png`;
+  const fileName = `claim-screen.png`;
   const filePath = path.join(process.cwd(), 'public', 'generated', fileName);
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, screenshot);
