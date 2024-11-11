@@ -28,7 +28,6 @@
       "lib/*": ["./lib/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
-      "config/*": ["./config/*"],
       "@root/adapters/http": ["../../adapters/http"],
       "@root/config/constants": ["../../config/constants"],
       "@root/connectors/chains": ["../../connectors/chains"],

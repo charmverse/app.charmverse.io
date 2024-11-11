@@ -1,6 +1,5 @@
+import { baseUrl, cookieName, authSecret } from '@packages/utils/constants';
 import type { SessionOptions } from 'iron-session';
-
-import { baseUrl, cookieName, authSecret } from 'config/constants';
 
 export function getIronOptions({
   sameSite = 'lax',
