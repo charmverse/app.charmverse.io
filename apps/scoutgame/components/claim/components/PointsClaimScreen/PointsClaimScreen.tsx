@@ -13,8 +13,8 @@ import { revalidateClaimPointsAction } from 'lib/points/revalidateClaimPointsAct
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
-import { PointsClaimBuilderModal } from './PointsClaimModal/PointsClaimBuilderModal';
-import { PointsClaimScoutModal } from './PointsClaimModal/PointsClaimScoutModal';
+import { PointsClaimBuilderScreen } from './PointsClaimModal/PointsClaimBuilderScreen';
+import { PointsClaimScoutScreen } from './PointsClaimModal/PointsClaimScoutScreen';
 import { PointsClaimSocialShare } from './PointsClaimModal/PointsClaimSocialShare';
 
 export function PointsClaimScreen({
@@ -141,9 +141,13 @@ export function PointsClaimScreen({
             alt='Claim success modal'
           />
           {builderPoints ? (
-            <PointsClaimBuilderModal repos={repos} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
+            <PointsClaimBuilderScreen repos={repos} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
           ) : (
-            <PointsClaimScoutModal claimedPoints={totalUnclaimedPoints} displayName={displayName} builders={builders} />
+            <PointsClaimScoutScreen
+              claimedPoints={totalUnclaimedPoints}
+              displayName={displayName}
+              builders={builders}
+            />
           )}
         </Stack>
         <PointsClaimSocialShare
