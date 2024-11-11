@@ -1,6 +1,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 
+import createCache from '@emotion/cache';
+import createEmotionServer from '@emotion/server/create-instance';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import { baseUrl } from '@root/config/constants';
 import puppeteer from 'puppeteer';
 import React from 'react';
@@ -8,6 +11,7 @@ import { renderToString } from 'react-dom/server';
 
 import { PointsClaimBuilderScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimBuilderScreen';
 import { PointsClaimScoutScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimScoutScreen';
+import { serverTheme } from '../theme/serverTheme';
 
 type CaptureClaimScreenProps = {
   displayName: string;
@@ -26,17 +30,23 @@ export async function captureClaimScreen({
   builders = [],
   isBuilder
 }: CaptureClaimScreenProps) {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  const cache = createCache({ key: 'css' });
+  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
 
-  // Pre-render the component to HTML
-  const component = isBuilder ? (
-    <PointsClaimBuilderScreen displayName={displayName} claimedPoints={claimedPoints} repos={repos} />
-  ) : (
-    <PointsClaimScoutScreen displayName={displayName} claimedPoints={claimedPoints} builders={builders} />
+  const component = (
+    <ThemeProvider theme={serverTheme}>
+      <CssBaseline />
+      {isBuilder ? (
+        <PointsClaimBuilderScreen displayName={displayName} claimedPoints={claimedPoints} repos={repos} />
+      ) : (
+        <PointsClaimScoutScreen displayName={displayName} claimedPoints={claimedPoints} builders={builders} />
+      )}
+    </ThemeProvider>
   );
 
   const renderedHtml = renderToString(component);
+  const emotionChunks = extractCriticalToChunks(renderedHtml);
+  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
 
   const html = `
     <html>
@@ -50,8 +60,13 @@ export async function captureClaimScreen({
             font-family: 'Posterama';
             src: url('${baseUrl}/fonts/Posterama-Regular.ttf');
           }
-          body { margin: 0; background: url('${baseUrl}/images/claim-share-background.png'); }
+          body { 
+            margin: 0;
+            background: url('${baseUrl}/images/claim-share-background.png');
+            color: ${serverTheme.palette.text.primary};
+          }
         </style>
+        ${emotionCss}
       </head>
       <body>
         <div id="root">${renderedHtml}</div>
@@ -59,6 +74,8 @@ export async function captureClaimScreen({
     </html>
   `;
 
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
   await page.setViewport({ width: 600, height: 600 });
   await page.setContent(html);
 
@@ -78,4 +95,9 @@ export async function captureClaimScreen({
   return fileName;
 }
 
-captureClaimScreen({ displayName: 'John Doe', claimedPoints: 100, isBuilder: true, repos: ['charmverse/charmverse'] });
+captureClaimScreen({
+  displayName: 'John Doe 🎩🍌 ⏩',
+  claimedPoints: 100,
+  isBuilder: true,
+  repos: ['charmverse/charmverse']
+});

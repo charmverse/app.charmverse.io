@@ -1,8 +1,6 @@
-'use client';
-
 import { Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
-import Image from 'next/image';
+import { baseUrl } from '@root/config/constants';
 import React from 'react';
 
 export function PointsClaimBuilderScreen({
@@ -30,7 +28,7 @@ export function PointsClaimBuilderScreen({
       }}
       className='scoutgame-claim-screen'
     >
-      <Typography variant='h4' fontFamily='K2D'>
+      <Typography variant='h4' fontFamily='K2D' color='text.primary'>
         TOP BUILDER
       </Typography>
       <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
@@ -42,7 +40,7 @@ export function PointsClaimBuilderScreen({
       <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='Posterama'>
         SCOUT GAME!
       </Typography>
-      <Image src='/images/diamond.png' alt='Diamond' width={100} height={100} />
+      <img src={`${baseUrl}/images/diamond.png`} alt='Diamond' width={100} height={100} />
       <Stack gap={0.5} width='100%' px={2} mt={1}>
         <Typography variant='h6' fontWeight={700}>
           Contributions:

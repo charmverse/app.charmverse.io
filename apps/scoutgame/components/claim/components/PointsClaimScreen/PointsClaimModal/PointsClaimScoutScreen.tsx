@@ -1,5 +1,3 @@
-'use client';
-
 import { Avatar, Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import Image from 'next/image';
