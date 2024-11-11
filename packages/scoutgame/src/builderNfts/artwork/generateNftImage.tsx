@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-import { ImageResponse } from 'next/og';
+import { ImageResponse } from '@vercel/og';
 // Must be there otherwise React is not defined error is thrown
 import React from 'react';
 import type { Font } from 'satori';
