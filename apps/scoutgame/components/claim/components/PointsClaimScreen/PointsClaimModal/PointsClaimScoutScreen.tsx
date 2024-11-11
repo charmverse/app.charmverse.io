@@ -1,6 +1,6 @@
 import { Avatar, Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
-import Image from 'next/image';
+import { baseUrl } from '@root/config/constants';
 import React from 'react';
 
 export function PointsClaimScoutScreen({
@@ -57,7 +57,7 @@ export function PointsClaimScoutScreen({
             </Stack>
           ))}
         </Stack>
-        <Image src='/images/profile/builder-dog.png' alt='Builder Dog' width={200} height={200} />
+        <img src={`${baseUrl}/images/profile/builder-dog.png`} alt='Builder Dog' width={200} height={200} />
       </Stack>
     </Stack>
   );

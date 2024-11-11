@@ -98,6 +98,9 @@ export async function captureClaimScreen({
 captureClaimScreen({
   displayName: 'John Doe 🎩🍌 ⏩',
   claimedPoints: 100,
-  isBuilder: true,
-  repos: ['charmverse/charmverse', 'charmverse/charmverse-1', 'charmverse/charmverse-2']
+  isBuilder: false,
+  builders: [
+    { avatar: 'https://avatars.githubusercontent.com/u/123456789?v=4', displayName: 'John Doe 🎩🍌 ⏩' },
+    { avatar: 'https://avatars.githubusercontent.com/u/123456781?v=4', displayName: 'Jane Doe 🎩🍌 ⏩' }
+  ]
 });
