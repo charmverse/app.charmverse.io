@@ -8,7 +8,7 @@ import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
 import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { isAddress } from 'viem';
 
-import { resolveENSName } from '../../packages/blockchain/getENSName';
+import { resolveENSName } from '../../../packages/blockchain/getENSName';
 
 import { gitcoinProjectAttestationChainId } from './constants';
 import { storeGitcoinProjectProfileInS3 } from './storeGitcoinProjectProfileInS3';
