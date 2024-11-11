@@ -72,8 +72,6 @@ export async function captureClaimScreen({
   `;
 
   const browser = await puppeteer.launch({
-    headless: false,
-    devtools: true,
     // This is required to load the fonts
     args: ['--disable-web-security']
   });
@@ -91,7 +89,7 @@ export async function captureClaimScreen({
   const filePath = path.join(process.cwd(), 'public', 'generated', fileName);
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, screenshot);
-
+  await browser.close();
   return fileName;
 }
 
