@@ -37,7 +37,7 @@ export function PointsClaimBuilderScreen({
       <Typography variant='h6' textAlign='center'>
         scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
       </Typography>
-      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='K2D'>
+      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='Posterama'>
         SCOUT GAME!
       </Typography>
       <img src={`${baseUrl}/images/diamond.png`} alt='Diamond' width={100} height={100} />

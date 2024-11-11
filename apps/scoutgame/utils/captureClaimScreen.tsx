@@ -1,8 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import createCache from '@emotion/cache';
-import createEmotionServer from '@emotion/server/create-instance';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { baseUrl } from '@root/config/constants';
 import puppeteer from 'puppeteer';
@@ -30,8 +28,6 @@ export async function captureClaimScreen({
   builders = [],
   isBuilder
 }: CaptureClaimScreenProps) {
-  const cache = createCache({ key: 'css' });
-  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
   const component = (
     <ThemeProvider theme={serverTheme}>
       <CssBaseline />
@@ -44,8 +40,6 @@ export async function captureClaimScreen({
   );
 
   const renderedHtml = renderToString(component);
-  const emotionChunks = extractCriticalToChunks(renderedHtml);
-  const emotionCss = constructStyleTagsFromChunks(emotionChunks);
 
   const html = `
     <html>
@@ -66,12 +60,7 @@ export async function captureClaimScreen({
             font-style: normal;
             font-display: swap;
           }
-          
-          body {
-            margin: 0;
-          }
         </style>
-        ${emotionCss}
       </head>
       <body>
         <div id="root">
@@ -82,12 +71,17 @@ export async function captureClaimScreen({
     </html>
   `;
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: false,
+    devtools: true,
+    // This is required to load the fonts
+    args: ['--disable-web-security']
+  });
   const page = await browser.newPage();
+
   await page.setViewport({ width: 600, height: 600 });
   await page.setContent(html);
-
-  // Wait for images and fonts to load
+  await page.evaluateHandle('document.fonts.ready');
   await page.waitForSelector('.scoutgame-claim-screen', { visible: true });
   await page.waitForNetworkIdle();
 
@@ -98,8 +92,6 @@ export async function captureClaimScreen({
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, screenshot);
 
-  await browser.close();
-
   return fileName;
 }
 
@@ -107,5 +99,5 @@ captureClaimScreen({
   displayName: 'John Doe 🎩🍌 ⏩',
   claimedPoints: 100,
   isBuilder: true,
-  repos: ['charmverse/charmverse']
+  repos: ['charmverse/charmverse', 'charmverse/charmverse-1', 'charmverse/charmverse-2']
 });
