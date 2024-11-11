@@ -6,13 +6,19 @@ import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 
+import { useUser } from 'components/layout/UserProvider';
 import { claimDailyRewardAction } from 'lib/claims/claimDailyRewardAction';
 import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 import { DailyClaimGift } from './DailyClaimGift';
 
 export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
-  const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction);
+  const { refreshUser } = useUser();
+  const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction, {
+    onSuccess: () => {
+      refreshUser();
+    }
+  });
   const currentWeekDay = DateTime.fromJSDate(new Date()).weekday;
   const isPastDay = currentWeekDay > dailyClaim.day;
   const isClaimToday = currentWeekDay === dailyClaim.day;

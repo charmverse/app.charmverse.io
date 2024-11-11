@@ -74,11 +74,9 @@ interface PageBreadCrumb {
 }
 
 function DocumentPageTitle({
-  basePath,
   pageId,
   pageMeta
 }: {
-  basePath: string;
   pageId?: string;
   pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId' | 'isLocked'>;
 }) {
@@ -113,7 +111,7 @@ function DocumentPageTitle({
       {displayedCrumbs.map((crumb) => (
         <BreadCrumb key={crumb.path}>
           {crumb.path ? (
-            <Link href={`${basePath}/${crumb.path}`}>
+            <Link href={`/${crumb.path}`}>
               <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>
                 {crumb.icon && <StyledPageIcon icon={crumb.icon} />}
                 {crumb.title || 'Untitled'}
@@ -145,12 +143,12 @@ function DocumentPageTitle({
   );
 }
 
-function ProposalPageTitle({ basePath, sectionName }: { basePath: string; sectionName: string }) {
+function ProposalPageTitle({ sectionName }: { sectionName: string }) {
   const [pageTitle] = usePageTitle();
   return (
     <Box display='flex'>
       <BreadCrumb>
-        <Link href={`${basePath}/proposals`}>
+        <Link href='/proposals'>
           <BreadcrumbPageTitle>
             <StyledPageIcon pageType='proposal' />
             {sectionName}
@@ -162,21 +160,13 @@ function ProposalPageTitle({ basePath, sectionName }: { basePath: string; sectio
   );
 }
 
-function ReviewerNotesPageTitle({
-  basePath,
-  parentId,
-  sectionName
-}: {
-  basePath: string;
-  parentId?: string | null;
-  sectionName: string;
-}) {
+function ReviewerNotesPageTitle({ parentId, sectionName }: { parentId?: string | null; sectionName: string }) {
   const [pageTitle] = usePageTitle();
   const { data: proposalPage } = useGetPageMeta(parentId);
   return (
     <Box display='flex'>
       <BreadCrumb>
-        <Link href={`${basePath}/proposals`}>
+        <Link href='/proposals'>
           <BreadcrumbPageTitle>
             <StyledPageIcon pageType='proposal' />
             {sectionName}
@@ -184,7 +174,7 @@ function ReviewerNotesPageTitle({
         </Link>
       </BreadCrumb>
       <BreadCrumb>
-        <Link href={`${basePath}/${proposalPage?.path}`}>
+        <Link href={`/${proposalPage?.path}`}>
           <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{proposalPage?.title}</BreadcrumbPageTitle>
         </Link>
       </BreadCrumb>
@@ -193,15 +183,7 @@ function ReviewerNotesPageTitle({
   );
 }
 
-function ForumPostTitle({
-  basePath,
-  pathName,
-  sectionName
-}: {
-  basePath: string;
-  pathName: string;
-  sectionName: string;
-}) {
+function ForumPostTitle({ pathName, sectionName }: { pathName: string; sectionName: string }) {
   const [pageTitle] = usePageTitle();
   const title = pathName === '/[domain]/forum' ? 'All Categories' : pageTitle;
 
@@ -212,7 +194,7 @@ function ForumPostTitle({
   return (
     <Box display='flex'>
       <BreadCrumb>
-        <Link href={`${basePath}/forum`}>
+        <Link href='/forum'>
           <BreadcrumbPageTitle>
             <StyledPageIcon pageType='forum' />
             {sectionName}
@@ -221,7 +203,7 @@ function ForumPostTitle({
       </BreadCrumb>
       {category && (
         <BreadCrumb>
-          <Link href={`${basePath}/forum/${category.path}`}>{category.name}</Link>
+          <Link href={`/forum/${category.path}`}>{category.name}</Link>
         </BreadCrumb>
       )}
       <BreadcrumbPageTitle>{title ?? 'Untitled'}</BreadcrumbPageTitle>
@@ -229,13 +211,13 @@ function ForumPostTitle({
   );
 }
 
-function RewardsPageTitle({ basePath, sectionName }: { basePath: string; sectionName: string }) {
+function RewardsPageTitle({ sectionName }: { sectionName: string }) {
   const [pageTitle] = usePageTitle();
 
   return (
     <Box display='flex'>
       <BreadCrumb>
-        <Link href={`${basePath}/rewards`}>
+        <Link href='/rewards'>
           <BreadcrumbPageTitle>
             <StyledPageIcon pageType='rewards' />
             {sectionName}
@@ -248,13 +230,11 @@ function RewardsPageTitle({ basePath, sectionName }: { basePath: string; section
 }
 
 function RewardApplicationPageTitle({
-  basePath,
   sectionName,
   applicationId,
   rewardId
 }: {
   rewardId?: string;
-  basePath: string;
   sectionName: string;
   applicationId?: string;
 }) {
@@ -264,12 +244,12 @@ function RewardApplicationPageTitle({
   return (
     <Box display='flex'>
       <BreadCrumb>
-        <Link href={`${basePath}/rewards`}>{sectionName}</Link>
+        <Link href='/rewards'>{sectionName}</Link>
       </BreadCrumb>
       {rewardWithPageMeta && (
         <>
           <BreadCrumb>
-            <Link href={`${basePath}/${rewardWithPageMeta.page.path}`}>
+            <Link href={`/${rewardWithPageMeta.page.path}`}>
               <BreadcrumbPageTitle>{rewardWithPageMeta.page.title}</BreadcrumbPageTitle>
             </Link>
           </BreadCrumb>
@@ -314,14 +294,13 @@ export function PageTitleWithBreadcrumbs({
     return <PublicBountyPageTitle />;
   } else if (pageType === 'bounty' || pageType === 'bounty_template' || router.route === '/[domain]/rewards/new') {
     const sectionName = mappedFeatures.rewards.title;
-    return <RewardsPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
+    return <RewardsPageTitle sectionName={sectionName} />;
   } else if (router.route === '/[domain]/rewards/applications/[applicationId]') {
     const applicationId = router.query.applicationId as string;
 
     const sectionName = mappedFeatures.rewards.title;
     return (
       <RewardApplicationPageTitle
-        basePath={`/${router.query.domain}`}
         sectionName={sectionName}
         applicationId={applicationId === 'new' ? undefined : applicationId}
         rewardId={router.query.rewardId as string}
@@ -329,21 +308,15 @@ export function PageTitleWithBreadcrumbs({
     );
   } else if (pageType === 'proposal' || pageType === 'proposal_template') {
     const sectionName = mappedFeatures.proposals.title;
-    return <ProposalPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
+    return <ProposalPageTitle sectionName={sectionName} />;
   } else if (pageType === 'proposal_notes') {
     const sectionName = mappedFeatures.proposals.title;
-    return (
-      <ReviewerNotesPageTitle
-        parentId={pageMeta?.parentId}
-        basePath={`/${router.query.domain}`}
-        sectionName={sectionName}
-      />
-    );
+    return <ReviewerNotesPageTitle parentId={pageMeta?.parentId} sectionName={sectionName} />;
   } else if (router.route === '/[domain]/[pageId]') {
-    return <DocumentPageTitle basePath={`/${router.query.domain}`} pageId={pageId} pageMeta={pageMeta} />;
+    return <DocumentPageTitle pageId={pageId} pageMeta={pageMeta} />;
   } else if (router.route.includes('/[domain]/forum')) {
     const sectionName = mappedFeatures.forum.title;
-    return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} sectionName={sectionName} />;
+    return <ForumPostTitle pathName={router.pathname} sectionName={sectionName} />;
   } else {
     return <DefaultPageTitle />;
   }

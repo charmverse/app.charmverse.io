@@ -45,12 +45,12 @@ function GridDivider() {
   );
 }
 
-export function ContractDashboard(data: BuilderNFTContractData) {
+export function SeasonOneDashboard(data: BuilderNFTContractData) {
   const itemSizeTwoColumnMd = { xs: 12, md: 6 };
   const itemSizeThreeColumnMd = { xs: 12, md: 4 };
 
   return (
-    <Grid2 container spacing={2} px={6}>
+    <Grid2 container spacing={2}>
       <Grid2 size={12}>
         <SectionTitle title='Contract Addresses' />
       </Grid2>

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo } from 'react';
 
 import { useGetUser } from 'hooks/api/session';
 import type { SessionUser } from 'lib/session/interfaces';
