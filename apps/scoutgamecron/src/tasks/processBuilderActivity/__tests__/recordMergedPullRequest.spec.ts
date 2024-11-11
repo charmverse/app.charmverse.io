@@ -540,10 +540,10 @@ describe('recordMergedPullRequest', () => {
 
     await recordMergedPullRequest({ pullRequest: firstPR, repo: repo1, season: currentSeason });
 
-    // Second PR in repo2
+    // Second PR in repo2 was created a week before and merged in the last 7 days
     const secondPR = mockPullRequest({
       mergedAt: startOfWeek.plus({ days: 4 }).toISO(),
-      createdAt: startOfWeek.plus({ days: 3 }).toISO(),
+      createdAt: startOfWeek.minus({ days: 3 }).toISO(),
       state: 'MERGED',
       author: builder.githubUser,
       repo: repo2
