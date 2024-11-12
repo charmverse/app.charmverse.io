@@ -2,7 +2,7 @@
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack, Typography } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';

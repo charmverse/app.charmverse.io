@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Typography } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

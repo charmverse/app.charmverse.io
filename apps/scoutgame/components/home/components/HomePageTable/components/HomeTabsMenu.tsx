@@ -1,5 +1,5 @@
-import type { TabItem } from '@packages/scoutgame/components/common/Tabs/TabsMenu';
-import { TabsMenu } from '@packages/scoutgame/components/common/Tabs/TabsMenu';
+import type { TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
+import { TabsMenu } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 
 export const homeTabs: TabItem[] = [
   { label: 'Leaderboard', value: 'leaderboard' },

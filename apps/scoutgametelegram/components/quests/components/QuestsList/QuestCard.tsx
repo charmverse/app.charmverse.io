@@ -3,7 +3,7 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Stack, Typography } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 

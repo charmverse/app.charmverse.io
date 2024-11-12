@@ -25,6 +25,7 @@
     "@packages/github": "file:../../packages/github",
     "@packages/mixpanel": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
+    "@packages/scoutgame-ui": "^0.0.0",
     "@packages/utils": "file:../../packages/utils",
     "@rainbow-me/rainbowkit": "^2.1.7",
     "@serwist/next": "^9.0.5",

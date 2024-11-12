@@ -1,8 +1,8 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
-import { useMdScreen } from '@packages/scoutgame/hooks/useMediaScreens';
+import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';

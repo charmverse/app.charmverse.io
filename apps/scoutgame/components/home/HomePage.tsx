@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { LoadingCards } from '@packages/scoutgame/components/common/Loading/LoadingCards';
-import { TodaysHotBuildersCarousel } from '@packages/scoutgame/components/home/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
+import { LoadingCards } from '@packages/scoutgame-ui/components/common/Loading/LoadingCards';
+import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/home/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import Image from 'next/image';
 import { Suspense } from 'react';
 

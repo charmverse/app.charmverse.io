@@ -2,7 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { Box, Typography } from '@mui/material';
-import { useGetUserTrigger } from '@packages/scoutgame/hooks/api/session';
+import { useGetUserTrigger } from '@packages/scoutgame-ui/hooks/api/session';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';

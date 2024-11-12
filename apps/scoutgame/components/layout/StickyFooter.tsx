@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { Hidden } from '@packages/scoutgame/components/common/Hidden';
+import { Hidden } from '@packages/scoutgame-ui/components/common/Hidden';
 
 import { SiteNavigation } from 'components/common/SiteNavigation';
 

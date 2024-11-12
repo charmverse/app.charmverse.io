@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
-import type { ProfileTab } from '@packages/scoutgame/components/profile/ProfilePage';
-import { ProfilePage } from '@packages/scoutgame/components/profile/ProfilePage';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { getUserStats } from '@packages/scoutgame/users/getUserStats';
+import type { ProfileTab } from '@packages/scoutgame-ui/components/profile/ProfilePage';
+import { ProfilePage } from '@packages/scoutgame-ui/components/profile/ProfilePage';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { Avatar, Stack, Typography } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 
 export function Header() {

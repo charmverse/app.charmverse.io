@@ -3,9 +3,9 @@
 import { log } from '@charmverse/core/log';
 import { Alert, Box } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
-import { BuildersGallery } from '@packages/scoutgame/components/common/Gallery/BuildersGallery';
-import { LoadingCards } from '@packages/scoutgame/components/common/Loading/LoadingCards';
-import { useMdScreen } from '@packages/scoutgame/hooks/useMediaScreens';
+import { BuildersGallery } from '@packages/scoutgame-ui/components/common/Gallery/BuildersGallery';
+import { LoadingCards } from '@packages/scoutgame-ui/components/common/Loading/LoadingCards';
+import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 import type { BuildersSort, CompositeCursor } from 'lib/builders/getSortedBuilders';

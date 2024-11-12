@@ -3,8 +3,8 @@
 import type { BuilderStatus } from '@charmverse/core/prisma';
 import { LoadingButton } from '@mui/lab';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
-import { useTrackEvent } from '@packages/scoutgame/hooks/useTrackEvent';
+import { useTrackEvent } from '@packages/scoutgame-ui/hooks/useTrackEvent';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
