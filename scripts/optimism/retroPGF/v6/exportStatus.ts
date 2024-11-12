@@ -5,10 +5,10 @@ import { sortBy } from 'lodash-es';
 import { writeFileSync } from 'fs';
 import { fieldIds, spaceId, templateId, getProjectsFromFile, applicationsFile } from './data';
 import { uniq } from 'lodash';
-import { getProposals } from './utils';
+import { DatabaseProposal, getProposals } from './utils';
 
-const fullReviewsummaryFile = './op-full-review-oct-22.csv';
-const reviewersFile = './op-reviewers-oct-22.csv';
+const fullReviewsummaryFile = './op-full-review-reviewers.csv';
+const reviewersFile = './op-reviewers.csv';
 
 async function exportFullReviewSummary() {
   const pages = await getProposals();
@@ -23,6 +23,8 @@ async function exportFullReviewSummary() {
     Approved: number;
     Pending: number;
     'Project Emails': string;
+    Reviewers: string;
+    'Appeal Reviewers': string;
   }[] = pages.map(({ path, proposal, title }) => {
     const attestationId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
     const currentEvaluation = getCurrentEvaluation(proposal!.evaluations);
@@ -31,6 +33,8 @@ async function exportFullReviewSummary() {
     const isRuleViolation = currentEvaluation.title === 'Automated Requirements Check';
     const approved = evaluation.reviews.filter((review) => review.result === 'pass').length;
     const rejected = evaluation.reviews.filter((review) => review.result === 'fail').length;
+    const approvedAppeal = evaluation.appealReviews.filter((review) => review.result === 'pass').length;
+    const rejectedAppeal = evaluation.appealReviews.filter((review) => review.result === 'fail').length;
     const rejectedMessages = uniq(
       evaluation.reviews
         .map((review) => review.declineReasons.concat(review.declineMessage || ''))
@@ -76,7 +80,12 @@ async function exportFullReviewSummary() {
       Approved: approved,
       Pending: 5 - approved - rejected,
       'Attestation Id': attestationId || 'N/A',
-      'Project Emails': applicationEmails.join(',')
+      'Project Emails': applicationEmails.join(','),
+      // only show the people that reviewed
+      Reviewers: evaluation.reviews.map((review) => review.reviewer.email || review.reviewer.username).join(','),
+      'Appeal Reviewers': evaluation.appealReviews
+        .map((review) => review.reviewer.email || review.reviewer.username)
+        .join(',')
     };
   });
 
@@ -103,12 +112,14 @@ async function exportFullReviewSummary() {
       'Title',
       'Link',
       'Attestation Id',
-      'Full Review Status',
-      'Approved',
-      'Rejected',
-      // 'Rejected Reasons',
-      'Pending',
-      'Project Emails'
+      // 'Full Review Status',
+      // 'Approved',
+      // 'Rejected',
+      // // 'Rejected Reasons',
+      // 'Pending',
+      // 'Project Emails',
+      'Reviewers',
+      'Appeal Reviewers'
     ]
   });
 
