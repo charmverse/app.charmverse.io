@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
-import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
+
+import { builderPointsShare, scoutPointsShare } from '../builderNfts/constants';
+import { calculateEarnableScoutPointsForRank } from '../points/calculatePoints';
 
 /**
  * Function to calculate scout points

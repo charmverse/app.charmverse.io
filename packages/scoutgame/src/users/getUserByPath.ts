@@ -1,7 +1,8 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
 import { cache } from 'react';
+
+import { currentSeason } from '../dates';
 
 import type { BasicUserInfo } from './interfaces';
 import { BasicUserInfoSelect } from './queries';

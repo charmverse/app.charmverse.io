@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 
+import { currentSeason } from '../dates';
 import type { BasicUserInfo } from '../users/interfaces';
 import { BasicUserInfoSelect } from '../users/queries';
 

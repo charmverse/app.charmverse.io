@@ -1,8 +1,9 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { ClaimPage } from '@packages/scoutgame-ui/components/claim/ClaimPage';
 import type { Metadata } from 'next';
 
-import { ClaimPage } from 'components/claim/ClaimPage';
+import { PageContainer } from 'components/layout/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,11 +24,13 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   const { bonusPartners, points } = await getClaimablePoints({ userId: user.id });
 
   return (
-    <ClaimPage
-      period={searchParams.tab}
-      displayName={user.displayName}
-      totalUnclaimedPoints={points}
-      bonusPartners={bonusPartners}
-    />
+    <PageContainer>
+      <ClaimPage
+        period={searchParams.tab}
+        displayName={user.displayName}
+        totalUnclaimedPoints={points}
+        bonusPartners={bonusPartners}
+      />
+    </PageContainer>
   );
 }

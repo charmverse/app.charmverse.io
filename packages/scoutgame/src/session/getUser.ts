@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import { replaceS3Domain } from '@packages/utils/url';
 import { cache } from 'react';
+
+import type { SessionUser } from '../session/interfaces';
 
 export async function getUser(userId?: string): Promise<SessionUser | null> {
   if (!userId) {

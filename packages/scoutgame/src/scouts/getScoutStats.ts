@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
+
+import { currentSeason } from '../dates';
 
 export async function getScoutStats(scoutId: string) {
   const scout = await prisma.scout.findUniqueOrThrow({

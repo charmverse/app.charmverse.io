@@ -1,10 +1,10 @@
 'use client';
 
 import { Stack, Table, TableCell, TableRow, Typography } from '@mui/material';
-import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import type { BuilderReward } from '@packages/scoutgame/builders/getBuilderRewards';
 import Link from 'next/link';
 
-import type { BuilderReward } from 'lib/builders/getBuilderRewards';
+import { Avatar } from 'components/common/Avatar';
 
 import { PointsCell } from '../common/PointsCell';
 import { StyledTableBody, StyledTableHead } from '../common/StyledTable';

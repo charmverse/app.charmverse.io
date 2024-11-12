@@ -1,8 +1,7 @@
 import { Paper, Typography } from '@mui/material';
+import { getSeasonBuilderRewards, getWeeklyBuilderRewards } from '@packages/scoutgame/builders/getBuilderRewards';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import Image from 'next/image';
-
-import { getSeasonBuilderRewards, getWeeklyBuilderRewards } from 'lib/builders/getBuilderRewards';
 
 import { BuilderRewardsTable } from './BuilderRewardsTable';
 

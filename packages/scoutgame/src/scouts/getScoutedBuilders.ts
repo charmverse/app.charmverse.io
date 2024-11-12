@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 import type { Last7DaysGems } from '../builders/getTodaysHotBuilders';
+import type { BuilderInfo } from '../builders/interfaces';
+import { currentSeason, getCurrentWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
 
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {

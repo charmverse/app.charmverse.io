@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
 
+import { currentSeason, getCurrentWeek, getLastWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BuilderInfo } from './interfaces';

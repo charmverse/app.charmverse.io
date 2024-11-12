@@ -9,9 +9,10 @@ import {
   currentSeasonNumber,
   getSeasonWeekFromISOWeek
 } from '@packages/scoutgame/dates';
-import { TabsMenu } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import Link from 'next/link';
 import { Suspense } from 'react';
+
+import { TabsMenu } from 'components/common/Tabs/TabsMenu';
 
 import { LoadingTable } from '../common/LoadingTable';
 
