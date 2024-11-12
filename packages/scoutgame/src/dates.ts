@@ -79,7 +79,7 @@ export function getWeekStartEndFormatted(date: Date) {
   return `${start.toFormat('MMM, dd')} - ${end.toFormat('MMM, dd')}`;
 }
 
-export function getStartOfSeason(week: Season) {
+export function getStartOfWeek(week: ISOWeek) {
   return getDateFromISOWeek(week);
 }
 
@@ -106,7 +106,7 @@ export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; we
 
 export function getAllISOWeeksFromSeasonStart(): string[] {
   const seasonOneStart = '2024-W41';
-  const start = getStartOfSeason(seasonOneStart);
+  const start = getStartOfWeek(seasonOneStart);
   const end = DateTime.now();
 
   let current = start;
