@@ -1,9 +1,9 @@
 import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
+import { Avatar } from '@packages/scoutgame/components/common/Avatar';
+import { PointsIcon } from '@packages/scoutgame/components/common/Icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
-import { PointsIcon } from 'components/common/Icons';
 import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 

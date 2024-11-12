@@ -3,9 +3,9 @@ import { getENSDetails, getENSName } from '@packages/blockchain/getENSName';
 import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUsersByAddresses';
 import { findOrCreateUser } from '@packages/scoutgame/users/findOrCreateUser';
 import type { FindOrCreateUserResult } from '@packages/scoutgame/users/findOrCreateUser';
+import { generateUserPath } from '@packages/scoutgame/users/generateUserPath';
 import { getAddress } from 'viem';
 
-import { generateUserPath } from 'lib/users/generateUserPath';
 import { generateRandomName } from 'lib/utils/generateRandomName';
 
 export async function findOrCreateWalletUser({

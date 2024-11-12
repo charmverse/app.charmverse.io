@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
+import { Hidden } from '@packages/scoutgame/components/common/Hidden';
 
-import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
 
 export function StickyFooter() {

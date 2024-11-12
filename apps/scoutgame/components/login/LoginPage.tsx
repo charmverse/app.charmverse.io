@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { Box, Typography } from '@mui/material';
+import { useGetUserTrigger } from '@packages/scoutgame/hooks/api/session';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -10,7 +11,6 @@ import { SinglePageLayout } from 'components/common/Layout';
 import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';
 import { WarpcastLogin } from 'components/common/WarpcastLogin/WarpcastLogin';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
-import { useGetUserTrigger } from 'hooks/api/session';
 
 import { LaunchDate } from './LaunchDate';
 

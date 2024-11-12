@@ -1,8 +1,8 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
+import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import type { Metadata } from 'next';
 
 import { ClaimPage } from 'components/claim/ClaimPage';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
 

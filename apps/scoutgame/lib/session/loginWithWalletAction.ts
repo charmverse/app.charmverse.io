@@ -2,8 +2,8 @@
 
 import { log } from '@charmverse/core/log';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
-import type { SessionUser } from '@packages/scoutgame/session/getUserFromSession';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { type SessionUser } from '@packages/scoutgame/session/interfaces';
 import { authSecret } from '@root/config/constants';
 import { sealData } from 'iron-session';
 import { cookies } from 'next/headers';

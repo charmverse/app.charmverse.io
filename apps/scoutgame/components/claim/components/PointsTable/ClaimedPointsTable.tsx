@@ -1,9 +1,8 @@
-import { sleep } from '@decent.xyz/box-common';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack } from '@mui/material';
+import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 
 import { getPointsReceiptsRewards } from 'lib/points/getPointsReceiptsRewards';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { PointsTable } from './PointsTable';
 

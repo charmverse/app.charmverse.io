@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { LoadingCards } from '@packages/scoutgame/components/common/Loading/LoadingCards';
-import { TodaysHotBuildersCarousel } from '@packages/scoutgame/components/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
+import { TodaysHotBuildersCarousel } from '@packages/scoutgame/components/home/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import { Suspense } from 'react';
 
 export default function ScoutPage() {

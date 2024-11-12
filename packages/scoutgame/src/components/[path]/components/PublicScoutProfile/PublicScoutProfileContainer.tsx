@@ -3,12 +3,11 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper, Typography } from '@mui/material';
 
-import { BackButton } from 'components/common/Button/BackButton';
-import { UserProfile } from 'components/common/Profile/UserProfile';
-import { useMdScreen } from 'hooks/useMediaScreens';
-import type { BuilderInfo } from 'lib/builders/interfaces';
-import type { BasicUserInfo } from 'lib/users/interfaces';
-
+import type { BuilderInfo } from '../../../../builders/interfaces';
+import { BackButton } from '../../../../components/common/Button/BackButton';
+import { UserProfile } from '../../../../components/common/Profile/UserProfile';
+import { useMdScreen } from '../../../../hooks/useMediaScreens';
+import type { BasicUserInfo } from '../../../../users/interfaces';
 import { BuildersGallery } from '../../../common/Gallery/BuildersGallery';
 
 import { PublicScoutProfileStats } from './PublicScoutProfileStats';

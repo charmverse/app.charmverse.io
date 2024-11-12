@@ -1,7 +1,7 @@
+import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { redirect } from 'next/navigation';
 
 import { WelcomePage } from 'components/welcome/WelcomePage';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export default async function Welcome() {
   const user = await getUserFromSession();

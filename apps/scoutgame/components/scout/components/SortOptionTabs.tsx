@@ -1,5 +1,5 @@
-import type { TabItem } from 'components/common/Tabs/TabsMenu';
-import { TabsMenu } from 'components/common/Tabs/TabsMenu';
+import type { TabItem } from '@packages/scoutgame/components/common/Tabs/TabsMenu';
+import { TabsMenu } from '@packages/scoutgame/components/common/Tabs/TabsMenu';
 
 export const sortOptions: TabItem[] = [
   { label: 'Top', value: 'top' },

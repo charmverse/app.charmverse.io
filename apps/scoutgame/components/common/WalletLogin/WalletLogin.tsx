@@ -5,6 +5,7 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { LoadingButton } from '@mui/lab';
 import { Box, Stack, Typography } from '@mui/material';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -15,7 +16,6 @@ import { useSignMessage, useAccount } from 'wagmi';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { useUser } from 'components/layout/UserProvider';
 import { loginWithWalletAction } from 'lib/session/loginWithWalletAction';
 
 export function WalletLogin() {

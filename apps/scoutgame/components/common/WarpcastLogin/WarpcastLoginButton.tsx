@@ -5,13 +5,13 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Box, Button, Stack, Typography } from '@mui/material';
+import { LoadingComponent } from '@packages/scoutgame/components/common/Loading/LoadingComponent';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
-import { useUser } from 'components/layout/UserProvider';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { loginWithFarcasterAction } from 'lib/session/loginWithFarcasterAction';
 
