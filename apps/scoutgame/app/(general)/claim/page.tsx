@@ -1,4 +1,5 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
+import { baseUrl } from '@root/config/constants';
 import type { Metadata } from 'next';
 
 import { ClaimPage } from 'components/claim/ClaimPage';
