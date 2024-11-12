@@ -3,6 +3,7 @@
     // "customConditions": ["@colinhacks/source"],
     "outDir": "../../dist/apps/farcaster",
     "rootDir": "../../",
+    "baseUrl": ".",
     "lib": ["dom", "dom.iterable", "esnext", "webworker"],
     "allowJs": true,
     "skipLibCheck": true,

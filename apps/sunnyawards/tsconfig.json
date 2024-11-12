@@ -2,6 +2,7 @@
   "compilerOptions": {
     "outDir": "../../dist/apps/sunnyawards",
     "rootDir": "../../",
+    "baseUrl": ".",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
