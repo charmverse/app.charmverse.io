@@ -12,7 +12,10 @@ export async function refreshCongratsImages() {
 
   for (const builderNft of builderNfts) {
     if (builderNft?.tokenId) {
-      const updatedBuilderNft = await refreshCongratsImage(builderNft);
+      const updatedBuilderNft = await refreshCongratsImage(builderNft).catch((error) => {
+        log.error(`Error refreshing congrats image for ${builderNft.builderId}`, { error });
+        return null;
+      });
 
       // log.info(
       //   `Builder congrats metadata image was created with the link:${updatedBuilderNft?.congratsImageUrl} for ${
