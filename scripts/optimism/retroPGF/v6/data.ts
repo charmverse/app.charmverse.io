@@ -9,6 +9,11 @@ import { readFileSync } from 'fs';
 
 // production
 export const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669'; // op retrofunding space
+// Season 4:
+// export const templateId = 'a8ac2799-5c79-45f7-9527-a1d52d717625';
+// Season 5:
+// export const templateId = '762064ff-2430-4a7c-bfa5-7e54dc51f19a';
+// Season 6:
 export const templateId = '58ccc779-7d07-4918-896b-4d19f753ec04';
 
 // Local storage for Farcaster profiles

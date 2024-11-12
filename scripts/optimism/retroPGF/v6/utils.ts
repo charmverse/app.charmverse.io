@@ -8,9 +8,9 @@ export function getProposals() {
     where: {
       spaceId,
       type: 'proposal',
-      proposal: {
-        archived: false
-      },
+      // proposal: {
+      //   archived: false
+      // },
       sourceTemplateId: templateId
     },
     include: {
