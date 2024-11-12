@@ -29,7 +29,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
           </Button>
         }
       >
-        Join now & Compete for 500 OP
+        Join now and compete for 500 OP
       </Alert>
       <Table size='small' sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }} data-test='new-scouts-table'>
         <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
