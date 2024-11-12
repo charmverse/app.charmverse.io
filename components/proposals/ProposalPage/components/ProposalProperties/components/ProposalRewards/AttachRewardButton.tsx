@@ -22,7 +22,7 @@ export function AttachRewardButton({
     );
   } else {
     return (
-      <Button size='small' disabled={disabled} onClick={createNewReward}>
+      <Button size='small' data-test='add-reward-from-table' disabled={disabled} onClick={createNewReward}>
         <Typography fontWeight={700} variant='subtitle1'>
           + Add a {getFeatureTitle('reward')}
         </Typography>
