@@ -198,9 +198,6 @@ jobs:
       - name: Install unbuffer
         run: sudo apt-get update && sudo apt-get install -y expect-dev
 
-      - name: Install pupeteer (FOR TESTING -- not intended to be used in main)
-        run: npx puppeteer browsers install chrome
-
       - name: Start scoutgame app
         run: |
           unbuffer npm run scoutgame:start:test:ci 2>&1 | tee server.log &
