@@ -22,13 +22,6 @@ COPY --parents @connect-shared  \
   package.json                  \
   .
 
-COPY --parents @connect-shared  \
-  node_modules                  \
-  package.json                  \
-  apps/sunnyawards/node_modules \
-  apps/sunnyawards/package.json \
-  .
-
 # Copy compiled code
 COPY --parents apps/sunnyawards/.next apps/sunnyawards/public .
 

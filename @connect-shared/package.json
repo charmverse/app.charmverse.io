@@ -13,7 +13,6 @@
   "license": "ISC",
   "dependencies": {
     "@mui/material-nextjs": "^6.1.0",
-    "@packages/aws": "file:../packages/aws",
     "framer-motion": "^11.3.17",
     "next-safe-action": "~7.4.2"
   }
