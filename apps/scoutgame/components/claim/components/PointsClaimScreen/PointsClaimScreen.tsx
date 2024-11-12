@@ -2,7 +2,7 @@
 
 import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';

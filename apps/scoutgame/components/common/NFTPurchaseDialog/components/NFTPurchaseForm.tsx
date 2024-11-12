@@ -26,9 +26,9 @@ import {
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { IconButton } from '@packages/scoutgame/components/common/Button/IconButton';
-import { PointsIcon } from '@packages/scoutgame/components/common/Icons';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { IconButton } from '@packages/scoutgame-ui/components/common/Button/IconButton';
+import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { isTestEnv } from '@root/config/constants';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';

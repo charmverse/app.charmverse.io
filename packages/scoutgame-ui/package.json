@@ -1,0 +1,16 @@
+{
+  "name": "@packages/scoutgame-ui",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {},
+  "exports": {
+    "./components/*": "./src/components/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./providers/*": "./src/providers/*.tsx"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
+    "@packages/scoutgame": "^0.0.0"
+  }
+}

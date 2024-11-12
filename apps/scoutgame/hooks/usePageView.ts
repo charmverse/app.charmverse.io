@@ -1,4 +1,4 @@
-import { useTrackEvent } from '@packages/scoutgame/hooks/useTrackEvent';
+import { useTrackEvent } from '@packages/scoutgame-ui/hooks/useTrackEvent';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 

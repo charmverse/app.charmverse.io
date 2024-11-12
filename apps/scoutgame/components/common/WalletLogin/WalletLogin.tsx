@@ -5,7 +5,7 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { LoadingButton } from '@mui/lab';
 import { Box, Stack, Typography } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

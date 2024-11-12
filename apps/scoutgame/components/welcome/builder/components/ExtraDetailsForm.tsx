@@ -15,10 +15,10 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { EditableUserProfile } from '@packages/scoutgame/components/common/Profile/EditableUserProfile';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
-import { useIsMounted } from '@packages/scoutgame/hooks/useIsMounted';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
+import { EditableUserProfile } from '@packages/scoutgame-ui/components/common/Profile/EditableUserProfile';
+import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

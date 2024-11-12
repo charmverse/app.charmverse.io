@@ -1,6 +1,6 @@
 'use client';
 
-import { useSmScreen } from '@packages/scoutgame/hooks/useMediaScreens';
+import { useSmScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';

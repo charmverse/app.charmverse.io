@@ -1,4 +1,4 @@
-import { useGETImmutable } from '@packages/scoutgame/hooks/helpers';
+import { useGETImmutable } from '@packages/scoutgame-ui/hooks/helpers';
 
 export function useGetClaimablePoints() {
   return useGETImmutable<{ points: number }>(

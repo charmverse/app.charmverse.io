@@ -1,8 +1,8 @@
 'use client';
 
 import { Button, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material';
-import { PointsIcon } from '@packages/scoutgame/components/common/Icons';
-import { useMdScreen } from '@packages/scoutgame/hooks/useMediaScreens';
+import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
+import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Link from 'next/link';
 import React from 'react';
 

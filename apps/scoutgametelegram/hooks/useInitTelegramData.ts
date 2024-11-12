@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { log } from '@charmverse/core/log';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
-import { useIsMounted } from '@packages/scoutgame/hooks/useIsMounted';
+import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import WebApp from '@twa-dev/sdk';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';

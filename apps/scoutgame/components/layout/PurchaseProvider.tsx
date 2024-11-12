@@ -6,7 +6,7 @@ import {
   getBuilderContractAddress,
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';

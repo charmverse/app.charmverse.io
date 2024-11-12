@@ -15,8 +15,8 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
-import { useIsMounted } from '@packages/scoutgame/hooks/useIsMounted';
+import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';

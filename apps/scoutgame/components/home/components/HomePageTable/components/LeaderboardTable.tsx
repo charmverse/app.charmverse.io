@@ -4,9 +4,9 @@ import { Box, Stack, TableHead } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import { Avatar } from '@packages/scoutgame/components/common/Avatar';
-import { getSXProps } from '@packages/scoutgame/components/common/Hidden';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
 import Image from 'next/image';
 import Link from 'next/link';
 

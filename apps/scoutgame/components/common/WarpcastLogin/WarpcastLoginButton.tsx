@@ -5,8 +5,8 @@ import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePath
 import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { LoadingComponent } from '@packages/scoutgame/components/common/Loading/LoadingComponent';
-import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { LoadingComponent } from '@packages/scoutgame-ui/components/common/Loading/LoadingComponent';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

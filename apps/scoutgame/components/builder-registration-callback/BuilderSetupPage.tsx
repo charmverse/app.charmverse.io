@@ -2,7 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { Link, Typography } from '@mui/material';
-import { LoadingComponent } from '@packages/scoutgame/components/common/Loading/LoadingComponent';
+import { LoadingComponent } from '@packages/scoutgame-ui/components/common/Loading/LoadingComponent';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useRef, useState } from 'react';

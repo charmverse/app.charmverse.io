@@ -1,7 +1,6 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { IconButton, Stack, Typography } from '@mui/material';
-import { TabsMenu } from '@packages/scoutgame/components/common/Tabs/TabsMenu';
 import {
   getLastWeek,
   currentSeason,
@@ -10,6 +9,7 @@ import {
   currentSeasonNumber,
   getSeasonWeekFromISOWeek
 } from '@packages/scoutgame/dates';
+import { TabsMenu } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import Link from 'next/link';
 import { Suspense } from 'react';
 

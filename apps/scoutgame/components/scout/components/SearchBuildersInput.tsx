@@ -2,7 +2,7 @@
 
 import SearchIcon from '@mui/icons-material/Search';
 import { Autocomplete, Box, CircularProgress, InputAdornment, TextField, Typography, styled } from '@mui/material';
-import { Avatar } from '@packages/scoutgame/components/common/Avatar';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Link from 'next/link';
 import { useState } from 'react';
 

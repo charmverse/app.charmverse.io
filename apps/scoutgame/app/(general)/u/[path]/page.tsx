@@ -1,5 +1,5 @@
-import { PublicProfilePage } from '@packages/scoutgame/components/[path]/PublicProfilePage';
 import { getUserByPath } from '@packages/scoutgame/users/getUserByPath';
+import { PublicProfilePage } from '@packages/scoutgame-ui/components/[path]/PublicProfilePage';
 import type { Metadata, ResolvingMetadata } from 'next';
 import type { ResolvedOpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
 import { notFound } from 'next/navigation';
