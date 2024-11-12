@@ -1,10 +1,11 @@
+import { PublicProfilePage } from '@packages/scoutgame/components/[path]/PublicProfilePage';
+import { getUserByPath } from '@packages/scoutgame/users/getUserByPath';
 import type { Metadata, ResolvingMetadata } from 'next';
 import type { ResolvedOpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
 import { notFound } from 'next/navigation';
 
 import { FarcasterMetadata } from 'components/[path]/FarcasterMetadata';
-import { PublicProfilePage } from 'components/[path]/PublicProfilePage';
-import { getUserByPath } from 'lib/users/getUserByPath';
+import { PageContainer } from 'components/layout/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +47,9 @@ export default async function Profile({ params, searchParams }: Props) {
   return (
     <>
       <FarcasterMetadata user={user} />
-      <PublicProfilePage user={user} tab={tab} />
+      <PageContainer>
+        <PublicProfilePage user={user} tab={tab} />
+      </PageContainer>
     </>
   );
 }

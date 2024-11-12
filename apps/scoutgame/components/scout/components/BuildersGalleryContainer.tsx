@@ -2,9 +2,9 @@
 
 import { log } from '@charmverse/core/log';
 import { Alert, Box } from '@mui/material';
+import { BuildersGallery } from '@packages/scoutgame/components/common/Gallery/BuildersGallery';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
 import { LoadingCards } from 'components/common/Loading/LoadingCards';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuildersSort, CompositeCursor } from 'lib/builders/getSortedBuilders';

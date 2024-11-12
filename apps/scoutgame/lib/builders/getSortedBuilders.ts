@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
+import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
-
-import type { Last7DaysGems } from './getTodaysHotBuilders';
-import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
 

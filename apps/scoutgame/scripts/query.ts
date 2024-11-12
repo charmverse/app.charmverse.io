@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserByPath } from 'lib/users/getUserByPath';
 
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopScoutsByWeek } from 'lib/scouts/getTopScouts';

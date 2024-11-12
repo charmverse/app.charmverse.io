@@ -4,6 +4,9 @@ import { log } from '@charmverse/core/log';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
+import { Avatar } from '@packages/scoutgame/components/common/Avatar';
+import { Hidden } from '@packages/scoutgame/components/common/Hidden';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,10 +14,7 @@ import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { Avatar } from 'components/common/Avatar';
-import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
-import { useUser } from 'components/layout/UserProvider';
 
 export function Header() {
   const router = useRouter();

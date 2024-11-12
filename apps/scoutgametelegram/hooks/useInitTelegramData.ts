@@ -1,11 +1,11 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { log } from '@charmverse/core/log';
+import { useIsMounted } from '@packages/scoutgame/hooks/useIsMounted';
 import WebApp from '@twa-dev/sdk';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect } from 'react';
 
 import { useUser } from 'components/layout/UserProvider';
-import { useIsMounted } from 'hooks/useIsMounted';
 import { loadUser } from 'lib/session/loadUserAction';
 
 export function useInitTelegramData() {

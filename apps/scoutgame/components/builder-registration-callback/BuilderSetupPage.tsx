@@ -2,12 +2,12 @@
 
 import { log } from '@charmverse/core/log';
 import { Link, Typography } from '@mui/material';
+import { LoadingComponent } from '@packages/scoutgame/components/common/Loading/LoadingComponent';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useRef, useState } from 'react';
 
 import { SinglePageLayout } from 'components/common/Layout';
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
 import { setupBuilderProfileAction } from 'lib/builders/setupBuilderProfileAction';

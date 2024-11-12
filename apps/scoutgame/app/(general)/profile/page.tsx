@@ -1,11 +1,12 @@
 import { log } from '@charmverse/core/log';
+import type { ProfileTab } from '@packages/scoutgame/components/profile/ProfilePage';
+import { ProfilePage } from '@packages/scoutgame/components/profile/ProfilePage';
+import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { getUserStats } from '@packages/scoutgame/users/getUserStats';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 
-import type { ProfileTab } from 'components/profile/ProfilePage';
-import { ProfilePage } from 'components/profile/ProfilePage';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
-import { getUserStats } from 'lib/users/getUserStats';
+import { PageContainer } from 'components/layout/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,12 +42,14 @@ export default async function Profile({
   const userStats = await getUserStats(user.id);
 
   return (
-    <ProfilePage
-      user={{
-        ...user,
-        ...userStats
-      }}
-      tab={tab}
-    />
+    <PageContainer>
+      <ProfilePage
+        user={{
+          ...user,
+          ...userStats
+        }}
+        tab={tab}
+      />
+    </PageContainer>
   );
 }
