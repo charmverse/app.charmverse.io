@@ -10,7 +10,7 @@ export default async function Welcome() {
     redirect('/quests');
   }
 
-  if (!user?.agreedToTermsAt && !user?.onboardedAt) {
+  if (user && !user.agreedToTermsAt && !user.onboardedAt) {
     redirect('/onboarding');
   }
 

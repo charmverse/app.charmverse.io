@@ -16,11 +16,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/quests', request.url));
   }
 
-  // We don't have a '/' page anymore since we need to handle 2 different layouts
-  if (path === '/') {
-    return NextResponse.redirect(new URL('/welcome', request.url));
-  }
-
   if (!isLoggedIn && path !== '/welcome') {
     return NextResponse.redirect(new URL('/welcome', request.url));
   }
