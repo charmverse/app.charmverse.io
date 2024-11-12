@@ -16,6 +16,9 @@ import {
   Box
 } from '@mui/material';
 import { EditableUserProfile } from '@packages/scoutgame/components/common/Profile/EditableUserProfile';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useIsMounted } from '@packages/scoutgame/hooks/useIsMounted';
+import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -23,9 +26,6 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useUser } from 'components/layout/UserProvider';
-import { useIsMounted } from 'hooks/useIsMounted';
-import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveOnboardingDetailsAction } from 'lib/users/saveOnboardingDetailsAction';
 import { saveOnboardingDetailsSchema } from 'lib/users/saveOnboardingDetailsSchema';
 import type { SaveOnboardingDetailsFormValues } from 'lib/users/saveOnboardingDetailsSchema';

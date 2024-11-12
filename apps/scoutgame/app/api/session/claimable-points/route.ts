@@ -1,7 +1,6 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
+import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { NextResponse } from 'next/server';
-
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 export async function GET() {
   const user = await getUserFromSession();

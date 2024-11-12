@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Typography } from '@mui/material';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -8,7 +9,6 @@ import { useAction } from 'next-safe-action/hooks';
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
-import { useUser } from 'components/layout/UserProvider';
 import { saveOnboardedAction } from 'lib/users/saveOnboardedAction';
 
 export function SpamPolicyPage({ redirectToProfile }: { redirectToProfile: boolean }) {

@@ -6,6 +6,7 @@ import {
   getBuilderContractAddress,
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
@@ -16,7 +17,6 @@ import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransac
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 
 import { useSnackbar } from './SnackbarContext';
-import { useUser } from './UserProvider';
 
 const purchaseLogPrefix = 'MINT_ACTION';
 

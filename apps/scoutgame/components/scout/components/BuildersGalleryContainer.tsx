@@ -2,14 +2,14 @@
 
 import { log } from '@charmverse/core/log';
 import { Alert, Box } from '@mui/material';
+import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { BuildersGallery } from '@packages/scoutgame/components/common/Gallery/BuildersGallery';
+import { LoadingCards } from '@packages/scoutgame/components/common/Loading/LoadingCards';
+import { useMdScreen } from '@packages/scoutgame/hooks/useMediaScreens';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import { LoadingCards } from 'components/common/Loading/LoadingCards';
-import { useMdScreen } from 'hooks/useMediaScreens';
 import type { BuildersSort, CompositeCursor } from 'lib/builders/getSortedBuilders';
 import { getSortedBuildersAction } from 'lib/builders/getSortedBuildersAction';
-import type { BuilderInfo } from 'lib/builders/interfaces';
 
 export function BuildersGalleryContainer({
   initialBuilders,

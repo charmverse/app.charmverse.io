@@ -3,9 +3,8 @@
 import type { Scout } from '@charmverse/core/prisma';
 import { Stack, Typography } from '@mui/material';
 
-import { useIsMounted } from 'hooks/useIsMounted';
-import { useMdScreen } from 'hooks/useMediaScreens';
-
+import { useIsMounted } from '../../../hooks/useIsMounted';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
 import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 

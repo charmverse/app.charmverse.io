@@ -1,9 +1,9 @@
 'use client';
 
 import { Stack, Table, TableCell, TableRow, Typography } from '@mui/material';
+import { Avatar } from '@packages/scoutgame/components/common/Avatar';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
 import type { BuilderReward } from 'lib/builders/getBuilderRewards';
 
 import { PointsCell } from '../common/PointsCell';

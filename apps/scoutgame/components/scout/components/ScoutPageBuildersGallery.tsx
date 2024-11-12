@@ -1,8 +1,8 @@
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import type { BuildersSort } from 'lib/builders/getSortedBuilders';
 import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
-import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { BuildersGalleryContainer } from './BuildersGalleryContainer';
 

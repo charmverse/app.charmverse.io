@@ -1,6 +1,6 @@
-import type { Scout } from '@charmverse/core/prisma';
-
+import { getSession } from './getSession';
 import { cacheGetUser, getUser } from './getUser';
+import type { SessionUser } from './interfaces';
 
 export async function getUserFromSession(): Promise<SessionUser | null> {
   const session = await getSession();

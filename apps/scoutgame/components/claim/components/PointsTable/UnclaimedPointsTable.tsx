@@ -1,5 +1,6 @@
+import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+
 import { getPointsReceiptsRewards } from 'lib/points/getPointsReceiptsRewards';
-import { getUserFromSession } from 'lib/session/getUserFromSession';
 
 import { PointsTable } from './PointsTable';
 

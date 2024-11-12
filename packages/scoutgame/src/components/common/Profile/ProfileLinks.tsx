@@ -1,7 +1,7 @@
 import { IconButton } from '@mui/material';
 import Image from 'next/image';
 
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
 
 export function ProfileLinks({
   farcasterName,

@@ -1,6 +1,8 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
+import { useMdScreen } from '@packages/scoutgame/hooks/useMediaScreens';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -8,9 +10,7 @@ import { useState } from 'react';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
-import { useUser } from 'components/layout/UserProvider';
 import { useGetClaimablePoints } from 'hooks/api/session';
-import { useMdScreen } from 'hooks/useMediaScreens';
 
 import { ClaimIcon } from './ClaimIcon';
 import { SignInModalMessage } from './ScoutButton/SignInModalMessage';

@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
-import { findScoutOrThrow } from 'lib/scouts/findScoutOrThrow';
-import { getScoutedBuilders } from 'lib/scouts/getScoutedBuilders';
-import { getScoutStats } from 'lib/scouts/getScoutStats';
-import type { BasicUserInfo } from 'lib/users/interfaces';
-import { safeAwaitSSRData } from 'lib/utils/async';
+import { ErrorSSRMessage } from '../../../../components/common/ErrorSSRMessage';
+import { findScoutOrThrow } from '../../../../scouts/findScoutOrThrow';
+import { getScoutedBuilders } from '../../../../scouts/getScoutedBuilders';
+import { getScoutStats } from '../../../../scouts/getScoutStats';
+import type { BasicUserInfo } from '../../../../users/interfaces';
+import { safeAwaitSSRData } from '../../../../utils/async';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 

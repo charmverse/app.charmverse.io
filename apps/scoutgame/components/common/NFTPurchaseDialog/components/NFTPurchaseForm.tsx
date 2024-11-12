@@ -27,6 +27,8 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { IconButton } from '@packages/scoutgame/components/common/Button/IconButton';
+import { PointsIcon } from '@packages/scoutgame/components/common/Icons';
+import { useUser } from '@packages/scoutgame/components/layout/UserProvider';
 import { isTestEnv } from '@root/config/constants';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
@@ -36,10 +38,8 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
-import { PointsIcon } from 'components/common/Icons';
 import { usePurchase } from 'components/layout/PurchaseProvider';
 import { useSnackbar } from 'components/layout/SnackbarContext';
-import { useUser } from 'components/layout/UserProvider';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 

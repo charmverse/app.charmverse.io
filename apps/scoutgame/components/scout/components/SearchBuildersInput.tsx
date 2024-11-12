@@ -2,10 +2,10 @@
 
 import SearchIcon from '@mui/icons-material/Search';
 import { Autocomplete, Box, CircularProgress, InputAdornment, TextField, Typography, styled } from '@mui/material';
+import { Avatar } from '@packages/scoutgame/components/common/Avatar';
 import Link from 'next/link';
 import { useState } from 'react';
 
-import { Avatar } from 'components/common/Avatar';
 import { useSearchBuilders } from 'hooks/api/builders';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { BuilderSearchResult } from 'lib/builders/searchBuilders';
