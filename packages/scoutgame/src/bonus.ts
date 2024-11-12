@@ -1,4 +1,4 @@
-export const bonusPartnersRecord: Record<string, { icon: string; name: string }> = {
+export const bonusPartnersRecord = {
   // optimism: {
   //   name: 'Optimism',
   //   // repos: ['optimism-labs/optimism', 'optimism-labs/optimism-monorepo'],
@@ -12,5 +12,19 @@ export const bonusPartnersRecord: Record<string, { icon: string; name: string }>
   celo: {
     name: 'Celo',
     icon: 'https://cryptologos.cc/logos/celo-celo-logo.png'
+  },
+  game7: {
+    name: 'Game7',
+    icon: 'https://yt3.googleusercontent.com/KHNdF-AtNsZDH0efEdZnVA4O4BjLKAkgeszsZ11mTUgjtbmc0EYfp23Y5MnIK9-tQ94M7Lu4nQ=s160-c-k-c0x00ffffff-no-rj'
+  },
+  lit_protocol: {
+    name: 'Lit Protocol',
+    icon: '/images/logos/lit-protocol.png'
+  },
+  op_supersim: {
+    name: 'OP Supersim',
+    icon: 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.png'
   }
-};
+} as const;
+
+export type BonusPartner = keyof typeof bonusPartnersRecord;

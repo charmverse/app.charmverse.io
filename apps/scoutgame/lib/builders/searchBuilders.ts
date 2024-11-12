@@ -3,7 +3,8 @@ import { currentSeason } from '@packages/scoutgame/dates';
 
 export type BuilderSearchResult = {
   id: string;
-  username: string;
+  path: string;
+  displayName: string;
   avatar: string | null;
   seasonPoints: number;
   allTimePoints: number;
@@ -12,31 +13,42 @@ export type BuilderSearchResult = {
 };
 
 export async function searchBuilders({
-  username,
+  search,
   limit = 10
 }: {
-  username: string;
+  search: string;
   limit?: number;
 }): Promise<BuilderSearchResult[]> {
   const builders = await prisma.scout.findMany({
     where: {
-      username: {
-        contains: username,
-        mode: 'insensitive'
-      }
+      OR: [
+        {
+          path: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        },
+        {
+          displayName: {
+            contains: search,
+            mode: 'insensitive'
+          }
+        }
+      ]
     },
     take: limit,
     orderBy: {
       // Sort by similarity to the query
       _relevance: {
-        fields: ['username'],
-        search: username,
+        fields: ['path', 'displayName'],
+        search,
         sort: 'desc'
       }
     },
     select: {
       id: true,
-      username: true,
+      path: true,
+      displayName: true,
       avatar: true,
       userSeasonStats: {
         where: {
@@ -67,7 +79,8 @@ export async function searchBuilders({
 
   return builders.map((builder) => ({
     id: builder.id,
-    username: builder.username,
+    path: builder.path,
+    displayName: builder.displayName!,
     avatar: builder.avatar,
     seasonPoints: builder.userSeasonStats?.[0]?.pointsEarnedAsBuilder ?? 0,
     allTimePoints: builder.userAllTimeStats?.[0]?.pointsEarnedAsBuilder ?? 0,

@@ -1,34 +1,38 @@
+'use client';
+
 import { Paper, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
+import React from 'react';
 
 import { Avatar } from 'components/common/Avatar';
+import { useDynamicFontSize } from 'hooks/useDynamicFontSize';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 export type ScoutInfo = BasicUserInfo & {
+  displayName: string;
   nfts: number;
 };
 
 export function ScoutCard({ scout }: { scout: ScoutInfo }) {
+  const { fontSize, spanRef } = useDynamicFontSize(scout.displayName, 8, 18);
+
   return (
     <Paper sx={{ p: 1, py: 2, height: '100%', display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
       <Avatar src={scout.avatar} variant='circular' size='large' />
-      <Typography variant='h6' textAlign='center'>
-        {scout.displayName}
-      </Typography>
       <Typography
-        variant='body2'
+        variant='h6'
         textAlign='center'
-        textOverflow='ellipsis'
-        overflow='hidden'
-        width='100%'
-        whiteSpace='nowrap'
+        sx={{
+          fontSize: `${fontSize}px`,
+          width: '100%',
+          lineHeight: 1.2
+        }}
       >
-        {scout.username}
+        <span ref={spanRef}>{scout.displayName}</span>
       </Typography>
-
       <Stack direction='row' gap={0.5} alignItems='center' justifyContent='space-between'>
-        <Typography color='orange.main'>{scout.nfts}</Typography>
-        <Image width={20} height={20} src='/images/profile/icons/nft-orange-icon.svg' alt='Nfts' />
+        <Typography color='green.main'>{scout.nfts}</Typography>
+        <Image width={20} height={20} src='/images/profile/icons/cards-green.svg' alt='Cards' />
       </Stack>
     </Paper>
   );

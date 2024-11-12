@@ -2,7 +2,7 @@ import { CardActionArea, CardMedia, Typography, Box } from '@mui/material';
 import Link from 'next/link';
 
 // Maintain a 3:4 aspect ratio for the NFT display
-const nftDisplaySize = {
+export const nftDisplaySize = {
   'x-small': {
     width: 140,
     height: 186
@@ -24,24 +24,26 @@ const nftDisplaySize = {
 export function BuilderCardNftDisplay({
   nftImageUrl,
   children,
-  username,
+  path,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  hideDetails = false
 }: {
-  username: string;
+  path: string;
   nftImageUrl?: string | null;
   showHotIcon?: boolean;
   children?: React.ReactNode;
   size?: 'x-small' | 'small' | 'medium' | 'large';
+  hideDetails?: boolean;
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
 
   return (
-    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark' }}>
+    <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
       <CardActionArea
         LinkComponent={Link}
-        href={`/u/${username}`}
+        href={`/u/${path}`}
         sx={{
           position: 'relative',
           width: '100%',
@@ -80,25 +82,13 @@ export function BuilderCardNftDisplay({
         </Box>
         <Box
           sx={{
-            px:
-              size === 'small'
-                ? 0.5
-                : {
-                    xs: 0.5,
-                    md: 1
-                  },
-            height: 'fit-content',
+            height: hideDetails ? 'fit-content' : '33.33%',
             position: 'absolute',
-            width: 'calc(100% - 10px)',
+            width: 'calc(100% - 8px)',
             left: '50%',
+            backgroundColor: hideDetails ? 'transparent' : '#000',
             transform: 'translateX(-50%)',
-            bottom:
-              size === 'small'
-                ? 7.5
-                : {
-                    xs: 7.5,
-                    md: 10
-                  }
+            bottom: 3.5
           }}
         >
           {nftImageUrl ? null : (

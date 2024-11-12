@@ -1,12 +1,10 @@
-import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import { ActionType } from '@decent.xyz/box-common';
 import type { BoxActionRequest, BoxActionResponse } from '@decent.xyz/box-common';
+import { ActionType } from '@decent.xyz/box-common';
 import {
-  getBuilderContractAddress,
-  usdcOptimismMainnetContractAddress,
-  getDecentApiKey,
   builderNftChain,
+  getBuilderContractAddress,
+  getDecentApiKey,
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
 import { GET } from '@packages/utils/http';
@@ -72,7 +70,6 @@ export function useDecentTransaction({
     dstChainId: builderNftChain.id,
     slippage: 1,
     actionType: ActionType.NftMint,
-    // @ts-ignore
     actionConfig: {
       chainId: optimism.id,
       contractAddress: getBuilderContractAddress(),
@@ -98,7 +95,7 @@ export function useDecentTransaction({
       prepareDecentTransaction({
         txConfig: decentAPIParams
       }).catch((error) => {
-        log.error(`Error preparing decent transaction`, { error, decentAPIParams });
+        log.error(`There was an error communicating with Decent API`, { error, decentAPIParams });
         throw error;
       }),
     {

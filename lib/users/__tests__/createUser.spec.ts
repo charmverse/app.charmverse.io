@@ -6,7 +6,7 @@ import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { createOrGetUserFromWallet } from '../createUser';
 
-jest.mock('lib/blockchain/getENSName', () => {
+jest.mock('@packages/blockchain/getENSName', () => {
   return {
     getENSName: (address: string) => {
       if (address.match('include')) {

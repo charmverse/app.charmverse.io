@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getLastWeek } from '@packages/scoutgame/dates';
-import { sendPoints } from '@packages/scoutgame/points/sendPoints';
+import { sendPointsForMiscEvent } from '@packages/scoutgame/points/builderEvents/sendPointsForMiscEvent';
 import { refreshPointStatsFromHistory } from '@packages/scoutgame/points/refreshPointStatsFromHistory';
 
 const fids: number[] = [];
@@ -37,7 +37,7 @@ async function issuePoints({ points }: { points: number }) {
 
     await prisma.$transaction(
       async (tx) => {
-        await sendPoints({
+        await sendPointsForMiscEvent({
           builderId: scout.id,
           points,
           claimed: true,
@@ -48,7 +48,7 @@ async function issuePoints({ points }: { points: number }) {
           tx
         });
 
-        await refreshPointStatsFromHistory({ userIdOrUsername: scout.id, tx });
+        await refreshPointStatsFromHistory({ userIdOrPath: scout.id, tx });
       },
       { timeout: 15000 }
     );

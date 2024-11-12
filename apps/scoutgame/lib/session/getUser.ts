@@ -15,13 +15,14 @@ export async function getUser(userId?: string): Promise<SessionUser | null> {
     },
     select: {
       id: true,
-      username: true,
+      path: true,
       displayName: true,
       avatar: true,
       builderStatus: true,
       currentBalance: true,
       onboardedAt: true,
       agreedToTermsAt: true,
+      farcasterName: true,
       bio: true
     }
   });

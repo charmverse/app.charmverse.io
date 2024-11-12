@@ -5,8 +5,18 @@ cron:
     # every 20 minutes
     schedule: '*/20 * * * *'
 
+  - name: 'issue-gems-onchain'
+    url: '/issue-gems-onchain'
+    # every 20 minutes
+    schedule: '*/20 * * * *'
+
   - name: 'process-gems-payout'
     url: '/process-gems-payout'
+    # Start of every hour
+    schedule: '0 * * * *'
+
+  - name: 'process-onchain-gems-payout'
+    url: '/process-onchain-gems-payout'
     # Start of every hour
     schedule: '0 * * * *'
 
@@ -24,3 +34,19 @@ cron:
     url: '/alert-low-wallet-gas-balance'
     # Every 5 minutes
     schedule: '*/5 * * * *'
+
+  - name: 'resync-nft-purchases'
+    url: '/resync-nft-purchases'
+    # Every 5 minutes
+    schedule: '*/5 * * * *'
+
+  - name: 'update-builder-card-activity'
+    url: '/update-builder-card-activity'
+    # Every hour
+    schedule: '0 * * * *'
+
+
+  - name: 'resolve-balance-issues'
+    url: '/resolve-balance-issues'
+    # Every day at midnight
+    schedule: '0 0 * * *'

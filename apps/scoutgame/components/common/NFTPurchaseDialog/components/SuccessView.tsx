@@ -2,20 +2,17 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { useGetFarcasterUser } from 'hooks/api/farcaster';
-
-export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: string | null; username: string } }) {
-  // retrieve the user's latest farcaster profile
-  const { data: farcasterUser } = useGetFarcasterUser({ userId: builder.id });
-
-  const farcasterUsername = farcasterUser?.username || builder.username;
-
+export function SuccessView({
+  builder
+}: {
+  builder: { id: string; displayName: string; nftImageUrl?: string | null; path: string };
+}) {
   return (
-    <Stack gap={2} textAlign='center'>
+    <Stack gap={2} textAlign='center' data-test='success-view'>
       <Typography color='secondary' variant='h5' fontWeight={600}>
         Congratulations!
       </Typography>
-      <Typography>You scouted @{builder.username}</Typography>
+      <Typography>You scouted {builder.displayName}</Typography>
       <Box
         bgcolor='black.dark'
         width='100%'
@@ -35,7 +32,7 @@ export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: 
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
-            alt={builder.username}
+            alt={builder.path}
             width={200}
             height={300}
             style={{ aspectRatio: '1/1.4', width: '50%', height: '50%' }}
@@ -48,8 +45,8 @@ export function SuccessView({ builder }: { builder: { id: string; nftImageUrl?: 
         LinkComponent={Link}
         fullWidth
         href={`https://warpcast.com/~/compose?text=${encodeURI(
-          `I scouted @${builder.username} on Scout Game!`
-        )}&embeds[]=${window.location.origin}/u/${farcasterUsername}`}
+          `I scouted ${builder.displayName} on Scout Game!`
+        )}&embeds[]=${window.location.origin}/u/${builder.path}`}
         target='_blank'
         rel='noopener noreferrer'
       >

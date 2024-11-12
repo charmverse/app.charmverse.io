@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
-import { getWeekFromDate, getStartOfSeason, streakWindow, isToday } from '@packages/scoutgame/dates';
+import { getStartOfSeason, getWeekStartEnd, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
@@ -30,12 +30,12 @@ export async function recordMergedPullRequest({
   pullRequest,
   repo,
   season,
-  isFirstMergedPullRequest: _isFirstMergedPullRequest,
+  skipFirstMergedPullRequestCheck,
   now = DateTime.utc()
 }: {
   pullRequest: MergedPullRequestMeta;
   repo: RepoInput;
-  isFirstMergedPullRequest?: boolean;
+  skipFirstMergedPullRequestCheck?: boolean;
   season: Season;
   now?: DateTime;
 }) {
@@ -43,7 +43,8 @@ export async function recordMergedPullRequest({
     throw new Error('Pull request was not merged');
   }
   const week = getWeekFromDate(now.toJSDate());
-  const start = getStartOfSeason(season);
+  const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
+  const start = getStartOfSeason(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -83,10 +84,10 @@ export async function recordMergedPullRequest({
 
   if (existingGithubEvent) {
     // already processed
-    return;
+    return { githubEvent: null, builderEvent: null };
   }
 
-  // check our data to see if this is the first merged PR, and if so, check the Github API to confirm
+  // check our data to see if this is the first merged PR in a repo in the last 7 days, and if so, check the Github API to confirm
   const totalMergedPullRequests = await prisma.githubEvent.count({
     where: {
       createdBy: pullRequest.author.id,
@@ -95,15 +96,30 @@ export async function recordMergedPullRequest({
     }
   });
 
-  let isFirstMergedPullRequest = _isFirstMergedPullRequest ?? totalMergedPullRequests === 0;
-  if (isFirstMergedPullRequest) {
+  const recentFirstMergedPullRequests = await prisma.githubEvent.count({
+    where: {
+      createdBy: pullRequest.author.id,
+      type: 'merged_pull_request',
+      isFirstPullRequest: true,
+      completedAt: {
+        gte: startOfWeek.toJSDate()
+      }
+    }
+  });
+  const hasFirstMergedPullRequestAlreadyThisWeek = recentFirstMergedPullRequests > 0;
+
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !hasFirstMergedPullRequestAlreadyThisWeek;
+  if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentPullRequestsByUser({
       defaultBranch: repo.defaultBranch,
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
     });
-    if (prs.filter((pr) => pr.number !== pullRequest.number).length > 0) {
+    if (
+      prs.filter((pr) => pr.number !== pullRequest.number || pr.repository.owner.login === pullRequest.author.login)
+        .length > 0
+    ) {
       isFirstMergedPullRequest = false;
     }
   }
@@ -115,7 +131,7 @@ export async function recordMergedPullRequest({
     return isToday(event.createdAt, DateTime.fromISO(pullRequest.createdAt, { zone: 'utc' }));
   });
 
-  await prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx) => {
     const githubUser = await tx.githubUser.upsert({
       where: {
         id: pullRequest.author.id
@@ -204,7 +220,7 @@ export async function recordMergedPullRequest({
             new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
           );
 
-          await tx.builderEvent.create({
+          const builderEvent = await tx.builderEvent.create({
             data: {
               builderId: githubUser.builderId,
               createdAt: builderEventDate,
@@ -240,15 +256,10 @@ export async function recordMergedPullRequest({
               }
             }
           });
+          return { builderEvent, githubEvent: event };
         }
-
-        log.info('Recorded a merged PR', {
-          eventId: event.id,
-          userId: githubUser.builderId,
-          week,
-          url: pullRequest.url
-        });
       }
     }
+    return { builderEvent: null, githubEvent: event };
   });
 }

@@ -1,30 +1,31 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Season } from '@packages/scoutgame/dates';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@root/lib/utils/types';
 
 export type TopBuilderInfo = {
   id: string;
-  username: string;
   displayName: string;
+  path: string;
   avatar: string | null;
   seasonPoints: number;
+  builderStatus: BuilderStatus;
   allTimePoints: number;
   scoutedBy: number;
   price: bigint;
   nftImageUrl: string;
 };
 
-export async function getTopBuilders({ limit }: { limit: number }): Promise<TopBuilderInfo[]> {
+export async function getTopBuilders({
+  limit,
+  season = currentSeason
+}: { limit?: number; season?: Season } = {}): Promise<TopBuilderInfo[]> {
   const topBuilders = await prisma.userSeasonStats.findMany({
     where: {
-      season: currentSeason,
+      season,
       user: {
-        builderStatus: 'approved',
-        builderNfts: {
-          some: {
-            season: currentSeason
-          }
-        }
+        builderStatus: 'approved'
       }
     },
     orderBy: {
@@ -36,7 +37,8 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
       user: {
         select: {
           id: true,
-          username: true,
+          builderStatus: true,
+          path: true,
           displayName: true,
           avatar: true,
           userAllTimeStats: {
@@ -46,12 +48,13 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
           },
           builderNfts: {
             where: {
-              season: currentSeason
+              season
             },
             select: {
               currentPrice: true,
               imageUrl: true,
               nftSoldEvents: {
+                distinct: 'scoutId',
                 select: {
                   id: true
                 }
@@ -66,7 +69,7 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
   return topBuilders
     .map((builder) => {
       const { user, pointsEarnedAsBuilder } = builder;
-      const { id, username, avatar, displayName } = user;
+      const { id, path, displayName, avatar } = user;
       const nft = user.builderNfts[0];
       if (!nft) {
         return null;
@@ -74,13 +77,14 @@ export async function getTopBuilders({ limit }: { limit: number }): Promise<TopB
 
       return {
         id,
-        username,
-        avatar,
+        path: path!,
         displayName,
+        avatar,
         nftImageUrl: nft.imageUrl,
         seasonPoints: pointsEarnedAsBuilder,
         allTimePoints: builder.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
         scoutedBy: nft.nftSoldEvents.length,
+        builderStatus: user.builderStatus!,
         price: nft.currentPrice
       };
     })

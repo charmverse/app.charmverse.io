@@ -1,8 +1,8 @@
-import { Typography } from '@mui/material';
-import Link from 'next/link';
+import { Link, Typography } from '@mui/material';
+import NextLink from 'next/link';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 
 import { InfoPageContainer } from '../components/InfoPageContainer';
 
@@ -23,16 +23,39 @@ function Document() {
       </Typography>
       <List>
         <ListItem>
-          <Link href='/info/partner-rewards/celo'>Celo</Link>
+          <Link component={NextLink} href='/info/partner-rewards/celo'>
+            Celo
+          </Link>
         </ListItem>
         <ListItem>
-          <Link href='/info/partner-rewards/game7'>Game7</Link>
+          <Link component={NextLink} href='/info/partner-rewards/game7'>
+            Game7
+          </Link>
         </ListItem>
         <ListItem>
-          <Link href='/info/partner-rewards/moxie'>Moxie</Link>
+          <Link component={NextLink} href='/info/partner-rewards/moxie'>
+            Moxie
+          </Link>
         </ListItem>
         <ListItem>
-          <Link href='/info/partner-rewards/bountycaster'>BountyCaster</Link>
+          <Link component={NextLink} href='/info/partner-rewards/bountycaster'>
+            BountyCaster
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link component={NextLink} href='/info/partner-rewards/lit'>
+            Lit Protocol
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link component={NextLink} href='/info/partner-rewards/optimism'>
+            Optimism
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link component={NextLink} href='/info/partner-rewards/op-supersim'>
+            Optimism Supersim
+          </Link>
         </ListItem>
       </List>
     </InfoCard>

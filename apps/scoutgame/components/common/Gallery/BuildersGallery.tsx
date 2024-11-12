@@ -23,10 +23,10 @@ export function BuildersGallery({
         columns={{ xs: 2, sm: 3, md: builders.length < columns ? builders.length : columns }}
       >
         {builders.map((builder) => (
-          <Grid key={builder.username} size={{ xs: 1 }} display='flex' justifyContent='center' alignItems='center'>
+          <Grid key={builder.path} size={{ xs: 1 }} display='flex' justifyContent='center' alignItems='center'>
             <Box>
               {builder.nftsSoldToScout !== undefined && builder.nftsSoldToScout > 0 && (
-                <Typography color='orange.main' textAlign='right' mb={1}>
+                <Typography color='green.main' textAlign='right' mb={1}>
                   X {builder.nftsSoldToScout ?? 0}
                 </Typography>
               )}

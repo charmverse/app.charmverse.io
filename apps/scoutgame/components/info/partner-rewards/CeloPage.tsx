@@ -1,7 +1,17 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import {
+  Link,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography
+} from '@mui/material';
 
 import { InfoCard } from 'components/common/DocumentPageContainer/components/InfoCard';
-import { List, ListItem } from 'components/common/DocumentPageContainer/components/List';
+import { List, ListItem } from 'components/common/List';
 import { InfoPageContainer } from 'components/info/components/InfoPageContainer';
 
 export function CeloPage() {
@@ -51,63 +61,76 @@ function Document() {
         </Table>
       </TableContainer>
       <Typography variant='h6' color='secondary' mt={2}>
+        How to contribute
+      </Typography>
+      <Typography>
+        <Link href='https://docs.celo.org/general/ecosystem/contributors' target='_blank' rel='noreferrer'>
+          Learn how to contribute to Celo
+        </Link>
+      </Typography>
+      <Typography variant='h6' color='secondary' mt={2}>
         Qualified Celo Projects:
       </Typography>
       <List>
         <ListItem>
-          <a href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
-            https://github.com/mento-protocol/mento-web
-          </a>
+          <Link href='https://github.com/celo-org/faucet' target='_blank' rel='noreferrer'>
+            https://github.com/celo-org/faucet
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/mento-protocol/reserve-site' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
+            https://github.com/mento-protocol/mento-web
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link href='https://github.com/mento-protocol/reserve-site' target='_blank' rel='noreferrer'>
             https://github.com/mento-protocol/reserve-site
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/mento-protocol/mento-web' target='_blank' rel='noreferrer'>
             https://github.com/mento-protocol/mento-web
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/mento-protocol/mento-sdk' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/mento-protocol/mento-sdk' target='_blank' rel='noreferrer'>
             https://github.com/mento-protocol/mento-sdk
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/celo-org/celo-composer' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/celo-org/celo-composer' target='_blank' rel='noreferrer'>
             https://github.com/celo-org/celo-composer
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/valora-inc/hooks' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/valora-inc/hooks' target='_blank' rel='noreferrer'>
             https://github.com/valora-inc/hooks
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/GoodDollar/GoodWeb3-Mono' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/GoodDollar/GoodWeb3-Mono' target='_blank' rel='noreferrer'>
             https://github.com/GoodDollar/GoodWeb3-Mono
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/GoodDollar/GoodCollective' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/GoodDollar/GoodCollective' target='_blank' rel='noreferrer'>
             https://github.com/GoodDollar/GoodCollective
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/Glo-Foundation/glo-wallet' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/Glo-Foundation/glo-wallet' target='_blank' rel='noreferrer'>
             https://github.com/Glo-Foundation/glo-wallet/issues
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/Ubeswap/ubeswap-interface-v3' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/Ubeswap/ubeswap-interface-v3' target='_blank' rel='noreferrer'>
             https://github.com/Ubeswap/ubeswap-interface-v3
-          </a>
+          </Link>
         </ListItem>
         <ListItem>
-          <a href='https://github.com/gitcoinco/grants-stack' target='_blank' rel='noreferrer'>
+          <Link href='https://github.com/gitcoinco/grants-stack' target='_blank' rel='noreferrer'>
             https://github.com/gitcoinco/grants-stack
-          </a>
+          </Link>
         </ListItem>
       </List>
     </InfoCard>

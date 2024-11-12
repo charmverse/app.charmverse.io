@@ -37,7 +37,7 @@ export async function recordCommit({
   }
 
   const week = getWeekFromDate(now.toJSDate());
-  const start = getStartOfSeason(season);
+  const start = getStartOfSeason(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {

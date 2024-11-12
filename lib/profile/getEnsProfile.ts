@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getENSDetails } from '@root/lib/blockchain/getENSName';
+import { getENSDetails } from '@packages/blockchain/getENSName';
 
 export type EnsProfile = {
   ensname: string | null;

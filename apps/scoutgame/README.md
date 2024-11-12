@@ -1,1 +1,1 @@
-# connect.charmverse.io
+# scoutgame.xyz

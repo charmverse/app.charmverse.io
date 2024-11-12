@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
+import type { Last7DaysGems } from 'lib/builders/getTodaysHotBuilders';
 import { BasicUserInfoSelect } from 'lib/users/queries';
 
 import type { BuilderInfo } from '../builders/interfaces';
@@ -51,13 +52,18 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           currentPrice: true
         }
       },
+      builderCardActivities: {
+        select: {
+          last7Days: true
+        }
+      },
       builderStatus: true,
       userWeeklyStats: {
         where: {
           week: getCurrentWeek()
         },
         select: {
-          gemsCollected: true
+          rank: true
         }
       }
     }
@@ -70,15 +76,17 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     return {
       id: builder.id,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
-      username: builder.username,
+      path: builder.path,
       displayName: builder.displayName,
-      builderStatus: builder.builderStatus,
+      builderStatus: builder.builderStatus!,
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder ?? 0,
-      gemsCollected: builder.userWeeklyStats[0]?.gemsCollected ?? 0,
       nftsSold: builder.userSeasonStats[0]?.nftsSold ?? 0,
       nftsSoldToScout,
-      isBanned: builder.builderStatus === 'banned',
-      price: builder.builderNfts[0]?.currentPrice ?? 0
+      rank: builder.userWeeklyStats[0]?.rank ?? -1,
+      price: builder.builderNfts[0]?.currentPrice ?? 0,
+      last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+        .map((gem) => gem.gemsCount)
+        .slice(-7)
     };
   });
 }

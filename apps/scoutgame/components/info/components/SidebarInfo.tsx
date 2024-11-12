@@ -23,13 +23,16 @@ const partners = [
   { href: '/info/partner-rewards/celo', text: 'Celo' },
   { href: '/info/partner-rewards/game7', text: 'Game7' },
   { href: '/info/partner-rewards/moxie', text: 'Moxie' },
-  { href: '/info/partner-rewards/bountycaster', text: 'BountyCaster' }
+  { href: '/info/partner-rewards/bountycaster', text: 'BountyCaster' },
+  { href: '/info/partner-rewards/lit', text: 'Lit Protocol' },
+  { href: '/info/partner-rewards/optimism', text: 'Optimism' },
+  { href: '/info/partner-rewards/op-supersim', text: 'OP Supersim' },
+  { href: '/info/partner-rewards/talent-protocol', text: 'Talent Protocol' }
 ];
 
 export function SidebarInfo({ handleClose }: Readonly<{ handleClose?: () => void }>) {
-  const [open, setOpen] = useState(false);
-
   const pathname = usePathname();
+  const [open, setOpen] = useState(pathname.startsWith('/info/partner-rewards'));
 
   function handleClick() {
     setOpen((prevState) => !prevState);

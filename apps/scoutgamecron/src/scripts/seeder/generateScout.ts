@@ -5,7 +5,7 @@ export async function generateScout({ index }: { index: number }) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const displayName = `${firstName} ${lastName}`;
-  const username = faker.internet
+  const path = faker.internet
     .userName({
       firstName,
       lastName
@@ -20,16 +20,20 @@ export async function generateScout({ index }: { index: number }) {
 
   const scout = await prisma.scout.create({
     data: {
-      username,
+      path,
       displayName,
       email,
       avatar,
       bio: faker.lorem.paragraph(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
-      walletAddress: faker.finance.ethereumAddress(),
-      farcasterId: faker.number.int({ min: 1, max: 5000 }) + index,
-      farcasterName: displayName
+      scoutWallet: {
+        create: {
+          address: faker.finance.ethereumAddress()
+        }
+      },
+      farcasterId: faker.number.int({ min: 1, max: 500000 }) + index,
+      farcasterName: path
     }
   });
 

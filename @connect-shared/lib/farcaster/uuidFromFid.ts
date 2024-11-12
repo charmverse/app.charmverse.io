@@ -4,6 +4,7 @@ import { log } from '@charmverse/core/log';
 import { v4 as uuid } from 'uuid';
 
 // Function to generate a deterministic UUID v4 based on an integer input
+/** @deprecated Use uuidFromNumber from @packages/utils/uuid instead */
 export function deterministicV4UUIDFromFid(num: number | string): string {
   // Create a hash of the input number to generate more uniformly distributed random bytes
   const hash = createHash('sha256').update(num.toString()).digest();

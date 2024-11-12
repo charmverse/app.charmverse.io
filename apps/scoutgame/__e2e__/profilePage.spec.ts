@@ -7,19 +7,8 @@ test.describe('Profile page', () => {
     await page.goto('/profile');
 
     await page.waitForURL('**/login');
-    await expect(loginPage.container).toBeVisible();
-  });
-
-  test('Clicking profile link should prompt user to go to login page', async ({ page, loginPage, profilePage }) => {
-    await page.goto('/home');
-    await profilePage.selectNavigationLink('/profile').click();
-
-    // continue to login
-    await expect(profilePage.signInModalButton).toBeVisible();
-    await profilePage.signInModalButton.click();
-
-    await page.waitForURL('**/login?redirectUrl=profile');
-    await expect(loginPage.container).toBeVisible();
+    const container = page.locator('data-test=login-page');
+    await expect(container).toBeVisible();
   });
 
   test('An onboarded user can access the profile page', async ({ page, profilePage, utils }) => {
@@ -30,11 +19,12 @@ test.describe('Profile page', () => {
     await utils.loginAsUserId(builder.id);
 
     await page.goto('/home');
-    await profilePage.selectNavigationLink('/profile').click();
+    const link = page.locator(`data-test=site-navigation >> [href*="/profile"]`).first();
+    await link.click();
 
-    //  await page.waitForTimeout(1000000);
     // Logged in user should be redirected
     await page.waitForURL('**/profile*');
-    await expect(profilePage.container).toBeVisible();
+    const container = page.locator('data-test=profile-page');
+    await expect(container).toBeVisible();
   });
 });

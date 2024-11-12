@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { builderPointsShare, scoutPointsShare } from '@packages/scoutgame/builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
+import { dividePointsBetweenBuilderAndScouts } from '@packages/scoutgame/points/dividePointsBetweenBuilderAndScouts';
 import { incrementPointsEarnedStats } from '@packages/scoutgame/points/updatePointsEarned';
 import { v4 } from 'uuid';
 
@@ -12,7 +12,8 @@ export async function processScoutPointsPayout({
   week,
   season,
   createdAt,
-  normalisationFactor = 1
+  normalisationFactor = 1,
+  weeklyAllocatedPoints
 }: {
   builderId: string;
   rank: number;
@@ -21,36 +22,8 @@ export async function processScoutPointsPayout({
   season: string;
   createdAt?: Date;
   normalisationFactor?: number;
+  weeklyAllocatedPoints: number;
 }) {
-  const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
-    where: {
-      builderNFT: {
-        season,
-        builderId
-      }
-    }
-  });
-
-  const { totalNftsPurchased, nftsByScout } = nftPurchaseEvents.reduce(
-    (acc, purchaseEvent) => {
-      acc.totalNftsPurchased += purchaseEvent.tokensPurchased;
-      acc.nftsByScout[purchaseEvent.scoutId] =
-        (acc.nftsByScout[purchaseEvent.scoutId] || 0) + purchaseEvent.tokensPurchased;
-      return acc;
-    },
-    {
-      totalNftsPurchased: 0,
-      nftsByScout: {} as Record<string, number>
-    }
-  );
-
-  if (totalNftsPurchased === 0) {
-    log.warn(`No NFTs purchased for builder in week ${week}`, { userId: builderId });
-    return;
-  }
-
-  const earnableScoutPoints = Math.floor(calculateEarnableScoutPointsForRank(rank) * normalisationFactor);
-
   const existingGemsPayoutEvent = await prisma.gemsPayoutEvent.findUnique({
     where: {
       builderId_week: {
@@ -64,6 +37,23 @@ export async function processScoutPointsPayout({
     log.warn(`Gems payout event already exists for builder in week ${week}`, { userId: builderId });
     return;
   }
+
+  const { pointsForBuilder, pointsPerScout, totalNftsPurchased } = await dividePointsBetweenBuilderAndScouts({
+    builderId,
+    season,
+    rank,
+    weeklyAllocatedPoints,
+    normalisationFactor
+  });
+
+  if (totalNftsPurchased === 0) {
+    log.warn(`No NFTs purchased for builder in week ${week}`, { userId: builderId });
+    return;
+  }
+
+  const earnableScoutPoints = Math.floor(
+    calculateEarnableScoutPointsForRank({ rank, weeklyAllocatedPoints }) * normalisationFactor
+  );
 
   return prisma.$transaction(
     async (tx) => {
@@ -89,12 +79,8 @@ export async function processScoutPointsPayout({
         }
       });
 
-      const builderPoints = Math.floor(builderPointsShare * earnableScoutPoints);
       await Promise.all([
-        ...Object.entries(nftsByScout).map(async ([scoutId, tokensPurchased]) => {
-          const scoutPoints = Math.floor(
-            scoutPointsShare * earnableScoutPoints * (tokensPurchased / totalNftsPurchased)
-          );
+        ...pointsPerScout.map(async ({ scoutId, scoutPoints }) => {
           await tx.pointsReceipt.create({
             data: {
               value: scoutPoints,
@@ -119,7 +105,7 @@ export async function processScoutPointsPayout({
         }),
         tx.pointsReceipt.create({
           data: {
-            value: builderPoints,
+            value: pointsForBuilder,
             recipientId: builderId,
             eventId: builderEventId,
             activities: {
@@ -135,7 +121,7 @@ export async function processScoutPointsPayout({
         incrementPointsEarnedStats({
           userId: builderId,
           season,
-          builderPoints,
+          builderPoints: pointsForBuilder,
           tx
         })
       ]);

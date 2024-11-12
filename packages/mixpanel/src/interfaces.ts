@@ -4,29 +4,39 @@ export interface MixpanelTrackBase {
   isAnonymous?: boolean;
 }
 
-export interface BaseEventWithoutGroup {
+export type BaseEvent = {
   userId: string;
-}
-
-export type UserSignupEvent = BaseEventWithoutGroup & {
-  username: string;
-  fid?: number;
 };
 
-export type UserLoginEvent = BaseEventWithoutGroup;
-
-export type NftPurchaseEvent = BaseEventWithoutGroup & {
+export type NftPurchaseEvent = BaseEvent & {
   amount: number;
+  builderPath: string;
   paidWithPoints: boolean;
   season: string;
 };
 
-export interface UserEventMap {
-  sign_up: UserSignupEvent;
-  sign_in: UserLoginEvent;
-  nft_purchase: NftPurchaseEvent;
-}
+type FrontendEvent = BaseEvent & {
+  currentPageTitle: string;
+  currentDomain: string;
+  currentUrlPath: string;
+  currentUrlSearch: string;
+};
 
-export type MixpanelEventMap = UserEventMap;
+export type ClickScoutButton = FrontendEvent & {
+  price: number;
+  builderPath: string;
+};
+
+export type MixpanelEventMap = {
+  sign_up: BaseEvent;
+  sign_in: BaseEvent;
+  nft_purchase: NftPurchaseEvent;
+  connect_github_success: BaseEvent;
+  click_scout_button: ClickScoutButton;
+  click_moxie_promo: FrontendEvent;
+  click_optimism_promo: FrontendEvent;
+  page_view: FrontendEvent;
+};
+
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;

@@ -12,27 +12,31 @@ type RepoAddress = {
 };
 
 export async function mockBuilder({
+  id,
   createdAt,
+  displayName = 'Test User',
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
   onboardedAt,
-  username = uuid(),
+  path = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
-  createNft = false
+  createNft = false,
+  farcasterId
 }: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
       createdAt,
-      username,
-      displayName: 'Test User',
+      path,
+      displayName,
       builderStatus,
       onboardedAt,
       agreedToTermsAt,
+      farcasterId,
       githubUser: {
         create: {
           id: githubUserId,
-          login: username
+          login: path!
         }
       }
     },
@@ -51,29 +55,35 @@ export async function mockBuilder({
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
-  username = `user-${uuid()}`,
+  path = `user-${uuid()}`,
   displayName = 'Test Scout',
   agreedToTermsAt = new Date(),
   onboardedAt = new Date(),
   builderId,
   season,
-  email
+  email,
+  currentBalance,
+  avatar
 }: {
-  username?: string;
+  avatar?: string;
+  path?: string;
   agreedToTermsAt?: Date | null;
   onboardedAt?: Date | null;
   displayName?: string;
   builderId?: string; // automatically "scout" a builder
   season?: string;
   email?: string;
+  currentBalance?: number;
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
-      username,
+      path,
       agreedToTermsAt,
       onboardedAt,
       displayName,
-      email
+      email,
+      currentBalance,
+      avatar
     }
   });
   if (builderId) {
@@ -129,13 +139,24 @@ export async function mockGemPayoutEvent({
   });
 }
 
-export async function mockBuilderEvent({ builderId, eventType }: { builderId: string; eventType: BuilderEventType }) {
+export async function mockBuilderEvent({
+  builderId,
+  eventType,
+  week = getCurrentWeek(),
+  createdAt = new Date()
+}: {
+  builderId: string;
+  eventType: BuilderEventType;
+  week?: string;
+  createdAt?: Date;
+}) {
   return prisma.builderEvent.create({
     data: {
+      createdAt,
       builderId,
       season: mockSeason,
       type: eventType,
-      week: getCurrentWeek()
+      week
     }
   });
 }
@@ -200,8 +221,8 @@ export function mockRepo(fields: Partial<GithubRepo> & { owner?: string } = {}) 
     data: {
       ...fields,
       id: fields.id ?? randomLargeInt(),
-      name: fields.name ?? `test_repo_${+Math.random()}`,
-      owner: fields.owner ?? `test_owner_${Math.random()}`,
+      name: fields.name ?? `test_repo_${Math.floor(Math.random() * 1000) + 1}`,
+      owner: fields.owner ?? `test_owner_${Math.floor(Math.random() * 1000) + 1}`,
       ownerType: fields.ownerType ?? 'org',
       defaultBranch: fields.defaultBranch ?? 'main'
     }
@@ -261,25 +282,29 @@ export async function mockNFTPurchaseEvent({
 export async function mockBuilderNft({
   builderId,
   chainId = 1,
+  tokenId = Math.round(Math.random() * 10000000),
   contractAddress = '0x1',
   owners = [],
-  season = mockSeason
+  season = mockSeason,
+  currentPrice = 100
 }: {
   builderId: string;
   chainId?: number;
   contractAddress?: string;
+  currentPrice?: number;
   owners?: (string | { id: string })[];
   season?: string;
+  tokenId?: number;
 }) {
   const nft = await prisma.builderNft.create({
     data: {
       builderId,
       chainId,
       contractAddress,
-      currentPrice: 0,
+      currentPrice,
       season,
       imageUrl: 'https://placehold.co/600x400',
-      tokenId: Math.round(Math.random() * 10000000),
+      tokenId,
       nftSoldEvents: {
         createMany: {
           data: owners.map((owner) => ({

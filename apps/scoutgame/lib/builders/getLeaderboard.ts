@@ -1,25 +1,35 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason } from '@packages/scoutgame/dates';
 
 export type LeaderBoardRow = {
   id: string;
   avatar: string | null;
-  username: string;
   displayName: string;
+  path: string;
+  builderStatus: BuilderStatus;
   progress: number;
   gemsCollected: number;
   price: bigint;
   nftImageUrl?: string;
 };
 
-export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise<LeaderBoardRow[]> {
-  const currentWeek = getCurrentWeek();
+export async function getLeaderboard({
+  limit = 10,
+  week = getCurrentWeek()
+}: {
+  limit?: number;
+  week?: string;
+}): Promise<LeaderBoardRow[]> {
   const season = currentSeason;
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {
-      week: currentWeek,
+      week,
       rank: {
         not: null
+      },
+      user: {
+        builderStatus: 'approved'
       }
     },
     orderBy: {
@@ -32,8 +42,9 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
         select: {
           id: true,
           avatar: true,
-          username: true,
+          path: true,
           displayName: true,
+          builderStatus: true,
           builderNfts: {
             select: {
               currentPrice: true,
@@ -55,8 +66,9 @@ export async function getLeaderboard({ limit = 10 }: { limit: number }): Promise
       return {
         id: weeklyTopBuilder.user.id,
         avatar: weeklyTopBuilder.user.avatar,
-        username: weeklyTopBuilder.user.username,
         displayName: weeklyTopBuilder.user.displayName,
+        path: weeklyTopBuilder.user.path,
+        builderStatus: weeklyTopBuilder.user.builderStatus!,
         gemsCollected: weeklyTopBuilder.gemsCollected,
         progress,
         price,

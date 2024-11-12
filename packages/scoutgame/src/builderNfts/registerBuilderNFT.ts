@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getBuilderContractAdminClient } from './clients/builderContractAdminWriteClient';
+import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
 import { builderNftChain } from './constants';
 import { createBuilderNft } from './createBuilderNft';
 import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
@@ -18,10 +18,10 @@ export async function registerBuilderNFT({
   imageHostingBaseUrl?: string;
 }) {
   if (!stringUtils.isUUID(builderId)) {
-    throw new InvalidInputError('Invalid builderId. Must be a uuid');
+    throw new InvalidInputError(`Invalid builderId. Must be a uuid: ${builderId}`);
   }
 
-  const contractClient = getBuilderContractAdminClient();
+  const contractClient = getBuilderContractMinterClient();
 
   const existingBuilderNft = await prisma.builderNft.findFirst({
     where: {
@@ -44,7 +44,8 @@ export async function registerBuilderNFT({
     select: {
       githubUser: true,
       avatar: true,
-      username: true,
+      path: true,
+      displayName: true,
       builderStatus: true
     }
   });
@@ -53,38 +54,29 @@ export async function registerBuilderNFT({
     throw new InvalidInputError('Scout profile does not have a github user');
   }
 
-  if (builder.builderStatus !== 'approved') {
-    throw new InvalidInputError('Scout profile not marked as a builder');
-  }
+  let tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } }).catch(() => null);
 
-  let existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } }).catch(() => null);
-
-  if (!existingTokenId) {
-    log.info(`Registering builder token for builderId: ${builderId}`);
+  if (!tokenId) {
+    log.info(`Registering builder token for builder`, { userId: builderId });
     await contractClient.registerBuilderToken({ args: { builderId } });
-    existingTokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
+    tokenId = await contractClient.getTokenIdForBuilder({ args: { builderId } });
   }
 
   const builderNft = await createBuilderNft({
     imageHostingBaseUrl,
-    tokenId: existingTokenId,
+    tokenId,
     builderId,
     avatar: builder.avatar,
-    username: builder.username
+    path: builder.path!,
+    displayName: builder.displayName
   });
 
-  const nftWithRefreshedPrice = await refreshBuilderNftPrice({ builderId, season });
-
-  await prisma.scout.update({
-    where: {
-      id: builderId
-    },
-    data: {
-      builderStatus: 'approved'
-    }
+  log.info(`Registered builder NFT for builder`, {
+    userId: builderId,
+    builderPath: builder.path,
+    tokenId,
+    season
   });
-
-  log.info(`Last price: ${builderNft.currentPrice}`);
 
   return builderNft;
 }

@@ -12,6 +12,6 @@ export function useSearchReposByOwnerFromGithub(owner: string) {
   return useGETImmutable<RepoSearchResult[]>(owner ? '/api/github/search-repos' : null, { owner });
 }
 
-export function useCreateRepo() {
+export function useCreateRepos() {
   return usePOST<{ owner: string }>('/api/repos');
 }

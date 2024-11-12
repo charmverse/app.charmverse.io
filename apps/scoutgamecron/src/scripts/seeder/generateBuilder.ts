@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import path from 'path';
+import { dirname, join } from 'path';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
@@ -12,7 +12,7 @@ export async function generateBuilder({ index }: { index: number }) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
   const displayName = `${firstName} ${lastName}`;
-  const username = faker.internet
+  const path = faker.internet
     .userName({
       firstName,
       lastName
@@ -28,7 +28,7 @@ export async function generateBuilder({ index }: { index: number }) {
 
   const githubUser = {
     id: faker.number.int({ min: 10000000, max: 25000000 }),
-    login: username,
+    login: path,
     email,
     displayName
   };
@@ -41,13 +41,13 @@ export async function generateBuilder({ index }: { index: number }) {
     const imageUrl = faker.datatype.boolean() ? avatar : faker.image.url();
     const nftImageBuffer = await generateNftImage({
       avatar: imageUrl,
-      username
+      displayName
     });
 
     // images will be hosted by the
     const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const scoutgamePublicFolder = path.join(
+    const __dirname = dirname(__filename);
+    const scoutgamePublicFolder = join(
       __dirname,
       '..',
       '..',
@@ -93,16 +93,20 @@ export async function generateBuilder({ index }: { index: number }) {
   }
   const builder = await prisma.scout.create({
     data: {
-      username,
+      path,
       displayName,
       email,
       avatar,
       bio: faker.lorem.paragraph(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
-      walletAddress: faker.finance.ethereumAddress(),
-      farcasterId: faker.number.int({ min: 1, max: 5000 }) + index,
-      farcasterName: displayName,
+      scoutWallet: {
+        create: {
+          address: faker.finance.ethereumAddress()
+        }
+      },
+      farcasterId: faker.number.int({ min: 1, max: 5000000 }) + index,
+      farcasterName: path,
       builderStatus,
       githubUser: {
         create: githubUser

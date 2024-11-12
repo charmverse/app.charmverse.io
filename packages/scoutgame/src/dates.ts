@@ -9,21 +9,25 @@ export const seasons = [
   // dev season
   {
     start: '2024-W38',
-    end: '2024-W40'
+    end: '2024-W40',
+    title: 'Dev Season'
   },
   // pre-release season
   {
     start: '2024-W40',
-    end: '2024-W41'
+    end: '2024-W41',
+    title: 'Pre Season'
   },
   // 1st season
   {
     start: '2024-W41',
-    end: '2025-W02'
+    end: '2025-W02',
+    title: 'Season 1'
   }
 ] as const;
 
 export type Season = (typeof seasons)[number]['start'];
+export const seasonStarts = seasons.map((s) => s.start);
 
 export const currentSeason: Season = '2024-W41';
 
@@ -32,8 +36,6 @@ export const streakWindow = 7 * 24 * 60 * 60 * 1000;
 
 export const seasonAllocatedPoints = 18_141_850;
 // Currently, we are hardcoding the value of weekly allocated points to 100,000
-// export const weeklyAllocatedPoints = seasonAllocatedPoints / 13;
-export const weeklyAllocatedPoints = 1e5;
 
 // Return the format of week
 export function getCurrentWeek(): ISOWeek {
@@ -46,6 +48,10 @@ export function getLastWeek(now: DateTime = DateTime.utc()): ISOWeek {
 
 export function getPreviousWeek(week: ISOWeek): ISOWeek {
   return _formatWeek(getDateFromISOWeek(week).minus({ week: 1 }));
+}
+
+export function getNextWeek(week: ISOWeek): ISOWeek {
+  return _formatWeek(getDateFromISOWeek(week).plus({ week: 1 }));
 }
 
 export function getPreviousSeason(season: Season): Season {
@@ -96,4 +102,20 @@ export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; we
   const seasonDate = DateTime.fromISO(season, { zone: 'utc' });
   const weeksDiff = weekDate.diff(seasonDate, 'weeks').weeks;
   return weeksDiff + 1;
+}
+
+export function getAllISOWeeksFromSeasonStart(): string[] {
+  const seasonOneStart = '2024-W41';
+  const start = getStartOfSeason(seasonOneStart);
+  const end = DateTime.now();
+
+  let current = start;
+  const weeks: string[] = [];
+
+  while (current <= end) {
+    weeks.push(`${current.weekYear}-W${current.weekNumber}`);
+    current = current.plus({ weeks: 1 });
+  }
+
+  return weeks;
 }

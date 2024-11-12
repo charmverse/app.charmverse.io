@@ -9,14 +9,14 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 
 export function BuilderStats({
   nftImageUrl,
-  username,
+  path,
   builderPoints,
   totalScouts,
   totalNftsSold,
   currentNftPrice
 }: {
   nftImageUrl?: string | null;
-  username: string;
+  path: string;
   builderPoints?: number;
   totalScouts?: number;
   totalNftsSold?: number;
@@ -36,7 +36,7 @@ export function BuilderStats({
       }}
     >
       <Stack justifyContent='center'>
-        <BuilderCardNftDisplay nftImageUrl={nftImageUrl} username={username} size={isDesktop ? 'large' : 'small'} />
+        <BuilderCardNftDisplay hideDetails nftImageUrl={nftImageUrl} path={path} size={isDesktop ? 'large' : 'small'} />
       </Stack>
       <Stack justifyContent='space-between' gap={2}>
         <Stack justifyContent='center' gap={0.5}>
@@ -44,29 +44,29 @@ export function BuilderStats({
             THIS SEASON
           </Typography>
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
-            <Typography fontWeight={500} variant='h4' color='green.main'>
+            <Typography fontWeight={500} variant='h4' color='orange.main'>
               {builderPoints || 0}
             </Typography>
-            <Image src='/images/profile/scout-game-green-icon.svg' width='25' height='25' alt='scout game icon' />
+            <Image src='/images/profile/scout-game-orange-icon.svg' width='25' height='25' alt='scout game icon' />
           </Stack>
-          <Typography fontWeight={500} variant='h4' color='green.main' align='center'>
+          <Typography fontWeight={500} variant='h4' color='orange.main' align='center'>
             {totalScouts || 0} Scouts
           </Typography>
           <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center'>
-            <Typography fontWeight={500} variant='h4' color='green.main'>
+            <Typography fontWeight={500} variant='h4' color='orange.main'>
               {totalNftsSold || 0}
             </Typography>
-            <Image src='/images/profile/icons/nft-green-icon.svg' width='25' height='25' alt='nft icon' />
-            <Typography fontWeight={500} variant='h4' color='green.main'>
+            <Image src='/images/profile/icons/cards-orange.svg' width='20' height='20' alt='cards icon' />
+            <Typography fontWeight={500} variant='h4' color='orange.main'>
               Sold
             </Typography>
           </Stack>
         </Stack>
         <Stack justifyContent='center' gap={0.5}>
           <Typography fontWeight={500} color='secondary' variant='subtitle1' align='center'>
-            CURRENT NFT PRICE
+            CURRENT CARD PRICE
           </Typography>
-          <Typography fontWeight={500} variant='h4' color='green.main' align='center'>
+          <Typography fontWeight={500} variant='h4' color='orange.main' align='center'>
             ${(Number(currentNftPrice || 0) / 10 ** builderTokenDecimals).toFixed(2)}
           </Typography>
         </Stack>

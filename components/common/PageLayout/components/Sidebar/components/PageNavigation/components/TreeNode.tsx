@@ -29,7 +29,6 @@ type NodeProps = {
   item: ParentMenuNode;
   onDropAdjacent: null | ((a: ParentMenuNode, b: ParentMenuNode) => void);
   onDropChild: null | ((a: ParentMenuNode, b: ParentMenuNode) => void);
-  pathPrefix: string;
   addPage?: (p: Partial<Page>) => void;
   deletePage?: (id: string) => void;
   selectedNodeId: string | null;
@@ -43,7 +42,6 @@ function DraggableTreeNode({
   onDropAdjacent,
   onDropChild,
   onClick,
-  pathPrefix,
   addPage,
   deletePage,
   selectedNodeId,
@@ -179,7 +177,6 @@ function DraggableTreeNode({
       }
     }
   }, [viewsRecord, views, item]);
-
   return (
     <PageTreeItem
       handlerId={handlerId}
@@ -188,7 +185,7 @@ function DraggableTreeNode({
       hasSelectedChildView={hasSelectedChildView}
       ref={dndEnabled ? mergeRefs([ref, drag, drop, dragPreview, focusListener]) : null}
       label={item.title}
-      href={`${pathPrefix}/${item.path}${
+      href={`/${item.path}${
         item.type.includes('board') && viewsRecord[item.id] ? `?viewId=${viewsRecord[item.id]}` : ''
       }`}
       pagePath={item.path}
@@ -209,7 +206,7 @@ function DraggableTreeNode({
               !view.fields.inline && (
                 <BoardViewTreeItem
                   key={view.id}
-                  href={`${pathPrefix}/${item.path}?viewId=${view.id}`}
+                  href={`/${item.path}?viewId=${view.id}`}
                   label={view.title || formatViewTitle(view)}
                   itemId={view.id}
                   viewType={view.fields.viewType}
@@ -224,7 +221,6 @@ function DraggableTreeNode({
           <MemoizedTreeNode
             onDropAdjacent={onDropAdjacent}
             onDropChild={onDropChild}
-            pathPrefix={pathPrefix}
             key={childItem.id}
             item={childItem}
             addPage={addPage}

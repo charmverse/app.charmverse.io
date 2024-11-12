@@ -44,17 +44,17 @@ async function createBuilders() {
         }
         const builder = await prisma.scout.upsert({
           where: {
-            username
+            path: username
           },
           update: {},
           create: {
             displayName,
-            username,
+            path: username,
             avatar: avatarUrl,
             bio,
             builderStatus: 'applied',
             farcasterId: fid,
-            farcasterName: displayName,
+            farcasterName: username,
             githubUser: {
               create: {
                 id: githubUser.data.id,

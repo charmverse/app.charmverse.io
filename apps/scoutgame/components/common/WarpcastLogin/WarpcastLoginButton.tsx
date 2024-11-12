@@ -4,8 +4,7 @@ import { log } from '@charmverse/core/log';
 import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
-import type { ButtonProps } from '@mui/material';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -19,7 +18,7 @@ import { loginWithFarcasterAction } from 'lib/session/loginWithFarcasterAction';
 import { FarcasterLoginModal } from './FarcasterModal';
 import { WarpcastIcon } from './WarpcastIcon';
 
-export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
+export function WarpcastLoginButton() {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const router = useRouter();
   const { refreshUser } = useUser();
@@ -44,11 +43,10 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         return;
       }
 
-      await refreshUser(data.user);
+      await refreshUser();
 
       await revalidatePath();
       router.push(nextPage);
-
       popupState.close();
     },
     onError(err) {
@@ -66,13 +64,16 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
     popupState.close();
   }, []);
 
-  const onSuccessCallback = useCallback(async (res: StatusAPIResponse) => {
-    if (res.message && res.signature) {
-      await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
-    } else {
-      log.error('Did not receive message or signature from Farcaster', res);
-    }
-  }, []);
+  const onSuccessCallback = useCallback(
+    async (res: StatusAPIResponse) => {
+      if (res.message && res.signature) {
+        await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
+      } else {
+        log.error('Did not receive message or signature from Farcaster', res);
+      }
+    },
+    [inviteCode]
+  );
 
   const onClick = useCallback(() => {
     popupState.open();
@@ -113,18 +114,21 @@ export function WarpcastLoginButton({ children, ...props }: ButtonProps) {
         onClick={signIn}
         variant='contained'
         sx={{
-          px: {
-            xs: 2.5,
-            md: 4
-          },
-          py: {
-            xs: 1.5,
-            md: 2
-          }
+          minWidth: '250px',
+          px: 2.5,
+          py: 1.5
         }}
-        startIcon={<WarpcastIcon />}
+        data-test='sign-in-with-warpcast'
       >
-        {children || 'Sign in with Warpcast'}
+        <Stack direction='row' alignItems='center' gap={1} justifyContent='flex-start' width='100%'>
+          {/** 24px is the size of the wallet button icon */}
+          <Box height='24px' width='24px' display='flex' alignItems='center' justifyContent='center'>
+            <WarpcastIcon size='20px' />
+          </Box>
+          <Typography fontWeight={600} color='white'>
+            Sign in with Warpcast
+          </Typography>
+        </Stack>
       </Button>
       {errorMessage && (
         <Typography variant='body2' sx={{ mt: 2 }} color='error'>

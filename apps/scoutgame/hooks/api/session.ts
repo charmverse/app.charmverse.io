@@ -1,10 +1,6 @@
+import { useGETImmutable, useGETtrigger } from '@packages/scoutgame/hooks/helpers';
+
 import type { SessionUser } from 'lib/session/getUserFromSession';
-
-import { useGETImmutable, useGETtrigger } from './helpers';
-
-export function useRefreshUserProfiles() {
-  return useGETImmutable<[]>('/api/session/refresh');
-}
 
 export function useGetUser() {
   return useGETImmutable<SessionUser | null>('/api/session/user');
@@ -15,5 +11,11 @@ export function useGetUserTrigger() {
 }
 
 export function useGetClaimablePoints() {
-  return useGETImmutable<{ points: number }>('/api/session/claimable-points');
+  return useGETImmutable<{ points: number }>(
+    '/api/session/claimable-points',
+    {},
+    {
+      refreshInterval: 30000
+    }
+  );
 }

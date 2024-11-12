@@ -11,7 +11,8 @@ export const checkDecentTransactionAction = authActionClient
   .metadata({ actionName: 'handle-mint-nft' })
   .schema(
     yup.object().shape({
-      pendingTransactionId: yup.string().required()
+      pendingTransactionId: yup.string().required(),
+      txHash: yup.string()
     })
   )
   .action(async ({ parsedInput }) => {

@@ -1,7 +1,8 @@
-'use server';
+import 'server-only';
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { Alert, Box, Stack, Typography } from '@mui/material';
+import { appealUrl } from '@packages/scoutgame/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -12,12 +13,12 @@ import { BuilderActivitiesList } from 'components/profile/components/BuilderProf
 import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
 import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
 import { getBuilderStats } from 'lib/builders/getBuilderStats';
-import type { BasicUserInfo } from 'lib/users/interfaces';
+import type { BuilderUserInfo } from 'lib/users/interfaces';
 
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
-export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
+export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) {
   const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}] =
     builder.builderStatus === 'approved'
       ? await Promise.all([
@@ -74,7 +75,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
         <Typography>
           Your Builder account was not approved. Submit an appeal for review{' '}
           <Typography color='secondary' component='span'>
-            <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+            <Link href={appealUrl}>here</Link>
           </Typography>{' '}
           if you think this was a mistake.
         </Typography>
@@ -89,7 +90,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
           <Typography>
             Your builder account has been banned. Submit an appeal for review{' '}
             <Typography color='secondary' component='span'>
-              <Link href='https://appeal.scoutgame.xyz/'>here</Link>
+              <Link href={appealUrl}>here</Link>
             </Typography>
             to get unbanned.
           </Typography>
@@ -97,7 +98,7 @@ export async function BuilderProfile({ builder }: { builder: BasicUserInfo }) {
       ) : null}
       <BuilderStats
         nftImageUrl={builderNft?.imageUrl}
-        username={builder.username}
+        path={builder.path}
         builderPoints={builderStats?.seasonPoints}
         totalScouts={totalScouts}
         totalNftsSold={totalNftsSold}

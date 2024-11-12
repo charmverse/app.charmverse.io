@@ -1,11 +1,10 @@
 'use client';
 
-import { Badge, BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { CiBellOn } from 'react-icons/ci';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
@@ -13,6 +12,7 @@ import { useUser } from 'components/layout/UserProvider';
 import { useGetClaimablePoints } from 'hooks/api/session';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
+import { ClaimIcon } from './ClaimIcon';
 import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
@@ -80,30 +80,23 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
         />
         <BottomNavigationAction
           LinkComponent={Link}
-          label='Notifications'
-          href='/notifications'
-          value='notifications'
-          icon={<CiBellOn size='26px' style={{ margin: '-1px 0' }} />}
-          onClick={(e) => openAuthModal?.(e, 'notifications')}
+          label='Claim'
+          href='/claim'
+          value='claim'
+          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
+          onClick={(e) => openAuthModal?.(e, 'claim')}
         />
-        <BottomNavigationAction
-          LinkComponent={Link}
-          label='Profile'
-          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-          href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
-          value='profile'
-          icon={
-            <Badge
-              color='error'
-              variant='dot'
-              overlap={isDesktop ? 'rectangular' : 'circular'}
-              invisible={!claimablePoints || claimablePoints.points === 0}
-            >
-              <SlUser size='19px' style={{ margin: '2px 0 3px' }} />
-            </Badge>
-          }
-          onClick={(e) => openAuthModal?.(e, 'profile')}
-        />
+        {user ? (
+          <BottomNavigationAction
+            LinkComponent={Link}
+            label='Profile'
+            // This makes sure the UI doesn't flicker from single column to double column for desktop screens
+            href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
+            value='profile'
+            icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
+            onClick={(e) => openAuthModal?.(e, 'profile')}
+          />
+        ) : null}
         <BottomNavigationAction
           LinkComponent={Link}
           label='Info'
@@ -115,7 +108,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
       </StyledBottomNavigation>
       <SignInModalMessage
         open={authPopup.open}
-        onClose={() => setAuthPopup({ open: false, path: '/home' })}
+        onClose={() => setAuthPopup({ open: false, path: authPopup.path })}
         path={authPopup.path}
       />
     </>
@@ -133,6 +126,8 @@ function getActiveButton(pathname: string) {
     return 'profile';
   } else if (pathname.startsWith('/info')) {
     return 'info';
+  } else if (pathname.startsWith('/claim')) {
+    return 'claim';
   }
   return null;
 }

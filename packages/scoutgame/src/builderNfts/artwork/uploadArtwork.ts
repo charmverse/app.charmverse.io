@@ -2,8 +2,8 @@ import { S3Client } from '@aws-sdk/client-s3';
 import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
-import { generateNftImage, generateNftCongrats } from './generateNftImage';
-import { getNftCongratsFilePath, getNftFilePath, imageDomain } from './utils';
+import { generateNftImage, generateNftCongrats, updateNftImage } from './generateNftImage';
+import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from './utils';
 
 function getS3ClientConfig() {
   const config: Pick<S3ClientConfig, 'region' | 'credentials'> = {
@@ -26,21 +26,28 @@ export async function uploadArtwork({
   avatar,
   tokenId,
   season,
-  username
+  displayName,
+  currentNftImage
 }: {
   imageHostingBaseUrl?: string;
-  username: string;
+  displayName: string;
   season: string;
   avatar: string | null;
   tokenId: bigint | number;
+  currentNftImage?: string;
 }) {
-  const imageBuffer = await generateNftImage({
-    avatar,
-    username,
-    imageHostingBaseUrl
-  });
+  const imageBuffer = currentNftImage
+    ? await updateNftImage({
+        displayName,
+        currentNftImage
+      })
+    : await generateNftImage({
+        avatar,
+        displayName,
+        imageHostingBaseUrl
+      });
 
-  const imagePath = getNftFilePath({ season, tokenId: Number(tokenId), type: 'artwork.png' });
+  const imagePath = getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'artwork.png' });
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
@@ -76,7 +83,7 @@ export async function uploadArtworkCongrats({
     imageHostingBaseUrl
   });
 
-  const imagePath = getNftCongratsFilePath({ season, tokenId: Number(tokenId) });
+  const imagePath = getNftCongratsPath({ season, tokenId: Number(tokenId) });
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',

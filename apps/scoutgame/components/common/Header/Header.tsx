@@ -16,8 +16,6 @@ import { Hidden } from 'components/common/Hidden';
 import { SiteNavigation } from 'components/common/SiteNavigation';
 import { useUser } from 'components/layout/UserProvider';
 
-import { InstallAppMenuItem } from './components/InstallAppMenuItem';
-
 export function Header() {
   const router = useRouter();
   const { user, refreshUser } = useUser();
@@ -46,6 +44,7 @@ export function Header() {
     <AppBar
       position='static'
       sx={{
+        zIndex: 1,
         height: 58,
         backgroundColor: { xs: 'transparent', md: 'var(--mui-palette-AppBar-darkBg, var(--AppBar-background))' }
       }}
@@ -97,8 +96,9 @@ export function Header() {
                     disabled={isExecutingLogout}
                     onClick={handleOpenUserMenu}
                     sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
+                    data-test='user-menu-pill'
                   >
-                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary'>
+                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-test='user-points-balance'>
                       {user.currentBalance}
                     </Typography>
                     <Image
@@ -108,7 +108,7 @@ export function Header() {
                       alt='Scout Game points icon'
                       priority={true}
                     />
-                    <Avatar src={user?.avatar || undefined} size='medium' name={user.username} />
+                    <Avatar src={user?.avatar || undefined} size='medium' name={user.displayName} />
                   </Button>
                   <Menu
                     sx={{ mt: 5 }}
@@ -131,14 +131,16 @@ export function Header() {
                     onClick={handleCloseUserMenu}
                   >
                     <MenuItem>
-                      <Link href='/profile'>{user.username}</Link>
+                      <Link href='/profile'>{user.displayName}</Link>
                     </MenuItem>
-                    <MenuItem onClick={() => logoutUser()}>Sign Out</MenuItem>
+                    <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
+                      Sign Out
+                    </MenuItem>
                     {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
                   </Menu>
                 </Box>
               ) : (
-                <Button variant='gradient' LinkComponent={Link} href='/login' data-test='sign-in-button'>
+                <Button variant='gradient' href='/login' data-test='sign-in-button'>
                   Sign in
                 </Button>
               )}

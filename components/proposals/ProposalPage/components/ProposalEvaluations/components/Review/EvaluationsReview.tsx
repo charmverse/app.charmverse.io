@@ -420,6 +420,7 @@ export function EvaluationsReview({
       {evaluationInput && (
         <EvaluationStepSettingsModal
           close={closeSettings}
+          isAdmin={isAdmin}
           evaluationInput={evaluationInput}
           templateId={templateId}
           saveEvaluation={saveEvaluation}

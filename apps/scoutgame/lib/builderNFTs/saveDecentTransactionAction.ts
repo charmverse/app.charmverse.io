@@ -52,5 +52,5 @@ export const saveDecentTransactionAction = authActionClient
       userId
     });
 
-    return { id: data.id };
+    return { id: data.id, txHash: data.sourceChainTxHash, input: parsedInput };
   });

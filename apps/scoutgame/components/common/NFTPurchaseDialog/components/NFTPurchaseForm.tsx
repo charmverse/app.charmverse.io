@@ -22,25 +22,25 @@ import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/b
 import {
   builderNftChain,
   getBuilderContractAddress,
-  optimismUsdcContractAddress,
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
-import { convertCostToPoints, convertCostToUsdDisplay } from '@packages/scoutgame/builderNfts/utils';
+import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
+import { isTestEnv } from '@root/config/constants';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { useAccount, useSendTransaction, useSwitchChain } from 'wagmi';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 import { IconButton } from 'components/common/Button/IconButton';
 import { PointsIcon } from 'components/common/Icons';
+import { usePurchase } from 'components/layout/PurchaseProvider';
+import { useSnackbar } from 'components/layout/SnackbarContext';
 import { useUser } from 'components/layout/UserProvider';
-import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
-import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 import type { MinimalUserInfo } from 'lib/users/interfaces';
 
 import { useDecentTransaction } from '../hooks/useDecentTransaction';
@@ -62,12 +62,12 @@ export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
 
-  if (!apiKey) {
+  if (!apiKey && !isTestEnv) {
     return <Typography color='error'>Decent API key not found</Typography>;
   }
 
   return (
-    <BoxHooksContextProvider apiKey={apiKey}>
+    <BoxHooksContextProvider apiKey={apiKey || '1234'}>
       <NFTPurchaseFormContent {...props} />
     </BoxHooksContextProvider>
   );
@@ -79,6 +79,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
+  const {
+    isExecutingTransaction,
+    sendNftMintTransaction,
+    isSavingDecentTransaction,
+    clearPurchaseSuccess,
+    purchaseSuccess,
+    purchaseError
+  } = usePurchase();
+  const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
 
@@ -99,6 +108,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const [fetchError, setFetchError] = useState<any>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (purchaseError) {
+      setSubmitError(purchaseError);
+    }
+  }, [purchaseError]);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
@@ -124,50 +139,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setSubmitError(null);
     }
   });
-
-  const {
-    isExecuting: isExecutingTransaction,
-    hasSucceeded: transactionHasSucceeded,
-    executeAsync: checkDecentTransaction
-  } = useAction(checkDecentTransactionAction, {
-    onError({ error, input }) {
-      log.error('Error checking Decent transaction', { error, input });
-      setSubmitError(error.serverError?.message || 'Something went wrong');
-    },
-    onExecute() {
-      setSubmitError(null);
-    }
-  });
-
-  const {
-    isExecuting: isSavingDecentTransaction,
-    hasSucceeded: savedDecentTransaction,
-    executeAsync: saveDecentTransaction
-  } = useAction(saveDecentTransactionAction, {
-    async onSuccess(res) {
-      if (res.data?.id) {
-        await checkDecentTransaction({ pendingTransactionId: res.data.id });
-        await refreshUser();
-        log.info('NFT minted', { chainId, builderTokenId, purchaseCost });
-      } else {
-        log.warn('NFT minted but no transaction id returned', {
-          chainId,
-          builderTokenId,
-          purchaseCost,
-          responseData: res.data
-        });
-      }
-    },
-    onError({ error, input }) {
-      log.error('Error minting NFT', { chainId, input, error });
-      setSubmitError(error.serverError?.message || 'Something went wrong');
-    },
-    onExecute() {
-      setSubmitError(null);
-    }
-  });
-
-  const { sendTransaction } = useSendTransaction();
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
@@ -253,46 +224,39 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       }
 
       if (chainId !== selectedPaymentOption.chainId) {
-        await switchChainAsync({ chainId: selectedPaymentOption.chainId });
+        await switchChainAsync(
+          { chainId: selectedPaymentOption.chainId },
+          {
+            onError() {
+              showMessage('Failed to switch chain');
+            }
+          }
+        );
       }
 
       const _value = BigInt(String((decentTransactionInfo.tx as any).value || 0).replace('n', ''));
+      setSubmitError(null);
 
-      sendTransaction(
-        {
+      sendNftMintTransaction({
+        txData: {
           to: decentTransactionInfo.tx.to as Address,
           data: decentTransactionInfo.tx.data as any,
           value: _value
         },
-        {
-          onSuccess: async (data) => {
-            log.info('Successfully sent mint transaction', { data });
-            await saveDecentTransaction({
-              user: {
-                walletAddress: address as `0x${string}`
-              },
-              transactionInfo: {
-                destinationChainId: builderNftChain.id,
-                sourceChainId: selectedPaymentOption.chainId,
-                sourceChainTxHash: data
-              },
-              purchaseInfo: {
-                quotedPrice: Number(purchaseCost),
-                tokenAmount: tokensToBuy,
-                builderContractAddress: getBuilderContractAddress(),
-                tokenId: Number(builderTokenId),
-                quotedPriceCurrency: optimismUsdcContractAddress
-              }
-            });
-          },
-          onError: (err: any) => {
-            setSubmitError(
-              err.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
-            );
-            log.error('Creating a mint transaction failed', { decentTransactionInfo, error: err });
-          }
+        txMetadata: {
+          fromAddress: address as Address,
+          sourceChainId: selectedPaymentOption.chainId,
+          builderTokenId: Number(builderTokenId),
+          purchaseCost: Number(purchaseCost),
+          tokensToBuy
         }
-      );
+      }).catch((error) => {
+        setSubmitError(
+          typeof error === 'string'
+            ? 'Error'
+            : error.message || 'Something went wrong. Check your wallet is connected and has a sufficient balance'
+        );
+      });
     }
   };
 
@@ -327,7 +291,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  if (hasPurchasedWithPoints || (savedDecentTransaction && transactionHasSucceeded)) {
+  if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
   }
 
@@ -346,7 +310,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         {builder.nftImageUrl ? (
           <Image
             src={builder.nftImageUrl}
-            alt={builder.username}
+            alt={builder.path}
             width={200}
             height={300}
             style={{ aspectRatio: '1/1.4', width: '40%', height: '50%' }}
@@ -357,7 +321,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         <Typography textAlign='center' fontWeight={600} color='secondary'>
           <>
             {pricePerNft}{' '}
-            <Box display='inline' position='relative' top={4}>
+            <Box component='span' display='inline' position='relative' top={4}>
               <PointsIcon color='blue' size={18} />
             </Box>
           </>
@@ -425,7 +389,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       <Stack>
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
           <Typography color='secondary'>Total cost</Typography>
-          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder NFTs are priced'>
+          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder cards are priced'>
             <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
           </Link>
         </Stack>
@@ -438,12 +402,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between'>
-          <Typography sx={{ width: '50%' }}>{tokensToBuy} NFT</Typography>
+          <Typography sx={{ width: '50%' }}>{tokensToBuy} Card</Typography>
           <Typography align='left' flexGrow={1}>
             {purchaseCost && (
               <>
                 {purchaseCostInPoints.toLocaleString()}{' '}
-                <Box display='inline' position='relative' top={4}>
+                <Box component='span' display='inline' position='relative' top={4}>
                   <PointsIcon size={18} />
                 </Box>
               </>
@@ -542,6 +506,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             (paymentMethod === 'points' && notEnoughPoints) ||
             isExecutingPointsPurchase
           }
+          data-test='purchase-button'
         >
           Buy
         </LoadingButton>
@@ -556,7 +521,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       )}
       {decentSdkError instanceof Error ? (
         <Typography variant='caption' color='error' align='center'>
-          {(decentSdkError as Error).message}
+          There was an error communicating with Decent API
         </Typography>
       ) : null}
       {submitError && (

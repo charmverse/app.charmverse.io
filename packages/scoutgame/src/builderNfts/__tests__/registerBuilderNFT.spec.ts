@@ -6,8 +6,8 @@ import { mockBuilder, mockBuilderNft } from '../../testing/database';
 import { randomLargeInt } from '../../testing/generators';
 import { builderNftChain, getBuilderContractAddress } from '../constants';
 
-jest.unstable_mockModule('../clients/builderContractAdminWriteClient', () => ({
-  getBuilderContractAdminClient: () => ({
+jest.unstable_mockModule('../clients/builderContractMinterWriteClient', () => ({
+  getBuilderContractMinterClient: () => ({
     getTokenIdForBuilder: () => Promise.resolve(randomLargeInt()),
     registerBuilderToken: jest.fn(),
     getTokenPurchasePrice: () => Promise.resolve(randomLargeInt())
@@ -26,7 +26,7 @@ jest.unstable_mockModule('../createBuilderNft', () => ({
   createBuilderNft: jest.fn()
 }));
 
-const { getBuilderContractAdminClient } = await import('../clients/builderContractAdminWriteClient');
+const { getBuilderContractMinterClient } = await import('../clients/builderContractMinterWriteClient');
 
 const { registerBuilderNFT } = await import('../registerBuilderNFT');
 
@@ -85,12 +85,6 @@ describe('registerBuilderNFT', () => {
     });
 
     expect(result?.id).toEqual(existingNft.id);
-    expect(getBuilderContractAdminClient().registerBuilderToken).not.toHaveBeenCalled();
-  });
-
-  it('should throw an error if scout profile is not marked as a builder', async () => {
-    const builder = await mockBuilder({ builderStatus: 'applied' });
-
-    await expect(registerBuilderNFT({ builderId: builder.id, season: mockSeason })).rejects.toThrow(InvalidInputError);
+    expect(getBuilderContractMinterClient().registerBuilderToken).not.toHaveBeenCalled();
   });
 });

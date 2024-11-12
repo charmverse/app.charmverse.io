@@ -1,17 +1,34 @@
+import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { currentSeason } from '@packages/scoutgame/dates';
 import { cache } from 'react';
 
 import type { BasicUserInfo } from './interfaces';
 import { BasicUserInfoSelect } from './queries';
 
-export async function getUserByUsernamePath(
-  username: string
-): Promise<(BasicUserInfo & { nftImageUrl?: string; congratsImageUrl?: string | null }) | null> {
+async function _getUserByPath(path: string): Promise<
+  | (BasicUserInfo & {
+      nftImageUrl?: string;
+      congratsImageUrl?: string | null;
+      builderStatus: BuilderStatus | null;
+      displayName: string;
+    })
+  | null
+> {
   const user = await prisma.scout.findFirst({
     where: {
-      username
+      path
     },
-    select: { ...BasicUserInfoSelect, builderNfts: true }
+    select: {
+      ...BasicUserInfoSelect,
+      displayName: true,
+      builderNfts: {
+        where: {
+          season: currentSeason
+        }
+      },
+      farcasterName: true
+    }
   });
 
   if (!user) {
@@ -26,4 +43,4 @@ export async function getUserByUsernamePath(
   };
 }
 
-export const getUserByPath = cache(getUserByUsernamePath);
+export const getUserByPath = cache(_getUserByPath);

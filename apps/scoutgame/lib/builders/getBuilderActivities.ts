@@ -1,5 +1,6 @@
 import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
@@ -9,7 +10,10 @@ export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
 type NftPurchaseActivity = {
   type: 'nft_purchase';
-  scout: string;
+  scout: {
+    path: string;
+    displayName: string;
+  };
 };
 
 type MergedPullRequestActivity = {
@@ -18,7 +22,7 @@ type MergedPullRequestActivity = {
   gems: number;
   repo: string;
   url: string;
-  bonusPartner: string | null;
+  bonusPartner: BonusPartner | null;
 };
 
 export type BuilderActivity = BasicUserInfo & {
@@ -35,7 +39,10 @@ export async function getBuilderActivities({
 }): Promise<BuilderActivity[]> {
   const builderEvents = await prisma.builderEvent.findMany({
     where: {
-      builderId,
+      builder: {
+        id: builderId,
+        builderStatus: 'approved'
+      },
       type: {
         in: ['nft_purchase', 'merged_pull_request', 'daily_commit']
       }
@@ -56,7 +63,8 @@ export async function getBuilderActivities({
         select: {
           scout: {
             select: {
-              username: true
+              path: true,
+              displayName: true
             }
           },
           tokensPurchased: true
@@ -90,7 +98,7 @@ export async function getBuilderActivities({
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout.username
+          scout: event.nftPurchaseEvent.scout
         };
       } else if (
         (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&
@@ -106,7 +114,7 @@ export async function getBuilderActivities({
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
           url: event.githubEvent.url,
-          bonusPartner: event.bonusPartner
+          bonusPartner: event.bonusPartner as BonusPartner | null
         };
       } else {
         return null;

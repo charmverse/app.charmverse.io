@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
 
+import type { Last7DaysGems } from './getTodaysHotBuilders';
 import type { BuilderInfo } from './interfaces';
 
 export type BuildersSort = 'top' | 'hot' | 'new';
@@ -23,10 +24,6 @@ export async function getSortedBuilders({
   season: string;
   cursor: CompositeCursor | null;
 }): Promise<{ builders: BuilderInfo[]; nextCursor: CompositeCursor | null }> {
-  // new is based on the most recent builder
-  // top is based on the most gems earned in their user week stats
-  // hot is based on the most points earned in the previous user week stats
-
   switch (sort) {
     case 'new': {
       const builders = await prisma.scout
@@ -47,7 +44,8 @@ export async function getSortedBuilders({
           cursor: cursor ? { id: cursor.userId } : undefined,
           select: {
             id: true,
-            username: true,
+            path: true,
+            displayName: true,
             builderStatus: true,
             createdAt: true,
             builderNfts: {
@@ -62,12 +60,18 @@ export async function getSortedBuilders({
                 }
               }
             },
+            builderCardActivities: {
+              select: {
+                last7Days: true
+              }
+            },
             userWeeklyStats: {
               where: {
-                week
+                week,
+                season
               },
               select: {
-                gemsCollected: true
+                rank: true
               }
             },
             userSeasonStats: {
@@ -89,14 +93,17 @@ export async function getSortedBuilders({
           return scouts.map((scout) => ({
             id: scout.id,
             nftImageUrl: scout.builderNfts[0]?.imageUrl,
-            username: scout.username,
-            displayName: scout.username,
+            path: scout.path,
+            displayName: scout.displayName,
             builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: scout.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: scout.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gemsCollected: scout.userWeeklyStats[0]?.gemsCollected ?? 0,
+            rank: scout.userWeeklyStats[0]?.rank ?? -1,
             nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: scout.builderStatus
+            builderStatus: scout.builderStatus!,
+            last7DaysGems: ((scout.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }));
         });
       const userId = builders[builders.length - 1]?.id;
@@ -136,7 +143,8 @@ export async function getSortedBuilders({
             user: {
               select: {
                 id: true,
-                username: true,
+                path: true,
+                displayName: true,
                 builderStatus: true,
                 builderNfts: {
                   where: {
@@ -148,6 +156,11 @@ export async function getSortedBuilders({
                     nftSoldEvents: {
                       distinct: 'scoutId'
                     }
+                  }
+                },
+                builderCardActivities: {
+                  select: {
+                    last7Days: true
                   }
                 },
                 userAllTimeStats: {
@@ -164,23 +177,24 @@ export async function getSortedBuilders({
                   }
                 }
               }
-            },
-            gemsCollected: true
+            }
           }
         })
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            rank: stat.rank,
+            rank: stat.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
-            username: stat.user.username,
-            displayName: stat.user.username,
+            path: stat.user.path,
+            displayName: stat.user.displayName,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
             scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
-            gemsCollected: stat.gemsCollected,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!,
+            last7DaysGems: ((stat.user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }))
         );
       const userId = builders[builders.length - 1]?.id;
@@ -218,15 +232,29 @@ export async function getSortedBuilders({
               }
             : undefined,
           select: {
-            rank: true,
             user: {
               select: {
                 id: true,
-                username: true,
+                path: true,
+                displayName: true,
                 builderStatus: true,
+                userWeeklyStats: {
+                  where: {
+                    week,
+                    season
+                  },
+                  select: {
+                    rank: true
+                  }
+                },
                 userAllTimeStats: {
                   select: {
                     pointsEarnedAsBuilder: true
+                  }
+                },
+                builderCardActivities: {
+                  select: {
+                    last7Days: true
                   }
                 },
                 userSeasonStats: {
@@ -235,14 +263,6 @@ export async function getSortedBuilders({
                   },
                   select: {
                     nftsSold: true
-                  }
-                },
-                userWeeklyStats: {
-                  where: {
-                    week
-                  },
-                  select: {
-                    gemsCollected: true
                   }
                 },
                 builderNfts: {
@@ -261,15 +281,17 @@ export async function getSortedBuilders({
         .then((stats) =>
           stats.map((stat) => ({
             id: stat.user.id,
-            rank: stat.rank,
+            rank: stat.user.userWeeklyStats[0]?.rank ?? -1,
             nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
-            username: stat.user.username,
-            displayName: stat.user.username,
+            path: stat.user.path,
+            displayName: stat.user.displayName,
             builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
             price: stat.user.builderNfts?.[0]?.currentPrice ?? 0,
-            gemsCollected: stat.user.userWeeklyStats[0]?.gemsCollected ?? 0,
             nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
-            builderStatus: stat.user.builderStatus
+            builderStatus: stat.user.builderStatus!,
+            last7DaysGems: ((stat.user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
+              .map((gem) => gem.gemsCount)
+              .slice(-7)
           }))
         );
       const userId = builders[builders.length - 1]?.id;

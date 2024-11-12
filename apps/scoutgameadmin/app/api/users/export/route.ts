@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 type ScoutWithGithubUser = {
   id: string;
-  username: string;
+  path: string;
   createdAt: string;
   email?: string;
   tokenId?: number;
@@ -29,7 +29,7 @@ export async function GET() {
   const users = await prisma.scout.findMany({
     select: {
       id: true,
-      username: true,
+      path: true,
       sendMarketing: true,
       createdAt: true,
       avatar: true,
@@ -50,7 +50,7 @@ export async function GET() {
   });
   const rows: ScoutWithGithubUser[] = users.map((user) => ({
     id: user.id,
-    username: user.username,
+    path: user.path!,
     createdAt: user.createdAt.toDateString(),
     email: user.email || undefined,
     optedInToMarketing: user.sendMarketing ? 'Yes' : '',

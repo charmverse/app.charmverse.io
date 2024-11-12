@@ -1,9 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { weeklyRewardableBuilders } from '@packages/scoutgame/builderNfts/constants';
-import { currentSeason, getLastWeek, weeklyAllocatedPoints } from '@packages/scoutgame/dates';
-import { getBuildersLeaderboard } from '@packages/scoutgame/getBuildersLeaderboard';
+import { getCurrentWeekPointsAllocation } from '@packages/scoutgame/builderNfts/getCurrentWeekPointsAllocation';
+import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
+import { currentSeason, getLastWeek } from '@packages/scoutgame/dates';
 import { getPointsCountForWeekWithNormalisation } from '@packages/scoutgame/points/getPointsCountForWeekWithNormalisation';
+import { getWeeklyPointsPoolAndBuilders } from '@packages/scoutgame/points/getWeeklyPointsPoolAndBuilders';
 import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
@@ -34,9 +36,8 @@ export async function processGemsPayout(
     return;
   }
 
-  const topWeeklyBuilders = await getBuildersLeaderboard({ quantity: weeklyRewardableBuilders, week });
-
-  const { normalisationFactor, totalPoints } = await getPointsCountForWeekWithNormalisation({ week });
+  const { normalisationFactor, topWeeklyBuilders, totalPoints, weeklyAllocatedPoints } =
+    await getWeeklyPointsPoolAndBuilders({ week });
 
   log.debug(`Allocation: ${weeklyAllocatedPoints} -- Total points for week ${week}: ${totalPoints}`, {
     topWeeklyBuilders: topWeeklyBuilders.length,
@@ -56,7 +57,8 @@ export async function processGemsPayout(
         gemsCollected,
         week,
         season,
-        normalisationFactor
+        normalisationFactor,
+        weeklyAllocatedPoints
       });
     } catch (error) {
       log.error(`Error processing scout points payout for builder ${builder.id}: ${error}`);

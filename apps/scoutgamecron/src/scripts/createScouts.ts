@@ -17,16 +17,16 @@ async function createScouts(farcasterUsernames: string[]) {
 
       const scout = await prisma.scout.upsert({
         where: {
-          username: farcasterUsername
+          path: farcasterUsername
         },
         update: {},
         create: {
           displayName,
-          username: farcasterUsername,
+          path: farcasterUsername,
           avatar: avatarUrl,
           bio,
           farcasterId: fid,
-          farcasterName: displayName,
+          farcasterName: farcasterUsername,
           currentBalance: 10
         }
       });

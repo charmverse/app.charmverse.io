@@ -8,7 +8,7 @@ export function SinglePageLayout({ children, ...props }: BoxProps) {
         display: 'flex',
         flexDirection: 'column',
         gap: 4,
-        justifyContent: 'space-evenly',
+        justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
         height: '100%',

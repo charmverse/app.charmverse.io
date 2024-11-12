@@ -3,7 +3,8 @@ import { currentSeason } from '@packages/scoutgame/dates';
 
 export type TopScout = {
   id: string;
-  username: string;
+  path: string;
+  displayName: string;
   avatar: string | null;
   buildersScouted: number;
   nftsHeld: number;
@@ -25,7 +26,8 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       user: {
         select: {
           id: true,
-          username: true,
+          path: true,
+          displayName: true,
           avatar: true,
           nftPurchaseEvents: {
             where: {
@@ -68,7 +70,8 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       const seasonPoints = scout.pointsEarnedAsScout;
       return {
         id: scout.user.id,
-        username: scout.user.username,
+        path: scout.user.path,
+        displayName: scout.user.displayName,
         avatar: scout.user.avatar,
         buildersScouted,
         nftsHeld,
@@ -92,4 +95,45 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
       return 0;
     })
     .filter((scout) => scout.seasonPoints || scout.allTimePoints || scout.nftsHeld);
+}
+
+// TODO: cache the pointsEarned as part of userWeeklyStats like we do in userSeasonStats
+export async function getTopScoutsByWeek({ week, limit = 10 }: { week: string; limit?: number }) {
+  const receipts = await prisma.pointsReceipt.findMany({
+    where: {
+      event: {
+        type: 'gems_payout',
+        season: currentSeason,
+        week
+      }
+    },
+    include: {
+      event: {
+        include: { gemsPayoutEvent: true }
+      }
+    }
+  });
+  const scoutReceipts = receipts.filter((receipt) => receipt.event.builderId !== receipt.recipientId);
+  // create a map of userId to pointsEarned
+  const pointsEarnedByUserId = scoutReceipts.reduce<Record<string, number>>((acc, receipt) => {
+    acc[receipt.recipientId!] = (acc[receipt.recipientId!] || 0) + receipt.value;
+    return acc;
+  }, {});
+  // create a list of users sorted by pointsEarned
+  const sortedUsers = Object.entries(pointsEarnedByUserId)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit);
+
+  const users = await prisma.scout.findMany({
+    where: {
+      id: {
+        in: sortedUsers.map((user) => user[0])
+      }
+    }
+  });
+
+  return sortedUsers.map((user) => ({
+    ...users.find((u) => u.id === user[0]),
+    pointsEarned: pointsEarnedByUserId[user[0]]
+  }));
 }

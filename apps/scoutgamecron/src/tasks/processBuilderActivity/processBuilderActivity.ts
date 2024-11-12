@@ -30,8 +30,9 @@ export async function processBuilderActivity({
   const timer = DateTime.now();
   const week = getWeekFromDate(now.toJSDate());
 
-  const { commits, pullRequests, newOwnerRepos } = await getBuilderActivity({
+  const { commits, pullRequests } = await getBuilderActivity({
     login: githubUser.login,
+    githubUserId: githubUser.id,
     after: createdAfter
   });
 
@@ -57,25 +58,8 @@ export async function processBuilderActivity({
     newCommits: newCommits.length,
     prs: pullRequests.length,
     newPrs: newPullRequests.length,
-    newRepos: newOwnerRepos.map((r) => r.full_name),
     userId: builderId
   });
-
-  if (newOwnerRepos.length) {
-    await prisma.githubRepo.createMany({
-      data: newOwnerRepos.map((repo) => ({
-        id: repo.id,
-        owner: repo.owner.login,
-        name: repo.name,
-        ownerType: 'user',
-        defaultBranch: repo.default_branch || 'main'
-      }))
-    });
-    log.debug('Created new repos based on commit from owner', {
-      newRepos: newOwnerRepos.map((r) => r.full_name),
-      userId: builderId
-    });
-  }
 
   // Loop thru new pull requests
   for (const pullRequest of newPullRequests) {
@@ -98,10 +82,13 @@ export async function processBuilderActivity({
           await recordMergedPullRequest({ pullRequest, repo, season });
         }
       } catch (error) {
-        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, { error });
+        log.error(`Error processing ${pullRequest.repository.nameWithOwner}/${pullRequest.number}`, {
+          error,
+          userId: builderId
+        });
       }
     } else {
-      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`);
+      log.error(`Repo not found for pull request: ${pullRequest.repository.nameWithOwner}`, { userId: builderId });
     }
   }
 
@@ -110,7 +97,7 @@ export async function processBuilderActivity({
     try {
       await recordCommit({ commit, season });
     } catch (error) {
-      log.error(`Error processing commit ${commit.sha}`, { error });
+      log.error(`Error processing commit ${commit.sha}`, { error, userId: builderId });
     }
   }
 
