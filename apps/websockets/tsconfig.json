@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "esModuleInterop": true,
+    "baseUrl": ".",
     "paths": {
       "@packages/charmeditor/*": ["../../packages/charmeditor/src/*"],
       "@packages/utils/*": ["../../packages/utils/src/*"],
