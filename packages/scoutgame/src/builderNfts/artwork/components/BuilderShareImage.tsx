@@ -206,16 +206,16 @@ export function BuilderShareImage({
                 <div
                   style={{
                     margin: 0,
-                    alignItems: 'center',
                     gap: 3,
                     display: 'flex',
+                    alignItems: 'center',
                     flexDirection: 'row',
-                    justifyContent: 'center'
+                    height: '30px'
                   }}
                 >
                   {activity.type === 'github_event' ? (
-                    <>
-                      +{activity.gems}
+                    <div style={{ display: 'flex', alignItems: 'center', alignSelf: 'flex-start', gap: 3 }}>
+                      <span>+{activity.gems}</span>
                       <img
                         style={{ margin: 0 }}
                         width={15}
@@ -223,7 +223,7 @@ export function BuilderShareImage({
                         src={`${domain}/images/profile/icons/hex-gem-icon.svg`}
                         alt='gem'
                       />
-                    </>
+                    </div>
                   ) : null}
                   {activity.type === 'github_event' &&
                   activity.bonusPartner &&
