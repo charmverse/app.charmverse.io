@@ -39,7 +39,7 @@ export function PointsClaimScreen({
 }) {
   const { executeAsync, isExecuting } = useAction(claimPointsAction);
   const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
-  const { refreshUser } = useUser();
+  const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
 
   const handleClaim = async () => {
@@ -150,11 +150,14 @@ export function PointsClaimScreen({
             />
           )}
         </Stack>
-        <PointsClaimSocialShare
-          builderPoints={builderPoints}
-          scoutPoints={scoutPoints}
-          builders={builders.map((b) => b.displayName)}
-        />
+        {user ? (
+          <PointsClaimSocialShare
+            builderPoints={builderPoints}
+            scoutPoints={scoutPoints}
+            builders={builders.map((b) => b.displayName)}
+            userPath={user.path}
+          />
+        ) : null}
       </Dialog>
     </Paper>
   );

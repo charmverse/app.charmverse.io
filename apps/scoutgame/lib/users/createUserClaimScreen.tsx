@@ -1,18 +1,15 @@
 import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { prisma } from '@charmverse/core/prisma-client';
-import { CssBaseline, ThemeProvider } from '@mui/material';
 import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
-import { baseUrl } from '@root/config/constants';
+import { appEnv, baseUrl } from '@root/config/constants';
 import puppeteer from 'puppeteer';
 import React from 'react';
 
-import { getUnclaimedPointsSource } from 'lib/points/getUnclaimedPointsSource';
-
 import { PointsClaimBuilderScreen } from '../../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimBuilderScreen';
 import { PointsClaimScoutScreen } from '../../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimScoutScreen';
-import { serverTheme } from '../../theme/serverTheme';
+import { getUnclaimedPointsSource } from '../../lib/points/getUnclaimedPointsSource';
 
 const client = new S3Client(getS3ClientConfig());
 
@@ -35,15 +32,10 @@ export async function createUserClaimScreen(userId: string) {
   const displayName = user.displayName;
 
   try {
-    const component = (
-      <ThemeProvider theme={serverTheme}>
-        <CssBaseline />
-        {isBuilder ? (
-          <PointsClaimBuilderScreen displayName={displayName} claimedPoints={claimedPoints} repos={repos} />
-        ) : (
-          <PointsClaimScoutScreen displayName={displayName} claimedPoints={claimedPoints} builders={builders} />
-        )}
-      </ThemeProvider>
+    const component = isBuilder ? (
+      <PointsClaimBuilderScreen displayName={displayName} claimedPoints={claimedPoints} repos={repos} />
+    ) : (
+      <PointsClaimScoutScreen displayName={displayName} claimedPoints={claimedPoints} builders={builders} />
     );
 
     const renderedHtml = renderToString(component);
@@ -66,6 +58,10 @@ export async function createUserClaimScreen(userId: string) {
             font-weight: 500;
             font-style: normal;
             font-display: swap;
+          }
+
+          body {
+            font-family: 'Inter', sans-serif;
           }
         </style>
       </head>
@@ -90,7 +86,7 @@ export async function createUserClaimScreen(userId: string) {
 
     const params: PutObjectCommandInput = {
       Bucket: process.env.SCOUTGAME_S3_BUCKET,
-      Key: `claim-screens/${userId}/${getCurrentWeek()}.png`,
+      Key: `claim-screens/${appEnv}/${userId}/${getCurrentWeek()}.png`,
       Body: screenshot,
       ContentType: 'image/png'
     };

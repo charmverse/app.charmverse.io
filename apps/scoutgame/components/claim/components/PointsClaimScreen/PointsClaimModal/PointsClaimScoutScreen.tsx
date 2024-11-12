@@ -1,7 +1,8 @@
-import { Avatar, Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { baseUrl } from '@root/config/constants';
 import React from 'react';
+
+import { primaryTextColorDarkMode, secondaryText } from 'theme/colors';
 
 export function PointsClaimScoutScreen({
   claimedPoints,
@@ -13,52 +14,119 @@ export function PointsClaimScoutScreen({
   builders: { avatar: string | null; displayName: string }[];
 }) {
   const currentWeek = getCurrentSeasonWeekNumber();
+
   return (
-    <Stack
-      sx={{
+    <div
+      style={{
         transform: 'translate(-50%, -50%)',
         position: 'absolute',
         top: '50%',
         left: '50%',
         width: '75%',
         height: '75%',
+        display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         zIndex: 1,
-        mt: 4
+        marginTop: '32px',
+        color: primaryTextColorDarkMode
       }}
       className='scoutgame-claim-screen'
     >
-      <Typography variant='h4' fontFamily='K2D'>
+      <h1
+        style={{
+          fontFamily: 'K2D',
+          fontSize: '2.125rem',
+          margin: 0
+        }}
+      >
         TOP SCOUT
-      </Typography>
-      <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
+      </h1>
+
+      <h2
+        style={{
+          color: secondaryText,
+          fontWeight: 600,
+          fontSize: '1.25rem',
+          marginTop: '16px'
+        }}
+      >
         {displayName}
-      </Typography>
-      <Typography variant='h6' textAlign='center'>
+      </h2>
+
+      <div
+        style={{
+          fontSize: '1.25rem',
+          textAlign: 'center'
+        }}
+      >
         scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
-      </Typography>
-      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='Posterama'>
+      </div>
+
+      <div
+        style={{
+          fontWeight: 'bold',
+          fontSize: '1.25rem',
+          textAlign: 'center',
+          fontFamily: 'Posterama'
+        }}
+      >
         SCOUT GAME!
-      </Typography>
-      <Stack flexDirection='row' gap={1} justifyContent='space-between' width='100%' mt={2} pl={4}>
-        <Stack mt={4} gap={1}>
-          <Typography variant='h6' fontWeight={700}>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          justifyContent: 'space-between',
+          width: '100%',
+          marginTop: '16px',
+          paddingLeft: '32px'
+        }}
+      >
+        <div
+          style={{
+            marginTop: '32px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '8px'
+          }}
+        >
+          <h2
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              margin: 0
+            }}
+          >
             My Top Builders:
-          </Typography>
+          </h2>
+
           {builders.map((builder) => (
-            <Stack key={builder.displayName} flexDirection='row' alignItems='center' gap={1}>
-              <Avatar
+            <div
+              key={builder.displayName}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <img
                 src={builder.avatar ?? ''}
                 alt={builder.displayName}
-                variant='circular'
-                sx={{ width: 24, height: 24 }}
+                style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '50%'
+                }}
               />
-              <Typography fontWeight={600}>{builder.displayName}</Typography>
-            </Stack>
+              <span style={{ fontWeight: 600 }}>{builder.displayName}</span>
+            </div>
           ))}
-        </Stack>
+        </div>
+
         <img src={`${baseUrl}/images/profile/builder-dog.png`} alt='Builder Dog' width={200} height={200} />
-      </Stack>
-    </Stack>
+      </div>
+    </div>
   );
 }

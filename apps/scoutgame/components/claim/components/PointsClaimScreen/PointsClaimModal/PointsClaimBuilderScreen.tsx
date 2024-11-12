@@ -1,7 +1,8 @@
-import { Stack, Typography } from '@mui/material';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { baseUrl } from '@root/config/constants';
 import React from 'react';
+
+import { primaryTextColorDarkMode, secondaryText } from 'theme/colors';
 
 export function PointsClaimBuilderScreen({
   claimedPoints,
@@ -13,44 +14,101 @@ export function PointsClaimBuilderScreen({
   repos: string[];
 }) {
   const currentWeek = getCurrentSeasonWeekNumber();
+
   return (
-    <Stack
-      sx={{
+    <div
+      style={{
         transform: 'translate(-50%, -50%)',
         position: 'absolute',
         top: '50%',
         left: '50%',
         width: '75%',
         height: '75%',
+        display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         zIndex: 1,
-        mt: 4
+        marginTop: '32px',
+        color: primaryTextColorDarkMode
       }}
       className='scoutgame-claim-screen'
     >
-      <Typography variant='h4' fontFamily='K2D'>
+      <h1
+        style={{
+          fontFamily: 'K2D',
+          fontSize: '2.125rem',
+          margin: 0
+        }}
+      >
         TOP BUILDER
-      </Typography>
-      <Typography variant='h6' color='secondary' fontWeight={600} mt={2}>
+      </h1>
+
+      <h2
+        style={{
+          color: secondaryText,
+          fontWeight: 600,
+          fontSize: '1.25rem',
+          marginTop: '16px'
+        }}
+      >
         {displayName}
-      </Typography>
-      <Typography variant='h6' textAlign='center'>
+      </h2>
+
+      <div
+        style={{
+          fontSize: '1.25rem',
+          textAlign: 'center'
+        }}
+      >
         scored {claimedPoints} Scout Points <br /> in week {currentWeek} of
-      </Typography>
-      <Typography fontWeight='bold' variant='h6' textAlign='center' fontFamily='Posterama'>
+      </div>
+
+      <div
+        style={{
+          fontWeight: 'bold',
+          fontSize: '1.25rem',
+          textAlign: 'center',
+          fontFamily: 'Posterama'
+        }}
+      >
         SCOUT GAME!
-      </Typography>
+      </div>
+
       <img src={`${baseUrl}/images/diamond.png`} alt='Diamond' width={100} height={100} />
-      <Stack gap={0.5} width='100%' px={2} mt={1}>
-        <Typography variant='h6' fontWeight={700}>
+
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '4px',
+          width: '100%',
+          padding: '0 16px',
+          marginTop: '8px'
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '1.25rem',
+            fontWeight: 700,
+            margin: 0
+          }}
+        >
           Contributions:
-        </Typography>
+        </h2>
+
         {repos.map((repo) => (
-          <Typography key={repo} textOverflow='ellipsis'>
+          <div
+            key={repo}
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >
             {repo}
-          </Typography>
+          </div>
         ))}
-      </Stack>
-    </Stack>
+      </div>
+    </div>
   );
 }
