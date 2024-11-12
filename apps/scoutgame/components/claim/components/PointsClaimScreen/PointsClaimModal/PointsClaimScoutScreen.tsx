@@ -1,5 +1,4 @@
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
-import { baseUrl } from '@root/config/constants';
 import React from 'react';
 
 import { primaryTextColorDarkMode, secondaryText } from 'theme/colors';
@@ -7,8 +6,10 @@ import { primaryTextColorDarkMode, secondaryText } from 'theme/colors';
 export function PointsClaimScoutScreen({
   claimedPoints,
   displayName,
-  builders
+  builders,
+  baseUrl = ''
 }: {
+  baseUrl?: string;
   displayName: string;
   claimedPoints: number;
   builders: { avatar: string | null; displayName: string }[];

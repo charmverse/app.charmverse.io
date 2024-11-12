@@ -27,15 +27,25 @@ export async function createUserClaimScreen(userId: string) {
     // This is required to load the fonts
     args: ['--disable-web-security']
   });
-  const isBuilder = builders.length > 0;
+  const isBuilder = builderPoints > 0;
   const claimedPoints = builderPoints + scoutPoints;
   const displayName = user.displayName;
 
   try {
     const component = isBuilder ? (
-      <PointsClaimBuilderScreen displayName={displayName} claimedPoints={claimedPoints} repos={repos} />
+      <PointsClaimBuilderScreen
+        displayName={displayName}
+        claimedPoints={claimedPoints}
+        repos={repos}
+        baseUrl={baseUrl}
+      />
     ) : (
-      <PointsClaimScoutScreen displayName={displayName} claimedPoints={claimedPoints} builders={builders} />
+      <PointsClaimScoutScreen
+        displayName={displayName}
+        claimedPoints={claimedPoints}
+        builders={builders}
+        baseUrl={baseUrl}
+      />
     );
 
     const renderedHtml = renderToString(component);
@@ -85,8 +95,8 @@ export async function createUserClaimScreen(userId: string) {
     const screenshot = await page.screenshot();
 
     const params: PutObjectCommandInput = {
-      Bucket: process.env.SCOUTGAME_S3_BUCKET,
-      Key: `claim-screens/${appEnv}/${userId}/${getCurrentWeek()}.png`,
+      Bucket: process.env.S3_UPLOAD_BUCKET,
+      Key: `points-claim/${appEnv}/${userId}/${getCurrentWeek()}.png`,
       Body: screenshot,
       ContentType: 'image/png'
     };

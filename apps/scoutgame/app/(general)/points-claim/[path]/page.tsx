@@ -11,8 +11,8 @@ export default async function Claim({ params }: { params: { path: string } }) {
   }
 
   const region = process.env.S3_UPLOAD_REGION;
-  const bucket = process.env.SCOUTGAME_S3_BUCKET;
-  const claimScreenUrl = `https://s3.${region}.amazonaws.com/${bucket}/claim-screens/${appEnv}/${user.id}/${getCurrentWeek()}.png`;
+  const bucket = process.env.S3_UPLOAD_BUCKET;
+  const claimScreenUrl = `https://s3.${region}.amazonaws.com/${bucket}/points-claim/${appEnv}/${user.id}/${getCurrentWeek()}.png`;
 
   return (
     <>
