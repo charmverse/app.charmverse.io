@@ -1,8 +1,8 @@
 import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { isTruthy } from '@packages/utils/types';
 
+import type { BonusPartner } from '../bonus';
 import type { BasicUserInfo } from '../users/interfaces';
 import { BasicUserInfoSelect } from '../users/queries';
 

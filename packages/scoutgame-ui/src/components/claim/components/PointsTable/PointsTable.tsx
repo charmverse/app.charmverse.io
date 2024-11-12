@@ -2,9 +2,8 @@
 
 import { Paper, Table, TableCell, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import type { PointsReceiptReward } from '@packages/scoutgame/points/getPointsReceiptsRewards';
 import type { ReactNode } from 'react';
-
-import type { PointsReceiptReward } from 'lib/points/getPointsReceiptsRewards';
 
 import { StyledTableBody, StyledTableHead } from '../common/StyledTable';
 

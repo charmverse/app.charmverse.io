@@ -1,5 +1,6 @@
-import { getUserByPath } from '@packages/scoutgame/users/getUserByPath';
 import { v4 } from 'uuid';
+
+import { getUserByPath } from './getUserByPath';
 
 export async function generateUserPath(displayName: string) {
   const path = displayName

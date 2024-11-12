@@ -4,8 +4,6 @@ import { Suspense } from 'react';
 
 import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
 
-import { PageContainer } from '../layout/PageContainer';
-
 import { BuilderRewardsScreen } from './components/BuilderRewardsScreen/BuilderRewardsScreen';
 import { LoadingTable } from './components/common/LoadingTable';
 import { ClaimedPointsTable } from './components/PointsTable/ClaimedPointsTable';
@@ -20,54 +18,52 @@ export type ClaimPageProps = {
 
 export function ClaimPage({ displayName, totalUnclaimedPoints, bonusPartners, period }: ClaimPageProps) {
   return (
-    <PageContainer>
-      <Stack
-        gap={8}
-        mt={2}
-        flexDirection={{
-          xs: 'column',
-          md: 'row'
-        }}
-      >
-        <Stack flex={1} gap={4}>
-          <PointsClaimScreen
-            totalUnclaimedPoints={totalUnclaimedPoints}
-            displayName={displayName}
-            bonusPartners={bonusPartners}
-          />
-          {totalUnclaimedPoints === 0 ? null : (
-            <Suspense fallback={<LoadingTable />}>
-              <UnclaimedPointsTable />
-            </Suspense>
-          )}
-          <Stack
-            sx={{
-              display: {
-                xs: 'flex',
-                md: 'none'
-              }
-            }}
-          >
-            <BuilderRewardsScreen period={period} />
-          </Stack>
+    <Stack
+      gap={8}
+      mt={2}
+      flexDirection={{
+        xs: 'column',
+        md: 'row'
+      }}
+    >
+      <Stack flex={1} gap={4}>
+        <PointsClaimScreen
+          totalUnclaimedPoints={totalUnclaimedPoints}
+          displayName={displayName}
+          bonusPartners={bonusPartners}
+        />
+        {totalUnclaimedPoints === 0 ? null : (
           <Suspense fallback={<LoadingTable />}>
-            <ClaimedPointsTable />
+            <UnclaimedPointsTable />
           </Suspense>
-        </Stack>
+        )}
         <Stack
           sx={{
-            flex: 1,
-            height: 'fit-content',
-            justifyContent: 'flex-start',
             display: {
-              xs: 'none',
-              md: 'flex'
+              xs: 'flex',
+              md: 'none'
             }
           }}
         >
           <BuilderRewardsScreen period={period} />
         </Stack>
+        <Suspense fallback={<LoadingTable />}>
+          <ClaimedPointsTable />
+        </Suspense>
       </Stack>
-    </PageContainer>
+      <Stack
+        sx={{
+          flex: 1,
+          height: 'fit-content',
+          justifyContent: 'flex-start',
+          display: {
+            xs: 'none',
+            md: 'flex'
+          }
+        }}
+      >
+        <BuilderRewardsScreen period={period} />
+      </Stack>
+    </Stack>
   );
 }

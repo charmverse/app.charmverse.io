@@ -2,12 +2,11 @@
 
 import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
-import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
+import { claimPointsAction } from '@packages/scoutgame/points/claimPointsAction';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
+import { useUser } from 'providers/UserProvider';
 import { useState } from 'react';
-
-import { claimPointsAction } from 'lib/points/claimPointsAction';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';

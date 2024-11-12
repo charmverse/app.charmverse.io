@@ -1,14 +1,13 @@
 import { Stack, TableCell, TableRow, Typography } from '@mui/material';
 import { seasons } from '@packages/scoutgame/dates';
-import Image from 'next/image';
-
 import type {
   BuilderPointsReceiptReward,
   LeaderboardRankPointsReceiptReward,
   PointsReceiptReward,
   SeasonPointsReceiptsReward,
   SoldNftsPointsReceiptReward
-} from 'lib/points/getPointsReceiptsRewards';
+} from '@packages/scoutgame/points/getPointsReceiptsRewards';
+import Image from 'next/image';
 
 import { PointsCell } from '../common/PointsCell';
 

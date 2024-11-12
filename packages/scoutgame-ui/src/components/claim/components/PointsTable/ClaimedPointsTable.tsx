@@ -1,8 +1,7 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack } from '@mui/material';
+import { getPointsReceiptsRewards } from '@packages/scoutgame/points/getPointsReceiptsRewards';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
-
-import { getPointsReceiptsRewards } from 'lib/points/getPointsReceiptsRewards';
 
 import { PointsTable } from './PointsTable';
 
