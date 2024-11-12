@@ -24,6 +24,7 @@ const nextConfig = {
     unoptimized: true
   },
   productionBrowserSourceMaps: true,
+  serverExternalPackages: ['puppeteer', 'puppeteer-core'], // used to generate server-side images
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   webpack(_config) {
     // Fix for: "Module not found: Can't resolve 'canvas'"
