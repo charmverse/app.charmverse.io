@@ -46,6 +46,13 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
         LinkComponent={Link}
       />
       <BottomNavigationAction
+        label='Scout'
+        href='/scout'
+        value='scout'
+        icon={<Image src='/images/scout-binoculars.svg' width={24} height={24} alt='Scout' />}
+        LinkComponent={Link}
+      />
+      <BottomNavigationAction
         label='Friends'
         href='/friends'
         value='friends'
@@ -61,6 +68,8 @@ function getActiveButton(pathname: string) {
     return 'quests';
   } else if (pathname.startsWith('/friends')) {
     return 'friends';
+  } else if (pathname.startsWith('/scout')) {
+    return 'scout';
   }
   return null;
 }

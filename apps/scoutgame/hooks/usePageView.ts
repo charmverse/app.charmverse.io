@@ -1,7 +1,6 @@
+import { useTrackEvent } from '@packages/scoutgame/hooks/useTrackEvent';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
-
-import { useTrackEvent } from './useTrackEvent';
 
 export function usePageView() {
   const trackEvent = useTrackEvent();

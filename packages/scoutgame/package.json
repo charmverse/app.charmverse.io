@@ -8,9 +8,12 @@
   },
   "exports": {
     "./*": "./src/*.ts",
+    "./components/*": "./src/components/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts",
     "./builderNfts/artwork/generateNftImage": "./src/builderNfts/artwork/generateNftImage.tsx"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.1",
     "@packages/aws": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
     "@packages/farcaster": "^0.0.0",

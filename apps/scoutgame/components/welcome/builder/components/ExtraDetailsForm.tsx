@@ -15,6 +15,7 @@ import {
   Typography,
   Box
 } from '@mui/material';
+import { EditableUserProfile } from '@packages/scoutgame/components/common/Profile/EditableUserProfile';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -22,7 +23,6 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-import { EditableUserProfile } from 'components/common/Profile/EditableUserProfile';
 import { useUser } from 'components/layout/UserProvider';
 import { useIsMounted } from 'hooks/useIsMounted';
 import type { SessionUser } from 'lib/session/getUserFromSession';

@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getTodaysHotBuilders } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockUserWeeklyStats } from '@packages/scoutgame/testing/database';
-
-import { getTodaysHotBuilders } from '../getTodaysHotBuilders';
 
 beforeEach(async () => {
   await prisma.userWeeklyStats.deleteMany();
