@@ -21,6 +21,9 @@ COPY --parents @connect-shared   \
   apps/scoutgame/next.config.mjs \
   .
 
+# Install Chromium using puppeteer
+RUN npx puppeteer browsers install chrome
+
 # Copy compiled code
 COPY --parents apps/*/.next apps/*/public .
 
