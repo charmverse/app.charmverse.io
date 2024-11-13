@@ -34,6 +34,7 @@ const PaperContainer = styled(Paper)(({ theme }) => ({
   flex: 1,
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(2),
+    // @ts-ignore
     backgroundColor: theme.palette.background.dark
   },
   [theme.breakpoints.down('md')]: {

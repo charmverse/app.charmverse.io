@@ -1,11 +1,12 @@
 'use server';
 
-import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
-import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { revalidatePath } from 'next/cache';
 import * as yup from 'yup';
 
 import { authActionClient } from '../actions/actionClient';
+import { getUserFromSession } from '../session/getUserFromSession';
+
+import { handlePendingTransaction } from './handlePendingTransaction';
 
 export const checkDecentTransactionAction = authActionClient
   .metadata({ actionName: 'handle-mint-nft' })

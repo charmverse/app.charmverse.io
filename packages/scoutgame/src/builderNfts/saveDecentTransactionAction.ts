@@ -1,12 +1,12 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
-import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { authActionClient } from '../actions/actionClient';
+import { savePendingTransaction } from '../savePendingTransaction';
+import { getUserFromSession } from '../session/getUserFromSession';
 
 export const saveDecentTransactionAction = authActionClient
   .metadata({ actionName: 'save-decent-transaction' })
