@@ -2,6 +2,7 @@ import { Stack, TableHead, Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
+import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
 import { getRelativeTime } from '@packages/utils/dates';
 import Link from 'next/link';
 import { BiLike } from 'react-icons/bi';
@@ -14,7 +15,6 @@ import {
   BuilderActivityGems,
   getActivityLabel
 } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
-import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 
 import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';

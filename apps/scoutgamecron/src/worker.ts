@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import * as middleware from './middleware';
 import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
 import { issueGemsOnchain } from './tasks/issueGemsOnchain';
+import { nftCongratsImageTask } from './tasks/nftCongratsImage';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processOnchainGemsPayout } from './tasks/processGemsPayout/processOnchainGemsPayout';
@@ -68,6 +69,9 @@ addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
 
+addTask('/nft-congrats-image', nftCongratsImageTask);
+
+// Standard health check used by Beanstalk
 // Onchain tasks -------
 
 // Calculate merkle tree and write to protocol

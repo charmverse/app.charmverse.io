@@ -1,6 +1,7 @@
 import 'server-only';
 
-import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
+import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
 import { getTopScouts } from 'lib/scouts/getTopScouts';

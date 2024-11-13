@@ -2,16 +2,17 @@
 
 import type { BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
+import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
+import type { BuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
+import type { BuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
 
 import { BackButton } from 'components/common/Button/BackButton';
 import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
-import type { ScoutInfo } from 'components/common/Card/ScoutCard';
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { UserProfile } from 'components/common/Profile/UserProfile';
 import { BuilderActivitiesList } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
 import { BuilderWeeklyStats } from 'components/profile/components/BuilderProfile/BuilderWeeklyStats';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { BuilderActivity } from 'lib/builders/getBuilderActivities';
 import type { BasicUserInfo } from 'lib/users/interfaces';
 
 import { PublicBuilderStats } from './PublicBuilderStats';
@@ -22,15 +23,9 @@ export type BuilderProfileProps = {
     price?: bigint;
     nftImageUrl?: string;
   };
-  allTimePoints?: number;
-  seasonPoints?: number;
-  totalScouts?: number;
-  scouts: ScoutInfo[];
-  totalNftsSold?: number;
   builderActivities: BuilderActivity[];
-  gemsCollected?: number;
-  rank?: number | null;
-};
+} & BuilderStats &
+  BuilderScouts;
 
 const PaperContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',

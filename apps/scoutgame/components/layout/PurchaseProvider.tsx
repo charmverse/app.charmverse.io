@@ -12,6 +12,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { Address } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
+import { useRefreshCongratsImage } from 'hooks/api/builders';
 import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
 import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
 
@@ -30,6 +31,7 @@ type MintTransactionInput = {
     fromAddress: Address;
     sourceChainId: number;
     builderTokenId: number;
+    builderId: string;
     purchaseCost: number;
     tokensToBuy: number;
   };
@@ -51,6 +53,7 @@ export const PurchaseContext = createContext<Readonly<PurchaseContext | null>>(n
 
 export function PurchaseProvider({ children }: { children: ReactNode }) {
   const { showMessage } = useSnackbar();
+  const { trigger: refreshCongratsImage } = useRefreshCongratsImage();
   const { refreshUser } = useUser();
   const { sendTransactionAsync } = useSendTransaction();
 
@@ -79,6 +82,9 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
   } = useAction(saveDecentTransactionAction, {
     async onSuccess(res) {
       if (res.data?.id) {
+        // Refresh the congrats image without awaiting it since we don't want to slow down the process
+        refreshCongratsImage({ builderId: res.input.user.id });
+
         const checkResult = await checkDecentTransaction({
           pendingTransactionId: res.data.id,
           txHash: res.data.txHash
@@ -87,22 +93,22 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
 
         if (checkResult?.serverError) {
           log.error(`${purchaseLogPrefix} Error checking decent.xyz for transaction`, {
-            chainId: res.data.input.transactionInfo.sourceChainId,
-            builderTokenId: res.data.input.purchaseInfo.tokenId,
-            purchaseCost: res.data.input.purchaseInfo.quotedPrice
+            chainId: res.input.transactionInfo.sourceChainId,
+            builderTokenId: res.input.purchaseInfo.tokenId,
+            purchaseCost: res.input.purchaseInfo.quotedPrice
           });
         } else {
           log.info(`${purchaseLogPrefix} NFT minted`, {
-            chainId: res.data.input.transactionInfo.sourceChainId,
-            builderTokenId: res.data.input.purchaseInfo.tokenId,
-            purchaseCost: res.data.input.purchaseInfo.quotedPrice
+            chainId: res.input.transactionInfo.sourceChainId,
+            builderTokenId: res.input.purchaseInfo.tokenId,
+            purchaseCost: res.input.purchaseInfo.quotedPrice
           });
         }
       } else {
         log.warn(`${purchaseLogPrefix} NFT minted but no transaction id returned`, {
-          chainId: res.data?.input.transactionInfo.sourceChainId,
-          builderTokenId: res.data?.input.purchaseInfo.tokenId,
-          purchaseCost: res.data?.input.purchaseInfo.quotedPrice,
+          chainId: res.input.transactionInfo.sourceChainId,
+          builderTokenId: res.input.purchaseInfo.tokenId,
+          purchaseCost: res.input.purchaseInfo.quotedPrice,
           responseData: res.data
         });
       }
@@ -120,7 +126,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     async (input: MintTransactionInput) => {
       const {
         txData: { to, data, value: _txValue },
-        txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress }
+        txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress, builderId }
       } = input;
       return sendTransactionAsync(
         {
@@ -133,6 +139,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
             setPurchaseSuccess(true);
             const output = await saveDecentTransaction({
               user: {
+                id: builderId,
                 walletAddress: fromAddress
               },
               transactionInfo: {

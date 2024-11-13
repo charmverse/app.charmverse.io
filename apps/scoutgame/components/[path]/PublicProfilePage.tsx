@@ -14,7 +14,7 @@ import { PublicBuilderProfile } from './components/PublicBuilderProfile/PublicBu
 import { PublicScoutProfile } from './components/PublicScoutProfile/PublicScoutProfile';
 import { PublicProfileTabsMenu } from './PublicProfileTabsMenu';
 
-type UserProfile = BasicUserInfo & { displayName: string; builderStatus: BuilderStatus | null };
+type UserProfile = BasicUserInfo & { displayName: string; builderStatus: BuilderStatus | null; nftImageUrl?: string };
 
 export function PublicProfilePage({ user, tab }: { user: UserProfile; tab: string }) {
   return (
