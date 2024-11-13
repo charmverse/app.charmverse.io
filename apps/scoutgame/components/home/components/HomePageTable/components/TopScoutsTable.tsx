@@ -59,13 +59,13 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
             <TableCell align='right'>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                 <TableCellText color='green.main'>{scout.seasonPoints || 0}</TableCellText>
-                <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
+                <PointsIcon color='green' size={15} />
               </Stack>
             </TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                 <TableCellText color='green.main'>{scout.allTimePoints || 0}</TableCellText>
-                <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
+                <PointsIcon color='green' size={15} />
               </Stack>
             </TableCell>
             <TableCell align='center'>

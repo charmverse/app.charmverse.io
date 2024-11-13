@@ -8,6 +8,7 @@ const mockPermissions: ProposalPermissionFlags = {
   evaluate: true,
   comment: true,
   edit: true,
+  edit_rewards: true,
   delete: true,
   view: false,
   view_notes: false,

@@ -5,10 +5,12 @@ import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
+import { getNewScouts } from 'lib/scouts/getNewScouts';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
 
 import { ActivityTable } from './components/ActivityTable';
 import { LeaderboardTable } from './components/LeaderboardTable';
+import { NewScoutsTable } from './components/NewScoutsTable';
 import { TopBuildersTable } from './components/TopBuildersTable';
 import { TopScoutsTable } from './components/TopScoutsTable';
 
@@ -21,6 +23,11 @@ export async function HomeTab({ tab }: { tab: string }) {
   if (tab === 'top-scouts') {
     const [, topScouts = []] = await safeAwaitSSRData(getTopScouts({ limit: 200 }));
     return <TopScoutsTable scouts={topScouts} />;
+  }
+
+  if (tab === 'new-scouts') {
+    const [, newScouts = []] = await safeAwaitSSRData(getNewScouts({ limit: 200 }));
+    return <NewScoutsTable scouts={newScouts} />;
   }
 
   if (tab === 'top-builders') {

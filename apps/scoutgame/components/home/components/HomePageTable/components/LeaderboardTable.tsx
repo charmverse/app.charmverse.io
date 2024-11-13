@@ -7,8 +7,8 @@ import TableCell from '@mui/material/TableCell';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
+import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import { ScoutButton } from '@packages/scoutgame-ui/components/common/ScoutButton/ScoutButton';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
@@ -74,7 +74,7 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
             <TableCell>
               <Stack flexDirection='row' gap={0.2} alignItems='center' justifyContent='center'>
                 <TableCellText>{row.gemsCollected}</TableCellText>
-                <Image width={15} height={15} src='/images/profile/icons/hex-gem-icon.svg' alt='Gem' />
+                <GemsIcon size={15} />
               </Stack>
             </TableCell>
             <TableCell sx={getSXProps({ mdDown: true, display: 'table-cell' })} width='200px'>

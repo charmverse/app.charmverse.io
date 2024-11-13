@@ -9,6 +9,7 @@ type PointsReceiptRewardBase = {
   week: number;
   points: number;
   type: PointsReceiptRewardType;
+  season: Season;
 };
 
 export type BuilderPointsReceiptReward = PointsReceiptRewardBase & {
@@ -141,6 +142,7 @@ export async function getPointsReceiptsRewards({
           points: 0,
           quantity: 0,
           week: weekNumber,
+          season: receipt.event.season as Season,
           type: 'sold_nfts'
         };
       }
@@ -153,6 +155,7 @@ export async function getPointsReceiptsRewards({
             points: 0,
             week: weekNumber,
             type: 'builder',
+            season: receipt.event.season as Season,
             bonusPartners: []
           };
         }
@@ -168,6 +171,7 @@ export async function getPointsReceiptsRewards({
             points: 0,
             rank: weeklyRank,
             week: weekNumber,
+            season: receipt.event.season as Season,
             type: 'leaderboard_rank'
           };
         }

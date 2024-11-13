@@ -14,7 +14,8 @@ esbuild
     external: [
       // esbuild cannot bundle native modules
       '@datadog/native-metrics',
-      '@charmverse/core'
+      '@charmverse/core',
+      '@vercel/og'
     ],
     plugins: [ddPlugin],
     platform: 'node',

@@ -1,55 +1,43 @@
 'use client';
 
-import { Box, Button, Dialog, Paper, Stack, Typography } from '@mui/material';
+import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { Box, Dialog, IconButton, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
-import { claimPointsAction } from '@packages/scoutgame/points/claimPointsAction';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 
+import { claimPointsAction } from '../../../../actions/claimPointsAction';
 import { useUser } from '../../../../providers/UserProvider';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
-
-function PointsClaimSuccessModal({
-  showModal,
-  handleCloseModal,
-  claimedPoints
-}: {
-  showModal: boolean;
-  handleCloseModal: VoidFunction;
-  claimedPoints: number;
-}) {
-  return (
-    <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
-      <Stack gap={2} textAlign='center' my={2}>
-        <Typography color='secondary' variant='h5' fontWeight={600}>
-          Congratulations!
-        </Typography>
-        <Typography>You claimed {claimedPoints.toLocaleString()} points</Typography>
-        <Image src='/images/trophy_sticker.jpg' alt='Success' width={300} height={300} />
-        <div>
-          <Button variant='outlined' color='primary' onClick={handleCloseModal}>
-            Return to app
-          </Button>
-        </div>
-      </Stack>
-    </Dialog>
-  );
-}
+import { PointsClaimBuilderScreen } from './PointsClaimModal/PointsClaimBuilderScreen';
+import { PointsClaimScoutScreen } from './PointsClaimModal/PointsClaimScoutScreen';
+import { PointsClaimSocialShare } from './PointsClaimModal/PointsClaimSocialShare';
 
 export function PointsClaimScreen({
   totalUnclaimedPoints,
   displayName,
-  bonusPartners
+  bonusPartners,
+  builders,
+  builderPoints,
+  scoutPoints,
+  repos
 }: {
   totalUnclaimedPoints: number;
   displayName: string;
   bonusPartners: BonusPartner[];
+  builders: {
+    avatar: string | null;
+    displayName: string;
+  }[];
+  scoutPoints: number;
+  builderPoints: number;
+  repos: string[];
 }) {
-  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
-  const { refreshUser } = useUser();
+  const { executeAsync, isExecuting } = useAction(claimPointsAction);
+  const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
 
   const handleClaim = async () => {
@@ -133,11 +121,41 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      <PointsClaimSuccessModal
-        showModal={showModal}
-        handleCloseModal={handleCloseModal}
-        claimedPoints={result?.data?.claimedPoints ?? 0}
-      />
+      <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+        <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
+          <CancelOutlinedIcon color='primary' />
+        </IconButton>
+        <Stack position='relative' width={600} height={600}>
+          <Image
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0
+            }}
+            width={600}
+            height={600}
+            src='/images/claim-share-background.png'
+            alt='Claim success modal'
+          />
+          {builderPoints ? (
+            <PointsClaimBuilderScreen repos={repos} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
+          ) : (
+            <PointsClaimScoutScreen
+              claimedPoints={totalUnclaimedPoints}
+              displayName={displayName}
+              builders={builders}
+            />
+          )}
+        </Stack>
+        {user ? (
+          <PointsClaimSocialShare
+            builderPoints={builderPoints}
+            scoutPoints={scoutPoints}
+            builders={builders.map((b) => b.displayName)}
+            userPath={user.path}
+          />
+        ) : null}
+      </Dialog>
     </Paper>
   );
 }

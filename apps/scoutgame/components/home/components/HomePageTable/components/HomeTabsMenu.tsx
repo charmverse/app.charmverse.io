@@ -5,6 +5,7 @@ export const homeTabs: TabItem[] = [
   { label: 'Leaderboard', value: 'leaderboard' },
   { label: 'Activity', value: 'activity' },
   { label: 'Top Scouts', value: 'top-scouts' },
+  { label: 'New Scouts', value: 'new-scouts' },
   { label: 'Top Builders', value: 'top-builders' }
 ];
 

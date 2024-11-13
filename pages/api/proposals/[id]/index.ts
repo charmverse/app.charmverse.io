@@ -94,7 +94,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     userId
   });
 
-  if (!proposalPermissions.edit) {
+  if (!proposalPermissions.edit && !proposalPermissions.edit_rewards) {
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
