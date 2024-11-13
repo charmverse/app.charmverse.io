@@ -1,5 +1,4 @@
 import { getLastWeek } from '@packages/scoutgame/dates';
-import { appEnv } from '@root/config/constants';
 import { notFound } from 'next/navigation';
 
 import { getUserByPath } from 'lib/users/getUserByPath';
@@ -12,7 +11,7 @@ export default async function Claim({ params }: { params: { path: string } }) {
 
   const region = process.env.S3_UPLOAD_REGION;
   const bucket = process.env.S3_UPLOAD_BUCKET;
-  const claimScreenUrl = `https://s3.${region}.amazonaws.com/${bucket}/points-claim/${appEnv}/${user.id}/${getLastWeek()}.png`;
+  const claimScreenUrl = `https://s3.${region}.amazonaws.com/${bucket}/points-claim/${user.id}/${getLastWeek()}.png`;
 
   return (
     <>
