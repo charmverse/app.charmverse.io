@@ -1,5 +1,6 @@
 import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
 import { getLastWeek } from '@packages/scoutgame/dates';
@@ -106,7 +107,11 @@ export async function createUserClaimScreen(userId: string) {
       params
     });
 
+    log.info('generated claim screen', { userId });
+
     await s3Upload.done();
+  } catch (e) {
+    log.error('error generating claim screen', { userId, error: e });
   } finally {
     await browser.close();
   }
