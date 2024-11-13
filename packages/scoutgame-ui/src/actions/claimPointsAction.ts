@@ -3,6 +3,7 @@
 import { authActionClient } from '@packages/scoutgame/actions/actionClient';
 import { claimPoints } from '@packages/scoutgame/points/claimPoints';
 import { isTestEnv } from '@packages/utils/constants';
+import { revalidatePath } from 'next/cache';
 
 import { createUserClaimScreen } from './createUserClaimScreen';
 
@@ -14,5 +15,7 @@ export const claimPointsAction = authActionClient.metadata({ actionName: 'claim_
   if (!isTestEnv) {
     await createUserClaimScreen(userId);
   }
+  revalidatePath('/profile');
+  revalidatePath('/claim');
   return { success: true, claimedPoints: result.total };
 });

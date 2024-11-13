@@ -25,8 +25,8 @@ export async function createUserClaimScreen(userId: string) {
   });
   const { builders, builderPoints, scoutPoints, repos } = await getUnclaimedPointsSource(userId);
   const browser = await puppeteer.launch({
-    // This is required to load the fonts
-    args: ['--disable-web-security']
+    // These flags are required to load the fonts and run the browser inside docker container
+    args: ['--disable-web-security', '--disable-setuid-sandbox', '--no-sandbox']
   });
   const isBuilder = builderPoints > 0;
   const claimedPoints = builderPoints + scoutPoints;
