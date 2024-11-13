@@ -240,6 +240,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           fromAddress: address as Address,
           sourceChainId: selectedPaymentOption.chainId,
           builderTokenId: Number(builderTokenId),
+          builderId: builder.id,
           purchaseCost: Number(purchaseCost),
           tokensToBuy
         }

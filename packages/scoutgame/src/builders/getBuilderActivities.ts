@@ -1,9 +1,8 @@
-import type { GemsReceiptType } from '@charmverse/core/prisma-client';
+import type { GemsReceiptType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from '@packages/utils/types';
 
 import type { BonusPartner } from '../bonus';
-import type { BasicUserInfo } from '../users/interfaces';
 import { BasicUserInfoSelect } from '../users/queries';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
@@ -25,9 +24,8 @@ type MergedPullRequestActivity = {
   bonusPartner: BonusPartner | null;
 };
 
-export type BuilderActivity = BasicUserInfo & {
-  id: string;
-  createdAt: Date;
+export type BuilderActivity = Pick<Scout, 'id' | 'createdAt' | 'displayName' | 'path' | 'avatar' | 'bio'> & {
+  githubLogin?: string;
 } & (NftPurchaseActivity | MergedPullRequestActivity);
 
 export async function getBuilderActivities({
@@ -95,10 +93,14 @@ export async function getBuilderActivities({
       if (event.type === 'nft_purchase' && event.nftPurchaseEvent) {
         return {
           ...event.builder,
+          path: event.builder.path,
           id: event.id,
           createdAt: event.createdAt,
           type: 'nft_purchase' as const,
-          scout: event.nftPurchaseEvent.scout
+          scout: {
+            path: event.nftPurchaseEvent.scout.path,
+            displayName: event.nftPurchaseEvent.scout.displayName
+          }
         };
       } else if (
         (event.type === 'merged_pull_request' || event.type === 'daily_commit') &&
@@ -107,6 +109,7 @@ export async function getBuilderActivities({
       ) {
         return {
           ...event.builder,
+          path: event.builder.path!,
           id: event.id,
           createdAt: event.createdAt,
           type: 'github_event' as const,

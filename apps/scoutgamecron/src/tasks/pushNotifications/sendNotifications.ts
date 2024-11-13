@@ -8,7 +8,7 @@ import { initWebPush } from './initWebPush';
 initWebPush();
 
 export async function sendNotifications() {
-  log.debug('Running Push Notification cron job for Connect app');
+  log.debug('Running Push Notification cron job for Scoutgame app');
 
   try {
     const subscriptions = await prisma.pushNotificationSubscription.findMany({});

@@ -10,7 +10,13 @@ export type ScoutInfo = BasicUserInfo & {
   nfts: number;
 };
 
-export async function getBuilderScouts(builderId: string) {
+export type BuilderScouts = {
+  totalScouts: number;
+  totalNftsSold: number;
+  scouts: ScoutInfo[];
+};
+
+export async function getBuilderScouts(builderId: string): Promise<BuilderScouts> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderEvent: {

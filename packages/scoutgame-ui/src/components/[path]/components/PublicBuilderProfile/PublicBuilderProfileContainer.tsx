@@ -3,12 +3,13 @@
 import type { BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
+import type { BuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
+import type { BuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
 import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 
 import { useMdScreen } from '../../../../hooks/useMediaScreens';
 import { BackButton } from '../../../common/Button/BackButton';
 import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';
-import type { ScoutInfo } from '../../../common/Card/ScoutCard';
 import { ScoutsGallery } from '../../../common/Gallery/ScoutsGallery';
 import { UserProfile } from '../../../common/Profile/UserProfile';
 import { BuilderActivitiesList } from '../../../profile/components/BuilderProfile/BuilderActivitiesList';
@@ -22,15 +23,9 @@ export type BuilderProfileProps = {
     price?: bigint;
     nftImageUrl?: string;
   };
-  allTimePoints?: number;
-  seasonPoints?: number;
-  totalScouts?: number;
-  scouts: ScoutInfo[];
-  totalNftsSold?: number;
   builderActivities: BuilderActivity[];
-  gemsCollected?: number;
-  rank?: number | null;
-};
+} & BuilderStats &
+  BuilderScouts;
 
 const PaperContainer = styled(Paper)(({ theme }) => ({
   display: 'flex',
@@ -39,7 +34,6 @@ const PaperContainer = styled(Paper)(({ theme }) => ({
   flex: 1,
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(2),
-    // @ts-expect-error
     backgroundColor: theme.palette.background.dark
   },
   [theme.breakpoints.down('md')]: {
