@@ -1,5 +1,6 @@
 import { uploadToken } from '@packages/aws/uploadToken';
-import { getSession } from '@packages/scoutgame/session/getSession';
+
+import { getSession } from 'lib/session/getSession';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

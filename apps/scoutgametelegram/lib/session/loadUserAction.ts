@@ -2,13 +2,13 @@
 
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { actionClient } from '@connect-shared/lib/actions/actionClient';
+import { actionClient } from '@packages/scoutgame/actions/actionClient';
 import { findOrCreateTelegramUser } from '@packages/scoutgame/users/findOrCreateTelegramUser';
 
-import { getSession } from 'lib/session/getSession';
 import { getUserAvatar } from 'lib/telegram/getUserAvatar';
 import { validateTelegramData } from 'lib/telegram/validate';
 
+import { getSession } from './getSession';
 import { userActionSchema } from './loadUserActionSchema';
 
 export const loadUser = actionClient

@@ -53,6 +53,13 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
         LinkComponent={Link}
       />
       <BottomNavigationAction
+        label='Claim'
+        href='/claim'
+        value='claim'
+        icon={<Image src='/images/claim-icon.svg' width={24} height={24} alt='Claim' />}
+        LinkComponent={Link}
+      />
+      <BottomNavigationAction
         label='Friends'
         href='/friends'
         value='friends'
