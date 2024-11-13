@@ -1,7 +1,7 @@
 import { currentSeason, getLastWeek, getSeasonWeekFromISOWeek } from '@packages/scoutgame/dates';
 import React from 'react';
 
-import { primaryTextColorDarkMode, secondaryText } from 'theme/colors';
+import { primaryTextColorDarkMode, secondaryText } from '../../../../../theme/colors';
 
 export function PointsClaimScoutScreen({
   claimedPoints,

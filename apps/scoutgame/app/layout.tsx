@@ -5,7 +5,7 @@ import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
-import 'theme/styles.scss';
+import '@packages/scoutgame-ui/theme/styles.scss';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false

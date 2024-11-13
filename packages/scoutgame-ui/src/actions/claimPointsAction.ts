@@ -6,6 +6,7 @@ import { isTestEnv } from '@packages/utils/constants';
 
 import { createUserClaimScreen } from './createUserClaimScreen';
 
+// This action needs to be in the scoutgame-ui package because it uses the createUserClaimScreen function which imports components from the scoutgame-ui package
 export const claimPointsAction = authActionClient.metadata({ actionName: 'claim_points' }).action(async ({ ctx }) => {
   const userId = ctx.session.scoutId;
   const result = await claimPoints({ userId });
