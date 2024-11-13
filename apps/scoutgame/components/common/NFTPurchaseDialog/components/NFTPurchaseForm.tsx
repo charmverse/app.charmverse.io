@@ -58,6 +58,8 @@ export type NFTPurchaseProps = {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
+const PRICE_POLLING_INTERVAL = 10000;
+
 export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
@@ -285,6 +287,41 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     selectedPaymentOption.currency === 'USDC' &&
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
+
+  useEffect(() => {
+    if (!builderId || !tokensToBuy) return;
+
+    const pollPrice = async () => {
+      try {
+        const _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({
+          args: { builderId }
+        });
+        await refreshAsk({
+          _builderTokenId,
+          amount: tokensToBuy
+        });
+      } catch (error) {
+        log.warn('Error polling price', { error, builderId });
+      }
+    };
+
+    pollPrice();
+
+    const interval = setInterval(pollPrice, PRICE_POLLING_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [builderId, tokensToBuy]);
+
+  const [previousPrice, setPreviousPrice] = useState<bigint>(BigInt(0));
+
+  useEffect(() => {
+    if (purchaseCost && purchaseCost !== previousPrice) {
+      if (previousPrice !== BigInt(0)) {
+        showMessage('Price has updated due to recent purchases');
+      }
+      setPreviousPrice(purchaseCost);
+    }
+  }, [purchaseCost, previousPrice]);
 
   if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
