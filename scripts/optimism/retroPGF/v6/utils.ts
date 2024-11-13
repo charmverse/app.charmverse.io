@@ -8,9 +8,9 @@ export function getProposals() {
     where: {
       spaceId,
       type: 'proposal',
-      proposal: {
-        archived: false
-      },
+      // proposal: {
+      //   archived: false
+      // },
       sourceTemplateId: templateId
     },
     include: {
@@ -18,7 +18,17 @@ export function getProposals() {
         include: {
           evaluations: {
             include: {
-              reviews: true,
+              reviews: {
+                include: {
+                  reviewer: true
+                }
+              },
+              appealReviews: {
+                include: {
+                  reviewer: true
+                }
+              },
+              appealReviewers: true,
               reviewers: true
             }
           },
@@ -30,6 +40,7 @@ export function getProposals() {
 }
 
 export type DatabaseProposals = Awaited<ReturnType<typeof getProposals>>;
+export type DatabaseProposal = DatabaseProposals[number];
 
 export function findProposalMatch(attestationId: string, proposals: DatabaseProposals) {
   return proposals.find(

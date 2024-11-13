@@ -5,13 +5,14 @@ import { sortBy } from 'lodash-es';
 import { writeFileSync } from 'fs';
 import { fieldIds, spaceId, templateId, getProjectsFromFile, applicationsFile } from './data';
 import { uniq } from 'lodash';
-import { getProposals } from './utils';
+import { DatabaseProposal, getProposals } from './utils';
 
-const fullReviewsummaryFile = './op-full-review-oct-22.csv';
-const reviewersFile = './op-reviewers-oct-22.csv';
+const fullReviewsummaryFile = './op-full-review-reviewers.tsv';
+const reviewersFile = './op-reviewers.tsv';
 
 async function exportFullReviewSummary() {
   const pages = await getProposals();
+  console.log('Found', pages.length, 'proposals');
   const applications = await getProjectsFromFile(applicationsFile);
   const mapped: {
     Title: string;
@@ -22,63 +23,77 @@ async function exportFullReviewSummary() {
     'Rejected Reasons': string;
     Approved: number;
     Pending: number;
-    'Project Emails': string;
-  }[] = pages.map(({ path, proposal, title }) => {
-    const attestationId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])?.value as string;
-    const currentEvaluation = getCurrentEvaluation(proposal!.evaluations);
-    const evaluation = proposal!.evaluations.find((evaluation) => evaluation.title === 'Full Review');
-    if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
-    const isRuleViolation = currentEvaluation.title === 'Automated Requirements Check';
-    const approved = evaluation.reviews.filter((review) => review.result === 'pass').length;
-    const rejected = evaluation.reviews.filter((review) => review.result === 'fail').length;
-    const rejectedMessages = uniq(
-      evaluation.reviews
-        .map((review) => review.declineReasons.concat(review.declineMessage || ''))
-        .flat()
-        .filter(Boolean)
-    );
-    let status: string;
-    if (isRuleViolation) {
-      if (currentEvaluation.result === 'pass') {
-        status = 'Passed';
+    // 'Project Emails': string;
+    Reviewers: string;
+    'Appeal Reviewers': string;
+  }[] = pages
+    .map(({ path, proposal, title }) => {
+      const attestationId = proposal!.formAnswers.find((a) => a.fieldId === fieldIds['Attestation ID'])
+        ?.value as string;
+      const currentEvaluation = getCurrentEvaluation(proposal!.evaluations);
+      const evaluation = proposal!.evaluations.find((evaluation) => evaluation.title === 'Full Review');
+      if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
+      const isRuleViolation = currentEvaluation.title === 'Automated Requirements Check';
+      const approved = evaluation.reviews.filter((review) => review.result === 'pass').length;
+      const rejected = evaluation.reviews.filter((review) => review.result === 'fail').length;
+      const approvedAppeal = evaluation.appealReviews.filter((review) => review.result === 'pass').length;
+      const rejectedAppeal = evaluation.appealReviews.filter((review) => review.result === 'fail').length;
+      const rejectedMessages = uniq(
+        evaluation.reviews
+          .map((review) => review.declineReasons.concat(review.declineMessage || ''))
+          .flat()
+          .filter(Boolean)
+      );
+      let status: string;
+      if (isRuleViolation) {
+        if (currentEvaluation.result === 'pass') {
+          status = 'Passed';
+        } else {
+          status = 'Not started';
+        }
       } else {
-        status = 'Not started';
+        if (approved >= 3) {
+          status = 'Passed';
+        } else if (rejected >= 3) {
+          status = 'Rejected';
+        } else {
+          status = 'Pending';
+        }
       }
-    } else {
-      if (approved >= 3) {
-        status = 'Passed';
-      } else if (rejected >= 3) {
-        status = 'Rejected';
-      } else {
-        status = 'Pending';
-      }
-    }
 
-    // const authorEmails = proposal!.authors.map((author) => author.author.verifiedEmails[0]?.email).filter(Boolean);
-    const application = applications.find((application) => application.attestationId === attestationId);
-    // console.log(application, title, attestationId);
-    if (!application) {
-      console.log('missing application', title);
-    }
-    const applicationEmails =
-      application?.project.organization?.organization.team.map((member) => member.user.email).filter(Boolean) || [];
-    if (applicationEmails.length === 0 && application?.project.organization) {
-      console.log('missing author email', title, attestationId);
-      console.log(application?.project.organization?.organization.team);
-    }
+      // const authorEmails = proposal!.authors.map((author) => author.author.verifiedEmails[0]?.email).filter(Boolean);
+      // const application = applications.find((application) => application.attestationId === attestationId);
+      // // console.log(application, title, attestationId);
+      // if (!application) {
+      //   console.log('missing application', title);
+      // }
+      // const applicationEmails =
+      //   application?.project.organization?.organization.team.map((member) => member.user.email).filter(Boolean) || [];
+      // if (applicationEmails.length === 0 && application?.project.organization) {
+      //   console.log('missing author email', title, attestationId);
+      //   console.log(application?.project.organization?.organization.team);
+      // }
 
-    return {
-      Title: title,
-      'Full Review Status': status,
-      Link: 'https://app.charmverse.io/op-retrofunding-review-process/' + path,
-      Rejected: rejected,
-      'Rejected Reasons': rejectedMessages.join(', '),
-      Approved: approved,
-      Pending: 5 - approved - rejected,
-      'Attestation Id': attestationId || 'N/A',
-      'Project Emails': applicationEmails.join(',')
-    };
-  });
+      return {
+        Title: title,
+        'Full Review Status': status,
+        Link: 'https://app.charmverse.io/op-retrofunding-review-process/' + path,
+        Rejected: rejected,
+        'Rejected Reasons': rejectedMessages.join(', '),
+        Approved: approved,
+        Pending: 5 - approved - rejected,
+        'Attestation Id': attestationId || 'N/A',
+        // 'Project Emails': applicationEmails.join(','),
+        // only show the people that reviewed
+        Reviewers: evaluation.reviews.map((review) => review.reviewer.email || review.reviewer.username).join(','),
+        'Appeal Reviewers': evaluation.appealReviews
+          .map((review) => review.reviewer.email || review.reviewer.username)
+          .join(',')
+      };
+    })
+    .filter((row) => row['Reviewers'] || row['Appeal Reviewers']);
+
+  console.log('Exporting', mapped.length, 'rows');
 
   const csvData = sortBy(Object.values(mapped), (row) => {
     const status = row['Full Review Status'];
@@ -102,13 +117,15 @@ async function exportFullReviewSummary() {
     columns: [
       'Title',
       'Link',
-      'Attestation Id',
-      'Full Review Status',
-      'Approved',
-      'Rejected',
-      // 'Rejected Reasons',
-      'Pending',
-      'Project Emails'
+      // 'Attestation Id',
+      // 'Full Review Status',
+      // 'Approved',
+      // 'Rejected',
+      // // 'Rejected Reasons',
+      // 'Pending',
+      // 'Project Emails',
+      'Reviewers',
+      'Appeal Reviewers'
     ]
   });
 
