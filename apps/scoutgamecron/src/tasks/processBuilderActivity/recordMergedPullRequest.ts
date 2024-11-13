@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
-import { getStartOfSeason, getWeekStartEnd, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
+import { getStartOfWeek, getWeekStartEnd, getWeekFromDate, isToday, streakWindow } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
@@ -44,7 +44,7 @@ export async function recordMergedPullRequest({
   }
   const week = getWeekFromDate(now.toJSDate());
   const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
-  const start = getStartOfSeason(season as Season);
+  const start = getStartOfWeek(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
