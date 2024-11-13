@@ -502,7 +502,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
       {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase || isFetchingPrice ? (
         <LoadingButton
-          loading={isLoading || isFetchingPrice}
+          loading={isLoading}
           size='large'
           onClick={handlePurchase}
           variant='contained'
