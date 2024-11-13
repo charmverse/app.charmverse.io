@@ -1,9 +1,8 @@
-/** @type {import('next').NextConfig} */
-
 // Next.js requires this configured at build and run time
 const useCDN =
   process.env.CI || process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging';
 
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   // types are tested separately from the build
   eslint: {
