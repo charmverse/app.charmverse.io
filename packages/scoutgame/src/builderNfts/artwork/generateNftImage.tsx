@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-import { ImageResponse } from '@vercel/og';
 // Must be there otherwise React is not defined error is thrown
 import React from 'react';
 import type { Font } from 'satori';
@@ -98,6 +97,8 @@ export async function updateNftImage({
   const cutoutWidth = 300;
   const cutoutHeight = 400;
 
+  const { ImageResponse } = await import('@vercel/og');
+
   const baseImage = new ImageResponse(
     (
       <div
@@ -176,6 +177,8 @@ export async function generateNftImage({
     const arrayBuffer = await response.arrayBuffer();
     avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(300, 300).png().toBuffer();
   }
+
+  const { ImageResponse } = await import('@vercel/og');
 
   const baseImage = new ImageResponse(
     (
@@ -273,6 +276,8 @@ export async function generateNftCongrats({
   // const stats = await getBuilderStats('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
   // const builderScouts = await getBuilderScouts('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
   // const builderNft = await getBuilderNft('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
+
+  const { ImageResponse } = await import('@vercel/og');
 
   const baseImage = new ImageResponse(
     (
