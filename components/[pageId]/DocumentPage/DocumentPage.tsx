@@ -482,7 +482,7 @@ function DocumentPageComponent({
                           requiredTemplateId: proposal.fields?.rewardsTemplateId,
                           reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
                           assignedSubmitters: proposal.authors.map((a) => a.userId),
-                          readOnly: !proposal.permissions.edit,
+                          readOnly: !proposal.permissions.edit_rewards,
                           rewardIds: proposal.rewardIds || [],
                           onSave: (pendingReward) => {
                             const isExisting = proposal.fields?.pendingRewards?.find(
