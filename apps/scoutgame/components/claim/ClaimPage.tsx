@@ -16,25 +16,9 @@ export type ClaimPageProps = {
   bonusPartners: BonusPartner[];
   displayName: string;
   period: string;
-  builderPoints: number;
-  scoutPoints: number;
-  repos: string[];
-  builders: {
-    avatar: string | null;
-    displayName: string;
-  }[];
 };
 
-export function ClaimPage({
-  displayName,
-  totalUnclaimedPoints,
-  bonusPartners,
-  period,
-  builders,
-  builderPoints,
-  scoutPoints,
-  repos
-}: ClaimPageProps) {
+export function ClaimPage({ displayName, totalUnclaimedPoints, bonusPartners, period }: ClaimPageProps) {
   return (
     <PageContainer>
       <Stack
@@ -50,10 +34,6 @@ export function ClaimPage({
             totalUnclaimedPoints={totalUnclaimedPoints}
             displayName={displayName}
             bonusPartners={bonusPartners}
-            builders={builders}
-            builderPoints={builderPoints}
-            repos={repos}
-            scoutPoints={scoutPoints}
           />
           {totalUnclaimedPoints === 0 ? null : (
             <Suspense fallback={<LoadingTable />}>
