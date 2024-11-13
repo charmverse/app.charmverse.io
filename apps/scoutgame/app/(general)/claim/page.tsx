@@ -1,9 +1,7 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
-import { baseUrl } from '@root/config/constants';
 import type { Metadata } from 'next';
 
 import { ClaimPage } from 'components/claim/ClaimPage';
-import { getUnclaimedPointsSource } from 'lib/points/getUnclaimedPointsSource';
 import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 export const dynamic = 'force-dynamic';
@@ -23,14 +21,9 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   }
 
   const { bonusPartners, points } = await getClaimablePoints({ userId: user.id });
-  const { builders, builderPoints, scoutPoints, repos } = await getUnclaimedPointsSource(user.id);
 
   return (
     <ClaimPage
-      builders={builders}
-      builderPoints={builderPoints}
-      scoutPoints={scoutPoints}
-      repos={repos}
       period={searchParams.tab}
       displayName={user.displayName}
       totalUnclaimedPoints={points}

@@ -1,3 +1,4 @@
+import { sleep } from '@decent.xyz/box-common';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack } from '@mui/material';
 
