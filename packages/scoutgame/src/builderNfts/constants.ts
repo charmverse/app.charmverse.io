@@ -13,7 +13,7 @@ export const useTestnets = false;
 export const builderTokenDecimals = 6;
 
 export const builderNftChain: Chain = useTestnets ? optimismSepolia : optimism;
-export const builderCreatorAddress = '0x518AF6fA5eEC4140e4283f7BDDaB004D45177946';
+export const builderCreatorAddress = '0x854AFEBD6A5ed967A2D959eFE23d79336B3a4310';
 
 if (builderNftChain.id !== optimism.id) {
   log.warn(`Builder NFT chain is using "${builderNftChain.name}" not Optimism`);
