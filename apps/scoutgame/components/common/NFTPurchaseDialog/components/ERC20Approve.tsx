@@ -15,6 +15,7 @@ type ERC20ApproveButtonProps = {
   chainId: number;
   erc20Address: Address;
   decimals?: number;
+  disabled?: boolean;
 };
 
 export function ERC20ApproveButton({
@@ -24,7 +25,8 @@ export function ERC20ApproveButton({
   erc20Address,
   spender,
   // Default to decimals for USDC
-  decimals = 6
+  decimals = 6,
+  disabled = false
 }: ERC20ApproveButtonProps) {
   const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
 
@@ -55,7 +57,7 @@ export function ERC20ApproveButton({
           variant='contained'
           color='primary'
           onClick={approveSpender}
-          disabled={isApprovingSpender}
+          disabled={isApprovingSpender || disabled}
           data-test='approve-spending-nft-purchase-button'
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}

@@ -288,11 +288,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
+  const [isPollingPrice, setIsPollingPrice] = useState(false);
+
+  // Add polling interval for price updates
   useEffect(() => {
     if (!builderId || !tokensToBuy) return;
 
     const pollPrice = async () => {
       try {
+        setIsPollingPrice(true);
         const _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({
           args: { builderId }
         });
@@ -302,13 +306,13 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         });
       } catch (error) {
         log.warn('Error polling price', { error, builderId });
+      } finally {
+        setIsPollingPrice(false);
       }
     };
 
     pollPrice();
-
     const interval = setInterval(pollPrice, PRICE_POLLING_INTERVAL);
-
     return () => clearInterval(interval);
   }, [builderId, tokensToBuy]);
 
@@ -322,6 +326,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setPreviousPrice(purchaseCost);
     }
   }, [purchaseCost, previousPrice]);
+
+  const shouldDisableButton = isPollingPrice;
 
   if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
@@ -524,7 +530,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
       {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
         <LoadingButton
-          loading={isLoading}
+          loading={isLoading || isPollingPrice}
           size='large'
           onClick={handlePurchase}
           variant='contained'
@@ -536,11 +542,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase
+            isExecutingPointsPurchase ||
+            shouldDisableButton
           }
           data-test='purchase-button'
         >
-          Buy
+          {isPollingPrice ? 'Updating Price...' : 'Buy'}
         </LoadingButton>
       ) : (
         <ERC20ApproveButton
@@ -549,6 +556,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
           amount={amountToPay}
           onSuccess={() => refreshAllowance()}
+          disabled={shouldDisableButton}
         />
       )}
       {decentSdkError instanceof Error ? (
