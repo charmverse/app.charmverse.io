@@ -6,7 +6,7 @@ import { getIronOptions } from './getIronOptions';
 import type { SessionData } from './interfaces';
 
 export async function getSession<T extends object = SessionData>(o?: SessionOptions) {
-  const options = getIronOptions({ sameSite: 'none' });
+  const options = getIronOptions();
 
   const session = await getIronSession<T>(cookies(), options);
 

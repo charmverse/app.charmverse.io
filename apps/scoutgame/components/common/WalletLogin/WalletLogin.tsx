@@ -1,10 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
 import { LoadingButton } from '@mui/lab';
 import { Box, Stack, Typography } from '@mui/material';
+import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useRouter, useSearchParams } from 'next/navigation';

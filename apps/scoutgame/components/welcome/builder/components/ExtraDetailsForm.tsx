@@ -1,7 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -16,6 +15,7 @@ import {
   Box
 } from '@mui/material';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
+import { FormErrors } from '@packages/scoutgame-ui/components/common/FormErrors';
 import { EditableUserProfile } from '@packages/scoutgame-ui/components/common/Profile/EditableUserProfile';
 import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';

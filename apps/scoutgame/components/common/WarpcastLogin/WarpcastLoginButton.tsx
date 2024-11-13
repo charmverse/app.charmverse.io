@@ -1,10 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Box, Button, Stack, Typography } from '@mui/material';
+import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { LoadingComponent } from '@packages/scoutgame-ui/components/common/Loading/LoadingComponent';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';

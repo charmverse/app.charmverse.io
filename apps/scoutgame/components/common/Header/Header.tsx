@@ -1,9 +1,9 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
+import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
+import { logoutAction } from '@packages/scoutgame/session/logoutAction';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { Hidden } from '@packages/scoutgame-ui/components/common/Hidden';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
