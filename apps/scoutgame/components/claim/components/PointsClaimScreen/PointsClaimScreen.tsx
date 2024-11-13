@@ -120,18 +120,37 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+      <Dialog
+        open={showModal}
+        onClose={handleCloseModal}
+        data-test='claim-points-success-modal'
+        PaperProps={{
+          sx: {
+            width: '100%'
+          }
+        }}
+      >
         <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
           <CancelOutlinedIcon color='primary' />
         </IconButton>
-        <Stack width='600px' height='600px'>
+        <Stack
+          sx={{
+            width: '100%',
+            height: '100%',
+            aspectRatio: '1/1',
+            maxWidth: 600,
+            maxHeight: 600,
+            position: 'relative'
+          }}
+        >
           <img
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '600px',
-              height: '600px'
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
             }}
             src={`https://cdn.charmverse.io/points-claim/${user?.id}/${getLastWeek()}.png`}
             alt='Claim success modal'
