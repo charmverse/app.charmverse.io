@@ -2,7 +2,7 @@ import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
-import { getCurrentWeek } from '@packages/scoutgame/dates';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import { appEnv, baseUrl } from '@root/config/constants';
 import puppeteer from 'puppeteer';
 import React from 'react';
@@ -96,7 +96,7 @@ export async function createUserClaimScreen(userId: string) {
 
     const params: PutObjectCommandInput = {
       Bucket: process.env.S3_UPLOAD_BUCKET,
-      Key: `points-claim/${appEnv}/${userId}/${getCurrentWeek()}.png`,
+      Key: `points-claim/${appEnv}/${userId}/${getLastWeek()}.png`,
       Body: screenshot,
       ContentType: 'image/png'
     };
