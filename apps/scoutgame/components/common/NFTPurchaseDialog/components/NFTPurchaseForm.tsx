@@ -166,6 +166,18 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
 
   useEffect(() => {
+    if (builderId) {
+      refreshTokenData();
+    }
+  }, [builderId]);
+
+  useEffect(() => {
+    if (tokensToBuy && builderTokenId) {
+      refreshAsk({ _builderTokenId: builderTokenId, amount: tokensToBuy });
+    }
+  }, [tokensToBuy, builderTokenId, refreshAsk]);
+
+  useEffect(() => {
     if (!builderId || isExecutingTransaction || isExecutingPointsPurchase || isSavingDecentTransaction) {
       return;
     }
@@ -288,17 +300,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     selectedPaymentOption.currency === 'USDC' &&
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
-
-  const [previousPrice, setPreviousPrice] = useState<bigint>(BigInt(0));
-
-  useEffect(() => {
-    if (purchaseCost && purchaseCost !== previousPrice) {
-      if (previousPrice !== BigInt(0)) {
-        showMessage('Price has updated due to recent purchases');
-      }
-      setPreviousPrice(purchaseCost);
-    }
-  }, [purchaseCost, previousPrice]);
 
   if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
