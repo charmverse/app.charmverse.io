@@ -166,16 +166,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   }
 
   useEffect(() => {
-    if (builderId) {
-      refreshTokenData();
+    if (!builderId || isExecutingTransaction || isExecutingPointsPurchase || isSavingDecentTransaction) {
+      return;
     }
-  }, [builderId]);
 
-  useEffect(() => {
-    if (tokensToBuy && builderTokenId) {
-      refreshAsk({ _builderTokenId: builderTokenId, amount: tokensToBuy });
-    }
-  }, [tokensToBuy, builderTokenId, refreshAsk]);
+    // Initial fetch
+    refreshTokenData();
+
+    // Set up polling
+    const interval = setInterval(refreshTokenData, PRICE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [builderId, tokensToBuy, isExecutingTransaction, isExecutingPointsPurchase, isSavingDecentTransaction]);
 
   const enableNftButton = !!address && !!purchaseCost && !!user;
 
@@ -288,34 +289,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     typeof allowance === 'bigint' &&
     allowance < (typeof amountToPay === 'bigint' ? amountToPay : BigInt(0));
 
-  const [isPollingPrice, setIsPollingPrice] = useState(false);
-
-  // Add polling interval for price updates
-  useEffect(() => {
-    if (!builderId || !tokensToBuy) return;
-
-    const pollPrice = async () => {
-      try {
-        setIsPollingPrice(true);
-        const _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({
-          args: { builderId }
-        });
-        await refreshAsk({
-          _builderTokenId,
-          amount: tokensToBuy
-        });
-      } catch (error) {
-        log.warn('Error polling price', { error, builderId });
-      } finally {
-        setIsPollingPrice(false);
-      }
-    };
-
-    pollPrice();
-    const interval = setInterval(pollPrice, PRICE_POLLING_INTERVAL);
-    return () => clearInterval(interval);
-  }, [builderId, tokensToBuy]);
-
   const [previousPrice, setPreviousPrice] = useState<bigint>(BigInt(0));
 
   useEffect(() => {
@@ -326,8 +299,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setPreviousPrice(purchaseCost);
     }
   }, [purchaseCost, previousPrice]);
-
-  const shouldDisableButton = isPollingPrice;
 
   if (hasPurchasedWithPoints || purchaseSuccess) {
     return <SuccessView builder={builder} />;
@@ -528,9 +499,9 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
+      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase || isFetchingPrice ? (
         <LoadingButton
-          loading={isLoading || isPollingPrice}
+          loading={isLoading || isFetchingPrice}
           size='large'
           onClick={handlePurchase}
           variant='contained'
@@ -542,12 +513,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase ||
-            shouldDisableButton
+            isExecutingPointsPurchase
           }
           data-test='purchase-button'
         >
-          {isPollingPrice ? 'Updating Price...' : 'Buy'}
+          {isFetchingPrice ? 'Updating Price...' : 'Buy'}
         </LoadingButton>
       ) : (
         <ERC20ApproveButton
@@ -556,7 +526,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           erc20Address={getCurrencyContract(selectedPaymentOption) as Address}
           amount={amountToPay}
           onSuccess={() => refreshAllowance()}
-          disabled={shouldDisableButton}
         />
       )}
       {decentSdkError instanceof Error ? (

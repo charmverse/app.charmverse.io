@@ -1,11 +1,10 @@
 import { LoadingButton } from '@mui/lab';
-import { Checkbox, FormControlLabel, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import { useState } from 'react';
 import type { Address } from 'viem';
 import { useSwitchChain, useWalletClient } from 'wagmi';
 
-import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
+import { useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
 
 // Component for approving ERC20 tokens
 type ERC20ApproveButtonProps = {
@@ -15,7 +14,6 @@ type ERC20ApproveButtonProps = {
   chainId: number;
   erc20Address: Address;
   decimals?: number;
-  disabled?: boolean;
 };
 
 export function ERC20ApproveButton({
@@ -25,8 +23,7 @@ export function ERC20ApproveButton({
   erc20Address,
   spender,
   // Default to decimals for USDC
-  decimals = 6,
-  disabled = false
+  decimals = 6
 }: ERC20ApproveButtonProps) {
   const amountToApprove = amount ? amount + amount / BigInt(50) : undefined;
 
@@ -57,7 +54,7 @@ export function ERC20ApproveButton({
           variant='contained'
           color='primary'
           onClick={approveSpender}
-          disabled={isApprovingSpender || disabled}
+          disabled={isApprovingSpender}
           data-test='approve-spending-nft-purchase-button'
         >
           {isApprovingSpender ? 'Approving...' : `Approve ${displayAmount} USDC`}
