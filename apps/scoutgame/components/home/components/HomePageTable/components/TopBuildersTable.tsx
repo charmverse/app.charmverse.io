@@ -1,10 +1,10 @@
 import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
+import { ScoutButton } from '@packages/scoutgame-ui/components/common/ScoutButton/ScoutButton';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
 import { CommonTableRow } from './CommonTableRow';

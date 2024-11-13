@@ -3,20 +3,19 @@
 import type { BuilderStatus } from '@charmverse/core/prisma';
 import { LoadingButton } from '@mui/lab';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { useTrackEvent } from '@packages/scoutgame-ui/hooks/useTrackEvent';
-import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useState } from 'react';
 
-import type { NFTPurchaseProps } from 'components/common/NFTPurchaseDialog/components/NFTPurchaseForm';
-
-import { DynamicLoadingContext, LoadingComponent } from '../DynamicLoading';
+import { useTrackEvent } from '../../../hooks/useTrackEvent';
+import { useUser } from '../../../providers/UserProvider';
+import { DynamicLoadingContext, LoadingComponent } from '../Loading/DynamicLoading';
+import type { NFTPurchaseProps } from '../NFTPurchaseDialog/components/NFTPurchaseForm';
 
 import { SignInModalMessage } from './SignInModalMessage';
 
 const NFTPurchaseDialog = dynamic(
-  () => import('components/common/NFTPurchaseDialog/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialog),
+  () => import('../NFTPurchaseDialog/NFTPurchaseDialog').then((mod) => mod.NFTPurchaseDialog),
   {
     loading: LoadingComponent,
     ssr: false
@@ -44,6 +43,7 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
 
   if (builder.builderStatus === 'banned') {
     return (
+      // @ts-ignore
       <LoadingButton disabled variant='buy'>
         SUSPENDED
       </LoadingButton>
@@ -57,6 +57,7 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
           loading={dialogLoadingStatus}
           fullWidth
           onClick={handleClick}
+          // @ts-ignore
           variant='buy'
           data-test='scout-button'
         >

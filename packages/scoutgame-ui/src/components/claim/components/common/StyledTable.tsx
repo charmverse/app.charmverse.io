@@ -4,7 +4,10 @@ import { styled, TableBody, TableHead } from '@mui/material';
 
 export const StyledTableBody = styled(TableBody)`
   ${({ theme }) => `
-  background-color: ${theme.palette.background.dark};
+  background-color: ${
+    // @ts-ignore
+    theme.palette.background.dark
+  };
   & .MuiTableCell-root {
     padding: ${theme.spacing(1)};
     border-bottom: 4px solid ${theme.palette.background.default};
@@ -24,7 +27,10 @@ export const StyledTableBody = styled(TableBody)`
 
 export const StyledTableHead = styled(TableHead)`
   ${({ theme }) => `
-  background-color: ${theme.palette.background.dark};
+  background-color: ${
+    // @ts-ignore
+    theme.palette.background.dark
+  };
   & .MuiTableCell-root {
     padding: ${theme.spacing(1)};
     border-bottom: 4px solid ${theme.palette.background.default};

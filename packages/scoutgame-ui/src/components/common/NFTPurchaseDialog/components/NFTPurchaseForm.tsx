@@ -18,6 +18,7 @@ import {
   ToggleButtonGroup,
   Typography
 } from '@mui/material';
+import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
@@ -25,12 +26,10 @@ import {
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
+import { purchaseWithPointsAction } from '@packages/scoutgame/builderNfts/purchaseWithPointsAction';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { IconButton } from '@packages/scoutgame-ui/components/common/Button/IconButton';
-import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
-import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
-import { isTestEnv } from '@root/config/constants';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import type { MinimalUserInfo } from '@packages/scoutgame/users/interfaces';
+import { isTestEnv } from '@packages/utils/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAction } from 'next-safe-action/hooks';
@@ -38,11 +37,11 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
-import { usePurchase } from 'components/layout/PurchaseProvider';
-import { useSnackbar } from 'components/layout/SnackbarContext';
-import { purchaseWithPointsAction } from 'lib/builderNFTs/purchaseWithPointsAction';
-import type { MinimalUserInfo } from 'lib/users/interfaces';
-
+import { usePurchase } from '../../../../providers/PurchaseProvider';
+import { useSnackbar } from '../../../../providers/SnackbarContext';
+import { useUser } from '../../../../providers/UserProvider';
+import { IconButton } from '../../Button/IconButton';
+import { PointsIcon } from '../../Icons';
 import { useDecentTransaction } from '../hooks/useDecentTransaction';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
 import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
@@ -79,14 +78,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const {
-    isExecutingTransaction,
-    sendNftMintTransaction,
-    isSavingDecentTransaction,
-    clearPurchaseSuccess,
-    purchaseSuccess,
-    purchaseError
-  } = usePurchase();
+  const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, purchaseSuccess, purchaseError } =
+    usePurchase();
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();

@@ -10,8 +10,13 @@
     "./providers/*": "./src/providers/*.tsx"
   },
   "dependencies": {
+    "@decent.xyz/box-common": "^3.3.20",
+    "@decent.xyz/box-hooks": "^3.3.20",
+    "@decent.xyz/box-ui": "^3.3.20",
+    "@decent.xyz/the-box": "^3.3.20",
     "@hookform/resolvers": "^3.9.1",
     "@mui/lab": "^6.0.0-beta.14",
-    "@packages/scoutgame": "^0.0.0"
+    "@packages/scoutgame": "^0.0.0",
+    "@rainbow-me/rainbowkit": "^2.2.0"
   }
 }

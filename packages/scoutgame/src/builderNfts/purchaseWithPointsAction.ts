@@ -2,15 +2,15 @@
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
-import { mintNFT } from '@packages/scoutgame/builderNfts/mintNFT';
-import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { currentSeason } from '@packages/scoutgame/dates';
 import { revalidatePath } from 'next/cache';
 
-import { authActionClient } from 'lib/actions/actionClient';
+import { authActionClient } from '../actions/actionClient';
+import { currentSeason } from '../dates';
 
+import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
+import { mintNFT } from './mintNFT';
 import { schema } from './purchaseWithPointsSchema';
+import { convertCostToPoints } from './utils';
 
 export const purchaseWithPointsAction = authActionClient
   .metadata({ actionName: 'purchase_with_points' })
@@ -48,7 +48,7 @@ export const purchaseWithPointsAction = authActionClient
       builderNftId: builderNft.id,
       recipientAddress: parsedInput.recipientAddress,
       amount: parsedInput.amount,
-      scoutId: ctx.session.scoutId,
+      scoutId: ctx.session.scoutId as string,
       paidWithPoints: true,
       pointsValue
     });

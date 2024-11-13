@@ -1,22 +1,21 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { checkDecentTransactionAction } from '@packages/scoutgame/builderNfts/checkDecentTransactionAction';
 import {
   builderNftChain,
   getBuilderContractAddress,
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
-import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
+import { saveDecentTransactionAction } from '@packages/scoutgame/builderNfts/saveDecentTransactionAction';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { Address } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
-import { checkDecentTransactionAction } from 'lib/builderNFTs/checkDecentTransactionAction';
-import { saveDecentTransactionAction } from 'lib/builderNFTs/saveDecentTransactionAction';
-
 import { useSnackbar } from './SnackbarContext';
+import { useUser } from './UserProvider';
 
 const purchaseLogPrefix = 'MINT_ACTION';
 

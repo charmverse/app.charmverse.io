@@ -7,10 +7,10 @@ import TableCell from '@mui/material/TableCell';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
+import { ScoutButton } from '@packages/scoutgame-ui/components/common/ScoutButton/ScoutButton';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { CommonTableRow } from './CommonTableRow';

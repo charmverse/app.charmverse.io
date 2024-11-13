@@ -12,8 +12,9 @@ import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
 
+import { SignInModalMessage } from '../../../../packages/scoutgame-ui/src/components/common/ScoutButton/SignInModalMessage';
+
 import { ClaimIcon } from './ClaimIcon';
-import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'

@@ -1,12 +1,12 @@
 'use client';
 
-import { useSmScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 
-import { Dialog } from 'components/common/Dialog';
-import { usePurchase } from 'components/layout/PurchaseProvider';
+import { useSmScreen } from '../../../hooks/useMediaScreens';
+import { usePurchase } from '../../../providers/PurchaseProvider';
+import { Dialog } from '../Dialog';
 
 import type { NFTPurchaseProps } from './components/NFTPurchaseForm';
 import { NFTPurchaseForm } from './components/NFTPurchaseForm';

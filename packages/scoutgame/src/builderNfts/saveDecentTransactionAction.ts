@@ -6,7 +6,7 @@ import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSessi
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
-import { authActionClient } from 'lib/actions/actionClient';
+import { authActionClient } from '../actions/actionClient';
 
 export const saveDecentTransactionAction = authActionClient
   .metadata({ actionName: 'save-decent-transaction' })
