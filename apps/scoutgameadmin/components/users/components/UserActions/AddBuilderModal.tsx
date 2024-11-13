@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Stack,
   Button,
   TextField,
@@ -13,7 +12,6 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { revalidatePath } from 'next/cache';
 import { useAction } from 'next-safe-action/hooks';
 import React, { useState } from 'react';
 import { mutate } from 'swr';
@@ -26,7 +24,7 @@ import { setBuilderStatusAction } from 'lib/users/updateUserAction';
 
 type Props = {
   open: boolean;
-  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin' | 'farcasterName'>;
+  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin' | 'farcasterName' | 'path'>;
   onClose: () => void;
   onSave: () => void;
 };

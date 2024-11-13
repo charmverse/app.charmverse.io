@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
+import { Octokit } from '@octokit/core';
 import { throttling } from '@octokit/plugin-throttling';
-import { Octokit } from '@octokit/rest';
 
 const OctokitWithThrottling = Octokit.plugin(throttling);
 
