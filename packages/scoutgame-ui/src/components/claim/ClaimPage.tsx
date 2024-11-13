@@ -2,10 +2,9 @@ import { Stack } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { Suspense } from 'react';
 
-import { PointsClaimScreen } from 'components/claim/components/PointsClaimScreen/PointsClaimScreen';
-
 import { BuilderRewardsScreen } from './components/BuilderRewardsScreen/BuilderRewardsScreen';
 import { LoadingTable } from './components/common/LoadingTable';
+import { PointsClaimScreen } from './components/PointsClaimScreen/PointsClaimScreen';
 import { ClaimedPointsTable } from './components/PointsTable/ClaimedPointsTable';
 import { UnclaimedPointsTable } from './components/PointsTable/UnclaimedPointsTable';
 

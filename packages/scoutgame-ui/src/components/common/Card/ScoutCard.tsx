@@ -5,8 +5,7 @@ import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 import Image from 'next/image';
 import React from 'react';
 
-import { useDynamicFontSize } from 'hooks/useDynamicFontSize';
-
+import { useDynamicFontSize } from '../../../hooks/useDynamicFontSize';
 import { Avatar } from '../Avatar';
 
 export type ScoutInfo = BasicUserInfo & {

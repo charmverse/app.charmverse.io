@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 
-import { GemsIcon } from 'components/common/Icons';
+import { GemsIcon } from '../../../Icons';
 
 export function BuilderCardActivityTooltip() {
   return (

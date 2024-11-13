@@ -1,6 +1,6 @@
 import { Button, Stack, Link, Box, Card, CardActionArea, CardMedia } from '@mui/material';
 
-import { nftDisplaySize } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
+import { nftDisplaySize } from '../../common/Card/BuilderCard/BuilderCardNftDisplay';
 
 export function PromoCard({
   src,

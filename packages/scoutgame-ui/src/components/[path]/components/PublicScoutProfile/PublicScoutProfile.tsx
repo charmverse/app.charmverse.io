@@ -6,7 +6,7 @@ import { getScoutStats } from '@packages/scoutgame/scouts/getScoutStats';
 import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
-import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
+import { ErrorSSRMessage } from '../../../common/ErrorSSRMessage';
 
 import { PublicScoutProfileContainer } from './PublicScoutProfileContainer';
 

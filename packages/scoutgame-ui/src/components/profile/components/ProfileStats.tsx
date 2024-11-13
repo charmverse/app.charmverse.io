@@ -4,8 +4,7 @@ import { Paper, Stack, Tab, Tabs, Typography, tabClasses, tabsClasses } from '@m
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { useMdScreen } from 'hooks/useMediaScreens';
-
+import { useMdScreen } from '../../../hooks/useMediaScreens';
 import type { UserProfileWithPoints } from '../ProfilePage';
 
 export function ProfileStats({

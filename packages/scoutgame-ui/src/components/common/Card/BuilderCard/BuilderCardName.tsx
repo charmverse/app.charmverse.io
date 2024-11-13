@@ -2,7 +2,7 @@
 
 import { Typography } from '@mui/material';
 
-import { useDynamicFontSize } from 'hooks/useDynamicFontSize';
+import { useDynamicFontSize } from '../../../../hooks/useDynamicFontSize';
 
 export function BuilderCardName({ name, size }: { name: string; size: 'x-small' | 'small' | 'medium' | 'large' }) {
   const maxFontSize = size === 'medium' || size === 'large' ? 14 : 12;

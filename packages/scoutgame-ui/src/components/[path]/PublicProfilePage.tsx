@@ -4,9 +4,9 @@ import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper } from '@mui/material';
 import type { BasicUserInfo, BuilderUserInfo } from '@packages/scoutgame/users/interfaces';
 
-import { BackButton } from 'components/common/Button/BackButton';
-import { Hidden } from 'components/common/Hidden';
-import { UserProfile } from 'components/common/Profile/UserProfile';
+import { BackButton } from '../common/Button/BackButton';
+import { Hidden } from '../common/Hidden';
+import { UserProfile } from '../common/Profile/UserProfile';
 
 import { PublicBuilderProfile } from './components/PublicBuilderProfile/PublicBuilderProfile';
 import { PublicScoutProfile } from './components/PublicScoutProfile/PublicScoutProfile';

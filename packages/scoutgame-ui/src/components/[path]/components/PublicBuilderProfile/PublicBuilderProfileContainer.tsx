@@ -5,14 +5,14 @@ import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
 import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 
-import { BackButton } from 'components/common/Button/BackButton';
-import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
-import type { ScoutInfo } from 'components/common/Card/ScoutCard';
-import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
-import { UserProfile } from 'components/common/Profile/UserProfile';
-import { BuilderActivitiesList } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
-import { BuilderWeeklyStats } from 'components/profile/components/BuilderProfile/BuilderWeeklyStats';
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from '../../../../hooks/useMediaScreens';
+import { BackButton } from '../../../common/Button/BackButton';
+import { BuilderCard } from '../../../common/Card/BuilderCard/BuilderCard';
+import type { ScoutInfo } from '../../../common/Card/ScoutCard';
+import { ScoutsGallery } from '../../../common/Gallery/ScoutsGallery';
+import { UserProfile } from '../../../common/Profile/UserProfile';
+import { BuilderActivitiesList } from '../../../profile/components/BuilderProfile/BuilderActivitiesList';
+import { BuilderWeeklyStats } from '../../../profile/components/BuilderProfile/BuilderWeeklyStats';
 
 import { PublicBuilderStats } from './PublicBuilderStats';
 

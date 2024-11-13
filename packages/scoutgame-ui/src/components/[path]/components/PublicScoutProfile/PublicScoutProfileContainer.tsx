@@ -5,10 +5,10 @@ import { Box, Stack, Paper, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 
-import { BackButton } from 'components/common/Button/BackButton';
-import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
-import { UserProfile } from 'components/common/Profile/UserProfile';
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from '../../../../hooks/useMediaScreens';
+import { BackButton } from '../../../common/Button/BackButton';
+import { BuildersGallery } from '../../../common/Gallery/BuildersGallery';
+import { UserProfile } from '../../../common/Profile/UserProfile';
 
 import { PublicScoutProfileStats } from './PublicScoutProfileStats';
 

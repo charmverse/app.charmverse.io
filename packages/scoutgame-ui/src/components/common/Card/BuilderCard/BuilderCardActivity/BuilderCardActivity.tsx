@@ -4,7 +4,7 @@ import type { Theme } from '@mui/material';
 import { Stack, Tooltip, useMediaQuery } from '@mui/material';
 import { useState } from 'react';
 
-import { Dialog } from 'components/common/Dialog';
+import { Dialog } from '../../../Dialog';
 
 import { BuilderCardActivityTooltip } from './BuilderCardActivityTooltip';
 

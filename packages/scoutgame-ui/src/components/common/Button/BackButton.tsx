@@ -5,7 +5,7 @@ import type { IconButtonProps } from '@mui/material';
 import { IconButton } from '@mui/material';
 import { useRouter } from 'next/navigation';
 
-import { BoxMotion } from 'components/common/Motions/BoxMotion';
+import { BoxMotion } from '../../common/Motions/BoxMotion';
 
 export function BackButton(props: IconButtonProps) {
   const router = useRouter();

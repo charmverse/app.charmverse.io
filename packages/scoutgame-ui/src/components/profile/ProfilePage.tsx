@@ -4,7 +4,7 @@ import type { UserStats } from '@packages/scoutgame/users/getUserStats';
 import type { BuilderUserInfo } from '@packages/scoutgame/users/interfaces';
 import { Suspense } from 'react';
 
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
+import { LoadingComponent } from '../common/Loading/LoadingComponent';
 
 import { BuilderProfile } from './components/BuilderProfile/BuilderProfile';
 import { ProfileStats } from './components/ProfileStats';

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { TabsMenu } from 'components/common/Tabs/TabsMenu';
+import { TabsMenu } from '../common/Tabs/TabsMenu';
 
 export function PublicProfileTabsMenu({
   tab,

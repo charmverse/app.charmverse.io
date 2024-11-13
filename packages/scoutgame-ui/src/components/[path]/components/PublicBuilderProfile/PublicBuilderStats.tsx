@@ -3,7 +3,7 @@
 import { Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from '../../../../hooks/useMediaScreens';
 
 export function PublicBuilderStats({
   allTimePoints,

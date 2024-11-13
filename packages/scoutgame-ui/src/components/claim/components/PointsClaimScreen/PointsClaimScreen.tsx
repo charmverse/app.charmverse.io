@@ -5,8 +5,9 @@ import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { claimPointsAction } from '@packages/scoutgame/points/claimPointsAction';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
-import { useUser } from 'providers/UserProvider';
 import { useState } from 'react';
+
+import { useUser } from '../../../../providers/UserProvider';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';

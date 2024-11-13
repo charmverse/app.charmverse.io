@@ -12,8 +12,7 @@ import {
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { TabsMenu } from 'components/common/Tabs/TabsMenu';
-
+import { TabsMenu } from '../../../common/Tabs/TabsMenu';
 import { LoadingTable } from '../common/LoadingTable';
 
 import { BuilderRewardsTableContainer } from './BuilderRewardsTableContainer';

@@ -3,7 +3,7 @@ import 'server-only';
 import { getTodaysHotBuilders } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
-import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
+import { ErrorSSRMessage } from '../../common/ErrorSSRMessage';
 
 import { BuildersCarousel } from './BuildersCarousel';
 

@@ -5,9 +5,8 @@ import { useMediaQuery } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { TabsMenu } from 'components/common/Tabs/TabsMenu';
-import { useMdScreen } from 'hooks/useMediaScreens';
-
+import { useMdScreen } from '../../../hooks/useMediaScreens';
+import { TabsMenu } from '../../common/Tabs/TabsMenu';
 import type { ProfileTab } from '../ProfilePage';
 
 const desktopTabs = ['scout-build', 'win'];

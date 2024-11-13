@@ -5,12 +5,11 @@ import { updateUserDetailsAction } from '@packages/scoutgame/users/updateUserDet
 import { updateUserDetailsSchema } from '@packages/scoutgame/users/updateUserDetailsSchema';
 import type { UpdateUserDetailsFormValues } from '@packages/scoutgame/users/updateUserDetailsSchema';
 import { useAction } from 'next-safe-action/hooks';
-import { useUser } from 'providers/UserProvider';
 import { useForm } from 'react-hook-form';
 
-import { EditableUserProfile } from 'components/common/Profile/EditableUserProfile';
-import { useMdScreen } from 'hooks/useMediaScreens';
-
+import { EditableUserProfile } from '../../../components/common/Profile/EditableUserProfile';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
+import { useUser } from '../../../providers/UserProvider';
 import type { UserProfileWithPoints } from '../ProfilePage';
 
 export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {

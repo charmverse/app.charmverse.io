@@ -11,7 +11,7 @@ import type { BuilderUserInfo } from '@packages/scoutgame/users/interfaces';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
+import { ScoutsGallery } from '../../../common/Gallery/ScoutsGallery';
 
 import { BuilderActivitiesList } from './BuilderActivitiesList';
 import { BuilderStats } from './BuilderStats';

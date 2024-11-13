@@ -4,8 +4,7 @@ import { Stack, Table, TableCell, TableRow, Typography } from '@mui/material';
 import type { BuilderReward } from '@packages/scoutgame/builders/getBuilderRewards';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
-
+import { Avatar } from '../../../common/Avatar';
 import { PointsCell } from '../common/PointsCell';
 import { StyledTableBody, StyledTableHead } from '../common/StyledTable';
 

@@ -10,9 +10,9 @@ import { useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
 
-import { useIsMounted } from 'hooks/useIsMounted';
-import { useMdScreen } from 'hooks/useMediaScreens';
-import { useS3UploadInput } from 'hooks/useS3UploadInput';
+import { useIsMounted } from '../../../hooks/useIsMounted';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
+import { useS3UploadInput } from '../../../hooks/useS3UploadInput';
 
 import { ProfileLinks } from './ProfileLinks';
 

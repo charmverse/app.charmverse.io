@@ -8,7 +8,7 @@ import React from 'react';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
 
-import { GemsIcon } from 'components/common/Icons';
+import { GemsIcon } from '../../../common/Icons';
 
 export function getActivityLabel(activity: BuilderActivity) {
   return activity.type === 'github_event'

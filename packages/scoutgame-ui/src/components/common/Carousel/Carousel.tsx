@@ -5,8 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { LoadingCards } from 'components/common/Loading/LoadingCards';
-import { useLgScreen, useMdScreen, useSmScreen } from 'hooks/useMediaScreens';
+import { useLgScreen, useMdScreen, useSmScreen } from '../../../hooks/useMediaScreens';
+import { LoadingCards } from '../Loading/LoadingCards';
 
 import { NextArrow, PrevArrow } from './Arrows';
 

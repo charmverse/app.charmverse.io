@@ -4,8 +4,8 @@ import { Paper, Typography, Stack } from '@mui/material';
 import { builderTokenDecimals } from '@packages/scoutgame/builderNfts/constants';
 import Image from 'next/image';
 
-import { BuilderCardNftDisplay } from 'components/common/Card/BuilderCard/BuilderCardNftDisplay';
-import { useMdScreen } from 'hooks/useMediaScreens';
+import { useMdScreen } from '../../../../hooks/useMediaScreens';
+import { BuilderCardNftDisplay } from '../../../common/Card/BuilderCard/BuilderCardNftDisplay';
 
 export function BuilderStats({
   nftImageUrl,

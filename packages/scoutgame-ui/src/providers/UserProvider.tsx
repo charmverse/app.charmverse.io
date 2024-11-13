@@ -4,7 +4,7 @@ import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
 
-import { useGetUser } from 'hooks/api/session';
+import { useGetUser } from '../hooks/api/session';
 
 type UserContext = {
   user: SessionUser | null;

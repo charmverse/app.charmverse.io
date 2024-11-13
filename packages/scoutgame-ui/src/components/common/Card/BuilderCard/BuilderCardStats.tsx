@@ -1,7 +1,7 @@
 import { Stack, Tooltip, Typography } from '@mui/material';
 import Image from 'next/image';
 
-import { PointsIcon } from 'components/common/Icons';
+import { PointsIcon } from '../../Icons';
 
 import { BuilderCardActivity } from './BuilderCardActivity/BuilderCardActivity';
 import { BuilderCardName } from './BuilderCardName';

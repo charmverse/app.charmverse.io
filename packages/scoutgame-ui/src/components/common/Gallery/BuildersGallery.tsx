@@ -1,7 +1,7 @@
 import { Box, Grid2 as Grid, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 
-import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
+import { BuilderCard } from '../Card/BuilderCard/BuilderCard';
 
 export function BuildersGallery({
   builders,

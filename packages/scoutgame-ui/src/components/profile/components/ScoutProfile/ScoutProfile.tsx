@@ -5,8 +5,8 @@ import { getScoutedBuilders } from '@packages/scoutgame/scouts/getScoutedBuilder
 import { getUserSeasonStats } from '@packages/scoutgame/scouts/getUserSeasonStats';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
-import { ErrorSSRMessage } from 'components/common/ErrorSSRMessage';
-import { BuildersGallery } from 'components/common/Gallery/BuildersGallery';
+import { ErrorSSRMessage } from '../../../common/ErrorSSRMessage';
+import { BuildersGallery } from '../../../common/Gallery/BuildersGallery';
 
 import { ScoutStats } from './ScoutStats';
 

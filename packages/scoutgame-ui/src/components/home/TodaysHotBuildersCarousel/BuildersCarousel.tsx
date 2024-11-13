@@ -2,11 +2,11 @@
 
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 
-import { BuilderCard } from 'components/common/Card/BuilderCard/BuilderCard';
-import { Carousel } from 'components/common/Carousel/Carousel';
-import { useIsMounted } from 'hooks/useIsMounted';
-import { useLgScreen, useMdScreen } from 'hooks/useMediaScreens';
-import { useTrackEvent } from 'hooks/useTrackEvent';
+import { useIsMounted } from '../../../hooks/useIsMounted';
+import { useLgScreen, useMdScreen } from '../../../hooks/useMediaScreens';
+import { useTrackEvent } from '../../../hooks/useTrackEvent';
+import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
+import { Carousel } from '../../common/Carousel/Carousel';
 
 import { PromoCard } from './PromoCard';
 
