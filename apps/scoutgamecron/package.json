@@ -29,6 +29,7 @@
     "@jest/globals": "^29.7.0",
     "@packages/testing": "^1.0.0",
     "@swc/core": "^1.7.26",
-    "@types/web-push": "^3.6.3"
+    "@types/web-push": "^3.6.3",
+    "js-yaml": "^4.1.0"
   }
 }
