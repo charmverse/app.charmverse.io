@@ -30,6 +30,8 @@ RUN apt-get update && apt-get install gnupg wget -y && \
   apt-get install google-chrome-stable -y --no-install-recommends && \
   rm -rf /var/lib/apt/lists/*
 
+RUN npx puppeteer browsers install chrome
+
 # Copy compiled code
 COPY --parents apps/*/.next apps/*/public .
 
