@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+
+import { currentSeason, getCurrentWeek } from '../dates';
 
 export type UnclaimedPointsSource = {
   builders: {
