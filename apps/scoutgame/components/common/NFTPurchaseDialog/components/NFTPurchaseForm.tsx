@@ -182,10 +182,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       return;
     }
 
-    // Initial fetch
     refreshTokenData();
 
-    // Set up polling
     const interval = setInterval(refreshTokenData, PRICE_POLLING_INTERVAL);
     return () => clearInterval(interval);
   }, [builderId, tokensToBuy, isExecutingTransaction, isExecutingPointsPurchase, isSavingDecentTransaction]);
