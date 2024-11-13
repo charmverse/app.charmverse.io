@@ -9,9 +9,7 @@ export default async function Claim({ params }: { params: { path: string } }) {
     return notFound();
   }
 
-  const region = process.env.S3_UPLOAD_REGION;
-  const bucket = process.env.S3_UPLOAD_BUCKET;
-  const claimScreenUrl = `https://s3.${region}.amazonaws.com/${bucket}/points-claim/${user.id}/${getLastWeek()}.png`;
+  const claimScreenUrl = `https://cdn.charmverse.io/points-claim/${user.id}/${getLastWeek()}.png`;
 
   return (
     <>

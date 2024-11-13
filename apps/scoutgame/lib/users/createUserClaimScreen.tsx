@@ -107,9 +107,8 @@ export async function createUserClaimScreen(userId: string) {
       params
     });
 
-    log.info('generated claim screen', { userId });
-
     await s3Upload.done();
+    log.info('generated claim screen', { userId });
   } catch (e) {
     log.error('error generating claim screen', { userId, error: e });
   } finally {
