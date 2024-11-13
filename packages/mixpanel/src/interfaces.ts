@@ -27,6 +27,16 @@ export type ClickScoutButton = FrontendEvent & {
   builderPath: string;
 };
 
+export type EventType =
+  | 'page_view'
+  | 'create_project'
+  | 'click_dont_have_farcaster_account'
+  | 'click_join_the_sunnys'
+  | 'click_share_on_warpcast'
+  | 'click_share_on_twitter'
+  | 'click_powered_by_charmverse'
+  | 'click_need_help';
+
 export type MixpanelEventMap = {
   sign_up: BaseEvent;
   sign_in: BaseEvent;
@@ -36,7 +46,7 @@ export type MixpanelEventMap = {
   click_moxie_promo: FrontendEvent;
   click_optimism_promo: FrontendEvent;
   page_view: FrontendEvent;
-};
+} & Record<EventType, FrontendEvent>;
 
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;
