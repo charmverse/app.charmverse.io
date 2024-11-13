@@ -1,7 +1,6 @@
 'use server';
 
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
@@ -10,6 +9,7 @@ import {
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
 import { currentSeason } from '@packages/scoutgame/dates';
+import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
@@ -35,7 +35,7 @@ export async function handlePendingTransaction({
   });
 
   if (updatedTx.count === 0) {
-    log.info('Skip processing tx as it is locked', { pendingTransactionId });
+    scoutgamePaymentsLogger.info('Skip processing tx as it is locked', { pendingTransactionId });
     // The transaction is already being processed or completed, so exit
     return;
   }
@@ -49,7 +49,7 @@ export async function handlePendingTransaction({
     });
 
     if (pendingTx.status !== 'processing') {
-      log.info(`Skipping processing for tx id ${pendingTx.id}`);
+      scoutgamePaymentsLogger.info(`Skipping processing for tx id ${pendingTx.id}`);
       return;
     }
 

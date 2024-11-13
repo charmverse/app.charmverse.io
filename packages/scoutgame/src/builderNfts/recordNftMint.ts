@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { NFTPurchaseEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import type { Season } from '@packages/scoutgame/dates';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
+import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 
 import type { MintNFTParams } from './mintNFT';
 
@@ -36,7 +36,7 @@ export async function recordNftMint(
   });
 
   if (existingTx) {
-    log.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
+    scoutgamePaymentsLogger.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
     return;
   }
 
@@ -183,7 +183,13 @@ export async function recordNftMint(
     return builderEvent.nftPurchaseEvent;
   });
 
-  log.info('Minted NFT', { builderNftId, recipientAddress, tokenId: builderNft.tokenId, amount, userId: scoutId });
+  scoutgamePaymentsLogger.info('Minted NFT', {
+    builderNftId,
+    recipientAddress,
+    tokenId: builderNft.tokenId,
+    amount,
+    userId: scoutId
+  });
 
   if (!skipMixpanel) {
     trackUserAction('nft_purchase', {

@@ -1,8 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { BuilderNft } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 
 import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
@@ -44,7 +44,7 @@ export async function refreshBuilderNftPrice({
 
     return updatedNft;
   } catch (error) {
-    log.error('Error refreshing builder nft price', { builderId, season, error });
+    scoutgamePaymentsLogger.error('Error refreshing builder nft price', { builderId, season, error });
     throw error;
   }
 }
