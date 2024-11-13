@@ -7,5 +7,7 @@ export const isProdEnv = process.env.NODE_ENV === 'production' && !isTestEnv && 
 export const isDevEnv =
   (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') && !isProdEnv && !isStagingEnv && !isTestEnv;
 
-export const authSecret = process.env.AUTH_SECRET as string | undefined;
+// Session
 export const baseUrl = process.env.DOMAIN as string | undefined;
+export const authSecret = process.env.AUTH_SECRET as string | undefined;
+export const cookieName = process.env.AUTH_COOKIE || 'scoutgame-session';

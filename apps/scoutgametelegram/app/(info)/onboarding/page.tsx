@@ -6,6 +6,10 @@ import { getUserFromSession } from 'lib/session/getUserFromSession';
 export default async function Onboarding() {
   const user = await getUserFromSession();
 
+  if (!user) {
+    return null;
+  }
+
   if (user?.onboardedAt && user?.agreedToTermsAt) {
     redirect('/quests');
   }

@@ -1,4 +1,4 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { getSession } from 'lib/session/getSession';
 
 import { cacheGetUser, getUser } from './getUser';
 import type { SessionUser } from './interfaces';

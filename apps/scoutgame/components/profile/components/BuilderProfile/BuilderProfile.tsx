@@ -2,6 +2,9 @@ import 'server-only';
 
 import { prisma } from '@charmverse/core/prisma-client';
 import { Alert, Box, Stack, Typography } from '@mui/material';
+import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+import { getBuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
+import { getBuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
 import { appealUrl } from '@packages/scoutgame/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import Link from 'next/link';
@@ -10,9 +13,6 @@ import { Suspense } from 'react';
 import { ScoutsGallery } from 'components/common/Gallery/ScoutsGallery';
 import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { BuilderActivitiesList } from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
-import { getBuilderActivities } from 'lib/builders/getBuilderActivities';
-import { getBuilderScouts } from 'lib/builders/getBuilderScouts';
-import { getBuilderStats } from 'lib/builders/getBuilderStats';
 import type { BuilderUserInfo } from 'lib/users/interfaces';
 
 import { BuilderStats } from './BuilderStats';

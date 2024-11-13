@@ -1,11 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 
-import { ImageResponse } from 'next/og';
 // Must be there otherwise React is not defined error is thrown
 import React from 'react';
 import type { Font } from 'satori';
 import sharp from 'sharp';
+
+import type { BuilderActivity } from '../../builders/getBuilderActivities';
+import type { BuilderScouts } from '../../builders/getBuilderScouts';
+import type { BuilderStats } from '../../builders/getBuilderStats';
+
+import { BuilderShareImage } from './components/BuilderShareImage';
 
 // fails inside of Next.js
 function getAssetsFromDisk() {
@@ -92,6 +97,8 @@ export async function updateNftImage({
   const cutoutWidth = 300;
   const cutoutHeight = 400;
 
+  const { ImageResponse } = await import('@vercel/og');
+
   const baseImage = new ImageResponse(
     (
       <div
@@ -145,7 +152,7 @@ export async function updateNftImage({
   );
 
   const baseImageBuffer = await baseImage.arrayBuffer();
-  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+  const imageBuffer = await sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
 
   return imageBuffer;
 }
@@ -170,6 +177,8 @@ export async function generateNftImage({
     const arrayBuffer = await response.arrayBuffer();
     avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(300, 300).png().toBuffer();
   }
+
+  const { ImageResponse } = await import('@vercel/og');
 
   const baseImage = new ImageResponse(
     (
@@ -232,21 +241,28 @@ export async function generateNftImage({
   );
 
   const baseImageBuffer = await baseImage.arrayBuffer();
-  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+  const imageBuffer = await sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
 
   return imageBuffer;
 }
 
 export async function generateNftCongrats({
   imageHostingBaseUrl,
-  userImage
+  userImage,
+  activities,
+  builderPrice,
+  stats,
+  builderScouts
 }: {
   imageHostingBaseUrl?: string;
   userImage: string | null;
+  activities: BuilderActivity[];
+  stats: BuilderStats;
+  builderScouts: BuilderScouts;
+  builderPrice: bigint;
 }): Promise<Buffer> {
   let avatarBuffer: Buffer | null = null;
-  const cutoutWidth = 400;
-  const cutoutHeight = 400;
+  const size = 550;
 
   const { noPfpAvatarBase64 } = await getAssets(imageHostingBaseUrl);
 
@@ -255,41 +271,34 @@ export async function generateNftCongrats({
     const arrayBuffer = await response.arrayBuffer();
     avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(150, 200).png().toBuffer();
   }
+  // Just for testing
+  // const activities = await getBuilderActivities({ builderId: '745c9ffd-278f-4e91-8b94-beaded2ebcd1', limit: 3 });
+  // const stats = await getBuilderStats('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
+  // const builderScouts = await getBuilderScouts('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
+  // const builderNft = await getBuilderNft('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
+
+  const { ImageResponse } = await import('@vercel/og');
 
   const baseImage = new ImageResponse(
     (
-      <div
-        style={{
-          backgroundColor: '#000',
-          height: cutoutHeight,
-          width: cutoutWidth,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: '8px',
-          backgroundImage: `url(${process.env.DOMAIN}/images/profile/congrats-bg.jpg)`,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'center',
-          backgroundSize: 'cover'
-        }}
-      >
-        <img
-          src={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
-          alt='user nft'
-          width={150}
-          height={200}
-        />
-      </div>
+      <BuilderShareImage
+        activities={activities}
+        builderScouts={builderScouts}
+        stats={stats}
+        nftImageUrl={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
+        size={size}
+        builderPrice={builderPrice}
+      />
     ),
     {
-      width: cutoutWidth,
-      height: cutoutHeight
+      width: size,
+      height: size,
+      emoji: 'noto'
     }
   );
 
   const baseImageBuffer = await baseImage.arrayBuffer();
-  const imageBuffer = sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
+  const imageBuffer = await sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
 
   return imageBuffer;
 }

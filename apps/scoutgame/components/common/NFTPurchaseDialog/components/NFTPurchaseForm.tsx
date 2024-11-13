@@ -79,14 +79,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
-  const {
-    isExecutingTransaction,
-    sendNftMintTransaction,
-    isSavingDecentTransaction,
-    clearPurchaseSuccess,
-    purchaseSuccess,
-    purchaseError
-  } = usePurchase();
+  const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, purchaseSuccess, purchaseError } =
+    usePurchase();
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
@@ -247,6 +241,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           fromAddress: address as Address,
           sourceChainId: selectedPaymentOption.chainId,
           builderTokenId: Number(builderTokenId),
+          builderId: builder.id,
           purchaseCost: Number(purchaseCost),
           tokensToBuy
         }

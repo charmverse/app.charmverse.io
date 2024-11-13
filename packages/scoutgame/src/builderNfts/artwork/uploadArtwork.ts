@@ -2,6 +2,11 @@ import { S3Client } from '@aws-sdk/client-s3';
 import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
+import { getBuilderActivities } from '../../builders/getBuilderActivities';
+import { getBuilderNft } from '../../builders/getBuilderNft';
+import { getBuilderScouts } from '../../builders/getBuilderScouts';
+import { getBuilderStats } from '../../builders/getBuilderStats';
+
 import { generateNftImage, generateNftCongrats, updateNftImage } from './generateNftImage';
 import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from './utils';
 
@@ -71,16 +76,27 @@ export async function uploadArtworkCongrats({
   imageHostingBaseUrl,
   season,
   tokenId,
-  userImage
+  userImage,
+  builderId
 }: {
   imageHostingBaseUrl?: string;
   season: string;
   tokenId: bigint | number;
   userImage: string | null;
+  builderId: string;
 }) {
+  const activities = await getBuilderActivities({ builderId, limit: 3 });
+  const stats = await getBuilderStats(builderId);
+  const builderScouts = await getBuilderScouts(builderId);
+  const builderNft = await getBuilderNft(builderId);
+
   const imageBuffer = await generateNftCongrats({
     userImage,
-    imageHostingBaseUrl
+    imageHostingBaseUrl,
+    activities,
+    stats,
+    builderScouts,
+    builderPrice: builderNft?.currentPrice || BigInt(0)
   });
 
   const imagePath = getNftCongratsPath({ season, tokenId: Number(tokenId) });

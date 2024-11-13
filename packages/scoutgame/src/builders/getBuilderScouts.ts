@@ -1,11 +1,21 @@
+import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
-import type { ScoutInfo } from 'components/common/Card/ScoutCard';
-import { BasicUserInfoSelect } from 'lib/users/queries';
+import { BasicUserInfoSelect } from '../scouts/queries';
 
-export async function getBuilderScouts(builderId: string) {
+type ScoutInfo = Pick<Scout, 'id' | 'path' | 'avatar' | 'displayName'> & {
+  nfts: number;
+};
+
+export type BuilderScouts = {
+  totalScouts: number;
+  totalNftsSold: number;
+  scouts: ScoutInfo[];
+};
+
+export async function getBuilderScouts(builderId: string): Promise<BuilderScouts> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderEvent: {

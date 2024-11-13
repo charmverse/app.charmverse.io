@@ -1,7 +1,6 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
 import { savePendingTransaction } from '@packages/scoutgame/savePendingTransaction';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
@@ -14,6 +13,7 @@ export const saveDecentTransactionAction = authActionClient
   .schema(
     yup.object().shape({
       user: yup.object().shape({
+        id: yup.string().required(),
         walletAddress: yup
           .string()
           .required()
@@ -52,5 +52,5 @@ export const saveDecentTransactionAction = authActionClient
       userId
     });
 
-    return { id: data.id, txHash: data.sourceChainTxHash, input: parsedInput };
+    return { id: data.id, txHash: data.sourceChainTxHash };
   });
