@@ -9,9 +9,7 @@
     "import/internal-regex": "^(adapters|charmClient|components|config|context|db|hooks|lib|models|pages|public|seedData|testing|theme)",
     "import/resolver": {
       "node": {
-        "moduleDirectory": [
-          "node_modules"
-        ]
+        "moduleDirectory": ["node_modules"]
       }
     }
   },
@@ -31,12 +29,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "@typescript-eslint",
-    "@stylistic/ts",
-    "react",
-    "react-hooks"
-  ],
+  "plugins": ["@typescript-eslint", "@stylistic/ts", "react", "react-hooks"],
   "rules": {
     "react/jsx-key": "error",
     "react/forbid-prop-types": 0,
@@ -67,18 +60,12 @@
         "multilineDetection": "brackets"
       }
     ],
-    "@stylistic/ts/object-curly-spacing": [
-      "error",
-      "always"
-    ],
+    "@stylistic/ts/object-curly-spacing": ["error", "always"],
     "object-curly-spacing": "off",
     "arrow-body-style": "off",
     "arrow-parens": "off",
     "class-methods-use-this": "off",
-    "comma-dangle": [
-      "error",
-      "never"
-    ],
+    "comma-dangle": ["error", "never"],
     "consistent-return": "off",
     "import/prefer-default-export": "off",
     "import/extensions": "off",
@@ -119,23 +106,12 @@
           "caseInsensitive": true
         },
         "newlines-between": "always",
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "object",
-          "parent",
-          "sibling",
-          "index"
-        ]
+        "groups": ["builtin", "external", "internal", "object", "parent", "sibling", "index"]
       }
     ],
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/no-static-element-interactions": "off",
-    "jsx-quotes": [
-      "error",
-      "prefer-single"
-    ],
+    "jsx-quotes": ["error", "prefer-single"],
     "max-classes-per-file": "off",
     "max-len": [
       "error",
@@ -188,10 +164,7 @@
     "react/jsx-filename-extension": [
       1,
       {
-        "extensions": [
-          ".tsx",
-          ".jsx"
-        ]
+        "extensions": [".tsx", ".jsx"]
       }
     ],
     "react/jsx-no-bind": "off",
@@ -229,9 +202,7 @@
   "overrides": [
     {
       // ignore default export warning for next.js folder
-      "files": [
-        "!pages"
-      ],
+      "files": ["!pages"],
       "rules": {
         "import/no-default-export": "off"
       }
