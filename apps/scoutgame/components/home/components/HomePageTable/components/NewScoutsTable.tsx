@@ -23,7 +23,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
             color='inherit'
             size='small'
             endIcon={<LaunchIcon />}
-            sx={{ fontSize: 'inherit', px: 2 }}
+            sx={{ fontSize: 'inherit', lineHeight: 'inherit', px: 2 }}
           >
             Learn more
           </Button>
@@ -40,18 +40,19 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
             <TableCell align='left' sx={{ width: '20%' }}>
               SCOUT
             </TableCell>
-            <TableCell align='right' sx={{ width: '20%' }}>
-              <Tooltip title="Gems earned by the scout's builders">
-                <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-                  GEMS <GemsIcon />
-                </Stack>
-              </Tooltip>
-            </TableCell>
-            <TableCell align='center' sx={{ width: '20%' }}>
+            <TableCell align='center' sx={{ width: '15%', display: { xs: 'none', md: 'table-cell' } }}>
               SCOUTED
             </TableCell>
-            <TableCell align='center' sx={{ width: '20%', display: { xs: 'none', md: 'table-cell' } }}>
+            <TableCell align='center' sx={{ width: '15%', display: { xs: 'none', md: 'table-cell' } }}>
               CARDS HELD
+            </TableCell>
+            <TableCell align='right' sx={{ width: '60%' }}>
+              <Tooltip title="Gems earned by the scout's builders">
+                <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
+                  BUILDER GEMS
+                  <GemsIcon />
+                </Stack>
+              </Tooltip>
             </TableCell>
           </CommonTableRow>
         </TableHead>
@@ -80,23 +81,23 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
-                  maxWidth={{ xs: '100px', md: 'initial' }}
+                  maxWidth={{ xs: '140px', md: 'initial' }}
                 >
                   <Avatar src={scout.avatar} name={scout.displayName} size='small' />
                   <TableCellText noWrap>{scout.displayName}</TableCellText>
                 </Stack>
+              </TableCell>
+              <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <TableCellText color='green.main'>{scout.buildersScouted || 0}</TableCellText>
+              </TableCell>
+              <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+                <TableCellText color='green.main'>{scout.nftsHeld || 0}</TableCellText>
               </TableCell>
               <TableCell align='right'>
                 <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                   <TableCellText>{scout.builderGemsCollected || 0}</TableCellText>
                   <GemsIcon />
                 </Stack>
-              </TableCell>
-              <TableCell align='center'>
-                <TableCellText color='green.main'>{scout.buildersScouted || 0}</TableCellText>
-              </TableCell>
-              <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-                <TableCellText color='green.main'>{scout.nftsHeld || 0}</TableCellText>
               </TableCell>
             </CommonTableRow>
           ))}
