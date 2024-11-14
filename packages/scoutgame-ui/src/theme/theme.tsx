@@ -1,5 +1,7 @@
 'use client';
 
+import './index.d.ts';
+
 import { createTheme, alpha, darken, lighten, responsiveFontSizes } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
 
