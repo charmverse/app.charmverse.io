@@ -1,10 +1,11 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { SessionData } from '@connect-shared/lib/session/config';
-import { isSystemError } from '@root/lib/middleware/isSystemError';
 import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';
 import type { ServerErrorFunctionUtils } from 'next-safe-action';
+
+import type { SessionData } from '../session/interfaces';
+import { isSystemError } from '../utils/isSystemError';
 
 import type { defineMetadataSchema } from './actionClient';
 
