@@ -1,4 +1,4 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { getSession } from '@packages/scoutgame/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

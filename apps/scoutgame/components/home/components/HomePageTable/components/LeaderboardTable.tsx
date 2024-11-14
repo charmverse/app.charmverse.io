@@ -1,17 +1,16 @@
 import 'server-only';
 
-import type { SxProps } from '@mui/material';
 import { Box, Stack, TableHead } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
+import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
+import { ScoutButton } from '@packages/scoutgame-ui/components/common/ScoutButton/ScoutButton';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
-import { getSXProps } from 'components/common/Hidden';
-import { GemsIcon } from 'components/common/Icons';
-import { ScoutButton } from 'components/common/ScoutButton/ScoutButton';
 import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { CommonTableRow } from './CommonTableRow';

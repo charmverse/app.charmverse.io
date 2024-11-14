@@ -3,18 +3,17 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
-import { getRelativeTime } from '@packages/utils/dates';
-import Link from 'next/link';
-import { BiLike } from 'react-icons/bi';
-import { LuBookMarked } from 'react-icons/lu';
-
-import { Avatar } from 'components/common/Avatar';
-import { GemsIcon } from 'components/common/Icons';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import {
   BuilderActivityBonusPartner,
   BuilderActivityGems,
   getActivityLabel
-} from 'components/profile/components/BuilderProfile/BuilderActivitiesList';
+} from '@packages/scoutgame-ui/components/profile/components/BuilderProfile/BuilderActivitiesList';
+import { getRelativeTime } from '@packages/utils/dates';
+import Link from 'next/link';
+import { BiLike } from 'react-icons/bi';
+import { LuBookMarked } from 'react-icons/lu';
 
 import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';

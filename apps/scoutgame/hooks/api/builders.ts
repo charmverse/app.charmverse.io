@@ -1,4 +1,4 @@
-import { useGETImmutable, usePUT } from '@packages/scoutgame/hooks/helpers';
+import { useGETImmutable, usePUT } from '@packages/scoutgame-ui/hooks/helpers';
 
 import type { BuilderSearchResult } from 'lib/builders/searchBuilders';
 

@@ -1,12 +1,12 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { actionClient } from '@packages/scoutgame/actions/actionClient';
 import { findOrCreateFarcasterUser } from '@packages/scoutgame/users/findOrCreateFarcasterUser';
 import { authSecret } from '@root/config/constants';
 import { sealData } from 'iron-session';
 import { cookies } from 'next/headers';
 
-import { actionClient } from 'lib/actions/actionClient';
 import { verifyFarcasterUser } from 'lib/farcaster/verifyFarcasterUser';
 
 import { authSchema } from '../farcaster/config';

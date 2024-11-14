@@ -1,10 +1,10 @@
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
-import { baseUrl } from '@root/config/constants';
+import { getUnclaimedPointsSource } from '@packages/scoutgame/points/getUnclaimedPointsSource';
+import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { ClaimPage } from '@packages/scoutgame-ui/components/claim/ClaimPage';
 import type { Metadata } from 'next';
 
-import { ClaimPage } from 'components/claim/ClaimPage';
-import { getUnclaimedPointsSource } from 'lib/points/getUnclaimedPointsSource';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
+import { PageContainer } from 'components/layout/PageContainer';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,15 +26,17 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   const { builders, builderPoints, scoutPoints, repos } = await getUnclaimedPointsSource(user.id);
 
   return (
-    <ClaimPage
-      builders={builders}
-      builderPoints={builderPoints}
-      scoutPoints={scoutPoints}
-      repos={repos}
-      period={searchParams.tab}
-      displayName={user.displayName}
-      totalUnclaimedPoints={points}
-      bonusPartners={bonusPartners}
-    />
+    <PageContainer>
+      <ClaimPage
+        builders={builders}
+        builderPoints={builderPoints}
+        scoutPoints={scoutPoints}
+        repos={repos}
+        period={searchParams.tab}
+        displayName={user.displayName}
+        totalUnclaimedPoints={points}
+        bonusPartners={bonusPartners}
+      />
+    </PageContainer>
   );
 }

@@ -1,6 +1,8 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -8,12 +10,11 @@ import { useState } from 'react';
 import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
-import { useUser } from 'components/layout/UserProvider';
 import { useGetClaimablePoints } from 'hooks/api/session';
-import { useMdScreen } from 'hooks/useMediaScreens';
+
+import { SignInModalMessage } from '../../../../packages/scoutgame-ui/src/components/common/ScoutButton/SignInModalMessage';
 
 import { ClaimIcon } from './ClaimIcon';
-import { SignInModalMessage } from './ScoutButton/SignInModalMessage';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'

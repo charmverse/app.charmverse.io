@@ -1,12 +1,12 @@
 import 'server-only';
 
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
 import { getNewScouts } from 'lib/scouts/getNewScouts';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
-import { safeAwaitSSRData } from 'lib/utils/async';
 
 import { ActivityTable } from './components/ActivityTable';
 import { LeaderboardTable } from './components/LeaderboardTable';

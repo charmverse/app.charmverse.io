@@ -19,6 +19,7 @@ dist/
 /apps/scoutgame/public/sw*
 /apps/scoutgame/public/swe-worker*
 /apps/scoutgame/public/builder-nfts
+/apps/scoutgametelegram/public/builder-nfts
 
 # Tests
 /__e2e-dist__/

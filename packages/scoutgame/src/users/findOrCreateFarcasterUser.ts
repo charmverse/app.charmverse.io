@@ -1,6 +1,7 @@
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
-import type { ConnectWaitlistTier } from '@packages/scoutgame/waitlist/scoring/constants';
 import { uuidFromNumber } from '@packages/utils/uuid';
+
+import type { ConnectWaitlistTier } from '../waitlist/scoring/constants';
 
 import { findOrCreateUser } from './findOrCreateUser';
 import type { FindOrCreateUserResult } from './findOrCreateUser';

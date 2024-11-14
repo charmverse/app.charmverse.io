@@ -1,11 +1,10 @@
 'use server';
 
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { authActionClient } from '@packages/scoutgame/actions/actionClient';
 import { authSecret } from '@root/config/constants';
 import { unsealData } from 'iron-session';
 import { cookies } from 'next/headers';
-
-import { authActionClient } from 'lib/actions/actionClient';
 
 import { setupBuilderProfileSchema } from './config';
 import { setupBuilderProfile } from './setupBuilderProfile';

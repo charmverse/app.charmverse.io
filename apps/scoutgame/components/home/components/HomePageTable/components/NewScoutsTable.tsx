@@ -1,10 +1,10 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Alert, Button, Stack, Table, TableBody, TableCell, TableHead, Tooltip } from '@mui/material';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
-import { GemsIcon } from 'components/common/Icons';
 import type { NewScout } from 'lib/scouts/getNewScouts';
 
 import { CommonTableRow } from './CommonTableRow';
