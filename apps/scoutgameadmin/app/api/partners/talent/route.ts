@@ -66,8 +66,8 @@ export async function GET() {
     'User Name': builder.displayName,
     'Profile Link': `https://scoutgame.xyz/u/${builder.path}`,
     Email: builder.email,
-    'Scout Game Rank': rank,
     'Wallet Address': wallet,
+    'Scout Game Rank': rank,
     'Talent Score': score
   }));
 
