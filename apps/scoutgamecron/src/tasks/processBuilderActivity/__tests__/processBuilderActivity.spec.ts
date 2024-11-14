@@ -23,10 +23,10 @@ jest.unstable_mockModule('../github/getPullRequestsByUser', () => ({
 //   recordCommit: jest.fn()
 // }));
 
-jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
-  getRecentPullRequestsByUser: jest.fn()
+jest.unstable_mockModule('../github/getRecentMergedPullRequestsByUser', () => ({
+  getRecentMergedPullRequestsByUser: jest.fn()
 }));
-const { getRecentPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
+const { getRecentMergedPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
 
 const { getCommitsByUser } = await import('@packages/github/getCommitsByUser');
 const { getPullRequestsByUser } = await import('../github/getPullRequestsByUser');
@@ -61,7 +61,7 @@ describe('processBuilderActivity', () => {
 
     (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);
     (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([pullRequest]);
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await processBuilderActivity({
       builderId: builder.id,
@@ -109,7 +109,7 @@ describe('processBuilderActivity', () => {
 
     (getCommitsByUser as jest.Mock<typeof getCommitsByUser>).mockResolvedValue([commit]);
     (getPullRequestsByUser as jest.Mock<typeof getPullRequestsByUser>).mockResolvedValue([pullRequest]);
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await processBuilderActivity({
       builderId: builder.id,

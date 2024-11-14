@@ -16,12 +16,12 @@ import { mockPullRequest } from '../../../testing/generators';
 
 const currentSeason = '2024-W40';
 
-jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
-  getRecentPullRequestsByUser: jest.fn()
+jest.unstable_mockModule('../github/getRecentMergedPullRequestsByUser', () => ({
+  getRecentMergedPullRequestsByUser: jest.fn()
 }));
 
 const { recordMergedPullRequest } = await import('../recordMergedPullRequest');
-const { getRecentPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
+const { getRecentMergedPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
 
 describe('recordMergedPullRequest', () => {
   beforeEach(() => {
@@ -60,7 +60,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
@@ -131,7 +131,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
@@ -165,7 +165,7 @@ describe('recordMergedPullRequest', () => {
       owners: [scout]
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([
       mockPullRequest()
     ]);
 
@@ -238,7 +238,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([
       mockPullRequest()
     ]);
 
@@ -319,7 +319,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([
       mockPullRequest()
     ]);
 
@@ -364,7 +364,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([
       mockPullRequest()
     ]);
 
@@ -412,7 +412,7 @@ describe('recordMergedPullRequest', () => {
       state: 'MERGED',
       author: builder.githubUser
     });
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
@@ -475,7 +475,7 @@ describe('recordMergedPullRequest', () => {
       repo
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
 
@@ -536,7 +536,7 @@ describe('recordMergedPullRequest', () => {
       repo: repo1
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest: firstPR, repo: repo1, season: currentSeason });
 
@@ -549,7 +549,7 @@ describe('recordMergedPullRequest', () => {
       repo: repo2
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest: secondPR, repo: repo2, season: currentSeason });
 
@@ -592,7 +592,7 @@ describe('recordMergedPullRequest', () => {
       repo: repo1
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest: firstPR, repo: repo1, season: currentSeason });
 
@@ -605,7 +605,7 @@ describe('recordMergedPullRequest', () => {
       repo: repo2
     });
 
-    (getRecentPullRequestsByUser as jest.Mock<typeof getRecentPullRequestsByUser>).mockResolvedValue([]);
+    (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
     await recordMergedPullRequest({ pullRequest: secondPR, repo: repo2, season: currentSeason });
 
