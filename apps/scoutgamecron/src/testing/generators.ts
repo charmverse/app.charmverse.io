@@ -1,6 +1,6 @@
+import type { Commit } from '@packages/github/getCommitsByUser';
 import { randomLargeInt } from '@packages/scoutgame/testing/generators';
 
-import type { Commit } from '../tasks/processBuilderActivity/github/getCommitsByUser';
 import type { PullRequest } from '../tasks/processBuilderActivity/github/getPullRequestsByUser';
 
 export function mockPullRequest(

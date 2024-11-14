@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Stack,
   Button,
   TextField,
@@ -13,11 +12,11 @@ import {
   Typography,
   Box
 } from '@mui/material';
-import { revalidatePath } from 'next/cache';
 import { useAction } from 'next-safe-action/hooks';
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
+import { useGetGithubUserStats } from 'hooks/api/github';
 import { useCreateBuilder } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { ScoutGameUser } from 'lib/users/getUsers';
@@ -25,7 +24,7 @@ import { setBuilderStatusAction } from 'lib/users/updateUserAction';
 
 type Props = {
   open: boolean;
-  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin' | 'farcasterName'>;
+  user: Pick<ScoutGameUser, 'builderStatus' | 'id' | 'githubLogin' | 'farcasterName' | 'path'>;
   onClose: () => void;
   onSave: () => void;
 };
@@ -44,11 +43,18 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
     }
   });
 
+  const didApply = user?.builderStatus === 'applied' || user?.builderStatus === 'rejected';
+  const requireGithubLogin = !user.githubLogin;
+
+  const githubLoginDisplayed = githubLogin || user.githubLogin;
+
+  const { data: githubUserStats } = useGetGithubUserStats(githubLoginDisplayed);
+
   function rejectBuilder() {
     setBuilderStatus({ userId: user.id, status: 'rejected' });
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     await createUser({ userId: user.id, githubLogin });
     onClose();
@@ -60,12 +66,7 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
       undefined // update cache data to `undefined`
       // { revalidate: false } // do not revalidate
     );
-  };
-
-  const didApply = user?.builderStatus === 'applied' || user?.builderStatus === 'rejected';
-  const requireGithubLogin = !user.githubLogin;
-
-  const githubLoginDisplayed = githubLogin || user.githubLogin;
+  }
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
@@ -77,6 +78,12 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Stack gap={2}>
+            <Stack>
+              <Typography variant='caption'>Scout Game profile</Typography>
+              <Link href={`https://scoutgame.xyz/u/${user.path}`} target='_blank'>
+                https://scoutgame.xyz/u/{user.path}
+              </Link>
+            </Stack>
             <Stack>
               <Typography variant='caption'>Github profile</Typography>
               {requireGithubLogin && (
@@ -98,6 +105,22 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
                 </Link>
               ) : (
                 <>&nbsp;</>
+              )}
+              {githubLoginDisplayed && (
+                <Typography variant='caption'>
+                  Last commit:{' '}
+                  {githubUserStats ? (
+                    githubUserStats.lastCommit ? (
+                      <Link href={githubUserStats.lastCommit.url} target='_blank'>
+                        {new Date(githubUserStats.lastCommit.date).toLocaleDateString()}
+                      </Link>
+                    ) : (
+                      'N/A'
+                    )
+                  ) : (
+                    <em>Loading...</em>
+                  )}
+                </Typography>
               )}
             </Stack>
             {user.farcasterName && (

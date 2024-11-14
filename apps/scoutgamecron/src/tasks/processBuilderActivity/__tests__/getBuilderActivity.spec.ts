@@ -3,7 +3,7 @@ import { mockRepo, mockGithubUser } from '@packages/scoutgame/testing/database';
 
 import { mockCommit, mockPullRequest } from '@/testing/generators';
 
-jest.unstable_mockModule('../github/getCommitsByUser', () => ({
+jest.unstable_mockModule('@packages/github/getCommitsByUser', () => ({
   getCommitsByUser: jest.fn()
 }));
 
@@ -11,7 +11,7 @@ jest.unstable_mockModule('../github/getPullRequestsByUser', () => ({
   getPullRequestsByUser: jest.fn()
 }));
 
-const { getCommitsByUser } = await import('../github/getCommitsByUser');
+const { getCommitsByUser } = await import('@packages/github/getCommitsByUser');
 const { getPullRequestsByUser } = await import('../github/getPullRequestsByUser');
 const { getBuilderActivity } = await import('../getBuilderActivity');
 
