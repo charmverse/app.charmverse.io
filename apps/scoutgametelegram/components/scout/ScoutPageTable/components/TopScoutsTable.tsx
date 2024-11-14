@@ -1,15 +1,14 @@
-import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
-import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { TopScout } from 'lib/scouts/getTopScouts';
+import type { TopScoutInfo } from 'lib/scouts/getTopScouts';
 
-import { CommonTableRow } from './CommonTableRow';
+import { CommonTableRow, tableRowSx } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
 
-export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
+export function TopScoutsTable({ scouts, order, sort }: { scouts: TopScoutInfo[]; order: string; sort: string }) {
   return (
     <Table
       aria-label='Top scouts table'
@@ -19,62 +18,68 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
     >
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
-          <TableCell align='center'>RANK</TableCell>
-          <TableCell align='left'>SCOUT</TableCell>
-          <TableCell align='right'>
+          <TableCell align='left' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+            SCOUT
+          </TableCell>
+          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+            <Link href={`/scout?tab=scouts&order=${order === 'desc' || sort !== 'rank' ? 'asc' : 'desc'}&sort=rank`}>
+              RANK
+            </Link>
+          </TableCell>
+          <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              SEASON <PointsIcon />
+              <Link
+                href={`/scout?tab=scouts&order=${order === 'desc' || sort !== 'points' ? 'asc' : 'desc'}&sort=points`}
+              >
+                POINTS
+              </Link>
             </Stack>
           </TableCell>
-          <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-            <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              ALL TIME <PointsIcon />
-            </Stack>
+          <TableCell
+            align='center'
+            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
+          >
+            <Link
+              href={`/scout?tab=scouts&order=${order === 'desc' || sort !== 'builders' ? 'asc' : 'desc'}&sort=builders`}
+            >
+              BUILDERS
+            </Link>
           </TableCell>
-          <TableCell align='center'>SCOUTED</TableCell>
-          <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-            CARDS HELD
+          <TableCell
+            align='center'
+            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
+          >
+            <Link href={`/scout?tab=scouts&order=${order === 'desc' || sort !== 'cards' ? 'asc' : 'desc'}&sort=cards`}>
+              CARDS
+            </Link>
           </TableCell>
         </CommonTableRow>
       </TableHead>
       <TableBody>
-        {scouts.map((scout, index) => (
-          <CommonTableRow key={scout.path}>
-            <TableCell align='center' sx={{ width: '16.67%' }}>
-              <TableCellText>{index + 1}</TableCellText>
-            </TableCell>
+        {scouts.map((scout) => (
+          <TableRow key={scout.path} sx={tableRowSx} component={Link} href={`/u/${scout.path}?tab=scout`}>
             <TableCell sx={{ width: '16.67%' }}>
-              <Stack
-                component={Link}
-                href={`/u/${scout.path}?tab=scout`}
-                alignItems='center'
-                flexDirection='row'
-                gap={1}
-                maxWidth={{ xs: '100px', md: 'initial' }}
-              >
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
                 <Avatar src={scout.avatar} name={scout.displayName} size='small' />
                 <TableCellText noWrap>{scout.displayName}</TableCellText>
               </Stack>
             </TableCell>
-            <TableCell align='right'>
-              <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                <TableCellText color='green.main'>{scout.seasonPoints || 0}</TableCellText>
-                <PointsIcon color='green' size={15} />
-              </Stack>
+            <TableCell align='center'>
+              <TableCellText>{scout.rank === -1 ? '-' : scout.rank}</TableCellText>
             </TableCell>
-            <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
+            <TableCell align='right' sx={{ display: 'table-cell' }}>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
-                <TableCellText color='green.main'>{scout.allTimePoints || 0}</TableCellText>
-                <PointsIcon color='green' size={15} />
+                <TableCellText color='green.main'>{scout.points || 0}</TableCellText>
+                <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='scout game icon ' />
               </Stack>
             </TableCell>
             <TableCell align='center'>
-              <TableCellText color='green.main'>{scout.buildersScouted || 0}</TableCellText>
+              <TableCellText color='green.main'>{scout.builders || 0}</TableCellText>
             </TableCell>
-            <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
-              <TableCellText color='green.main'>{scout.nftsHeld || 0}</TableCellText>
+            <TableCell align='center'>
+              <TableCellText color='green.main'>{scout.cards || 0}</TableCellText>
             </TableCell>
-          </CommonTableRow>
+          </TableRow>
         ))}
       </TableBody>
     </Table>
