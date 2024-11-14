@@ -111,6 +111,11 @@ export class StagingStack extends Stack {
               namespace: 'aws:elbv2:listener:443',
               optionName: 'SSLPolicy',
               value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
+            },
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'LowerThreshold',
+              value: '0' // never hit the lower threshold, so that we dont get chaged for scaling Alarms
             }
           ]
         : []),
@@ -134,11 +139,6 @@ export class StagingStack extends Stack {
         namespace: 'aws:autoscaling:asg',
         optionName: 'Custom Availability Zones',
         value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
-      },
-      {
-        namespace: 'aws:autoscaling:trigger',
-        optionName: 'LowerThreshold',
-        value: '0' // never hit the lower threshold, so that we dont get chaged for scaling Alarms
       },
       {
         namespace: 'aws:ec2:instances',

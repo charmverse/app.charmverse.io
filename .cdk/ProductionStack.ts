@@ -108,6 +108,12 @@ export class ProductionStack extends Stack {
               namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
               optionName: 'MaxBatchSize',
               value: '3'
+            },
+            // Set scaling trigger to 4000000 bytes (4MB), the default is 2MB
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'LowerThreshold',
+              value: '4000000'
             }
           ]
         : []),
@@ -200,11 +206,6 @@ export class ProductionStack extends Stack {
         namespace: 'aws:autoscaling:asg',
         optionName: 'Custom Availability Zones',
         value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
-      },
-      {
-        namespace: 'aws:autoscaling:trigger',
-        optionName: 'LowerThreshold',
-        value: '0' // never hit the lower threshold, so that we dont get charged for scaling Alarms
       },
       {
         namespace: 'aws:ec2:instances',
