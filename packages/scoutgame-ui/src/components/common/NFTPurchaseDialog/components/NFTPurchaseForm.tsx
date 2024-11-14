@@ -57,7 +57,7 @@ export type NFTPurchaseProps = {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
-const PRICE_POLLING_INTERVAL = 10000;
+const PRICE_POLLING_INTERVAL = 60000;
 
 export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key

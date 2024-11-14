@@ -82,14 +82,13 @@ export function useDecentTransaction({
       args: [address, bigIntToString(builderTokenId), bigIntToString(tokensToPurchase), scoutId]
     }
   };
-
   const {
     error: decentSdkError,
     isLoading: isLoadingDecentSdk,
     data: decentTransactionInfo
   } = useSWR(
     address && paymentAmountOut
-      ? `buy-token-${builderTokenId}-${tokensToPurchase}-${sourceChainId}-${sourceToken}-${scoutId}`
+      ? `buy-token-${builderTokenId}-${tokensToPurchase}-${sourceChainId}-${sourceToken}-${scoutId}-${paymentAmountOut}`
       : null,
     () =>
       prepareDecentTransaction({
