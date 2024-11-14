@@ -11,6 +11,7 @@
     "./theme/*.scss": "./src/theme/*.scss",
     "./theme/*.ts": "./src/theme/*.ts",
     "./theme/*.tsx": "./src/theme/*.tsx",
+    "./theme/colors": "./src/theme/colors.ts",
     "./actions/*": "./src/actions/*.ts"
   },
   "dependencies": {

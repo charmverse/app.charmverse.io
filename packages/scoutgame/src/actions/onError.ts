@@ -4,6 +4,7 @@ import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';
 import type { ServerErrorFunctionUtils } from 'next-safe-action';
 
+import type { SessionData } from '../session/interfaces';
 import { isSystemError } from '../utils/isSystemError';
 
 import type { defineMetadataSchema } from './actionClient';
