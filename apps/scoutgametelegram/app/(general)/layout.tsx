@@ -13,8 +13,8 @@ export default function Layout({
     <>
       <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto' }}>
         <Header />
-        {/* <InfoBackgroundImage /> */}
-        {children}
+        <InfoBackgroundImage />
+        <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
       </Box>
       <StickyFooter />
     </>
