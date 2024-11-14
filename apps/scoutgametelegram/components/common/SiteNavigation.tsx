@@ -80,7 +80,7 @@ function getActiveButton(pathname: string) {
     return 'quests';
   } else if (pathname.startsWith('/friends')) {
     return 'friends';
-  } else if (pathname.startsWith('/scout')) {
+  } else if (pathname.startsWith('/scout') || pathname.startsWith('/u')) {
     return 'scout';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
