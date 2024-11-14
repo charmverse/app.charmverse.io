@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BasicUserInfoSelect } from '@packages/scoutgame/users/queries';
+
+import { BasicUserInfoSelect } from '../users/queries';
 
 export async function getFriends(userId?: string) {
   if (!userId) {
