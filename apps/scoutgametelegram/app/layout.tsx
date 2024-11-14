@@ -1,10 +1,9 @@
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { AppProviders } from '@packages/scoutgame-ui/providers/AppProviders';
 import type { Metadata, Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
-
-import { AppProviders } from 'components/layout/AppProviders';
 
 import '@packages/scoutgame-ui/theme/styles.scss';
 

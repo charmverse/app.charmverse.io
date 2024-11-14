@@ -19,6 +19,7 @@
     "./uuid": "./src/uuid.ts",
     "./constants": "./src/constants.ts",
     "./url": "./src/url.ts",
-    "./file": "./src/file.ts"
+    "./file": "./src/file.ts",
+    "./array": "./src/array.ts"
   }
 }
