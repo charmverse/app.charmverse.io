@@ -111,32 +111,6 @@ export class StagingStack extends Stack {
               namespace: 'aws:elbv2:listener:443',
               optionName: 'SSLPolicy',
               value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
-            },
-            // Set scaling trigger to network out. The lower threshold is 0 by default.
-            {
-              namespace: 'aws:autoscaling:trigger',
-              optionName: 'MeasureName',
-              value: 'NetworkOut'
-            },
-            {
-              namespace: 'aws:autoscaling:trigger',
-              optionName: 'Statistic',
-              value: 'Average'
-            },
-            {
-              namespace: 'aws:autoscaling:trigger',
-              optionName: 'Unit',
-              value: 'Bytes'
-            },
-            {
-              namespace: 'aws:autoscaling:trigger',
-              optionName: 'LowerThreshold',
-              value: '4000000'
-            },
-            {
-              namespace: 'aws:autoscaling:trigger',
-              optionName: 'UpperThreshold',
-              value: '6000000'
             }
           ]
         : []),
