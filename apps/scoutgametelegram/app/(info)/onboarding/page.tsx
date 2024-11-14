@@ -11,7 +11,7 @@ export default async function Onboarding() {
   }
 
   if (user?.onboardedAt && user?.agreedToTermsAt) {
-    redirect('/quests');
+    redirect('/scout');
   }
 
   return <OnboardingPage />;

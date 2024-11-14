@@ -1,10 +1,10 @@
 import { Box, Stack, Typography } from '@mui/material';
+import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { LoadingCards } from '@packages/scoutgame-ui/components/common/Loading/LoadingCards';
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/home/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
-import { HeaderMessage } from 'components/common/Header/components/HeaderMessage';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
 
 import { HomeTabsMenu, homeTabs } from './components/HomePageTable/components/HomeTabsMenu';

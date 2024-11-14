@@ -7,7 +7,7 @@ export default async function Welcome() {
   const user = await getUserFromSession();
 
   if (user?.onboardedAt && user?.agreedToTermsAt) {
-    redirect('/quests');
+    redirect('/scout');
   }
 
   if (user && !user.agreedToTermsAt && !user.onboardedAt) {

@@ -6,7 +6,6 @@ import { getQuests } from 'lib/quests/getQuests';
 
 export default async function Quests() {
   const user = await getUserFromSession();
-
   if (!user) {
     return null;
   }
