@@ -1,11 +1,10 @@
 import { LoadingButton } from '@mui/lab';
-import { Checkbox, FormControlLabel, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
-import { useState } from 'react';
 import type { Address } from 'viem';
 import { useSwitchChain, useWalletClient } from 'wagmi';
 
-import { MAX_UINT256, useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
+import { useUpdateERC20Allowance } from '../hooks/useUpdateERC20Allowance';
 
 // Component for approving ERC20 tokens
 type ERC20ApproveButtonProps = {

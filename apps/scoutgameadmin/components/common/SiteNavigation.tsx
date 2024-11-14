@@ -39,17 +39,17 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
   return (
     <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
       <BottomNavigationAction
-        label='Repos'
-        href='/repos'
-        value='repos'
-        icon={<FaGithubAlt size='24px' />}
-        LinkComponent={Link}
-      />
-      <BottomNavigationAction
         label='Users'
         href='/users'
         value='users'
         icon={<HiOutlineUsers size='24px' />}
+        LinkComponent={Link}
+      />
+      <BottomNavigationAction
+        label='Repos'
+        href='/repos'
+        value='repos'
+        icon={<FaGithubAlt size='24px' />}
         LinkComponent={Link}
       />
       <BottomNavigationAction

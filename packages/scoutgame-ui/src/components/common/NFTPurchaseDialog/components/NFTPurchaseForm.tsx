@@ -57,6 +57,8 @@ export type NFTPurchaseProps = {
   builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
 };
 
+const PRICE_POLLING_INTERVAL = 10000;
+
 export function NFTPurchaseForm(props: NFTPurchaseProps) {
   // Waiting for component to render before fetching the API key
   const apiKey = env('DECENT_API_KEY');
@@ -173,6 +175,17 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       refreshAsk({ _builderTokenId: builderTokenId, amount: tokensToBuy });
     }
   }, [tokensToBuy, builderTokenId, refreshAsk]);
+
+  useEffect(() => {
+    if (!builderId || isExecutingTransaction || isExecutingPointsPurchase || isSavingDecentTransaction) {
+      return;
+    }
+
+    refreshTokenData();
+
+    const interval = setInterval(refreshTokenData, PRICE_POLLING_INTERVAL);
+    return () => clearInterval(interval);
+  }, [builderId, tokensToBuy, isExecutingTransaction, isExecutingPointsPurchase, isSavingDecentTransaction]);
 
   const enableNftButton = !!address && !!purchaseCost && !!user;
 
@@ -484,7 +497,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         </Typography>
       )}
 
-      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase ? (
+      {!approvalRequired || isExecutingTransaction || isExecutingPointsPurchase || isFetchingPrice ? (
         <LoadingButton
           loading={isLoading}
           size='large'
@@ -502,7 +515,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           }
           data-test='purchase-button'
         >
-          Buy
+          {isFetchingPrice ? 'Updating Price...' : 'Buy'}
         </LoadingButton>
       ) : (
         <ERC20ApproveButton
