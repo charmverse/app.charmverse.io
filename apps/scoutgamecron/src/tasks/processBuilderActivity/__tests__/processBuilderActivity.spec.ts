@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 
 import { mockCommit, mockPullRequest } from '@/testing/generators';
 
-jest.unstable_mockModule('../github/getCommitsByUser', () => ({
+jest.unstable_mockModule('@packages/github/getCommitsByUser', () => ({
   getCommitsByUser: jest.fn()
 }));
 
@@ -28,7 +28,7 @@ jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
 }));
 const { getRecentPullRequestsByUser } = await import('../github/getRecentPullRequestsByUser');
 
-const { getCommitsByUser } = await import('../github/getCommitsByUser');
+const { getCommitsByUser } = await import('@packages/github/getCommitsByUser');
 const { getPullRequestsByUser } = await import('../github/getPullRequestsByUser');
 const { processBuilderActivity } = await import('../processBuilderActivity');
 const { recordMergedPullRequest } = await import('../recordMergedPullRequest');

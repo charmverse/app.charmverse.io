@@ -15,7 +15,8 @@ import {
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useCreateRepos, useSearchReposByOwnerFromGithub } from 'hooks/api/repos';
+import { useSearchReposByOwnerFromGithub } from 'hooks/api/github';
+import { useCreateRepos } from 'hooks/api/repos';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 
 type Props = {

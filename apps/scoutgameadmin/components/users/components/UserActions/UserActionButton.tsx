@@ -49,12 +49,14 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
           Wallets: <strong>{user.wallets.join(', ')}</strong>
         </MenuItemNoAction>
       </Menu>
-      <AddBuilderModal
-        user={user}
-        open={isBuilderModalOpen}
-        onClose={() => setIsBuilderModalOpen(false)}
-        onSave={onChange}
-      />
+      {isBuilderModalOpen && (
+        <AddBuilderModal
+          user={user}
+          open={isBuilderModalOpen}
+          onClose={() => setIsBuilderModalOpen(false)}
+          onSave={onChange}
+        />
+      )}
       <ViewTransactionsModal
         open={isTransactionsModalOpen}
         onClose={() => setIsTransactionsModalOpen(false)}
