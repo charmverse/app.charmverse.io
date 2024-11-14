@@ -1,5 +1,5 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
 import { getGithubOAuthCallbackUrl } from '@packages/github/oauth';
+import { getSession } from '@packages/scoutgame/session/getSession';
 import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID } from '@root/lib/github/constants';
 import { sealData } from 'iron-session';

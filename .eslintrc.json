@@ -92,6 +92,7 @@
           "./packages/charmeditor/",
           "./packages/github/",
           "./packages/scoutgame/",
+          "./packages/scoutgame-ui/",
           "./packages/testing/",
           "./packages/utils/"
         ]

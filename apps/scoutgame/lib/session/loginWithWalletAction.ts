@@ -2,17 +2,17 @@
 
 import { log } from '@charmverse/core/log';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { actionClient } from '@packages/scoutgame/actions/actionClient';
+import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import { type SessionUser } from '@packages/scoutgame/session/interfaces';
 import { authSecret } from '@root/config/constants';
 import { sealData } from 'iron-session';
 import { cookies } from 'next/headers';
 
-import { actionClient } from 'lib/actions/actionClient';
 import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { loginWithWalletSchema } from 'lib/blockchain/schema';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
 
-import type { SessionUser } from './getUserFromSession';
-import { getUserFromSession } from './getUserFromSession';
 import { saveSession } from './saveSession';
 
 export const loginWithWalletAction = actionClient

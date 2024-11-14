@@ -1,6 +1,5 @@
 import Box from '@mui/material/Box';
-
-import { LoadingComponent } from './LoadingComponent';
+import { LoadingComponent } from '@packages/scoutgame-ui/components/common/Loading/LoadingComponent';
 
 export function LoadingPage() {
   return (

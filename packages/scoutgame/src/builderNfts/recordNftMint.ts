@@ -3,11 +3,12 @@ import { log } from '@charmverse/core/log';
 import type { NFTPurchaseEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
-import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
-import type { Season } from '@packages/scoutgame/dates';
-import { getCurrentWeek } from '@packages/scoutgame/dates';
+
+import type { Season } from '../dates';
+import { getCurrentWeek } from '../dates';
 
 import type { MintNFTParams } from './mintNFT';
+import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export async function recordNftMint(
   params: MintNFTParams & { createdAt?: Date; mintTxHash: string; skipMixpanel?: boolean; skipPriceRefresh?: boolean }

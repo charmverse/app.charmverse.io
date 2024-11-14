@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    // composite is useful for referenced packages. see https://www.typescriptlang.org/docs/handbook/project-references.html#composite
+    "composite": true,
+    "paths": {
+      "hooks/*": ["./src/hooks/*"],
+      "components/*": ["./src/components/*"],
+      "providers/*": ["./src/providers/*"]
+    }
+  },
+  "exclude": ["jest.config.ts", "jest.teardown.ts"]
+}

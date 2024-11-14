@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getIronOptions } from '@connect-shared/lib/session/config';
+import { getIronOptions } from '@packages/scoutgame/session/getIronOptions';
 import { isDevEnv } from '@root/config/constants';
 import { sealData } from 'iron-session';
 

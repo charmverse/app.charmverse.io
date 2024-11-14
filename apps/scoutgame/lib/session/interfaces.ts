@@ -1,8 +1,6 @@
-import type { SessionData } from '@connect-shared/lib/session/config';
+import type { SessionData } from '@packages/scoutgame/session/interfaces';
 import type { IronSession } from 'iron-session';
 import type { headers } from 'next/headers';
-
-export { SessionData };
 
 export type RequestContext = {
   session: IronSession<SessionData>;

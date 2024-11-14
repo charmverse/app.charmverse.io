@@ -1,7 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -15,6 +14,11 @@ import {
   Typography,
   Box
 } from '@mui/material';
+import type { SessionUser } from '@packages/scoutgame/session/interfaces';
+import { FormErrors } from '@packages/scoutgame-ui/components/common/FormErrors';
+import { EditableUserProfile } from '@packages/scoutgame-ui/components/common/Profile/EditableUserProfile';
+import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -22,10 +26,6 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-import { EditableUserProfile } from 'components/common/Profile/EditableUserProfile';
-import { useUser } from 'components/layout/UserProvider';
-import { useIsMounted } from 'hooks/useIsMounted';
-import type { SessionUser } from 'lib/session/getUserFromSession';
 import { saveOnboardingDetailsAction } from 'lib/users/saveOnboardingDetailsAction';
 import { saveOnboardingDetailsSchema } from 'lib/users/saveOnboardingDetailsSchema';
 import type { SaveOnboardingDetailsFormValues } from 'lib/users/saveOnboardingDetailsSchema';
