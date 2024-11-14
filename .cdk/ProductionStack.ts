@@ -108,6 +108,32 @@ export class ProductionStack extends Stack {
               namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
               optionName: 'MaxBatchSize',
               value: '3'
+            },
+            // Set scaling trigger to network out. The lower threshold is 0 by default.
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'MeasureName',
+              value: 'NetworkOut'
+            },
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'Statistic',
+              value: 'Average'
+            },
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'Unit',
+              value: 'Bytes'
+            },
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'LowerThreshold',
+              value: '4000000'
+            },
+            {
+              namespace: 'aws:autoscaling:trigger',
+              optionName: 'UpperThreshold',
+              value: '6000000'
             }
           ]
         : []),
