@@ -1,4 +1,4 @@
-import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
+import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Image from 'next/image';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
-import { CommonTableRow } from './CommonTableRow';
+import { CommonTableRow, tableRowSx } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
 
 export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
@@ -42,17 +42,10 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
         </CommonTableRow>
       </TableHead>
       <TableBody>
-        {builders.map((builder, index) => (
-          <CommonTableRow key={builder.path}>
+        {builders.map((builder) => (
+          <TableRow key={builder.path} sx={tableRowSx} component={Link} href={`/u/${builder.path}?tab=builder`}>
             <TableCell sx={{ width: '16.67%' }}>
-              <Stack
-                component={Link}
-                href={`/u/${builder.path}`}
-                alignItems='center'
-                flexDirection='row'
-                gap={1}
-                maxWidth={{ xs: '100px', md: 'initial' }}
-              >
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
                 <Avatar src={builder.avatar} name={builder.displayName} size='small' />
                 <TableCellText noWrap>{builder.displayName}</TableCellText>
               </Stack>
@@ -75,7 +68,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             <TableCell align='center'>
               <TableCellText color='orange.main'>{builder.cards || 0}</TableCellText>
             </TableCell>
-          </CommonTableRow>
+          </TableRow>
         ))}
       </TableBody>
     </Table>
