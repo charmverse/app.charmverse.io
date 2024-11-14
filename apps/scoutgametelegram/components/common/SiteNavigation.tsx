@@ -5,6 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { ClaimIcon } from './Icons/ClaimIcon';
+import { FriendsIcon } from './Icons/FriendsIcon';
+import { QuestsIcon } from './Icons/QuestsIcon';
+import { ScoutIcon } from './Icons/ScoutIcon';
+
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
 })<{ topNav?: boolean }>(({ theme, topNav }) => ({
@@ -42,28 +47,28 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
         label='Quests'
         href='/quests'
         value='quests'
-        icon={<Image src='/images/quests-icon.svg' width={24} height={24} alt='Quests' />}
+        icon={<QuestsIcon active={value === 'quests'} />}
         LinkComponent={Link}
       />
       <BottomNavigationAction
         label='Scout'
         href='/scout'
         value='scout'
-        icon={<Image src='/images/scout-binoculars.svg' width={24} height={24} alt='Scout' />}
+        icon={<ScoutIcon active={value === 'scout'} />}
         LinkComponent={Link}
       />
       <BottomNavigationAction
         label='Claim'
         href='/claim'
         value='claim'
-        icon={<Image src='/images/claim-icon.svg' width={24} height={24} alt='Claim' />}
+        icon={<ClaimIcon active={value === 'claim'} />}
         LinkComponent={Link}
       />
       <BottomNavigationAction
         label='Friends'
         href='/friends'
         value='friends'
-        icon={<Image src='/images/friends-2-icon.svg' width={24} height={24} alt='Friends' />}
+        icon={<FriendsIcon active={value === 'friends'} />}
         LinkComponent={Link}
       />
     </StyledBottomNavigation>
