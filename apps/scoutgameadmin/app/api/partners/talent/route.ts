@@ -15,8 +15,7 @@ const minimumTalentScore = 75;
 export async function GET() {
   const lastWeek = getLastWeek();
   const topBuilders = await getBuildersLeaderboard({
-    week: lastWeek,
-    quantity: 5
+    week: lastWeek
   });
 
   const buildersWithTalent: { wallet: string; score: number; rank: number; builder: Scout }[] = [];
@@ -46,7 +45,7 @@ export async function GET() {
     }
     let foundScore = false;
     for (const wallet of wallets) {
-      const walletScore = !foundScore ? await getWalletScore(wallet.address) : null;
+      const walletScore = !foundScore ? await getWalletScore(wallet.address).catch(() => null) : null;
       if (walletScore && walletScore > minimumTalentScore) {
         const scout = await prisma.scout.findUniqueOrThrow({
           where: {
@@ -56,6 +55,10 @@ export async function GET() {
         buildersWithTalent.push({ wallet: wallet.address, rank: builder.rank, score: walletScore, builder: scout });
         foundScore = true;
       }
+    }
+    // grab the first 5 builders with 'talent'
+    if (buildersWithTalent.length >= 5) {
+      break;
     }
   }
 
