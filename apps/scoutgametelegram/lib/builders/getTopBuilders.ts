@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type TopBuildersSortBy = 'cards' | 'points' | 'price' | 'rank';
 
@@ -26,6 +26,7 @@ export async function getTopBuilders({
   if (sortBy === 'rank') {
     const builders = await prisma.userWeeklyStats.findMany({
       where: {
+        week: getCurrentWeek(),
         user: {
           builderStatus: 'approved'
         }
@@ -77,7 +78,8 @@ export async function getTopBuilders({
         },
         pointsEarnedAsBuilder: {
           gt: 0
-        }
+        },
+        season: currentSeason
       },
       orderBy: {
         pointsEarnedAsBuilder: order
@@ -175,7 +177,8 @@ export async function getTopBuilders({
       where: {
         user: {
           builderStatus: 'approved'
-        }
+        },
+        season: currentSeason
       },
       orderBy: {
         nftsSold: order
