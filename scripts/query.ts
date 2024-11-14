@@ -7,26 +7,9 @@ const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
 async function query() {
-  const w = await prisma.scout.findFirst({ where: { path: 'matt_eth' } });
-  const x = await prisma.githubUser.findFirst({ where: { login: 'mattcasey' } });
+  const w = await prisma.scout.findFirst({ where: { path: 'mattcasey' } });
 
-  console.log(x);
-  await prisma.githubUser.update({
-    where: {
-      id: x.id
-    },
-    data: {
-      builderId: w.id
-    }
-  });
-  await prisma.scout.update({
-    where: {
-      id: w.id
-    },
-    data: {
-      builderStatus: 'applied'
-    }
-  });
+  console.log(w);
 }
 
 query();
