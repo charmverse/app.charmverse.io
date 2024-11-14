@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ commits: 0 });
   }
   try {
-    const commits = await getCommitsByUser({ login, after: afterDate });
+    const commits = await getCommitsByUser({ login, after: afterDate, paginated: true });
     const lastCommit = commits[0];
     const result: GithubUserStats = {
       afterDate: afterDate.toISOString(),

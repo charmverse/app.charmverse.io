@@ -31,7 +31,8 @@ export async function getBuilderActivity({
 }): Promise<BuilderActivities> {
   const commits = await getCommitsByUser({
     login,
-    after
+    after,
+    paginated: true
   });
 
   const pullRequests = await getPullRequestsByUser({
