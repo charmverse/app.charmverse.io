@@ -65,7 +65,7 @@ export function TopScoutsTable({ scouts, order, sort }: { scouts: TopScoutInfo[]
               </Stack>
             </TableCell>
             <TableCell align='center'>
-              <TableCellText>{scout.rank === -1 ? '-' : scout.rank}</TableCellText>
+              <TableCellText>{scout.rank === 0 ? '-' : scout.rank}</TableCellText>
             </TableCell>
             <TableCell align='right' sx={{ display: 'table-cell' }}>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>

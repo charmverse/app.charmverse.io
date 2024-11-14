@@ -23,6 +23,29 @@ export async function getTopScouts({
   sortBy?: TopScoutsSortBy;
   order?: 'asc' | 'desc';
 }) {
+  // First get all users sorted by points to establish ranks
+  const allUsers = await prisma.userSeasonStats.findMany({
+    where: {
+      pointsEarnedAsScout: {
+        gt: 0
+      },
+      season: currentSeason
+    },
+    orderBy: {
+      pointsEarnedAsScout: 'desc'
+    },
+    select: {
+      user: {
+        select: {
+          path: true
+        }
+      }
+    }
+  });
+
+  // Create a map of user path to their rank
+  const rankMap = new Map(allUsers.map((user, index) => [user.user.path, index + 1]));
+
   if (sortBy === 'points' || sortBy === 'rank') {
     const scouts = await prisma.userSeasonStats.findMany({
       where: {
@@ -50,11 +73,12 @@ export async function getTopScouts({
         pointsEarnedAsScout: true
       }
     });
-    return scouts.map((scout, index) => ({
+
+    return scouts.map((scout) => ({
       path: scout.user.path,
       avatar: scout.user.avatar as string,
       displayName: scout.user.displayName,
-      rank: index + 1,
+      rank: rankMap.get(scout.user.path) || 0,
       points: scout.pointsEarnedAsScout || 0,
       cards: scout.nftsPurchased || 0,
       builders: scout.user.nftPurchaseEvents.length
@@ -62,7 +86,10 @@ export async function getTopScouts({
   } else if (sortBy === 'cards' || sortBy === 'builders') {
     const builders = await prisma.userSeasonStats.findMany({
       where: {
-        season: currentSeason
+        season: currentSeason,
+        pointsEarnedAsScout: {
+          gt: 0
+        }
       },
       orderBy: {
         nftsPurchased: order
@@ -84,11 +111,11 @@ export async function getTopScouts({
       }
     });
 
-    const sortedBuilders = builders.map((builder, index) => ({
+    const sortedBuilders = builders.map((builder) => ({
       path: builder.user.path,
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
-      rank: index + 1,
+      rank: rankMap.get(builder.user.path) || 0,
       points: builder.pointsEarnedAsScout || 0,
       cards: builder.nftsPurchased || 0,
       builders: builder.user.nftPurchaseEvents.length
@@ -108,6 +135,5 @@ export async function getTopScouts({
   }
 
   log.error(`Invalid sortBy provided: ${sortBy}`);
-
   return [];
 }
