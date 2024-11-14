@@ -110,12 +110,11 @@ export async function getTopBuilders({
         pointsEarnedAsBuilder: true
       }
     });
-
     return builders.map((builder) => ({
       path: builder.user.path,
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
-      rank: builder.user.userWeeklyStats[0].rank || -1,
+      rank: builder.user.userWeeklyStats[0]?.rank || -1,
       price: builder.user.builderNfts[0].currentPrice,
       points: builder.pointsEarnedAsBuilder || 0,
       cards: builder.nftsSold || 0
@@ -167,7 +166,7 @@ export async function getTopBuilders({
       path: builder.builder.path,
       avatar: builder.builder.avatar as string,
       displayName: builder.builder.displayName,
-      rank: builder.builder.userWeeklyStats[0].rank || -1,
+      rank: builder.builder.userWeeklyStats[0]?.rank || -1,
       price: builder.currentPrice,
       points: builder.builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       cards: builder.builder.userSeasonStats[0]?.nftsSold || 0
@@ -211,7 +210,7 @@ export async function getTopBuilders({
       path: builder.user.path,
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
-      rank: builder.user.userWeeklyStats[0].rank || -1,
+      rank: builder.user.userWeeklyStats[0]?.rank || -1,
       price: builder.user.builderNfts[0].currentPrice,
       points: builder.pointsEarnedAsBuilder || 0,
       cards: builder.nftsSold || 0

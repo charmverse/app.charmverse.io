@@ -1,10 +1,8 @@
 import { ScoutPage } from 'components/scout/ScoutPage';
 
-export default async function Scout({
-  searchParams
-}: {
-  searchParams: { [key: string]: string | string[] | undefined };
-}) {
+export default async function Scout({ searchParams }: { searchParams: { tab: string; order: string; sort: string } }) {
   const tab = searchParams.tab as string;
-  return <ScoutPage tab={tab || 'builders'} />;
+  const order = searchParams.order || 'asc';
+  const sort = searchParams.sort || 'rank';
+  return <ScoutPage tab={tab || 'builders'} order={order} sort={sort} />;
 }

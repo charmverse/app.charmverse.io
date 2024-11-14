@@ -9,7 +9,15 @@ import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 import { CommonTableRow, tableRowSx } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
 
-export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
+export function TopBuildersTable({
+  builders,
+  order,
+  sort
+}: {
+  builders: TopBuilderInfo[];
+  order: string;
+  sort: string;
+}) {
   return (
     <Table
       aria-label='Top scouts table'
@@ -23,21 +31,35 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
             BUILDER
           </TableCell>
           <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            RANK
+            <Link href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'rank' ? 'asc' : 'desc'}&sort=rank`}>
+              RANK
+            </Link>
           </TableCell>
           <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            PRICE
+            <Link
+              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'price' ? 'asc' : 'desc'}&sort=price`}
+            >
+              PRICE
+            </Link>
           </TableCell>
           <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              POINTS
+              <Link
+                href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'points' ? 'asc' : 'desc'}&sort=points`}
+              >
+                POINTS
+              </Link>
             </Stack>
           </TableCell>
           <TableCell
             align='center'
             sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
           >
-            CARDS
+            <Link
+              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'cards' ? 'asc' : 'desc'}&sort=cards`}
+            >
+              CARDS
+            </Link>
           </TableCell>
         </CommonTableRow>
       </TableHead>
@@ -51,7 +73,7 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
               </Stack>
             </TableCell>
             <TableCell align='center'>
-              <TableCellText>{builder.rank}</TableCellText>
+              <TableCellText>{builder.rank === -1 ? '-' : builder.rank}</TableCellText>
             </TableCell>
             <TableCell align='center'>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>

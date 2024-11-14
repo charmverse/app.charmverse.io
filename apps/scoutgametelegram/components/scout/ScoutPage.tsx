@@ -8,7 +8,7 @@ import { Suspense } from 'react';
 import { scoutTabs, ScoutTabsMenu } from './ScoutPageTable/components/ScoutTabsMenu';
 import { ScoutPageTable } from './ScoutPageTable/ScoutPageTable';
 
-export function ScoutPage({ tab }: { tab: string }) {
+export function ScoutPage({ tab, order, sort }: { tab: string; order: string; sort: string }) {
   const currentTab = scoutTabs.some((t) => t.value === tab) ? tab : 'builders';
 
   return (
@@ -30,7 +30,7 @@ export function ScoutPage({ tab }: { tab: string }) {
         <ScoutTabsMenu tab={currentTab} />
       </Box>
       <Suspense key={currentTab} fallback={<LoadingTable />}>
-        <ScoutPageTable tab={currentTab} />
+        <ScoutPageTable tab={currentTab} order={order} sort={sort} />
       </Suspense>
     </Stack>
   );
