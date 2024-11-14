@@ -26,7 +26,7 @@ jest.unstable_mockModule('../github/getPullRequestsByUser', () => ({
 jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
   getRecentPullRequestsByUser: jest.fn()
 }));
-const { getRecentPullRequestsByUser } = await import('../github/getRecentPullRequestsByUser');
+const { getRecentPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
 
 const { getCommitsByUser } = await import('@packages/github/getCommitsByUser');
 const { getPullRequestsByUser } = await import('../github/getPullRequestsByUser');

@@ -21,7 +21,7 @@ jest.unstable_mockModule('../github/getRecentPullRequestsByUser', () => ({
 }));
 
 const { recordMergedPullRequest } = await import('../recordMergedPullRequest');
-const { getRecentPullRequestsByUser } = await import('../github/getRecentPullRequestsByUser');
+const { getRecentPullRequestsByUser } = await import('../github/getRecentMergedPullRequestsByUser');
 
 describe('recordMergedPullRequest', () => {
   beforeEach(() => {

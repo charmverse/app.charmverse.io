@@ -48,7 +48,7 @@ const getPrsByUser = `
 `;
 
 // get the latest pull requests by a user
-export async function getRecentPullRequestsByUser({
+export async function getRecentMergedPullRequestsByUser({
   repoNameWithOwner,
   defaultBranch,
   username
@@ -62,7 +62,8 @@ export async function getRecentPullRequestsByUser({
     search: { edges: EdgeNode<PullRequestByUser>[] };
   }>({
     query: getPrsByUser,
-    filterQuery: `repo:${repoNameWithOwner} is:pr author:${username}`
+    // only include merged PRs, since a closed PR  shouldnt be considered as your first event
+    filterQuery: `repo:${repoNameWithOwner} is:pr author:${username} is:merged`
   });
   return response.search.edges.map((edge) => edge.node).filter((pr) => pr.baseRefName === defaultBranch);
 }
