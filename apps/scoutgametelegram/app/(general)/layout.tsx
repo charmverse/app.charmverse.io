@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 
 import { Header } from 'components/common/Header';
-import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
+import { GeneralBackgroundImage } from 'components/layout/GeneralBackgroundImage';
 import { StickyFooter } from 'components/layout/StickyFooter';
 
 export default function Layout({
@@ -11,9 +11,9 @@ export default function Layout({
 }>) {
   return (
     <>
-      <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto' }}>
-        <Header />
-        <InfoBackgroundImage />
+      <Header />
+      <Box sx={{ minHeight: 'calc(100vh - 107px)', overflow: 'auto' }} component='main'>
+        <GeneralBackgroundImage />
         {children}
       </Box>
       <StickyFooter />

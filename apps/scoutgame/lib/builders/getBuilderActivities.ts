@@ -1,10 +1,10 @@
 import type { GemsReceiptType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
+import { BasicUserInfoSelect } from '@packages/scoutgame/users/queries';
 import { isTruthy } from '@root/lib/utils/types';
 
 import type { BasicUserInfo } from 'lib/users/interfaces';
-import { BasicUserInfoSelect } from 'lib/users/queries';
 
 export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 

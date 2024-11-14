@@ -18,6 +18,7 @@
     "./strings": "./src/strings.ts",
     "./uuid": "./src/uuid.ts",
     "./constants": "./src/constants.ts",
-    "./url": "./src/url.ts"
+    "./url": "./src/url.ts",
+    "./cuid": "./src/cuid.ts"
   }
 }

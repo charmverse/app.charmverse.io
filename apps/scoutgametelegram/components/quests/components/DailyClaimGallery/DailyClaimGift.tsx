@@ -6,8 +6,8 @@ export function DailyClaimGift({
   variant = 'primary',
   size = 64
 }: {
-  variant: 'disabled' | 'primary' | 'secondary';
-  size: number;
+  variant?: 'disabled' | 'primary' | 'secondary';
+  size?: number;
 }) {
   const primaryColor = brandColor;
   const secondaryColor = secondaryDarkText;

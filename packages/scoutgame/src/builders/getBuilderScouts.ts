@@ -1,9 +1,8 @@
 import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
+import { BasicUserInfoSelect } from '@packages/scoutgame/users/queries';
 import { isTruthy } from '@packages/utils/types';
-
-import { BasicUserInfoSelect } from '../scouts/queries';
 
 type ScoutInfo = Pick<Scout, 'id' | 'path' | 'avatar' | 'displayName'> & {
   nfts: number;

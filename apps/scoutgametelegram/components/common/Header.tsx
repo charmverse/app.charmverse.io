@@ -9,7 +9,7 @@ export function Header() {
   const { user } = useUser();
 
   return (
-    <Stack position='static' flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1}>
+    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1} component='header'>
       <Image
         src='/images/scout-game-logo.png'
         width={77.77}

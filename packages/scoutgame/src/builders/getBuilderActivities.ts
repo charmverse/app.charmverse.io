@@ -1,6 +1,6 @@
 import type { GemsReceiptType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { BasicUserInfoSelect } from '@packages/scoutgame/scouts/queries';
+import { BasicUserInfoSelect } from '@packages/scoutgame/users/queries';
 import { isTruthy } from '@packages/utils/types';
 
 type NftPurchaseActivity = {

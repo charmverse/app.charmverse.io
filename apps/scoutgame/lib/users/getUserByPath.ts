@@ -1,10 +1,10 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
+import { BasicUserInfoSelect } from '@packages/scoutgame/users/queries';
 import { cache } from 'react';
 
 import type { BasicUserInfo } from './interfaces';
-import { BasicUserInfoSelect } from './queries';
 
 async function _getUserByPath(path: string): Promise<
   | (BasicUserInfo & {
