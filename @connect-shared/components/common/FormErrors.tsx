@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Stack, Typography } from '@mui/material';
 
 export function FormErrors({ errors }: { errors?: string[] | null }) {
   if (!errors?.length) {

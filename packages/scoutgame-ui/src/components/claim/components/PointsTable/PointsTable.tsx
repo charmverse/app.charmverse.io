@@ -1,7 +1,6 @@
 'use client';
 
-import { Paper, Table, TableCell, TableRow, Typography } from '@mui/material';
-import { Stack } from '@mui/system';
+import { Paper, Stack, Table, TableCell, TableRow, Typography } from '@mui/material';
 import type { PointsReceiptReward } from '@packages/scoutgame/points/getPointsReceiptsRewards';
 import type { ReactNode } from 'react';
 

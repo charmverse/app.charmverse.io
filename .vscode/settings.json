@@ -39,4 +39,10 @@
       "source.fixAll.eslint": "explicit"
     }
   },
+  "javascript.preferences.autoImportFileExcludePatterns": [
+    "**/node_modules/@mui/system/*"
+  ],
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "**/node_modules/@mui/system/*"
+  ],
 }

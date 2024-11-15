@@ -1,6 +1,6 @@
 'use client';
 
-import { Stack } from '@mui/system';
+import { Stack } from '@mui/material';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useState } from 'react';
 
