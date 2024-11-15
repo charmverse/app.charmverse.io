@@ -1,4 +1,4 @@
-import 'server-only';
+'use server';
 
 import { aggregateProtocolData } from 'lib/contract/aggregateProtocolData';
 import { getUserFromSession } from 'lib/session/getUserFromSession';
