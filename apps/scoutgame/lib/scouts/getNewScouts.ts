@@ -40,6 +40,9 @@ export async function getNewScouts({ limit }: { limit: number }): Promise<NewSco
         nftPurchaseEvents: {
           where: {
             builderNFT: {
+              builder: {
+                builderStatus: 'approved'
+              },
               season: currentSeason
             }
           },
