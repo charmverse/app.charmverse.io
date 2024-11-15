@@ -13,7 +13,7 @@ import { SeasonOneDashboard } from './SeasonOneDashboard';
 export function ContractHome({ seasonOne, protocol }: { seasonOne: BuilderNFTContractData; protocol: ProtocolData }) {
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleChange = (e: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
 
