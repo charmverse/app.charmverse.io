@@ -1,8 +1,10 @@
 import { PUT } from '@packages/utils/http';
 import { v4 as uuid } from 'uuid';
 
+// API Key requires special privileges to use this method
+const warpcastApiKey = process.env.WARPCAST_API_KEY;
+
 // Docs: https://warpcast.notion.site/Direct-Cast-API-Reference-Public-1276a6c0c1018089af2bda0d1697a2fd
-// API Key requires special privileges to use.
 
 // Sends a message to a group chat, conversation or recipient depending on which id is provided.
 // limit: Max 5,000 messages per caller per day.
@@ -24,7 +26,7 @@ export function sendDirectCast(params: {
     },
     {
       headers: {
-        Authorization: `Bearer ${process.env.WARPCAST_API_KEY}`,
+        Authorization: `Bearer ${warpcastApiKey}`,
         // allows idempotent retries
         'idempotency-key': uuid()
       }
