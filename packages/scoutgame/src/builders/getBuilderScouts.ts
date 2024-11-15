@@ -1,11 +1,12 @@
-import type { Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
 
-import { BasicUserInfoSelect } from '../scouts/queries';
+import { currentSeason } from '../dates';
+import type { BasicUserInfo } from '../users/interfaces';
+import { BasicUserInfoSelect } from '../users/queries';
 
-type ScoutInfo = Pick<Scout, 'id' | 'path' | 'avatar' | 'displayName'> & {
+export type ScoutInfo = BasicUserInfo & {
+  displayName: string;
   nfts: number;
 };
 

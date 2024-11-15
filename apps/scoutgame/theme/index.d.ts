@@ -1,3 +1,4 @@
+// need to re declare these types because exporting them from @packages/scoutgame-ui doesn't work
 import type {
   PaletteOptions as MuiPaletteOptions,
   PaletteColorOptions as MuiPaletteColorOptions,

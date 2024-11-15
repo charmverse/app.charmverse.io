@@ -1,8 +1,8 @@
 'use client';
 
-import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { Link, Typography } from '@mui/material';
+import { useTrackEvent } from '@packages/scoutgame-ui/hooks/useTrackEvent';
 
 import { getAuthConfig } from 'lib/farcaster/config';
 

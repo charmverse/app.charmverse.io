@@ -1,9 +1,9 @@
 import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
+import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
+import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { Avatar } from 'components/common/Avatar';
-import { PointsIcon } from 'components/common/Icons';
 import type { TopScout } from 'lib/scouts/getTopScouts';
 
 import { CommonTableRow } from './CommonTableRow';
@@ -59,13 +59,13 @@ export function TopScoutsTable({ scouts }: { scouts: TopScout[] }) {
             <TableCell align='right'>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                 <TableCellText color='green.main'>{scout.seasonPoints || 0}</TableCellText>
-                <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
+                <PointsIcon color='green' size={15} />
               </Stack>
             </TableCell>
             <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               <Stack alignItems='center' flexDirection='row' gap={1} justifyContent='flex-end'>
                 <TableCellText color='green.main'>{scout.allTimePoints || 0}</TableCellText>
-                <Image width={15} height={15} src='/images/profile/scout-game-green-icon.svg' alt='season icon ' />
+                <PointsIcon color='green' size={15} />
               </Stack>
             </TableCell>
             <TableCell align='center'>

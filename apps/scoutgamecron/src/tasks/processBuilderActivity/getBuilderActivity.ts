@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { Commit } from '@packages/github/getCommitsByUser';
+import { getCommitsByUser } from '@packages/github/getCommitsByUser';
 import { uniqBy } from 'lodash-es';
 
-import type { Commit } from './github/getCommitsByUser';
-import { getCommitsByUser } from './github/getCommitsByUser';
 import type { PullRequest } from './github/getPullRequestsByUser';
 import { getPullRequestsByUser } from './github/getPullRequestsByUser';
 
@@ -31,7 +31,8 @@ export async function getBuilderActivity({
 }): Promise<BuilderActivities> {
   const commits = await getCommitsByUser({
     login,
-    after
+    after,
+    paginated: true
   });
 
   const pullRequests = await getPullRequestsByUser({

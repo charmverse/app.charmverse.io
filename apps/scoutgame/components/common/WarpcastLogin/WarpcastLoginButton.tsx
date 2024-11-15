@@ -1,17 +1,17 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
 import { useProfile } from '@farcaster/auth-kit';
 import type { StatusAPIResponse, AuthClientError } from '@farcaster/auth-kit';
 import { Box, Button, Stack, Typography } from '@mui/material';
+import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
+import { LoadingComponent } from '@packages/scoutgame-ui/components/common/Loading/LoadingComponent';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 
-import { LoadingComponent } from 'components/common/Loading/LoadingComponent';
-import { useUser } from 'components/layout/UserProvider';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { loginWithFarcasterAction } from 'lib/session/loginWithFarcasterAction';
 

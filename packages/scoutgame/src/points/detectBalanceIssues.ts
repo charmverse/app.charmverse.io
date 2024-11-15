@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getPointStatsFromHistory } from '@packages/scoutgame/points/getPointStatsFromHistory';
+
+import { getPointStatsFromHistory } from '../points/getPointStatsFromHistory';
 
 export async function detectBalanceIssues() {
   const scouts = await prisma.scout.findMany({

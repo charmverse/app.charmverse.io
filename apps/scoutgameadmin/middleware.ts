@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
 
   // We don't have a '/' page anymore since we need to handle 2 different layouts
   if (path === '/') {
-    return NextResponse.redirect(new URL('/repos', request.url));
+    return NextResponse.redirect(new URL('/users', request.url));
   }
 
   return NextResponse.next();

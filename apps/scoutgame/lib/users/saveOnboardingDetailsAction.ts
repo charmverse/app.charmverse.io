@@ -1,10 +1,9 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
+import { authActionClient } from '@packages/scoutgame/actions/actionClient';
+import { generateUserPath } from '@packages/scoutgame/users/generateUserPath';
 
-import { authActionClient } from 'lib/actions/actionClient';
-
-import { generateUserPath } from './generateUserPath';
 import { saveOnboardingDetailsSchema } from './saveOnboardingDetailsSchema';
 
 export const saveOnboardingDetailsAction = authActionClient

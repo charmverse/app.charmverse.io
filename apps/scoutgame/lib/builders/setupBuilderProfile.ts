@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { approveBuilder } from '@packages/scoutgame/builders/approveBuilder';
+import { authSecret } from '@packages/utils/constants';
 import { GET as httpGET, POST as httpPOST } from '@root/adapters/http';
-import { authSecret } from '@root/config/constants';
 import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } from '@root/lib/github/constants';
 import { unsealData } from 'iron-session';
 

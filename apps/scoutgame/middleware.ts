@@ -1,8 +1,9 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { getSession } from '@packages/scoutgame/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 const privateLinks = ['/profile', '/notifications', '/welcome', '/claim'];
+
 export async function middleware(request: NextRequest) {
   const session = await getSession();
   const isLoggedIn = !!session.scoutId;

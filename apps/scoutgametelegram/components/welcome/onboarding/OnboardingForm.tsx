@@ -15,6 +15,8 @@ import {
   Typography,
   Box
 } from '@mui/material';
+import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -23,8 +25,6 @@ import { useState } from 'react';
 import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
-import { useUser } from 'components/layout/UserProvider';
-import { useIsMounted } from 'hooks/useIsMounted';
 import { saveOnboardingDetailsAction } from 'lib/onboarding/saveOnboardingDetailsAction';
 import type { SaveOnboardingDetailsFormValues } from 'lib/onboarding/saveOnboardingDetailsSchema';
 import { saveOnboardingDetailsSchema } from 'lib/onboarding/saveOnboardingDetailsSchema';

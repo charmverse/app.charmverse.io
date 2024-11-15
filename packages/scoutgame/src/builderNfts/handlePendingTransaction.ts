@@ -9,7 +9,8 @@ import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
-import { currentSeason } from '@packages/scoutgame/dates';
+
+import { currentSeason } from '../dates';
 
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';

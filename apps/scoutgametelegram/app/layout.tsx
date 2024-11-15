@@ -1,11 +1,12 @@
+import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import type { Metadata, Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 import { AppProviders } from 'components/layout/AppProviders';
+
 import 'theme/styles.scss';
-import { getCachedUserFromSession as getUserFromSession } from 'lib/session/getUserFromSession';
 
 const ClientGlobals = dynamic(() => import('components/common/ClientGlobals').then((comp) => comp.ClientGlobals), {
   ssr: false

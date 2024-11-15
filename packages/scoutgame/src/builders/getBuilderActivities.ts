@@ -1,7 +1,11 @@
 import type { GemsReceiptType, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { BasicUserInfoSelect } from '@packages/scoutgame/scouts/queries';
 import { isTruthy } from '@packages/utils/types';
+
+import type { BonusPartner } from '../bonus';
+import { BasicUserInfoSelect } from '../users/queries';
+
+export type BuilderActivityType = 'nft_purchase' | 'merged_pull_request';
 
 type NftPurchaseActivity = {
   type: 'nft_purchase';
@@ -17,7 +21,7 @@ type MergedPullRequestActivity = {
   gems: number;
   repo: string;
   url: string;
-  bonusPartner: string | null;
+  bonusPartner: BonusPartner | null;
 };
 
 export type BuilderActivity = Pick<Scout, 'id' | 'createdAt' | 'displayName' | 'path' | 'avatar' | 'bio'> & {
@@ -113,7 +117,7 @@ export async function getBuilderActivities({
           gems: event.gemsReceipt.value,
           repo: `${event.githubEvent.repo.owner}/${event.githubEvent.repo.name}`,
           url: event.githubEvent.url,
-          bonusPartner: event.bonusPartner
+          bonusPartner: event.bonusPartner as BonusPartner | null
         };
       } else {
         return null;
