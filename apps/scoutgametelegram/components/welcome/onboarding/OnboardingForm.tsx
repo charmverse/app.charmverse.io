@@ -1,7 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Button,
@@ -15,6 +14,7 @@ import {
   Typography,
   Box
 } from '@mui/material';
+import { FormErrors } from '@packages/scoutgame-ui/components/common/FormErrors';
 import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
