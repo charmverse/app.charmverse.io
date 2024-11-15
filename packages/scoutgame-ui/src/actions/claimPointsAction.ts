@@ -10,11 +10,11 @@ import { createUserClaimScreen } from './createUserClaimScreen';
 // This action needs to be in the scoutgame-ui package because it uses the createUserClaimScreen function which imports components from the scoutgame-ui package
 export const claimPointsAction = authActionClient.metadata({ actionName: 'claim_points' }).action(async ({ ctx }) => {
   const userId = ctx.session.scoutId;
-  const result = await claimPoints({ userId });
   // Skip generating claim screen in test environment
   if (!isTestEnv) {
     await createUserClaimScreen(userId);
   }
+  const result = await claimPoints({ userId });
   revalidatePath('/profile');
   revalidatePath('/claim');
   return { success: true, claimedPoints: result.total };

@@ -20,13 +20,17 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
     <Box sx={sx}>
       <Tabs
         value={tabValue}
-        aria-label='scout game nav tabs'
         role='navigation'
         variant='scrollable'
         scrollButtons='auto'
+        // allow scroll buttons on mobile
+        // allowScrollButtonsMobile
         sx={{
           [`& .${tabsClasses.flexContainer}`]: {
-            justifyContent: 'center'
+            justifyContent: {
+              xs: 'flex-start',
+              sm: 'center'
+            }
           },
           [`& .${tabsClasses.indicator}`]: {
             bottom: {
@@ -38,6 +42,10 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
           [`& .${tabClasses.root}`]: {
             borderBottom: '1px solid',
             borderColor: 'var(--mui-palette-divider)'
+          },
+          [`& .${tabsClasses.scrollButtons}`]: {
+            width: '40px',
+            height: '40px'
           }
         }}
       >
