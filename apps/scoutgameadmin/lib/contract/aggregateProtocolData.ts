@@ -36,6 +36,10 @@ export type ProtocolData = {
 };
 
 export async function aggregateProtocolData({ userId }: { userId?: string }): Promise<ProtocolData> {
+  if (!getScoutProtocolAddress()) {
+    throw new Error('REACT_APP_SCOUTPROTOCOL_CONTRACT_ADDRESS is not set');
+  }
+
   const [implementation, admin, claimsManager] = await Promise.all([
     protocolProxyReadonlyApiClient.implementation(),
     protocolProxyReadonlyApiClient.admin(),
