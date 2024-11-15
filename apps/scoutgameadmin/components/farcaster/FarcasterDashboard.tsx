@@ -34,7 +34,7 @@ export function FarcasterDashboard() {
       .split(/[\s,]+/)
       .map((recipient) => recipient.trim())
       .filter(Boolean);
-    const _result = await sendMessages({ message: data.messageContent, recipients });
+    await sendMessages({ message: data.messageContent, recipients });
   };
   return (
     <Container maxWidth='xl'>
@@ -91,8 +91,8 @@ export function FarcasterDashboard() {
                     </Typography>
                   )}
                   {isSuccessResponse(result.data) && (
-                    <Typography variant='subtitle1' color='error'>
-                      Message sent successfully
+                    <Typography variant='subtitle1' color='success'>
+                      {result.data.sent} message(s) sent successfully
                     </Typography>
                   )}
                 </Box>

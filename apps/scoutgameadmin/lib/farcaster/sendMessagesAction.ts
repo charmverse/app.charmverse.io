@@ -9,6 +9,7 @@ import { authActionClient } from 'lib/actions/actionClient';
 
 export type SuccessResponse = {
   type: 'success';
+  sent: number;
 };
 
 export type InvalidInputResponse = {
@@ -70,7 +71,7 @@ export const sendMessagesAction = authActionClient
         error: (error as Error).message || (error as any).errors?.[0].message || error
       };
     }
-    return { type: 'success' };
+    return { sent: sentRecipients.length, type: 'success' };
   });
 
 async function getFarcasterFid(recipient: string) {
