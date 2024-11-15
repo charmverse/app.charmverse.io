@@ -1,8 +1,8 @@
 import 'server-only';
 
 import { Typography, Stack } from '@mui/material';
-import { getScoutedBuilders } from '@packages/scoutgame/scouts/getScoutedBuilders';
-import { getUserSeasonStats } from '@packages/scoutgame/scouts/getUserSeasonStats';
+import { getScoutedBuilders } from '@packages/scoutgame/users/getScoutedBuilders';
+import { getUserSeasonStats } from '@packages/scoutgame/users/getUserSeasonStats';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { ErrorSSRMessage } from '../../../common/ErrorSSRMessage';
