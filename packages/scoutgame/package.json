@@ -18,5 +18,8 @@
     "@packages/farcaster": "^0.0.0",
     "@packages/github": "^0.0.0",
     "@packages/utils": "^1.0.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.33.5"
   }
 }
