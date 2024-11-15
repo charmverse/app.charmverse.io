@@ -31,7 +31,8 @@ export const loadUser = actionClient
 
     const user = await findOrCreateTelegramUser({
       ...validatedData.user,
-      photo_url: avatar ?? undefined
+      photo_url: avatar ?? undefined,
+      start_param: validatedData?.start_param
     });
 
     session.scoutId = user?.id;
