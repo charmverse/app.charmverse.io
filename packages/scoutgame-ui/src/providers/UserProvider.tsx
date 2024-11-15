@@ -2,7 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
-import { usePathname, redirect } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 
@@ -20,6 +20,7 @@ const agreeToTermsPaths = ['/welcome', '/info'];
 
 export function UserProvider({ children, userSession }: { children: ReactNode; userSession: SessionUser | null }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { data: user = userSession, mutate: mutateUser, isLoading, isValidating } = useGetUser();
   const refreshUser = useCallback(
     async (_user?: SessionUser | null) => {
@@ -31,7 +32,7 @@ export function UserProvider({ children, userSession }: { children: ReactNode; u
   useEffect(() => {
     if (user && !user?.agreedToTermsAt && !agreeToTermsPaths.some((path) => pathname.startsWith(path))) {
       log.debug('Redirect user to agree to terms page', { pathname });
-      redirect('/welcome');
+      router.push('/welcome');
     }
   }, [user, pathname]);
 
