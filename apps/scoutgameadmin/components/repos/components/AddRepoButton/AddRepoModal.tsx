@@ -54,7 +54,7 @@ export function AddRepoModal({ open, onClose, onAdd }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
-      <DialogTitle>Add new repos by owner</DialogTitle>
+      <DialogTitle>Add repos by owner</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <TextField
