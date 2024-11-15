@@ -1,7 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { rewardPoints } from '@packages/scoutgame/constants';
-
-import type { SessionUser } from 'lib/session/interfaces';
+import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 
 export function Stats({ friends }: { friends: SessionUser[] }) {
   const friendsJoined = friends.length;

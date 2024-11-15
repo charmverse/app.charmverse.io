@@ -1,6 +1,5 @@
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
-
-import type { SessionUser } from 'lib/session/interfaces';
+import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 
 import { Avatar } from '../../common/Avatar';
 

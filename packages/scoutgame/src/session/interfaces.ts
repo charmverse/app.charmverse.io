@@ -18,4 +18,5 @@ export type SessionUser = Pick<
   | 'onboardedAt'
   | 'agreedToTermsAt'
   | 'bio'
+  | 'referralCode'
 >;
