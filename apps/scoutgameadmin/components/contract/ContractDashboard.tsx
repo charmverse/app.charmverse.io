@@ -1,11 +1,7 @@
-'use client';
-
 import { Tabs, Tab, Box, Container } from '@mui/material';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import { WagmiProvider } from 'components/providers/wagmi/WagmiProvider';
-import type { ProtocolData } from 'lib/contract/aggregateProtocolData';
 import type { BuilderNFTContractData } from 'lib/contract/getContractData';
 
 import { ProtocolContract } from './ProtocolContract';
