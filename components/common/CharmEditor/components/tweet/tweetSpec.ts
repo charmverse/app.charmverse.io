@@ -33,7 +33,7 @@ export function spec(): RawSpecs {
         const { screenName, id } = node.attrs as TweetNodeAttrs;
 
         if (screenName && id) {
-          const toRender = `Embedded Twitter Url: https://twitter.com/${screenName}/status/${id}`;
+          const toRender = `Embedded Twitter Url: https://x.com/${screenName}/status/${id}`;
 
           // Ensure markdown html will be separated by newlines
           state.ensureNewLine();

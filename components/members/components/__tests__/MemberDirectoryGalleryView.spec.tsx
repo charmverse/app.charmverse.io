@@ -190,7 +190,7 @@ const mockMember: Member = {
       discordUsername: 'test-discord',
       githubURL: 'github.com/testuser1',
       linkedinURL: 'linkedin.com/testuser1',
-      twitterURL: 'twitter.com/testuser1'
+      twitterURL: 'x.com/testuser1'
     }
   },
   roles: [],

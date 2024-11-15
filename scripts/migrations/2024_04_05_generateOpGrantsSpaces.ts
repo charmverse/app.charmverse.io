@@ -41,7 +41,7 @@ function extractTwitterUsername(twitterValue: string) {
     return twitterValue.slice(1);
   } else if (twitterValue.startsWith('https://')) {
     const url = new URL(twitterValue);
-    if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
+    if (url.hostname === 'x.com' || url.hostname === 'x.com') {
       const [, username] = url.pathname.split('/');
       return username;
     }

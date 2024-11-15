@@ -16,7 +16,7 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import type { TweetNodeAttrs } from './tweetSpec';
 import { extractTweetAttrs } from './tweetSpec';
 
-export const twitterWidgetJs = 'https://platform.twitter.com/widgets.js';
+export const twitterWidgetJs = 'https://platform.x.com/widgets.js';
 
 type TweetOptions = {
   theme?: 'dark' | 'light';
@@ -26,7 +26,7 @@ declare global {
   interface Window {
     twttr: {
       widgets: {
-        // @ref https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference
+        // @ref https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference
         createTweet: (id: string, el: HTMLElement, options: TweetOptions) => void;
         // createTimeline - we might want this in the future?
       };
@@ -96,7 +96,7 @@ export function TweetNodeView({ deleteNode, readOnly, node, selected, updateAttr
                   updateAttrs(_attrs);
                 }
               }}
-              placeholder='https://twitter.com...'
+              placeholder='https://x.com...'
             />
           </Box>
         </MediaSelectionPopup>

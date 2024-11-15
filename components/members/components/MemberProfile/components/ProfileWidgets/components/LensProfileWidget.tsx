@@ -98,7 +98,7 @@ export function LensProfileWidget({ lensProfile }: { lensProfile: ProfileFragmen
                 return (
                   <LensProfileAttributes
                     key={attribute.key}
-                    href={`https://twitter.com/${attribute.value}`}
+                    href={`https://x.com/${attribute.value}`}
                     icon={<FaXTwitter style={{ color: '#888', height: 20, width: 18 }} />}
                     label={attribute.value}
                   />
