@@ -13,7 +13,7 @@ import { DateTime } from 'luxon';
 
 import { gemsValues } from './config';
 import type { PullRequest } from './github/getPullRequestsByUser';
-import { getRecentPullRequestsByUser } from './github/getRecentPullRequestsByUser';
+import { getRecentMergedPullRequestsByUser } from './github/getRecentMergedPullRequestsByUser';
 
 type RepoInput = Pick<GithubRepo, 'defaultBranch' | 'bonusPartner'>;
 
@@ -111,7 +111,7 @@ export async function recordMergedPullRequest({
   let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !hasFirstMergedPullRequestAlreadyThisWeek;
   if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
-    const prs = await getRecentPullRequestsByUser({
+    const prs = await getRecentMergedPullRequestsByUser({
       defaultBranch: repo.defaultBranch,
       repoNameWithOwner: pullRequest.repository.nameWithOwner,
       username: pullRequest.author.login
