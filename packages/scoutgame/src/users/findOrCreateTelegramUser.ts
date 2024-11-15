@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { uuidFromNumber } from '@packages/utils/uuid';
 
-import { createReferralEvent } from '../referrals/createReferralEvent';
+import { updateReferralUsers } from '../referrals/updateReferralUsers';
 
 import { findOrCreateUser } from './findOrCreateUser';
 import type { FindOrCreateUserResult } from './findOrCreateUser';
@@ -30,10 +30,16 @@ export async function findOrCreateTelegramUser(telegramUser: {
   });
 
   if (user?.isNew && telegramUser.start_param) {
-    await createReferralEvent(telegramUser.start_param, user.id).catch((error) => {
+    const users = await updateReferralUsers(telegramUser.start_param, user.id).catch((error) => {
       // There can be a case where the referrer is not found. Maybe someone will try to guess referral codes to get rewards.
       log.warn('Error creating referral event.', { error, startParam: telegramUser.start_param, referrerId: user.id });
+      return null;
     });
+
+    if (users) {
+      const [, referee] = users;
+      return { ...referee, isNew: true };
+    }
   }
 
   return user;
