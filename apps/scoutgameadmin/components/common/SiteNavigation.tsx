@@ -72,14 +72,5 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.startsWith('/repos')) {
-    return 'repos';
-  } else if (pathname.startsWith('/transactions')) {
-    return 'transactions';
-  } else if (pathname.startsWith('/contract')) {
-    return 'contract';
-  } else if (pathname.startsWith('/users')) {
-    return 'users';
-  }
-  return null;
+  return pathname.split('/')[1].split('?')[0];
 }
