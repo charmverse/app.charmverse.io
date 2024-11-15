@@ -45,7 +45,7 @@ export function MyFriends({ friends }: { friends: SessionUser[] }) {
               <TableCell align='right'>
                 <Stack gap={0.5} flexDirection='row' alignItems='center' justifyContent='right'>
                   <Typography noWrap color='secondary'>
-                    {row.currentBalance}
+                    5
                   </Typography>
                   <img width={20} height={20} src='/images/profile/icons/scout-game-blue-icon.svg' alt='points' />
                 </Stack>

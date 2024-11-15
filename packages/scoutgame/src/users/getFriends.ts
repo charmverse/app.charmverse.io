@@ -13,7 +13,7 @@ export async function getFriends(userId?: string) {
     },
     include: {
       referee: {
-        include: BasicUserInfoSelect
+        select: BasicUserInfoSelect
       }
     }
   });
