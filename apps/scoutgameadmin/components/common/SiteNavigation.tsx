@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { FaGithubAlt } from 'react-icons/fa';
 import { HiOutlineUsers } from 'react-icons/hi2';
 import { MdDocumentScanner } from 'react-icons/md';
+import { SiFarcaster } from 'react-icons/si';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -59,19 +60,17 @@ export function SiteNavigation({ topNav, isAuthenticated = false }: { topNav?: b
         icon={<MdDocumentScanner size='24px' />}
         LinkComponent={Link}
       />
+      <BottomNavigationAction
+        label='Farcaster'
+        href='/farcaster'
+        value='farcaster'
+        icon={<SiFarcaster size='24px' />}
+        LinkComponent={Link}
+      />
     </StyledBottomNavigation>
   );
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.startsWith('/repos')) {
-    return 'repos';
-  } else if (pathname.startsWith('/transactions')) {
-    return 'transactions';
-  } else if (pathname.startsWith('/contract')) {
-    return 'contract';
-  } else if (pathname.startsWith('/users')) {
-    return 'users';
-  }
-  return null;
+  return pathname.split('/')[1].split('?')[0];
 }
