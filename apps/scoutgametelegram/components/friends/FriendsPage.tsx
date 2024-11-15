@@ -1,5 +1,6 @@
 import { Stack } from '@mui/material';
 import { getFriends } from '@packages/scoutgame/users/getFriends';
+import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { getSession } from 'lib/session/getSession';
 
@@ -10,7 +11,7 @@ import { Stats } from './components/Stats';
 
 export async function FriendsPage() {
   const session = await getSession();
-  const friends = await getFriends(session.scoutId);
+  const [, friends = []] = await safeAwaitSSRData(getFriends(session.scoutId));
 
   return (
     <Stack px={1} gap={2} position='relative'>
