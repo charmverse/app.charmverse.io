@@ -1,17 +1,16 @@
 'use client';
 
-import { Button, IconButton, Stack, Tooltip, styled } from '@mui/material';
+import { Button, IconButton, Stack, Tooltip } from '@mui/material';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import WebApp from '@twa-dev/sdk';
 import { useState } from 'react';
 import { LuCopy } from 'react-icons/lu';
-
-import { useUser } from 'components/layout/UserProvider';
 
 export function InviteButtons() {
   const { user } = useUser();
   const [copied, setCopied] = useState('');
   const referral = user?.referralCode;
-  const url = `https://t.me/ScoutGameXYZBot/start?startapp=${referral}`;
+  const url = encodeURIComponent(`https://t.me/ScoutGameXYZBot/start?startapp=${referral}`);
   const text = encodeURIComponent('Play ScoutGame with me!');
 
   const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
