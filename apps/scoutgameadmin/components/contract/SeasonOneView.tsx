@@ -45,7 +45,7 @@ function GridDivider() {
   );
 }
 
-export function SeasonOneDashboard(data: BuilderNFTContractData) {
+export function SeasonOneView(data: BuilderNFTContractData) {
   const itemSizeTwoColumnMd = { xs: 12, md: 6 };
   const itemSizeThreeColumnMd = { xs: 12, md: 4 };
 

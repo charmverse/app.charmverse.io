@@ -64,7 +64,7 @@ function GridDivider() {
   );
 }
 
-export function ProtocolContractDashboard(data: ProtocolData) {
+export function ProtocolContractView(data: ProtocolData) {
   const itemSizeTwoColumnMd = { xs: 12, md: 6 };
   const itemSizeThreeColumnMd = { xs: 12, md: 4 };
 
