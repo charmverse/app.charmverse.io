@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
-import { createCuid } from '@packages/utils/cuid';
+import { randomString } from '@packages/utils/strings';
 
 export async function generateScout({ index }: { index: number }) {
   const firstName = faker.person.firstName();
@@ -26,7 +26,7 @@ export async function generateScout({ index }: { index: number }) {
       email,
       avatar,
       bio: faker.lorem.paragraph(),
-      referralCode: createCuid(),
+      referralCode: randomString(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
       scoutWallet: {

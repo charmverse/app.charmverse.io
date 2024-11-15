@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { log } from '@charmverse/core/log';
 
 import { getFarcasterUserByIds } from '@packages/farcaster/getFarcasterUserById';
-import { createCuid } from '@packages/utils/cuid';
+import { randomString } from '@packages/utils/strings';
 
 const FIDS = [2514];
 
@@ -37,7 +37,7 @@ async function query() {
       data: {
         farcasterId: user.fid,
         path: user.username,
-        referralCode: createCuid(),
+        referralCode: randomString(),
         displayName: user.display_name || user.username,
         avatar: user.pfp_url,
         bio: user.profile.bio.text,

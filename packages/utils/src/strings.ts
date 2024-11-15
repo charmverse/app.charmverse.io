@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { init } from '@paralleldrive/cuid2';
 
 /**
  * Change the first character of a string to uppercase
@@ -50,3 +51,10 @@ export function stringToHue(name: string) {
   const h = hash % 360;
   return h;
 }
+
+/**
+ * Create by default a cuid with length 10
+ */
+export const randomString = init({
+  length: 10
+});

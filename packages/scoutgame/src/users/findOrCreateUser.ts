@@ -9,8 +9,7 @@ import {
   getFilenameWithExtension
 } from '@packages/aws/uploadToS3Server';
 import { getENSName } from '@packages/blockchain/getENSName';
-import { createCuid } from '@packages/utils/cuid';
-import { capitalize } from '@packages/utils/strings';
+import { capitalize, randomString } from '@packages/utils/strings';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 import type { Address } from 'viem';
@@ -153,7 +152,7 @@ export async function findOrCreateUser({
         : undefined,
       farcasterId,
       telegramId,
-      referralCode: createCuid(),
+      referralCode: randomString(),
       currentBalance: points,
       pointsReceived:
         points && tier

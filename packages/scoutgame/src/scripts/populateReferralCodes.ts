@@ -1,4 +1,4 @@
-import { createCuid } from '@packages/utils/cuid';
+import { randomString } from '@packages/utils/strings';
 
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -7,7 +7,7 @@ export async function populateReferralCodes() {
 
   for (const scout of scouts) {
     if (!scout.referralCode) {
-      const referralCode = createCuid();
+      const referralCode = randomString();
 
       await prisma.scout.update({
         where: { id: scout.id },

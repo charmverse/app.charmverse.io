@@ -7,7 +7,7 @@ import { faker } from '@faker-js/faker';
 import { getBuilderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
 import { generateNftImage } from '@packages/scoutgame/builderNfts/artwork/generateNftImage';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { createCuid } from '@packages/utils/cuid';
+import { randomString } from '@packages/utils/strings';
 
 export async function generateBuilder({ index }: { index: number }) {
   const firstName = faker.person.firstName();
@@ -101,7 +101,7 @@ export async function generateBuilder({ index }: { index: number }) {
       bio: faker.lorem.paragraph(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
-      referralCode: createCuid(),
+      referralCode: randomString(),
       scoutWallet: {
         create: {
           address: faker.finance.ethereumAddress()
