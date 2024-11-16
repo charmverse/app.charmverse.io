@@ -12,12 +12,19 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { ScoutsGallery } from '../../../common/Gallery/ScoutsGallery';
+import { JoinGithubButton } from '../../../common/JoinGithubButton';
 
 import { BuilderActivitiesList } from './BuilderActivitiesList';
 import { BuilderStats } from './BuilderStats';
 import { BuilderWeeklyStats } from './BuilderWeeklyStats';
 
-export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) {
+export async function BuilderProfile({
+  builder,
+  hideGithubButton
+}: {
+  builder: BuilderUserInfo;
+  hideGithubButton?: boolean;
+}) {
   const [builderNft, builderStats, builderActivities = [], { scouts = [], totalNftsSold = 0, totalScouts = 0 } = {}] =
     builder.builderStatus === 'approved'
       ? await Promise.all([
@@ -39,13 +46,13 @@ export async function BuilderProfile({ builder }: { builder: BuilderUserInfo }) 
         ])
       : [];
 
-  if (!builder.githubLogin) {
+  if (!builder.githubLogin && !hideGithubButton) {
     return (
       <Stack gap={2} alignItems='center'>
         <Typography>Connect your GitHub account to apply as a Builder.</Typography>
         <Suspense>
           {/* TODO: Re-enable this once we have a way to connect GitHub accounts */}
-          {/* <JoinGithubButton /> */}
+          <JoinGithubButton />
         </Suspense>
       </Stack>
     );

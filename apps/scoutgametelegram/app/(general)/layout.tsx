@@ -11,10 +11,10 @@ export default function Layout({
 }>) {
   return (
     <>
-      <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto' }}>
+      <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto', px: 1 }}>
         <Header />
         <InfoBackgroundImage />
-        {children}
+        <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
       </Box>
       <StickyFooter />
     </>

@@ -12,17 +12,15 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies
 
-  if (isLoggedIn && (path === '/' || path === '/welcome')) {
-    return NextResponse.redirect(new URL('/quests', request.url));
-  }
-
-  // We don't have a '/' page anymore since we need to handle 2 different layouts
-  if (path === '/') {
+  // User flow
+  // lands on /, redirect to /welcome if logged in, otherwise stay on / (this should ideally never happen)
+  // on /welcome, redirect to /quests if onboarded, otherwise stay on /welcome
+  if (isLoggedIn && path === '/') {
     return NextResponse.redirect(new URL('/welcome', request.url));
   }
 
-  if (!isLoggedIn && path !== '/welcome') {
-    return NextResponse.redirect(new URL('/welcome', request.url));
+  if (!isLoggedIn && path !== '/') {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return response;

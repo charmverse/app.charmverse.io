@@ -1,8 +1,7 @@
 'use server';
 
+import { authActionClient } from '@packages/scoutgame/actions/actionClient';
 import { revalidatePath } from 'next/cache';
-
-import { authActionClient } from 'lib/actions/actionClient';
 
 import { claimDailyReward } from './claimDailyReward';
 import { claimDailyRewardSchema } from './claimDailyRewardSchema';

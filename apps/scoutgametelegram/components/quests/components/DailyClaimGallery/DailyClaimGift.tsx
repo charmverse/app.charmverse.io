@@ -1,6 +1,5 @@
 import { SvgIcon } from '@mui/material';
-
-import { brandColor, disabledTextColorDarkMode, secondaryDarkText } from 'theme/colors';
+import { brandColor, disabledTextColorDarkMode, secondaryDarkText } from '@packages/scoutgame-ui/theme/colors';
 
 export function DailyClaimGift({
   variant = 'primary',
