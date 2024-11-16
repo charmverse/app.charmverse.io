@@ -1,6 +1,5 @@
+import { WagmiProvider } from '@packages/scoutgame-ui/providers/WagmiProvider';
 import { headers } from 'next/headers';
-
-import { WagmiProvider } from './WagmiProvider';
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   return (

@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
+import { createContext, useCallback, useContext, useMemo, useEffect } from 'react';
 
 import { useGetUser } from '../hooks/api/session';
 

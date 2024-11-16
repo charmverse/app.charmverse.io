@@ -5,8 +5,8 @@ import { cookies } from 'next/headers';
 import { getIronOptions } from './getIronOptions';
 import type { SessionData } from './interfaces';
 
-export async function getSession<T extends object = SessionData>(o?: SessionOptions['cookieOptions']) {
-  const options = getIronOptions(o);
+export async function getSession<T extends object = SessionData>(cookieOptions?: SessionOptions['cookieOptions']) {
+  const options = getIronOptions(cookieOptions);
 
   const session = await getIronSession<T>(cookies(), options);
 

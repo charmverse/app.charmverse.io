@@ -33,7 +33,7 @@ export function SocialInputs(props: SocialInputsProps) {
           disabled={readOnly}
           error={!!errors?.twitterURL?.message}
           helperText={errors?.twitterURL?.message}
-          placeholder='https://twitter.com/charmverse'
+          placeholder='https://x.com/charmverse'
           onChange={(event) => {
             onChange({
               ...social,

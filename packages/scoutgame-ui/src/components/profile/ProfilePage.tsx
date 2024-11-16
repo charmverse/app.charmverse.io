@@ -25,9 +25,10 @@ export type UserProfileWithPoints = Omit<BuilderUserInfo, 'builderStatus'> &
 export type ProfilePageProps = {
   user: UserProfileWithPoints;
   tab: ProfileTab;
+  hideGithubButton?: boolean;
 };
 
-export function ProfilePage({ user, tab }: ProfilePageProps) {
+export function ProfilePage({ user, tab, hideGithubButton }: ProfilePageProps) {
   return (
     <Box
       sx={{
@@ -106,7 +107,7 @@ export function ProfilePage({ user, tab }: ProfilePageProps) {
               <Typography variant='h6' color='text.secondary'>
                 Build
               </Typography>
-              <BuilderProfile builder={user as BuilderUserInfo} />
+              <BuilderProfile hideGithubButton={hideGithubButton} builder={user as BuilderUserInfo} />
             </Paper>
           </Stack>
         )}

@@ -10,7 +10,7 @@ test('View project details', async ({ page }) => {
     projectFormName: 'Acme Inc',
     projectFormDescription: 'A description of your project',
     projectFormCategory: 'Art Marketplace',
-    projectFormTwitter: 'https://twitter.com/acme_inc_twitter',
+    projectFormTwitter: 'https://x.com/acme_inc_twitter',
     projectFormGithub: 'https://github.com/acme-inc-github/reponame',
     projectFormWebsites: ['https://www.acme-inc.com'],
     projectFormFarcasterValues: ['https://warpcast.com/acme-inc-warpcast']

@@ -20,7 +20,7 @@ jest.mock('@packages/blockchain/getENSName', () => {
           description: 'New guy in town',
           discord: 'VVV#1234',
           github: 'https://github.com/charmverse',
-          twitter: 'https://twitter.com/charmverse'
+          twitter: 'https://x.com/charmverse'
         };
       }
       return null;

@@ -1,7 +1,6 @@
 import { Stack, Table, TableBody, TableCell, TableHead } from '@mui/material';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import type { TopScout } from 'lib/scouts/getTopScouts';

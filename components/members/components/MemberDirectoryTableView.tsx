@@ -119,7 +119,7 @@ function MemberDirectoryTableRow({
               return (
                 <TableCell key={property.id}>
                   {twitterHandle ? (
-                    <Link target='_blank' href={`https://twitter.com/${twitterHandle}`}>
+                    <Link target='_blank' href={`https://x.com/${twitterHandle}`}>
                       @{twitterHandle}
                     </Link>
                   ) : (

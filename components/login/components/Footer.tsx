@@ -80,7 +80,7 @@ export default function Footer() {
                 <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>
                   <LinkedInIcon />
                 </StyledIconButton>
-                <StyledIconButton href='https://twitter.com/charmverse' target='_blank'>
+                <StyledIconButton href='https://x.com/charmverse' target='_blank'>
                   <FaXTwitter />
                 </StyledIconButton>
                 <StyledIconButton href='https://www.facebook.com/charmverse.io' target='_blank'>

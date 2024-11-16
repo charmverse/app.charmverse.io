@@ -1,8 +1,8 @@
 'use client';
 
 import env from '@beam-australia/react-env';
+import { getAlchemyBaseUrl } from '@packages/blockchain/provider/alchemy/client';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 import type { Chain, Transport } from 'viem';
 import { http, cookieStorage, createStorage, fallback } from 'wagmi';
 import {

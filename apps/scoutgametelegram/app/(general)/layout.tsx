@@ -12,7 +12,7 @@ export default function Layout({
   return (
     <>
       <Header />
-      <Box sx={{ minHeight: 'calc(100vh - 107px)', overflow: 'auto' }} component='main'>
+      <Box sx={{ minHeight: 'calc(100vh - 107px)', overflow: 'auto', px: 1 }} component='main'>
         <GeneralBackgroundImage />
         {children}
       </Box>

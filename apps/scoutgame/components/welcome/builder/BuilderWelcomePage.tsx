@@ -1,10 +1,10 @@
 import 'server-only';
 
 import { Box, Typography } from '@mui/material';
+import { JoinGithubButton } from '@packages/scoutgame-ui/components/common/JoinGithubButton';
 import Image from 'next/image';
 import { Suspense } from 'react';
 
-import { JoinGithubButton } from 'components/common/JoinGithubButton';
 import { SinglePageLayout } from 'components/common/Layout';
 import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
