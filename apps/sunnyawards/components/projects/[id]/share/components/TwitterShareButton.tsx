@@ -23,7 +23,7 @@ export function TwitterShareButton({ projectPath }: { projectPath: string }) {
   }, [projectPath]);
 
   const href = encodeURI(
-    `https://twitter.com/intent/tweet?text=I just registered for the SUNNY Awards to be eligible for 540K OP!&url=${url}`
+    `https://x.com/intent/tweet?text=I just registered for the SUNNY Awards to be eligible for 540K OP!&url=${url}`
   );
 
   return (

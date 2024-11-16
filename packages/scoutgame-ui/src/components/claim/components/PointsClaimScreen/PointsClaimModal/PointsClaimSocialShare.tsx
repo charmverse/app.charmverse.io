@@ -20,7 +20,7 @@ export function PointsClaimSocialShare({
 
   const handleShare = (platform: 'x' | 'telegram' | 'warpcast') => {
     const urls = {
-      x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
+      x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
       // Url must be provided for telegram share
       telegram: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareMessage)}`,
       warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${window.location.origin}/points-claim/${userPath}`

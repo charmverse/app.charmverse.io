@@ -228,7 +228,7 @@ export function OptimismProjectDisplay({
                 label='Farcaster'
                 value={socialLinks.farcaster.map((farcasterValue) => replaceUrl(farcasterValue, 'warpcast.com').href)}
               />
-              <OptimismProjectFields label='Twitter' value={replaceUrl(socialLinks.twitter, 'twitter.com').href} />
+              <OptimismProjectFields label='Twitter' value={replaceUrl(socialLinks.twitter, 'x.com').href} />
               <OptimismProjectFields label='Website' value={socialLinks.website} />
               <OptimismProjectFields
                 label='Mirror'

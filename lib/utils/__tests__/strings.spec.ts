@@ -30,7 +30,7 @@ describe('conditionalPlural', () => {
 
 describe('isUrl()', () => {
   const validUrls = [
-    'https://twitter.com',
+    'https://x.com',
     'https://docs.google.com/forms/d/e/1FAIpQLSf-Z7e_l7htY7DO6GQuzkW2KWsqUOcXjzLS2fwvWnapvfltEQ/viewform',
     'https://www.loom.com/share/d0e3f7b3abb6448eb0c7a00bdd6dcd90',
     'https://en.m.wikipedia.org/wiki/C_Sharp_(programming_language)',

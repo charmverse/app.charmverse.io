@@ -45,10 +45,10 @@ const getProjects = async () => {
 //       username: '',
 //       createdBy: '',
 //       adminAddress: project.applicant.address.address,
-//       'Project Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+//       'Project Twitter': twitterHandle ? `https://x.com/${twitterHandle}` : '',
 //       status: '',
 //       createdAt: '',
-//       'Author Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+//       'Author Twitter': twitterHandle ? `https://x.com/${twitterHandle}` : '',
 //       twitterUsername: twitterHandle,
 //       avatarUrl: project.profile.profileImageUrl,
 //       website: project.websiteUrl
