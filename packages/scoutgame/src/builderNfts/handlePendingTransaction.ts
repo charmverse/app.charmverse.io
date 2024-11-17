@@ -9,9 +9,11 @@ import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
+import { parseEventLogs } from 'viem';
 
 import { currentSeason } from '../dates';
 
+import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
 
@@ -63,36 +65,49 @@ export async function handlePendingTransaction({
     });
     const txHash =
       pendingTx.destinationChainId === pendingTx.sourceChainId
-        ? await getPublicClient(pendingTx.destinationChainId)
-            .waitForTransactionReceipt({
-              hash: pendingTx.sourceChainTxHash as `0x${string}`
-            })
-            .then((_tx) => _tx.transactionHash)
+        ? pendingTx.sourceChainTxHash
         : await waitForDecentTransactionSettlement({
             sourceTxHash: pendingTx.sourceChainTxHash.toLowerCase(),
             sourceTxHashChainId: pendingTx.sourceChainId
           });
 
-    // Update the pending transaction status to 'completed' and set destination details
-    await prisma.pendingNftTransaction.update({
-      where: {
-        id: pendingTransactionId
-      },
-      data: {
-        status: TransactionStatus.completed,
-        destinationChainTxHash: txHash.toLowerCase()
-      }
+    const onchainEvent = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
+      hash: txHash as `0x${string}`
     });
 
-    await recordNftMint({
-      amount: pendingTx.tokenAmount,
-      builderNftId: builderNft.id,
-      mintTxHash: txHash,
-      paidWithPoints: false,
-      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived),
-      recipientAddress: pendingTx.senderAddress,
-      scoutId: pendingTx.userId
+    const events = await parseEventLogs({
+      abi: builderContractReadonlyApiClient.abi,
+      logs: onchainEvent.logs
     });
+
+    const builderScoutedEvent = events.find((ev) => ev.eventName === 'BuilderScouted');
+    const transferSingleEvent = events.find((ev) => ev.eventName === 'TransferSingle');
+
+    if (!builderScoutedEvent || !transferSingleEvent) {
+      log.error(`Transaction on chain ${pendingTx.destinationChainId} failed`);
+      throw new DecentTxFailedPermanently();
+    } else {
+      // Update the pending transaction status to 'completed' and set destination details
+      await prisma.pendingNftTransaction.update({
+        where: {
+          id: pendingTransactionId
+        },
+        data: {
+          status: TransactionStatus.completed,
+          destinationChainTxHash: txHash.toLowerCase()
+        }
+      });
+
+      await recordNftMint({
+        amount: pendingTx.tokenAmount,
+        builderNftId: builderNft.id,
+        mintTxHash: txHash,
+        paidWithPoints: false,
+        pointsValue: convertCostToPoints(pendingTx.targetAmountReceived),
+        recipientAddress: pendingTx.senderAddress,
+        scoutId: pendingTx.userId
+      });
+    }
   } catch (error) {
     if (error instanceof DecentTxFailedPermanently) {
       await prisma.pendingNftTransaction.update({
@@ -118,5 +133,3 @@ export async function handlePendingTransaction({
     }
   }
 }
-
-// handlePendingTransaction({ pendingTransactionId: '4aec5524-e633-44c9-8297-6fa0fb691ead' }).then(console.log);
