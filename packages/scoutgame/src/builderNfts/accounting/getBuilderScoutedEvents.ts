@@ -24,10 +24,12 @@ export type BuilderScoutedEvent = {
   blockNumber: bigint;
 };
 
-// Ignore the old series of mints where a cron issued too many tokens
 function ignoreEvent(ev: BuilderScoutedEvent) {
-  if (ev.args.tokenId <= BigInt(8)) {
+  // Ignore internal team token ids, and test token 163
+  if (ev.args.tokenId <= BigInt(8) || ev.args.tokenId === BigInt(163)) {
     return true;
+
+    // Ignore the old series of mints where a cron issued too many tokens
   } else if (
     ev.args.scout !== 'c9d7406a-1ec6-4204-9abc-d29ff4708cb5' ||
     ev.args.amount !== BigInt(1) ||
