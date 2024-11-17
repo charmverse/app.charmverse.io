@@ -11,14 +11,16 @@ export function Header() {
 
   return (
     <Stack position='static' flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1}>
-      <Image
-        src='/images/scout-game-logo.png'
-        width={77.77}
-        height={35}
-        alt='Scout Game logo'
-        priority={true}
-        style={{ verticalAlign: 'middle' }}
-      />
+      <Link href='/scout'>
+        <Image
+          src='/images/scout-game-logo.png'
+          width={77.77}
+          height={35}
+          alt='Scout Game logo'
+          priority={true}
+          style={{ verticalAlign: 'middle' }}
+        />
+      </Link>
       <Stack flexDirection='row' alignItems='center'>
         <Link href='/info'>
           <IconButton>
