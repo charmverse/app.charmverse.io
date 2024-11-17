@@ -75,3 +75,6 @@ playwright/.cache/
 storybook-static
 # Storybook dev server cache folder
 .cache
+
+
+token-diffs/
