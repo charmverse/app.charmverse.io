@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { getBuilderScoutedEvents } from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
 import { builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import type { BuilderScoutedEvent } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
-import { getAndParseNftMintLogs } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
 import { syncUserNFTsFromOnchainData } from '@packages/scoutgame/builderNfts/syncUserNFTsFromOnchainData';
 
 const averageOptimismBlockTimeInSeconds = 2;
@@ -26,25 +25,18 @@ export async function resolveMissingPurchases({ minutesAgoToNow }: { minutesAgoT
 
   const earliestBlockNumber = Number(lastBlock.number) - blockOffset;
 
-  const earliestBlock = await client.getBlock({ blockNumber: BigInt(earliestBlockNumber) });
+  log.info(`Resyncing mint transactions from block ${earliestBlockNumber} to ${lastBlock.number}`);
 
-  log.info(`Resyncing mint transactions from block ${earliestBlock.number} to ${lastBlock.number}`);
+  const builderScoutedEvents = await getBuilderScoutedEvents({ fromBlock: earliestBlockNumber });
 
-  const onchainPurchaseData = await getAndParseNftMintLogs({
-    fromBlock: earliestBlock.number,
-    toBlock: lastBlock.number
-  });
-
-  const scoutIds = onchainPurchaseData
-    .filter((event) => event.eventName === 'BuilderScouted')
-    .map((ev) => (ev as any as BuilderScoutedEvent).args.scout);
+  const scoutIds = builderScoutedEvents.map((ev) => ev.args.scout);
 
   const uniqueScoutIds = arrayUtils.uniqueValues(scoutIds);
 
   for (let i = 0; i < uniqueScoutIds.length; i++) {
     const scoutId = uniqueScoutIds[i];
     log.info(`Syncing NFTs for scout ${scoutId}`);
-    await syncUserNFTsFromOnchainData({ scoutId, fromBlock: Number(earliestBlock.number) });
+    await syncUserNFTsFromOnchainData({ scoutId, fromBlock: Number(earliestBlockNumber) });
   }
 
   return uniqueScoutIds as any;
