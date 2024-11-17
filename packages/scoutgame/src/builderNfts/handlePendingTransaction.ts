@@ -4,18 +4,16 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
-import { parseEventLogs } from 'viem';
 
 import { currentSeason } from '../dates';
 
-import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
+import { validateMint } from './validateMint';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -71,19 +69,12 @@ export async function handlePendingTransaction({
             sourceTxHashChainId: pendingTx.sourceChainId
           });
 
-    const onchainEvent = await getPublicClient(pendingTx.destinationChainId).waitForTransactionReceipt({
-      hash: txHash as `0x${string}`
+    const validatedMint = await validateMint({
+      chainId: pendingTx.destinationChainId,
+      txHash
     });
 
-    const events = await parseEventLogs({
-      abi: builderContractReadonlyApiClient.abi,
-      logs: onchainEvent.logs
-    });
-
-    const builderScoutedEvent = events.find((ev) => ev.eventName === 'BuilderScouted');
-    const transferSingleEvent = events.find((ev) => ev.eventName === 'TransferSingle');
-
-    if (!builderScoutedEvent || !transferSingleEvent) {
+    if (!validatedMint) {
       log.error(`Transaction on chain ${pendingTx.destinationChainId} failed`);
       throw new DecentTxFailedPermanently();
     } else {

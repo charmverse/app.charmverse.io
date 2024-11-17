@@ -1,7 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { createPublicClient, http } from 'viem';
+import { optimism } from 'viem/chains';
 
 import { getChainById } from './chains';
+import { getAlchemyBaseUrl } from './getAlchemyBaseUrl';
 
 /**
  * Create a viem public client for a given chain.
@@ -19,9 +22,18 @@ export const getPublicClient = (chainId: number) => {
     throw new InvalidInputError(`Chain id ${chainId} not supported`);
   }
 
-  const providerUrl: string | null = chainDetails.rpcUrls[0];
+  let providerUrl: string | null = chainDetails.rpcUrls[0];
 
   const chain = chainDetails.viem;
+
+  if (chainDetails.alchemyUrl) {
+    try {
+      const alchemyProviderUrl = getAlchemyBaseUrl(chainId);
+      providerUrl = alchemyProviderUrl;
+    } catch (error) {
+      log.error('Error getting alchemy provider url', { error, chainId });
+    }
+  }
 
   return createPublicClient({
     chain,
