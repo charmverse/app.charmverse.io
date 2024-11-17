@@ -80,7 +80,3 @@ async function checkSavedVsOnchainSupply() {
   }
 
 }
-
-
-
-checkSavedVsOnchainSupply()

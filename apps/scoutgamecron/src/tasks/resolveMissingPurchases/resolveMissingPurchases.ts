@@ -49,3 +49,5 @@ export async function resolveMissingPurchases({ minutesAgoToNow }: { minutesAgoT
 
   return uniqueScoutIds as any;
 }
+
+resolveMissingPurchases({ minutesAgoToNow: 80000 });
