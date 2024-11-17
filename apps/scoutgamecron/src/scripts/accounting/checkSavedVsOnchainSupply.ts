@@ -88,5 +88,3 @@ async function checkSavedVsOnchainSupply() {
   }
 
 }
-
-checkSavedVsOnchainSupply().then(console.log)
