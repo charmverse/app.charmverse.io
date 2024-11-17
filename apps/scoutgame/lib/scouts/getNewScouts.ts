@@ -1,6 +1,7 @@
 import type { UserWeeklyStats } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getCurrentWeek, getStartOfWeek } from '@packages/scoutgame/dates';
+import { prettyPrint } from '@packages/utils/strings';
 
 export type NewScout = {
   id: string;
@@ -15,6 +16,18 @@ export type NewScout = {
 export async function getNewScouts({ limit }: { limit: number }): Promise<NewScout[]> {
   const week = getCurrentWeek();
   const startOfWeek = getStartOfWeek(week);
+
+  const startOfWeekAsJsDate = startOfWeek.toJSDate();
+
+  const nftsSold = await prisma.nFTPurchaseEvent.groupBy({
+    by: ['scoutId'],
+    where: {
+      createdAt: {
+        gte: startOfWeekAsJsDate
+      }
+    }
+  });
+
   const [weeklyStats, newScouts] = await prisma.$transaction([
     prisma.userWeeklyStats.findMany({
       where: {
@@ -24,11 +37,15 @@ export async function getNewScouts({ limit }: { limit: number }): Promise<NewSco
     }),
     prisma.scout.findMany({
       where: {
-        createdAt: {
-          gt: startOfWeek.toJSDate()
+        id: {
+          in: nftsSold.map((nft) => nft.scoutId)
         },
         nftPurchaseEvents: {
-          some: {}
+          every: {
+            createdAt: {
+              gte: startOfWeekAsJsDate
+            }
+          }
         }
       },
       take: limit,
@@ -131,3 +148,5 @@ export async function getnewScoutsByWeek({ week, limit = 10 }: { week: string; l
     pointsEarned: pointsEarnedByUserId[user[0]]
   }));
 }
+
+getNewScouts({ limit: 20 }).then(prettyPrint);
