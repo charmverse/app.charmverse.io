@@ -11,7 +11,9 @@ async function checkSavedVsOnchainSupply() {
     where: {
       tokenId: {
         // Start from first non team Member NFT
-        gte: 9
+        // gte: 9
+        // Continue where we left off
+        gte: 20
       }
     },
     include: {
@@ -39,6 +41,8 @@ async function checkSavedVsOnchainSupply() {
 
     const nft = builderNfts[i];
 
+    log.info(`Checking tokenId ${nft.tokenId}  (${i + 1} / ${builderNfts.length})`)
+
     const tokenId = nft.tokenId;
 
     const totalSold = nft.nftSoldEvents.reduce((acc, val) => acc + val.tokensPurchased, 0);
@@ -46,26 +50,30 @@ async function checkSavedVsOnchainSupply() {
     const actual = await builderContractReadonlyApiClient.totalSupply({args: {tokenId: BigInt(tokenId)}});
 
     if (Number(actual) !== totalSold) {
+      log.error(`Token ${tokenId} // ${nft.builder.path} error: Onchain supply ${actual} vs saved ${totalSold}`);
+    }
 
-      log.error(`Token ${tokenId} // ${nft.builder.path} error: Onchain supply ${actual} vs saved ${totalSold}, validating ${nft.nftSoldEvents.length} events`);
+    log.info(`Validating ${nft.nftSoldEvents.length} events`)
 
-      let invalidTransactions: {id: string; txHash: string}[] = [];
+    let invalidTransactions: {id: string; txHash: string}[] = [];
 
-      for (const purchaseEvent of nft.nftSoldEvents) {
-        const validatedMint = await validateMint({
-          chainId: builderNftChain.id,
+    for (const purchaseEvent of nft.nftSoldEvents) {
+      const validatedMint = await validateMint({
+        chainId: builderNftChain.id,
+        txHash: purchaseEvent.txHash
+      });
+
+      if (!validatedMint) {
+        log.error(`Tx ${purchaseEvent.txHash} with ${purchaseEvent.tokensPurchased} tokens is not a valid mint`)
+        invalidTransactions.push({
+          id: purchaseEvent.id,
           txHash: purchaseEvent.txHash
-        });
-
-        if (!validatedMint) {
-          log.error(`Tx ${purchaseEvent.txHash} with ${purchaseEvent.tokensPurchased} tokens is not a valid mint`)
-          invalidTransactions.push({
-            id: purchaseEvent.id,
-            txHash: purchaseEvent.txHash
-          })
-        }
+        })
       }
+    }
 
+    if (invalidTransactions.length || Number(actual) !== totalSold) {
+      log.error(`Token ${tokenId} // ${nft.builder.path} error: Onchain supply ${actual} vs saved ${totalSold}, ${invalidTransactions.length} invalid txs`);
       fs.writeFileSync(path.join(tokenDiffDir, `tokenId-${tokenId}.json`), JSON.stringify({
         nft,
         stats: {
@@ -75,8 +83,10 @@ async function checkSavedVsOnchainSupply() {
           invalidTransactions
         }
       }, null, 2))
-          }
-
+    }
+        
   }
 
 }
+
+checkSavedVsOnchainSupply().then(console.log)

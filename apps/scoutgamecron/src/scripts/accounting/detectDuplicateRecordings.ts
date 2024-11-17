@@ -45,5 +45,3 @@ async function detectDuplicateRecordings() {
   return eventsWithSource;
 
 }
-
-detectDuplicateRecordings().then(prettyPrint)
