@@ -29,11 +29,6 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
         currentBalance: {
           increment: rewardPoints
         },
-        referrerCodeEvent: {
-          create: {
-            refereeId
-          }
-        },
         pointsReceived: {
           create: {
             value: rewardPoints,
@@ -44,7 +39,12 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
                 type: eventType,
                 description: `Received points for being a referrer`,
                 week: getCurrentWeek(),
-                builderId: referrerId
+                builderId: referrerId,
+                referralCodeEvent: {
+                  create: {
+                    refereeId
+                  }
+                }
               }
             },
             activities: {

@@ -9,7 +9,7 @@ export async function getFriends(userId?: string) {
 
   const friends = await prisma.referralCodeEvent.findMany({
     where: {
-      referrerId: userId
+      builderEvent: { builderId: userId }
     },
     include: {
       referee: {
