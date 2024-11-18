@@ -11,7 +11,7 @@ export function InviteButtons() {
   const [copied, setCopied] = useState('');
   const referral = user?.referralCode;
   const url = encodeURIComponent(`https://t.me/ScoutGameXYZBot/start?startapp=${referral}`);
-  const text = encodeURIComponent('Play ScoutGame with me!');
+  const text = encodeURIComponent('Pick great builders. Earn rewards.');
 
   const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
 
