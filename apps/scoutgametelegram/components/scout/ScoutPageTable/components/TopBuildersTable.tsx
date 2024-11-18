@@ -1,8 +1,11 @@
+'use client';
+
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
@@ -18,6 +21,7 @@ export function TopBuildersTable({
   order: string;
   sort: string;
 }) {
+  const router = useRouter();
   return (
     <Table
       aria-label='Top scouts table'
@@ -65,7 +69,7 @@ export function TopBuildersTable({
       </TableHead>
       <TableBody>
         {builders.map((builder) => (
-          <TableRow key={builder.path} sx={tableRowSx} component={Link} href={`/u/${builder.path}?tab=builder`}>
+          <TableRow key={builder.path} sx={tableRowSx} onClick={() => router.push(`/u/${builder.path}?tab=builder`)}>
             <TableCell sx={{ width: '16.67%' }}>
               <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
                 <Avatar src={builder.avatar} name={builder.displayName} size='small' />

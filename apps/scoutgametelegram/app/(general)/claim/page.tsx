@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { getUnclaimedPointsSource } from '@packages/scoutgame/points/getUnclaimedPointsSource';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';

@@ -3,6 +3,7 @@ import { TableRow } from '@mui/material';
 import { tableCellClasses } from '@mui/material/TableCell';
 
 export const tableRowSx = {
+  cursor: 'pointer',
   boxShadow: '2px 2px 2px 0px rgba(0, 0, 0, 0.25)',
   [`& .${tableCellClasses.root}`]: {
     paddingLeft: '6px',
