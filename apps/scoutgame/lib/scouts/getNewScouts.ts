@@ -148,5 +148,3 @@ export async function getnewScoutsByWeek({ week, limit = 10 }: { week: string; l
     pointsEarned: pointsEarnedByUserId[user[0]]
   }));
 }
-
-getNewScouts({ limit: 20 }).then(prettyPrint);
