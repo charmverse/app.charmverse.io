@@ -7,6 +7,7 @@ import { useLgScreen, useMdScreen } from '../../../hooks/useMediaScreens';
 import { useTrackEvent } from '../../../hooks/useTrackEvent';
 import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
 import { Carousel } from '../../common/Carousel/Carousel';
+import { LoadingCards } from '../../common/Loading/LoadingCards';
 
 import { PromoCard } from './PromoCard';
 
@@ -27,7 +28,8 @@ export function BuildersCarousel({
   const isMounted = useIsMounted();
 
   if (!isMounted) {
-    return null;
+    // This is returned to prevent a layout shift when the carousel is mounted
+    return <LoadingCards />;
   }
 
   const builderCards = showPromoCards
