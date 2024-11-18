@@ -8,6 +8,10 @@ jest.unstable_mockModule('../../builderNfts/registerBuilderNFT', () => ({
   registerBuilderNFT: jest.fn()
 }));
 
+jest.unstable_mockModule('../../importReposByUser', () => ({
+  importReposByUser: () => new Promise(() => {})
+}));
+
 const { approveBuilder } = await import('../approveBuilder');
 
 const { registerBuilderNFT } = await import('../../builderNfts/registerBuilderNFT');

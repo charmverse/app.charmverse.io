@@ -1,6 +1,6 @@
 import type { UserWeeklyStats } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek, getStartOfWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
 export type NewScout = {
   id: string;
@@ -101,21 +101,27 @@ export async function getRankedNewScoutsForPastWeek({
 }
 
 // new Scout definition: only scouts that purchased NFT this week for the first time
-async function getNewScouts({ week, season }: { week: string; season: string }) {
-  const startOfWeek = getStartOfWeek(week).toJSDate();
+export async function getNewScouts({ week, season }: { week: string; season: string }) {
   return prisma.scout.findMany({
     where: {
       nftPurchaseEvents: {
         every: {
+          // every nft purchase event must have been purchased this week or later
           builderEvent: {
-            createdAt: {
-              gt: startOfWeek
+            week: {
+              gte: week
+            }
+          },
+          builderNFT: {
+            builder: {
+              builderStatus: 'approved'
             }
           }
         },
+        // at least one NFT was purchased this week
         some: {
-          createdAt: {
-            gt: startOfWeek
+          builderEvent: {
+            week
           }
         }
       }
@@ -132,14 +138,23 @@ async function getNewScouts({ week, season }: { week: string; season: string }) 
       },
       nftPurchaseEvents: {
         where: {
+          builderEvent: {
+            week,
+            season
+          },
           builderNFT: {
             builder: {
               builderStatus: 'approved'
-            },
-            season
+            }
           }
         },
         select: {
+          builderEvent: {
+            select: {
+              week: true,
+              season: true
+            }
+          },
           builderNFT: {
             select: {
               builderId: true
