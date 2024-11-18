@@ -22,6 +22,9 @@ export async function getBuildersLeaderboard({
       week,
       user: {
         builderStatus: 'approved'
+      },
+      gemsCollected: {
+        gt: 0
       }
     },
     orderBy: {

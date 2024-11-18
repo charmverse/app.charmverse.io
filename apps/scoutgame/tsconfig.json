@@ -40,6 +40,12 @@
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/scoutgame/src/scouts/getNewScouts.ts"
+  ],
   "exclude": ["../../node_modules", ".next/", "public/sw.js", "sw.js"]
 }

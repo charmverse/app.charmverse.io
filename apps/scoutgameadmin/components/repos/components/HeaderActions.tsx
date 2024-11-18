@@ -61,6 +61,15 @@ export function HeaderActions() {
         <MenuItem>
           <FileDownloadButton
             size='small'
+            filename={`Optimism Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/optimism'
+          >
+            Optimism
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            size='small'
             filename={`OP Supersim Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/op_supersim'
           >

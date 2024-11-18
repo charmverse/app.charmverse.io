@@ -42,7 +42,7 @@ export async function getUsers({
         ? {
             _relevance: {
               fields: ['path', 'displayName', 'email', 'id'],
-              search: searchString,
+              search: `*${searchString}:*`,
               sort: 'desc'
             }
           }
@@ -60,10 +60,26 @@ export async function getUsers({
         ? { id: searchString }
         : typeof searchString === 'string'
           ? {
-              path: {
-                contains: searchString,
-                mode: 'insensitive'
-              }
+              OR: [
+                {
+                  path: {
+                    search: `*${searchString}:*`,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  displayName: {
+                    search: `*${searchString}:*`,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  email: {
+                    startsWith: searchString,
+                    mode: 'insensitive'
+                  }
+                }
+              ]
             }
           : filter === 'only-builders'
             ? { builderStatus: { not: null } }
