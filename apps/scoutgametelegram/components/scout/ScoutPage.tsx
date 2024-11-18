@@ -15,35 +15,26 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
   return (
     <>
       <HeaderMessage />
-      <Stack
+      <Typography variant='h4' color='secondary' textAlign='center' fontWeight='bold' my={2}>
+        Scout today's HOT Builders!
+      </Typography>
+      <Suspense key='todays-hot-builders' fallback={<LoadingCards />}>
+        <TodaysHotBuildersCarousel />
+      </Suspense>
+      <Box
         sx={{
-          width: '100%',
-          height: 'calc(100vh - 147.5px)',
-          overflowY: 'scroll'
+          position: 'sticky',
+          top: -2.5,
+          backgroundColor: 'background.default',
+          zIndex: 1
         }}
-        data-test='home-page'
       >
-        <Typography variant='h4' color='secondary' textAlign='center' fontWeight='bold' my={2}>
-          Scout today's HOT Builders!
-        </Typography>
-        <Suspense key='todays-hot-builders' fallback={<LoadingCards />}>
-          <TodaysHotBuildersCarousel />
-        </Suspense>
-        <Box
-          sx={{
-            position: 'sticky',
-            top: 0,
-            backgroundColor: 'background.default',
-            zIndex: 1
-          }}
-        >
-          <ScoutTabsMenu tab={currentTab} />
-          <InfoModal builder={currentTab === 'builders'} />
-        </Box>
-        <Suspense key={currentTab} fallback={<LoadingTable />}>
-          <ScoutPageTable tab={currentTab} order={order} sort={sort} />
-        </Suspense>
-      </Stack>
+        <ScoutTabsMenu tab={currentTab} />
+        <InfoModal builder={currentTab === 'builders'} />
+      </Box>
+      <Suspense key={currentTab} fallback={<LoadingTable />}>
+        <ScoutPageTable tab={currentTab} order={order} sort={sort} />
+      </Suspense>
     </>
   );
 }
