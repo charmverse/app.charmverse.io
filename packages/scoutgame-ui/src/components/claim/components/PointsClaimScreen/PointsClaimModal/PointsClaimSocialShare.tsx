@@ -1,5 +1,4 @@
 import { Typography, Stack, IconButton } from '@mui/material';
-import { getLastWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
 import { useMdScreen } from '../../../../../hooks/useMediaScreens';
@@ -18,12 +17,12 @@ export function PointsClaimSocialShare({
   builders: string[];
 }) {
   const isMd = useMdScreen();
-  const imageUrl = `https://cdn.charmverse.io/points-claim/${userId}/${getLastWeek()}.png`;
+  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}`;
   const shareMessage = builderPoints
-    ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!\nMy profile: https://soutgame.xyz/u/${userPath}\n\n`
+    ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`
     : `I scored ${scoutPoints} Scout Points this week as a Top Scout! Big shoutout to my top Builders: ${builders.join(
         ', '
-      )}. Who will be next?\nMy profile: https://soutgame.xyz/u/${userPath}\n\n`;
+      )}. Who will be next?\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
 
   const handleShare = (platform: 'x' | 'telegram' | 'warpcast') => {
     const urls = {
