@@ -3,6 +3,7 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { Box, Dialog, IconButton, Paper, Stack, Typography } from '@mui/material';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
@@ -13,8 +14,6 @@ import { useUser } from '../../../../providers/UserProvider';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
 import { PointsClaimButton } from './PointsClaimButton';
-import { PointsClaimBuilderScreen } from './PointsClaimModal/PointsClaimBuilderScreen';
-import { PointsClaimScoutScreen } from './PointsClaimModal/PointsClaimScoutScreen';
 import { PointsClaimSocialShare } from './PointsClaimModal/PointsClaimSocialShare';
 
 export function PointsClaimScreen({
@@ -124,31 +123,41 @@ export function PointsClaimScreen({
           </Typography>
         </>
       )}
-      <Dialog open={showModal} onClose={handleCloseModal} data-test='claim-points-success-modal'>
+      <Dialog
+        open={showModal}
+        onClose={handleCloseModal}
+        data-test='claim-points-success-modal'
+        PaperProps={{
+          sx: {
+            width: '100%'
+          }
+        }}
+      >
         <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
           <CancelOutlinedIcon color='primary' />
         </IconButton>
-        <Stack position='relative' width={600} height={600}>
-          <Image
+        <Stack
+          sx={{
+            width: '100%',
+            height: '100%',
+            aspectRatio: '1/1',
+            maxWidth: 600,
+            maxHeight: 600,
+            position: 'relative'
+          }}
+        >
+          <img
             style={{
               position: 'absolute',
               top: 0,
-              left: 0
+              left: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
             }}
-            width={600}
-            height={600}
-            src='/images/claim-share-background.png'
+            src={`https://cdn.charmverse.io/points-claim/${user?.id}/${getLastWeek()}.png`}
             alt='Claim success modal'
           />
-          {builderPoints ? (
-            <PointsClaimBuilderScreen repos={repos} displayName={displayName} claimedPoints={totalUnclaimedPoints} />
-          ) : (
-            <PointsClaimScoutScreen
-              claimedPoints={totalUnclaimedPoints}
-              displayName={displayName}
-              builders={builders}
-            />
-          )}
         </Stack>
         {user ? (
           <Stack width='100%'>

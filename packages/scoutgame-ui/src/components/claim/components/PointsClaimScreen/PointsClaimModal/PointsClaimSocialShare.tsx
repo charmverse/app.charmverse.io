@@ -2,6 +2,8 @@ import { Typography, Stack, IconButton } from '@mui/material';
 import { getLastWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
+import { useMdScreen } from '../../../../../hooks/useMediaScreens';
+
 export function PointsClaimSocialShare({
   builderPoints,
   scoutPoints,
@@ -15,6 +17,7 @@ export function PointsClaimSocialShare({
   scoutPoints: number;
   builders: string[];
 }) {
+  const isMd = useMdScreen();
   const imageUrl = `https://cdn.charmverse.io/points-claim/${userId}/${getLastWeek()}.png`;
   const shareMessage = builderPoints
     ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!\nMy profile: https://soutgame.xyz/u/${userPath}\n\n`
@@ -31,27 +34,32 @@ export function PointsClaimSocialShare({
     window.open(urls[platform], '_blank');
   };
 
+  const size = !isMd ? 30 : 42.5;
+
   return (
     <Stack
       sx={{
         justifyContent: 'center',
-        p: 2,
+        p: {
+          xs: 1,
+          md: 2
+        },
         alignItems: 'center',
         backgroundColor: '#D8E1FF'
       }}
     >
-      <Typography variant='h6' color='#000' fontWeight='bold'>
+      <Typography variant={isMd ? 'h6' : 'subtitle1'} color='#000' fontWeight='bold'>
         Share your win!
       </Typography>
       <Stack flexDirection='row' justifyContent='center'>
         <IconButton onClick={() => handleShare('x')}>
-          <Image src='/images/logos/x.png' alt='X' width={42.5} height={42.5} />
+          <Image src='/images/logos/x.png' alt='X' width={size} height={size} />
         </IconButton>
         <IconButton onClick={() => handleShare('telegram')}>
-          <Image src='/images/logos/telegram.png' alt='Telegram' width={42.5} height={42.5} />
+          <Image src='/images/logos/telegram.png' alt='Telegram' width={size} height={size} />
         </IconButton>
         <IconButton onClick={() => handleShare('warpcast')}>
-          <Image src='/images/logos/warpcast.png' alt='Warpcast' width={42.5} height={42.5} />
+          <Image src='/images/logos/warpcast.png' alt='Warpcast' width={size} height={size} />
         </IconButton>
       </Stack>
     </Stack>
