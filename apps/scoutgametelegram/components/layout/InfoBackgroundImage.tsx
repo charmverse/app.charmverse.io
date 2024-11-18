@@ -6,7 +6,7 @@ export function InfoBackgroundImage(props: BoxProps) {
     <Box
       height='100%'
       width='100%'
-      zIndex={0}
+      zIndex={-1}
       position='absolute'
       top={0}
       left={0}

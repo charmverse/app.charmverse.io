@@ -16,7 +16,7 @@ export default function Layout({
         <GeneralBackgroundImage />
         {children}
       </Box>
-      <Box sx={{ position: 'relative', zIndex: 1, height: 'calc(100vh - 107.5px)', overflow: 'auto' }}>{children}</Box>
+
       <StickyFooter />
     </Stack>
   );

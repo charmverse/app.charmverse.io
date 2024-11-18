@@ -38,7 +38,7 @@ export function InviteButtons() {
 
   return (
     <Stack justifyContent='center' alignItems='center' gap={1} my={2} flexDirection='row'>
-      <Button href={shareUrl} sx={{ bgcolor: 'secondary.main', width: '100%' }} color='secondary'>
+      <Button href={shareUrl} sx={{ bgcolor: 'secondary.main', width: '100%', color: 'black.main' }}>
         Invite Friends
       </Button>
       <Tooltip arrow placement='top' title={copied || undefined} disableInteractive>
