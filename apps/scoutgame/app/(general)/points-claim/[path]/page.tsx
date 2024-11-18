@@ -27,7 +27,7 @@ export default async function Claim({ params }: { params: { path: string } }) {
       <meta name='og:image' content={claimScreenUrl} />
       <meta name='og:image:width' content='600' />
       <meta name='og:image:height' content='600' />
-      <meta name='og:url' content={`https://scoutgame.xyz/points-claim/${params.path}`} />
+      <meta name='og:url' content={`https://scoutgame.xyz/u/${params.path}`} />
       <meta name='og:title' content={`Scout Game - ${user.displayName}`} />
       <meta name='og:description' content={`Points claim screen for ${user.displayName}`} />
 
@@ -35,7 +35,7 @@ export default async function Claim({ params }: { params: { path: string } }) {
       <meta name='twitter:title' content={`Scout Game - ${user.displayName}`} />
       <meta name='twitter:description' content={`Points claim screen for ${user.displayName}`} />
       <meta name='twitter:image' content={claimScreenUrl} />
-      <meta name='twitter:url' content={`https://scoutgame.xyz/points-claim/${params.path}`} />
+      <meta name='twitter:url' content={`https://scoutgame.xyz/u/${params.path}`} />
     </>
   );
 }
