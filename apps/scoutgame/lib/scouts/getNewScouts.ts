@@ -15,6 +15,18 @@ export type NewScout = {
 export async function getNewScouts({ limit }: { limit: number }): Promise<NewScout[]> {
   const week = getCurrentWeek();
   const startOfWeek = getStartOfWeek(week);
+
+  const startOfWeekAsJsDate = startOfWeek.toJSDate();
+
+  const nftsSold = await prisma.nFTPurchaseEvent.groupBy({
+    by: ['scoutId'],
+    where: {
+      createdAt: {
+        gte: startOfWeekAsJsDate
+      }
+    }
+  });
+
   const [weeklyStats, newScouts] = await prisma.$transaction([
     prisma.userWeeklyStats.findMany({
       where: {
@@ -24,11 +36,15 @@ export async function getNewScouts({ limit }: { limit: number }): Promise<NewSco
     }),
     prisma.scout.findMany({
       where: {
-        createdAt: {
-          gt: startOfWeek.toJSDate()
+        id: {
+          in: nftsSold.map((nft) => nft.scoutId)
         },
         nftPurchaseEvents: {
-          some: {}
+          every: {
+            createdAt: {
+              gte: startOfWeekAsJsDate
+            }
+          }
         }
       },
       take: limit,
