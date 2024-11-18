@@ -1,28 +1,31 @@
 import { Typography, Stack, IconButton } from '@mui/material';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import Image from 'next/image';
 
 export function PointsClaimSocialShare({
   builderPoints,
   scoutPoints,
   builders,
+  userId,
   userPath
 }: {
+  userId: string;
   userPath: string;
   builderPoints: number;
   scoutPoints: number;
   builders: string[];
 }) {
+  const imageUrl = `https://cdn.charmverse.io/points-claim/${userId}/${getLastWeek()}.png`;
   const shareMessage = builderPoints
-    ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!`
+    ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!\nMy profile: https://soutgame.xyz/u/${userPath}\n\n`
     : `I scored ${scoutPoints} Scout Points this week as a Top Scout! Big shoutout to my top Builders: ${builders.join(
         ', '
-      )}. Who will be next?`;
+      )}. Who will be next?\nMy profile: https://soutgame.xyz/u/${userPath}\n\n`;
 
   const handleShare = (platform: 'x' | 'telegram' | 'warpcast') => {
     const urls = {
-      x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
-      // Url must be provided for telegram share
-      telegram: `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(shareMessage)}`,
+      x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}&url=${imageUrl}`,
+      telegram: `https://t.me/share/url?url=${imageUrl}&text=${encodeURIComponent(shareMessage)}`,
       warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${window.location.origin}/points-claim/${userPath}`
     };
     window.open(urls[platform], '_blank');
