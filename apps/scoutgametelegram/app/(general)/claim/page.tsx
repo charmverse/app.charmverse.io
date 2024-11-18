@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { getUnclaimedPointsSource } from '@packages/scoutgame/points/getUnclaimedPointsSource';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
@@ -21,15 +22,17 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
   const { builders, builderPoints, scoutPoints, repos } = await getUnclaimedPointsSource(user.id);
 
   return (
-    <ClaimPage
-      builders={builders}
-      builderPoints={builderPoints}
-      scoutPoints={scoutPoints}
-      repos={repos}
-      period={searchParams.tab}
-      displayName={user.displayName}
-      totalUnclaimedPoints={points}
-      bonusPartners={bonusPartners}
-    />
+    <Box sx={{ overflow: 'hidden' }}>
+      <ClaimPage
+        builders={builders}
+        builderPoints={builderPoints}
+        scoutPoints={scoutPoints}
+        repos={repos}
+        period={searchParams.tab}
+        displayName={user.displayName}
+        totalUnclaimedPoints={points}
+        bonusPartners={bonusPartners}
+      />
+    </Box>
   );
 }
