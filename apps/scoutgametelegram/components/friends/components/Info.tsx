@@ -18,7 +18,7 @@ export function Info() {
         bgcolor='primary.dark'
       >
         <DailyClaimGift size={50} />
-        <Typography fontWeight={600} fontSize='1.1rem'>
+        <Typography fontWeight={600}>
           Invite friends to play and earn +5 <img src='/images/profile/icons/scout-game-icon.svg' alt='points' /> per
           referral for you and your friends!
         </Typography>
