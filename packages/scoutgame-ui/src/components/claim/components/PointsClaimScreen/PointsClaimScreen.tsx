@@ -9,6 +9,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 
 import { claimPointsAction } from '../../../../actions/claimPointsAction';
+import { revalidateClaimPointsAction } from '../../../../actions/revalidateClaimPointsAction';
 import { useUser } from '../../../../providers/UserProvider';
 
 import { BonusPartnersDisplay } from './BonusPartnersDisplay';
@@ -38,6 +39,7 @@ export function PointsClaimScreen({
   const { executeAsync, isExecuting } = useAction(claimPointsAction);
   const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
+  const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
 
   const handleClaim = async () => {
     await executeAsync();
@@ -47,6 +49,7 @@ export function PointsClaimScreen({
 
   const handleCloseModal = () => {
     setShowModal(false);
+    revalidateClaimPoints();
   };
 
   return (
@@ -159,6 +162,7 @@ export function PointsClaimScreen({
         {user ? (
           <Stack width='100%'>
             <PointsClaimSocialShare
+              userId={user.id}
               builderPoints={builderPoints}
               scoutPoints={scoutPoints}
               builders={builders.map((b) => b.displayName)}
