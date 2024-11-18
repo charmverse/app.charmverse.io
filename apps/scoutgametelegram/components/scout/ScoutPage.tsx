@@ -1,4 +1,4 @@
-import { Box, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { LoadingTable } from '@packages/scoutgame-ui/components/claim/components/common/LoadingTable';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { LoadingCards } from '@packages/scoutgame-ui/components/common/Loading/LoadingCards';
@@ -18,7 +18,7 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
       <Stack
         sx={{
           width: '100%',
-          height: 'calc(100vh - 150px)',
+          height: 'calc(100vh - 147.5px)',
           overflowY: 'scroll'
         }}
         data-test='home-page'
