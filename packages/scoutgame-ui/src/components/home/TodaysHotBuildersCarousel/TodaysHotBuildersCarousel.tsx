@@ -9,7 +9,6 @@ import { BuildersCarousel } from './BuildersCarousel';
 
 export async function TodaysHotBuildersCarousel({ showPromoCards = false }: { showPromoCards?: boolean }) {
   const [error, builders] = await safeAwaitSSRData(getTodaysHotBuilders());
-
   if (error) {
     return <ErrorSSRMessage />;
   }
