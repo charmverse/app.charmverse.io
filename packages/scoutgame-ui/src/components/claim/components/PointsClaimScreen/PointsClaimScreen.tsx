@@ -151,12 +151,15 @@ export function PointsClaimScreen({
           )}
         </Stack>
         {user ? (
-          <PointsClaimSocialShare
-            builderPoints={builderPoints}
-            scoutPoints={scoutPoints}
-            builders={builders.map((b) => b.displayName)}
-            userPath={user.path}
-          />
+          <Stack width='100%'>
+            <PointsClaimSocialShare
+              userId={user.id}
+              builderPoints={builderPoints}
+              scoutPoints={scoutPoints}
+              builders={builders.map((b) => b.displayName)}
+              userPath={user.path}
+            />
+          </Stack>
         ) : null}
       </Dialog>
     </Paper>

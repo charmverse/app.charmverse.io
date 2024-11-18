@@ -31,11 +31,11 @@ export default async function Claim({ searchParams }: { searchParams: { tab: str
         builders={builders}
         builderPoints={builderPoints}
         scoutPoints={scoutPoints}
-        repos={repos}
         period={searchParams.tab}
         displayName={user.displayName}
         totalUnclaimedPoints={points}
         bonusPartners={bonusPartners}
+        repos={repos}
       />
     </PageContainer>
   );
