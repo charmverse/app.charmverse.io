@@ -125,6 +125,11 @@ async function getNewScouts({ week, season }: { week: string; season: string }) 
       path: true,
       displayName: true,
       avatar: true,
+      scoutWallet: {
+        select: {
+          address: true
+        }
+      },
       nftPurchaseEvents: {
         where: {
           builderNFT: {
