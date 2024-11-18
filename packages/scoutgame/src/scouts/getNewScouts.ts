@@ -80,6 +80,7 @@ export async function getRankedNewScoutsForPastWeek({
     }),
     getNewScouts({ week, season })
   ]);
+
   // remove receipts for builder payout
   const scoutReceipts = receipts.filter((receipt) => receipt.event.builderId !== receipt.recipientId);
   // create a map of userId to pointsEarned
@@ -110,18 +111,15 @@ export async function getNewScouts({ week, season }: { week: string; season: str
           builderEvent: {
             week: {
               gte: week
-            }
-          },
-          builderNFT: {
-            builder: {
-              builderStatus: 'approved'
-            }
+            },
+            season
           }
         },
         // at least one NFT was purchased this week
         some: {
           builderEvent: {
-            week
+            week,
+            season
           }
         }
       }
