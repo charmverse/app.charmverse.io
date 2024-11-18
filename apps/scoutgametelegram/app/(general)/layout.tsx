@@ -11,7 +11,9 @@ export default function Layout({
 }>) {
   return (
     <Stack height='100vh'>
-      <Header />
+      <Box sx={{ position: 'sticky', top: 0, zIndex: 1 }}>
+        <Header />
+      </Box>
       <InfoBackgroundImage />
       <Box sx={{ position: 'relative', zIndex: 1, height: 'calc(100vh - 107.5px)', overflow: 'auto' }}>{children}</Box>
       <StickyFooter />
