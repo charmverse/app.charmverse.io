@@ -8,5 +8,5 @@ export const scoutTabs: TabItem[] = [
 
 export function ScoutTabsMenu({ tab }: { tab: string }) {
   // @TODO: When clicked, the content below the tabs should disappear and the skeleton should appear and then the new content. Somehow this behaviour stopped working.
-  return <TabsMenu value={tab} tabs={scoutTabs} sx={{ mb: 1 }} />;
+  return <TabsMenu value={tab} tabs={scoutTabs} />;
 }

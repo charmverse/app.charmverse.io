@@ -11,13 +11,9 @@ export default function Layout({
 }>) {
   return (
     <>
-      <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto', px: 1 }}>
-        <Box sx={{ position: 'relative', zIndex: 1 }}>
-          <Header />
-        </Box>
-        <InfoBackgroundImage />
-        <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
-      </Box>
+      <Header />
+      <InfoBackgroundImage />
+      <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
       <StickyFooter />
     </>
   );
