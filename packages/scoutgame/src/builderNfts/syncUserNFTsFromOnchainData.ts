@@ -77,8 +77,8 @@ export async function syncUserNFTsFromOnchainData({
         purchaseInfo: {
           quotedPriceCurrency: optimismUsdcContractAddress,
           builderContractAddress: realOptimismMainnetBuildersContract,
-          tokenId: parseInt(txToReconcile.tokenId),
-          quotedPrice: Number(expectedPrice.toString()),
+          tokenId: Number(txToReconcile.tokenId),
+          quotedPrice: Number(expectedPrice),
           tokenAmount: Number(txToReconcile.amount)
         }
       }));
