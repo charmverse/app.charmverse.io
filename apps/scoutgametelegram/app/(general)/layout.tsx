@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import { Header } from 'components/common/Header';
 import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
@@ -10,11 +10,11 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
+    <Stack height='100vh'>
       <Header />
       <InfoBackgroundImage />
-      <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
+      <Box sx={{ position: 'relative', zIndex: 1, height: 'calc(100vh - 107.5px)', overflow: 'auto' }}>{children}</Box>
       <StickyFooter />
-    </>
+    </Stack>
   );
 }

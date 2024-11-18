@@ -32,7 +32,7 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
         <Box
           sx={{
             position: 'sticky',
-            top: -5,
+            top: 0,
             backgroundColor: 'background.default',
             zIndex: 1
           }}
