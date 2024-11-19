@@ -7,7 +7,7 @@ import { builderNftChain, getBuilderContractAddress } from '../constants';
 import type { BlockRange } from './convertBlockRange';
 import { convertBlockRange } from './convertBlockRange';
 
-const transferSingle = {
+const transferSingleAbi = {
   anonymous: false,
   inputs: [
     { indexed: true, internalType: 'address', name: 'operator', type: 'address' },
@@ -32,11 +32,11 @@ export function getTransferSingleEvents({ fromBlock, toBlock }: BlockRange): Pro
     .getLogs({
       ...convertBlockRange({ fromBlock, toBlock }),
       address: getBuilderContractAddress(),
-      event: transferSingle
+      event: transferSingleAbi
     })
     .then((logs) =>
       parseEventLogs({
-        abi: [transferSingle],
+        abi: [transferSingleAbi],
         logs,
         eventName: 'TransferSingle'
       })

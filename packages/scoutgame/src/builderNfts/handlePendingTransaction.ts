@@ -75,7 +75,7 @@ export async function handlePendingTransaction({
     });
 
     if (!validatedMint) {
-      log.error(`Transaction on chain ${pendingTx.destinationChainId} failed`);
+      log.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, { userId: pendingTx.userId });
       throw new DecentTxFailedPermanently();
     } else {
       // Update the pending transaction status to 'completed' and set destination details

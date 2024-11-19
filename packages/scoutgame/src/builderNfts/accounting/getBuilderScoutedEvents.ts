@@ -5,7 +5,7 @@ import { builderNftChain, getBuilderContractAddress } from '../constants';
 
 import { convertBlockRange, type BlockRange } from './convertBlockRange';
 
-const builderScouted = {
+const builderScoutedAbi = {
   anonymous: false,
   inputs: [
     { indexed: false, internalType: 'uint256', name: 'tokenId', type: 'uint256' },
@@ -47,11 +47,11 @@ export function getBuilderScoutedEvents({ fromBlock, toBlock }: BlockRange): Pro
     .getLogs({
       ...convertBlockRange({ fromBlock, toBlock }),
       address: getBuilderContractAddress(),
-      event: builderScouted
+      event: builderScoutedAbi
     })
     .then((logs) =>
       parseEventLogs({
-        abi: [builderScouted],
+        abi: [builderScoutedAbi],
         logs,
         eventName: 'BuilderScouted'
       }).filter((ev) => !ignoreEvent(ev))
