@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { findScoutOrThrow } from '@packages/scoutgame/users/findScoutOrThrow';
-import { getScoutedBuilders } from '@packages/scoutgame/users/getScoutedBuilders';
-import { getScoutStats } from '@packages/scoutgame/users/getScoutStats';
+import { findScoutOrThrow } from '@packages/scoutgame/scouts/findScoutOrThrow';
+import { getScoutedBuilders } from '@packages/scoutgame/scouts/getScoutedBuilders';
+import { getScoutStats } from '@packages/scoutgame/scouts/getScoutStats';
 import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
