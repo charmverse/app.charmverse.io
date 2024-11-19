@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import { TransactionStatus, prisma } from '@charmverse/core/prisma-client';
 import { realOptimismMainnetBuildersContract } from '@packages/scoutgame/builderNfts/constants';
 import { handlePendingTransaction } from '@packages/scoutgame/builderNfts/handlePendingTransaction';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 
 export async function processNftMints() {
   const pending = await prisma.pendingNftTransaction.findMany({
@@ -17,7 +17,7 @@ export async function processNftMints() {
 
   const totalPendingTxs = pending.length;
 
-  log.info(`Found ${totalPendingTxs} mint transactions to process`, {
+  scoutgameMintsLogger.info(`Found ${totalPendingTxs} mint transactions to process`, {
     tx: pending.map((tx) => ({
       createdAt: tx.createdAt,
       sourceChainTxHash: tx.sourceChainTxHash,
@@ -29,7 +29,7 @@ export async function processNftMints() {
     const pendingTx = pending[i];
 
     try {
-      log.info(`Processing ${i + 1}/${totalPendingTxs} pending txs`, {
+      scoutgameMintsLogger.info(`Processing ${i + 1}/${totalPendingTxs} pending txs`, {
         pendingTransactionId: pendingTx.id,
         builderId: pendingTx.tokenId,
         sourceChainTxHash: pendingTx.sourceChainTxHash,
@@ -37,9 +37,9 @@ export async function processNftMints() {
       });
       await handlePendingTransaction({ pendingTransactionId: pendingTx.id });
 
-      log.info(`Processed ${i + 1}/${totalPendingTxs} pending txs`);
+      scoutgameMintsLogger.info(`Processed ${i + 1}/${totalPendingTxs} pending txs`);
     } catch (error) {
-      log.warn(`Error processing pending tx`, { pendingTransactionId: pendingTx.id, error });
+      scoutgameMintsLogger.warn(`Error processing pending tx`, { pendingTransactionId: pendingTx.id, error });
     }
   }
 }
