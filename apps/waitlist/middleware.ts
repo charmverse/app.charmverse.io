@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/frame')) {
+    const redirectDomain = process.env.REDIRECT_DOMAIN;
     return NextResponse.redirect(
-      new URL(`https://scoutgame.xyz/${request.nextUrl.pathname}${request.nextUrl.search}`),
+      new URL(`${redirectDomain}/${request.nextUrl.pathname}${request.nextUrl.search}`),
       302
     );
   }
