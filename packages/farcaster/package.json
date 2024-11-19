@@ -10,6 +10,6 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@packages/utils": "file:../../packages/utils"
+    "@packages/utils": "^1.0.0"
   }
 }

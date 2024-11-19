@@ -2,9 +2,9 @@ import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
+import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BasicUserInfo } from './interfaces';
-import { BasicUserInfoSelect } from './queries';
 
 export async function getUserByPath(path: string): Promise<
   | (BasicUserInfo & {

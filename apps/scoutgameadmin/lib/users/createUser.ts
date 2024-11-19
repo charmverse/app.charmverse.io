@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { octokit } from '@packages/github/client';
 import { findOrCreateFarcasterUser } from '@packages/scoutgame/users/findOrCreateFarcasterUser';
+import { randomString } from '@packages/utils/strings';
 
 import type { SearchUserResult } from './searchForUser';
 
@@ -44,6 +45,7 @@ export async function createUser({ scout, waitlistUser, farcasterUser }: SearchU
         builderStatus: 'applied',
         farcasterId: waitlistUser.fid,
         farcasterName: username,
+        referralCode: randomString(),
         githubUser: githubUserDB
           ? { connect: { id: githubUserDB.id } }
           : githubUser

@@ -337,7 +337,7 @@
     "rfc6902": "^5.0.1",
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless": "^4.1.19",
-    "sharp": "^0.33.4",
+    "sharp": "^0.33.5",
     "siwe": "^2.1.4",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
