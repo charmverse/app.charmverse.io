@@ -38,7 +38,7 @@ export class BuilderNFTSeasonOneImplementation01Client {
 
   private chain: Chain;
 
-  private abi: Abi = [
+  public abi = [
     {
       inputs: [
         {
@@ -255,8 +255,70 @@ export class BuilderNFTSeasonOneImplementation01Client {
       ],
       stateMutability: 'view',
       type: 'function'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256'
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'amount',
+          type: 'uint256'
+        },
+        {
+          indexed: false,
+          internalType: 'string',
+          name: 'scout',
+          type: 'string'
+        }
+      ],
+      name: 'BuilderScouted',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'operator',
+          type: 'address'
+        },
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'from',
+          type: 'address'
+        },
+        {
+          indexed: true,
+          internalType: 'address',
+          name: 'to',
+          type: 'address'
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'id',
+          type: 'uint256'
+        },
+        {
+          indexed: false,
+          internalType: 'uint256',
+          name: 'value',
+          type: 'uint256'
+        }
+      ],
+      name: 'TransferSingle',
+      type: 'event'
     }
-  ];
+  ] as const;
 
   constructor({
     contractAddress,
@@ -296,7 +358,7 @@ export class BuilderNFTSeasonOneImplementation01Client {
     const txData = encodeFunctionData({
       abi: this.abi,
       functionName: 'balanceOf',
-      args: [params.args.account, params.args.id]
+      args: [params.args.account as Address, params.args.id]
     });
 
     const { data } = await this.publicClient.call({
@@ -407,7 +469,10 @@ export class BuilderNFTSeasonOneImplementation01Client {
     return result as bigint;
   }
 
-  async getTokenPurchasePrice(params: { args: { tokenId: bigint; amount: bigint } }): Promise<bigint> {
+  async getTokenPurchasePrice(params: {
+    args: { tokenId: bigint; amount: bigint };
+    blockNumber?: bigint;
+  }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
       functionName: 'getTokenPurchasePrice',
@@ -416,7 +481,8 @@ export class BuilderNFTSeasonOneImplementation01Client {
 
     const { data } = await this.publicClient.call({
       to: this.contractAddress,
-      data: txData
+      data: txData,
+      blockNumber: params.blockNumber
     });
 
     // Decode the result based on the expected return type
@@ -442,7 +508,7 @@ export class BuilderNFTSeasonOneImplementation01Client {
     const txData = encodeFunctionData({
       abi: this.abi,
       functionName: 'mintTo',
-      args: [params.args.account, params.args.tokenId, params.args.amount, params.args.scout]
+      args: [params.args.account as Address, params.args.tokenId, params.args.amount, params.args.scout]
     });
 
     const txInput: Omit<Parameters<WalletClient['sendTransaction']>[0], 'account' | 'chain'> = {

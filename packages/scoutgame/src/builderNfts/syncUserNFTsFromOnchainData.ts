@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 import { savePendingTransaction } from '../savePendingTransaction';
 
 import { optimismUsdcContractAddress, realOptimismMainnetBuildersContract } from './constants';
@@ -37,7 +37,7 @@ export async function syncUserNFTsFromOnchainData({
   for (let i = 0; i < txRequiringReconciliation.length; i++) {
     const txToReconcile = txRequiringReconciliation[i];
 
-    log.error(`Processing missing txToReconcile ${i + 1} / ${txRequiringReconciliation.length}`, {
+    scoutgameMintsLogger.error(`Processing missing txToReconcile ${i + 1} / ${txRequiringReconciliation.length}`, {
       sourceTransaction: txToReconcile.pendingTransaction?.sourceChainTxHash,
       sourceChain: txToReconcile.pendingTransaction?.sourceChainId,
       optimismTxHash: txToReconcile.txHash,
@@ -56,7 +56,7 @@ export async function syncUserNFTsFromOnchainData({
       }));
 
     if (!txToReconcile.pendingTransaction) {
-      log.error('No pending transaction found for txToReconcile', {
+      scoutgameMintsLogger.error('No pending transaction found for txToReconcile', {
         scoutId: txToReconcile.scoutId,
         tokenId: txToReconcile.tokenId,
         tokensToPurchase: txToReconcile.amount
@@ -77,8 +77,8 @@ export async function syncUserNFTsFromOnchainData({
         purchaseInfo: {
           quotedPriceCurrency: optimismUsdcContractAddress,
           builderContractAddress: realOptimismMainnetBuildersContract,
-          tokenId: parseInt(txToReconcile.tokenId),
-          quotedPrice: Number(expectedPrice.toString()),
+          tokenId: Number(txToReconcile.tokenId),
+          quotedPrice: Number(expectedPrice),
           tokenAmount: Number(txToReconcile.amount)
         }
       }));
