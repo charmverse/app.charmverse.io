@@ -1,10 +1,10 @@
 'use server';
 
-import { log } from '@charmverse/core/log';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { authActionClient } from '../actions/actionClient';
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 import { savePendingTransaction } from '../savePendingTransaction';
 import { getUserFromSession } from '../session/getUserFromSession';
 
@@ -45,7 +45,7 @@ export const saveDecentTransactionAction = authActionClient
       ...parsedInput,
       user: { ...(parsedInput.user as any), scoutId: userId }
     });
-    log.info('Saved NFT transaction', {
+    scoutgameMintsLogger.info('Saved NFT transaction', {
       transactionInfo: parsedInput.transactionInfo,
       purchaseInfo: parsedInput.purchaseInfo,
       pendingTransactionId: data.id,

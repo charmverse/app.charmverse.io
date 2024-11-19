@@ -5,7 +5,8 @@ import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { refreshBuilderNftPrice } from '@packages/scoutgame/builderNfts/refreshBuilderNftPrice';
 import type { Season } from '@packages/scoutgame/dates';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
-import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
+
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 
 import type { MintNFTParams } from './mintNFT';
 
@@ -36,7 +37,7 @@ export async function recordNftMint(
   });
 
   if (existingTx) {
-    scoutgamePaymentsLogger.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
+    scoutgameMintsLogger.warn(`Tried to record duplicate tx ${mintTxHash}`, { params, existingTx });
     return;
   }
 
@@ -183,7 +184,7 @@ export async function recordNftMint(
     return builderEvent.nftPurchaseEvent;
   });
 
-  scoutgamePaymentsLogger.info('Minted NFT', {
+  scoutgameMintsLogger.info('Minted NFT', {
     builderNftId,
     recipientAddress,
     tokenId: builderNft.tokenId,

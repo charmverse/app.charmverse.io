@@ -7,9 +7,9 @@ import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
-import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 
 import { currentSeason } from '../dates';
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
@@ -36,7 +36,7 @@ export async function handlePendingTransaction({
   });
 
   if (updatedTx.count === 0) {
-    scoutgamePaymentsLogger.info('Skip processing tx as it is locked', { pendingTransactionId });
+    scoutgameMintsLogger.info('Skip processing tx as it is locked', { pendingTransactionId });
     // The transaction is already being processed or completed, so exit
     return;
   }
@@ -50,7 +50,7 @@ export async function handlePendingTransaction({
     });
 
     if (pendingTx.status !== 'processing') {
-      scoutgamePaymentsLogger.info(`Skipping processing for tx id ${pendingTx.id}`);
+      scoutgameMintsLogger.info(`Skipping processing for tx id ${pendingTx.id}`);
       return;
     }
 
@@ -75,7 +75,7 @@ export async function handlePendingTransaction({
     });
 
     if (!validatedMint) {
-      scoutgamePaymentsLogger.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, {
+      scoutgameMintsLogger.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, {
         userId: pendingTx.userId
       });
       throw new DecentTxFailedPermanently();

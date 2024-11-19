@@ -7,7 +7,7 @@ import {
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
 import { saveDecentTransactionAction } from '@packages/scoutgame/builderNfts/saveDecentTransactionAction';
-import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
@@ -67,7 +67,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       showMessage(`Transaction ${input.txHash || ''} was successful`, 'success');
     },
     onError({ error, input }) {
-      scoutgamePaymentsLogger.error(`Error checking Decent transaction`, { error, input });
+      scoutgameMintsLogger.error(`Error checking Decent transaction`, { error, input });
       showMessage(error.serverError?.message || 'Something went wrong', 'error');
     }
   });
@@ -90,20 +90,20 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
         await refreshUser();
 
         if (checkResult?.serverError) {
-          scoutgamePaymentsLogger.error(`Error checking decent.xyz for transaction`, {
+          scoutgameMintsLogger.error(`Error checking decent.xyz for transaction`, {
             chainId: res.input.transactionInfo.sourceChainId,
             builderTokenId: res.input.purchaseInfo.tokenId,
             purchaseCost: res.input.purchaseInfo.quotedPrice
           });
         } else if (checkResult?.data?.success) {
-          scoutgamePaymentsLogger.info(`NFT minted`, {
+          scoutgameMintsLogger.info(`NFT minted`, {
             chainId: res.input.transactionInfo.sourceChainId,
             builderTokenId: res.input.purchaseInfo.tokenId,
             purchaseCost: res.input.purchaseInfo.quotedPrice
           });
         }
       } else {
-        scoutgamePaymentsLogger.warn(`NFT minted but no transaction id returned`, {
+        scoutgameMintsLogger.warn(`NFT minted but no transaction id returned`, {
           chainId: res.input.transactionInfo.sourceChainId,
           builderTokenId: res.input.purchaseInfo.tokenId,
           purchaseCost: res.input.purchaseInfo.quotedPrice,
@@ -112,7 +112,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       }
     },
     onError({ error, input }) {
-      scoutgamePaymentsLogger.error(`Error saving Decent NFT transaction`, {
+      scoutgameMintsLogger.error(`Error saving Decent NFT transaction`, {
         chainId: input.transactionInfo.sourceChainId,
         input,
         error
@@ -155,13 +155,13 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
             });
 
             if (output?.serverError) {
-              scoutgamePaymentsLogger.error(`Saving mint transaction failed`, {});
+              scoutgameMintsLogger.error(`Saving mint transaction failed`, {});
             } else {
-              scoutgamePaymentsLogger.info(`Successfully sent mint transaction`, { data: _data });
+              scoutgameMintsLogger.info(`Successfully sent mint transaction`, { data: _data });
             }
           },
           onError: (err: any) => {
-            scoutgamePaymentsLogger.error(`Creating a mint transaction failed`, {
+            scoutgameMintsLogger.error(`Creating a mint transaction failed`, {
               txData: input.txData,
               txMetadata: input.txMetadata,
               error: err

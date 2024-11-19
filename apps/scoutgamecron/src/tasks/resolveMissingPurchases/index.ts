@@ -1,11 +1,11 @@
-import { log } from '@charmverse/core/log';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import type Koa from 'koa';
 
 import { findAndIndexMissingPurchases } from './findAndIndexMissingPurchases';
 
 export async function resolveMissingPurchasesTask(ctx: Koa.Context) {
-  log.info('Resyncing builder NFT sales');
+  scoutgameMintsLogger.info('Resyncing builder NFT sales');
 
   await findAndIndexMissingPurchases();
-  log.info(`Syncing complete`);
+  scoutgameMintsLogger.info(`Syncing complete`);
 }

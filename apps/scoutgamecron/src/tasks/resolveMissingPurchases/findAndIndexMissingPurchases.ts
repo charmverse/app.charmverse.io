@@ -1,7 +1,3 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { BuilderScoutedEvent } from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
 import { getBuilderScoutedEvents } from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
@@ -10,6 +6,7 @@ import { getTransferSingleEvents } from '@packages/scoutgame/builderNfts/account
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
 import { recordNftMint } from '@packages/scoutgame/builderNfts/recordNftMint';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 
 // Start block number for refetching events - Nov.14th 2024 - Last manual reindexing was Nov. 17th 2024
 const startBlockNumberForReindexing = 128000000;
@@ -44,11 +41,11 @@ export async function findAndIndexMissingPurchases() {
 
   // Early exit
   if (!missingEvents.length) {
-    log.info('No missing events found');
+    scoutgameMintsLogger.info('No missing events found');
     return;
   }
 
-  log.error(`Found ${missingEvents.length} missing events`);
+  scoutgameMintsLogger.error(`Found ${missingEvents.length} missing events`);
 
   const groupedByTokenId = missingEvents.reduce(
     (acc, val) => {
@@ -76,12 +73,12 @@ export async function findAndIndexMissingPurchases() {
 
   for (const key of allTokenIdsAsString) {
     for (const missingTx of groupedByTokenId[key as any].records) {
-      log.error('Missing tx', missingTx.transactionHash, 'tokenId', key);
+      scoutgameMintsLogger.error('Missing tx', missingTx.transactionHash, 'tokenId', key);
 
       const matchingNft = nfts.find((nft) => nft.tokenId === Number(key));
 
       if (!matchingNft) {
-        log.error(`NFT with tokenId ${key} not found`);
+        scoutgameMintsLogger.error(`NFT with tokenId ${key} not found`);
         // eslint-disable-next-line no-continue
         continue;
       }
@@ -96,7 +93,7 @@ export async function findAndIndexMissingPurchases() {
       const address = transferSingleEvents[missingTx.transactionHash].args.to;
 
       if (!address) {
-        log.error(`Tx ${missingTx.transactionHash} has no recipient address`);
+        scoutgameMintsLogger.error(`Tx ${missingTx.transactionHash} has no recipient address`);
       }
 
       await recordNftMint({
