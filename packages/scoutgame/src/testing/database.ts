@@ -55,6 +55,7 @@ export async function mockBuilder({
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;
 
 export async function mockScout({
+  createdAt,
   path = `user-${uuid()}`,
   displayName = 'Test Scout',
   agreedToTermsAt = new Date(),
@@ -65,6 +66,7 @@ export async function mockScout({
   currentBalance,
   avatar
 }: {
+  createdAt?: Date;
   avatar?: string;
   path?: string;
   agreedToTermsAt?: Date | null;
@@ -77,6 +79,7 @@ export async function mockScout({
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
+      createdAt,
       path,
       agreedToTermsAt,
       onboardedAt,
@@ -233,6 +236,7 @@ export async function mockNFTPurchaseEvent({
   builderId,
   scoutId,
   points = 0,
+  week = getCurrentWeek(),
   season = mockSeason,
   tokensPurchased = 1
 }: {
@@ -241,6 +245,7 @@ export async function mockNFTPurchaseEvent({
   points?: number;
   season?: string;
   tokensPurchased?: number;
+  week?: string;
 }) {
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
@@ -257,7 +262,7 @@ export async function mockNFTPurchaseEvent({
       },
       season,
       type: 'nft_purchase',
-      week: getCurrentWeek(),
+      week,
       nftPurchaseEvent: {
         create: {
           builderNftId: builderNft.id,

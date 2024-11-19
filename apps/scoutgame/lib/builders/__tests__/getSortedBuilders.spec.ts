@@ -7,8 +7,8 @@ import { getSortedBuilders } from '../getSortedBuilders';
 
 describe('getSortedBuilders', () => {
   it('Should sort builders by new', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W21';
+    const mockSeason = '2024-W21';
     const builders = await Promise.all([
       mockBuilder({ createdAt: new Date('2024-01-01'), createNft: true, nftSeason: mockSeason }),
       mockBuilder({ createdAt: new Date('2024-01-02'), createNft: true, nftSeason: mockSeason }),
@@ -25,8 +25,8 @@ describe('getSortedBuilders', () => {
   });
 
   it('Should sort builders by hot', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W22';
+    const mockSeason = '2024-W22';
     // include a 3rd builder that has no weekly stats for this week
     const builders = await Promise.all([
       mockBuilder({ createNft: true, nftSeason: mockSeason }),
@@ -55,8 +55,8 @@ describe('getSortedBuilders', () => {
   });
 
   it('Should sort builders by top', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W23';
+    const mockSeason = '2024-W23';
     const builders = await Promise.all([
       mockBuilder({ createNft: true, nftSeason: mockSeason }),
       mockBuilder({ createNft: true, nftSeason: mockSeason }),
@@ -93,8 +93,8 @@ describe('getSortedBuilders', () => {
   });
 
   it('should skip builders without nfts', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W24';
+    const mockSeason = '2024-W24';
     const builders = await Promise.all([
       mockBuilder(),
       mockBuilder({ createNft: true, nftSeason: mockSeason }),
@@ -117,8 +117,8 @@ describe('getSortedBuilders', () => {
   });
 
   it('should skip rejected or pending or banned builders', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W25';
+    const mockSeason = '2024-W25';
     const builders = await Promise.all([
       mockBuilder({ builderStatus: 'applied' }),
       mockBuilder({ createNft: true, nftSeason: mockSeason }),
@@ -136,8 +136,8 @@ describe('getSortedBuilders', () => {
   });
 
   it('should throw an error for invalid sort option', async () => {
-    const mockWeek = v4();
-    const mockSeason = v4();
+    const mockWeek = '2024-W26';
+    const mockSeason = '2024-W26';
     await expect(
       getSortedBuilders({
         sort: 'invalid' as BuildersSort,
