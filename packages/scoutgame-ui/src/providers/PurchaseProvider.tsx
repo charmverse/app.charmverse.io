@@ -1,6 +1,5 @@
 'use client';
 
-import { log } from '@charmverse/core/log';
 import { checkDecentTransactionAction } from '@packages/scoutgame/builderNfts/checkDecentTransactionAction';
 import {
   builderNftChain,
@@ -8,6 +7,7 @@ import {
   optimismUsdcContractAddress
 } from '@packages/scoutgame/builderNfts/constants';
 import { saveDecentTransactionAction } from '@packages/scoutgame/builderNfts/saveDecentTransactionAction';
+import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 import { useAction } from 'next-safe-action/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
@@ -18,8 +18,6 @@ import { useRefreshCongratsImage } from '../hooks/api/builders';
 
 import { useSnackbar } from './SnackbarContext';
 import { useUser } from './UserProvider';
-
-const purchaseLogPrefix = 'MINT_ACTION';
 
 type MintTransactionInput = {
   txData: {
@@ -69,7 +67,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       showMessage(`Transaction ${input.txHash || ''} was successful`, 'success');
     },
     onError({ error, input }) {
-      log.error(`${purchaseLogPrefix} Error checking Decent transaction`, { error, input });
+      scoutgamePaymentsLogger.error(`Error checking Decent transaction`, { error, input });
       showMessage(error.serverError?.message || 'Something went wrong', 'error');
     }
   });
@@ -92,20 +90,20 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
         await refreshUser();
 
         if (checkResult?.serverError) {
-          log.error(`${purchaseLogPrefix} Error checking decent.xyz for transaction`, {
+          scoutgamePaymentsLogger.error(`Error checking decent.xyz for transaction`, {
             chainId: res.input.transactionInfo.sourceChainId,
             builderTokenId: res.input.purchaseInfo.tokenId,
             purchaseCost: res.input.purchaseInfo.quotedPrice
           });
-        } else {
-          log.info(`${purchaseLogPrefix} NFT minted`, {
+        } else if (checkResult?.data?.success) {
+          scoutgamePaymentsLogger.info(`NFT minted`, {
             chainId: res.input.transactionInfo.sourceChainId,
             builderTokenId: res.input.purchaseInfo.tokenId,
             purchaseCost: res.input.purchaseInfo.quotedPrice
           });
         }
       } else {
-        log.warn(`${purchaseLogPrefix} NFT minted but no transaction id returned`, {
+        scoutgamePaymentsLogger.warn(`NFT minted but no transaction id returned`, {
           chainId: res.input.transactionInfo.sourceChainId,
           builderTokenId: res.input.purchaseInfo.tokenId,
           purchaseCost: res.input.purchaseInfo.quotedPrice,
@@ -114,7 +112,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
       }
     },
     onError({ error, input }) {
-      log.error(`${purchaseLogPrefix} Error saving Decent NFT transaction`, {
+      scoutgamePaymentsLogger.error(`Error saving Decent NFT transaction`, {
         chainId: input.transactionInfo.sourceChainId,
         input,
         error
@@ -157,13 +155,13 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
             });
 
             if (output?.serverError) {
-              log.error(`${purchaseLogPrefix} Saving mint transaction failed`, {});
+              scoutgamePaymentsLogger.error(`Saving mint transaction failed`, {});
             } else {
-              log.info(`${purchaseLogPrefix} Successfully sent mint transaction`, { data: _data });
+              scoutgamePaymentsLogger.info(`Successfully sent mint transaction`, { data: _data });
             }
           },
           onError: (err: any) => {
-            log.error(`${purchaseLogPrefix} Creating a mint transaction failed`, {
+            scoutgamePaymentsLogger.error(`Creating a mint transaction failed`, {
               txData: input.txData,
               txMetadata: input.txMetadata,
               error: err

@@ -1,13 +1,13 @@
 'use server';
 
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
+import { scoutgamePaymentsLogger } from '@packages/scoutgame/loggers/paymentsLogger';
 
 import { currentSeason } from '../dates';
 
@@ -36,7 +36,7 @@ export async function handlePendingTransaction({
   });
 
   if (updatedTx.count === 0) {
-    log.info('Skip processing tx as it is locked', { pendingTransactionId });
+    scoutgamePaymentsLogger.info('Skip processing tx as it is locked', { pendingTransactionId });
     // The transaction is already being processed or completed, so exit
     return;
   }
@@ -50,7 +50,7 @@ export async function handlePendingTransaction({
     });
 
     if (pendingTx.status !== 'processing') {
-      log.info(`Skipping processing for tx id ${pendingTx.id}`);
+      scoutgamePaymentsLogger.info(`Skipping processing for tx id ${pendingTx.id}`);
       return;
     }
 
@@ -75,7 +75,9 @@ export async function handlePendingTransaction({
     });
 
     if (!validatedMint) {
-      log.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, { userId: pendingTx.userId });
+      scoutgamePaymentsLogger.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, {
+        userId: pendingTx.userId
+      });
       throw new DecentTxFailedPermanently();
     } else {
       // Update the pending transaction status to 'completed' and set destination details
