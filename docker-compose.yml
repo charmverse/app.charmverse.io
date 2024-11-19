@@ -43,7 +43,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     # environment:
     #   - FORCE_SUBDOMAINS=true
@@ -94,7 +94,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env --dest ./apps/scoutgame/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/scoutgame --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/scoutgame/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/scoutgame --keepAliveTimeout 70000'
       ]
     profiles:
       - prd-scoutgame
