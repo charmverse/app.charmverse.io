@@ -135,7 +135,7 @@ export function EditableUserProfile({
               <IconButton
                 sx={{
                   position: 'absolute',
-                  top: -5,
+                  top: 0,
                   right: -5,
                   zIndex: 20,
                   backgroundColor: 'background.light',
@@ -147,7 +147,7 @@ export function EditableUserProfile({
                 }}
                 color='primary'
               >
-                <EditIcon fontSize='small' />
+                <EditIcon sx={{ fontSize: 16 }} />
               </IconButton>
             )}
             {isUploading ? (
@@ -215,13 +215,20 @@ export function EditableUserProfile({
                     {farcasterName || githubLogin ? (
                       <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
                     ) : null}
-                    <EditIcon
-                      sx={{ cursor: 'pointer' }}
-                      fontSize='small'
+                    <IconButton
+                      sx={{
+                        backgroundColor: 'background.light',
+                        borderRadius: '50%',
+                        padding: 0.5
+                      }}
+                      color='primary'
+                      size='small'
                       onClick={() => {
                         setIsEditingName(true);
                       }}
-                    />
+                    >
+                      <EditIcon sx={{ fontSize: 16 }} />
+                    </IconButton>
                   </Stack>
                 )}
               </Stack>
