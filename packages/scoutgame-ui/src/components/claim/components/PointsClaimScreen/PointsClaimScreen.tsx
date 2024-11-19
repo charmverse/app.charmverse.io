@@ -27,7 +27,7 @@ export function PointsClaimScreen({
   displayName: string;
   bonusPartners: BonusPartner[];
   builders: {
-    avatar: string | null;
+    farcasterHandle?: string;
     displayName: string;
   }[];
   repos: string[];
@@ -160,7 +160,7 @@ export function PointsClaimScreen({
             <PointsClaimSocialShare
               isBuilder={repos.length > 0}
               totalUnclaimedPoints={totalUnclaimedPoints}
-              builders={builders.map((b) => b.displayName)}
+              builders={builders}
               userPath={user.path}
             />
           </Stack>

@@ -8,7 +8,7 @@ type ShareMessageProps = {
   isBuilder: boolean;
   platform: 'x' | 'telegram' | 'warpcast';
   userPath: string;
-  builders: string[];
+  builders: { farcasterHandle?: string; displayName: string }[];
 };
 
 export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'>) {
@@ -62,9 +62,13 @@ function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, 
   } else if (isBuilder) {
     shareMessage += ` Discover my work and scout me to see what I'm building next!\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
   } else {
-    shareMessage += ` Big shoutout to my top Builders: ${builders.join(
-      ', '
-    )}. Who will be next?\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
+    const buidersFormatted =
+      platform === 'warpcast'
+        ? builders
+            .map((builder) => (builder.farcasterHandle ? `@${builder.farcasterHandle}` : builder.displayName))
+            .join(', ')
+        : builders.map((builder) => builder.displayName).join(', ');
+    shareMessage += ` Big shoutout to my top Builders: ${buidersFormatted}. Who will be next?\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
   }
   const urls = {
     x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,

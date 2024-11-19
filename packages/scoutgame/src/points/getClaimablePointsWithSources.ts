@@ -1,4 +1,7 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getFarcasterUserByIds } from '@packages/farcaster/getFarcasterUserById';
+import { isTruthy } from '@packages/utils/types';
 
 import type { BonusPartner } from '../bonus';
 import { currentSeason, getCurrentWeek } from '../dates';
@@ -9,7 +12,7 @@ export type UnclaimedPointsSource = {
   builders: {
     id: string;
     avatar: string | null;
-    farcasterId: number | null;
+    farcasterHandle?: string;
     displayName: string;
   }[];
   points: number;
@@ -63,7 +66,8 @@ export async function getClaimablePointsWithSources(userId: string): Promise<Unc
 
   const topBuilderIds = Object.entries(builderIdScoutPointsRecord)
     .sort((builder1, builder2) => builder2[1] - builder1[1])
-    .map(([builderId]) => builderId);
+    .map(([builderId]) => builderId)
+    .slice(0, 3);
 
   const builders = await prisma.scout.findMany({
     where: {
@@ -75,6 +79,19 @@ export async function getClaimablePointsWithSources(userId: string): Promise<Unc
       displayName: true,
       farcasterId: true
     }
+  });
+
+  const farcasterIds = builders.map((b) => b.farcasterId).filter(isTruthy);
+  const farcasterUsers = await getFarcasterUserByIds(farcasterIds).catch((err) => {
+    log.error('Could not retrieve farcaster profiles', { farcasterIds, error: err });
+    return [];
+  });
+  const buildersWithFarcaster: UnclaimedPointsSource['builders'] = builders.map((builder) => {
+    const farcasterUser = farcasterUsers.find((f) => f.fid === builder.farcasterId);
+    return {
+      ...builder,
+      farcasterHandle: farcasterUser?.username
+    };
   });
 
   const repos = await prisma.githubEvent.findMany({
@@ -97,7 +114,7 @@ export async function getClaimablePointsWithSources(userId: string): Promise<Unc
   const uniqueRepos = Array.from(new Set(repos.map((repo) => `${repo.repo.owner}/${repo.repo.name}`)));
 
   return {
-    builders: builders.slice(0, 3),
+    builders,
     points,
     bonusPartners,
     repos: uniqueRepos.slice(0, 3)

@@ -12,11 +12,11 @@ export async function getClaimablePoints({
 }: {
   userId: string;
   season?: Season;
+  week?: string;
 }): Promise<{
   points: number;
   bonusPartners: BonusPartner[];
   pointsReceiptIds: string[];
-  week?: string;
 }> {
   const previousSeason = getPreviousSeason(season);
   const claimableSeasons = [previousSeason, season].filter(Boolean);
