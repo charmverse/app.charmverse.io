@@ -7,7 +7,8 @@ import { currentSeason, getPreviousSeason } from '../dates';
 
 export async function getClaimablePoints({
   userId,
-  season = currentSeason
+  season = currentSeason,
+  week
 }: {
   userId: string;
   season?: Season;
@@ -15,6 +16,7 @@ export async function getClaimablePoints({
   points: number;
   bonusPartners: BonusPartner[];
   pointsReceiptIds: string[];
+  week?: string;
 }> {
   const previousSeason = getPreviousSeason(season);
   const claimableSeasons = [previousSeason, season].filter(Boolean);
@@ -26,6 +28,7 @@ export async function getClaimablePoints({
       recipientId: userId,
       claimedAt: null,
       event: {
+        week,
         season: {
           in: claimableSeasons
         }
