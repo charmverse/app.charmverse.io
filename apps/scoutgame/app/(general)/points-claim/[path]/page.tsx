@@ -1,9 +1,9 @@
 import { getLastWeek } from '@packages/scoutgame/dates';
-import { getUserByPath } from '@packages/scoutgame/users/getUserByPath';
+import { getUserByPathCached } from '@packages/scoutgame/users/getUserByPathCached';
 import { notFound } from 'next/navigation';
 
 export default async function Claim({ params }: { params: { path: string } }) {
-  const user = await getUserByPath(params.path);
+  const user = await getUserByPathCached(params.path);
   if (!user) {
     return notFound();
   }
