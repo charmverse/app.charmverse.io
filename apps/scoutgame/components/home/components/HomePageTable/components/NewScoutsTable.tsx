@@ -1,6 +1,6 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Alert, Button, Stack, Table, TableBody, TableCell, TableHead, Tooltip } from '@mui/material';
-import type { NewScout } from '@packages/scoutgame/scouts/getNewScouts';
+import type { NewScout } from '@packages/scoutgame/users/getNewScouts';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import Image from 'next/image';

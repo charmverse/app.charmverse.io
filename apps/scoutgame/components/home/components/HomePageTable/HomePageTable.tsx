@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
-import { getRankedNewScoutsForCurrentWeek } from '@packages/scoutgame/scouts/getNewScouts';
+import { getRankedNewScoutsForCurrentWeek } from '@packages/scoutgame/users/getNewScouts';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
