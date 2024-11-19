@@ -60,6 +60,8 @@ runs:
           type=sha,prefix=${{github.run_id}}-,format=short
         flavor: |
           latest=${{ github.ref == 'refs/heads/main' }}
+      env:
+        DOCKER_METADATA_SHORT_SHA_LENGTH: 12 # this should match the short-length in the deploy_production action
 
     - name: Build and push
       uses: docker/build-push-action@v6
