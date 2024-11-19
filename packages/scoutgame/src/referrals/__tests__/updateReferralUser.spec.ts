@@ -1,22 +1,21 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { rewardPoints } from '../../constants';
-import { mockScout } from '../../testing/database';
+import { mockBuilderEvent, mockScout } from '../../testing/database';
 import { updateReferralUsers } from '../updateReferralUsers';
 
 describe('updateReferralUsers', () => {
   it('should create a referral event with a valid referral code', async () => {
-    const scout = await mockScout();
-    const scout2 = await mockScout();
+    const referral = await mockScout();
+    const referee = await mockScout();
+    await updateReferralUsers(referral.referralCode || '', referee.id);
 
-    await updateReferralUsers(scout.referralCode || '', scout2.id);
-
-    const event = await prisma.referralCodeEvent.findUnique({
+    const event = await prisma.referralCodeEvent.findFirstOrThrow({
       where: {
-        referrerId_refereeId: {
-          referrerId: scout.id,
-          refereeId: scout2.id
-        }
+        builderEvent: {
+          builderId: referral.id
+        },
+        refereeId: referee.id
       }
     });
 
