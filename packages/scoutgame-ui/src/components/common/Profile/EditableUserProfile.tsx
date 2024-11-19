@@ -297,7 +297,7 @@ export function EditableUserProfile({
                   {_bioField.value}
                 </TextField>
                 <Stack direction='row' gap={0.5}>
-                  {isBioDirty && !error?.message && _bioField.value ? (
+                  {isBioDirty && !error?.message ? (
                     <CheckCircleIcon
                       sx={{ cursor: 'pointer' }}
                       color='success'
