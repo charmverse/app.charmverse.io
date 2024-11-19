@@ -19,7 +19,8 @@ export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {
     mode: 'onChange',
     defaultValues: {
       avatar: user.avatar ?? undefined,
-      displayName: user.displayName
+      displayName: user.displayName,
+      bio: user.bio ?? 'Scouting and building in the blockchain space'
     }
   });
   const { refreshUser } = useUser();
@@ -43,6 +44,9 @@ export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {
       }}
       onDisplayNameChange={(displayName) => {
         updateUserDetails({ avatar: values.avatar, displayName });
+      }}
+      onBioChange={(bio) => {
+        updateUserDetails({ avatar: values.avatar, displayName: values.displayName, bio });
       }}
       isLoading={isUpdatingUserDetails}
       avatarSize={isDesktop ? 100 : 75}

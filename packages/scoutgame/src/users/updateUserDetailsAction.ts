@@ -29,7 +29,8 @@ export const updateUserDetailsAction = authActionClient
       data: {
         avatar: parsedInput.avatar,
         displayName: parsedInput.displayName,
-        path
+        path,
+        bio: parsedInput.bio
       }
     });
 

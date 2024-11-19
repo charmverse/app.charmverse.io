@@ -4,7 +4,7 @@ import type { Scout } from '@charmverse/core/prisma';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, CircularProgress, IconButton, Stack, TextField, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, TextField, Typography } from '@mui/material';
 import Image from 'next/image';
 import { useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
@@ -37,6 +37,7 @@ type UserProfileProps = {
   onAvatarChange?: (url: string) => void;
   onDisplayNameChange?: (displayName: string) => void;
   isLoading?: boolean;
+  onBioChange?: (bio: string) => void;
 };
 
 export function EditableUserProfile({
@@ -45,6 +46,7 @@ export function EditableUserProfile({
   onAvatarChange,
   onDisplayNameChange,
   isLoading,
+  onBioChange,
   avatarSize = 100
 }: UserProfileProps) {
   const isDesktop = useMdScreen();
@@ -52,13 +54,22 @@ export function EditableUserProfile({
   const isMounted = useIsMounted();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isDisplayNameDirty, setIsDisplayNameDirty] = useState(false);
+  const [isBioDirty, setIsBioDirty] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+
   const previousDisplayNameRef = useRef<string>(user.displayName);
+  const previousBioRef = useRef<string>(bio || '');
+
   const { field: avatarField } = useController({
     name: 'avatar',
     control
   });
   const { field: displayNameField } = useController({
     name: 'displayName',
+    control
+  });
+  const { field: bioField } = useController({
+    name: 'bio',
     control
   });
 
@@ -80,6 +91,19 @@ export function EditableUserProfile({
     setIsEditingName(false);
     setIsDisplayNameDirty(false);
     displayNameField.onChange(previousDisplayNameRef.current);
+  };
+
+  const updateBio = (_bio: string) => {
+    setIsEditingBio(false);
+    setIsBioDirty(false);
+    onBioChange?.(_bio);
+    previousBioRef.current = _bio;
+  };
+
+  const resetBio = () => {
+    setIsEditingBio(false);
+    setIsBioDirty(false);
+    bioField.onChange(previousBioRef.current);
   };
 
   // We are using the mounted flag here because MUI media query returns false on the server and true on the client and it throws warnings
@@ -132,23 +156,22 @@ export function EditableUserProfile({
               }}
             />
             {isUploading ? null : (
-              <IconButton
+              <EditIcon
                 sx={{
+                  fontSize: 16,
                   position: 'absolute',
-                  top: 0,
-                  right: -5,
-                  zIndex: 20,
-                  backgroundColor: 'background.light',
-                  p: 0.5
-                }}
-                disabled={isLoading}
-                onClick={() => {
-                  inputRef.current?.click();
+                  top: -2.5,
+                  right: -2.5,
+                  cursor: 'pointer'
                 }}
                 color='primary'
-              >
-                <EditIcon sx={{ fontSize: 16 }} />
-              </IconButton>
+                onClick={() => {
+                  if (isLoading) {
+                    return;
+                  }
+                  inputRef.current?.click();
+                }}
+              />
             )}
             {isUploading ? (
               <CircularProgress color='secondary' size={25} sx={{ position: 'absolute', top: '35%', left: '35%' }} />
@@ -215,31 +238,27 @@ export function EditableUserProfile({
                     {farcasterName || githubLogin ? (
                       <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
                     ) : null}
-                    <IconButton
-                      sx={{
-                        backgroundColor: 'background.light',
-                        borderRadius: '50%',
-                        padding: 0.5
-                      }}
-                      color='primary'
-                      size='small'
+                    <EditIcon
                       onClick={() => {
                         setIsEditingName(true);
                       }}
-                    >
-                      <EditIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
+                      sx={{
+                        cursor: 'pointer'
+                      }}
+                      color='primary'
+                      fontSize='small'
+                    />
                   </Stack>
                 )}
               </Stack>
               {isEditingName && (
                 <Stack direction='row' gap={0.5}>
-                  {isDisplayNameDirty && !error?.message && displayNameField.value ? (
+                  {isDisplayNameDirty && !error?.message && _displayNameField.value ? (
                     <CheckCircleIcon
                       sx={{ cursor: 'pointer' }}
                       color='success'
                       fontSize='small'
-                      onClick={() => updateDisplayName(displayNameField.value)}
+                      onClick={() => updateDisplayName(_displayNameField.value)}
                     />
                   ) : null}
                   <CancelIcon
@@ -255,16 +274,63 @@ export function EditableUserProfile({
             </Stack>
           )}
         />
-        {bio ? (
-          <Typography
-            variant={isDesktop ? 'body2' : 'caption'}
-            overflow='hidden'
-            textOverflow='ellipsis'
-            maxWidth='500px'
-          >
-            {bio}
-          </Typography>
-        ) : null}
+        <Controller
+          name='bio'
+          control={control}
+          render={({ field: _bioField, fieldState: { error } }) =>
+            isEditingBio ? (
+              <Stack gap={1}>
+                <TextField
+                  {..._bioField}
+                  onChange={(event) => {
+                    setIsBioDirty(true);
+                    _bioField.onChange(event);
+                  }}
+                  slotProps={{
+                    input: {
+                      multiline: true,
+                      rows: 3,
+                      placeholder: 'Scouting and building in the blockchain space'
+                    }
+                  }}
+                >
+                  {_bioField.value}
+                </TextField>
+                <Stack direction='row' gap={0.5}>
+                  {isBioDirty && !error?.message && _bioField.value ? (
+                    <CheckCircleIcon
+                      sx={{ cursor: 'pointer' }}
+                      color='success'
+                      fontSize='small'
+                      onClick={() => updateBio(_bioField.value)}
+                    />
+                  ) : null}
+                  <CancelIcon
+                    sx={{ cursor: 'pointer' }}
+                    color='error'
+                    fontSize='small'
+                    onClick={() => {
+                      resetBio();
+                    }}
+                  />
+                </Stack>
+              </Stack>
+            ) : (
+              <Typography variant={isDesktop ? 'body2' : 'caption'}>
+                {_bioField.value || 'Scouting and building in the blockchain space'}
+                <span style={{ marginLeft: '4px' }}>
+                  <EditIcon
+                    sx={{ fontSize: 16, position: 'relative', top: '2px', cursor: 'pointer' }}
+                    onClick={() => {
+                      setIsEditingBio(true);
+                    }}
+                    color='primary'
+                  />
+                </span>
+              </Typography>
+            )
+          }
+        />
       </Stack>
     </Stack>
   );

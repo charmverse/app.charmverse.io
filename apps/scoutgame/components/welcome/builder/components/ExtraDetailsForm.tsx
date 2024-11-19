@@ -63,6 +63,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
     mode: 'onChange',
     defaultValues: {
       email: '',
+      bio: user.bio ?? 'Scouting and building in the blockchain space',
       agreedToTOS: false,
       sendMarketing: true,
       avatar: user.avatar ?? undefined,
