@@ -51,7 +51,8 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
             builderId: referrerId,
             referralCodeEvent: {
               create: {
-                refereeId
+                refereeId,
+                platform: 'telegram'
               }
             }
           }
