@@ -6,8 +6,8 @@ import { getBuildersLeaderboard } from '../getBuildersLeaderboard';
 
 describe('getBuildersLeaderboard', () => {
   it('should return top builders sorted by gems collected, handle ties, and respect quantity parameter', async () => {
-    const testWeek = v4();
-    const previousWeek = v4();
+    const testWeek = '2024-W02';
+    const previousWeek = '2024-W01';
     const builders = await Promise.all(
       Array(10)
         .fill(null)
@@ -98,7 +98,7 @@ describe('getBuildersLeaderboard', () => {
   });
 
   it('should sort builders by username when gems collected and events are the same', async () => {
-    const testWeek = v4();
+    const testWeek = '2024-W12';
     const builders = await Promise.all([
       mockBuilder({ path: `charlie-${v4()}` }),
       mockBuilder({ path: `alice-${v4()}` }),
@@ -117,7 +117,7 @@ describe('getBuildersLeaderboard', () => {
             userId: builder.id,
             week: testWeek,
             season: 'blah',
-            gemsCollected: 0
+            gemsCollected: 1
           }
         });
       })
@@ -132,9 +132,9 @@ describe('getBuildersLeaderboard', () => {
       expect(topBuilders[index].builder.displayName).toBe(builder.displayName);
     });
 
-    // Verify that all builders have 0 gems collected
+    // Verify that all builders have the same gems collected
     topBuilders.forEach((builder) => {
-      expect(builder.gemsCollected).toBe(0);
+      expect(builder.gemsCollected).toBe(1);
     });
 
     // Verify that ranks are assigned correctly
@@ -144,7 +144,7 @@ describe('getBuildersLeaderboard', () => {
   });
 
   it('should only include builders with approved status', async () => {
-    const testWeek = v4();
+    const testWeek = '2024-W05';
     const builders = await Promise.all([
       mockBuilder({ builderStatus: 'approved', displayName: 'Charlie' }),
       mockBuilder({ builderStatus: 'approved', displayName: 'David' }),
@@ -162,7 +162,7 @@ describe('getBuildersLeaderboard', () => {
             userId: builder.id,
             week: testWeek,
             season: 'blah',
-            gemsCollected: 0
+            gemsCollected: 1
           }
         });
       })

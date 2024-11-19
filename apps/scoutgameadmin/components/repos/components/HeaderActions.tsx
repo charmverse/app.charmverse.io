@@ -26,7 +26,14 @@ export function HeaderActions() {
       </Button>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={closeMenu}>
         <MenuItem>
-          <FileDownloadButton size='small' filename='github_repos.tsv' src='/api/repos/export' onComplete={closeMenu}>
+          <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+            size='small'
+            filename='github_repos.tsv'
+            src='/api/repos/export'
+            onComplete={closeMenu}
+          >
             Export repositories
           </FileDownloadButton>
         </MenuItem>
@@ -36,6 +43,7 @@ export function HeaderActions() {
         </MenuItemNoAction>
         <MenuItem>
           <FileDownloadButton
+            fullWidth
             sx={{ justifyContent: 'flex-start' }}
             size='small'
             filename={`Celo Weekly Report (${lastWeek}).tsv`}
@@ -45,12 +53,20 @@ export function HeaderActions() {
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
-          <FileDownloadButton size='small' filename={`Game7 Weekly Report (${lastWeek}).tsv`} src='/api/partners/game7'>
+          <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+            size='small'
+            filename={`Game7 Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/game7'
+          >
             Game7
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
           <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
             size='small'
             filename={`Lit Protocol Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/lit_protocol'
@@ -60,6 +76,19 @@ export function HeaderActions() {
         </MenuItem>
         <MenuItem>
           <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+            size='small'
+            filename={`Optimism Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/optimism'
+          >
+            Optimism
+          </FileDownloadButton>
+        </MenuItem>
+        <MenuItem>
+          <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
             size='small'
             filename={`OP Supersim Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/op_supersim'
@@ -68,12 +97,20 @@ export function HeaderActions() {
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
-          <FileDownloadButton size='small' filename={`Moxie Weekly Report (${lastWeek}).tsv`} src='/api/partners/moxie'>
+          <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
+            size='small'
+            filename={`Moxie Weekly Report (${lastWeek}).tsv`}
+            src='/api/partners/moxie'
+          >
             Moxie
           </FileDownloadButton>
         </MenuItem>
         <MenuItem>
           <FileDownloadButton
+            fullWidth
+            sx={{ justifyContent: 'flex-start' }}
             size='small'
             filename={`Talent Protocol Weekly Report (${lastWeek}).tsv`}
             src='/api/partners/talent'
