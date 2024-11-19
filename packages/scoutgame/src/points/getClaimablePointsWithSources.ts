@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { BonusPartner } from '../bonus';
 import { currentSeason, getCurrentWeek } from '../dates';
 
 import { getClaimablePoints } from './getClaimablePoints';
@@ -12,11 +13,12 @@ export type UnclaimedPointsSource = {
     displayName: string;
   }[];
   points: number;
+  bonusPartners: BonusPartner[];
   repos: string[];
 };
 
-export async function getUnclaimedPointsSource(userId: string): Promise<UnclaimedPointsSource> {
-  const { points, pointsReceiptIds } = await getClaimablePoints({ season: currentSeason, userId });
+export async function getClaimablePointsWithSources(userId: string): Promise<UnclaimedPointsSource> {
+  const { points, bonusPartners, pointsReceiptIds } = await getClaimablePoints({ season: currentSeason, userId });
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
       id: {
@@ -97,6 +99,7 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
   return {
     builders: builders.slice(0, 3),
     points,
+    bonusPartners,
     repos: uniqueRepos.slice(0, 3)
   };
 }

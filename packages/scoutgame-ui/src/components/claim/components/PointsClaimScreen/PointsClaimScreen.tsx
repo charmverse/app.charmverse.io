@@ -21,8 +21,6 @@ export function PointsClaimScreen({
   displayName,
   bonusPartners,
   builders,
-  builderPoints,
-  scoutPoints,
   repos
 }: {
   totalUnclaimedPoints: number;
@@ -32,8 +30,6 @@ export function PointsClaimScreen({
     avatar: string | null;
     displayName: string;
   }[];
-  scoutPoints: number;
-  builderPoints: number;
   repos: string[];
 }) {
   const { executeAsync, isExecuting } = useAction(claimPointsAction);
@@ -162,8 +158,8 @@ export function PointsClaimScreen({
         {user ? (
           <Stack width='100%'>
             <PointsClaimSocialShare
-              builderPoints={builderPoints}
-              scoutPoints={scoutPoints}
+              isBuilder={repos.length > 0}
+              totalUnclaimedPoints={totalUnclaimedPoints}
               builders={builders.map((b) => b.displayName)}
               userPath={user.path}
             />

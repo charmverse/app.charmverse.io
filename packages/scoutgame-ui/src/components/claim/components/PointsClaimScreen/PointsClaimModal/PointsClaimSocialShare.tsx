@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useMdScreen } from 'hooks/useMediaScreens';
 
 type ShareMessageProps = {
-  builderPoints: number;
-  scoutPoints: number;
+  totalUnclaimedPoints: number;
+  isBuilder: boolean;
   platform: 'x' | 'telegram' | 'warpcast';
   userPath: string;
   builders: string[];
@@ -51,15 +51,15 @@ export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'
   );
 }
 
-function getShareMessage({ builderPoints, scoutPoints, platform, userPath, builders }: ShareMessageProps) {
+function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, builders }: ShareMessageProps) {
   const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}`;
-  let shareMessage = builderPoints
-    ? `I scored ${builderPoints} Scout Points this week as a Top Builder!`
-    : `I scored ${scoutPoints} Scout Points this week as a Top Scout!`;
+  let shareMessage = isBuilder
+    ? `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Builder!`
+    : `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Scout!`;
   // Twitter discounts tweets with links
   if (platform === 'x') {
     shareMessage += `\n\nJoin me on @scoutgamexyz\n\n`;
-  } else if (builderPoints) {
+  } else if (isBuilder) {
     shareMessage += ` Discover my work and scout me to see what I'm building next!\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
   } else {
     shareMessage += ` Big shoutout to my top Builders: ${builders.join(
