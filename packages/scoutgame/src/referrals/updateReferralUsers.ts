@@ -6,7 +6,7 @@ import { currentSeason, getCurrentWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
 
 export async function updateReferralUsers(referralCode: string, refereeId: string) {
-  const referrer = await prisma.scout.findUniqueOrThrow({
+  const initialReferrer = await prisma.scout.findUniqueOrThrow({
     where: {
       referralCode
     },
@@ -15,52 +15,52 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
     }
   });
 
-  const referrerId = referrer?.id;
+  const referrerId = initialReferrer?.id;
 
   const eventType: BuilderEventType = 'referral';
 
-  const users = await prisma.$transaction([
+  const txs = await prisma.$transaction(async (tx) => {
     // Update referrer
-    prisma.scout.update({
+    const referrer = await tx.scout.update({
       where: {
         id: referrerId
       },
       data: {
         currentBalance: {
           increment: rewardPoints
+        }
+      },
+      select: BasicUserInfoSelect
+    });
+
+    const referrerPointsReceived = await tx.pointsReceipt.create({
+      data: {
+        value: rewardPoints,
+        claimedAt: new Date(),
+        recipient: {
+          connect: {
+            id: referrerId
+          }
         },
-        pointsReceived: {
+        event: {
           create: {
-            value: rewardPoints,
-            claimedAt: new Date(),
-            event: {
+            season: currentSeason,
+            type: eventType,
+            description: `Received points for being a referrer`,
+            week: getCurrentWeek(),
+            builderId: referrerId,
+            referralCodeEvent: {
               create: {
-                season: currentSeason,
-                type: eventType,
-                description: `Received points for being a referrer`,
-                week: getCurrentWeek(),
-                builderId: referrerId,
-                referralCodeEvent: {
-                  create: {
-                    refereeId
-                  }
-                }
-              }
-            },
-            activities: {
-              create: {
-                type: 'points',
-                userId: referrerId,
-                recipientType: 'scout'
+                refereeId
               }
             }
           }
         }
-      },
-      select: BasicUserInfoSelect
-    }),
+      }
+    });
+
     // Update referee
-    prisma.scout.update({
+    const referee = await tx.scout.update({
       where: {
         id: refereeId
       },
@@ -72,28 +72,15 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
           create: {
             value: rewardPoints,
             claimedAt: new Date(),
-            event: {
-              create: {
-                season: currentSeason,
-                type: eventType,
-                description: `Received points for being referred`,
-                week: getCurrentWeek(),
-                builderId: refereeId
-              }
-            },
-            activities: {
-              create: {
-                type: 'points',
-                userId: refereeId,
-                recipientType: 'scout'
-              }
-            }
+            eventId: referrerPointsReceived.eventId
           }
         }
       },
       select: BasicUserInfoSelect
-    })
-  ]);
+    });
 
-  return users;
+    return [referrer, referee];
+  });
+
+  return txs;
 }
