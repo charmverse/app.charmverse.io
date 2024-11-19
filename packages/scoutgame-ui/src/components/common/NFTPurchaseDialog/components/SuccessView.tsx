@@ -1,3 +1,5 @@
+'use client';
+
 import { Box, Button, Stack, Typography } from '@mui/material';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,9 +46,15 @@ export function SuccessView({
       <Button
         LinkComponent={Link}
         fullWidth
-        href={`https://warpcast.com/~/compose?text=${encodeURI(
-          `I scouted ${builder.displayName} on Scout Game!`
-        )}&embeds[]=${window.location.origin}/u/${builder.path}`}
+        href={
+          typeof window !== 'undefined' && 'Telegram' in window
+            ? `https://t.me/share/url?url=${window.location.origin}/u/${builder.path}&text=${encodeURI(
+                `I scouted ${builder.displayName} on Scout Game!`
+              )}`
+            : `https://warpcast.com/~/compose?text=${encodeURI(
+                `I scouted ${builder.displayName} on Scout Game!`
+              )}&embeds[]=${window.location.origin}/u/${builder.path}`
+        }
         target='_blank'
         rel='noopener noreferrer'
       >

@@ -1,7 +1,10 @@
+'use client';
+
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import type { TopScoutInfo } from 'lib/scouts/getTopScouts';
 
@@ -9,6 +12,7 @@ import { CommonTableRow, tableRowSx } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
 
 export function TopScoutsTable({ scouts, order, sort }: { scouts: TopScoutInfo[]; order: string; sort: string }) {
+  const router = useRouter();
   return (
     <Table
       aria-label='Top scouts table'
@@ -57,7 +61,13 @@ export function TopScoutsTable({ scouts, order, sort }: { scouts: TopScoutInfo[]
       </TableHead>
       <TableBody>
         {scouts.map((scout) => (
-          <TableRow key={scout.path} sx={tableRowSx} component={Link} href={`/u/${scout.path}?tab=scout`}>
+          <TableRow
+            key={scout.path}
+            sx={tableRowSx}
+            component={Link}
+            href={`/u/${scout.path}?tab=scout`}
+            onClick={() => router.push(`/u/${scout.path}?tab=scout`)}
+          >
             <TableCell sx={{ width: '16.67%' }}>
               <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
                 <Avatar src={scout.avatar} name={scout.displayName} size='small' />

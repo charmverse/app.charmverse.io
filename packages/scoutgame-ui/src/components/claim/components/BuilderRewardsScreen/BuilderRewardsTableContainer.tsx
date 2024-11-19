@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Paper, Typography, Box } from '@mui/material';
 import { getSeasonBuilderRewards, getWeeklyBuilderRewards } from '@packages/scoutgame/builders/getBuilderRewards';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import Image from 'next/image';
@@ -33,7 +33,30 @@ export async function BuilderRewardsTableContainer({ week }: { week: string | nu
         }}
       >
         <Typography>Time to scout some Builders!</Typography>
-        <Image src='/images/cat-with-binoculars.png' alt='Scouts' width={400} height={400} />
+        <Box
+          sx={{
+            width: {
+              md: '400px',
+              xs: '250px'
+            },
+            height: {
+              md: '400px',
+              xs: '250px'
+            }
+          }}
+        >
+          <Image
+            src='/images/cat-with-binoculars.png'
+            alt='Scouts'
+            width={400}
+            height={400}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain'
+            }}
+          />
+        </Box>
       </Paper>
     );
   }

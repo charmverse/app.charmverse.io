@@ -1,11 +1,11 @@
 import 'server-only';
 
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+import { getRankedNewScoutsForCurrentWeek } from '@packages/scoutgame/scouts/getNewScouts';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { getLeaderboard } from 'lib/builders/getLeaderboard';
 import { getTopBuilders } from 'lib/builders/getTopBuilders';
-import { getNewScouts } from 'lib/scouts/getNewScouts';
 import { getTopScouts } from 'lib/scouts/getTopScouts';
 
 import { ActivityTable } from './components/ActivityTable';
@@ -26,7 +26,7 @@ export async function HomeTab({ tab }: { tab: string }) {
   }
 
   if (tab === 'new-scouts') {
-    const [, newScouts = []] = await safeAwaitSSRData(getNewScouts({ limit: 200 }));
+    const [, newScouts = []] = await safeAwaitSSRData(getRankedNewScoutsForCurrentWeek());
     return <NewScoutsTable scouts={newScouts} />;
   }
 

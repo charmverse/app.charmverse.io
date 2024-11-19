@@ -10,19 +10,8 @@ jest.unstable_mockModule('../github/getClosedPullRequest', () => ({
   getClosedPullRequest: jest.fn()
 }));
 
-jest.unstable_mockModule('@packages/github/client', () => ({
-  octokit: {
-    rest: {
-      issues: {
-        createComment: jest.fn()
-      }
-    }
-  }
-}));
-
 const { getClosedPullRequest } = await import('../github/getClosedPullRequest');
 const { recordClosedPullRequest } = await import('../recordClosedPullRequest');
-const { octokit } = await import('@packages/github/client');
 
 describe('recordClosedPullRequest', () => {
   beforeEach(async () => {
@@ -64,7 +53,6 @@ describe('recordClosedPullRequest', () => {
       where: { builderId: builder.id }
     });
     expect(strike).toBeDefined();
-    expect(octokit.rest.issues.createComment).toHaveBeenCalled();
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -117,7 +105,6 @@ describe('recordClosedPullRequest', () => {
       where: { builderId: builder.id }
     });
     expect(strike).toBeNull();
-    expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -168,7 +155,6 @@ describe('recordClosedPullRequest', () => {
       where: { id: builder.id }
     });
     expect(bannedBuilder.builderStatus).toEqual('banned');
-    expect(octokit.rest.issues.createComment).toHaveBeenCalled();
 
     const builderStrikeActivities = await prisma.scoutGameActivity.count({
       where: {
@@ -227,7 +213,6 @@ describe('recordClosedPullRequest', () => {
       where: { pullRequestNumber: pullRequest.number }
     });
     expect(githubEvent).toBeNull();
-    expect(octokit.rest.issues.createComment).not.toHaveBeenCalled();
   });
 
   it('should not create a new github event if it was processed before', async () => {
@@ -259,7 +244,6 @@ describe('recordClosedPullRequest', () => {
       }
     });
     expect(githubEventsCount).toBe(1);
-    expect(octokit.rest.issues.createComment).toHaveBeenCalledTimes(1);
 
     const builderActivities = await prisma.scoutGameActivity.count({
       where: {
