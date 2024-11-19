@@ -7,6 +7,7 @@ import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
+  Alert,
   Box,
   CircularProgress,
   FormControlLabel,
@@ -28,6 +29,7 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { purchaseWithPointsAction } from '@packages/scoutgame/builderNfts/purchaseWithPointsAction';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
+import { getBuilderStrikesCountAction } from '@packages/scoutgame/builders/getBuilderStrikesCountAction';
 import type { MinimalUserInfo } from '@packages/scoutgame/users/interfaces';
 import { isTestEnv } from '@packages/utils/constants';
 import Image from 'next/image';
@@ -85,6 +87,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
+  const {
+    executeAsync: getBuilderStrikesCount,
+    isExecuting: isFetchingStrikesCount,
+    result
+  } = useAction(getBuilderStrikesCountAction);
+  const builderStrikesCount = result?.data;
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
@@ -109,6 +117,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setSubmitError(purchaseError);
     }
   }, [purchaseError]);
+
+  useEffect(() => {
+    if (builderId) {
+      getBuilderStrikesCount({ builderId });
+    }
+  }, [builderId]);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
@@ -334,6 +348,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </>
         </Typography>
       </Box>
+      {builderStrikesCount ? (
+        <Alert severity='warning'>
+          This builder has {builderStrikesCount} strike{builderStrikesCount > 1 ? 's' : ''}. Click{' '}
+          <Link href='/info/spam-policy' target='_blank'>
+            here
+          </Link>{' '}
+          to learn more.
+        </Alert>
+      ) : null}
       <Stack gap={1}>
         <Typography color='secondary'>Select quantity</Typography>
         <ToggleButtonGroup
