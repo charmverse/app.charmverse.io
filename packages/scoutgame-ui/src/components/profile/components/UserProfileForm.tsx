@@ -7,9 +7,9 @@ import type { UpdateUserDetailsFormValues } from '@packages/scoutgame/users/upda
 import { useAction } from 'next-safe-action/hooks';
 import { useForm } from 'react-hook-form';
 
-import { EditableUserProfile } from '../../../components/common/Profile/EditableUserProfile';
 import { useMdScreen } from '../../../hooks/useMediaScreens';
 import { useUser } from '../../../providers/UserProvider';
+import { EditableUserProfile } from '../../common/Profile/EditableUserProfile/EditableUserProfile';
 import type { UserProfileWithPoints } from '../ProfilePage';
 
 export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {
