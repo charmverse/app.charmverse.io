@@ -1,14 +1,23 @@
+import type { PointsReceipt } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BonusPartner } from '../bonus';
+import type { Season } from '../dates';
 import { currentSeason, getPreviousSeason } from '../dates';
 
-export async function getClaimablePoints({ userId, week }: { week?: string; userId: string }): Promise<{
+export async function getClaimablePoints({
+  userId,
+  season = currentSeason
+}: {
+  userId: string;
+  season?: Season;
+}): Promise<{
   points: number;
   bonusPartners: BonusPartner[];
+  pointsReceiptIds: string[];
 }> {
-  const previousSeason = getPreviousSeason(currentSeason);
-  const claimableSeasons = [previousSeason, currentSeason].filter(Boolean);
+  const previousSeason = getPreviousSeason(season);
+  const claimableSeasons = [previousSeason, season].filter(Boolean);
   if (claimableSeasons.length === 0) {
     throw new Error(`No seasons found to claim points: ${currentSeason}`);
   }
@@ -17,13 +26,13 @@ export async function getClaimablePoints({ userId, week }: { week?: string; user
       recipientId: userId,
       claimedAt: null,
       event: {
-        week,
         season: {
           in: claimableSeasons
         }
       }
     },
     select: {
+      id: true,
       value: true,
       event: {
         select: {
@@ -40,6 +49,7 @@ export async function getClaimablePoints({ userId, week }: { week?: string; user
 
   return {
     points: totalUnclaimedPoints,
-    bonusPartners
+    bonusPartners,
+    pointsReceiptIds: pointsReceipts.map((r) => r.id)
   };
 }

@@ -2,30 +2,25 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason, getCurrentWeek } from '../dates';
 
+import { getClaimablePoints } from './getClaimablePoints';
+
 export type UnclaimedPointsSource = {
   builders: {
     id: string;
     avatar: string | null;
+    farcasterId: number | null;
     displayName: string;
   }[];
-  builderPoints: number;
-  scoutPoints: number;
+  points: number;
   repos: string[];
 };
 
 export async function getUnclaimedPointsSource(userId: string): Promise<UnclaimedPointsSource> {
+  const { points, pointsReceiptIds } = await getClaimablePoints({ season: currentSeason, userId });
   const pointsReceipts = await prisma.pointsReceipt.findMany({
     where: {
-      recipientId: userId,
-      claimedAt: { equals: null },
-      event: {
-        type: {
-          in: ['nft_purchase', 'gems_payout']
-        },
-        season: currentSeason
-      },
-      value: {
-        gt: 0
+      id: {
+        in: pointsReceiptIds
       }
     },
     select: {
@@ -53,25 +48,13 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
     }
   });
 
-  let builderPoints = 0;
-  let scoutPoints = 0;
-
   const builderIdScoutPointsRecord: Record<string, number> = {};
-
   for (const receipt of pointsReceipts) {
-    const points = receipt.value;
-
-    if (receipt.event.type === 'nft_purchase') {
-      builderPoints += points;
-    } else if (receipt.event.type === 'gems_payout') {
-      if (receipt.event.builderId !== receipt.recipientId) {
-        scoutPoints += points;
-        if (!builderIdScoutPointsRecord[receipt.event.builderId]) {
-          builderIdScoutPointsRecord[receipt.event.builderId] = points;
-        }
-        builderIdScoutPointsRecord[receipt.event.builderId] += points;
+    if (receipt.event.type === 'gems_payout' && receipt.event.builderId !== receipt.recipientId) {
+      if (!builderIdScoutPointsRecord[receipt.event.builderId]) {
+        builderIdScoutPointsRecord[receipt.event.builderId] = receipt.value;
       } else {
-        builderPoints += points;
+        builderIdScoutPointsRecord[receipt.event.builderId] += receipt.value;
       }
     }
   }
@@ -87,7 +70,8 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
     select: {
       id: true,
       avatar: true,
-      displayName: true
+      displayName: true,
+      farcasterId: true
     }
   });
 
@@ -112,8 +96,7 @@ export async function getUnclaimedPointsSource(userId: string): Promise<Unclaime
 
   return {
     builders: builders.slice(0, 3),
-    builderPoints,
-    scoutPoints,
+    points,
     repos: uniqueRepos.slice(0, 3)
   };
 }

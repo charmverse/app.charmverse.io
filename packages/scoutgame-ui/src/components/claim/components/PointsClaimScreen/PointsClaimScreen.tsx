@@ -162,7 +162,6 @@ export function PointsClaimScreen({
         {user ? (
           <Stack width='100%'>
             <PointsClaimSocialShare
-              userId={user.id}
               builderPoints={builderPoints}
               scoutPoints={scoutPoints}
               builders={builders.map((b) => b.displayName)}
