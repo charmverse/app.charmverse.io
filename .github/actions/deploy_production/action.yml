@@ -18,7 +18,7 @@ runs:
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.x
       with:
-        short-length: 7
+        short-length: 7 # this should match the short-length in the build_docker_image action
 
     # we need to bring back node_modules which includes tsconfig-paths which is used by CDK files
     - name: Install dependencies
