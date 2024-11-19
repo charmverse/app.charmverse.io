@@ -1,19 +1,19 @@
 'use server';
 
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma, TransactionStatus } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import {
   DecentTxFailedPermanently,
   waitForDecentTransactionSettlement
 } from '@packages/blockchain/waitForDecentTransactionSettlement';
 
 import { currentSeason } from '../dates';
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 
 import { recordNftMint } from './recordNftMint';
 import { convertCostToPoints } from './utils';
+import { validateMint } from './validateMint';
 
 export async function handlePendingTransaction({
   pendingTransactionId
@@ -36,7 +36,7 @@ export async function handlePendingTransaction({
   });
 
   if (updatedTx.count === 0) {
-    log.info('Skip processing tx as it is locked', { pendingTransactionId });
+    scoutgameMintsLogger.info('Skip processing tx as it is locked', { pendingTransactionId });
     // The transaction is already being processed or completed, so exit
     return;
   }
@@ -50,7 +50,7 @@ export async function handlePendingTransaction({
     });
 
     if (pendingTx.status !== 'processing') {
-      log.info(`Skipping processing for tx id ${pendingTx.id}`);
+      scoutgameMintsLogger.info(`Skipping processing for tx id ${pendingTx.id}`);
       return;
     }
 
@@ -63,36 +63,44 @@ export async function handlePendingTransaction({
     });
     const txHash =
       pendingTx.destinationChainId === pendingTx.sourceChainId
-        ? await getPublicClient(pendingTx.destinationChainId)
-            .waitForTransactionReceipt({
-              hash: pendingTx.sourceChainTxHash as `0x${string}`
-            })
-            .then((_tx) => _tx.transactionHash)
+        ? pendingTx.sourceChainTxHash
         : await waitForDecentTransactionSettlement({
             sourceTxHash: pendingTx.sourceChainTxHash.toLowerCase(),
             sourceTxHashChainId: pendingTx.sourceChainId
           });
 
-    // Update the pending transaction status to 'completed' and set destination details
-    await prisma.pendingNftTransaction.update({
-      where: {
-        id: pendingTransactionId
-      },
-      data: {
-        status: TransactionStatus.completed,
-        destinationChainTxHash: txHash.toLowerCase()
-      }
+    const validatedMint = await validateMint({
+      chainId: pendingTx.destinationChainId,
+      txHash
     });
 
-    await recordNftMint({
-      amount: pendingTx.tokenAmount,
-      builderNftId: builderNft.id,
-      mintTxHash: txHash,
-      paidWithPoints: false,
-      pointsValue: convertCostToPoints(pendingTx.targetAmountReceived),
-      recipientAddress: pendingTx.senderAddress,
-      scoutId: pendingTx.userId
-    });
+    if (!validatedMint) {
+      scoutgameMintsLogger.error(`Transaction on chain ${pendingTx.destinationChainId} failed`, {
+        userId: pendingTx.userId
+      });
+      throw new DecentTxFailedPermanently();
+    } else {
+      // Update the pending transaction status to 'completed' and set destination details
+      await prisma.pendingNftTransaction.update({
+        where: {
+          id: pendingTransactionId
+        },
+        data: {
+          status: TransactionStatus.completed,
+          destinationChainTxHash: txHash.toLowerCase()
+        }
+      });
+
+      await recordNftMint({
+        amount: pendingTx.tokenAmount,
+        builderNftId: builderNft.id,
+        mintTxHash: txHash,
+        paidWithPoints: false,
+        pointsValue: convertCostToPoints(pendingTx.targetAmountReceived),
+        recipientAddress: pendingTx.senderAddress,
+        scoutId: pendingTx.userId
+      });
+    }
   } catch (error) {
     if (error instanceof DecentTxFailedPermanently) {
       await prisma.pendingNftTransaction.update({
@@ -118,5 +126,3 @@ export async function handlePendingTransaction({
     }
   }
 }
-
-// handlePendingTransaction({ pendingTransactionId: '4aec5524-e633-44c9-8297-6fa0fb691ead' }).then(console.log);

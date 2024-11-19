@@ -1,11 +1,11 @@
 'use server';
 
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { revalidatePath } from 'next/cache';
 
 import { authActionClient } from '../actions/actionClient';
 import { currentSeason } from '../dates';
+import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 
 import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
 import { mintNFT } from './mintNFT';
@@ -37,7 +37,7 @@ export const purchaseWithPointsAction = authActionClient
       throw new Error('Insufficient points');
     }
 
-    log.info(`Triggering NFT mint via admin wallet`, {
+    scoutgameMintsLogger.info(`Triggering NFT mint via admin wallet`, {
       builderNftId: builderNft.id,
       recipientAddress: parsedInput.recipientAddress,
       amount: parsedInput.amount,

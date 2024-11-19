@@ -23,6 +23,7 @@ COPY --parents @connect-shared/package.json \
 
 # Copy compiled code
 COPY --parents apps/*/dist .
+COPY packages/scoutgame/src/assets public/assets
 
 ENV PORT=3000
 
