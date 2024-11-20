@@ -96,6 +96,9 @@ jobs:
       - name: Typecheck app
         run: npm run typecheck -w apps/scoutgameadmin
 
+      - name: Run app tests
+        run: npm run scoutgameadmin:test
+
   upload-docker:
     name: Upload Docker image
     runs-on: ubuntu-latest

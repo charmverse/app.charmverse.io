@@ -127,7 +127,8 @@
     "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
     "scoutgameadmin": "dotenv -e .env.local -- npm start -w=apps/scoutgameadmin",
     "scoutgameadmin:remote": "dotenv -e .env.production -- npm start -w=apps/scoutgameadmin",
-    "scoutgameadmin:build": "npm run build -w=apps/scoutgameadmin"
+    "scoutgameadmin:build": "npm run build -w=apps/scoutgameadmin",
+    "scoutgameadmin:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgameadmin"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

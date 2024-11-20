@@ -14,6 +14,15 @@ export function capitalize(input?: string): string {
   return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
 }
 
+export function fancyTrimWords(_text: string = '', maxWords: number = 40) {
+  const text = _text || '';
+  const words = text.split(' ');
+  if (words.length <= maxWords) {
+    return text;
+  }
+  return `${words.slice(0, maxWords).join(' ')}...`;
+}
+
 export function prettyPrint(input: any): string {
   if (!input) {
     return '';
