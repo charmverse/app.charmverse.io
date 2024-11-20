@@ -28,7 +28,7 @@ export function Header() {
       width='100%'
       p={1}
       component='header'
-      height='75px'
+      minHeight='75px'
     >
       <Link href='/scout'>
         <Image
