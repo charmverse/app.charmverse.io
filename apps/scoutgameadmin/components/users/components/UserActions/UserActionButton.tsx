@@ -40,7 +40,7 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
           Scout Id: <strong>{user.id}</strong>
         </MenuItemNoAction>
         <MenuItemNoAction>
-          Fid: <strong>{user.farcasterId || '--'}</strong>
+          Farcaster: <strong>{user.farcasterId ? `${user.farcasterName} (${user.farcasterId})` : '--'}</strong>
         </MenuItemNoAction>
         <MenuItemNoAction>
           Github: <strong>{user.githubLogin || '--'}</strong>
