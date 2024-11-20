@@ -1,4 +1,4 @@
-import { useGETImmutable } from '@packages/scoutgame-ui/hooks/helpers';
+import { useGETImmutable, usePOST } from '@packages/scoutgame-ui/hooks/helpers';
 
 export function useGetClaimablePoints() {
   return useGETImmutable<{ points: number }>(
@@ -8,4 +8,8 @@ export function useGetClaimablePoints() {
       refreshInterval: 30000
     }
   );
+}
+
+export function useInitTelegramUser() {
+  return usePOST<{ initData: string }, { id: string }>('/api/session/telegram-user');
 }
