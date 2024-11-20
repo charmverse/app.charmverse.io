@@ -102,7 +102,7 @@ const getAllProjects = async () => {
 };
 
 function getTwitterHandle(links: ContributionLink[]) {
-  // find twitter.com or x.com  in url
+  // find x.com or x.com  in url
   const link = links.find((link) => link.url.match(/twitter\.com|x\.com/));
   let handle = link?.url?.match(/^https?:\/\/(www\.)?(twitter\.com|x\.com)\/(#!\/)?([^\/]+)(\/\w+)*$/)?.[3];
   if (handle?.includes('?')) {
@@ -126,10 +126,10 @@ export async function getProjectsImportData(): Promise<ProjectInputRow[]> {
       username: '',
       createdBy: '',
       adminAddress: project.applicant.address.address,
-      'Project Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+      'Project Twitter': twitterHandle ? `https://x.com/${twitterHandle}` : '',
       status: '',
       createdAt: '',
-      'Author Twitter': twitterHandle ? `https://twitter.com/${twitterHandle}` : '',
+      'Author Twitter': twitterHandle ? `https://x.com/${twitterHandle}` : '',
       twitterUsername: twitterHandle,
       avatarUrl: project.profile.profileImageUrl,
       website: project.websiteUrl

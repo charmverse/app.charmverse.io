@@ -6,6 +6,7 @@
     "start": "npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
+    "test": "npx jest --config jest.config.ts --maxWorkers=2",
     "lint": "npx next lint",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },

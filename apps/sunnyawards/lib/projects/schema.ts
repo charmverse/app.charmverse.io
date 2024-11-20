@@ -85,17 +85,13 @@ export const schema = yup.object({
   twitter: yup
     .string()
     .optional()
-    .test(
-      'isTwitter',
-      'Link must be a profile in format https://x.com/username or https://twitter.com/username',
-      (value) => {
-        if (!value) {
-          return true;
-        }
-
-        return !!value.match(/https:\/\/(x|twitter).com\/[a-zA-Z0-9_]+/);
+    .test('isTwitter', 'Link must be a profile in format https://x.com/username or https://x.com/username', (value) => {
+      if (!value) {
+        return true;
       }
-    ),
+
+      return !!value.match(/https:\/\/(x|twitter).com\/[a-zA-Z0-9_]+/);
+    }),
   sunnyAwardsProjectType: yup.string().oneOf(PROJECT_TYPES).required(),
   primaryContractChainId: yup.string().test('isChainId', 'Invalid chain ID', async (value, context) => {
     if ((context.parent.sunnyAwardsProjectType as SunnyAwardsProjectType) === 'app') {

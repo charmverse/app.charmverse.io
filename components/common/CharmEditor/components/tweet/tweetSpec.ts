@@ -15,7 +15,7 @@ export function extractTweetAttrs(url: string): TweetNodeAttrs | null {
     return null;
   }
 
-  const match = url.match(/twitter\.com\/([^/]+)\/status\/(\d+)/);
+  const match = url.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/);
   if (!match) {
     return null;
   }
@@ -33,7 +33,7 @@ export function spec(): RawSpecs {
         const { screenName, id } = node.attrs as TweetNodeAttrs;
 
         if (screenName && id) {
-          const toRender = `Embedded Twitter Url: https://twitter.com/${screenName}/status/${id}`;
+          const toRender = `Embedded Twitter Url: https://x.com/${screenName}/status/${id}`;
 
           // Ensure markdown html will be separated by newlines
           state.ensureNewLine();

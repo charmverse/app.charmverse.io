@@ -17,19 +17,18 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@mui/lab": "^6.0.0-beta.10",
-    "@packages/farcaster": "file:../../packages/farcaster",
-    "@packages/github": "file:../../packages/github",
+    "@packages/farcaster": "^0.0.0",
+    "@packages/github": "^0.0.0",
     "@packages/mixpanel": "^0.0.0",
     "@packages/scoutgame": "^0.0.0",
     "@packages/scoutgame-ui": "^0.0.0",
-    "@packages/utils": "file:../../packages/utils",
+    "@packages/utils": "^1.0.0",
     "@rainbow-me/rainbowkit": "^2.2.0",
     "@serwist/next": "^9.0.5",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
     "next-safe-action": "~7.4.2",
     "server-only": "^0.0.1",
-    "swiper": "^11.1.14",
     "web-push": "^3.6.7"
   },
   "devDependencies": {

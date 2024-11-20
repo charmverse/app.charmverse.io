@@ -22,7 +22,7 @@ describe('mapProjectToGitcoin', () => {
       farcasterValues: ['value1', 'value2'],
       farcasterFrameImage: null,
       github: 'https://github.com/projectx',
-      twitter: 'https://twitter.com/projectx',
+      twitter: 'https://x.com/projectx',
       websites: ['https://example.com'],
       path: null,
       mintingWalletAddress: '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07',
@@ -74,7 +74,7 @@ describe('mapProjectToGitcoin', () => {
         {
           description: 'Twitter Profile',
           type: 'Other',
-          url: 'https://twitter.com/projectx'
+          url: 'https://x.com/projectx'
         },
         {
           description: 'Website',

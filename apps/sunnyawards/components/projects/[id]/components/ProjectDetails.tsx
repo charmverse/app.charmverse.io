@@ -21,7 +21,7 @@ export type ProjectDetailsProps = {
 export function ProjectDetails({ project, showEditButton = false }: ProjectDetailsProps) {
   const farcasterLink = project?.farcasterValues[0] ? replaceUrl(project.farcasterValues[0], 'warpcast.com') : null;
   const githubLink = project?.github ? replaceUrl(project.github, 'github.com') : null;
-  const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'twitter.com') : null;
+  const twitterLink = project?.twitter ? replaceUrl(project.twitter, 'x.com') : null;
 
   return (
     <Box data-test='project-details'>

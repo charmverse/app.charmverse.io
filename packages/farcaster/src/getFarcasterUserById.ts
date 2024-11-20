@@ -9,7 +9,10 @@ export async function getFarcasterUserById(fid: number) {
   return users[0] || null;
 }
 
-export async function getFarcasterUserByIds(fids: number[]) {
+export async function getFarcasterUserByIds(fids: number[]): Promise<FarcasterUser[]> {
+  if (fids.length === 0) {
+    return [];
+  }
   const { users } = await http.GET<{ users: FarcasterUser[] }>(`${userApiUrl}?fids=${fids}`, {
     credentials: 'omit',
     headers: {

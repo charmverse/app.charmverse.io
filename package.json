@@ -127,7 +127,8 @@
     "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
     "scoutgameadmin": "dotenv -e .env.local -- npm start -w=apps/scoutgameadmin",
     "scoutgameadmin:remote": "dotenv -e .env.production -- npm start -w=apps/scoutgameadmin",
-    "scoutgameadmin:build": "npm run build -w=apps/scoutgameadmin"
+    "scoutgameadmin:build": "npm run build -w=apps/scoutgameadmin",
+    "scoutgameadmin:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgameadmin"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -150,7 +151,7 @@
     "@bangle.dev/pm-commands": "^0.31.6",
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
-    "@charmverse/core": "^0.95.2",
+    "@charmverse/core": "^0.96.0",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
@@ -337,7 +338,7 @@
     "rfc6902": "^5.0.1",
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless": "^4.1.19",
-    "sharp": "^0.33.4",
+    "sharp": "^0.33.5",
     "siwe": "^2.1.4",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",

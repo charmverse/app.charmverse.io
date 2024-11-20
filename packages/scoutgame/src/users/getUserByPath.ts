@@ -1,13 +1,12 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { cache } from 'react';
 
 import { currentSeason } from '../dates';
+import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BasicUserInfo } from './interfaces';
-import { BasicUserInfoSelect } from './queries';
 
-async function _getUserByPath(path: string): Promise<
+export async function getUserByPath(path: string): Promise<
   | (BasicUserInfo & {
       nftImageUrl?: string;
       congratsImageUrl?: string | null;
@@ -43,5 +42,3 @@ async function _getUserByPath(path: string): Promise<
     githubLogin: user?.githubUser[0]?.login
   };
 }
-
-export const getUserByPath = cache(_getUserByPath);

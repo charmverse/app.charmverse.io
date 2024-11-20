@@ -9,5 +9,7 @@
   "exports": {
     "./*": "./src/*.ts"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@packages/utils": "^1.0.0"
+  }
 }

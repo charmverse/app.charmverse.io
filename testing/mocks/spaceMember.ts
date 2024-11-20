@@ -23,7 +23,7 @@ export function createMockSpaceMember(user = createMockUser()): Member {
       social: {
         discordUsername: `${username}#1234`,
         linkedinURL: `https://www.linkedin.com/in/${username}`,
-        twitterURL: `https://twitter.com/${username}`,
+        twitterURL: `https://x.com/${username}`,
         githubURL: `https://github.com/${username}`
       } as Social
     },

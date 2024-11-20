@@ -11,7 +11,7 @@ describe('mapProjectToOptimism', () => {
       coverImage: 'cover.jpg',
       farcasterValues: ['CharmVerse'],
       github: 'https://github.com/projectx',
-      twitter: 'https://twitter.com/projectx',
+      twitter: 'https://x.com/projectx',
       websites: ['https://example.com'],
       mintingWalletAddress: null,
       primaryContractAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
@@ -36,7 +36,7 @@ describe('mapProjectToOptimism', () => {
       socialLinks: {
         website: ['https://example.com'],
         farcaster: ['CharmVerse'],
-        twitter: 'https://twitter.com/projectx',
+        twitter: 'https://x.com/projectx',
         mirror: null
       },
       team: ['123', '456'],

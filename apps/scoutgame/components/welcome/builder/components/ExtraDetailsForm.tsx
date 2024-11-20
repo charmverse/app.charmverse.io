@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import { FormErrors } from '@packages/scoutgame-ui/components/common/FormErrors';
-import { EditableUserProfile } from '@packages/scoutgame-ui/components/common/Profile/EditableUserProfile';
+import { EditableUserProfile } from '@packages/scoutgame-ui/components/common/Profile/EditableUserProfile/EditableUserProfile';
 import { useIsMounted } from '@packages/scoutgame-ui/hooks/useIsMounted';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { concatenateStringValues } from '@root/lib/utils/strings';
@@ -63,6 +63,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
     mode: 'onChange',
     defaultValues: {
       email: '',
+      bio: user.bio ?? 'Scouting and building in the blockchain space',
       agreedToTOS: false,
       sendMarketing: true,
       avatar: user.avatar ?? undefined,

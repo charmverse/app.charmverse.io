@@ -16,15 +16,17 @@ export type LeaderBoardRow = {
 
 export async function getLeaderboard({
   limit = 10,
-  week = getCurrentWeek()
+  week = getCurrentWeek(),
+  season = currentSeason
 }: {
   limit?: number;
   week?: string;
+  season?: string;
 }): Promise<LeaderBoardRow[]> {
-  const season = currentSeason;
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {
       week,
+      season,
       rank: {
         not: null
       },

@@ -12,6 +12,8 @@ import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 import { DailyClaimGift } from './DailyClaimGift';
 
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
 export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const { refreshUser } = useUser();
   const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction, {
@@ -23,7 +25,8 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const isPastDay = currentWeekDay > dailyClaim.day;
   const isClaimToday = currentWeekDay === dailyClaim.day;
   const isClaimed = dailyClaim.claimed;
-  const buttonLabel = isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : `Day ${dailyClaim.day}`;
+  const buttonLabel =
+    isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : WEEKDAYS[dailyClaim.day - 1];
   const canClaim = isClaimToday && !isClaimed && !isExecuting;
   const variant = isPastDay ? 'disabled' : isClaimToday ? 'secondary' : 'primary';
 

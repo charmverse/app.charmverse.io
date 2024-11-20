@@ -1,7 +1,7 @@
-import { Box } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import { Header } from 'components/common/Header';
-import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
+import { GeneralBackgroundImage } from 'components/layout/GeneralBackgroundImage';
 import { StickyFooter } from 'components/layout/StickyFooter';
 
 export default function Layout({
@@ -10,13 +10,14 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <Box sx={{ minHeight: 'calc(100vh + 120px)', position: 'relative', overflow: 'auto' }}>
-        <Header />
-        <InfoBackgroundImage />
+    <Stack height='100vh'>
+      <Header />
+      <Box sx={{ minHeight: 'calc(100vh - 135px)', overflow: 'auto', px: 1 }} component='main'>
+        <GeneralBackgroundImage />
         {children}
       </Box>
+
       <StickyFooter />
-    </>
+    </Stack>
   );
 }
