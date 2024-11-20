@@ -14,7 +14,7 @@ import { NewScoutsTable } from './components/NewScoutsTable';
 import { TopBuildersTable } from './components/TopBuildersTable';
 import { TopScoutsTable } from './components/TopScoutsTable';
 
-export async function HomeTab({ tab, week }: { tab: string; week?: string }) {
+export async function HomeTab({ tab, week }: { tab: string; week: string }) {
   if (tab === 'activity') {
     const [, activities = []] = await safeAwaitSSRData(getBuilderActivities({ limit: 100 }));
     return <ActivityTable activities={activities} />;

@@ -10,7 +10,7 @@ import { LoadingTable } from 'components/common/Loading/LoadingTable';
 import { HomeTabsMenu, homeTabs } from './components/HomePageTable/components/HomeTabsMenu';
 import { HomeTab } from './components/HomePageTable/HomePageTable';
 
-export function HomePage({ tab, week }: { tab: string; week?: string }) {
+export function HomePage({ tab, week }: { tab: string; week: string }) {
   const currentTab = homeTabs.some((t) => t.value === tab) ? tab : 'leaderboard';
   return (
     <>

@@ -17,7 +17,7 @@ import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
 import { WeekTableHead } from './WeekTableHead';
 
-export function LeaderboardTable({ data, week }: { data: LeaderBoardRow[]; week?: ISOWeek }) {
+export function LeaderboardTable({ data, week }: { data: LeaderBoardRow[]; week: ISOWeek }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
