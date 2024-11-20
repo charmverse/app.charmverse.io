@@ -41,7 +41,7 @@ export async function getUsers({
       !userFid && typeof searchString === 'string'
         ? {
             _relevance: {
-              fields: ['path', 'displayName', 'email', 'id'],
+              fields: ['path', 'displayName', 'farcasterName', 'email', 'id'],
               search: `*${searchString}:*`,
               sort: 'desc'
             }
@@ -71,6 +71,22 @@ export async function getUsers({
                   displayName: {
                     search: `*${searchString}:*`,
                     mode: 'insensitive'
+                  }
+                },
+                {
+                  farcasterName: {
+                    search: `*${searchString}:*`,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  githubUser: {
+                    some: {
+                      login: {
+                        search: `*${searchString}:*`,
+                        mode: 'insensitive'
+                      }
+                    }
                   }
                 },
                 {
