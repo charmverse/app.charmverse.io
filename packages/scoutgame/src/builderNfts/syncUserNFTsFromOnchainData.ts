@@ -27,6 +27,9 @@ export async function syncUserNFTsFromOnchainData({
     where: {
       id: scoutId,
       path
+    },
+    select: {
+      id: true
     }
   });
 
