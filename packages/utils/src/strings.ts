@@ -50,3 +50,18 @@ export function stringToHue(name: string) {
   const h = hash % 360;
   return h;
 }
+
+export function humanizeKey(key: string): string {
+  // Convert camelCase or PascalCase to space-separated words
+  const spacedKey = key
+    .replace(/([a-z])([A-Z])/g, '$1 $2') // Add space before capital letters
+    .replace(/[_-]/g, ' '); // Replace underscores and dashes with spaces
+
+  // Capitalize the first letter of each word
+  const humanizedKey = spacedKey
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+
+  return humanizedKey;
+}
