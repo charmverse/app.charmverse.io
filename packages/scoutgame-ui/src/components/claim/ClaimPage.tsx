@@ -13,8 +13,6 @@ export type ClaimPageProps = {
   bonusPartners: BonusPartner[];
   displayName: string;
   period: string;
-  builderPoints: number;
-  scoutPoints: number;
   builders: {
     avatar: string | null;
     displayName: string;
@@ -28,8 +26,6 @@ export function ClaimPage({
   bonusPartners,
   period,
   builders,
-  builderPoints,
-  scoutPoints,
   repos
 }: ClaimPageProps) {
   return (
@@ -47,8 +43,6 @@ export function ClaimPage({
           displayName={displayName}
           bonusPartners={bonusPartners}
           builders={builders}
-          builderPoints={builderPoints}
-          scoutPoints={scoutPoints}
           repos={repos}
         />
         {totalUnclaimedPoints === 0 ? null : (

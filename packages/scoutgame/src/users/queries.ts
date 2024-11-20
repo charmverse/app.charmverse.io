@@ -4,8 +4,13 @@ export const BasicUserInfoSelect = {
   id: true,
   path: true,
   displayName: true,
+  onboardedAt: true,
+  agreedToTermsAt: true,
+  farcasterName: true,
+  currentBalance: true,
   avatar: true,
   bio: true,
+  referralCode: true,
   githubUser: {
     select: {
       login: true

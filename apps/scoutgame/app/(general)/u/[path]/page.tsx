@@ -1,4 +1,4 @@
-import { getUserByPath } from '@packages/scoutgame/users/getUserByPath';
+import { getUserByPathCached } from '@packages/scoutgame/users/getUserByPathCached';
 import { PublicProfilePage } from '@packages/scoutgame-ui/components/[path]/PublicProfilePage';
 import type { Metadata, ResolvingMetadata } from 'next';
 import type { ResolvedOpenGraph } from 'next/dist/lib/metadata/types/opengraph-types';
@@ -15,7 +15,7 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props, parent: ResolvingMetadata): Promise<Metadata> {
-  const user = await getUserByPath(params.path);
+  const user = await getUserByPathCached(params.path);
 
   if (!user) {
     return {};
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props, parent: ResolvingMetad
 }
 
 export default async function Profile({ params, searchParams }: Props) {
-  const user = await getUserByPath(params.path);
+  const user = await getUserByPathCached(params.path);
   const tab = searchParams.tab || (user?.builderStatus === 'approved' ? 'builder' : 'scout');
 
   if (!user || typeof tab !== 'string') {

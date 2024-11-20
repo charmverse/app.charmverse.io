@@ -75,59 +75,61 @@ export function PointsClaimScoutScreen({
         SCOUT GAME!
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: '8px',
-          justifyContent: 'space-between',
-          width: '100%',
-          marginTop: '16px',
-          paddingLeft: '32px'
-        }}
-      >
+      {builders.length && (
         <div
           style={{
-            marginTop: '32px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '8px'
+            gap: '8px',
+            justifyContent: 'space-between',
+            width: '100%',
+            marginTop: '16px',
+            paddingLeft: '32px'
           }}
         >
-          <h2
+          <div
             style={{
-              fontSize: '1.25rem',
-              fontWeight: 700,
-              margin: 0
+              marginTop: '32px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
             }}
           >
-            My Top Builders:
-          </h2>
-
-          {builders.map((builder) => (
-            <div
-              key={builder.displayName}
+            <h2
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                fontSize: '1.25rem',
+                fontWeight: 700,
+                margin: 0
               }}
             >
-              <img
-                src={builder.avatar ?? ''}
-                alt={builder.displayName}
-                style={{
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '50%'
-                }}
-              />
-              <span style={{ fontWeight: 600 }}>{builder.displayName}</span>
-            </div>
-          ))}
-        </div>
+              My Top Builders:
+            </h2>
 
-        <img src={`${baseUrl}/images/profile/builder-dog.png`} alt='Builder Dog' width={200} height={200} />
-      </div>
+            {builders.map((builder) => (
+              <div
+                key={builder.displayName}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <img
+                  src={builder.avatar ?? ''}
+                  alt={builder.displayName}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%'
+                  }}
+                />
+                <span style={{ fontWeight: 600 }}>{builder.displayName}</span>
+              </div>
+            ))}
+          </div>
+
+          <img src={`${baseUrl}/images/profile/builder-dog.png`} alt='Builder Dog' width={200} height={200} />
+        </div>
+      )}
     </div>
   );
 }

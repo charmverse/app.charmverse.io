@@ -1,4 +1,4 @@
-import type { Scout } from '@charmverse/core/prisma-client';
+import type { BuilderStatus, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
@@ -16,19 +16,20 @@ export type ScoutGameUser = Pick<
   | 'farcasterId'
 > & { githubLogin: string | null; nftsPurchased: number; wallets: string[] };
 
-export type UserFilter = 'only-builders';
-
 export type SortField = 'displayName' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
 export type SortOrder = 'asc' | 'desc';
 
 export async function getUsers({
   searchString,
-  filter,
   sortField,
-  sortOrder
-}: { searchString?: string; filter?: UserFilter; sortField?: SortField; sortOrder?: SortOrder } = {}): Promise<
-  ScoutGameUser[]
-> {
+  sortOrder,
+  builderStatus
+}: {
+  searchString?: string;
+  sortField?: SortField;
+  sortOrder?: SortOrder;
+  builderStatus?: BuilderStatus;
+} = {}): Promise<ScoutGameUser[]> {
   if (typeof searchString === 'string' && searchString.length < 2) {
     return [];
   }
@@ -41,7 +42,7 @@ export async function getUsers({
       !userFid && typeof searchString === 'string'
         ? {
             _relevance: {
-              fields: ['path', 'displayName', 'email', 'id'],
+              fields: ['path', 'displayName', 'farcasterName', 'email', 'id'],
               search: `*${searchString}:*`,
               sort: 'desc'
             }
@@ -74,6 +75,22 @@ export async function getUsers({
                   }
                 },
                 {
+                  farcasterName: {
+                    search: `*${searchString}:*`,
+                    mode: 'insensitive'
+                  }
+                },
+                {
+                  githubUser: {
+                    some: {
+                      login: {
+                        search: `*${searchString}:*`,
+                        mode: 'insensitive'
+                      }
+                    }
+                  }
+                },
+                {
                   email: {
                     startsWith: searchString,
                     mode: 'insensitive'
@@ -81,9 +98,7 @@ export async function getUsers({
                 }
               ]
             }
-          : filter === 'only-builders'
-            ? { builderStatus: { not: null } }
-            : undefined,
+          : { builderStatus },
     include: {
       githubUser: true,
       userSeasonStats: true,

@@ -35,7 +35,8 @@ export const saveOnboardingDetailsAction = authActionClient
         agreedToTermsAt: new Date(),
         avatar: parsedInput.avatar,
         displayName: parsedInput.displayName,
-        path
+        path,
+        bio: parsedInput.bio
       }
     });
 

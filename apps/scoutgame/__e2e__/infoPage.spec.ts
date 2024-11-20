@@ -1,7 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { mockScout } from '@packages/scoutgame/testing/database';
-import { randomIntFromInterval } from '@root/lib/utils/random';
-
 import { expect, test } from './test';
 
 test.describe('Info page', () => {

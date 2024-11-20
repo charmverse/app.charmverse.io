@@ -3,7 +3,7 @@ import type { Repo } from 'lib/repos/getRepos';
 import type { RepoSearchResult } from '../../app/api/github/search-repos/route';
 import type { GithubUserStats } from '../../app/api/github/user-stats/route';
 
-import { useGETImmutable, usePOST } from './helpers';
+import { useGETImmutable, usePOST, useDELETE } from './helpers';
 
 export function useSearchReposByOwnerFromGithub(owner: string) {
   return useGETImmutable<RepoSearchResult[]>(owner ? '/api/github/search-repos' : null, { owner });
@@ -11,4 +11,8 @@ export function useSearchReposByOwnerFromGithub(owner: string) {
 
 export function useGetGithubUserStats(login: string | null) {
   return useGETImmutable<GithubUserStats>(login ? '/api/github/user-stats' : null, { login });
+}
+
+export function useDeleteGithubUserStrike() {
+  return useDELETE<{ strikeId: string }>('/api/github/delete-strike');
 }
