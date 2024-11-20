@@ -34,19 +34,19 @@ export function EditableDisplayName({
   });
   const [isEditingDisplayName, setIsEditingDisplayName] = useState(false);
   const [isDisplayNameDirty, setIsDisplayNameDirty] = useState(false);
-  const previousDisplayNameRef = useRef<string>(displayName);
+  const displayNameRef = useRef<string>(displayName);
 
   const updateDisplayName = (value: string) => {
     setIsEditingDisplayName(false);
     setIsDisplayNameDirty(false);
     onDisplayNameChange?.(value);
-    previousDisplayNameRef.current = value;
+    displayNameRef.current = value;
   };
 
   const resetDisplayName = () => {
     setIsEditingDisplayName(false);
     setIsDisplayNameDirty(false);
-    displayNameField.onChange(previousDisplayNameRef.current);
+    displayNameField.onChange(displayNameRef.current);
   };
 
   return (
