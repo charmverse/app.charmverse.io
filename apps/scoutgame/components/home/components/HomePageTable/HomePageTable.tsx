@@ -14,7 +14,7 @@ import { NewScoutsTable } from './components/NewScoutsTable';
 import { TopBuildersTable } from './components/TopBuildersTable';
 import { TopScoutsTable } from './components/TopScoutsTable';
 
-export async function HomeTab({ tab }: { tab: string }) {
+export async function HomeTab({ tab, week }: { tab: string; week?: string }) {
   if (tab === 'activity') {
     const [, activities = []] = await safeAwaitSSRData(getBuilderActivities({ limit: 100 }));
     return <ActivityTable activities={activities} />;
@@ -36,8 +36,8 @@ export async function HomeTab({ tab }: { tab: string }) {
   }
 
   if (tab === 'leaderboard') {
-    const [, leaderboard = []] = await safeAwaitSSRData(getLeaderboard({ limit: 200 }));
-    return <LeaderboardTable data={leaderboard} />;
+    const [, leaderboard = []] = await safeAwaitSSRData(getLeaderboard({ limit: 200, week }));
+    return <LeaderboardTable data={leaderboard} week={week} />;
   }
   return null;
 }
