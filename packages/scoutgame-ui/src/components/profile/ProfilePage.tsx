@@ -20,6 +20,7 @@ export type UserProfileWithPoints = Omit<BuilderUserInfo, 'builderStatus'> &
     currentBalance: number;
     displayName: string;
     builderStatus: BuilderStatus | null;
+    bio: string | null;
   };
 
 export type ProfilePageProps = {
