@@ -104,6 +104,9 @@ jobs:
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
 
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
