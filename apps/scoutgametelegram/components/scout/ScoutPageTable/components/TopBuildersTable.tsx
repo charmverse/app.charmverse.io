@@ -1,16 +1,26 @@
 'use client';
 
+import NorthIcon from '@mui/icons-material/North';
+import SouthIcon from '@mui/icons-material/South';
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
 import { CommonTableRow, tableRowSx } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
+
+function SortIcon({ columnName, order, sort }: { columnName: string; order: string; sort: string }) {
+  if (sort !== columnName) return null;
+  return order === 'desc' ? (
+    <NorthIcon color='primary' sx={{ fontSize: 14, ml: 0.15 }} />
+  ) : (
+    <SouthIcon color='primary' sx={{ fontSize: 14, ml: 0.15 }} />
+  );
+}
 
 export function TopBuildersTable({
   builders,
@@ -22,6 +32,18 @@ export function TopBuildersTable({
   sort: string;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleSort = (sortBy: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', 'builders');
+    params.set('sort', sortBy);
+    params.set('order', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <Table
       aria-label='Top scouts table'
@@ -31,47 +53,73 @@ export function TopBuildersTable({
     >
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
-          <TableCell align='left' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+          <TableCell align='left' sx={{ fontSize: { xs: '10px', md: 'initial' }, py: 1 }}>
             BUILDER
           </TableCell>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            <Link href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'rank' ? 'asc' : 'desc'}&sort=rank`}>
+          <TableCell
+            align='center'
+            onClick={() => handleSort('rank')}
+            sx={{
+              fontSize: { xs: '10px', md: 'initial' },
+              cursor: 'pointer',
+              py: 1
+            }}
+          >
+            <Stack direction='row' alignItems='center' justifyContent='center'>
               RANK
-            </Link>
-          </TableCell>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            <Link
-              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'price' ? 'asc' : 'desc'}&sort=price`}
-            >
-              PRICE
-            </Link>
-          </TableCell>
-          <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              <Link
-                href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'points' ? 'asc' : 'desc'}&sort=points`}
-              >
-                POINTS
-              </Link>
+              <SortIcon columnName='rank' order={order} sort={sort} />
             </Stack>
           </TableCell>
           <TableCell
             align='center'
-            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
+            onClick={() => handleSort('price')}
+            sx={{
+              fontSize: { xs: '10px', md: 'initial' },
+              cursor: 'pointer',
+              py: 1
+            }}
           >
-            <Link
-              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'cards' ? 'asc' : 'desc'}&sort=cards`}
-            >
+            <Stack direction='row' alignItems='center' justifyContent='center'>
+              PRICE
+              <SortIcon columnName='price' order={order} sort={sort} />
+            </Stack>
+          </TableCell>
+          <TableCell
+            align='right'
+            onClick={() => handleSort('points')}
+            sx={{
+              fontSize: { xs: '10px', md: 'initial' },
+              cursor: 'pointer',
+              py: 1
+            }}
+          >
+            <Stack direction='row' alignItems='center' justifyContent='flex-end'>
+              POINTS
+              <SortIcon columnName='points' order={order} sort={sort} />
+            </Stack>
+          </TableCell>
+          <TableCell
+            align='center'
+            onClick={() => handleSort('cards')}
+            sx={{
+              fontSize: { xs: '10px', md: 'initial' },
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              py: 1
+            }}
+          >
+            <Stack direction='row' alignItems='center' justifyContent='center'>
               CARDS
-            </Link>
+              <SortIcon columnName='cards' order={order} sort={sort} />
+            </Stack>
           </TableCell>
         </CommonTableRow>
       </TableHead>
       <TableBody>
         {builders.map((builder) => (
           <TableRow key={builder.path} sx={tableRowSx} onClick={() => router.push(`/u/${builder.path}?tab=builder`)}>
-            <TableCell sx={{ width: '16.67%' }}>
-              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
+            <TableCell>
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '85px', md: 'initial' }}>
                 <Avatar src={builder.avatar} name={builder.displayName} size='small' />
                 <TableCellText noWrap>{builder.displayName}</TableCellText>
               </Stack>

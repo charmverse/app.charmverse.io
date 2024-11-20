@@ -50,6 +50,9 @@ export async function getTopBuilders({
               }
             },
             userSeasonStats: {
+              where: {
+                season: currentSeason
+              },
               select: {
                 pointsEarnedAsBuilder: true,
                 nftsSold: true
@@ -92,6 +95,9 @@ export async function getTopBuilders({
             avatar: true,
             displayName: true,
             userWeeklyStats: {
+              where: {
+                week: getCurrentWeek()
+              },
               select: {
                 rank: true
               }
@@ -138,11 +144,17 @@ export async function getTopBuilders({
             avatar: true,
             displayName: true,
             userWeeklyStats: {
+              where: {
+                week: getCurrentWeek()
+              },
               select: {
                 rank: true
               }
             },
             userSeasonStats: {
+              where: {
+                season: currentSeason
+              },
               select: {
                 pointsEarnedAsBuilder: true,
                 nftsSold: true
@@ -190,6 +202,9 @@ export async function getTopBuilders({
             avatar: true,
             displayName: true,
             userWeeklyStats: {
+              where: {
+                week: getCurrentWeek()
+              },
               select: {
                 rank: true
               }
