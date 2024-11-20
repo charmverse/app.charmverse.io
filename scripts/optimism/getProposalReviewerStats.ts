@@ -1,7 +1,8 @@
 import { log } from '@charmverse/core/log';
-import { User, prisma } from '@charmverse/core/prisma-client';
+import { User, prisma, UserSpaceAction } from '@charmverse/core/prisma-client';
 import { prettyPrint } from '@root/lib/utils/strings';
 import {humanizeKey} from '@packages/utils/strings';
+import {getUniqueWeeksCount} from '@packages/utils/dates';
 import {uniqueValues} from '@packages/utils/array';
 import fs from 'node:fs';
 
@@ -19,17 +20,7 @@ const steps = [
 
 type StepType = (typeof steps)[number];
 
-async function loadProposals() {
-
-  const {id: spaceId} = await prisma.space.findUniqueOrThrow({
-    where: {
-      domain: spaceDomain
-    },
-    select: {
-      id: true
-    }
-  })
-
+async function loadProposals(spaceId: string) {
 
   const allProposals = await prisma.proposal.findMany({
     where: {
@@ -165,6 +156,9 @@ type ReviewerStats = {
   userId: string;
   username: string;
   proposalsReviewed: number;
+  // Activity stats
+  appLoadedTimes: number;
+  uniqueWeeksAppVisited: number;
   // First group of stats
   declinedOnIntake: number;
   commentedWhenDeclinedOnIntake: number;
@@ -187,6 +181,8 @@ type ReviewerStats = {
 const columnOrder: (keyof ReviewerStats)[] = [
   'userId',
   'username',
+  'appLoadedTimes',
+  'uniqueWeeksAppVisited',
   'proposalsReviewed',
   'declinedOnIntake',
   'commentedWhenDeclinedOnIntake',
@@ -205,7 +201,16 @@ const columnOrder: (keyof ReviewerStats)[] = [
 
 async function exportSummary() {
 
-  const allProposals = await loadProposals();
+  const {id: spaceId} = await prisma.space.findUniqueOrThrow({
+    where: {
+      domain: spaceDomain
+    },
+    select: {
+      id: true
+    }
+  })
+
+  const allProposals = await loadProposals(spaceId);
 
   console.log('Total proposals:', allProposals.length);
 
@@ -215,14 +220,24 @@ async function exportSummary() {
   const reviewerMap: Record<string, ReviewerStats> = {};
 
 
-  const userProfiles: Record<string, Pick<User, 'id' | 'username'>> = {};
+  const userProfiles: Record<string, Pick<User, 'id' | 'username'> & {spaceActions: Pick<UserSpaceAction, 'createdAt'>[]}> = {};
+
+  function getReviewerUserIds(reviewer: typeof allProposals[number]['evaluations'][number]['reviewers'][number]) {
+    return reviewer.userId ? reviewer.userId : reviewer.role?.spaceRolesToRole.map((spaceRoleToRole) => spaceRoleToRole.spaceRole.userId)
+  }
 
 
   for (const proposal of allProposals) {
 
     const intakeStep = proposal.steps.intake;
 
-    const uniqueReviewerUserIds = uniqueValues(intakeStep.reviewers.map((reviewer) => reviewer.userId ? reviewer.userId : reviewer.role?.spaceRolesToRole.map((spaceRoleToRole) => spaceRoleToRole.spaceRole.userId)).flat().filter(Boolean)) as string[];
+    const uniqueIntakeReviewerUserIds = uniqueValues(intakeStep.reviewers.map(getReviewerUserIds).flat().filter(Boolean)) as string[];
+
+    const uniqueSuperchainRubricUserIds = uniqueValues((proposal.steps.superchainRubric?.reviewers ?? []).map(getReviewerUserIds).flat().filter(Boolean)) as string[];
+
+    const uniqueFinalStepUserIds = uniqueValues(proposal.steps.final.reviewers.map(getReviewerUserIds).flat().filter(Boolean)) as string[];
+
+    const uniqueReviewerUserIds = uniqueValues([...uniqueIntakeReviewerUserIds, ...uniqueSuperchainRubricUserIds, ...uniqueFinalStepUserIds]);
 
     const missingUserProfiles = uniqueReviewerUserIds.filter((userId) => !userProfiles[userId]);
 
@@ -235,7 +250,20 @@ async function exportSummary() {
         },
         select: {
           id: true,
-          username: true
+          username: true,
+          spaceActions: {
+            where: {
+              createdAt: {
+                gte: new Date('2024-07-17'),
+                lte: new Date('2024-11-21')
+              },
+              spaceId,
+              action: 'view_page'
+            },
+            select: {
+              createdAt: true
+            }
+          },
         }
       });
 
@@ -249,9 +277,15 @@ async function exportSummary() {
       // Initialise user --------------------------
       if (!reviewerMap[userId]) {
 
+        const profile = userProfiles[userId];
+
+        const appLoadedTimes = profile.spaceActions.length;
+
         reviewerMap[userId] = {
           userId,
-          username: userProfiles[userId].username,
+          username: profile.username,
+          appLoadedTimes: appLoadedTimes,
+          uniqueWeeksAppVisited: getUniqueWeeksCount(profile.spaceActions.map((action) => action.createdAt)),
           proposalsReviewed: 0,
           commentedWhenDeclinedOnIntake: 0,
           declinedOnIntake: 0,
