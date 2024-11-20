@@ -22,7 +22,6 @@ function FieldAnswer({
   onChange?: (payload: Record<string, any>) => void;
 }) {
   const { control, register, watch } = useFormContext<ProjectAndMembersPayload>();
-
   const { field, fieldState } = useController({
     control,
     name
@@ -32,6 +31,7 @@ function FieldAnswer({
     setValueAs: (value) =>
       typeof value === 'string' ? value?.trim() : Array.isArray(value) ? value.filter((v) => Boolean(v.trim())) : value
   });
+
   const isShown = getFieldConfig(fieldConfig).show;
   if (!isShown) {
     return null;
@@ -65,10 +65,10 @@ function FieldAnswer({
       rows={property.rows ?? 1}
       required={fieldConfig?.required}
       disabled={disabled}
-      value={(field.value as string) ?? ''}
       error={fieldState.error?.message}
       data-test={`project-field-${name}`}
-      {...registeredField}
+      {...field}
+      value={(field.value as string) ?? ''}
       onChange={(e) => {
         field.onChange(e);
         if (onChange) {

@@ -12,12 +12,7 @@ import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
-export function useProjectForm(options: {
-  fieldConfig?: ProjectAndMembersFieldConfig;
-  projectId?: string | null;
-  selectedMemberIds?: string[];
-  initialProjectValues?: ProjectWithMembers | null;
-}) {
+export function useProjectForm(options: { fieldConfig?: ProjectAndMembersFieldConfig }) {
   const { fieldConfig } = options;
 
   const resolver = useYupValidationResolver(createProjectYupSchema({ fieldConfig }));

@@ -112,7 +112,6 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
         {/** Without label the field wrapper wraps its children inside a Fragment and if the container already has spacing it creates an uneven spacing with the extra margin bottom */}
         {topComponent && <Box mb={label ? 1 : 0}>{topComponent}</Box>}
         <CustomTextField
-          // InputProps={{ className: 'Mui-error' }}
           error={!!error}
           fullWidth
           required={required}
