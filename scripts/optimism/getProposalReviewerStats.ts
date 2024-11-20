@@ -338,19 +338,19 @@ async function exportSummary() {
 
 
       // Delayed steps stats --------------------------
-      if (!userIntakeReview) {
+      if (reviewedProposal && !userIntakeReview) {
         reviewerMap[userId].intakeStepsDelayed += 1;
         reviewerMap[userId].totalReviewsDelayed += 1;
       }
 
       // Only count superchainRubric if intake passed
-      if (proposal.steps.superchainRubric && proposal.steps.intake.result !== 'fail' && !proposal.steps.superchainRubric.rubricAnswers.some((review) => review.userId === userId)) {
+      if (reviewedProposal && proposal.steps.superchainRubric && proposal.steps.intake.result !== 'fail' && !proposal.steps.superchainRubric.rubricAnswers.some((review) => review.userId === userId)) {
         reviewerMap[userId].superchainRubricStepsDelayed += 1;
         reviewerMap[userId].totalReviewsDelayed += 1;
       }
 
       // Only count final if intake passed
-      if (proposal.steps.final && proposal.steps.intake.result !== 'fail' && !proposal.steps.final.rubricAnswers.some((review) => review.userId === userId)) {
+      if (reviewedProposal && proposal.steps.final && proposal.steps.intake.result !== 'fail' && !proposal.steps.final.rubricAnswers.some((review) => review.userId === userId)) {
         reviewerMap[userId].finalStepsDelayed += 1;
         reviewerMap[userId].totalReviewsDelayed += 1;
       }
