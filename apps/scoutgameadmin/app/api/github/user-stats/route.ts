@@ -8,12 +8,14 @@ import { NextResponse } from 'next/server';
 type Commit = {
   url: string;
   date: string;
+  repo: string;
+  title: string;
 };
 
 export type GithubUserStats = {
   afterDate: string;
   commits: number;
-  builderStrikes: (BuilderStrike & { githubEvent: GithubEvent })[];
+  builderStrikes: (Pick<BuilderStrike, 'id' | 'deletedAt' | 'createdAt'> & { githubEvent: GithubEvent })[];
   lastCommit?: Commit;
 };
 
@@ -40,9 +42,14 @@ export async function GET(request: NextRequest) {
         createdAt: 'desc'
       },
       select: {
+        id: true,
         createdAt: true,
         deletedAt: true,
-        githubEvent: true
+        githubEvent: {
+          include: {
+            repo: true
+          }
+        }
       }
     });
     const commits = await getCommitsByUser({ login, after: afterDate, paginated: true });
@@ -55,7 +62,8 @@ export async function GET(request: NextRequest) {
         ? {
             url: lastCommit.html_url,
             title: lastCommit.commit.message,
-            date: lastCommit.commit.author.date
+            date: lastCommit.commit.author.date,
+            repo: lastCommit.repository.full_name
           }
         : undefined
     };

@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { DeleteOutlined as TrashIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
   Dialog,
@@ -10,6 +11,7 @@ import {
   Tooltip,
   Link,
   Typography,
+  IconButton,
   Box
 } from '@mui/material';
 import { fancyTrimWords } from '@packages/utils/strings';
@@ -17,7 +19,7 @@ import { useAction } from 'next-safe-action/hooks';
 import React, { useState } from 'react';
 import { mutate } from 'swr';
 
-import { useGetGithubUserStats } from 'hooks/api/github';
+import { useGetGithubUserStats, useDeleteGithubUserStrike } from 'hooks/api/github';
 import { useCreateBuilder } from 'hooks/api/users';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { ScoutGameUser } from 'lib/users/getUsers';
@@ -48,7 +50,16 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
 
   const githubLoginDisplayed = githubLogin || user.githubLogin;
 
-  const { data: githubUserStats } = useGetGithubUserStats(githubLoginDisplayed);
+  const { trigger: deleteGithubUserStrike } = useDeleteGithubUserStrike();
+  const { data: githubUserStats, mutate: refreshGithubUserStats } = useGetGithubUserStats(githubLoginDisplayed);
+
+  const isSuspended = user.builderStatus === 'banned';
+  const isSuspendedInvalid =
+    isSuspended && githubUserStats && githubUserStats.builderStrikes.filter((strike) => !strike.deletedAt).length >= 3;
+
+  async function unsuspendBuilder() {
+    await setBuilderStatus({ userId: user.id, status: 'approved' });
+  }
 
   async function rejectBuilder() {
     await setBuilderStatus({ userId: user.id, status: 'rejected' });
@@ -56,16 +67,25 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    await createUser({ userId: user.id, githubLogin });
+    if (user.builderStatus === 'banned') {
+      await unsuspendBuilder();
+    } else {
+      await createUser({ userId: user.id, githubLogin });
+      setTextInput('');
+    }
     onClose();
     onSave();
-    setTextInput('');
     // clear SWR cache
     mutate(
       (key) => true, // which cache keys are updated
       undefined // update cache data to `undefined`
       // { revalidate: false } // do not revalidate
     );
+  }
+
+  async function deleteStrike(strikeId: string) {
+    await deleteGithubUserStrike(strikeId);
+    refreshGithubUserStats();
   }
 
   return (
@@ -121,8 +141,12 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                             <ul style={{ paddingLeft: 16 }}>
                               <li>
                                 <Link href={githubUserStats.lastCommit.url} target='_blank'>
-                                  {new Date(githubUserStats.lastCommit.date).toLocaleDateString()}:{' '}
                                   {fancyTrimWords(githubUserStats.lastCommit.title, 7)}
+                                  <br />
+                                  <Typography color='secondary' variant='caption' component='span'>
+                                    {new Date(githubUserStats.lastCommit.date).toLocaleDateString()} -{' '}
+                                    {githubUserStats.lastCommit.repo}
+                                  </Typography>
                                 </Link>
                               </li>
                             </ul>
@@ -139,14 +163,28 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                               <Typography
                                 variant='caption'
                                 sx={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'flex-start',
                                   textDecoration: strike.deletedAt ? 'line-through' : 'none',
                                   textDecorationColor: 'var(--mui-palette-primary-main)'
                                 }}
                               >
                                 <Link href={strike.githubEvent.url} target='_blank'>
-                                  {new Date(strike.createdAt).toLocaleDateString()}:{' '}
                                   {fancyTrimWords(strike.githubEvent.title, 7)}
+                                  <br />
+                                  <Typography color='secondary' variant='caption' component='span'>
+                                    {new Date(strike.createdAt).toLocaleDateString()} - {strike.githubEvent.repo.owner}/
+                                    {strike.githubEvent.repo.name}
+                                  </Typography>
                                 </Link>
+                                {!strike.deletedAt && (
+                                  <Tooltip title='Delete strike'>
+                                    <IconButton size='small' onClick={() => deleteStrike(strike.id)}>
+                                      <TrashIcon color='error' sx={{ fontSize: '0.75em', verticalAlign: 'middle' }} />
+                                    </IconButton>
+                                  </Tooltip>
+                                )}
                               </Typography>
                             </li>
                           ))}
@@ -183,16 +221,22 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                   Reject
                 </LoadingButton>
               )}
-              <Tooltip title='Provide a Github login to set up a builder profile'>
+              <Tooltip
+                title={
+                  isSuspendedInvalid
+                    ? 'Builder has been suspended for 3 strikes'
+                    : 'Provide a Github login to set up a builder profile'
+                }
+              >
                 <span>
                   <LoadingButton
-                    disabled={!githubLoginDisplayed}
+                    disabled={!githubLoginDisplayed || isSuspendedInvalid}
                     loading={isCreating}
                     type='submit'
                     color='primary'
                     variant='contained'
                   >
-                    Approve
+                    {user.builderStatus === 'banned' ? 'Unsuspend' : 'Approve'}
                   </LoadingButton>
                 </span>
               </Tooltip>
