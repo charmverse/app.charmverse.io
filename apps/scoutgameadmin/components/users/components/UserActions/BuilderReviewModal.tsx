@@ -114,7 +114,7 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
             )}
             <Stack direction='row'>
               <Typography sx={{ width: '120px' }}>Github:</Typography>
-              <Stack>
+              <Stack flexGrow={1}>
                 {requireGithubLogin && (
                   <TextField
                     autoFocus
@@ -145,7 +145,7 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                             <ul style={{ paddingLeft: 16 }}>
                               <li>
                                 <Link href={githubUserStats.lastCommit.url} target='_blank'>
-                                  {fancyTrimWords(githubUserStats.lastCommit.title, 7)}
+                                  {fancyTrimWords(githubUserStats.lastCommit.title, 8)}
                                   <br />
                                   <Typography color='secondary' variant='caption' component='span'>
                                     {new Date(githubUserStats.lastCommit.date).toLocaleDateString()} -{' '}
@@ -167,6 +167,7 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                                   <Typography
                                     variant='caption'
                                     sx={{
+                                      width: '100%',
                                       display: 'flex',
                                       justifyContent: 'space-between',
                                       alignItems: 'flex-start',
@@ -175,7 +176,7 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                                     }}
                                   >
                                     <Link href={strike.githubEvent.url} target='_blank'>
-                                      {fancyTrimWords(strike.githubEvent.title, 7)}
+                                      {fancyTrimWords(strike.githubEvent.title, 8)}
                                       <br />
                                       <Typography color='secondary' variant='caption' component='span'>
                                         {new Date(strike.createdAt).toLocaleDateString()} -{' '}
