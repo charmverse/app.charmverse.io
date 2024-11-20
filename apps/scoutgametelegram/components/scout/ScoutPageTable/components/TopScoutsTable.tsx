@@ -115,8 +115,8 @@ export function TopScoutsTable({ scouts, order, sort }: { scouts: TopScoutInfo[]
             onClick={() => router.push(`/u/${scout.path}?tab=scout`)}
             style={{ cursor: 'pointer' }}
           >
-            <TableCell sx={{ width: '10%' }}>
-              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
+            <TableCell>
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '85px', md: 'initial' }}>
                 <Avatar src={scout.avatar} name={scout.displayName} size='small' />
                 <TableCellText noWrap>{scout.displayName}</TableCellText>
               </Stack>

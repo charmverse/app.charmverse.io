@@ -118,8 +118,8 @@ export function TopBuildersTable({
       <TableBody>
         {builders.map((builder) => (
           <TableRow key={builder.path} sx={tableRowSx} onClick={() => router.push(`/u/${builder.path}?tab=builder`)}>
-            <TableCell sx={{ width: '10%' }}>
-              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '100px', md: 'initial' }}>
+            <TableCell>
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '85px', md: 'initial' }}>
                 <Avatar src={builder.avatar} name={builder.displayName} size='small' />
                 <TableCellText noWrap>{builder.displayName}</TableCellText>
               </Stack>
