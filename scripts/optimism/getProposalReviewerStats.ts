@@ -1,57 +1,21 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { stringify } from 'csv-stringify/sync';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { sortBy } from 'lodash-es';
-import { writeFileSync } from 'fs';
-import { spaceId, templateId, getProjectsFromFile } from './retroPGF/v4/data';
-import { uniq } from 'lodash';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from '@root/lib/utils/strings';
+import {uniqueValues} from '@packages/utils/array';
 
 const spaceDomain = 'op-grants';
 const summaryFile = './op-reviewer-stats.csv';
 
-type ReviewerStats = {
-  // First group of stats
-  declinedOnIntake: number;
-  commentedWhenDeclinedOnIntake: number;
-  // Second group of stats
-  rubricAnswers: number;
-  rubricAnswersWithComment: number;
-  // Third group of stats
-  uniqueProposalPagesCommented: number;
-  totalProposalPageComments: number;
-  // Fourth group of stats
-  workspaceOpens: number;
-  averageWorkspaceOpensWeekly: number;
-  // Fifth group of stats
-  totalReviewsDelayed: number;
-  intakeStepsDelayed: number;
-  prelimStepsDelayed: number;
-  finalStepsDelayed: number;
-}
-
-const columnOrder: (keyof ReviewerStats)[] = [
-  'declinedOnIntake',
-  'commentedWhenDeclinedOnIntake',
-  'rubricAnswers',
-  'rubricAnswersWithComment',
-  'uniqueProposalPagesCommented',
-  'totalProposalPageComments',
-  'workspaceOpens',
-  'averageWorkspaceOpensWeekly',
-  'totalReviewsDelayed',
-  'intakeStepsDelayed',
-  'prelimStepsDelayed',
-  'finalStepsDelayed'
-];
 
 const steps = [
   'intake',
-  'prelim', // Superchain Rubric
-  'final' // Superchain Grant Approval
-]
+  'superchainRubric', // Intake OR Superchain Rubric
+  'final' // Final OR Superchain Grant Approval
+] as const;
 
-async function exportSummary() {
+type StepType = (typeof steps)[number];
+
+async function loadProposals() {
 
   const {id: spaceId} = await prisma.space.findUniqueOrThrow({
     where: {
@@ -62,8 +26,9 @@ async function exportSummary() {
     }
   })
 
+
   const allProposals = await prisma.proposal.findMany({
-    // take: 10,
+    take: 10,
     where: {
       status: 'published',
       spaceId,
@@ -82,12 +47,34 @@ async function exportSummary() {
       id: true,
       page: {
         select: {
+          path: true,
           comments: true
         }
       },
       evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
         include: {
-          reviewers: true,
+          rubricAnswers: true,
+          reviewers: {
+            select: {
+              userId: true,
+              role: {
+                select: {
+                  spaceRolesToRole: {
+                    select: {
+                      spaceRole: {
+                        select: {
+                          userId: true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
           reviews: {
             include: {
               reviewer: {
@@ -113,34 +100,206 @@ async function exportSummary() {
     }
   });
 
-  const reviewerMap: Record<string, ReviewerStats> = {};
+  type ProposalStep = (typeof allProposals)[number]['evaluations'][number];
 
-  const invalidProposals: string[] = [];
+  type StepRecord = Record<StepType, ProposalStep>
 
-  allProposals.forEach((proposal) => {
+  const invalidProposals = [];
 
-    let missingSteps: string[] = [];
+  const mappedProposals: ((typeof allProposals)[number] & {steps: StepRecord})[] = allProposals.map((proposal) => {
+    let intakeStap: ProposalStep | undefined;
+    let superchainRubricStep: ProposalStep | undefined;
+    let finalStep: ProposalStep | undefined
 
-    steps.forEach((step) => {
-      if (!proposal.evaluations.some((evaluation) => evaluation.title.toLowerCase().match(step))) {
-        missingSteps.push(step);
+    proposal.evaluations.forEach((evaluation) => {
+      if (evaluation.title.toLowerCase().match('intake')) {
+        intakeStap = evaluation;
+      } else if (evaluation.title.toLowerCase().match('superchain rubric') || evaluation.title.toLowerCase().match('superchain rubric')) {
+        superchainRubricStep = evaluation;
+      } else if (evaluation.title.toLowerCase().match('final') || evaluation.title.toLowerCase().match('grant approval')) {
+        finalStep = evaluation;
       }
     });
+    const missingSteps: StepType[] = [];
+
+    if (!intakeStap) {
+      missingSteps.push('intake');
+    }
+    if (!superchainRubricStep) {
+      missingSteps.push('superchainRubric');
+    }
+    if (!finalStep) {
+      missingSteps.push('final');
+    }
 
     if (missingSteps.length) {
-      log.error(`Proposal ${proposal.id} is missing steps ${missingSteps.join(', ')} Here are its steps: ${proposal.evaluations.map((evaluation) => evaluation.title).join(', ')}`);
-      invalidProposals.push(`${proposal.id} => ${missingSteps.join(', ')}`);
+      if (missingSteps[0] === 'superchainRubric' && missingSteps.length === 1) {
+        // Ignore, as we don't need superchainRubric for all proposals
+      } else {
+        invalidProposals.push(proposal.id);
+        log.info(`\r\nProposal ${proposal.id} is missing steps ${missingSteps.join(', ')}.\nhttps://app.charmverse.io/${spaceDomain}/${proposal.page?.path}\r\nHere are its steps: ${proposal.evaluations.map((evaluation) => evaluation.title).join(', ')}\r\n`);
+        return null;
+      }
+
     }
-  });
+
+    return {
+      ...proposal,
+      steps: {
+        intake: intakeStap,
+        superchainRubric: superchainRubricStep,
+        final: finalStep
+      }
+    }
+  }).filter(Boolean) as ((typeof allProposals)[number] & {steps: StepRecord})[];
+
+  log.info(`Invalid proposals: ${invalidProposals.length}`);
+
+  return mappedProposals;
+}
+
+type ReviewerStats = {
+  // First group of stats
+  declinedOnIntake: number;
+  commentedWhenDeclinedOnIntake: number;
+  // Second group of stats
+  rubricAnswers: number;
+  rubricAnswersWithComment: number;
+  // Third group of stats
+  uniqueProposalPagesCommented: number;
+  totalProposalPageComments: number;
+  // // Fourth group of stats
+  // workspaceOpens: number;
+  // averageWorkspaceOpensWeekly: number;
+  // // Fifth group of stats
+  totalReviewsDelayed: number;
+  intakeStepsDelayed: number;
+  superchainRubricStepsDelayed: number;
+  finalStepsDelayed: number;
+}
+
+const columnOrder: (keyof ReviewerStats)[] = [
+  'declinedOnIntake',
+  'commentedWhenDeclinedOnIntake',
+  'rubricAnswers',
+  'rubricAnswersWithComment',
+  'uniqueProposalPagesCommented',
+  'totalProposalPageComments',
+  // 'workspaceOpens',
+  // 'averageWorkspaceOpensWeekly',
+  'totalReviewsDelayed',
+  'intakeStepsDelayed',
+  'superchainRubricStepsDelayed',
+  'finalStepsDelayed'
+];
+
+
+async function exportSummary() {
+
+  const allProposals = await loadProposals();
 
   console.log('Total proposals:', allProposals.length);
 
-  if (invalidProposals.length) {
-    throw new Error(`${invalidProposals.length} Invalid proposals found: ` + invalidProposals.join('; '));
+
+  console.log(`All ${allProposals.length}`);
+
+  const reviewerMap: Record<string, ReviewerStats> = {};
+
+
+  for (const proposal of allProposals) {
+
+    const intakeStep = proposal.steps.intake;
+
+    const uniqueReviewerUserIds = uniqueValues(intakeStep.reviewers.map((reviewer) => reviewer.userId ? reviewer.userId : reviewer.role?.spaceRolesToRole.map((spaceRoleToRole) => spaceRoleToRole.spaceRole.userId)).flat().filter(Boolean)) as string[];
+
+    for (const userId of uniqueReviewerUserIds) {
+
+      // Initialise user --------------------------
+      if (!reviewerMap[userId]) {
+        reviewerMap[userId] = {
+          commentedWhenDeclinedOnIntake: 0,
+          declinedOnIntake: 0,
+          rubricAnswers: 0,
+          rubricAnswersWithComment: 0,
+          totalProposalPageComments: 0,
+          uniqueProposalPagesCommented: 0,
+          finalStepsDelayed: 0,
+          intakeStepsDelayed: 0,
+          superchainRubricStepsDelayed: 0,
+          totalReviewsDelayed: 0
+        }
+      }
+
+      // Intake stats --------------------------
+      const userIntakeReview = intakeStep.reviews.find((review) => review.reviewer.id === userId);
+
+      if (userIntakeReview && userIntakeReview.result === 'fail') {
+        reviewerMap[userId].declinedOnIntake++;
+
+        const commentedWhenDeclined = !!userIntakeReview.declineMessage
+        if (commentedWhenDeclined) {
+          reviewerMap[userId].commentedWhenDeclinedOnIntake++;
+        }
+      }
+
+      // Rubric stats --------------------------
+      const allUserRubricAnswers = [...proposal.steps.intake.rubricAnswers, ...proposal.steps.superchainRubric.rubricAnswers, ...proposal.steps.final.rubricAnswers];
+
+      reviewerMap[userId].rubricAnswers += allUserRubricAnswers.length;
+      reviewerMap[userId].rubricAnswersWithComment += allUserRubricAnswers.filter((answer) => !!answer.comment).length;
+
+
+      // Page Comment stats --------------------------
+      const userProposalComments = proposal.page!.comments.filter((comment) => comment.createdBy === userId).length;
+
+      if (userProposalComments) {
+        reviewerMap[userId].uniqueProposalPagesCommented++;
+        reviewerMap[userId].totalProposalPageComments += userProposalComments;
+      }
+
+
+      // Delayed steps stats --------------------------
+      if (!userIntakeReview) {
+        reviewerMap[userId].intakeStepsDelayed++;
+        reviewerMap[userId].totalReviewsDelayed++;
+      }
+
+      // Only count superchainRubric if intake failed
+      if (proposal.steps.superchainRubric && proposal.steps.intake.result === 'fail' && !proposal.steps.superchainRubric.rubricAnswers.some((review) => review.userId === userId)) {
+        reviewerMap[userId].superchainRubricStepsDelayed++;
+        reviewerMap[userId].totalReviewsDelayed++;
+      }
+
+      // Only count final if intake failed
+      if (proposal.steps.final && proposal.steps.intake.result === 'fail' && !proposal.steps.final.rubricAnswers.some((review) => review.userId === userId)) {
+        reviewerMap[userId].superchainRubricStepsDelayed++;
+        reviewerMap[userId].totalReviewsDelayed++;
+      }
+    }
+
+    //   const reviewerId = reviewers.userId;
+    //   reviewerMap[reviewerId] = reviewerMap[reviewerId] || {
+    //     declinedOnIntake: 0,
+    //     commentedWhenDeclinedOnIntake: 0,
+    //     rubricAnswers: 0,
+    //     rubricAnswersWithComment: 0,
+    //     uniqueProposalPagesCommented: 0,
+    //     totalProposalPageComments: 0,
+    //     // workspaceOpens: 0,
+    //     // averageWorkspaceOpensWeekly: 0,
+    //     // totalReviewsDelayed: 0,
+    //     // intakeStepsDelayed: 0,
+    //     // superchainRubricStepsDelayed: 0,
+    //     // finalStepsDelayed: 0
+    //   };
+    //   reviewerMap[reviewerId].rubricAnswers += intakeStep.reviews.length;
+    //   reviewerMap[reviewerId].rubricAnswersWithComment += intakeStep.reviews.filter((review) => review.comment).length;
+
   }
 
-  console.log(`All ${allProposals.length} proposals are valid`);
 
+
+  //
 
 //   for (const proposal of proposals) {
 //     for (const evaluation of proposalOfProposals.evaluations) {
@@ -380,4 +539,4 @@ async function exportSummary() {
 //   writeFileSync(reviewersFile, csvString);
 }
 
-exportSummary().then(console.log)
+exportSummary().then()
