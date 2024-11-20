@@ -17,7 +17,7 @@ type EditableDisplayNameProps = {
   farcasterName?: string | null;
 };
 
-export function EditableDisplayName({
+export function EditableName({
   displayName,
   onDisplayNameChange,
   control,

@@ -9,7 +9,7 @@ import { useMdScreen } from '../../../../hooks/useMediaScreens';
 
 import { EditableAvatar } from './EditableAvatar';
 import { EditableBio } from './EditableBio';
-import { EditableDisplayName } from './EditableDisplayName';
+import { EditableName } from './EditableName';
 
 type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   avatar?: string | null;
@@ -65,7 +65,7 @@ export function EditableUserProfile({
     >
       <EditableAvatar control={control} avatarSize={avatarSize} isLoading={isLoading} onAvatarChange={onAvatarChange} />
       <Stack width='100%'>
-        <EditableDisplayName
+        <EditableName
           displayName={user.displayName}
           onDisplayNameChange={onDisplayNameChange}
           control={control}
