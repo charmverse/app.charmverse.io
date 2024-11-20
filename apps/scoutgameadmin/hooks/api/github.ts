@@ -13,6 +13,6 @@ export function useGetGithubUserStats(login: string | null) {
   return useGETImmutable<GithubUserStats>(login ? '/api/github/user-stats' : null, { login });
 }
 
-export function useDeleteGithubUserStrike(strikeId: string) {
-  return useDELETE('/api/github/delete-strike', { strikeId });
+export function useDeleteGithubUserStrike() {
+  return useDELETE<{ strikeId: string }>('/api/github/delete-strike');
 }

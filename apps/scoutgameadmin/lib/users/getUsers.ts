@@ -1,4 +1,4 @@
-import type { Scout } from '@charmverse/core/prisma-client';
+import type { BuilderStatus, Scout } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
@@ -21,13 +21,11 @@ export type SortOrder = 'asc' | 'desc';
 
 export async function getUsers({
   searchString,
-  filter,
   sortField,
   sortOrder,
   builderStatus
 }: {
   searchString?: string;
-  filter?: UserFilter;
   sortField?: SortField;
   sortOrder?: SortOrder;
   builderStatus?: BuilderStatus;

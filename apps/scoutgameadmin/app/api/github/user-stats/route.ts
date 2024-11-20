@@ -15,7 +15,9 @@ type Commit = {
 export type GithubUserStats = {
   afterDate: string;
   commits: number;
-  builderStrikes: (Pick<BuilderStrike, 'id' | 'deletedAt' | 'createdAt'> & { githubEvent: GithubEvent })[];
+  builderStrikes: (Pick<BuilderStrike, 'id' | 'deletedAt' | 'createdAt'> & {
+    githubEvent: GithubEvent & { repo: { owner: string; name: string } };
+  })[];
   lastCommit?: Commit;
 };
 
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const login = searchParams.get('login');
   if (!login || login.length < 2) {
-    return NextResponse.json({ commits: 0 });
+    return NextResponse.json({ commits: 0, builderStrikes: [] });
   }
   try {
     const builderStrikes = await prisma.builderStrike.findMany({
@@ -57,7 +59,10 @@ export async function GET(request: NextRequest) {
     const result: GithubUserStats = {
       afterDate: afterDate.toISOString(),
       commits: commits.length,
-      builderStrikes,
+      builderStrikes: builderStrikes.map((strike) => ({
+        ...strike,
+        githubEvent: strike.githubEvent! // TODO: make this required in the db?
+      })),
       lastCommit: lastCommit
         ? {
             url: lastCommit.html_url,

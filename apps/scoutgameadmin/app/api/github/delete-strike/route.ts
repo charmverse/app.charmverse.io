@@ -9,7 +9,7 @@ export async function DELETE(request: NextRequest) {
     return Response.json({ error: 'Strike ID is required' }, { status: 400 });
   }
   // Delete the strike
-  await prisma.builderStrike.update({
+  const strike = await prisma.builderStrike.update({
     where: {
       id: strikeId
     },
@@ -18,7 +18,7 @@ export async function DELETE(request: NextRequest) {
     }
   });
 
-  log.info('Builder strike marked as deleted', { builderId, strikeId });
+  log.info('Builder strike marked as deleted', { builderId: strike.builderId, strikeId });
 
   return Response.json({ success: true });
 }

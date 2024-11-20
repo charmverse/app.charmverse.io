@@ -1,5 +1,6 @@
 'use client';
 
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import {
   MoreHoriz as MoreHorizIcon,
   ArrowDropDown as ArrowDropDownIcon,
@@ -119,7 +120,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
             <InputLabel size='small'>Builder status</InputLabel>
             <Select
               value={builderFilter || ''}
-              onChange={(e) => setBuilderFilter(e.target.value || undefined)}
+              onChange={(e) => setBuilderFilter(e.target.value as BuilderStatus | undefined)}
               label='Builder status'
             >
               <MenuItem value=''>

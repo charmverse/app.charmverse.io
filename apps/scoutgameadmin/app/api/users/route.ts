@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { BuilderStatus } from '@charmverse/core/prisma';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

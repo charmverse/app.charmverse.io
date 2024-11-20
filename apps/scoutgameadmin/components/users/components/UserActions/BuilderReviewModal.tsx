@@ -51,7 +51,11 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
   const githubLoginDisplayed = githubLogin || user.githubLogin;
 
   const { trigger: deleteGithubUserStrike } = useDeleteGithubUserStrike();
-  const { data: githubUserStats, mutate: refreshGithubUserStats } = useGetGithubUserStats(githubLoginDisplayed);
+  const {
+    data: githubUserStats,
+    error: githubError,
+    mutate: refreshGithubUserStats
+  } = useGetGithubUserStats(githubLoginDisplayed);
 
   const isSuspended = user.builderStatus === 'banned';
   const isSuspendedInvalid =
@@ -84,7 +88,7 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
   }
 
   async function deleteStrike(strikeId: string) {
-    await deleteGithubUserStrike(strikeId);
+    await deleteGithubUserStrike({ strikeId });
     refreshGithubUserStats();
   }
 
@@ -110,20 +114,20 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
             )}
             <Stack direction='row'>
               <Typography sx={{ width: '120px' }}>Github:</Typography>
-              {requireGithubLogin && (
-                <TextField
-                  autoFocus
-                  placeholder='Provide a Github login'
-                  type='text'
-                  fullWidth
-                  value={githubLogin}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  required
-                  size='small'
-                  sx={{ my: 0.5 }}
-                />
-              )}
               <Stack>
+                {requireGithubLogin && (
+                  <TextField
+                    autoFocus
+                    placeholder='Provide a Github login'
+                    type='text'
+                    fullWidth
+                    value={githubLogin}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    required
+                    size='small'
+                    sx={{ my: 0.5 }}
+                  />
+                )}
                 {githubLoginDisplayed ? (
                   <Link href={`https://github.com/${githubLoginDisplayed}`} target='_blank'>
                     https://github.com/{githubLoginDisplayed}
@@ -154,45 +158,50 @@ export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
                             <em>N/A</em>
                           )}
                         </Typography>
-                        <Typography variant='caption'>
-                          Closed pull requests: {githubUserStats.builderStrikes.length === 0 ? <em>N/A</em> : ''}
-                        </Typography>
-                        <ul style={{ paddingLeft: 16 }}>
-                          {githubUserStats.builderStrikes.map((strike) => (
-                            <li key={strike.githubEvent.url}>
-                              <Typography
-                                variant='caption'
-                                sx={{
-                                  display: 'flex',
-                                  justifyContent: 'space-between',
-                                  alignItems: 'flex-start',
-                                  textDecoration: strike.deletedAt ? 'line-through' : 'none',
-                                  textDecorationColor: 'var(--mui-palette-primary-main)'
-                                }}
-                              >
-                                <Link href={strike.githubEvent.url} target='_blank'>
-                                  {fancyTrimWords(strike.githubEvent.title, 7)}
-                                  <br />
-                                  <Typography color='secondary' variant='caption' component='span'>
-                                    {new Date(strike.createdAt).toLocaleDateString()} - {strike.githubEvent.repo.owner}/
-                                    {strike.githubEvent.repo.name}
+                        {githubUserStats.builderStrikes.length > 0 && (
+                          <>
+                            <Typography variant='caption'>Closed pull requests:</Typography>
+                            <ul style={{ paddingLeft: 16 }}>
+                              {githubUserStats.builderStrikes.map((strike) => (
+                                <li key={strike.githubEvent.url}>
+                                  <Typography
+                                    variant='caption'
+                                    sx={{
+                                      display: 'flex',
+                                      justifyContent: 'space-between',
+                                      alignItems: 'flex-start',
+                                      textDecoration: strike.deletedAt ? 'line-through' : 'none',
+                                      textDecorationColor: 'var(--mui-palette-primary-main)'
+                                    }}
+                                  >
+                                    <Link href={strike.githubEvent.url} target='_blank'>
+                                      {fancyTrimWords(strike.githubEvent.title, 7)}
+                                      <br />
+                                      <Typography color='secondary' variant='caption' component='span'>
+                                        {new Date(strike.createdAt).toLocaleDateString()} -{' '}
+                                        {strike.githubEvent.repo.owner}/{strike.githubEvent.repo.name}
+                                      </Typography>
+                                    </Link>
+                                    {!strike.deletedAt && (
+                                      <Tooltip title='Delete strike'>
+                                        <IconButton size='small' onClick={() => deleteStrike(strike.id)}>
+                                          <TrashIcon
+                                            color='error'
+                                            sx={{ fontSize: '0.75em', verticalAlign: 'middle' }}
+                                          />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
                                   </Typography>
-                                </Link>
-                                {!strike.deletedAt && (
-                                  <Tooltip title='Delete strike'>
-                                    <IconButton size='small' onClick={() => deleteStrike(strike.id)}>
-                                      <TrashIcon color='error' sx={{ fontSize: '0.75em', verticalAlign: 'middle' }} />
-                                    </IconButton>
-                                  </Tooltip>
-                                )}
-                              </Typography>
-                            </li>
-                          ))}
-                        </ul>
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        )}
                       </>
                     ) : (
                       <Typography variant='caption' component='em'>
-                        Loading...
+                        {githubError ? 'Error loading Github data' : 'Loading...'}
                       </Typography>
                     )}
                   </Stack>

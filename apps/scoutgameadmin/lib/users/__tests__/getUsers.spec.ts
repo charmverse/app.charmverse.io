@@ -29,7 +29,7 @@ describe('getUsers', () => {
       farcasterName: `test-user-${Math.random().toString(36).substring(2, 15)}`
     });
 
-    const result = await getUsers({ searchString: mockUser.farcasterName });
+    const result = await getUsers({ searchString: mockUser.farcasterName! });
     expect(result).toHaveLength(1);
     expect(result[0].id).toEqual(mockUser.id);
   });
