@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason, validateISOWeek } from '@packages/scoutgame/dates';
@@ -25,9 +26,13 @@ export async function getLeaderboard({
 }): Promise<LeaderBoardRow[]> {
   const isWeekValid = validateISOWeek(week);
 
+  if (!isWeekValid) {
+    throw new InvalidInputError('Invalid week for leaderboard');
+  }
+
   const weeklyTopBuilders = await prisma.userWeeklyStats.findMany({
     where: {
-      week: isWeekValid ? week : getCurrentWeek(),
+      week,
       season,
       rank: {
         not: null
