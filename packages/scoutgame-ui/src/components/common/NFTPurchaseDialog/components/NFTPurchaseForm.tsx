@@ -1,7 +1,6 @@
 'use client';
 
 import env from '@beam-australia/react-env';
-import { log } from '@charmverse/core/log';
 import { ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
@@ -30,6 +29,7 @@ import {
 import { purchaseWithPointsAction } from '@packages/scoutgame/builderNfts/purchaseWithPointsAction';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { getBuilderStrikesCountAction } from '@packages/scoutgame/builders/getBuilderStrikesCountAction';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import type { MinimalUserInfo } from '@packages/scoutgame/users/interfaces';
 import { isTestEnv } from '@packages/utils/constants';
 import Image from 'next/image';
@@ -141,7 +141,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     executeAsync: purchaseWithPoints
   } = useAction(purchaseWithPointsAction, {
     onError({ error, input }) {
-      log.error('Error purchasing with points', { input, error });
+      scoutgameMintsLogger.error('Error purchasing with points', { input, error, userId: user?.id });
       setSubmitError(error.serverError?.message || 'Something went wrong');
     },
     onExecute() {
@@ -172,7 +172,12 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
       setIsFetchingPrice(false);
     } catch (error) {
-      log.warn('Error fetching token data', { error, builderId, tokenId: _builderTokenId });
+      scoutgameMintsLogger.warn('Error fetching token data', {
+        error,
+        builderId,
+        tokenId: _builderTokenId,
+        userId: user?.id
+      });
       setIsFetchingPrice(false);
       setFetchError(error);
     }

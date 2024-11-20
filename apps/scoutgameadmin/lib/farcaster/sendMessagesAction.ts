@@ -56,19 +56,30 @@ export const sendMessagesAction = authActionClient
       return { type: 'invalid_input', invalidRecipients };
     }
     const sentRecipients: string[] = [];
-    try {
-      for (const [recipient, recipientFid] of recipientFids) {
+    const unsentRecipients: string[] = [];
+    let sendingError: string | undefined;
+    for (const [recipient, recipientFid] of recipientFids) {
+      try {
         const result = await sendDirectCast({ recipientFid, message });
         log.info(`Sent message to ${recipientFid}`, { recipientFid, result });
         sentRecipients.push(recipient);
+      } catch (error) {
+        log.error(`Error sending message to ${recipientFid}`, {
+          recipient,
+          recipientFid,
+          error,
+          errors: (error as any).errors
+        });
+        unsentRecipients.push(recipient);
+        sendingError = (error as Error).message || (error as any).errors?.[0]?.message || error;
       }
-    } catch (error) {
-      log.error(`Error sending message to ${recipientFids}`, { error, errors: (error as any).errors });
+    }
+    if (unsentRecipients.length > 0) {
       return {
         type: 'warpcast_error',
         sentRecipients,
-        unsentRecipients: recipients.filter((recipient) => !sentRecipients.includes(recipient)),
-        error: (error as Error).message || (error as any).errors?.[0].message || error
+        unsentRecipients,
+        error: sendingError
       };
     }
     return { sent: sentRecipients.length, type: 'success' };

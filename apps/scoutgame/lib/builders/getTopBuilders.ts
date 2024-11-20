@@ -2,7 +2,7 @@ import type { BuilderStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
 import { currentSeason } from '@packages/scoutgame/dates';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 export type TopBuilderInfo = {
   id: string;

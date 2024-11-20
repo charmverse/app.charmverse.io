@@ -21,7 +21,7 @@ export function Header() {
   };
 
   return (
-    <Stack position='static' flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1}>
+    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1} component='header'>
       <Link href='/scout'>
         <Image
           src='/images/scout-game-logo.png'

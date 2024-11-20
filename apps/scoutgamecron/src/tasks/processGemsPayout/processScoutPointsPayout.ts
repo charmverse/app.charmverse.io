@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import { calculateEarnableScoutPointsForRank } from '@packages/scoutgame/points/calculatePoints';
 import { dividePointsBetweenBuilderAndScouts } from '@packages/scoutgame/points/dividePointsBetweenBuilderAndScouts';
 import { incrementPointsEarnedStats } from '@packages/scoutgame/points/updatePointsEarned';
@@ -34,7 +34,7 @@ export async function processScoutPointsPayout({
   });
 
   if (existingGemsPayoutEvent) {
-    log.warn(`Gems payout event already exists for builder in week ${week}`, { userId: builderId });
+    scoutgameMintsLogger.warn(`Gems payout event already exists for builder in week ${week}`, { userId: builderId });
     return;
   }
 
@@ -47,7 +47,7 @@ export async function processScoutPointsPayout({
   });
 
   if (totalNftsPurchased === 0) {
-    log.warn(`No NFTs purchased for builder in week ${week}`, { userId: builderId });
+    scoutgameMintsLogger.warn(`No NFTs purchased for builder in week ${week}`, { userId: builderId });
     return;
   }
 

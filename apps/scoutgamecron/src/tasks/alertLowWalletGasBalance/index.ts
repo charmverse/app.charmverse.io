@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { builderCreatorAddress } from '@packages/scoutgame/builderNfts/constants';
+import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import { POST } from '@packages/utils/http';
 import type Koa from 'koa';
 
@@ -16,7 +17,7 @@ export async function alertLowWalletGasBalance(
   }
 
   const balanceInUSD = await getWalletGasBalanceInUSD(builderCreatorAddress);
-  log.info(`Admin wallet has a balance of ${balanceInUSD} USD`);
+  scoutgameMintsLogger.info(`Admin wallet has a balance of ${balanceInUSD} USD`);
   if (balanceInUSD <= thresholdUSD) {
     await POST(discordWebhook, {
       content: `<@&1027309276454207519>: Admin wallet has a low balance: ${balanceInUSD} USD. (Threshold is ${thresholdUSD} USD)`,

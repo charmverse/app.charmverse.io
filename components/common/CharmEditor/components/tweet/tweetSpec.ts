@@ -15,7 +15,7 @@ export function extractTweetAttrs(url: string): TweetNodeAttrs | null {
     return null;
   }
 
-  const match = url.match(/twitter\.com\/([^/]+)\/status\/(\d+)/);
+  const match = url.match(/(?:twitter\.com|x\.com)\/([^/]+)\/status\/(\d+)/);
   if (!match) {
     return null;
   }

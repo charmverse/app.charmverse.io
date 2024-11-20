@@ -1,3 +1,5 @@
-export default function FriendsPage() {
-  return <div>FriendsPage</div>;
+import { FriendsPage } from 'components/friends/FriendsPage';
+
+export default async function Friends() {
+  return <FriendsPage />;
 }

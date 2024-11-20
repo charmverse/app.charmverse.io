@@ -2,7 +2,6 @@
   "name": "@packages/utils",
   "version": "1.0.0",
   "type": "module",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,5 +20,8 @@
     "./url": "./src/url.ts",
     "./file": "./src/file.ts",
     "./array": "./src/array.ts"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2"
   }
 }

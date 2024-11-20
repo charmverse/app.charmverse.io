@@ -82,7 +82,7 @@ export class ProductionStack extends Stack {
             {
               namespace: 'aws:elasticbeanstalk:command',
               optionName: 'DeploymentPolicy',
-              value: 'Rolling'
+              value: 'Rolling' // NOTE there must be at least two instances or else it will take the stack down during deploys
             },
             {
               namespace: 'aws:elasticbeanstalk:command',
@@ -102,12 +102,12 @@ export class ProductionStack extends Stack {
             {
               namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
               optionName: 'MinInstancesInService',
-              value: '1'
+              value: '2'
             },
             {
               namespace: 'aws:autoscaling:updatepolicy:rollingupdate',
               optionName: 'MaxBatchSize',
-              value: '3'
+              value: '4'
             },
             // Set scaling trigger to 4000000 bytes (4MB), the default is 2MB
             {
