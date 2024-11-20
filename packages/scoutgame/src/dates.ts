@@ -100,8 +100,8 @@ export function isToday(date: Date, now = DateTime.utc()) {
   return dateDay.equals(now.startOf('day'));
 }
 
-export function getCurrentSeasonWeekNumber(week?: ISOWeek): WeekOfSeason {
-  return getSeasonWeekFromISOWeek({ season: currentSeason, week: week || getCurrentWeek() });
+export function getCurrentSeasonWeekNumber(week: ISOWeek = getCurrentWeek()): WeekOfSeason {
+  return getSeasonWeekFromISOWeek({ season: currentSeason, week });
 }
 
 export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; week: ISOWeek }): WeekOfSeason {
