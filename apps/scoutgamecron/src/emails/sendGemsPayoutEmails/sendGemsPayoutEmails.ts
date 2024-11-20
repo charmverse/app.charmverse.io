@@ -4,7 +4,7 @@ import { sendEmail } from '@packages/mailer/mailer';
 import { getClaimablePoints } from '@packages/scoutgame/points/getClaimablePoints';
 import { render } from '@react-email/render';
 
-import { ClaimPointsTemplate } from './templates/ClaimPointsTemplate';
+import { ClaimPointsTemplate } from './ClaimPointsTemplate';
 
 export async function sendGemsPayoutEmails({ week }: { week: string }) {
   const scouts = await prisma.scout.findMany({

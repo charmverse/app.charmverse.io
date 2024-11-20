@@ -1,4 +1,4 @@
-import { sendGemsPayoutEmails } from '../tasks/processGemsPayout/sendGemsPayoutEmails/sendGemsPayoutEmails';
+import { sendGemsPayoutEmails } from '../emails/sendGemsPayoutEmails/sendGemsPayoutEmails';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function query() {
