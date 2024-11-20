@@ -9,18 +9,21 @@ export function useSearchUsers({
   searchString,
   sortField,
   sortOrder,
-  filter
+  filter,
+  builderStatus
 }: {
   searchString?: string;
   sortField?: SortField;
   sortOrder?: SortOrder;
   filter?: UserFilter;
+  builderStatus?: BuilderStatus;
 }) {
   return useGETImmutable<ScoutGameUser[]>(searchString || sortField || filter ? '/api/users' : null, {
     searchString,
     sortField,
     sortOrder,
-    filter
+    filter,
+    builderStatus
   });
 }
 

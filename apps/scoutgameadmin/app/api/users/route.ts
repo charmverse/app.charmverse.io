@@ -9,10 +9,16 @@ import { searchForUser } from 'lib/users/searchForUser';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
+  const builderStatus = searchParams.get('builderStatus') as BuilderStatus | undefined;
   const searchString = searchParams.get('searchString');
   const sortOrder = searchParams.get('sortOrder') as SortOrder | undefined;
   const sortField = searchParams.get('sortField') as SortField | undefined;
-  const repos = await getUsers({ searchString: searchString || undefined, sortOrder, sortField });
+  const repos = await getUsers({
+    searchString: searchString || undefined,
+    sortOrder,
+    sortField,
+    builderStatus
+  });
   return NextResponse.json(repos);
 }
 

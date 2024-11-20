@@ -1,3 +1,4 @@
+import type { BuilderStrike, GithubEvent } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCommitsByUser } from '@packages/github/getCommitsByUser';
 import { DateTime } from 'luxon';
@@ -12,6 +13,7 @@ type Commit = {
 export type GithubUserStats = {
   afterDate: string;
   commits: number;
+  builderStrikes: (BuilderStrike & { githubEvent: GithubEvent })[];
   lastCommit?: Commit;
 };
 
@@ -24,14 +26,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ commits: 0 });
   }
   try {
+    const builderStrikes = await prisma.builderStrike.findMany({
+      where: {
+        builder: {
+          githubUser: {
+            some: {
+              login
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      select: {
+        createdAt: true,
+        deletedAt: true,
+        githubEvent: true
+      }
+    });
     const commits = await getCommitsByUser({ login, after: afterDate, paginated: true });
     const lastCommit = commits[0];
     const result: GithubUserStats = {
       afterDate: afterDate.toISOString(),
       commits: commits.length,
+      builderStrikes,
       lastCommit: lastCommit
         ? {
             url: lastCommit.html_url,
+            title: lastCommit.commit.message,
             date: lastCommit.commit.author.date
           }
         : undefined

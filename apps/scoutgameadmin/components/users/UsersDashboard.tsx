@@ -4,9 +4,11 @@ import {
   MoreHoriz as MoreHorizIcon,
   ArrowDropDown as ArrowDropDownIcon,
   Add as AddIcon,
-  Clear as ClearIcon
+  Clear as ClearIcon,
+  FilterList as FilterListIcon
 } from '@mui/icons-material';
 import {
+  Button,
   CircularProgress,
   Container,
   InputAdornment,
@@ -24,8 +26,14 @@ import {
   Box,
   IconButton,
   Typography,
-  TableSortLabel
+  TableSortLabel,
+  Select,
+  MenuItem,
+  ListItemText,
+  FormControl,
+  InputLabel
 } from '@mui/material';
+import { capitalize } from '@packages/utils/strings';
 import React, { useState, useMemo } from 'react';
 
 import { FileDownloadButton } from 'components/common/FileDownloadButton';
@@ -40,6 +48,8 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   const [filterString, setFilter] = useState('');
   const [sortField, setSortField] = useState<SortField>('createdAt');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [builderFilter, setBuilderFilter] = useState<BuilderStatus | undefined>(undefined);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const debouncedFilterString = useDebouncedValue(filterString);
   const {
@@ -47,7 +57,7 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
     isValidating,
     mutate: refreshUsers,
     isLoading
-  } = useSearchUsers({ searchString: debouncedFilterString, sortField, sortOrder });
+  } = useSearchUsers({ searchString: debouncedFilterString, sortField, builderStatus: builderFilter, sortOrder });
   const showFilteredResults = Boolean(debouncedFilterString || filteredUsers || isValidating || isLoading);
 
   const filteredAndSortedUsers = useMemo(() => {
@@ -82,30 +92,49 @@ export function UsersDashboard({ users }: { users: ScoutGameUser[] }) {
   return (
     <Container maxWidth='xl'>
       <Stack direction='row' spacing={2} justifyContent='space-between' alignItems='center' mb={2}>
-        <TextField
-          label='Search'
-          placeholder='Filter by name, id, wallet address, email or fid'
-          variant='outlined'
-          value={filterString}
-          onChange={(e) => setFilter(e.target.value)}
-          size='small'
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position='end'>
-                  {(isLoading || isValidating) && filterString && <CircularProgress size={20} />}
-                  {filterString && (
-                    <IconButton aria-label='clear search' size='small' onClick={() => setFilter('')} edge='end'>
-                      <ClearIcon fontSize='small' />
-                    </IconButton>
-                  )}
-                </InputAdornment>
-              )
-            }
-          }}
-        />
-        <Box>
-          <AddUserButton variant='contained' color='primary' sx={{ mr: 2 }} startIcon={<AddIcon />}>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <TextField
+            label='Search'
+            placeholder='Filter by name, id, wallet address, email or fid'
+            variant='outlined'
+            value={filterString}
+            onChange={(e) => setFilter(e.target.value)}
+            size='small'
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    {(isLoading || isValidating) && filterString && <CircularProgress size={20} />}
+                    {filterString && (
+                      <IconButton aria-label='clear search' size='small' onClick={() => setFilter('')} edge='end'>
+                        <ClearIcon fontSize='small' />
+                      </IconButton>
+                    )}
+                  </InputAdornment>
+                )
+              }
+            }}
+          />
+          <FormControl sx={{ width: 150 }}>
+            <InputLabel size='small'>Builder status</InputLabel>
+            <Select
+              value={builderFilter || ''}
+              onChange={(e) => setBuilderFilter(e.target.value || undefined)}
+              label='Builder status'
+            >
+              <MenuItem value=''>
+                <em>None</em>
+              </MenuItem>
+              {['applied', 'approved', 'rejected', 'banned'].map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status === 'banned' ? 'Suspended' : capitalize(status)}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <AddUserButton variant='contained' color='primary' startIcon={<AddIcon />}>
             Add
           </AddUserButton>
           <FileDownloadButton variant='outlined' filename='scoutgame_users.tsv' src='/api/users/export'>

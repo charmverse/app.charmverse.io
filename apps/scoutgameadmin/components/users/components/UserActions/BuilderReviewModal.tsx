@@ -12,6 +12,7 @@ import {
   Typography,
   Box
 } from '@mui/material';
+import { fancyTrimWords } from '@packages/utils/strings';
 import { useAction } from 'next-safe-action/hooks';
 import React, { useState } from 'react';
 import { mutate } from 'swr';
@@ -28,7 +29,7 @@ type Props = {
   onClose: () => void;
   onSave: () => void;
 };
-export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
+export function BuilderReviewModal({ user, open, onClose, onSave }: Props) {
   const [githubLogin, setTextInput] = useState('');
   const { trigger: createUser, error: createBuilderError, isMutating: isCreating } = useCreateBuilder();
   const githubLoginDebounced = useDebouncedValue(githubLogin);
@@ -43,15 +44,14 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
     }
   });
 
-  const didApply = user?.builderStatus === 'applied' || user?.builderStatus === 'rejected';
   const requireGithubLogin = !user.githubLogin;
 
   const githubLoginDisplayed = githubLogin || user.githubLogin;
 
   const { data: githubUserStats } = useGetGithubUserStats(githubLoginDisplayed);
 
-  function rejectBuilder() {
-    setBuilderStatus({ userId: user.id, status: 'rejected' });
+  async function rejectBuilder() {
+    await setBuilderStatus({ userId: user.id, status: 'rejected' });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -69,23 +69,27 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
   }
 
   return (
-    <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 400 } }} fullWidth>
-      <DialogTitle>
-        {didApply ? 'Review' : 'Add'} builder profile
-        <br />
-        <Typography variant='caption'>Register an NFT and mark the builder as approved</Typography>
-      </DialogTitle>
+    <Dialog open={open} onClose={onClose} PaperProps={{ sx: { maxWidth: 600 } }} fullWidth>
+      <DialogTitle>{user?.builderStatus ? 'Review' : 'Add'} builder profile</DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Stack gap={2}>
-            <Stack>
-              <Typography variant='caption'>Scout Game profile</Typography>
+            <Stack direction='row'>
+              <Typography sx={{ width: '120px' }}>Scout Game:</Typography>
               <Link href={`https://scoutgame.xyz/u/${user.path}`} target='_blank'>
                 https://scoutgame.xyz/u/{user.path}
               </Link>
             </Stack>
-            <Stack>
-              <Typography variant='caption'>Github profile</Typography>
+            {user.farcasterName && (
+              <Stack direction='row'>
+                <Typography sx={{ width: '120px' }}>Farcaster:</Typography>
+                <Link href={`https://warpcast.com/${user.farcasterName}`} target='_blank'>
+                  https://warpcast.com/{user.farcasterName}
+                </Link>
+              </Stack>
+            )}
+            <Stack direction='row'>
+              <Typography sx={{ width: '120px' }}>Github:</Typography>
               {requireGithubLogin && (
                 <TextField
                   autoFocus
@@ -99,38 +103,64 @@ export function AddBuilderModal({ user, open, onClose, onSave }: Props) {
                   sx={{ my: 0.5 }}
                 />
               )}
-              {githubLoginDisplayed ? (
-                <Link href={`https://github.com/${githubLoginDisplayed}`} target='_blank'>
-                  https://github.com/{githubLoginDisplayed}
-                </Link>
-              ) : (
-                <>&nbsp;</>
-              )}
-              {githubLoginDisplayed && (
-                <Typography variant='caption'>
-                  Last commit:{' '}
-                  {githubUserStats ? (
-                    githubUserStats.lastCommit ? (
-                      <Link href={githubUserStats.lastCommit.url} target='_blank'>
-                        {new Date(githubUserStats.lastCommit.date).toLocaleDateString()}
-                      </Link>
-                    ) : (
-                      'N/A'
-                    )
-                  ) : (
-                    <em>Loading...</em>
-                  )}
-                </Typography>
-              )}
-            </Stack>
-            {user.farcasterName && (
               <Stack>
-                <Typography variant='caption'>Farcaster profile</Typography>
-                <Link href={`https://warpcast.com/${user.farcasterName}`} target='_blank'>
-                  https://warpcast.com/{user.farcasterName}
-                </Link>
+                {githubLoginDisplayed ? (
+                  <Link href={`https://github.com/${githubLoginDisplayed}`} target='_blank'>
+                    https://github.com/{githubLoginDisplayed}
+                  </Link>
+                ) : (
+                  <>&nbsp;</>
+                )}
+                {githubLoginDisplayed && (
+                  <Stack>
+                    {githubUserStats ? (
+                      <>
+                        <Typography variant='caption'>
+                          Last commit:{' '}
+                          {githubUserStats.lastCommit ? (
+                            <ul style={{ paddingLeft: 16 }}>
+                              <li>
+                                <Link href={githubUserStats.lastCommit.url} target='_blank'>
+                                  {new Date(githubUserStats.lastCommit.date).toLocaleDateString()}:{' '}
+                                  {fancyTrimWords(githubUserStats.lastCommit.title, 7)}
+                                </Link>
+                              </li>
+                            </ul>
+                          ) : (
+                            <em>N/A</em>
+                          )}
+                        </Typography>
+                        <Typography variant='caption'>
+                          Closed pull requests: {githubUserStats.builderStrikes.length === 0 ? <em>N/A</em> : ''}
+                        </Typography>
+                        <ul style={{ paddingLeft: 16 }}>
+                          {githubUserStats.builderStrikes.map((strike) => (
+                            <li key={strike.githubEvent.url}>
+                              <Typography
+                                variant='caption'
+                                sx={{
+                                  textDecoration: strike.deletedAt ? 'line-through' : 'none',
+                                  textDecorationColor: 'var(--mui-palette-primary-main)'
+                                }}
+                              >
+                                <Link href={strike.githubEvent.url} target='_blank'>
+                                  {new Date(strike.createdAt).toLocaleDateString()}:{' '}
+                                  {fancyTrimWords(strike.githubEvent.title, 7)}
+                                </Link>
+                              </Typography>
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    ) : (
+                      <Typography variant='caption' component='em'>
+                        Loading...
+                      </Typography>
+                    )}
+                  </Stack>
+                )}
               </Stack>
-            )}
+            </Stack>
             {createBuilderError && (
               <Box p={1}>
                 <Typography variant='caption' color='error'>

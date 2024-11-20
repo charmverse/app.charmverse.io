@@ -16,8 +16,6 @@ export type ScoutGameUser = Pick<
   | 'farcasterId'
 > & { githubLogin: string | null; nftsPurchased: number; wallets: string[] };
 
-export type UserFilter = 'only-builders';
-
 export type SortField = 'displayName' | 'builderStatus' | 'currentBalance' | 'nftsPurchased' | 'createdAt';
 export type SortOrder = 'asc' | 'desc';
 
@@ -25,10 +23,15 @@ export async function getUsers({
   searchString,
   filter,
   sortField,
-  sortOrder
-}: { searchString?: string; filter?: UserFilter; sortField?: SortField; sortOrder?: SortOrder } = {}): Promise<
-  ScoutGameUser[]
-> {
+  sortOrder,
+  builderStatus
+}: {
+  searchString?: string;
+  filter?: UserFilter;
+  sortField?: SortField;
+  sortOrder?: SortOrder;
+  builderStatus?: BuilderStatus;
+} = {}): Promise<ScoutGameUser[]> {
   if (typeof searchString === 'string' && searchString.length < 2) {
     return [];
   }
@@ -97,9 +100,7 @@ export async function getUsers({
                 }
               ]
             }
-          : filter === 'only-builders'
-            ? { builderStatus: { not: null } }
-            : undefined,
+          : { builderStatus },
     include: {
       githubUser: true,
       userSeasonStats: true,
