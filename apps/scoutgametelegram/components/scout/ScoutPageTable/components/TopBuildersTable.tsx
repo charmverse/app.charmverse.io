@@ -5,7 +5,7 @@ import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 import type { TopBuilderInfo } from 'lib/builders/getTopBuilders';
 
@@ -22,6 +22,18 @@ export function TopBuildersTable({
   sort: string;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleSort = (sortBy: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', 'builders');
+    params.set('sort', sortBy);
+    params.set('order', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
     <Table
       aria-label='Top scouts table'
@@ -34,36 +46,48 @@ export function TopBuildersTable({
           <TableCell align='left' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
             BUILDER
           </TableCell>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            <Link href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'rank' ? 'asc' : 'desc'}&sort=rank`}>
-              RANK
-            </Link>
+          <TableCell
+            align='center'
+            onClick={() => handleSort('rank')}
+            sx={{
+              fontSize: { xs: '12px', md: 'initial' },
+              cursor: 'pointer'
+            }}
+          >
+            RANK
           </TableCell>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            <Link
-              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'price' ? 'asc' : 'desc'}&sort=price`}
-            >
-              PRICE
-            </Link>
+          <TableCell
+            align='center'
+            onClick={() => handleSort('price')}
+            sx={{
+              fontSize: { xs: '12px', md: 'initial' },
+              cursor: 'pointer'
+            }}
+          >
+            PRICE
           </TableCell>
-          <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+          <TableCell
+            align='right'
+            onClick={() => handleSort('points')}
+            sx={{
+              fontSize: { xs: '12px', md: 'initial' },
+              cursor: 'pointer'
+            }}
+          >
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              <Link
-                href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'points' ? 'asc' : 'desc'}&sort=points`}
-              >
-                POINTS
-              </Link>
+              POINTS
             </Stack>
           </TableCell>
           <TableCell
             align='center'
-            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
+            onClick={() => handleSort('cards')}
+            sx={{
+              fontSize: { xs: '12px', md: 'initial' },
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
           >
-            <Link
-              href={`/scout?tab=builders&order=${order === 'desc' || sort !== 'cards' ? 'asc' : 'desc'}&sort=cards`}
-            >
-              CARDS
-            </Link>
+            CARDS
           </TableCell>
         </CommonTableRow>
       </TableHead>
