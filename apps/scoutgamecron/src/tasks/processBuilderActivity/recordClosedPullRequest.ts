@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { ActivityRecipientType, GithubRepo, ScoutGameActivityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from '@packages/utils/types';
+import { sendClosedPullRequestEmail } from 'src/emails/sendClosedPullRequestEmail/sendClosedPullRequestEmail';
 import { v4 as uuid } from 'uuid';
 
 import { getClosedPullRequest } from './github/getClosedPullRequest';
@@ -38,6 +39,7 @@ export async function recordClosedPullRequest({
     select: {
       id: true,
       builderStatus: true,
+      email: true,
       strikes: {
         select: {
           id: true
@@ -156,6 +158,15 @@ export async function recordClosedPullRequest({
       });
 
       log.info('Banned builder', { userId: builder.id, strikes: currentStrikesCount });
+    }
+
+    if (builder.email) {
+      await sendClosedPullRequestEmail({
+        currentStrikesCount,
+        pullRequestLink: pullRequest.url,
+        userId: builder.id,
+        email: builder.email
+      });
     }
   }
 }

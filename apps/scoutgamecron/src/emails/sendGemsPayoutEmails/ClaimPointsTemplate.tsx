@@ -4,8 +4,8 @@ import { Img } from '@react-email/img';
 import { Section } from '@react-email/section';
 import React from 'react';
 
-import Button from './components/Button';
-import Text from './components/Text';
+import Button from '../components/Button';
+import Text from '../components/Text';
 
 const lightGreyColor = '#edf2f4';
 
