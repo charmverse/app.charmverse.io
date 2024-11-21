@@ -12,6 +12,10 @@ export async function getUserByPath(path: string): Promise<
       congratsImageUrl?: string | null;
       builderStatus: BuilderStatus | null;
       displayName: string;
+      talent: {
+        id: string;
+        score: number;
+      } | null;
     })
   | null
 > {
@@ -27,7 +31,13 @@ export async function getUserByPath(path: string): Promise<
           season: currentSeason
         }
       },
-      farcasterName: true
+      farcasterName: true,
+      talentProfile: {
+        select: {
+          id: true,
+          score: true
+        }
+      }
     }
   });
 
@@ -39,6 +49,7 @@ export async function getUserByPath(path: string): Promise<
     ...user,
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
-    githubLogin: user?.githubUser[0]?.login
+    githubLogin: user?.githubUser[0]?.login,
+    talent: user.talentProfile
   };
 }

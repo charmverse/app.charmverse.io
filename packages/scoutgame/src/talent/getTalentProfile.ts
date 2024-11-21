@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { GET as httpGET } from '@packages/utils/http';
 
@@ -7,9 +6,7 @@ import { GET as httpGET } from '@packages/utils/http';
 type PassportResponse = {
   passport: {
     score: number;
-    user: {
-      id: string;
-    };
+    passport_id: number;
   };
 };
 
@@ -43,7 +40,7 @@ export async function getTalentProfile({
   for (const wallet of wallets) {
     const talentProfile = await getWalletTalentProfile(wallet).catch(() => null);
     if (talentProfile && talentProfile.score > minimumTalentScore) {
-      return { wallet, talentId: talentProfile.user.id, score: talentProfile.score };
+      return { wallet, id: talentProfile.passport_id, score: talentProfile.score };
     }
   }
   return null;

@@ -18,9 +18,9 @@ export async function updateTalentProfile({
 
   if (talentProfile) {
     await prisma.talentProfile.upsert({
-      where: { id: talentProfile.talentId },
+      where: { id: talentProfile.id },
       create: {
-        id: talentProfile.talentId,
+        id: talentProfile.id,
         builderId,
         score: talentProfile.score
       },

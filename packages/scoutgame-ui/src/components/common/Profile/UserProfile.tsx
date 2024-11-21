@@ -17,6 +17,10 @@ type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   displayName: string;
   githubLogin?: string;
   farcasterName?: string | null;
+  talent?: {
+    id: string;
+    score: number;
+  } | null;
 };
 
 type UserProfileProps = {
@@ -58,7 +62,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       <Stack width='100%'>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' gap={1}>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
+          <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} talent={user.talent} />
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}
