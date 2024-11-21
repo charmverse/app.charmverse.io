@@ -6,6 +6,7 @@ import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import {
+  Alert,
   Box,
   CircularProgress,
   FormControlLabel,
@@ -43,6 +44,7 @@ import { useUser } from '../../../../providers/UserProvider';
 import { IconButton } from '../../Button/IconButton';
 import { PointsIcon } from '../../Icons';
 import { useDecentTransaction } from '../hooks/useDecentTransaction';
+import { useGetBuilderStrikesCount } from '../hooks/useGetBuilderStrikesCount';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
 import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 
@@ -85,6 +87,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
+  const { data: builderStrikesCount } = useGetBuilderStrikesCount({ builderId });
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
@@ -339,6 +342,15 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </>
         </Typography>
       </Box>
+      {builderStrikesCount ? (
+        <Alert severity='warning'>
+          This builder has {builderStrikesCount} strike{builderStrikesCount > 1 ? 's' : ''}. Click{' '}
+          <Link href='/info/spam-policy' target='_blank'>
+            here
+          </Link>{' '}
+          to learn more.
+        </Alert>
+      ) : null}
       <Stack gap={1}>
         <Typography color='secondary'>Select quantity</Typography>
         <ToggleButtonGroup
