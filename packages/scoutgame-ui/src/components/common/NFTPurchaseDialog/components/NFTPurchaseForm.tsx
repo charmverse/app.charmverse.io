@@ -28,7 +28,6 @@ import {
 } from '@packages/scoutgame/builderNfts/constants';
 import { purchaseWithPointsAction } from '@packages/scoutgame/builderNfts/purchaseWithPointsAction';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import { getBuilderStrikesCountAction } from '@packages/scoutgame/builders/getBuilderStrikesCountAction';
 import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 import type { MinimalUserInfo } from '@packages/scoutgame/users/interfaces';
 import { isTestEnv } from '@packages/utils/constants';
@@ -45,6 +44,7 @@ import { useUser } from '../../../../providers/UserProvider';
 import { IconButton } from '../../Button/IconButton';
 import { PointsIcon } from '../../Icons';
 import { useDecentTransaction } from '../hooks/useDecentTransaction';
+import { useGetBuilderStrikesCount } from '../hooks/useGetBuilderStrikesCount';
 import { useGetERC20Allowance } from '../hooks/useGetERC20Allowance';
 import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 
@@ -87,12 +87,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const { showMessage } = useSnackbar();
 
   const { switchChainAsync } = useSwitchChain();
-  const {
-    executeAsync: getBuilderStrikesCount,
-    isExecuting: isFetchingStrikesCount,
-    result
-  } = useAction(getBuilderStrikesCountAction);
-  const builderStrikesCount = result?.data;
+  const { data: builderStrikesCount } = useGetBuilderStrikesCount({ builderId });
 
   const builderContractReadonlyApiClient = new BuilderNFTSeasonOneImplementation01Client({
     chain: builderNftChain,
@@ -117,12 +112,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       setSubmitError(purchaseError);
     }
   }, [purchaseError]);
-
-  useEffect(() => {
-    if (builderId) {
-      getBuilderStrikesCount({ builderId });
-    }
-  }, [builderId]);
 
   const [tokensToBuy, setTokensToBuy] = useState(1);
 
