@@ -46,7 +46,7 @@ export async function recordMergedPullRequest({
   const pullRequestDate = new Date(pullRequest.mergedAt!);
   const builderEventDate = pullRequestDate;
   const week = getWeekFromDate(builderEventDate);
-  const start = getStartOfWeek(season as Season);
+  const seasonStart = getStartOfWeek(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -159,7 +159,6 @@ export async function recordMergedPullRequest({
         completedAt: pullRequest.mergedAt
       }
     });
-
     if (githubUser.builderId && !existingGithubEventToday) {
       const builder = await tx.scout.findUniqueOrThrow({
         where: {
@@ -171,6 +170,7 @@ export async function recordMergedPullRequest({
       });
 
       if (builder.builderStatus !== 'approved') {
+        log.warn('Ignore PR: builder not approved', { eventId: event.id, userId: githubUser.builderId });
         return;
       }
       const weeklyBuilderEvents = previousGitEvents.filter((e) => e.builderEvent).length;
@@ -184,7 +184,7 @@ export async function recordMergedPullRequest({
 
       const gemValue = gemsValues[gemReceiptType];
 
-      if (builderEventDate >= start.toJSDate()) {
+      if (builderEventDate >= seasonStart.toJSDate()) {
         const existingBuilderEvent = await tx.builderEvent.findFirst({
           where: {
             githubEventId: event.id
@@ -219,7 +219,6 @@ export async function recordMergedPullRequest({
           const uniqueScoutIds = Array.from(
             new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
           );
-
           const builderEvent = await tx.builderEvent.create({
             data: {
               builderId: githubUser.builderId,
@@ -258,6 +257,8 @@ export async function recordMergedPullRequest({
           });
           return { builderEvent, githubEvent: event };
         }
+      } else {
+        log.warn('Ignore PR: PR is not in current season', { eventId: event.id, userId: githubUser.builderId });
       }
     }
     return { builderEvent: null, githubEvent: event };
