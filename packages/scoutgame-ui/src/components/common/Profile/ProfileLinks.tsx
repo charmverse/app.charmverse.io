@@ -1,4 +1,5 @@
 import { IconButton, Typography, Tooltip } from '@mui/material';
+import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -7,14 +8,13 @@ import { useMdScreen } from '../../../hooks/useMediaScreens';
 export function ProfileLinks({
   farcasterName,
   githubLogin,
-  talent
+  talent,
+  hasMoxieProfile
 }: {
   farcasterName?: string | null;
   githubLogin?: string | null;
-  talent?: {
-    id: string;
-    score: number;
-  } | null;
+  talent?: TalentProfile | null;
+  hasMoxieProfile?: boolean;
 }) {
   const isDesktop = useMdScreen();
   return (
@@ -46,10 +46,11 @@ export function ProfileLinks({
       ) : null}
       {talent ? (
         <Tooltip title='Talent protocol score'>
-          <Link
+          <IconButton
             href={`https://passport.talentprotocol.com/profile/${talent.id}`}
             target='_blank'
             rel='noopener noreferrer'
+            sx={{ px: 0 }}
           >
             <Typography
               variant='body2'
@@ -67,7 +68,24 @@ export function ProfileLinks({
             >
               {talent.score}
             </Typography>
-          </Link>
+          </IconButton>
+        </Tooltip>
+      ) : null}
+      {hasMoxieProfile ? (
+        <Tooltip title='Moxie profile'>
+          <IconButton
+            href={`https://airstack.xyz/users/fc_fname%3A${farcasterName}`}
+            target='_blank'
+            rel='noopener noreferrer'
+            sx={{ px: 0 }}
+          >
+            <Image
+              src='/images/moxie.svg'
+              alt='moxie icon'
+              width={isDesktop ? '24' : '18'}
+              height={isDesktop ? '24' : '18'}
+            />
+          </IconButton>
         </Tooltip>
       ) : null}
     </>

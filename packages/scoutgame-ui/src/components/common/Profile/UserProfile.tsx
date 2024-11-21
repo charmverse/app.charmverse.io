@@ -1,6 +1,6 @@
 'use client';
 
-import type { Scout } from '@charmverse/core/prisma';
+import type { Scout, TalentProfile } from '@charmverse/core/prisma';
 import { Stack, Typography } from '@mui/material';
 
 import { useIsMounted } from '../../../hooks/useIsMounted';
@@ -17,10 +17,8 @@ type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   displayName: string;
   githubLogin?: string;
   farcasterName?: string | null;
-  talent?: {
-    id: string;
-    score: number;
-  } | null;
+  talent?: TalentProfile | null;
+  hasMoxieProfile?: boolean;
 };
 
 type UserProfileProps = {
@@ -62,7 +60,12 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
       <Stack width='100%'>
         <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' gap={1}>
           <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} talent={user.talent} />
+          <ProfileLinks
+            farcasterName={farcasterName}
+            githubLogin={githubLogin}
+            talent={user.talent}
+            hasMoxieProfile={user.hasMoxieProfile}
+          />
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}

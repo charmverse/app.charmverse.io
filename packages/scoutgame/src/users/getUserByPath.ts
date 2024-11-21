@@ -6,16 +6,19 @@ import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BasicUserInfo } from './interfaces';
 
+export type TalentProfile = {
+  id: number;
+  score: number;
+};
+
 export async function getUserByPath(path: string): Promise<
   | (BasicUserInfo & {
       nftImageUrl?: string;
       congratsImageUrl?: string | null;
       builderStatus: BuilderStatus | null;
       displayName: string;
-      talent: {
-        id: string;
-        score: number;
-      } | null;
+      talent: TalentProfile | null;
+      hasMoxieProfile: boolean;
     })
   | null
 > {
@@ -32,6 +35,7 @@ export async function getUserByPath(path: string): Promise<
         }
       },
       farcasterName: true,
+      hasMoxieProfile: true,
       talentProfile: {
         select: {
           id: true,
@@ -50,6 +54,7 @@ export async function getUserByPath(path: string): Promise<
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
     githubLogin: user?.githubUser[0]?.login,
-    talent: user.talentProfile
+    talent: user.talentProfile,
+    hasMoxieProfile: user.hasMoxieProfile
   };
 }
