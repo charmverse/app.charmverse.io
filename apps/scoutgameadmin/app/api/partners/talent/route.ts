@@ -1,10 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { getBuildersLeaderboard } from '@packages/scoutgame/builders/getBuildersLeaderboard';
 import { getLastWeek } from '@packages/scoutgame/dates';
-import { GET as httpGET } from '@packages/utils/http';
+import { getTalentProfile } from '@packages/scoutgame/talent/getTalentProfile';
 
 import { respondWithTSV } from 'lib/nextjs/respondWithTSV';
 
@@ -20,7 +18,7 @@ export async function GET() {
 
   const buildersWithTalent: { wallet: string; score: number; rank: number; builder: Scout }[] = [];
   for (const builder of topBuilders) {
-    let wallets = await prisma.scoutWallet.findMany({
+    const wallets = await prisma.scoutWallet.findMany({
       where: {
         scoutId: builder.builder.id
       },
@@ -37,25 +35,26 @@ export async function GET() {
       }
     });
 
-    if (wallets.length === 0 && farcasterId) {
-      const farcasterProfile = await getFarcasterUserById(farcasterId);
-      // console.log('farcasterProfile', farcasterProfile?.verifications);
-      wallets = farcasterProfile?.verifications.map((address) => ({ address }));
-      log.debug('Found wallets from Farcaster', { farcasterId, wallets });
+    const talentProfile = await getTalentProfile({
+      farcasterId,
+      wallets: wallets.map((wallet) => wallet.address),
+      minimumTalentScore
+    });
+
+    if (talentProfile) {
+      const fullBuilder = await prisma.scout.findUniqueOrThrow({
+        where: {
+          id: builder.builder.id
+        }
+      });
+      buildersWithTalent.push({
+        ...talentProfile,
+        rank: builder.rank,
+        builder: fullBuilder,
+        score: talentProfile.score
+      });
     }
-    let foundScore = false;
-    for (const wallet of wallets) {
-      const walletScore = !foundScore ? await getWalletScore(wallet.address).catch(() => null) : null;
-      if (walletScore && walletScore > minimumTalentScore) {
-        const scout = await prisma.scout.findUniqueOrThrow({
-          where: {
-            id: builder.builder.id
-          }
-        });
-        buildersWithTalent.push({ wallet: wallet.address, rank: builder.rank, score: walletScore, builder: scout });
-        foundScore = true;
-      }
-    }
+
     // grab the first 5 builders with 'talent'
     if (buildersWithTalent.length >= 5) {
       break;
@@ -72,26 +71,4 @@ export async function GET() {
   }));
 
   return respondWithTSV(rows, `partners-export_talent_${lastWeek}.tsv`);
-}
-
-// https://docs.talentprotocol.com/docs/developers/talent-api/api-reference/talent-passports
-type PassportResponse = {
-  passport: {
-    score: number;
-  };
-};
-
-async function getWalletPassport(address: string): Promise<PassportResponse> {
-  // await rateLimiter();
-
-  return httpGET(`https://api.talentprotocol.com/api/v2/passports/${address}`, {
-    headers: {
-      'X-API-KEY': process.env.TALENT_PROTOCOL_API_KEY
-    }
-  });
-}
-
-async function getWalletScore(address: string): Promise<number | null> {
-  const result = await getWalletPassport(address);
-  return result.passport.score || null;
 }
