@@ -269,7 +269,6 @@ function DocumentPageComponent({
   }
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-
   return (
     <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
       <FormProvider {...projectForm}>

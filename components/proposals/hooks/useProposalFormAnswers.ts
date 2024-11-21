@@ -48,9 +48,6 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     applyProject,
     applyProjectMembers
   } = useProjectForm({
-    // initialProjectValues: proposal?.project,
-    // projectId: projectAnswer?.projectId,
-    // selectedMemberIds: projectAnswer?.selectedMemberIds,
     fieldConfig: projectField?.fieldConfig as ProjectAndMembersFieldConfig
   });
 
