@@ -1,7 +1,6 @@
 import { fetchQueryWithPagination, init } from '@airstack/node';
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from '@packages/utils/strings';
 
 import { currentSeason } from '../dates';
 
@@ -78,9 +77,7 @@ async function getBuildersFollowingUser({ fid }: { fid: number }): Promise<numbe
 
     const typedData = data as SocialFollowersResponse;
 
-    prettyPrint({ typedData });
-
-    if (typedData.SocialFollowers.Follower) {
+    if (typedData.SocialFollowers?.Follower) {
       records.push(...typedData.SocialFollowers.Follower);
 
       if (hasNextPage && typedData.SocialFollowers.pageInfo.nextCursor) {
@@ -135,9 +132,7 @@ async function getBuildersFollowedByUser({ fid }: { fid: number }): Promise<numb
 
     const typedData = data as SocialFollowingResponse;
 
-    prettyPrint({ typedData });
-
-    if (typedData.SocialFollowings.Following) {
+    if (typedData.SocialFollowings?.Following) {
       records.push(...typedData.SocialFollowings.Following);
 
       if (hasNextPage && typedData.SocialFollowings.pageInfo.nextCursor) {

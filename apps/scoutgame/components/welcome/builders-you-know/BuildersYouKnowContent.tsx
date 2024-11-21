@@ -1,12 +1,22 @@
 'use client';
 
 import { Button, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material';
+import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
+import { BuildersGallery } from '@packages/scoutgame-ui/components/common/Gallery/BuildersGallery';
 import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Link from 'next/link';
 import React from 'react';
 
-export function BuildersYouKnowContent({ onClickContinue }: { onClickContinue?: React.MouseEventHandler }) {
+export function BuildersYouKnowContent({
+  onClickContinue,
+  followingBuilders,
+  followedBuilders
+}: {
+  onClickContinue?: React.MouseEventHandler;
+  followingBuilders: BuilderInfo[];
+  followedBuilders: BuilderInfo[];
+}) {
   const isMdScreen = useMdScreen();
   const iconSize = isMdScreen ? 24 : 18;
   return (
@@ -14,6 +24,8 @@ export function BuildersYouKnowContent({ onClickContinue }: { onClickContinue?: 
       <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>
         Builders You Know
       </Typography>
+      <BuildersGallery builders={followingBuilders} />
+      <BuildersGallery builders={followedBuilders} />
       <List sx={{ mb: 2 }}>
         <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
           <ListItemAvatar>

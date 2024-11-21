@@ -73,7 +73,7 @@ export async function seedWithRealCharmverseGithubData() {
 
   const devUserEntries = Object.entries(devUsers);
 
-  for (const [builder, { avatar, id }] of devUserEntries) {
+  for (const [builder, { avatar, id, farcasterId }] of devUserEntries) {
     const githubUser = await prisma.githubUser.findUnique({
       where: {
         login: builder
@@ -107,7 +107,8 @@ export async function seedWithRealCharmverseGithubData() {
               displayName: builder,
               path: builder,
               builderStatus: 'approved',
-              avatar: avatar
+              avatar: avatar,
+              farcasterId: farcasterId
             }
           }
         }

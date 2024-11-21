@@ -22,6 +22,7 @@ export async function getUser(userId?: string): Promise<SessionUser | null> {
       currentBalance: true,
       onboardedAt: true,
       agreedToTermsAt: true,
+      farcasterId: true,
       farcasterName: true,
       bio: true,
       referralCode: true
