@@ -2,6 +2,7 @@
 
 import { log } from '@charmverse/core/log';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { getUTMParamsFromSearch } from '@packages/mixpanel/utils';
 import { v4 as uuid } from 'uuid';
 
 import { actionClient } from '../actions/actionClient';
@@ -14,25 +15,25 @@ export const trackEventAction = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { event: eventName, ...eventPayload } = parsedInput;
 
-    let sessionUserId = ctx.session.user?.id || ctx.session.scoutId || ctx.session.anonymousUserId;
-    const userId = sessionUserId || '';
+    const userAgent = ctx.headers.get('user-agent');
 
-    // TODO: Handle anonymous user ids
-    if (!ctx.session.anonymousUserId) {
+    let userId = ctx.session.scoutId || ctx.session.anonymousUserId;
+
+    if (!userId) {
       ctx.session.anonymousUserId = uuid();
-      sessionUserId = ctx.session.anonymousUserId;
+      userId = ctx.session.anonymousUserId;
       await ctx.session.save();
     }
 
     const event = { userId, ...eventPayload };
 
-    // Make sure to use userId from session
-    event.userId = sessionUserId || '';
     if (userId === ctx.session.anonymousUserId) {
       event.isAnonymous = true;
     }
 
-    trackUserAction(eventName, event);
+    const urlParams = getUTMParamsFromSearch(eventPayload.currentUrlSearch || '');
+
+    trackUserAction(eventName, event, urlParams);
 
     log.debug(`Track user event: ${eventName}`, { userId: event.userId, path: event.currentUrlPath });
 
