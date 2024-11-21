@@ -5,7 +5,7 @@ import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } fro
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import type { FormFieldValue } from 'lib/forms/interfaces';
+import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -30,7 +30,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
           options: (formField.options ?? []) as SelectOptionType[]
         };
       }),
-    [!!proposal?.form?.formFields, !!answers]
+    [!!proposal?.form?.formFields, !!answers, proposal?.id]
   );
 
   // get Answers form
@@ -41,16 +41,13 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   // get project form
   const projectField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectAnswer = answers?.find((answer) => answer.fieldId === projectField?.id)?.value as
-    | { projectId: string; selectedMemberIds: string[] }
+    | ProjectFieldValue
     | undefined;
   const {
     form: projectForm,
     applyProject,
     applyProjectMembers
   } = useProjectForm({
-    // initialProjectValues: proposal?.project,
-    // projectId: projectAnswer?.projectId,
-    // selectedMemberIds: projectAnswer?.selectedMemberIds,
     fieldConfig: projectField?.fieldConfig as ProjectAndMembersFieldConfig
   });
 
@@ -64,6 +61,19 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
             id: answers?.find((proposalFormFieldAnswer) => proposalFormFieldAnswer.id === answer.id)?.id
           };
         })
+      });
+      // update SWR cache (which is necessary as it is the state used when the user navigates away and comes back to the form)
+      refreshProposalFormAnswers((__answers) => {
+        return __answers?.map((answer) => {
+          const updated = _answers.find((_answer) => _answer.id === answer.fieldId);
+          if (updated) {
+            return {
+              ...answer,
+              value: updated.value
+            };
+          }
+          return answer;
+        });
       });
     },
     [trigger, answers]

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { MenuItemNoAction } from 'components/common/MenuItemNoAction';
 import type { ScoutGameUser } from 'lib/users/getUsers';
 
-import { AddBuilderModal } from './AddBuilderModal';
+import { BuilderReviewModal } from './BuilderReviewModal';
 import { ViewTransactionsModal } from './ViewTransactionsModal';
 
 export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onChange: () => void }) {
@@ -30,7 +30,7 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
         <MoreHorizIcon />
       </IconButton>
       <Menu id='user-menu' anchorEl={anchorEl} open={open} onClose={handleClose} onClick={handleClose}>
-        {(user.builderStatus === 'applied' || user.builderStatus === 'rejected') && (
+        {(user.builderStatus === 'applied' || user.builderStatus === 'rejected' || user.builderStatus === 'banned') && (
           <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Review builder profile</MenuItem>
         )}
         {!user.builderStatus && <MenuItem onClick={() => setIsBuilderModalOpen(true)}>Add builder profile</MenuItem>}
@@ -40,7 +40,7 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
           Scout Id: <strong>{user.id}</strong>
         </MenuItemNoAction>
         <MenuItemNoAction>
-          Fid: <strong>{user.farcasterId || '--'}</strong>
+          Farcaster: <strong>{user.farcasterId ? `${user.farcasterName} (${user.farcasterId})` : '--'}</strong>
         </MenuItemNoAction>
         <MenuItemNoAction>
           Github: <strong>{user.githubLogin || '--'}</strong>
@@ -50,7 +50,7 @@ export function UserActionButton({ user, onChange }: { user: ScoutGameUser; onCh
         </MenuItemNoAction>
       </Menu>
       {isBuilderModalOpen && (
-        <AddBuilderModal
+        <BuilderReviewModal
           user={user}
           open={isBuilderModalOpen}
           onClose={() => setIsBuilderModalOpen(false)}

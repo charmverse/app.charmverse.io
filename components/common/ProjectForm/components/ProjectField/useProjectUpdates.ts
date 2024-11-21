@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -26,7 +26,7 @@ export function useProjectUpdates({
   function updateProjectCache(projectPayload: Partial<ProjectWithMembers>) {
     refreshProjects(
       (projects) =>
-        projects?.map((_project) => {
+        projects?.map((_project, i) => {
           if (_project.id === projectId) {
             return {
               ..._project,
@@ -43,32 +43,35 @@ export function useProjectUpdates({
   }
 
   // we need to update "project cache" to update the contxt that is used when selecting project or members from the dropdown
-  function updateProjectMemberCache(member: ProjectWithMembers['projectMembers'][number], isNew = false) {
-    refreshProjects(
-      (projects) =>
-        projects?.map((_project) => {
-          if (_project.id === projectId) {
-            if (isNew) {
+  const updateProjectMemberCache = useCallback(
+    (member: ProjectWithMembers['projectMembers'][number], isNew = false) => {
+      refreshProjects(
+        (projects) =>
+          projects?.map((_project) => {
+            if (_project.id === projectId) {
+              if (isNew) {
+                return {
+                  ..._project,
+                  projectMembers: [..._project.projectMembers, member]
+                };
+              }
               return {
                 ..._project,
-                projectMembers: [..._project.projectMembers, member]
+                projectMembers: _project.projectMembers.map((projectMember) =>
+                  projectMember.id === member.id ? member : projectMember
+                )
               };
             }
-            return {
-              ..._project,
-              projectMembers: _project.projectMembers.map((projectMember) =>
-                projectMember.id === member.id ? member : projectMember
-              )
-            };
-          }
 
-          return _project;
-        }),
-      {
-        revalidate: false
-      }
-    );
-  }
+            return _project;
+          }),
+        {
+          revalidate: false
+        }
+      );
+    },
+    [refreshProjects, projectId]
+  );
 
   const onProjectUpdateMemo = useMemo(
     () =>
@@ -114,7 +117,7 @@ export function useProjectUpdates({
         },
         150
       ),
-    [projectId, user?.id, isTeamLead]
+    [projectId, user?.id, isTeamLead, updateProjectMemberCache]
   );
 
   const onProjectMemberAdd = async (projectMemberPayload: AddProjectMemberPayload) => {

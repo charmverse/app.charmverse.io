@@ -129,7 +129,7 @@ export function useUpdateProposalFormFields({ proposalId }: { proposalId: string
 }
 
 export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useGETImmutable<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
+  return useGETImmutable<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null, {});
 }
 
 export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {

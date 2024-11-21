@@ -52,6 +52,7 @@ export function ProposalStickyFooter({
       ? proposal.form?.formFields
       : proposal.form?.formFields?.filter((field) => field.type === 'project_profile' || field.type === 'milestone');
   const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
+
   const errors = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,

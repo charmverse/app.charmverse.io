@@ -21,7 +21,15 @@ export function Header() {
   };
 
   return (
-    <Stack flexDirection='row' justifyContent='space-between' alignItems='center' width='100%' p={1} component='header'>
+    <Stack
+      flexDirection='row'
+      justifyContent='space-between'
+      alignItems='center'
+      width='100%'
+      p={1}
+      component='header'
+      minHeight='60px'
+    >
       <Link href='/scout'>
         <Image
           src='/images/scout-game-logo.png'

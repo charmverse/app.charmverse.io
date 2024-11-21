@@ -18,14 +18,16 @@ export async function mockBuilder({
   displayName = 'Test User',
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
+  githubUserLogin = `github_user:${githubUserId}`,
   onboardedAt,
   path = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
   createNft = false,
   referralCode = randomString(),
-  farcasterId
-}: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
+  farcasterId,
+  farcasterName
+}: Partial<Scout & { githubUserId?: number; githubUserLogin?: string; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
       createdAt,
@@ -36,10 +38,11 @@ export async function mockBuilder({
       agreedToTermsAt,
       farcasterId,
       referralCode,
+      farcasterName,
       githubUser: {
         create: {
           id: githubUserId,
-          login: path!
+          login: githubUserLogin
         }
       }
     },
@@ -66,6 +69,7 @@ export async function mockScout({
   builderId,
   season,
   email,
+  farcasterName,
   referralCode = randomString(),
   currentBalance,
   avatar
@@ -81,6 +85,7 @@ export async function mockScout({
   email?: string;
   referralCode?: string;
   currentBalance?: number;
+  farcasterName?: string;
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
@@ -92,7 +97,8 @@ export async function mockScout({
       email,
       referralCode,
       currentBalance,
-      avatar
+      avatar,
+      farcasterName
     }
   });
   if (builderId) {
