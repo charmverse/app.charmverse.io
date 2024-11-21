@@ -10,21 +10,27 @@ function getRandomValue<T>(arr: T[]): T {
   return arr[randomIndex];
 }
 
-const devUsers = {
-  mattcasey: {
-    id: 305398,
-    avatar: 'https://app.charmverse.io/favicon.png'
-  },
-  motechFR: {
-    id: 18669748,
-    avatar:
-      'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
-  },
-  Devorein: {
-    id: 25636858,
-    avatar:
-      'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
-  },
+type DevUser = {
+  id: number;
+  avatar: string;
+  farcasterId?: number;
+};
+
+const devUsers: Record<string, DevUser> = {
+  // mattcasey: {
+  //   id: 305398,
+  //   avatar: 'https://app.charmverse.io/favicon.png'
+  // },
+  // motechFR: {
+  //   id: 18669748,
+  //   avatar:
+  //     'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
+  // },
+  // Devorein: {
+  //   id: 25636858,
+  //   avatar:
+  //     'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
+  // },
   valentinludu: {
     id: 34683631,
     avatar:
@@ -32,7 +38,8 @@ const devUsers = {
   },
   ccarella: {
     id: 199823,
-    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3'
+    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3',
+    farcasterId: 472
   }
 };
 
