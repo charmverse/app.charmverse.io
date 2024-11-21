@@ -24,6 +24,7 @@ import {
 } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
+import { usePersistentFormValues } from 'components/common/form/hooks/usePersistantFormValues';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import type { RubricAnswerData } from 'lib/proposals/rubric/upsertRubricAnswers';
 import { getNumberFromString } from 'lib/utils/numbers';
@@ -151,6 +152,7 @@ export function RubricAnswersForm({
     control,
     register,
     handleSubmit,
+    setValue,
     reset,
     watch,
     formState: { isDirty }
@@ -267,6 +269,9 @@ export function RubricAnswersForm({
     // include evaluationId so that answers reset when navigating between evaluations
   }, [answers, draftAnswers]);
 
+  // persist form values to sessionStorage
+  usePersistentFormValues(`proposalId-answers-${proposalId}`, 'answers', { watch, setValue });
+
   return (
     <form>
       {showDraftBanner && (
@@ -332,7 +337,7 @@ export function RubricAnswersForm({
             <Button
               data-test='save-rubric-answers'
               sx={{ alignSelf: 'start' }}
-              disabled={answersError || disabled || (!isDirty && !showDraftAnswers)}
+              disabled={!!answersError || disabled || (!isDirty && !showDraftAnswers)}
               disabledTooltip={
                 answersError ||
                 (archived
