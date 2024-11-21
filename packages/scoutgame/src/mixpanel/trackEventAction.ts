@@ -15,9 +15,14 @@ export const trackEventAction = actionClient
   .action(async ({ parsedInput, ctx }) => {
     const { event: eventName, ...eventPayload } = parsedInput;
 
-    const userAgent = ctx.headers.get('user-agent');
-
     let userId = ctx.session.scoutId || ctx.session.anonymousUserId;
+
+    const utmParams = getUTMParamsFromSearch(eventPayload.currentUrlSearch || '');
+    if (utmParams) {
+      // store the utm params in the session so we can use them in future events
+      ctx.session.utmParams = utmParams;
+      await ctx.session.save();
+    }
 
     if (!userId) {
       ctx.session.anonymousUserId = uuid();
@@ -31,11 +36,9 @@ export const trackEventAction = actionClient
       event.isAnonymous = true;
     }
 
-    const urlParams = getUTMParamsFromSearch(eventPayload.currentUrlSearch || '');
+    trackUserAction(eventName, event, ctx.session.utmParams);
 
-    trackUserAction(eventName, event, urlParams);
-
-    log.debug(`Track user event: ${eventName}`, { userId: event.userId, path: event.currentUrlPath });
+    log.debug(`Track user event: ${eventName}`, { userId: event.userId, path: event.currentUrlPath, utmParams });
 
     return { success: true };
   });
