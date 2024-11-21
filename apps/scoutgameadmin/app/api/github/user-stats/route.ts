@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
         }
       }
     });
-    const commits = await getCommitsByUser({ login, after: afterDate, paginated: true });
+    const commits = await getCommitsByUser({ login, after: afterDate });
     const lastCommit = commits[0];
     const result: GithubUserStats = {
       afterDate: afterDate.toISOString(),
