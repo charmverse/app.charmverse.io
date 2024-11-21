@@ -31,10 +31,3 @@ export async function sendClosedPullRequestEmail({
     log.error('Error sending closed pull request email', { error });
   }
 }
-
-sendClosedPullRequestEmail({
-  currentStrikesCount: 3,
-  pullRequestLink: 'https://github.com/charmverse/charmverse/pull/1234',
-  userId: '123',
-  email: 'devorein00@gmail.com'
-});
