@@ -50,10 +50,6 @@ export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {
       }}
       isLoading={isUpdatingUserDetails}
       avatarSize={isDesktop ? 100 : 75}
-      githubLogin={user.githubLogin}
-      farcasterName={user.farcasterName}
-      hasMoxieProfile={user.hasMoxieProfile}
-      talentProfile={user.talentProfile}
     />
   );
 }

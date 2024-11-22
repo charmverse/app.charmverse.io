@@ -2,6 +2,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { Stack, TextField, Typography } from '@mui/material';
+import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import { useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';

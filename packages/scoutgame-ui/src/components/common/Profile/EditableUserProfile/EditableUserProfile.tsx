@@ -71,10 +71,6 @@ export function EditableUserProfile({
           onDisplayNameChange={onDisplayNameChange}
           control={control}
           isLoading={isLoading}
-          githubLogin={user.githubLogin}
-          farcasterName={user.farcasterName}
-          hasMoxieProfile={user.hasMoxieProfile}
-          talentProfile={user.talentProfile}
         />
         <EditableBio bio={user.bio} onBioChange={onBioChange} control={control} isDesktop={isDesktop} />
       </Stack>
