@@ -1,103 +1,53 @@
 'use client';
 
-import { Button, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material';
+import { Box, Button, Grid2, List, ListItem, ListItemAvatar, Paper, Stack, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
+import { BuilderCard } from '@packages/scoutgame-ui/components/common/Card/BuilderCard/BuilderCard';
 import { BuildersGallery } from '@packages/scoutgame-ui/components/common/Gallery/BuildersGallery';
-import { PointsIcon } from '@packages/scoutgame-ui/components/common/Icons';
+import { BuildersCarousel } from '@packages/scoutgame-ui/components/home/TodaysHotBuildersCarousel/BuildersCarousel';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Link from 'next/link';
 import React from 'react';
 
 export function BuildersYouKnowContent({
   onClickContinue,
-  followingBuilders,
-  followedBuilders
+  builders
 }: {
   onClickContinue?: React.MouseEventHandler;
-  followingBuilders: BuilderInfo[];
-  followedBuilders: BuilderInfo[];
+  builders: BuilderInfo[];
 }) {
   const isMdScreen = useMdScreen();
   const iconSize = isMdScreen ? 24 : 18;
   return (
-    <>
-      <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>
-        Builders You Know
-      </Typography>
-      <BuildersGallery builders={followingBuilders} />
-      <BuildersGallery builders={followedBuilders} />
-      <List sx={{ mb: 2 }}>
-        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
-          <ListItemAvatar>
-            <img src='/images/number_icon_1.png' alt='1' />
-          </ListItemAvatar>
-          <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
-            <strong>Discover builders who are contributing to cool onchain projects.</strong> Choose from the Hot
-            Builders section or explore the Scout page to find hidden gems.
-          </Typography>
-        </ListItem>
-        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
-          <ListItemAvatar>
-            <img src='/images/number_icon_2.png' alt='2' />
-          </ListItemAvatar>
-          <Stack display='flex' gap={2}>
-            <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
-              <strong>
-                Scout them by buying their Builder Cards with{' '}
-                <Typography
-                  component='span'
-                  color='secondary'
-                  fontSize='inherit'
-                  fontWeight='inherit'
-                  style={{ display: 'inline-flex', gap: 4 }}
-                >
-                  points <PointsIcon color='blue' size={iconSize} />
-                </Typography>
-              </strong>{' '}
-              or <strong>ETH / USDC</strong> on
-            </Typography>
-          </Stack>
-        </ListItem>
-        <Stack flexDirection='row' gap={2} width='100%' justifyContent='center' my={2}>
-          <img src='/images/crypto/ethereum-circle.png' alt='Ethereum' title='Ethereum' width='24' height='24' />
-          <img src='/images/crypto/op64.png' alt='OP' title='Optimism' width='24' height='24' />
-          <img src='/images/crypto/arbitrum.png' alt='Arbitrum' title='Arbitrum' width='24' height='24' />
-          <img src='/images/crypto/base64.png' alt='Base' title='Base' width='24' height='24' />
-          <img src='/images/crypto/zora64.png' alt='Zora' title='Zora' width='24' height='24' />
-        </Stack>
-        <ListItem sx={{ px: 1, alignItems: 'flex-start' }}>
-          <ListItemAvatar>
-            <img src='/images/number_icon_3.png' alt='3' />
-          </ListItemAvatar>
-          <Typography fontSize={{ xs: '13px', sm: '1rem' }}>
-            <strong>
-              Watch your{' '}
-              <Typography
-                component='span'
-                color='secondary'
-                fontSize='inherit'
-                fontWeight='inherit'
-                style={{ display: 'inline-flex', gap: 4 }}
-              >
-                points <PointsIcon color='blue' size={iconSize} />
-              </Typography>
-              {'  '}
-              increase
-            </strong>{' '}
-            as your builders climb the weekly Leaderboard. The more they code, the higher you go!
-          </Typography>
-        </ListItem>
-      </List>
-      <Button
-        LinkComponent={Link}
-        variant='contained'
-        onClick={onClickContinue}
-        href='/'
-        data-test='continue-button'
-        sx={{ margin: '0 auto', display: 'flex', width: 'fit-content' }}
-      >
-        Start Playing
-      </Button>
-    </>
+    <Grid2 gap={2}>
+      <Grid2 size={{ xs: 12 }}>
+        <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>
+          Builders You Know
+        </Typography>
+      </Grid2>
+
+      <BuildersGallery size='small' builders={builders} />
+
+      {/* <Grid2 container component={Paper} size={{ xs: 12 }} overflowY='scroll'>
+        {builders.map((b) => (
+          <Grid2 key={b.id} size={{ xs: 6 }}>
+            <BuilderCard builder={b} showPurchaseButton />
+          </Grid2>
+        ))}
+      </Grid2> */}
+
+      <Grid2 size={{ xs: 12 }}>
+        <Button
+          LinkComponent={Link}
+          variant='contained'
+          onClick={onClickContinue}
+          href='/'
+          data-test='continue-button'
+          sx={{ margin: '0 auto', px: 1, display: 'flex', width: 'fit-content' }}
+        >
+          Go to Scout Game
+        </Button>
+      </Grid2>
+    </Grid2>
   );
 }

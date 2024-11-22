@@ -33,12 +33,25 @@ async function loadBuilderContent({ fid }: { fid: number }) {
       (follower) => !buildersUserFollows.some((followedByUser) => followedByUser.id === follower.id)
     );
 
+    // Temporarily duplicate the first builder 4 times if available
+    if (buildersFollowingUser.length > 0) {
+      const firstBuilder = buildersFollowingUser[0];
+      buildersFollowingUser.push(firstBuilder, firstBuilder, firstBuilder);
+    }
+
+    // TEST DATA
+    return {
+      buildersUserFollows: Array.from({ length: 4 }, () => buildersUserFollows[0]),
+      buildersFollowingUser: Array.from({ length: 4 }, () => buildersUserFollows[0])
+    };
+
+    // Real return value
     return {
       buildersFollowingUser: uniqueBuildersFollowingUser,
       buildersUserFollows
     };
   } catch (error) {
-    log.error('Error loading builders you know content', { error });
+    log.error('Error loading builders you know content', { error, fid });
     return null;
   }
 }
@@ -61,11 +74,8 @@ export async function BuildersYouKnowPage() {
   return (
     <SinglePageLayout>
       <InfoBackgroundImage />
-      <SinglePageWrapper bgcolor='background.default'>
-        <BuildersYouKnowContent
-          followingBuilders={data.buildersFollowingUser}
-          followedBuilders={data.buildersUserFollows}
-        />
+      <SinglePageWrapper bgcolor='background.default' width='90vw' maxWidth='70vw' maxHeight='600px'>
+        <BuildersYouKnowContent builders={data.buildersFollowingUser} />
       </SinglePageWrapper>
     </SinglePageLayout>
   );
