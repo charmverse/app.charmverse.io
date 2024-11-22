@@ -24,9 +24,9 @@ describe('getNewUrl()', () => {
 });
 
 describe('getSubdomainPath()', () => {
-  it('should not modify the path that starts with /api', () => {
-    const result = getSubdomainPath('/api', { domain: 'charmverse' });
-    expect(result).toEqual('/api');
+  it('should not modify the path that starts with /api/', () => {
+    const result = getSubdomainPath('/api/foo', { domain: 'charmverse' });
+    expect(result).toEqual('/api/foo');
   });
 
   it('should not return the path with subdomain when on subdomain host', () => {
@@ -47,5 +47,10 @@ describe('getSubdomainPath()', () => {
   it('should return the path with subdomain even if the path includes or is the subdomain', () => {
     const result = getSubdomainPath('/charmverse', { domain: 'charmverse' });
     expect(result).toEqual('/charmverse/charmverse');
+  });
+
+  it('should not strip out part of path when it include the domain', () => {
+    const result = getSubdomainPath('/charmverse-title', { domain: 'charmverse' });
+    expect(result).toEqual('/charmverse/charmverse-title');
   });
 });
