@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+import { ReferralPlatform } from '@charmverse/core/prisma';
 import { capitalize } from '@packages/utils/strings';
 
 export function eventNameToHumanFormat(eventName: string) {
@@ -39,4 +41,22 @@ export function getUTMParamsFromSearch(searchString: string): UTMParams | undefi
     utm_from: new Date().toLocaleDateString(), // so we know when these were created
     ...utmParams
   };
+}
+
+const platform = process.env.SCOUTGAME_PLATFORM;
+
+function isPlatform(_platform: string = ''): _platform is ReferralPlatform {
+  const availablePlatforms = Object.values(ReferralPlatform);
+
+  return availablePlatforms.includes(_platform as ReferralPlatform);
+}
+
+export function getPlatform(): ReferralPlatform {
+  if (isPlatform(platform)) {
+    return platform;
+  }
+
+  log.warn('Platform not found in environment variables', { platform });
+
+  return 'unknown';
 }
