@@ -2,21 +2,19 @@ import { fetchQueryWithPagination, init } from '@airstack/node';
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { currentSeason } from '../dates';
-
 const apiKey = process.env.AIRSTACK_API_KEY;
 
 if (apiKey) {
   init(process.env.AIRSTACK_API_KEY as string, 'prod');
 }
 
-function getBuildersWithFarcasterIds(): Promise<number[]> {
+function getBuildersWithFarcasterIds({ season }: { season: string }): Promise<number[]> {
   return prisma.scout
     .findMany({
       where: {
         builderNfts: {
           some: {
-            season: currentSeason
+            season
           }
         },
         farcasterId: {
@@ -41,8 +39,8 @@ type SocialFollowersResponse = {
   };
 };
 
-async function getBuildersFollowingUser({ fid }: { fid: number }): Promise<number[]> {
-  const uniqueBuilderFids = await getBuildersWithFarcasterIds();
+async function getBuildersFollowingUser({ fid, season }: { fid: number; season: string }): Promise<number[]> {
+  const uniqueBuilderFids = await getBuildersWithFarcasterIds({ season });
   // For debugging, replace by this line and reimport gql from '@apollo/client'
   // const query = gql`
   const query = `  
@@ -106,8 +104,8 @@ type SocialFollowingResponse = {
   };
 };
 
-async function getBuildersFollowedByUser({ fid }: { fid: number }): Promise<number[]> {
-  const uniqueBuilderFids = await getBuildersWithFarcasterIds();
+async function getBuildersFollowedByUser({ fid, season }: { fid: number; season: string }): Promise<number[]> {
+  const uniqueBuilderFids = await getBuildersWithFarcasterIds({ season });
   // For debugging, replace by this line and reimport gql from '@apollo/client'
   // const query = gql`
   const query = `  
@@ -150,17 +148,20 @@ async function getBuildersFollowedByUser({ fid }: { fid: number }): Promise<numb
   return records.map((record) => Number(record.followingProfileId));
 }
 
-export async function getScoutFarcasterBuilderSocialGraph({ fid }: { fid: number }): Promise<{
-  following: number[];
-  followers: number[];
-}> {
+export async function getScoutFarcasterBuilderSocialGraph({
+  fid,
+  season
+}: {
+  fid: number;
+  season: string;
+}): Promise<{ following: number[]; followers: number[] }> {
   if (!fid) {
     throw new InvalidInputError('fid is required');
   }
 
   const [following, followers] = await Promise.all([
-    getBuildersFollowedByUser({ fid }),
-    getBuildersFollowingUser({ fid })
+    getBuildersFollowedByUser({ fid, season }),
+    getBuildersFollowingUser({ fid, season })
   ]);
 
   return {
