@@ -1,4 +1,7 @@
+import { log } from '@charmverse/core/log';
 import { uuidFromNumber } from '@packages/utils/uuid';
+
+import { updateReferralUsers } from '../referrals/updateReferralUsers';
 
 import { findOrCreateUser } from './findOrCreateUser';
 import type { FindOrCreateUserResult } from './findOrCreateUser';
@@ -12,16 +15,32 @@ export async function findOrCreateTelegramUser(telegramUser: {
   language_code?: string;
   is_premium?: boolean;
   photo_url?: string;
+  start_param?: string;
 }): Promise<FindOrCreateUserResult> {
   if (!telegramUser.id || !telegramUser.username) {
     throw new Error('Missing telegram web app user data');
   }
 
-  return findOrCreateUser({
+  const user = await findOrCreateUser({
     newUserId: uuidFromNumber(telegramUser.id),
     telegramId: telegramUser.id,
     avatar: telegramUser.photo_url,
     displayName: `${telegramUser.first_name}${telegramUser.last_name ? ` ${telegramUser.last_name}` : ''}`,
     path: telegramUser.username
   });
+
+  if (user?.isNew && telegramUser.start_param) {
+    const users = await updateReferralUsers(telegramUser.start_param, user.id).catch((error) => {
+      // There can be a case where the referrer is not found. Maybe someone will try to guess referral codes to get rewards.
+      log.warn('Error creating referral event.', { error, startParam: telegramUser.start_param, referrerId: user.id });
+      return null;
+    });
+
+    if (users) {
+      const [, referee] = users;
+      return { ...referee, isNew: true };
+    }
+  }
+
+  return user;
 }

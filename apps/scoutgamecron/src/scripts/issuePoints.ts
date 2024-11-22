@@ -16,7 +16,8 @@ async function issuePoints({ points }: { points: number }) {
       where: {
         farcasterId: fid
       },
-      include: {
+      select: {
+        id: true,
         pointsReceived: {
           where: {
             event: {

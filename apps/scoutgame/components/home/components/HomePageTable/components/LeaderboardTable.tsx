@@ -4,7 +4,7 @@ import { Box, Stack, TableHead } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
-import { getCurrentSeasonWeekNumber } from '@packages/scoutgame/dates';
+import type { ISOWeek } from '@packages/scoutgame/dates';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
 import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
@@ -15,8 +15,9 @@ import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
 
 import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';
+import { WeekTableHead } from './WeekTableHead';
 
-export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
+export function LeaderboardTable({ data, week }: { data: LeaderBoardRow[]; week: ISOWeek }) {
   const sorted = data.sort((a, b) => b.progress - a.progress);
 
   return (
@@ -30,7 +31,9 @@ export function LeaderboardTable({ data }: { data: LeaderBoardRow[] }) {
         <CommonTableRow>
           <TableCell align='center'>RANK</TableCell>
           <TableCell>BUILDER</TableCell>
-          <TableCell>WEEK {getCurrentSeasonWeekNumber()}</TableCell>
+          <TableCell>
+            <WeekTableHead week={week} />
+          </TableCell>
           <TableCell
             sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'block' }, pr: 0 }}
             align='center'

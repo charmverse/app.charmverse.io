@@ -3,34 +3,20 @@ import Image from 'next/image';
 
 import { useMdScreen } from '../../../../../hooks/useMediaScreens';
 
-export function PointsClaimSocialShare({
-  builderPoints,
-  scoutPoints,
-  builders,
-  userId,
-  userPath
-}: {
-  userId: string;
+type ShareMessageProps = {
+  totalUnclaimedPoints: number;
+  isBuilder: boolean;
+  platform: 'x' | 'telegram' | 'warpcast';
   userPath: string;
-  builderPoints: number;
-  scoutPoints: number;
-  builders: string[];
-}) {
+  builders: { farcasterHandle?: string; displayName: string }[];
+};
+
+export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'>) {
   const isMd = useMdScreen();
-  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}`;
-  const shareMessage = builderPoints
-    ? `I scored ${builderPoints} Scout Points this week as a Top Builder! Discover my work and scout me to see what I'm building next!\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`
-    : `I scored ${scoutPoints} Scout Points this week as a Top Scout! Big shoutout to my top Builders: ${builders.join(
-        ', '
-      )}. Who will be next?\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
 
   const handleShare = (platform: 'x' | 'telegram' | 'warpcast') => {
-    const urls = {
-      x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}&url=${imageUrl}`,
-      telegram: `https://t.me/share/url?url=${imageUrl}&text=${encodeURIComponent(shareMessage)}`,
-      warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${window.location.origin}/points-claim/${userPath}`
-    };
-    window.open(urls[platform], '_blank');
+    const shareUrl = getShareMessage({ ...props, platform });
+    window.open(shareUrl, '_blank');
   };
 
   const size = !isMd ? 30 : 42.5;
@@ -63,4 +49,31 @@ export function PointsClaimSocialShare({
       </Stack>
     </Stack>
   );
+}
+
+function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, builders }: ShareMessageProps) {
+  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}`;
+  let shareMessage = isBuilder
+    ? `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Builder!`
+    : `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Scout!`;
+  // Twitter discounts tweets with links
+  if (platform === 'x') {
+    shareMessage += `\n\nJoin me on @scoutgamexyz\n\n`;
+  } else if (isBuilder) {
+    shareMessage += ` Discover my work and scout me to see what I'm building next!\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
+  } else {
+    const buidersFormatted =
+      platform === 'warpcast'
+        ? builders
+            .map((builder) => (builder.farcasterHandle ? `@${builder.farcasterHandle}` : builder.displayName))
+            .join(', ')
+        : builders.map((builder) => builder.displayName).join(', ');
+    shareMessage += ` Big shoutout to my top Builders: ${buidersFormatted}. Who will be next?\nMy profile: https://scoutgame.xyz/u/${userPath}\n\n`;
+  }
+  const urls = {
+    x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
+    telegram: `https://t.me/share/url?url=${imageUrl}&text=${encodeURIComponent(shareMessage)}`,
+    warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${window.location.origin}/points-claim/${userPath}`
+  };
+  return urls[platform];
 }

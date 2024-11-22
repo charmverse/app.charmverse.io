@@ -26,6 +26,9 @@ export const purchaseWithPointsAction = authActionClient
       prisma.scout.findFirstOrThrow({
         where: {
           id: ctx.session.scoutId
+        },
+        select: {
+          currentBalance: true
         }
       })
     ]);

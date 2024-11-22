@@ -1,5 +1,6 @@
 import type { BuilderEvent, BuilderEventType, GithubRepo, Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomString } from '@packages/utils/strings';
 import { v4 as uuid } from 'uuid';
 
 import { getCurrentWeek } from '../dates';
@@ -17,13 +18,16 @@ export async function mockBuilder({
   displayName = 'Test User',
   builderStatus = 'approved',
   githubUserId = randomLargeInt(),
+  githubUserLogin = `github_user:${githubUserId}`,
   onboardedAt,
   path = uuid(),
   agreedToTermsAt = new Date(),
   nftSeason = mockSeason,
   createNft = false,
-  farcasterId
-}: Partial<Scout & { githubUserId?: number; createNft?: boolean; nftSeason?: string }> = {}) {
+  referralCode = randomString(),
+  farcasterId,
+  farcasterName
+}: Partial<Scout & { githubUserId?: number; githubUserLogin?: string; createNft?: boolean; nftSeason?: string }> = {}) {
   const result = await prisma.scout.create({
     data: {
       createdAt,
@@ -33,10 +37,12 @@ export async function mockBuilder({
       onboardedAt,
       agreedToTermsAt,
       farcasterId,
+      referralCode,
+      farcasterName,
       githubUser: {
         create: {
           id: githubUserId,
-          login: path!
+          login: githubUserLogin
         }
       }
     },
@@ -63,6 +69,8 @@ export async function mockScout({
   builderId,
   season,
   email,
+  farcasterName,
+  referralCode = randomString(),
   currentBalance,
   avatar
 }: {
@@ -75,7 +83,9 @@ export async function mockScout({
   builderId?: string; // automatically "scout" a builder
   season?: string;
   email?: string;
+  referralCode?: string;
   currentBalance?: number;
+  farcasterName?: string;
 } = {}) {
   const scout = await prisma.scout.create({
     data: {
@@ -85,8 +95,10 @@ export async function mockScout({
       onboardedAt,
       displayName,
       email,
+      referralCode,
       currentBalance,
-      avatar
+      avatar,
+      farcasterName
     }
   });
   if (builderId) {

@@ -23,7 +23,8 @@ export async function getUser(userId?: string): Promise<SessionUser | null> {
       onboardedAt: true,
       agreedToTermsAt: true,
       farcasterName: true,
-      bio: true
+      bio: true,
+      referralCode: true
     }
   });
 

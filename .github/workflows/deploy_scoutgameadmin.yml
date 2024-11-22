@@ -13,6 +13,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/scoutgameadmin/**'
+      - 'packages/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
@@ -26,6 +27,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/scoutgameadmin/**'
+      - 'packages/**'
   workflow_dispatch:
     inputs:
       core_pkg_version:
@@ -79,6 +81,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: ${{ github.event.action != 'labeled' && needs.build.outputs.skip_tests != 'true' }}
+    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+          --hostname postgres
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
 
     steps:
       - uses: actions/checkout@v4
@@ -88,6 +106,9 @@ jobs:
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
 
+      - name: Setup test database
+        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+
       - name: Restore app from cache
         uses: ./.github/actions/build_app
         with:
@@ -95,6 +116,9 @@ jobs:
 
       - name: Typecheck app
         run: npm run typecheck -w apps/scoutgameadmin
+
+      - name: Run app tests
+        run: npm run scoutgameadmin:test
 
   upload-docker:
     name: Upload Docker image

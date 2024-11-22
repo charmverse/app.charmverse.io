@@ -4,10 +4,7 @@
     "outDir": "dist",
     "rootDir": "src",
     // composite is useful for referenced packages. see https://www.typescriptlang.org/docs/handbook/project-references.html#composite
-    "composite": true,
-    "paths": {
-      "@root/*": ["../../*"]
-    }
+    "composite": true
   },
   "exclude": ["jest.config.ts", "jest.teardown.ts"]
 }

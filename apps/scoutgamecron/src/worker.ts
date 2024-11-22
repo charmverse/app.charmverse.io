@@ -16,6 +16,7 @@ import { resolveBalanceIssues } from './tasks/resolveBalanceIssues/resolveBalanc
 import { resolveMissingPurchasesTask } from './tasks/resolveMissingPurchases';
 import { updateAllBuilderCardActivities } from './tasks/updateBuilderCardActivity';
 import { updateMixpanelUserProfilesTask } from './tasks/updateMixpanelProfilesTask';
+import { updateTalentMoxieProfiles } from './tasks/updateTalentMoxieProfiles';
 
 const app = new Koa();
 const router = new Router();
@@ -79,6 +80,8 @@ addTask('/process-onchain-gems-payout', processOnchainGemsPayout);
 
 // Issue receipts for Github Activity via EAS
 addTask('/issue-gems-onchain', issueGemsOnchain);
+
+addTask('/update-talent-moxie-profiles', updateTalentMoxieProfiles);
 
 // Standard health check used by Beanstalk -------
 router.get('/api/health', middleware.healthCheck);

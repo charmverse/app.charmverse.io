@@ -5,8 +5,9 @@ import { getWeeklyPointsPoolAndBuilders } from '@packages/scoutgame/points/getWe
 import type { Context } from 'koa';
 import { DateTime } from 'luxon';
 
+import { sendGemsPayoutEmails } from '../../emails/sendGemsPayoutEmails/sendGemsPayoutEmails';
+
 import { processScoutPointsPayout } from './processScoutPointsPayout';
-import { sendGemsPayoutEmails } from './sendGemsPayoutEmails/sendGemsPayoutEmails';
 
 export async function processGemsPayout(
   ctx: Context,

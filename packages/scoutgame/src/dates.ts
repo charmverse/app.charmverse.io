@@ -67,6 +67,13 @@ export function getDateFromISOWeek(week: ISOWeek): DateTime {
   return DateTime.fromISO(week, { zone: 'utc' });
 }
 
+export function validateISOWeek(week: ISOWeek): boolean {
+  const date = DateTime.fromISO(week, { zone: 'utc' });
+  const now = DateTime.utc();
+
+  return date.isValid && date.year >= 2024 && date <= now;
+}
+
 export function getWeekStartEnd(date: Date) {
   const utcDate = DateTime.fromJSDate(date, { zone: 'utc' });
   const startOfWeek = utcDate.startOf('week');
@@ -93,8 +100,8 @@ export function isToday(date: Date, now = DateTime.utc()) {
   return dateDay.equals(now.startOf('day'));
 }
 
-export function getCurrentSeasonWeekNumber(): WeekOfSeason {
-  return getSeasonWeekFromISOWeek({ season: currentSeason, week: getCurrentWeek() });
+export function getCurrentSeasonWeekNumber(week: ISOWeek = getCurrentWeek()): WeekOfSeason {
+  return getSeasonWeekFromISOWeek({ season: currentSeason, week });
 }
 
 export function getSeasonWeekFromISOWeek({ season, week }: { season: ISOWeek; week: ISOWeek }): WeekOfSeason {
