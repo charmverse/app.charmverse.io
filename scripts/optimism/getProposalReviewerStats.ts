@@ -7,6 +7,7 @@ import {uniqueValues} from '@packages/utils/array';
 import fs from 'node:fs';
 
 import { stringify } from 'csv-stringify/sync';
+import review from 'pages/api/reward-applications/review';
 
 const spaceDomain = 'op-grants';
 const summaryFile = './op-reviewer-stats.csv';
@@ -199,6 +200,9 @@ const columnOrder: (keyof ReviewerStats)[] = [
 ];
 
 
+
+
+
 async function exportSummary() {
 
   const {id: spaceId} = await prisma.space.findUniqueOrThrow({
@@ -385,4 +389,91 @@ async function exportSummary() {
   fs.writeFileSync(summaryFile, csvString);
 }
 
-exportSummary().then()
+
+
+async function getAssignedReviewers() {
+
+  const { id: spaceId}  = await prisma.space.findUniqueOrThrow({
+    where: {
+      domain: spaceDomain
+    },
+    select: {
+      id: true
+    }
+  });
+
+  const uniqueReviewers = await prisma.proposalReviewer.findMany({
+    select: {
+      userId: true,
+      roleId: true
+    },
+    where: {
+      evaluation: {
+        proposal: {
+          spaceId
+        }
+      }
+    }
+  }).then((reviewers) => {
+    return reviewers.reduce((acc, reviewer) => {
+
+      if (reviewer.userId) {
+        acc.userIds.push(reviewer.userId);
+      }
+
+      if (reviewer.roleId) {
+        acc.roleIds.push(reviewer.roleId);
+      }
+
+      return acc;
+    }, {roleIds: [], userIds: []} as {roleIds: string[], userIds: string[]});
+  });
+
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          id: {
+            in: uniqueReviewers.userIds
+          }
+        },
+        {
+          spaceRoles: {
+            some: {
+              space: {
+                domain: spaceDomain
+              },
+              spaceRoleToRole: {
+                some: {
+                  roleId: {
+                    in: uniqueReviewers.roleIds
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      spaceRoles: {
+        some: {
+          space: {
+            domain: spaceDomain
+          }
+        }
+      }
+    },
+    select: {
+      id: true,
+      username: true,
+      path: true,
+      email: true
+    }
+  });
+
+  prettyPrint(users);
+}
+
+// exportSummary().then()
+
+
+getAssignedReviewers().then();
