@@ -17,6 +17,7 @@ type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   githubLogin?: string;
   farcasterName?: string | null;
   bio?: string | null;
+  hasMoxieProfile?: boolean;
 };
 
 type UserProfileProps = {
@@ -72,6 +73,7 @@ export function EditableUserProfile({
           isLoading={isLoading}
           githubLogin={user.githubLogin}
           farcasterName={user.farcasterName}
+          hasMoxieProfile={user.hasMoxieProfile}
         />
         <EditableBio bio={user.bio} onBioChange={onBioChange} control={control} isDesktop={isDesktop} />
       </Stack>
