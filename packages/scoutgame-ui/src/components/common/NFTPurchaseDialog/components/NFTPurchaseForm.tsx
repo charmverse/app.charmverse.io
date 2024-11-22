@@ -38,6 +38,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
+import { useUserWalletAddress } from '../../../../hooks/api/session';
 import { usePurchase } from '../../../../providers/PurchaseProvider';
 import { useSnackbar } from '../../../../providers/SnackbarContext';
 import { useUser } from '../../../../providers/UserProvider';
@@ -82,6 +83,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
+  const { error: addressError } = useUserWalletAddress(address);
   const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, purchaseSuccess, purchaseError } =
     usePurchase();
   const { showMessage } = useSnackbar();
@@ -528,7 +530,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase
+            isExecutingPointsPurchase ||
+            addressError
           }
           data-test='purchase-button'
         >
@@ -548,6 +551,11 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           There was an error communicating with Decent API
         </Typography>
       ) : null}
+      {addressError && (
+        <Typography variant='caption' color='error' align='center'>
+          {`Address ${address} is already in use. Please connect a different wallet`}
+        </Typography>
+      )}
       {submitError && (
         <Typography variant='caption' color='error' align='center'>
           {submitError}
