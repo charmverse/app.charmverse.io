@@ -24,5 +24,5 @@ export async function POST(request: Request) {
   session.anonymousUserId = undefined;
   await session.save();
 
-  return Response.json(user);
+  return Response.json(validatedData);
 }

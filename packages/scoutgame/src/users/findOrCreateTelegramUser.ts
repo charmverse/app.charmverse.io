@@ -1,23 +1,16 @@
 import { log } from '@charmverse/core/log';
 import { uuidFromNumber } from '@packages/utils/uuid';
+import type { WebAppInitData } from '@twa-dev/types/index';
 
 import { updateReferralUsers } from '../referrals/updateReferralUsers';
 
 import { findOrCreateUser } from './findOrCreateUser';
 import type { FindOrCreateUserResult } from './findOrCreateUser';
 
-export async function findOrCreateTelegramUser(telegramUser: {
-  id: number;
-  is_bot?: boolean;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  is_premium?: boolean;
-  photo_url?: string;
-  start_param?: string;
-}): Promise<FindOrCreateUserResult> {
-  if (!telegramUser.id || !telegramUser.username) {
+export async function findOrCreateTelegramUser(
+  telegramUser: WebAppInitData['user'] & Pick<WebAppInitData, 'start_param'>
+): Promise<FindOrCreateUserResult> {
+  if (!telegramUser?.id || !telegramUser?.username) {
     throw new Error('Missing telegram web app user data');
   }
 
@@ -29,8 +22,11 @@ export async function findOrCreateTelegramUser(telegramUser: {
     path: telegramUser.username
   });
 
-  if (user?.isNew && telegramUser.start_param) {
-    const users = await updateReferralUsers(telegramUser.start_param, user.id).catch((error) => {
+  const startParam = telegramUser.start_param;
+
+  if (user?.isNew && startParam?.startsWith('ref_')) {
+    const param = startParam.replace('ref_', '').trim();
+    const users = await updateReferralUsers(param, user.id).catch((error) => {
       // There can be a case where the referrer is not found. Maybe someone will try to guess referral codes to get rewards.
       log.warn('Error creating referral event.', { error, startParam: telegramUser.start_param, referrerId: user.id });
       return null;

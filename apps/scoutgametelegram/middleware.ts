@@ -6,18 +6,12 @@ import { getSession } from 'lib/session/getSession';
 // Everything is private
 const privateLinks: string[] = [];
 
+// Home page handles the redirects after logging in.
 export async function middleware(request: NextRequest) {
   const session = await getSession();
   const isLoggedIn = !!session.scoutId;
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies
-
-  // User flow
-  // lands on /, redirect to /welcome if logged in, otherwise stay on / (this should ideally never happen)
-  // on /welcome, redirect to /quests if onboarded, otherwise stay on /welcome
-  if (isLoggedIn && path === '/') {
-    return NextResponse.redirect(new URL('/welcome', request.url));
-  }
 
   if (!isLoggedIn && path !== '/') {
     return NextResponse.redirect(new URL('/', request.url));

@@ -1,4 +1,5 @@
 import { useGETImmutable, usePOST } from '@packages/scoutgame-ui/hooks/helpers';
+import type { WebAppInitData } from '@twa-dev/types';
 
 export function useGetClaimablePoints() {
   return useGETImmutable<{ points: number }>(
@@ -11,5 +12,5 @@ export function useGetClaimablePoints() {
 }
 
 export function useInitTelegramUser() {
-  return usePOST<{ initData: string }, { id: string }>('/api/session/telegram-user');
+  return usePOST<{ initData: string }, WebAppInitData>('/api/session/telegram-user');
 }
