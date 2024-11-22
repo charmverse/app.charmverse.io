@@ -1,5 +1,6 @@
 import type { BuilderStatus } from '@charmverse/core/prisma';
-import { Box, Paper, Stack } from '@mui/material';
+import { Box, Paper } from '@mui/material';
+import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import type { UserStats } from '@packages/scoutgame/users/getUserStats';
 import type { BuilderUserInfo } from '@packages/scoutgame/users/interfaces';
 import { ProfileStats } from '@packages/scoutgame-ui/components/profile/components/ProfileStats';
@@ -14,6 +15,8 @@ export type UserProfileWithPoints = Omit<BuilderUserInfo, 'builderStatus'> &
     displayName: string;
     builderStatus: BuilderStatus | null;
     bio: string | null;
+    hasMoxieProfile: boolean;
+    talentProfile?: TalentProfile;
   };
 
 export type ProfilePageProps = {
