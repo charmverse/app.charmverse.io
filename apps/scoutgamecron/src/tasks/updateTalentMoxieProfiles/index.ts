@@ -26,6 +26,11 @@ export async function updateTalentMoxieProfiles() {
     }
   });
 
+  log.info(`Updating talent & moxie profiles for ${builders.length} builders`);
+
+  let updatedTalentProfiles = 0;
+  let updatedMoxieProfiles = 0;
+
   for (const builder of builders) {
     try {
       await updateTalentProfile({
@@ -36,15 +41,23 @@ export async function updateTalentMoxieProfiles() {
           ? [builder.talentProfile.address]
           : builder.scoutWallet.map((wallet) => wallet.address)
       });
+      updatedTalentProfiles += 1;
     } catch (error) {
       log.error('Error updating talent profile', { builderId: builder.id, error });
     }
     if (builder.farcasterId) {
       try {
         await updateMoxieProfile({ farcasterId: builder.farcasterId, builderId: builder.id });
+        updatedMoxieProfiles += 1;
       } catch (error) {
         log.error('Error updating moxie profile', { builderId: builder.id, error });
       }
     }
   }
+
+  log.info(`Updated profiles`, {
+    totalBuilders: builders.length,
+    updatedTalentProfiles,
+    updatedMoxieProfiles
+  });
 }

@@ -24,7 +24,9 @@ export async function getUser(userId?: string): Promise<SessionUser | null> {
       agreedToTermsAt: true,
       farcasterName: true,
       bio: true,
-      referralCode: true
+      referralCode: true,
+      talentProfile: true,
+      hasMoxieProfile: true
     }
   });
 
