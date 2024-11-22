@@ -1,6 +1,7 @@
-import { IconButton, Typography, Tooltip } from '@mui/material';
+import { IconButton, Tooltip, Chip } from '@mui/material';
 import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import { useMdScreen } from '../../../hooks/useMediaScreens';
 
@@ -45,29 +46,23 @@ export function ProfileLinks({
       ) : null}
       {talentProfile ? (
         <Tooltip title='Talent protocol score'>
-          <IconButton
-            href={`https://passport.talentprotocol.com/profile/${talentProfile.id}`}
+          <Chip
+            sx={{ cursor: 'pointer', border: '2px solid rgb(130, 106, 238)', fontWeight: 600 }}
+            component={Link}
             target='_blank'
-            rel='noopener noreferrer'
-            sx={{ px: 0 }}
-          >
-            <Typography
-              variant='body2'
-              sx={{
-                width: isDesktop ? '28px' : '24px',
-                height: isDesktop ? '28px' : '24px',
-                border: '2.5px solid rgb(130, 106, 238)',
-                borderRadius: '50%',
-                color: 'white',
-                fontSize: isDesktop ? '10px' : '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              {talentProfile.score}
-            </Typography>
-          </IconButton>
+            href={`https://passport.talentprotocol.com/profile/${talentProfile.id}`}
+            avatar={
+              <Image
+                src='/images/talent.jpg'
+                alt='talent icon'
+                width={14}
+                height={14}
+                style={{ borderRadius: '50%' }}
+              />
+            }
+            label={talentProfile.score}
+            variant='outlined'
+          />
         </Tooltip>
       ) : null}
       {hasMoxieProfile ? (
