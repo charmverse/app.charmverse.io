@@ -4,7 +4,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 
-init(process.env.AIRSTACK_API_KEY as string, 'prod');
+const apiKey = process.env.AIRSTACK_API_KEY;
+
+if (apiKey) {
+  init(process.env.AIRSTACK_API_KEY as string, 'prod');
+}
 
 function getBuildersWithFarcasterIds(): Promise<number[]> {
   return prisma.scout
