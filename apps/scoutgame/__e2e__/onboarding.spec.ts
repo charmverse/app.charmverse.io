@@ -64,13 +64,10 @@ test.describe('Onboarding flow', () => {
     expect(user.sendMarketing).toBe(true);
     expect(user.agreedToTermsAt).not.toBeNull();
     expect(user.email).toBe(email);
-    await welcomePage.continueButton.click();
 
-    await page.waitForURL('**/welcome/how-it-works');
+    await Promise.all([page.waitForURL('**/welcome/how-it-works'), welcomePage.continueButton.click()]);
 
-    await welcomePage.continueButton.click();
-
-    await page.waitForURL('**/home');
+    await Promise.all([page.waitForURL('**/home', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
 
     await expect(homePage.container).toBeVisible();
 
