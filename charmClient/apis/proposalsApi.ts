@@ -40,4 +40,8 @@ export class ProposalsApi {
   exportProposalsReviewers({ spaceId }: { spaceId: string }) {
     return http.GET<string>(`/api/spaces/${spaceId}/proposals/reviewers/export`);
   }
+
+  exportUserProposals({ spaceId }: { spaceId: string }) {
+    return http.GET<string>(`/api/spaces/${spaceId}/proposals/work/export`);
+  }
 }
