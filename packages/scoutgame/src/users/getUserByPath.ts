@@ -6,12 +6,19 @@ import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BasicUserInfo } from './interfaces';
 
+export type TalentProfile = {
+  id: number;
+  score: number;
+};
+
 export async function getUserByPath(path: string): Promise<
   | (BasicUserInfo & {
       nftImageUrl?: string;
       congratsImageUrl?: string | null;
       builderStatus: BuilderStatus | null;
       displayName: string;
+      talentProfile: TalentProfile | null;
+      hasMoxieProfile: boolean;
     })
   | null
 > {
@@ -27,7 +34,14 @@ export async function getUserByPath(path: string): Promise<
           season: currentSeason
         }
       },
-      farcasterName: true
+      farcasterName: true,
+      hasMoxieProfile: true,
+      talentProfile: {
+        select: {
+          id: true,
+          score: true
+        }
+      }
     }
   });
 
@@ -39,6 +53,8 @@ export async function getUserByPath(path: string): Promise<
     ...user,
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
-    githubLogin: user?.githubUser[0]?.login
+    githubLogin: user?.githubUser[0]?.login,
+    talentProfile: user.talentProfile,
+    hasMoxieProfile: user.hasMoxieProfile
   };
 }
