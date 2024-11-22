@@ -31,7 +31,7 @@ export async function BuildersYouKnowPage() {
         Builders You Know
       </Typography>
       <Typography mb={2} textAlign='center'>
-        We found some builders you might know based on your Farcaster network
+        We found some Builders you might know
       </Typography>
       <Box display='flex' flexDirection='column' mb={4}>
         <Button variant='contained' LinkComponent={Link} href='/home' sx={{ margin: 'auto', px: 2 }}>
