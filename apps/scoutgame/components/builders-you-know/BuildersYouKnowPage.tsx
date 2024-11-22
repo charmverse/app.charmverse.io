@@ -1,16 +1,17 @@
 import { log } from '@charmverse/core/log';
+import { Box, Button, Typography } from '@mui/material';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { getScoutFarcasterBuilderSocialGraph } from '@packages/scoutgame/social/getScoutFarcasterBuilderSocialGraph';
 import { baseUrl } from '@packages/utils/constants';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 
-import { SinglePageLayout } from 'components/common/Layout';
-import { SinglePageWrapper } from 'components/common/SinglePageWrapper';
-import { InfoBackgroundImage } from 'components/layout/InfoBackgroundImage';
+import { LoadingGallery } from 'components/common/Loading/LoadingGallery';
+import { PageContainer } from 'components/layout/PageContainer';
+import { BuildersGalleryContainer } from 'components/scout/components/BuildersGalleryContainer';
 import { getBuildersByFid } from 'lib/builders/getBuildersByFid';
-
-import { BuildersYouKnowContent } from './BuildersYouKnowContent';
 
 async function loadBuilderContent({ fid }: { fid: number }) {
   try {
@@ -72,11 +73,26 @@ export async function BuildersYouKnowPage() {
   }
 
   return (
-    <SinglePageLayout>
-      <InfoBackgroundImage />
-      <SinglePageWrapper bgcolor='background.default' width='90vw' maxWidth='70vw' maxHeight='600px'>
-        <BuildersYouKnowContent builders={data.buildersFollowingUser} />
-      </SinglePageWrapper>
-    </SinglePageLayout>
+    <PageContainer>
+      <Typography variant='h5' color='secondary' mb={2} textAlign='center'>
+        Builders You Know
+      </Typography>
+      <Typography mb={2} textAlign='center'>
+        We found some builders you might know based on your Farcaster network
+      </Typography>
+      <Box display='flex' flexDirection='column' mb={4}>
+        <Button variant='contained' LinkComponent={Link} href='/home' sx={{ margin: 'auto', px: 2 }}>
+          See all builders
+        </Button>
+      </Box>
+      <Suspense fallback={<LoadingGallery />}>
+        <BuildersGalleryContainer
+          sort='top'
+          initialCursor={null}
+          initialBuilders={[...data.buildersUserFollows, ...data.buildersFollowingUser]}
+          showHotIcon={false}
+        />
+      </Suspense>
+    </PageContainer>
   );
 }

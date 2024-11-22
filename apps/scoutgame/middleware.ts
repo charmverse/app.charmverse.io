@@ -2,7 +2,8 @@ import { getSession } from '@packages/scoutgame/session/getSession';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-const privateLinks = ['/profile', '/notifications', '/welcome', '/claim'];
+// These are the links that are only accessible to logged in users
+const privateLinks = ['/profile', '/notifications', '/welcome', '/claim', '/builders-you-know'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();

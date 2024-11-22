@@ -80,7 +80,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
         LinkComponent={Link}
         variant='contained'
         onClick={onClickContinue}
-        href='/welcome/builders-you-know'
+        href='/builders-you-know'
         data-test='continue-button'
         sx={{ margin: '0 auto', display: 'flex', width: 'fit-content' }}
       >
