@@ -23,11 +23,11 @@ export async function updateTalentProfile({
         id: talentProfile.id,
         builderId,
         score: talentProfile.score,
-        address: talentProfile.wallet
+        address: talentProfile.wallet.toLowerCase()
       },
       update: {
         score: talentProfile.score,
-        address: talentProfile.wallet,
+        address: talentProfile.wallet.toLowerCase(),
         updatedAt: new Date()
       }
     });
