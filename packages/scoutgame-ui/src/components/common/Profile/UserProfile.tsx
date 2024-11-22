@@ -17,7 +17,7 @@ type UserProfileData = Pick<Scout, 'id' | 'path'> & {
   displayName: string;
   githubLogin?: string;
   farcasterName?: string | null;
-  talent?: TalentProfile | null;
+  talentProfile?: TalentProfile | null;
   hasMoxieProfile?: boolean;
 };
 
@@ -63,7 +63,7 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
           <ProfileLinks
             farcasterName={farcasterName}
             githubLogin={githubLogin}
-            talent={user.talent}
+            talentProfile={user.talentProfile}
             hasMoxieProfile={user.hasMoxieProfile}
           />
         </Stack>

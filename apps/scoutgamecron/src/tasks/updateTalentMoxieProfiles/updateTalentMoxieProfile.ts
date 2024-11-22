@@ -22,10 +22,13 @@ export async function updateTalentProfile({
       create: {
         id: talentProfile.id,
         builderId,
-        score: talentProfile.score
+        score: talentProfile.score,
+        address: talentProfile.wallet
       },
       update: {
-        score: talentProfile.score
+        score: talentProfile.score,
+        address: talentProfile.wallet,
+        updatedAt: new Date()
       }
     });
   }

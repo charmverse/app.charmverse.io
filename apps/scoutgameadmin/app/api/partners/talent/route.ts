@@ -16,43 +16,66 @@ export async function GET() {
     week: lastWeek
   });
 
-  const buildersWithTalent: { wallet: string; score: number; rank: number; builder: Scout }[] = [];
+  const buildersWithTalent: {
+    wallet: string;
+    score: number;
+    rank: number;
+    builder: Pick<Scout, 'displayName' | 'path' | 'email'>;
+  }[] = [];
+
   for (const builder of topBuilders) {
-    const wallets = await prisma.scoutWallet.findMany({
-      where: {
-        scoutId: builder.builder.id
-      },
-      select: {
-        address: true
-      }
-    });
-    const { farcasterId } = await prisma.scout.findUniqueOrThrow({
+    const fullBuilder = await prisma.scout.findUniqueOrThrow({
       where: {
         id: builder.builder.id
       },
       select: {
-        farcasterId: true
+        farcasterId: true,
+        displayName: true,
+        path: true,
+        email: true,
+        talentProfile: {
+          select: {
+            id: true,
+            score: true,
+            address: true
+          }
+        },
+        scoutWallet: {
+          select: {
+            address: true
+          }
+        }
       }
     });
 
-    const talentProfile = await getTalentProfile({
-      farcasterId,
-      wallets: wallets.map((wallet) => wallet.address),
-      minimumTalentScore
-    });
+    const { scoutWallet, farcasterId } = fullBuilder;
 
-    if (talentProfile) {
-      const fullBuilder = await prisma.scout.findUniqueOrThrow({
-        where: {
-          id: builder.builder.id
-        }
+    if (fullBuilder.talentProfile) {
+      const talentProfile = fullBuilder.talentProfile;
+      if (talentProfile.score >= minimumTalentScore) {
+        buildersWithTalent.push({
+          rank: builder.rank,
+          builder: fullBuilder,
+          score: talentProfile.score,
+          wallet: talentProfile.address
+        });
+      }
+    } else {
+      const wallets = scoutWallet.map((wallet) => wallet.address);
+      const talentProfile = await getTalentProfile({
+        farcasterId,
+        wallets,
+        minimumTalentScore
       });
-      buildersWithTalent.push({
-        ...talentProfile,
-        rank: builder.rank,
-        builder: fullBuilder,
-        score: talentProfile.score
-      });
+
+      if (talentProfile) {
+        buildersWithTalent.push({
+          ...talentProfile,
+          rank: builder.rank,
+          builder: fullBuilder,
+          score: talentProfile.score
+        });
+      }
     }
 
     // grab the first 5 builders with 'talent'

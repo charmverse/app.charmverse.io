@@ -17,7 +17,7 @@ export async function getUserByPath(path: string): Promise<
       congratsImageUrl?: string | null;
       builderStatus: BuilderStatus | null;
       displayName: string;
-      talent: TalentProfile | null;
+      talentProfile: TalentProfile | null;
       hasMoxieProfile: boolean;
     })
   | null
@@ -54,7 +54,7 @@ export async function getUserByPath(path: string): Promise<
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
     githubLogin: user?.githubUser[0]?.login,
-    talent: user.talentProfile,
+    talentProfile: user.talentProfile,
     hasMoxieProfile: user.hasMoxieProfile
   };
 }

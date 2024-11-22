@@ -11,6 +11,11 @@ export async function updateTalentMoxieProfiles() {
       }
     },
     select: {
+      talentProfile: {
+        select: {
+          address: true
+        }
+      },
       farcasterId: true,
       id: true,
       scoutWallet: {
@@ -26,7 +31,10 @@ export async function updateTalentMoxieProfiles() {
       await updateTalentProfile({
         builderId: builder.id,
         farcasterId: builder.farcasterId,
-        wallets: builder.scoutWallet.map((wallet) => wallet.address)
+        // If the builder has a talent profile, use the wallet address, otherwise use the scout wallet
+        wallets: builder.talentProfile
+          ? [builder.talentProfile.address]
+          : builder.scoutWallet.map((wallet) => wallet.address)
       });
     } catch (error) {
       log.error('Error updating talent profile', { builderId: builder.id, error });

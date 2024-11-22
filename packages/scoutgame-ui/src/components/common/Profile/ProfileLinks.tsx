@@ -1,19 +1,18 @@
 import { IconButton, Typography, Tooltip } from '@mui/material';
 import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { useMdScreen } from '../../../hooks/useMediaScreens';
 
 export function ProfileLinks({
   farcasterName,
   githubLogin,
-  talent,
+  talentProfile,
   hasMoxieProfile
 }: {
   farcasterName?: string | null;
   githubLogin?: string | null;
-  talent?: TalentProfile | null;
+  talentProfile?: TalentProfile | null;
   hasMoxieProfile?: boolean;
 }) {
   const isDesktop = useMdScreen();
@@ -44,10 +43,10 @@ export function ProfileLinks({
           />
         </IconButton>
       ) : null}
-      {talent ? (
+      {talentProfile ? (
         <Tooltip title='Talent protocol score'>
           <IconButton
-            href={`https://passport.talentprotocol.com/profile/${talent.id}`}
+            href={`https://passport.talentprotocol.com/profile/${talentProfile.id}`}
             target='_blank'
             rel='noopener noreferrer'
             sx={{ px: 0 }}
@@ -66,7 +65,7 @@ export function ProfileLinks({
                 justifyContent: 'center'
               }}
             >
-              {talent.score}
+              {talentProfile.score}
             </Typography>
           </IconButton>
         </Tooltip>
