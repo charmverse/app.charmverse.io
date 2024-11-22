@@ -9,6 +9,7 @@ import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -130,6 +131,26 @@ export function ProposalsPage({ title }: { title: string }) {
     },
     [showError, trashPages]
   );
+
+  const exportToCSV = useCallback(() => {
+    if (currentSpace && activeView) {
+      const filter = JSON.stringify(activeView.fields.filter || {});
+      charmClient.proposals
+        .exportFilteredProposals({
+          spaceId: currentSpace.id,
+          filter,
+          viewId: activeView.id
+        })
+        .then((csvContent) => {
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Proposals.csv';
+          a.click();
+        });
+    }
+  }, [currentSpace?.id, activeView]);
 
   if (isLoadingAccess) {
     return null;
@@ -294,6 +315,16 @@ export function ProposalsPage({ title }: { title: string }) {
               <Box className='view-actions'>
                 <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
                 <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
+                <Button
+                  variant='outlined'
+                  size='small'
+                  onClick={exportToCSV}
+                  disabled={!cards.length}
+                  disabledTooltip='No proposals to export'
+                  sx={{ ml: 1 }}
+                >
+                  Export to CSV
+                </Button>
                 {user && (
                   <ToggleViewSidebarButton
                     onClick={(e) => {

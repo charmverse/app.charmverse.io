@@ -44,4 +44,15 @@ export class ProposalsApi {
   exportUserProposals({ spaceId }: { spaceId: string }) {
     return http.GET<string>(`/api/spaces/${spaceId}/proposals/work/export`);
   }
+
+  exportFilteredProposals({ spaceId, filter, viewId }: { spaceId: string; filter?: string; viewId?: string }) {
+    const params = new URLSearchParams();
+    if (filter) {
+      params.append('filter', filter);
+    }
+    if (viewId) {
+      params.append('viewId', viewId);
+    }
+    return http.GET<string>(`/api/spaces/${spaceId}/proposals/export?${params.toString()}`);
+  }
 }
