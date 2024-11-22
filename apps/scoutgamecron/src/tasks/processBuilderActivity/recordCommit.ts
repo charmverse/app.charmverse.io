@@ -18,15 +18,7 @@ export type RequiredCommitFields = Pick<Commit, 'sha' | 'html_url'> & {
   repository: Pick<Commit['repository'], 'id' | 'name' | 'full_name'>;
 };
 
-export async function recordCommit({
-  commit,
-  season,
-  now = DateTime.utc()
-}: {
-  commit: RequiredCommitFields;
-  season: Season;
-  now?: DateTime;
-}) {
+export async function recordCommit({ commit, season }: { commit: RequiredCommitFields; season: Season }) {
   if (!commit.author || !commit.commit.author) {
     log.warn('No commit author', commit);
     return null;
@@ -35,8 +27,14 @@ export async function recordCommit({
     log.warn('No committer found', commit);
     return null;
   }
+  // this is the date the commit was merged, which determines the season/week that it counts as a builder event
+  if (!commit.commit.committer?.date) {
+    log.warn('No committer date found', commit);
+    return null;
+  }
+  const builderEventDate = new Date(commit.commit.committer!.date);
 
-  const week = getWeekFromDate(now.toJSDate());
+  const week = getWeekFromDate(builderEventDate);
   const start = getStartOfWeek(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
@@ -111,8 +109,6 @@ export async function recordCommit({
     if (githubUser.builderId && !existingGithubEventToday && !existingPullRequestEvent) {
       const gemReceiptType: GemsReceiptType = 'daily_commit';
 
-      // this is the date the commit was merged, which determines the season/week that it counts as a builder event
-      const builderEventDate = event.completedAt!;
       const gemValue = gemsValues[gemReceiptType];
       if (builderEventDate >= start.toJSDate()) {
         const existingBuilderEvent = await tx.builderEvent.findFirst({
