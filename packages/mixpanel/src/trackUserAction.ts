@@ -1,15 +1,9 @@
 import { log } from '@charmverse/core/log';
 
-import type { MixpanelEventMap, MixpanelEventName } from './interfaces';
+import type { MixpanelEventMap, MixpanelEventName, MixpanelTrackBase } from './interfaces';
 import { mixpanel } from './mixpanel';
 import type { UTMParams } from './utils';
-import { eventNameToHumanFormat, paramsToHumanFormat } from './utils';
-
-export interface MixpanelTrackBase {
-  // distinct_id - property name required by mixpanel to identify unique users
-  distinct_id: string;
-  isAnonymous?: boolean;
-}
+import { eventNameToHumanFormat, getPlatform, paramsToHumanFormat } from './utils';
 
 export function trackUserAction<T extends MixpanelEventName>(
   eventName: T,
@@ -20,6 +14,7 @@ export function trackUserAction<T extends MixpanelEventName>(
   // map userId prop to distinct_id required by mixpanel to recognize the user
   const mixpanelTrackParams: MixpanelTrackBase = {
     distinct_id: userId,
+    platform: getPlatform(),
     ...paramsToHumanFormat(restParams),
     // when tracking utm_params in Mixpanel event, it should also update the user profile with initial_<utm_param> properties
     // source: https://docs.mixpanel.com/docs/tracking-methods/sdks/javascript#track-utm-tags

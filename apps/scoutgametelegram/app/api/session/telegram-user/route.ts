@@ -1,4 +1,5 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { findOrCreateTelegramUser } from '@packages/scoutgame/users/findOrCreateTelegramUser';
 
 import { getSession } from 'lib/session/getSession';
@@ -23,6 +24,16 @@ export async function POST(request: Request) {
   session.scoutId = user?.id;
   session.anonymousUserId = undefined;
   await session.save();
+
+  if (user.isNew) {
+    trackUserAction('sign_up', {
+      userId: user.id
+    });
+  } else {
+    trackUserAction('sign_in', {
+      userId: user.id
+    });
+  }
 
   return Response.json(validatedData);
 }
