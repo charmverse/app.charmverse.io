@@ -6,6 +6,7 @@ export const BasicUserInfoSelect = {
   displayName: true,
   onboardedAt: true,
   agreedToTermsAt: true,
+  farcasterId: true,
   farcasterName: true,
   currentBalance: true,
   avatar: true,
