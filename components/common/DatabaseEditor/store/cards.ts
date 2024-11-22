@@ -138,7 +138,7 @@ export function sortCards(
   cards: Card[],
   board: Pick<Board, 'fields'>,
   activeView: BoardView,
-  members: Record<string, Member>,
+  members: Record<string, Pick<Member, 'username'>>,
   cardTitles: Record<string, { title: string }>,
   localSort?: ISortOption[] | null
 ): Card[] {
