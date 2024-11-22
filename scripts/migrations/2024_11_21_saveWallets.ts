@@ -16,11 +16,11 @@ async function syncNFTWallets() {
     },
     include: { scoutWallet: true }
   });
-  console.log(`Found ${users.length} users with NFT purchases`);
 
-  const events = await getOnchainEvents();
+  // from block is somewhat arbitrary, but is early enough to grabs all events
+  const events = await getOnchainEvents({ fromBlock: 12800000 });
   console.log(`Found ${events.length} onchain events`);
-  return;
+
   for (const user of users) {
     const walletsFromOnchain = uniq(
       events
@@ -33,6 +33,9 @@ async function syncNFTWallets() {
     );
 
     await saveUserWallets(user.id, newWallets);
+    if (users.indexOf(user) % 10 === 0) {
+      console.log(`Updated ${user.id} users. Latest createdAt: ${user.createdAt}`);
+    }
   }
 }
 
@@ -71,11 +74,39 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
     const existing = await prisma.scoutWallet.findMany({
       where: {
         address: { in: newWallets.map((address) => address.toLowerCase()) }
+      },
+      include: {
+        scout: {
+          select: {
+            nftPurchaseEvents: true,
+            githubUser: true
+          }
+        }
       }
     });
-    if (existing.length > 0) {
+    const existingButUnused = existing.filter(
+      (w) => w.scout.nftPurchaseEvents.length === 0 && w.scout.githubUser === null
+    );
+    if (existingButUnused.length > 0) {
+      console.log('Wallet already exists but is unused, so switch the ownership', {
+        userId,
+        originalOwners: existingButUnused.map((w) => w.scoutId + ': ' + w.address)
+      });
+      await prisma.scoutWallet.updateMany({
+        where: { address: { in: existingButUnused.map((w) => w.address) } },
+        data: {
+          scoutId: userId
+        }
+      });
+    }
+    const existingAndUsed = existing.filter((w) => !existingButUnused.some((_w) => _w.address === w.address));
+    if (existingAndUsed.length > 0) {
       // safe to ignore, but interesting to know if this happens
-      console.log('Wallet already exists', { userId, existing, newWallets });
+      console.log('Wallet has already been used by another user', {
+        userId,
+        existingAndUsed,
+        newWallets: newWallets.length
+      });
     }
     const newWalletsToCreate = newWallets.filter((address) => !existing.some((w) => w.address === address));
     if (newWalletsToCreate.length > 0) {
