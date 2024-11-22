@@ -134,12 +134,9 @@ export function ProposalsPage({ title }: { title: string }) {
 
   const exportToCSV = useCallback(() => {
     if (currentSpace && activeView) {
-      const filter = JSON.stringify(activeView.fields.filter || {});
       charmClient.proposals
         .exportFilteredProposals({
-          spaceId: currentSpace.id,
-          filter,
-          viewId: activeView.id
+          spaceId: currentSpace.id
         })
         .then((csvContent) => {
           const blob = new Blob([csvContent], { type: 'text/csv' });
