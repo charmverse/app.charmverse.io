@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason, getLastWeek } from '@packages/scoutgame/dates';
-import { RateLimit } from 'async-sema';
+import { airstackRequest } from '@packages/scoutgame/moxie/airstackRequest';
+import { getMoxieFanToken } from '@packages/scoutgame/moxie/getMoxieFanToken';
 import { uniq } from 'lodash';
 
 import { respondWithTSV } from 'lib/nextjs/respondWithTSV';
@@ -100,50 +100,6 @@ export async function GET() {
   return respondWithTSV(rows, `partners-export_moxie_${lastWeek}.tsv`);
 }
 
-type MoxieFanToken = {
-  currentPrice: number;
-  currentPriceInWei: number;
-  dailyVolumeChange: number;
-  fanTokenAddress: string;
-  fanTokenName: string;
-  fanTokenSymbol: string;
-  lockedTvl: number;
-  tlv: number;
-  tokenLockedAmount: number;
-  tokenUnlockedAmount: number;
-  totalSupply: number;
-  uniqueHolders: number;
-  unlockedTvl: number;
-};
-
-export async function getMoxieFanToken(farcasterId: number): Promise<MoxieFanToken | null> {
-  const query = `
-    query MyQuery {
-      MoxieFanTokens(
-        input: {filter: {fanTokenSymbol: {_eq: "fid:${farcasterId}"}}, blockchain: ALL}
-      ) {
-        MoxieFanToken {
-          currentPrice
-          currentPriceInWei
-          dailyVolumeChange
-          fanTokenAddress
-          fanTokenName
-          fanTokenSymbol
-          lockedTvl
-          tlv
-          tokenLockedAmount
-          tokenUnlockedAmount
-          totalSupply
-          uniqueHolders
-          unlockedTvl
-        }
-      }
-    }
-  `;
-  const data = await getGQLQuery(query);
-  return data.data.MoxieFanTokens.MoxieFanToken?.[0] || null;
-}
-
 export async function getMoxieFanTokenAmount({
   builderFid,
   scoutFid
@@ -173,31 +129,7 @@ export async function getMoxieFanTokenAmount({
       }
     }
   `;
-  const data = await getGQLQuery(query);
+  const data = await airstackRequest(query);
   // console.log('data', data);
   return data.data.MoxieUserPortfolios.MoxieUserPortfolio?.[0]?.amount || 0;
-}
-
-// at most, 10 req per second
-// Moxy's rate limit is 3000/min and burst of 300/second.
-// @source https://docs.airstack.xyz/airstack-docs-and-faqs/api-capabilities#rate-limits
-const rateLimiter = RateLimit(50);
-
-async function getGQLQuery(query: string) {
-  await rateLimiter();
-  const response = await fetch('https://api.airstack.xyz/gql', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: process.env.AIRSTACK_API_KEY as string
-    },
-    body: JSON.stringify({ query })
-  });
-
-  if (!response.ok) {
-    log.debug('Error fetching Moxie NFT data:', { query, response });
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
 }

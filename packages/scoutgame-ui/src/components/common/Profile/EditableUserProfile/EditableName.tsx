@@ -15,6 +15,7 @@ type EditableDisplayNameProps = {
   isLoading?: boolean;
   githubLogin?: string;
   farcasterName?: string | null;
+  hasMoxieProfile?: boolean;
 };
 
 export function EditableName({
@@ -23,7 +24,8 @@ export function EditableName({
   control,
   isLoading,
   githubLogin,
-  farcasterName
+  farcasterName,
+  hasMoxieProfile
 }: EditableDisplayNameProps) {
   const {
     field: displayNameField,
@@ -89,7 +91,7 @@ export function EditableName({
               fontSize='small'
             />
             {farcasterName || githubLogin ? (
-              <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} />
+              <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} hasMoxieProfile={hasMoxieProfile} />
             ) : null}
           </Stack>
         )}

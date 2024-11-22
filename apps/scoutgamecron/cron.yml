@@ -54,3 +54,8 @@ cron:
     url: '/nft-congrats-image'
     # Every 1 hour
     schedule: '0 * * * *'
+
+  - name: 'update-talent-moxie-profiles'
+    url: '/update-talent-moxie-profiles'
+    # Every 12 hours
+    schedule: '0 */12 * * *'
