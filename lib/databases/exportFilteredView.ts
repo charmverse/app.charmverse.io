@@ -1,84 +1,74 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@charmverse/core/errors';
 import { baseUrl } from '@root/config/constants';
 import { CardFilter } from '@root/lib/databases/cardFilter';
-import { formatDate, formatDateTime } from '@root/lib/utils/dates';
+import type { FilterGroup } from '@root/lib/databases/filterGroup';
+import { getRelatedBlocks } from '@root/lib/databases/getRelatedBlocks';
+import { getBlocks as getBlocksForProposalSource } from '@root/lib/databases/proposalsSource/getBlocks';
+import { permissionsApiClient } from '@root/lib/permissions/api/client';
+import { isTruthy } from '@root/lib/utils/types';
 import { stringify } from 'csv-stringify/sync';
+import { sortBy } from 'lodash-es';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 
 import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
 import type { Card } from './card';
 import { Constants } from './constants';
-import { exportFilteredView, type FilteredViewToExport } from './exportFilteredView';
 
-export async function loadAndGenerateCsv(
-  params: FilteredViewToExport
-): Promise<{ csvData: string; childPageIds: string[] }> {
-  const { cards: cardBlocks, boardBlock, blocks, viewBlock } = await exportFilteredView(params);
+export type FilteredViewToExport = {
+  viewId?: string;
+  databaseId: string;
+  userId: string;
+  customFilter?: FilterGroup | null;
+};
 
-  const [space, spaceMembers] = await Promise.all([
-    prisma.space.findUniqueOrThrow({
-      where: {
-        id: boardBlock.spaceId
-      },
-      select: {
-        domain: true
-      }
-    }),
-    prisma.user
-      .findMany({
-        where: {
-          spaceRoles: {
-            some: {
-              spaceId: boardBlock.spaceId
-            }
-          }
-        },
-        select: {
-          id: true,
-          username: true
-        }
-      })
-      .then((users) =>
-        users.reduce<Record<string, { username: string }>>((acc, user) => {
-          acc[user.id] = {
-            username: user.username
-          };
-          return acc;
-        }, {})
-      )
-  ]);
+export async function exportFilteredView({ databaseId, userId, customFilter, viewId }: FilteredViewToExport): Promise<{
+  cards: Card[];
+  boardBlock: Board;
+  viewBlock: BoardView;
+  blocks: Awaited<ReturnType<typeof getRelatedBlocks>>['blocks'];
+}> {
+  if (!databaseId) {
+    throw new InvalidInputError('databaseId is required');
+  }
 
-  // geenrate card map for relation properties
-  const cardMap = blocks.reduce<Record<string, { title: string }>>((acc, block) => {
-    if (block.type === 'card') {
-      acc[block.id] = { title: block.title || '' };
-    }
-    return acc;
-  }, {});
+  let { blocks } = await getRelatedBlocks(databaseId);
+  const fbBlocks = blocks.map((block) => blockToFBBlock(block));
+  const boardBlock = fbBlocks.find((b) => b.id === databaseId) as Board | undefined;
+  if (!boardBlock) {
+    throw new Error('Database block not found');
+  }
+  const viewBlocks = fbBlocks.filter((block) => block.type === 'view') as BoardView[];
+  const viewBlock =
+    viewBlocks.find((block) => (viewId ? block.id === viewId : block.fields.viewType === 'table')) || viewBlocks[0];
 
-  const csvData = generateCSV(
-    boardBlock,
-    viewBlock,
-    cardBlocks,
-    {
-      date: formatDate,
-      dateTime: formatDateTime
-    },
-    {
-      users: spaceMembers,
-      spaceDomain: space.domain
-    },
-    cardMap
-  );
+  // apply custom filter from user if one exists
+  if (customFilter) {
+    viewBlock.fields.filter = customFilter;
+  }
 
-  return {
-    csvData: csvData.csvContent,
-    childPageIds: csvData.rowIds
-  };
+  if (boardBlock && boardBlock.fields.sourceType === 'proposals') {
+    // Hydrate and filter blocks based on proposal permissions
+    blocks = await getBlocksForProposalSource(boardBlock, blocks);
+  } else {
+    const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
+      pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
+      userId
+    });
+    // Remmeber to allow normal blocks that do not have a page, like views, to be shown
+    blocks = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
+  }
+
+  const cardBlocks = sortBy(
+    blocks.filter((block) => block.type === 'card' && block.parentId === databaseId).map(blockToFBBlock),
+    'createdAt'
+  ) as Card[];
+
+  return { cards: cardBlocks, boardBlock, blocks, viewBlock };
 }
 
 function generateCSV(
