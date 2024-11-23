@@ -9,13 +9,13 @@ import { stringify } from 'csv-stringify/sync';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { sortCards } from 'components/common/DatabaseEditor/store/cards';
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { mapProposalToCard } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { CardFilter } from 'lib/databases/cardFilter';
 import { Constants } from 'lib/databases/constants';
 import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposals/blocks/constants';
+import { CREATED_AT_ID, PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposals/blocks/constants';
 import { getProposals } from 'lib/proposals/getProposals';
 
 export async function exportProposals({ spaceId, userId }: { spaceId: string; userId: string }) {
@@ -77,7 +77,12 @@ export async function exportProposals({ spaceId, userId }: { spaceId: string; us
     evaluationStepTitles: Array.from(evaluationStepTitles)
   });
 
-  const viewBlock = blockToFBBlock(proposalViewBlock as ProposalBoardBlock) as BoardView;
+  let viewBlock = proposalViewBlock ? (blockToFBBlock(proposalViewBlock as ProposalBoardBlock) as BoardView) : null;
+
+  if (!viewBlock) {
+    viewBlock = getDefaultTableView({ board });
+    viewBlock.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+  }
 
   let cards = proposals.map((p) => mapProposalToCard({ proposal: p, spaceId }));
 
