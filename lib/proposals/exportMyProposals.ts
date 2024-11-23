@@ -1,6 +1,17 @@
+import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@root/config/constants';
+
 import { getUserProposals } from './getUserProposals';
 
 export async function exportMyProposals({ spaceId, userId }: { spaceId: string; userId: string }) {
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      domain: true
+    }
+  });
   const userProposals = await getUserProposals({ spaceId, userId });
 
   let csvContent = '';
@@ -12,6 +23,7 @@ export async function exportMyProposals({ spaceId, userId }: { spaceId: string; 
       'Your review',
       'Approved',
       'Declined',
+      'URL',
       ...(userProposals.customColumns?.map((column) => column.title) ?? [])
     ]
   ];
@@ -30,6 +42,7 @@ export async function exportMyProposals({ spaceId, userId }: { spaceId: string; 
       proposal.userReviewResult || '-',
       proposal.totalPassedReviewResults?.toString() || '-',
       proposal.totalFailedReviewResults?.toString() || '-',
+      `${baseUrl}/${space.domain}/${proposal.path}`,
       ...(userProposals.customColumns?.map((column) => {
         const customValue = proposal.customColumns?.find((c) => c.formFieldId === column.formFieldId)?.value;
         if (column.type === 'select' || column.type === 'multiselect') {
