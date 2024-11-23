@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
+import { getScoutFarcasterBuilderSocialGraph } from '@packages/farcaster/getScoutFarcasterBuilderSocialGraph';
 
 import { currentSeason } from '../dates';
 
 import { getBuildersByFid } from './getBuildersByFid';
-import { getScoutFarcasterBuilderSocialGraph } from './getScoutFarcasterBuilderSocialGraph';
 
 export async function loadBuildersUserKnows({ fid }: { fid: number }) {
   try {
-    const { followers, following } = await getScoutFarcasterBuilderSocialGraph({ fid });
+    const { followers, following } = await getScoutFarcasterBuilderSocialGraph({ fid, season: currentSeason });
 
     const { builders: buildersUserFollows } = await getBuildersByFid({
       fids: following,
