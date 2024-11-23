@@ -1,30 +1,62 @@
 import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Button, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Card, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
 import type { CustomColumn, UserProposal } from '@root/lib/proposals/getUserProposals';
 import { useRouter } from 'next/router';
+import { useCallback } from 'react';
 
+import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { evaluationIcons } from 'components/settings/proposals/constants';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import { CustomColumnTableCells } from './CustomColumnTableCells';
 import { OpenButton, StyledTable, StyledTableRow } from './ProposalsTable';
 
 export function ActionableProposalsTable({
   proposals,
-  customColumns
+  customColumns,
+  totalProposals
 }: {
   proposals: UserProposal[];
   customColumns: CustomColumn[];
+  totalProposals: number;
 }) {
+  const { space } = useCurrentSpace();
+
   const router = useRouter();
+
+  const exportToCSV = useCallback(() => {
+    if (space) {
+      charmClient.proposals.exportUserProposals({ spaceId: space.id }).then((csvContent) => {
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'My Proposals.csv';
+        a.click();
+      });
+    }
+  }, [!!space?.id]);
 
   return (
     <Stack gap={1}>
-      <Typography variant='h6' fontWeight='bold'>
-        Ready for review
-      </Typography>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Typography variant='h6' fontWeight='bold'>
+          Ready for review
+        </Typography>
+        <Button
+          variant='outlined'
+          size='small'
+          onClick={exportToCSV}
+          disabled={totalProposals === 0}
+          disabledTooltip='No proposals to export'
+        >
+          Export to CSV
+        </Button>
+      </Stack>
       {proposals.length ? (
         <StyledTable>
           <TableHead>
@@ -179,7 +211,7 @@ export function ActionableProposalsTable({
                       color='primary'
                       size='small'
                       sx={{ mr: 2, width: 75 }}
-                      onClick={(e) => {
+                      onClick={(e: MouseEvent) => {
                         e.stopPropagation();
                         router.push(`/${router.query.domain}/${proposal.path}`);
                       }}

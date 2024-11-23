@@ -9,6 +9,7 @@ import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -368,6 +369,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 closeSidebar={() => {
                   setShowSidebar(false);
                 }}
+                isProposal
                 hideLayoutOptions
                 hideSourceOptions
                 hideGroupOptions

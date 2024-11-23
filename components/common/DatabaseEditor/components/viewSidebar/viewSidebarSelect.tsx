@@ -1,4 +1,3 @@
-import { Apps } from '@mui/icons-material';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import GroupIcon from '@mui/icons-material/GroupWorkOutlined';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
@@ -6,11 +5,9 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 import { capitalize } from '@root/lib/utils/strings';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 
-import { Button } from 'components/common/Button';
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType, IPropertyTemplate } from 'lib/databases/board';
@@ -101,7 +98,6 @@ export function ViewSidebarSelect({
   hidePropertiesRow
 }: Props) {
   const { pages } = usePages();
-
   const withGroupBy = view?.fields.viewType.match(/board/) || view?.fields.viewType === 'table';
   const currentGroup = board?.fields.cardProperties.find((prop) => prop.id === groupByProperty?.id)?.name;
   const currentLayout = view?.fields.viewType;

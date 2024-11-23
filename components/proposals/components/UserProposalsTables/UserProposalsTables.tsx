@@ -23,7 +23,11 @@ export function UserProposalsTables() {
         </Grid>
       ) : (
         <Stack gap={3}>
-          <ActionableProposalsTable proposals={proposals.actionable} customColumns={proposals?.customColumns} />
+          <ActionableProposalsTable
+            proposals={proposals.actionable}
+            customColumns={proposals?.customColumns}
+            totalProposals={proposals.actionable.length + proposals.authored.length + proposals.review_completed.length}
+          />
           {proposals.authored.length ? (
             <ProposalsTable
               proposals={proposals.authored}
