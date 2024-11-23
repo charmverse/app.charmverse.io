@@ -196,7 +196,7 @@ export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId:
 }
 
 export function useGetUserProposals(params: { spaceId: MaybeString }) {
-  return useGET<GetUserProposalsResponse>(params.spaceId ? `/api/spaces/${params.spaceId}/proposals/work` : null);
+  return useGET<GetUserProposalsResponse>(params.spaceId ? `/api/spaces/${params.spaceId}/proposals/my-work` : null);
 }
 
 export function useGetProposalsReviewers(params: { spaceId: MaybeString }) {
