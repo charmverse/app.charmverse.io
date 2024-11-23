@@ -22,6 +22,12 @@ export class Utilities {
     const privateKey = `0x${crypto.randomBytes(32).toString('hex')}`;
     const addressKey = isHex(privateKey) ? privateKey : null;
 
+    if (!addressKey) {
+      throw new Error('Invalid private key in testing installMockWallet.');
+    }
+
+    const account = privateKeyToAccount(addressKey);
+
     // This can actually call the real chain or mock it. Ideally we want to mock it.
     const transports: Record<number, Transport> = {
       [optimism.id]: (config) => {
@@ -98,16 +104,12 @@ export class Utilities {
       ...httpTransport
     };
 
-    if (!addressKey) {
-      log.error('Invalid private key in testing installMockWallet.');
-      return;
-    }
-
     await installMockWallet({
       page: this.page,
       account: privateKeyToAccount(addressKey),
       defaultChain: optimism,
       transports
     });
+    return { account };
   }
 }

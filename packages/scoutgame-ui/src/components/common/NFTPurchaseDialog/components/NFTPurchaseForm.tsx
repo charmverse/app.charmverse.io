@@ -510,9 +510,25 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </>
         )}
       </Stack>
+
       {fetchError && (
-        <Typography variant='caption' color='error'>
+        <Typography variant='caption' color='error' align='center'>
           {fetchError.shortMessage || 'Something went wrong'}
+        </Typography>
+      )}
+      {decentSdkError instanceof Error ? (
+        <Typography variant='caption' color='error' align='center'>
+          There was an error communicating with Decent API
+        </Typography>
+      ) : null}
+      {addressError && (
+        <Typography variant='caption' color='error' align='center' data-test='address-error'>
+          {`Address ${address} is already in use. Please connect a different wallet`}
+        </Typography>
+      )}
+      {submitError && (
+        <Typography variant='caption' color='error' align='center'>
+          {submitError}
         </Typography>
       )}
 
@@ -545,21 +561,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           amount={amountToPay}
           onSuccess={() => refreshAllowance()}
         />
-      )}
-      {decentSdkError instanceof Error ? (
-        <Typography variant='caption' color='error' align='center'>
-          There was an error communicating with Decent API
-        </Typography>
-      ) : null}
-      {addressError && (
-        <Typography variant='caption' color='error' align='center'>
-          {`Address ${address} is already in use. Please connect a different wallet`}
-        </Typography>
-      )}
-      {submitError && (
-        <Typography variant='caption' color='error' align='center'>
-          {submitError}
-        </Typography>
       )}
     </Stack>
   );
