@@ -128,5 +128,6 @@ test.describe('Buy Nft', () => {
 
     // NFT buy button
     await expect(page.locator('data-test=purchase-button').first()).toBeDisabled();
+    expect(await page.locator('data-test=address-error')).toBeVisible();
   });
 });
