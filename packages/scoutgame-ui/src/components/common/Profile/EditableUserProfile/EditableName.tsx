@@ -2,6 +2,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import { Stack, TextField, Typography } from '@mui/material';
+import type { TalentProfile } from '@packages/scoutgame/users/getUserByPath';
 import { useRef, useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
@@ -16,6 +17,7 @@ type EditableDisplayNameProps = {
   githubLogin?: string;
   farcasterName?: string | null;
   hasMoxieProfile?: boolean;
+  talentProfile?: TalentProfile;
 };
 
 export function EditableName({
@@ -25,7 +27,8 @@ export function EditableName({
   isLoading,
   githubLogin,
   farcasterName,
-  hasMoxieProfile
+  hasMoxieProfile,
+  talentProfile
 }: EditableDisplayNameProps) {
   const {
     field: displayNameField,
@@ -90,8 +93,13 @@ export function EditableName({
               color='primary'
               fontSize='small'
             />
-            {farcasterName || githubLogin ? (
-              <ProfileLinks farcasterName={farcasterName} githubLogin={githubLogin} hasMoxieProfile={hasMoxieProfile} />
+            {farcasterName || githubLogin || talentProfile || hasMoxieProfile ? (
+              <ProfileLinks
+                farcasterName={farcasterName}
+                githubLogin={githubLogin}
+                hasMoxieProfile={hasMoxieProfile}
+                talentProfile={talentProfile}
+              />
             ) : null}
           </Stack>
         )}

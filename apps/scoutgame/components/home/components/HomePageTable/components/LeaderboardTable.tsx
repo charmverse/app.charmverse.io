@@ -35,7 +35,7 @@ export function LeaderboardTable({ data, week }: { data: LeaderBoardRow[]; week:
             <WeekTableHead week={week} />
           </TableCell>
           <TableCell
-            sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'block' }, pr: 0 }}
+            sx={{ maxWidth: { xs: '100px', sm: '100%' }, display: { xs: 'none', sm: 'table-cell' }, pr: 0 }}
             align='center'
           >
             GEMS

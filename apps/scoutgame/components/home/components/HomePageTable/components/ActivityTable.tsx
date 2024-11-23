@@ -91,7 +91,6 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
     >
       <TableHead
         sx={{
-          display: { xs: 'none', md: 'table-header-group' },
           position: 'sticky',
           top: 45,
           zIndex: 1000,

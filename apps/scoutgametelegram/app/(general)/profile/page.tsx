@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { getUserStats } from '@packages/scoutgame/users/getUserStats';
 import type { ProfileTab } from '@packages/scoutgame-ui/components/profile/ProfilePage';
@@ -31,12 +32,28 @@ export default async function Profile({
   }
 
   const userStats = await getUserStats(user.id);
+  const userExternalProfiles = await prisma.scout.findUniqueOrThrow({
+    where: {
+      id: user.id
+    },
+    select: {
+      hasMoxieProfile: true,
+      talentProfile: {
+        select: {
+          id: true,
+          score: true
+        }
+      }
+    }
+  });
 
   return (
     <ProfilePage
       user={{
         ...user,
-        ...userStats
+        ...userStats,
+        hasMoxieProfile: userExternalProfiles.hasMoxieProfile,
+        talentProfile: userExternalProfiles.talentProfile ?? undefined
       }}
     />
   );
