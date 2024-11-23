@@ -132,23 +132,6 @@ export function ProposalsPage({ title }: { title: string }) {
     [showError, trashPages]
   );
 
-  const exportToCSV = useCallback(() => {
-    if (currentSpace && activeView) {
-      charmClient.proposals
-        .exportFilteredProposals({
-          spaceId: currentSpace.id
-        })
-        .then((csvContent) => {
-          const blob = new Blob([csvContent], { type: 'text/csv' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'Proposals.csv';
-          a.click();
-        });
-    }
-  }, [currentSpace?.id, activeView]);
-
   if (isLoadingAccess) {
     return null;
   }
@@ -312,16 +295,6 @@ export function ProposalsPage({ title }: { title: string }) {
               <Box className='view-actions'>
                 <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
                 <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
-                <Button
-                  variant='outlined'
-                  size='small'
-                  onClick={exportToCSV}
-                  disabled={!cards.length}
-                  disabledTooltip='No proposals to export'
-                  sx={{ ml: 1 }}
-                >
-                  Export to CSV
-                </Button>
                 {user && (
                   <ToggleViewSidebarButton
                     onClick={(e) => {
@@ -396,6 +369,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 closeSidebar={() => {
                   setShowSidebar(false);
                 }}
+                isProposal
                 hideLayoutOptions
                 hideSourceOptions
                 hideGroupOptions
