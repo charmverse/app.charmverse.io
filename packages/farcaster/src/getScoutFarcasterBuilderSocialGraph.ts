@@ -39,7 +39,15 @@ type SocialFollowersResponse = {
   };
 };
 
-async function getBuildersFollowingUser({ fid, season }: { fid: number; season: string }): Promise<number[]> {
+async function getBuildersFollowingUser({
+  fid,
+  season,
+  maxRefetches = 1
+}: {
+  fid: number;
+  season: string;
+  maxRefetches?: number;
+}): Promise<number[]> {
   const uniqueBuilderFids = await getBuildersWithFarcasterIds({ season });
   // For debugging, replace by this line and reimport gql from '@apollo/client'
   // const query = gql`
@@ -70,7 +78,7 @@ async function getBuildersFollowingUser({ fid, season }: { fid: number; season: 
 
   const records: SocialFollowersResponse['SocialFollowers']['Follower'] = [];
 
-  async function fetchData(cursor?: string) {
+  async function fetchData(cursor?: string, refetchCount = 0) {
     const { data, hasNextPage } = await fetchQueryWithPagination(query, {
       fid: fid.toString(),
       selectedFids: uniqueBuilderFids.map(String),
@@ -82,8 +90,12 @@ async function getBuildersFollowingUser({ fid, season }: { fid: number; season: 
     if (typedData.SocialFollowers?.Follower) {
       records.push(...typedData.SocialFollowers.Follower);
 
-      if (hasNextPage && typedData.SocialFollowers.pageInfo.nextCursor) {
-        return fetchData(typedData.SocialFollowers.pageInfo.nextCursor);
+      if (
+        hasNextPage &&
+        typedData.SocialFollowers.pageInfo.nextCursor &&
+        (!maxRefetches || refetchCount < maxRefetches)
+      ) {
+        return fetchData(typedData.SocialFollowers.pageInfo.nextCursor, refetchCount + 1);
       }
     }
   }
@@ -104,7 +116,15 @@ type SocialFollowingResponse = {
   };
 };
 
-async function getBuildersFollowedByUser({ fid, season }: { fid: number; season: string }): Promise<number[]> {
+async function getBuildersFollowedByUser({
+  fid,
+  season,
+  maxRefetches = 1
+}: {
+  fid: number;
+  season: string;
+  maxRefetches?: number;
+}): Promise<number[]> {
   const uniqueBuilderFids = await getBuildersWithFarcasterIds({ season });
   // For debugging, replace by this line and reimport gql from '@apollo/client'
   // const query = gql`
@@ -125,7 +145,7 @@ async function getBuildersFollowedByUser({ fid, season }: { fid: number; season:
 
   const records: SocialFollowingResponse['SocialFollowings']['Following'] = [];
 
-  async function fetchData(cursor?: string) {
+  async function fetchData(cursor?: string, refetchCount = 0) {
     const { data, hasNextPage } = await fetchQueryWithPagination(query, {
       fid: fid.toString(),
       selectedFids: uniqueBuilderFids.map(String),
@@ -137,8 +157,12 @@ async function getBuildersFollowedByUser({ fid, season }: { fid: number; season:
     if (typedData.SocialFollowings?.Following) {
       records.push(...typedData.SocialFollowings.Following);
 
-      if (hasNextPage && typedData.SocialFollowings.pageInfo.nextCursor) {
-        return fetchData(typedData.SocialFollowings.pageInfo.nextCursor);
+      if (
+        hasNextPage &&
+        typedData.SocialFollowings.pageInfo.nextCursor &&
+        (!maxRefetches || refetchCount < maxRefetches)
+      ) {
+        return fetchData(typedData.SocialFollowings.pageInfo.nextCursor, refetchCount + 1);
       }
     }
   }
@@ -148,20 +172,25 @@ async function getBuildersFollowedByUser({ fid, season }: { fid: number; season:
   return records.map((record) => Number(record.followingProfileId));
 }
 
+/**
+ * @param maxRefetches - The maximum number of times to auto-follow pagination cursors
+ */
 export async function getScoutFarcasterBuilderSocialGraph({
   fid,
-  season
+  season,
+  maxRefetches = 1
 }: {
   fid: number;
   season: string;
+  maxRefetches?: number;
 }): Promise<{ following: number[]; followers: number[] }> {
   if (!fid) {
     throw new InvalidInputError('fid is required');
   }
 
   const [following, followers] = await Promise.all([
-    getBuildersFollowedByUser({ fid, season }),
-    getBuildersFollowingUser({ fid, season })
+    getBuildersFollowedByUser({ fid, season, maxRefetches }),
+    getBuildersFollowingUser({ fid, season, maxRefetches })
   ]);
 
   return {
