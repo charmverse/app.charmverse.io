@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { currentSeason } from '@packages/scoutgame/dates';
 
 export type TopScoutsSortBy = 'cards' | 'points' | 'builders' | 'rank';
 
@@ -54,9 +54,6 @@ export async function getTopScouts({
         },
         season: currentSeason
       },
-      orderBy: {
-        pointsEarnedAsScout: order
-      },
       take: limit,
       select: {
         user: {
@@ -74,15 +71,23 @@ export async function getTopScouts({
       }
     });
 
-    return scouts.map((scout) => ({
-      path: scout.user.path,
-      avatar: scout.user.avatar as string,
-      displayName: scout.user.displayName,
-      rank: rankMap.get(scout.user.path) || 0,
-      points: scout.pointsEarnedAsScout || 0,
-      cards: scout.nftsPurchased || 0,
-      builders: scout.user.nftPurchaseEvents.length
-    }));
+    return scouts
+      .map((scout) => ({
+        path: scout.user.path,
+        avatar: scout.user.avatar as string,
+        displayName: scout.user.displayName,
+        rank: rankMap.get(scout.user.path) || 0,
+        points: scout.pointsEarnedAsScout || 0,
+        cards: scout.nftsPurchased || 0,
+        builders: scout.user.nftPurchaseEvents.length
+      }))
+      .sort((a, b) => {
+        if (sortBy === 'points') {
+          return order === 'asc' ? a.points - b.points : b.points - a.points;
+        } else {
+          return order === 'asc' ? a.rank - b.rank : b.rank - a.rank;
+        }
+      });
   } else if (sortBy === 'cards' || sortBy === 'builders') {
     const builders = await prisma.userSeasonStats.findMany({
       where: {
