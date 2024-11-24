@@ -127,9 +127,11 @@ export function PublicBuilderProfileContainer({
               {scouts.length > 0 ? (
                 <ScoutsGallery scouts={scouts} />
               ) : (
-                <Typography>
-                  No Scouts have discovered this Builder yet. Be the first to support their journey!
-                </Typography>
+                <Paper sx={{ p: 2 }}>
+                  <Typography>
+                    No Scouts have discovered this Builder yet. Be the first to support their journey!
+                  </Typography>
+                </Paper>
               )}
             </Stack>
           </PaperContainer>

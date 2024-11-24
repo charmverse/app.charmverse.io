@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { Typography, Stack } from '@mui/material';
+import { Typography, Stack, Paper } from '@mui/material';
 import { getScoutedBuilders } from '@packages/scoutgame/scouts/getScoutedBuilders';
 import { getUserSeasonStats } from '@packages/scoutgame/scouts/getUserSeasonStats';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
@@ -37,7 +37,9 @@ export async function ScoutProfile({ userId }: { userId: string }) {
         {scoutedBuilders.length > 0 ? (
           <BuildersGallery builders={scoutedBuilders} columns={3} size='small' />
         ) : (
-          <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
+          <Paper sx={{ p: 2 }}>
+            <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
+          </Paper>
         )}
       </Stack>
     </Stack>

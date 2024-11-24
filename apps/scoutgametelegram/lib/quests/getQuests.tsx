@@ -27,7 +27,10 @@ export const QuestsRecord: Record<
   'share-x-channel': {
     points: 50,
     icon: <XIcon fontSize='large' />,
-    label: 'Share this channel'
+    label: 'Share this channel',
+    link: `https://x.com/intent/tweet?text=${encodeURIComponent(
+      'Check out our channel @scoutgamexyz on X here\n\nhttps://t.me/+J0dl4_uswBY2NTkx'
+    )}`
   },
   'watch-gameplay-video': {
     points: 50,
