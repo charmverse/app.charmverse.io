@@ -42,7 +42,7 @@ export function Header() {
       </Link>
       <Stack flexDirection='row' alignItems='center'>
         <Link href='/info'>
-          <IconButton sx={{ bgcolor: 'secondary.main', width: '100%', color: 'black.main' }}>
+          <IconButton sx={{ width: '100%' }}>
             <InfoIcon color='secondary' />
           </IconButton>
         </Link>
