@@ -13,6 +13,9 @@ type EditableBioProps = {
   isDesktop?: boolean;
 };
 
+export const DEFAULT_BIO =
+  'I’m playing the Scout Game: discovering builders, earning rewards, and supporting the future onchain.';
+
 export function EditableBio({ bio, onBioChange, control, isDesktop }: EditableBioProps) {
   const {
     field: bioField,
@@ -58,7 +61,7 @@ export function EditableBio({ bio, onBioChange, control, isDesktop }: EditableBi
             input: {
               multiline: true,
               rows: 3,
-              placeholder: 'Scouting and building in the blockchain space'
+              placeholder: DEFAULT_BIO
             }
           }}
           error={!!error?.message}
@@ -83,7 +86,7 @@ export function EditableBio({ bio, onBioChange, control, isDesktop }: EditableBi
 
   return (
     <Typography variant={isDesktop ? 'body2' : 'caption'}>
-      {bioField.value || 'Scouting and building in the blockchain space'}
+      {bioField.value || DEFAULT_BIO}
       <span style={{ marginLeft: '4px' }}>
         <EditIcon
           sx={{ fontSize: 16, position: 'relative', top: '2px', cursor: 'pointer' }}

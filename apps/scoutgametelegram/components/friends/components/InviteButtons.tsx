@@ -45,7 +45,18 @@ export function InviteButtons() {
         Invite Friends
       </Button>
       <Tooltip arrow placement='top' title={copied || undefined} disableInteractive>
-        <IconButton sx={{ bgcolor: 'secondary.main', borderRadius: '10px', color: 'black.main' }} onClick={onCopy}>
+        <IconButton
+          sx={{
+            bgcolor: 'secondary.main',
+            borderRadius: '10px',
+            color: 'black.main',
+            '&:hover': {
+              bgcolor: 'secondary.main',
+              opacity: 1
+            }
+          }}
+          onClick={onCopy}
+        >
           <LuCopy />
         </IconButton>
       </Tooltip>

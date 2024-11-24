@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { prisma } from '@charmverse/core/prisma-client';
-import { Alert, Box, Stack, Typography } from '@mui/material';
+import { Alert, Box, Paper, Stack, Typography } from '@mui/material';
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
 import { getBuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';
 import { getBuilderStats } from '@packages/scoutgame/builders/getBuilderStats';
@@ -132,7 +132,9 @@ export async function BuilderProfile({
         {scouts.length > 0 ? (
           <ScoutsGallery scouts={scouts} />
         ) : (
-          <Typography>No Scouts have discovered you yet. Keep building and they'll find you!</Typography>
+          <Paper sx={{ p: 2 }}>
+            <Typography>No Scouts have discovered you yet. Keep building and they'll find you!</Typography>
+          </Paper>
         )}
       </Stack>
     </Stack>

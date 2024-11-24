@@ -1,6 +1,6 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Stack, Typography } from '@mui/material';
+import { IconButton, Paper, Stack, Typography } from '@mui/material';
 import {
   getLastWeek,
   currentSeason,
@@ -29,7 +29,9 @@ export function BuilderRewardsScreen({ period }: { period: string }) {
       <Typography color='secondary' variant='h6'>
         Builder Rewards
       </Typography>
-      <Typography textAlign='center'>See how many Scout Points your Builders have earned for you!</Typography>
+      <Typography textAlign='center' component={Paper} sx={{ py: 1, backgroundColor: 'background.dark' }}>
+        See how many Scout Points your Builders have earned for you!
+      </Typography>
       <TabsMenu
         tabs={[
           { value: week || lastWeek, label: 'Weekly' },
