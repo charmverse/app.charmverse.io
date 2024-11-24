@@ -29,7 +29,7 @@ export const QuestsRecord: Record<
     icon: <XIcon fontSize='large' />,
     label: 'Share this channel',
     link: `https://x.com/intent/tweet?text=${encodeURIComponent(
-      'Check out our channel @scoutgamexyz on X here\n\nhttps://t.me/+J0dl4_uswBY2NTkx'
+      'I’m playing @scoutgamexyz on Telegram! 🕹️ Come join me, play in the channel, and discover top builders while earning points and rewards. Let’s scout together! 👉 https://t.me/+J0dl4_uswBY2NTkx #PlayAndEarn'
     )}`
   },
   'watch-gameplay-video': {

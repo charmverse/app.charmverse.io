@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 
 import { useMdScreen } from '../../../hooks/useMediaScreens';
 import { useUser } from '../../../providers/UserProvider';
+import { DEFAULT_BIO } from '../../common/Profile/EditableUserProfile/EditableBio';
 import { EditableUserProfile } from '../../common/Profile/EditableUserProfile/EditableUserProfile';
 import type { UserProfileWithPoints } from '../ProfilePage';
 
@@ -20,7 +21,7 @@ export function UserProfileForm({ user }: { user: UserProfileWithPoints }) {
     defaultValues: {
       avatar: user.avatar ?? undefined,
       displayName: user.displayName,
-      bio: user.bio ?? 'Scouting and building in the blockchain space'
+      bio: user.bio ?? DEFAULT_BIO
     }
   });
   const { refreshUser } = useUser();
