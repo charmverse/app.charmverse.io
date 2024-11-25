@@ -83,7 +83,6 @@
           "./apps/farcaster/",
           "./apps/scoutgame/",
           "./apps/scoutgametelegram/",
-          "./apps/scoutgameadmin/",
           "./apps/scoutgamecron/",
           "./apps/sunnyawards/",
           "./apps/waitlist/",

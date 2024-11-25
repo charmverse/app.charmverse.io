@@ -36,7 +36,6 @@ runs:
         rm -rf apps/sunnyawards/.next/cache
         rm -rf apps/farcaster/.next/cache
         rm -rf apps/scoutgametelegram/.next/cache
-        rm -rf apps/scoutgameadmin/.next/cache
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
