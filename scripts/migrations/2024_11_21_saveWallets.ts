@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { getOnchainEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';
 import { uniq } from 'lodash';
+import { DateTime } from 'luxon';
 
 // Save user wallets based on Farcaster profile and NFT purchases
 async function syncNFTWallets() {
@@ -18,7 +19,7 @@ async function syncNFTWallets() {
   });
 
   // from block is somewhat arbitrary, but is early enough to grabs all events
-  const events = await getOnchainEvents({ fromBlock: 12800000 });
+  const events = await getOnchainEvents({ fromBlock: 126062456 });
   console.log(`Found ${events.length} onchain events`);
 
   for (const user of users) {
@@ -34,7 +35,7 @@ async function syncNFTWallets() {
 
     await saveUserWallets(user.id, newWallets);
     if (users.indexOf(user) % 10 === 0) {
-      console.log(`Updated ${user.id} users. Latest createdAt: ${user.createdAt}`);
+      console.log(`Updated ${users.indexOf(user)} users. Latest createdAt: ${user.createdAt}`);
     }
   }
 }
@@ -62,7 +63,7 @@ async function syncFarcasterWallets() {
     await saveUserWallets(user.id, newWallets);
 
     if (users.indexOf(user) % 10 === 0) {
-      console.log(`Updated ${user.id} users. Latest createdAt: ${user.createdAt}`);
+      console.log(`Updated ${users.indexOf(user)} users. Latest createdAt: ${user.createdAt.toISOString()}`);
     }
   }
 
@@ -85,7 +86,7 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
       }
     });
     const existingButUnused = existing.filter(
-      (w) => w.scout.nftPurchaseEvents.length === 0 && w.scout.githubUser === null
+      (w) => w.scout.nftPurchaseEvents.length === 0 && w.scout.githubUser.length === 0
     );
     if (existingButUnused.length > 0) {
       console.log('Wallet already exists but is unused, so switch the ownership', {
@@ -108,7 +109,9 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
         newWallets: newWallets.length
       });
     }
-    const newWalletsToCreate = newWallets.filter((address) => !existing.some((w) => w.address === address));
+    const newWalletsToCreate = newWallets.filter(
+      (address) => !existing.some((w) => w.address === address.toLowerCase())
+    );
     if (newWalletsToCreate.length > 0) {
       await prisma.scoutWallet.createMany({
         data: newWalletsToCreate.map((address) => ({ address: address.toLowerCase(), scoutId: userId }))
@@ -118,5 +121,8 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
   }
 }
 
-//syncFarcasterWallets();
-syncNFTWallets();
+syncFarcasterWallets().catch((error) => {
+  console.error('ERROR', error);
+  process.exit(1);
+});
+//syncNFTWallets();
