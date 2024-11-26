@@ -156,13 +156,15 @@ export function PointsClaimScreen({
           />
         </Stack>
         <Stack width='100%'>
-          <PointsClaimSocialShare
-            isBuilder={repos.length > 0}
-            totalUnclaimedPoints={totalUnclaimedPoints}
-            builders={builders}
-            userPath={user!.path}
-            week={result.data!.week}
-          />
+          {result.data && user && (
+            <PointsClaimSocialShare
+              isBuilder={repos.length > 0}
+              totalUnclaimedPoints={totalUnclaimedPoints}
+              builders={builders}
+              userPath={user!.path}
+              week={result.data.week}
+            />
+          )}
         </Stack>
       </Dialog>
     </Paper>
