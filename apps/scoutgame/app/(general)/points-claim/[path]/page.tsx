@@ -2,13 +2,19 @@ import { getLastWeek } from '@packages/scoutgame/dates';
 import { getUserByPathCached } from '@packages/scoutgame/users/getUserByPathCached';
 import { notFound } from 'next/navigation';
 
-export default async function Claim({ params }: { params: { path: string } }) {
+export default async function Claim({
+  params,
+  searchParams
+}: {
+  params: { path: string };
+  searchParams: { week?: string };
+}) {
   const user = await getUserByPathCached(params.path);
   if (!user) {
     return notFound();
   }
 
-  const claimScreenUrl = `https://cdn.charmverse.io/points-claim/${user.id}/${getLastWeek()}.png`;
+  const claimScreenUrl = `https://cdn.charmverse.io/points-claim/${user.id}/${searchParams.week || getLastWeek()}.png`;
 
   return (
     <>
