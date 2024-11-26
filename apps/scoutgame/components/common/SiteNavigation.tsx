@@ -98,14 +98,6 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
             onClick={(e) => openAuthModal?.(e, 'profile')}
           />
         ) : null}
-        <BottomNavigationAction
-          LinkComponent={Link}
-          label='Info'
-          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-          href='/info'
-          value='info'
-          icon={<PiInfoLight size='24px' />}
-        />
       </StyledBottomNavigation>
       <SignInModalMessage
         open={authPopup.open}

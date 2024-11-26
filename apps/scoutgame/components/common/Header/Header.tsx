@@ -1,7 +1,8 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info';
+import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack, IconButton } from '@mui/material';
 import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { logoutAction } from '@packages/scoutgame/session/logoutAction';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
@@ -66,7 +67,12 @@ export function Header() {
                 style={{ verticalAlign: 'middle' }}
               />
             </Link>
-            <Stack flexDirection='row' gap={2} alignItems='center'>
+            <Stack flexDirection='row' alignItems='center'>
+              <Link href='/info'>
+                <IconButton sx={{ width: '100%' }}>
+                  <InfoIcon color='secondary' />
+                </IconButton>
+              </Link>
               <Hidden mdDown>
                 <SiteNavigation topNav />
               </Hidden>
