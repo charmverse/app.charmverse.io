@@ -61,7 +61,6 @@ export function CommentForm({
         minHeight: 100,
         left: 0
       },
-      key: editorKey,
       disableRowHandles: true,
       focusOnInit: false,
       placeholderText: placeholder ?? 'What are your thoughts?',
@@ -72,10 +71,10 @@ export function CommentForm({
     };
 
     if (!inlineCharmEditor) {
-      return <CharmEditor {...editorCommentProps} readOnly={disabled} />;
+      return <CharmEditor key={editorKey} {...editorCommentProps} readOnly={disabled} />;
     }
 
-    return <InlineCharmEditor {...editorCommentProps} readOnly={disabled} />;
+    return <InlineCharmEditor key={editorKey} {...editorCommentProps} readOnly={disabled} />;
   }, [inlineCharmEditor, postContent, updatePostContent]);
 
   if (!user) {
