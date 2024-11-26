@@ -93,9 +93,10 @@ export async function createUserClaimScreen({ userId, week }: { userId: string; 
     await page.waitForNetworkIdle();
 
     const screenshot = await page.screenshot();
+    const bucket = process.env.S3_UPLOAD_BUCKET;
 
     const params: PutObjectCommandInput = {
-      Bucket: process.env.S3_UPLOAD_BUCKET,
+      Bucket: bucket,
       Key: `points-claim/${userId}/${week}.png`,
       Body: screenshot,
       ContentType: 'image/png'
@@ -107,9 +108,9 @@ export async function createUserClaimScreen({ userId, week }: { userId: string; 
     });
 
     await s3Upload.done();
-    log.info('generated claim screen', { userId });
+    log.info('generated claim creen', { claimedPoints, bucket, week, userId });
   } catch (e) {
-    log.error('error generating claim screen', { userId, error: e });
+    log.error('error generating claim screen', { userId, week, claimedPoints, error: e });
   } finally {
     await browser.close();
   }
