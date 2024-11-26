@@ -2,11 +2,10 @@
 
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { usePageView } from '@packages/scoutgame-ui/hooks/usePageView';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-
-import { usePageView } from 'hooks/usePageView';
 
 const mobileVariants = {
   hidden: { opacity: 0, x: 200, y: 0 },

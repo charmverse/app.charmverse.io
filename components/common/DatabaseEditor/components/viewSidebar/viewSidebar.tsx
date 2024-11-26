@@ -1,8 +1,11 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
-import { memo, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView, IViewType } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
@@ -38,6 +41,7 @@ interface Props {
   selectedPropertyId: string | null;
   setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
   sidebarView?: SidebarView;
+  isProposal?: boolean;
   isReward?: boolean;
 }
 
@@ -50,6 +54,24 @@ function ViewSidebar(props: Props) {
   function goToSidebarHome() {
     setSidebarView('view-options');
   }
+  const { space: currentSpace } = useCurrentSpace();
+
+  const exportToCSV = useCallback(() => {
+    if (currentSpace) {
+      charmClient.proposals
+        .exportFilteredProposals({
+          spaceId: currentSpace.id
+        })
+        .then((csvContent) => {
+          const blob = new Blob([csvContent], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Proposals.csv';
+          a.click();
+        });
+    }
+  }, [currentSpace?.id]);
 
   useEffect(() => {
     if (!props.isOpen) {
@@ -147,6 +169,11 @@ function ViewSidebar(props: Props) {
               showView={props.showView}
               isReward={props.isReward}
             />
+          )}
+          {props.isProposal && (
+            <Button variant='outlined' size='small' onClick={exportToCSV} sx={{ my: 1, mx: 2 }}>
+              Export to CSV
+            </Button>
           )}
         </StyledSidebar>
       </Collapse>

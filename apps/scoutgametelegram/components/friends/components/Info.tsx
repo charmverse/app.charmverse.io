@@ -6,7 +6,7 @@ export function Info() {
   return (
     <Stack justifyContent='center' alignItems='center' gap={1} my={2}>
       <Typography variant='h4' color='secondary' fontWeight={600}>
-        Daily Claim
+        Friendly Quest
       </Typography>
       <Stack
         // paddingBottom=0.25

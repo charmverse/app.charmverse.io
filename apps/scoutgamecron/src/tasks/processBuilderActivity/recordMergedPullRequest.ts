@@ -42,9 +42,11 @@ export async function recordMergedPullRequest({
   if (!pullRequest.mergedAt) {
     throw new Error('Pull request was not merged');
   }
-  const week = getWeekFromDate(now.toJSDate());
-  const { start: startOfWeek } = getWeekStartEnd(now.toJSDate());
-  const start = getStartOfWeek(season as Season);
+  // this is the date the PR was merged, which determines the season/week that it counts as a builder event
+  const pullRequestDate = new Date(pullRequest.mergedAt!);
+  const builderEventDate = pullRequestDate;
+  const week = getWeekFromDate(builderEventDate);
+  const seasonStart = getStartOfWeek(season as Season);
 
   const previousGitEvents = await prisma.githubEvent.findMany({
     where: {
@@ -101,14 +103,14 @@ export async function recordMergedPullRequest({
       createdBy: pullRequest.author.id,
       type: 'merged_pull_request',
       isFirstPullRequest: true,
-      completedAt: {
-        gte: startOfWeek.toJSDate()
+      builderEvent: {
+        week
       }
     }
   });
   const hasFirstMergedPullRequestAlreadyThisWeek = recentFirstMergedPullRequests > 0;
 
-  let isFirstMergedPullRequest = totalMergedPullRequests === 0 && !hasFirstMergedPullRequestAlreadyThisWeek;
+  let isFirstMergedPullRequest = totalMergedPullRequests === 0;
   if (isFirstMergedPullRequest && !skipFirstMergedPullRequestCheck) {
     // double-check using Github API in case the previous PR was not recorded by us
     const prs = await getRecentMergedPullRequestsByUser({
@@ -157,7 +159,6 @@ export async function recordMergedPullRequest({
         completedAt: pullRequest.mergedAt
       }
     });
-
     if (githubUser.builderId && !existingGithubEventToday) {
       const builder = await tx.scout.findUniqueOrThrow({
         where: {
@@ -169,22 +170,21 @@ export async function recordMergedPullRequest({
       });
 
       if (builder.builderStatus !== 'approved') {
+        log.warn('Ignore PR: builder not approved', { eventId: event.id, userId: githubUser.builderId });
         return;
       }
       const weeklyBuilderEvents = previousGitEvents.filter((e) => e.builderEvent).length;
       const threeDayPrStreak = weeklyBuilderEvents % 3 === 2;
-      const gemReceiptType: GemsReceiptType = isFirstMergedPullRequest
-        ? 'first_pr'
-        : threeDayPrStreak
-          ? 'third_pr_in_streak'
-          : 'regular_pr';
+      const gemReceiptType: GemsReceiptType =
+        isFirstMergedPullRequest && !hasFirstMergedPullRequestAlreadyThisWeek
+          ? 'first_pr'
+          : threeDayPrStreak
+            ? 'third_pr_in_streak'
+            : 'regular_pr';
 
-      // this is the date the PR was merged, which determines the season/week that it counts as a builder event
-      const pullRequestDate = new Date(pullRequest.mergedAt!);
-      const builderEventDate = pullRequestDate;
       const gemValue = gemsValues[gemReceiptType];
 
-      if (builderEventDate >= start.toJSDate()) {
+      if (builderEventDate >= seasonStart.toJSDate()) {
         const existingBuilderEvent = await tx.builderEvent.findFirst({
           where: {
             githubEventId: event.id
@@ -219,7 +219,6 @@ export async function recordMergedPullRequest({
           const uniqueScoutIds = Array.from(
             new Set(nftPurchaseEvents.map((nftPurchaseEvent) => nftPurchaseEvent.scoutId).filter(isTruthy))
           );
-
           const builderEvent = await tx.builderEvent.create({
             data: {
               builderId: githubUser.builderId,
@@ -258,6 +257,8 @@ export async function recordMergedPullRequest({
           });
           return { builderEvent, githubEvent: event };
         }
+      } else {
+        log.warn('Ignore PR: PR is not in current season', { eventId: event.id, userId: githubUser.builderId });
       }
     }
     return { builderEvent: null, githubEvent: event };

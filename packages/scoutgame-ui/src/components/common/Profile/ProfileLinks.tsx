@@ -28,8 +28,8 @@ export function ProfileLinks({
         >
           <Image
             src='/images/profile/icons/warpcast-circle-icon.svg'
-            width={isDesktop ? '24' : '18'}
-            height={isDesktop ? '24' : '18'}
+            width={isDesktop ? '26' : '18'}
+            height={isDesktop ? '26' : '18'}
             alt='warpcast icon'
           />
         </IconButton>
@@ -76,8 +76,8 @@ export function ProfileLinks({
             <Image
               src='/images/moxie.svg'
               alt='moxie icon'
-              width={isDesktop ? '24' : '18'}
-              height={isDesktop ? '24' : '18'}
+              width={isDesktop ? '22' : '18'}
+              height={isDesktop ? '22' : '18'}
             />
           </IconButton>
         </Tooltip>

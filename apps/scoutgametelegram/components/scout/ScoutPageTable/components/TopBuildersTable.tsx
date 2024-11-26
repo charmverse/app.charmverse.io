@@ -15,7 +15,7 @@ import { TableCellText } from './TableCellText';
 
 function SortIcon({ columnName, order, sort }: { columnName: string; order: string; sort: string }) {
   if (sort !== columnName) return null;
-  return order === 'desc' ? (
+  return order === 'asc' ? (
     <NorthIcon color='primary' sx={{ fontSize: 14, ml: 0.15 }} />
   ) : (
     <SouthIcon color='primary' sx={{ fontSize: 14, ml: 0.15 }} />

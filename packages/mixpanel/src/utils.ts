@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+import { ReferralPlatform } from '@charmverse/core/prisma';
 import { capitalize } from '@packages/utils/strings';
 
 export function eventNameToHumanFormat(eventName: string) {
@@ -18,4 +20,43 @@ export function paramsToHumanFormat(params: Record<string, any>) {
   });
 
   return humanReadableParams;
+}
+
+// searchString is the search part of the URL, starting with ?
+export type UTMParams = Record<string, string | undefined>;
+
+export function getUTMParamsFromSearch(searchString: string): UTMParams | undefined {
+  const urlParams = new URLSearchParams(searchString);
+  const utmParams: UTMParams = {
+    utm_source: urlParams.get('utm_source') || undefined,
+    utm_medium: urlParams.get('utm_medium') || undefined,
+    utm_campaign: urlParams.get('utm_campaign') || undefined,
+    utm_term: urlParams.get('utm_term') || undefined,
+    utm_content: urlParams.get('utm_content') || undefined
+  };
+  if (Object.values(utmParams).every((value) => value === undefined)) {
+    return undefined;
+  }
+  return {
+    utm_from: new Date().toLocaleDateString(), // so we know when these were created
+    ...utmParams
+  };
+}
+
+const platform = process.env.SCOUTGAME_PLATFORM;
+
+function isPlatform(_platform: string = ''): _platform is ReferralPlatform {
+  const availablePlatforms = Object.values(ReferralPlatform);
+
+  return availablePlatforms.includes(_platform as ReferralPlatform);
+}
+
+export function getPlatform(): ReferralPlatform {
+  if (isPlatform(platform)) {
+    return platform;
+  }
+
+  log.warn('Platform not found in environment variables', { platform });
+
+  return 'unknown';
 }

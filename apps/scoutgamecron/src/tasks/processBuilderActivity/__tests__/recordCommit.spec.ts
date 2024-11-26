@@ -206,8 +206,7 @@ describe('recordCommit', () => {
     // record a builder event for the last week PR, use a different date so that it creates a builder event for the last week
     await recordCommit({
       commit: firstCommit,
-      season: currentSeason,
-      now
+      season: currentSeason
     });
 
     const secondCommit = mockCommit({
@@ -216,7 +215,7 @@ describe('recordCommit', () => {
       author: builder.githubUser
     });
 
-    await recordCommit({ commit: secondCommit, season: currentSeason, now });
+    await recordCommit({ commit: secondCommit, season: currentSeason });
 
     const gemsReceipts = await prisma.gemsReceipt.findMany({
       where: {

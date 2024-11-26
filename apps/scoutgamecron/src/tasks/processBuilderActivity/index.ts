@@ -55,7 +55,7 @@ export async function processAllBuilderActivity(
 
     if (newBuilder) {
       log.info(`Detected new builder. Pulling in github data for this season`, {
-        builderId: builder.id,
+        userId: builder.id,
         githubUserId: builder.githubUser[0]?.id
       });
     }

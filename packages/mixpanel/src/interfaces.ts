@@ -1,7 +1,10 @@
+import type { ReferralPlatform } from '@charmverse/core/prisma';
+
 export interface MixpanelTrackBase {
   // distinct_id - property name required by mixpanel to identify unique users
   distinct_id: string;
   isAnonymous?: boolean;
+  platform?: ReferralPlatform;
 }
 
 export type BaseEvent = {

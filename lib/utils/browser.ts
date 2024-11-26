@@ -258,7 +258,7 @@ export function getSubdomainPath(
   config?: { domain: string; customDomain?: string | null },
   host?: string
 ) {
-  if (path.startsWith('/api')) {
+  if (path.startsWith('/api/')) {
     return path;
   }
 
@@ -267,18 +267,18 @@ export function getSubdomainPath(
   // strip out domain when using full custom domain
   if (customDomain && config?.domain && config.customDomain && customDomain === config.customDomain) {
     // remove space domain from path for custom domain
-    if (path.startsWith(`/${config.domain}`)) {
-      return path.replace(`/${config.domain}`, '');
+    if (path.startsWith(`/${config.domain}/`)) {
+      return path.replace(`/${config.domain}/`, '/');
     }
 
-    if (path.startsWith(`/${config.customDomain}`)) {
-      return path.replace(`/${config.customDomain}`, '');
+    if (path.startsWith(`/${config.customDomain}/`)) {
+      return path.replace(`/${config.customDomain}/`, '/');
     }
   }
 
   // strip out subdomain when using subdomain
   if (subdomain) {
-    return path.replace(new RegExp(`^\\/${subdomain}`), '');
+    return path.replace(new RegExp(`^\\/${subdomain}\\/`), '/');
   }
   // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
   if (config && !customDomain && !path.startsWith(`/${config?.domain}/`)) {

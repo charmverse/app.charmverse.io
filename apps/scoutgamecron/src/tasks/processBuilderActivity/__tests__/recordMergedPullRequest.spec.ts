@@ -36,6 +36,9 @@ describe('recordMergedPullRequest', () => {
     const repoId = randomLargeInt();
     const username = v4();
 
+    const mockWeek = currentSeason;
+    const eventDate = DateTime.fromISO(`${mockWeek}-1`, { zone: 'utc' }).toJSDate();
+
     const builder = await mockBuilder();
     const scout = await mockScout();
 
@@ -53,7 +56,7 @@ describe('recordMergedPullRequest', () => {
     });
 
     const pullRequest = mockPullRequest({
-      mergedAt: new Date().toISOString(),
+      mergedAt: eventDate.toISOString(),
       createdAt: new Date().toISOString(),
       state: 'MERGED',
       author: builder.githubUser,
@@ -62,7 +65,10 @@ describe('recordMergedPullRequest', () => {
 
     (getRecentMergedPullRequestsByUser as jest.Mock<typeof getRecentMergedPullRequestsByUser>).mockResolvedValue([]);
 
-    await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
+    const result = await recordMergedPullRequest({ pullRequest, repo, season: currentSeason });
+
+    expect(result?.builderEvent).toBeTruthy();
+    expect(result?.githubEvent).toBeTruthy();
 
     const githubEvent = await prisma.githubEvent.findFirst({
       where: {
@@ -75,17 +81,19 @@ describe('recordMergedPullRequest', () => {
 
     expect(githubEvent).toBeDefined();
 
-    const builderEvent = await prisma.builderEvent.findFirst({
+    const builderEvents = await prisma.builderEvent.findMany({
       where: {
-        builderId: builder.id
+        builderId: builder.id,
+        type: 'merged_pull_request'
       }
     });
 
-    expect(builderEvent).toBeDefined();
+    expect(builderEvents).toHaveLength(1);
+    expect(builderEvents[0]?.week).toBe(mockWeek);
 
     const gemsReceipt = await prisma.gemsReceipt.findFirst({
       where: {
-        eventId: builderEvent?.id
+        eventId: builderEvents[0]?.id
       }
     });
 

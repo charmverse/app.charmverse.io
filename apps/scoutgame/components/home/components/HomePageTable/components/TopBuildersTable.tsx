@@ -20,34 +20,22 @@ export function TopBuildersTable({ builders }: { builders: TopBuilderInfo[] }) {
     >
       <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            RANK
-          </TableCell>
-          <TableCell align='left' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            BUILDER
-          </TableCell>
-          <TableCell align='right' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
+          <TableCell align='center'>RANK</TableCell>
+          <TableCell align='left'>BUILDER</TableCell>
+          <TableCell align='right'>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
               SEASON <PointsIcon />
             </Stack>
           </TableCell>
-          <TableCell
-            align='right'
-            sx={{ display: { xs: 'none', md: 'table-cell' }, fontSize: { xs: '12px', md: 'initial' } }}
-          >
+          <TableCell align='right' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
               ALL TIME <PointsIcon />
             </Stack>
           </TableCell>
-          <TableCell
-            align='center'
-            sx={{ whiteSpace: 'nowrap', display: 'table-cell', fontSize: { xs: '12px', md: 'initial' } }}
-          >
+          <TableCell align='center' sx={{ whiteSpace: 'nowrap', display: 'table-cell' }}>
             SCOUTED BY
           </TableCell>
-          <TableCell align='center' sx={{ fontSize: { xs: '12px', md: 'initial' } }}>
-            PRICE
-          </TableCell>
+          <TableCell align='center'>PRICE</TableCell>
         </CommonTableRow>
       </TableHead>
       <TableBody>

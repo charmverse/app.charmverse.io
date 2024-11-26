@@ -124,11 +124,7 @@
     "sunnyawards:start:test": "npm run start:test -w=apps/sunnyawards",
     "sunnyawards:start:test:ci": "npm run start:test:ci -w=apps/sunnyawards",
     "sunnyawards:debug:e2e": "npm run debug:e2e -w=apps/sunnyawards",
-    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards",
-    "scoutgameadmin": "dotenv -e .env.local -- npm start -w=apps/scoutgameadmin",
-    "scoutgameadmin:remote": "dotenv -e .env.production -- npm start -w=apps/scoutgameadmin",
-    "scoutgameadmin:build": "npm run build -w=apps/scoutgameadmin",
-    "scoutgameadmin:test": "dotenv -e .env.test.local -- npm test -w apps/scoutgameadmin"
+    "sunnyawards:test:e2e:ci": "npm run test:e2e:ci -w=apps/sunnyawards"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -137,6 +133,7 @@
   },
   "dependencies": {
     "@airstack/frames": "^1.2.0",
+    "@airstack/node": "^0.0.7",
     "@ankr.com/ankr.js": "^0.5.0",
     "@apollo/client": "^3.8.8",
     "@aws-sdk/client-acm": "^3.624.0",

@@ -101,6 +101,7 @@ export async function processBuilderActivity({
     }
   }
 
+  // update gems collected this week
   const thisWeekEvents = await prisma.builderEvent.findMany({
     where: {
       builderId,

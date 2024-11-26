@@ -38,6 +38,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
+import { useUserWalletAddress } from '../../../../hooks/api/session';
 import { usePurchase } from '../../../../providers/PurchaseProvider';
 import { useSnackbar } from '../../../../providers/SnackbarContext';
 import { useUser } from '../../../../providers/UserProvider';
@@ -82,6 +83,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const initialQuantities = [1, 11, 111];
   const pricePerNft = builder.price ? convertCostToPoints(builder.price).toLocaleString() : '';
   const { address, chainId } = useAccount();
+  const { error: addressError } = useUserWalletAddress(address);
   const { isExecutingTransaction, sendNftMintTransaction, isSavingDecentTransaction, purchaseSuccess, purchaseError } =
     usePurchase();
   const { showMessage } = useSnackbar();
@@ -508,9 +510,25 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           </>
         )}
       </Stack>
+
       {fetchError && (
-        <Typography variant='caption' color='error'>
+        <Typography variant='caption' color='error' align='center'>
           {fetchError.shortMessage || 'Something went wrong'}
+        </Typography>
+      )}
+      {decentSdkError instanceof Error ? (
+        <Typography variant='caption' color='error' align='center'>
+          There was an error communicating with Decent API
+        </Typography>
+      ) : null}
+      {addressError && (
+        <Typography variant='caption' color='error' align='center' data-test='address-error'>
+          {`Address ${address} is already in use. Please connect a different wallet`}
+        </Typography>
+      )}
+      {submitError && (
+        <Typography variant='caption' color='error' align='center'>
+          {submitError}
         </Typography>
       )}
 
@@ -528,7 +546,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
             isSavingDecentTransaction ||
             isExecutingTransaction ||
             (paymentMethod === 'points' && notEnoughPoints) ||
-            isExecutingPointsPurchase
+            isExecutingPointsPurchase ||
+            addressError
           }
           data-test='purchase-button'
         >
@@ -542,16 +561,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           amount={amountToPay}
           onSuccess={() => refreshAllowance()}
         />
-      )}
-      {decentSdkError instanceof Error ? (
-        <Typography variant='caption' color='error' align='center'>
-          There was an error communicating with Decent API
-        </Typography>
-      ) : null}
-      {submitError && (
-        <Typography variant='caption' color='error' align='center'>
-          {submitError}
-        </Typography>
       )}
     </Stack>
   );
