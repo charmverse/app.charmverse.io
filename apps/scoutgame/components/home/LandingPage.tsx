@@ -1,15 +1,20 @@
+'use client';
+
 import type { StackProps } from '@mui/material';
 import { Button, Container, Stack, Typography } from '@mui/material';
+import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Image from 'next/image';
 import Link from 'next/link';
 
 function ContainerStack({ children, ...props }: { children: React.ReactNode } & StackProps) {
+  const isDesktop = useMdScreen();
+
   return (
     <Stack
       {...props}
       sx={{
-        p: 3,
-        my: 3,
+        p: isDesktop ? 4 : 1,
+        my: isDesktop ? 3 : 2,
         width: '100%',
         bgcolor: 'background.dark',
         flexDirection: 'row',
@@ -36,14 +41,21 @@ function Step({
   iconSrc: string;
   additionalContent?: React.ReactNode;
 }) {
+  const isDesktop = useMdScreen();
   return (
     <ContainerStack sx={{ flexDirection: additionalContent ? 'column' : 'row' }}>
-      <Stack flexDirection='row' width='100%' alignItems='center'>
-        <Stack gap={1} alignItems='center' width='35%'>
+      <Stack flexDirection='row' width='100%' alignItems={isDesktop ? 'center' : 'flex-start'} gap={1}>
+        <Stack
+          gap={1}
+          alignItems='center'
+          width={isDesktop ? '35%' : '20%'}
+          position='relative'
+          top={isDesktop ? 0 : 3.5}
+        >
           <Typography color='secondary'>{stepNumber}</Typography>
-          <Image width={85} height={85} src={iconSrc} alt={`Step ${stepNumber}`} />
+          <Image width={isDesktop ? 85 : 50} height={isDesktop ? 85 : 50} src={iconSrc} alt={stepNumber} />
         </Stack>
-        <Stack width='65%' gap={1}>
+        <Stack width={isDesktop ? '65%' : '80%'} gap={1}>
           <Typography variant='h5' color='secondary'>
             {title}
           </Typography>
@@ -56,26 +68,60 @@ function Step({
 }
 
 function HeroSection() {
+  const isDesktop = useMdScreen();
+
   return (
     <Stack sx={{ position: 'relative' }}>
-      <Image
-        src='/images/home/landing-bg.png'
-        width='500'
-        height='350'
-        alt='title icon'
-        style={{
-          width: '100%',
-          objectFit: 'cover',
-          position: 'absolute',
-          top: 0
+      {isDesktop ? (
+        <Image
+          src='/images/home/landing-bg.png'
+          width='500'
+          height='350'
+          alt='title icon'
+          style={{
+            width: '100%',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0
+          }}
+        />
+      ) : null}
+      <Stack
+        zIndex={1}
+        mx='auto'
+        flexDirection={{
+          xs: 'column',
+          md: 'row'
         }}
-      />
-      <Stack zIndex={1} mx='auto' flexDirection='row'>
-        <Stack gap={2} my={4} mr={12} justifyContent='center'>
-          <Typography variant='h3' color='secondary' fontWeight={500}>
+        alignItems='center'
+      >
+        <Stack
+          gap={2}
+          my={isDesktop ? 4 : 2}
+          mr={{
+            xs: 0,
+            md: 12
+          }}
+          justifyContent='center'
+        >
+          <Typography
+            variant='h3'
+            color='secondary'
+            fontWeight={500}
+            textAlign={{
+              xs: 'center',
+              md: 'left'
+            }}
+          >
             Fantasy Sports for <br /> Onchain Builders
           </Typography>
-          <Typography variant='h5'>
+          <Typography
+            variant={isDesktop ? 'h5' : 'h6'}
+            textAlign={{
+              xs: 'center',
+              md: 'left'
+            }}
+          >
             Pick great developers. Earn rewards.
             <br />
             Everyone can play. No coding required!
@@ -84,41 +130,56 @@ function HeroSection() {
             variant='contained'
             sx={{
               my: 2,
-              width: '50%'
+              width: '50%',
+              mx: {
+                xs: 'auto',
+                md: 0
+              }
             }}
           >
             <Link href='/login'>Get started</Link>
           </Button>
         </Stack>
-        <Stack>
-          <Image src='/images/home/cool-dev.png' width='350' height='350' alt='Cool dev' />
-        </Stack>
+        <Image
+          src='/images/home/cool-dev.png'
+          width={isDesktop ? 350 : 250}
+          height={isDesktop ? 350 : 250}
+          alt='Cool dev'
+        />
       </Stack>
     </Stack>
   );
 }
 
 function HowToPlaySection() {
+  const isDesktop = useMdScreen();
   return (
     <Stack position='relative'>
-      <Image
-        src='/images/home/starry-bg.png'
-        width='500'
-        height='350'
-        alt='title icon'
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          position: 'absolute',
-          top: 0
-        }}
-      />
+      {isDesktop ? (
+        <Image
+          src='/images/home/starry-bg.png'
+          width='500'
+          height='350'
+          alt='title icon'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0
+          }}
+        />
+      ) : null}
       <Stack zIndex={1} alignItems='center' mt={3}>
         <Typography variant='h4' color='secondary' fontWeight={500}>
           How to Play
         </Typography>
-        <Container maxWidth='lg'>
+        <Container
+          maxWidth='lg'
+          sx={{
+            p: isDesktop ? 2 : 0
+          }}
+        >
           <Step
             stepNumber='Step 1'
             title='Discover Builders & Projects'
@@ -131,18 +192,19 @@ function HowToPlaySection() {
             description='Scout promising developers by collecting seasonal Builder NFT Cards. Earn Scout Points based on their contributions and activity—your insights help highlight the best talent.'
             iconSrc='/images/home/card-icon.svg'
             additionalContent={
-              <Stack>
+              <Stack alignItems='center'>
                 <Typography variant='h6' color='secondary' mt={2} mb={1} textAlign='center'>
                   carl's Builder Card
                 </Typography>
                 <Image
-                  src='/images/home/card-diagram.png'
+                  src={isDesktop ? '/images/home/card-diagram.png' : '/images/home/card-diagram-mobile.png'}
                   width='350'
                   height='350'
                   alt='Collect cards'
                   style={{
-                    width: '100%',
-                    objectFit: 'contain'
+                    height: '100%',
+                    width: isDesktop ? '100%' : '75%',
+                    objectFit: isDesktop ? 'contain' : 'cover'
                   }}
                 />
               </Stack>
@@ -167,21 +229,24 @@ function HowToPlaySection() {
 }
 
 function FooterSection() {
+  const isDesktop = useMdScreen();
   return (
-    <Stack position='relative' alignItems='center' gap={2} py={4}>
-      <Image
-        src='/images/home/landing-bg.png'
-        width='500'
-        height='250'
-        alt='footer bg'
-        style={{
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          position: 'absolute',
-          top: 0
-        }}
-      />
+    <Stack position='relative' alignItems='center' gap={2} py={isDesktop ? 4 : 0} pb={isDesktop ? 0 : 3}>
+      {isDesktop ? (
+        <Image
+          src='/images/home/landing-bg.png'
+          width='500'
+          height='250'
+          alt='footer bg'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0
+          }}
+        />
+      ) : null}
       <Stack mx='auto' zIndex={1} justifyContent='center' alignItems='center' gap={2}>
         <Typography variant='h6' textAlign='center'>
           Pick great developers. Earn rewards. <br /> Everyone can play. No coding required!
@@ -195,11 +260,27 @@ function FooterSection() {
 }
 
 export function LandingPage() {
+  const isDesktop = useMdScreen();
   return (
-    <>
+    <Stack>
+      {!isDesktop ? (
+        <Image
+          src='/images/home/starry-bg.png'
+          width='500'
+          height='350'
+          alt='title icon'
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            position: 'absolute',
+            top: 0
+          }}
+        />
+      ) : null}
       <HeroSection />
       <HowToPlaySection />
       <FooterSection />
-    </>
+    </Stack>
   );
 }
