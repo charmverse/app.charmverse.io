@@ -81,4 +81,4 @@ token-diffs/
 
 
 
-scripts/optimism/getProposalReviewerUtils.ts
+scripts/optimism/proposalReviewerStats/stubs.ts
