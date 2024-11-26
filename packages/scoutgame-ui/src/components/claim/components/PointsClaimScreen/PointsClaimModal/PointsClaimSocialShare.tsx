@@ -9,6 +9,7 @@ type ShareMessageProps = {
   platform: 'x' | 'telegram' | 'warpcast';
   userPath: string;
   builders: { farcasterHandle?: string; displayName: string }[];
+  week: string;
 };
 
 export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'>) {
@@ -51,8 +52,8 @@ export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'
   );
 }
 
-function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, builders }: ShareMessageProps) {
-  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}`;
+function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, builders, week }: ShareMessageProps) {
+  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}?week=${week}`;
   let shareMessage = isBuilder
     ? `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Builder!`
     : `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Scout!`;

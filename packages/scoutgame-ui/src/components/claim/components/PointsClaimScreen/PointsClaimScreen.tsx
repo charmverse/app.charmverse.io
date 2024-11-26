@@ -32,7 +32,7 @@ export function PointsClaimScreen({
   }[];
   repos: string[];
 }) {
-  const { executeAsync, isExecuting } = useAction(claimPointsAction);
+  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
   const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
   const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
@@ -151,20 +151,19 @@ export function PointsClaimScreen({
               height: '100%',
               objectFit: 'contain'
             }}
-            src={`https://cdn.charmverse.io/points-claim/${user?.id}/${getLastWeek()}.png`}
+            src={`https://cdn.charmverse.io/points-claim/${user!.id}/${result.data!.week}.png`}
             alt='Claim success modal'
           />
         </Stack>
-        {user ? (
-          <Stack width='100%'>
-            <PointsClaimSocialShare
-              isBuilder={repos.length > 0}
-              totalUnclaimedPoints={totalUnclaimedPoints}
-              builders={builders}
-              userPath={user.path}
-            />
-          </Stack>
-        ) : null}
+        <Stack width='100%'>
+          <PointsClaimSocialShare
+            isBuilder={repos.length > 0}
+            totalUnclaimedPoints={totalUnclaimedPoints}
+            builders={builders}
+            userPath={user!.path}
+            week={result.data!.week}
+          />
+        </Stack>
       </Dialog>
     </Paper>
   );

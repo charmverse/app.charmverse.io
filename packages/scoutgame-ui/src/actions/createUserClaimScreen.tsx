@@ -3,7 +3,6 @@ import { Upload } from '@aws-sdk/lib-storage';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
-import { getLastWeek } from '@packages/scoutgame/dates';
 import { getClaimablePointsWithSources } from '@packages/scoutgame/points/getClaimablePointsWithSources';
 import { baseUrl } from '@packages/utils/constants';
 import puppeteer from 'puppeteer';
@@ -14,7 +13,7 @@ import { PointsClaimScoutScreen } from '../components/claim/components/PointsCla
 
 const client = new S3Client(getS3ClientConfig());
 
-export async function createUserClaimScreen(userId: string) {
+export async function createUserClaimScreen({ userId, week }: { userId: string; week: string }) {
   const { renderToString } = await import('react-dom/server');
 
   const user = await prisma.scout.findUniqueOrThrow({
@@ -97,7 +96,7 @@ export async function createUserClaimScreen(userId: string) {
 
     const params: PutObjectCommandInput = {
       Bucket: process.env.S3_UPLOAD_BUCKET,
-      Key: `points-claim/${userId}/${getLastWeek()}.png`,
+      Key: `points-claim/${userId}/${week}.png`,
       Body: screenshot,
       ContentType: 'image/png'
     };
@@ -114,4 +113,5 @@ export async function createUserClaimScreen(userId: string) {
   } finally {
     await browser.close();
   }
+  return { week };
 }
