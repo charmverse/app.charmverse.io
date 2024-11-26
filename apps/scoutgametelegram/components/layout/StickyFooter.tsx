@@ -1,9 +1,10 @@
-import { Box } from '@mui/material';
+'use client';
+
 import { styled } from '@mui/material/styles';
 
 import { SiteNavigation } from 'components/common/SiteNavigation';
 
-const StickyContainer = styled('div')`
+const StickyContainer = styled('footer')`
   position: sticky;
   bottom: 0;
   z-index: 1000;
