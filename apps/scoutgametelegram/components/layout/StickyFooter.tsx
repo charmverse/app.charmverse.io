@@ -13,7 +13,7 @@ const StickyContainer = styled('div')`
   @media screen and (max-width: 767px) {
     _::-webkit-full-page-media,
     _:future,
-    :root .safari_only {
+    & {
       padding-bottom: 20px;
     }
   }
