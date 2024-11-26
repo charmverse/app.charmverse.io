@@ -114,7 +114,7 @@ export async function getClaimablePointsWithSources(userId: string): Promise<Unc
   const uniqueRepos = Array.from(new Set(repos.map((repo) => `${repo.repo.owner}/${repo.repo.name}`)));
 
   return {
-    builders,
+    builders: buildersWithFarcaster,
     points,
     bonusPartners,
     repos: uniqueRepos.slice(0, 3)

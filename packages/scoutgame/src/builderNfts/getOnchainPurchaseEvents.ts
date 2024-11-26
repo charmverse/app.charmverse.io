@@ -17,6 +17,70 @@ type SimplifiedGroupedEvent = {
   builderScoutedEvent: BuilderScoutedEvent['args'];
 };
 
+export async function getOnchainPurchaseEvents({
+  scoutId,
+  fromBlock,
+  toBlock
+}: {
+  scoutId: string;
+  fromBlock?: number;
+  toBlock?: number;
+}) {
+  const groupedEvents = await getOnchainEvents({ fromBlock, toBlock });
+
+  const fromBlockTimestamp = fromBlock
+    ? await getPublicClient(optimism.id)
+        .getBlock({ blockNumber: BigInt(fromBlock), includeTransactions: false })
+        .then((block) => new Date(Number(block.timestamp) * 1000))
+    : undefined;
+
+  const nftPurchases = await prisma.nFTPurchaseEvent.findMany({
+    where: {
+      scoutId,
+      createdAt: fromBlockTimestamp
+        ? {
+            gte: fromBlockTimestamp
+          }
+        : undefined
+    },
+    select: {
+      txHash: true,
+      tokensPurchased: true,
+      paidInPoints: true,
+      pointsValue: true
+    }
+  });
+
+  const pendingTransactions = await prisma.pendingNftTransaction.findMany({
+    where: {
+      userId: scoutId,
+      createdAt: fromBlockTimestamp ? { gte: fromBlockTimestamp } : undefined
+    },
+    select: {
+      id: true,
+      sourceChainTxHash: true,
+      sourceChainId: true,
+      destinationChainTxHash: true,
+      destinationChainId: true,
+      tokenAmount: true,
+      targetAmountReceived: true
+    }
+  });
+
+  const mappedEvents = groupedEvents
+    .filter((event) => event.scoutId === scoutId)
+    .map((event) => {
+      const nftPurchase = nftPurchases.find((nft) => nft.txHash.toLowerCase() === event.txHash.toLowerCase()) ?? null;
+      const pendingTransaction =
+        pendingTransactions.find(
+          (tx) => tx.sourceChainTxHash === event.txHash || tx.destinationChainTxHash === event.txHash
+        ) ?? null;
+      return { ...event, nftPurchase, pendingTransaction };
+    });
+
+  return mappedEvents;
+}
+
 function groupEventsByTransactionHash(events: (BuilderScoutedEvent | TransferSingleEvent)[]): SimplifiedGroupedEvent[] {
   const eventMap: Record<string, Partial<SimplifiedGroupedEvent>> = {};
 
@@ -47,71 +111,11 @@ function groupEventsByTransactionHash(events: (BuilderScoutedEvent | TransferSin
   }));
 }
 
-export async function getOnchainPurchaseEvents({
-  scoutId,
-  fromBlock,
-  toBlock
-}: {
-  scoutId: string;
-  fromBlock?: number;
-  toBlock?: number;
-}) {
+export async function getOnchainEvents(query: { fromBlock?: number; toBlock?: number } = {}) {
   const [builderEventLogs, transferSingleEventLogs] = await Promise.all([
-    getBuilderScoutedEvents({ fromBlock, toBlock }),
-    getTransferSingleEvents({ fromBlock, toBlock })
+    getBuilderScoutedEvents(query),
+    getTransferSingleEvents(query)
   ]);
 
-  const groupedEvents = groupEventsByTransactionHash([...builderEventLogs, ...transferSingleEventLogs]);
-
-  const purchasesFromDate = fromBlock
-    ? await getPublicClient(optimism.id)
-        .getBlock({ blockNumber: BigInt(fromBlock), includeTransactions: false })
-        .then((block) => new Date(Number(block.timestamp) * 1000))
-    : undefined;
-
-  const nftPurchases = await prisma.nFTPurchaseEvent.findMany({
-    where: {
-      scoutId,
-      createdAt: purchasesFromDate
-        ? {
-            gte: purchasesFromDate
-          }
-        : undefined
-    },
-    select: {
-      txHash: true,
-      tokensPurchased: true,
-      paidInPoints: true,
-      pointsValue: true
-    }
-  });
-
-  const pendingTransactions = await prisma.pendingNftTransaction.findMany({
-    where: {
-      userId: scoutId,
-      createdAt: purchasesFromDate ? { gte: purchasesFromDate } : undefined
-    },
-    select: {
-      id: true,
-      sourceChainTxHash: true,
-      sourceChainId: true,
-      destinationChainTxHash: true,
-      destinationChainId: true,
-      tokenAmount: true,
-      targetAmountReceived: true
-    }
-  });
-
-  const mappedEvents = groupedEvents
-    .filter((event) => event.scoutId === scoutId)
-    .map((event) => {
-      const nftPurchase = nftPurchases.find((nft) => nft.txHash === event.txHash) ?? null;
-      const pendingTransaction =
-        pendingTransactions.find(
-          (tx) => tx.sourceChainTxHash === event.txHash || tx.destinationChainTxHash === event.txHash
-        ) ?? null;
-      return { ...event, nftPurchase, pendingTransaction };
-    });
-
-  return mappedEvents;
+  return groupEventsByTransactionHash([...builderEventLogs, ...transferSingleEventLogs]);
 }

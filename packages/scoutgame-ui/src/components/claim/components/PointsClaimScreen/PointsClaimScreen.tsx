@@ -32,7 +32,7 @@ export function PointsClaimScreen({
   }[];
   repos: string[];
 }) {
-  const { executeAsync, isExecuting } = useAction(claimPointsAction);
+  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
   const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
   const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
@@ -132,38 +132,41 @@ export function PointsClaimScreen({
         <IconButton onClick={handleCloseModal} sx={{ position: 'absolute', top: 0, right: 0, zIndex: 1, m: 1 }}>
           <CancelOutlinedIcon color='primary' />
         </IconButton>
-        <Stack
-          sx={{
-            width: '100%',
-            height: '100%',
-            aspectRatio: '1/1',
-            maxWidth: 600,
-            maxHeight: 600,
-            position: 'relative'
-          }}
-        >
-          <img
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain'
-            }}
-            src={`https://cdn.charmverse.io/points-claim/${user?.id}/${getLastWeek()}.png`}
-            alt='Claim success modal'
-          />
-        </Stack>
-        {user ? (
-          <Stack width='100%'>
-            <PointsClaimSocialShare
-              isBuilder={repos.length > 0}
-              totalUnclaimedPoints={totalUnclaimedPoints}
-              builders={builders}
-              userPath={user.path}
-            />
-          </Stack>
+        {result.data && user ? (
+          <>
+            <Stack
+              sx={{
+                width: '100%',
+                height: '100%',
+                aspectRatio: '1/1',
+                maxWidth: 600,
+                maxHeight: 600,
+                position: 'relative'
+              }}
+            >
+              <img
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain'
+                }}
+                src={`https://cdn.charmverse.io/points-claim/${user.id}/${result.data.week}.png`}
+                alt='Claim success modal'
+              />
+            </Stack>
+            <Stack width='100%'>
+              <PointsClaimSocialShare
+                isBuilder={repos.length > 0}
+                totalUnclaimedPoints={totalUnclaimedPoints}
+                builders={builders}
+                userPath={user.path}
+                week={result.data.week}
+              />
+            </Stack>
+          </>
         ) : null}
       </Dialog>
     </Paper>
