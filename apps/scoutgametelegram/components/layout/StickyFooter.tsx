@@ -1,6 +1,7 @@
 'use client';
 
 import { styled } from '@mui/material/styles';
+import { useState, useCallback, useEffect } from 'react';
 
 import { SiteNavigation } from 'components/common/SiteNavigation';
 
@@ -9,20 +10,36 @@ const StickyContainer = styled('footer')`
   bottom: 0;
   z-index: 1000;
   width: 100%;
-  // add some padding for the bottom nav on mobile ios
-  // https://stackoverflow.com/questions/31541998/ios-mobile-safari-the-bottom-bar-covers-my-footer
-  @media screen and (max-width: 767px) {
-    _::-webkit-full-page-media,
-    _:future,
-    & {
-      padding-bottom: 20px;
-    }
-  }
 `;
 
 export function StickyFooter() {
+  const [paddingBottom, setPaddingBottom] = useState(0);
+  const handleSafeAreaChanged = useCallback(() => {
+    // console.log('safeAreaChanged', this.safeAreaInset);
+    // console.log('safeAreaChanged', e);
+    // @ts-ignore
+    // eslint-disable-next-line react/no-this-in-sfc
+    setPaddingBottom(this.safeAreaInset.bottom);
+    // @ts-ignore - https://core.telegram.org/bots/webapps#events-available-for-mini-apps
+    window.Telegram.WebApp.sendData(selectedRegions);
+  }, [setPaddingBottom]);
+
+  // add some padding for the bottom nav on mobile ios
+  useEffect(() => {
+    // console.log('adding safeAreaChanged listener');
+    // @ts-ignore
+    if (window.Telegram?.WebApp) {
+      // @ts-ignore - https://core.telegram.org/bots/webapps#events-available-for-mini-apps
+      window.Telegram.WebApp.onEvent('safeAreaChanged', handleSafeAreaChanged);
+    }
+    return () => {
+      // @ts-ignore - https://core.telegram.org/bots/webapps#events-available-for-mini-apps
+      window.Telegram.WebApp.offEvent('safeAreaChanged', handleSafeAreaChanged);
+    };
+  }, [handleSafeAreaChanged]);
+
   return (
-    <StickyContainer>
+    <StickyContainer style={{ paddingBottom }}>
       <SiteNavigation />
     </StickyContainer>
   );
