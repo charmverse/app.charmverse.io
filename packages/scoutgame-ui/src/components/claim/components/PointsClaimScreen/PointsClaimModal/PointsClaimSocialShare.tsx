@@ -53,7 +53,7 @@ export function PointsClaimSocialShare(props: Omit<ShareMessageProps, 'platform'
 }
 
 function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, builders, week }: ShareMessageProps) {
-  const imageUrl = `https://scoutgame.xyz/points-claim/${userPath}?week=${week}`;
+  const imageUrl = `${window.location.origin}/points-claim/${userPath}?week=${week}`;
   let shareMessage = isBuilder
     ? `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Builder!`
     : `I scored ${totalUnclaimedPoints} Scout Points this week as a Top Scout!`;
@@ -73,8 +73,10 @@ function getShareMessage({ totalUnclaimedPoints, isBuilder, platform, userPath, 
   }
   const urls = {
     x: `https://x.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`,
-    telegram: `https://t.me/share/url?url=${imageUrl}&text=${encodeURIComponent(shareMessage)}`,
-    warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${window.location.origin}/points-claim/${userPath}`
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(imageUrl)}&text=${encodeURIComponent(shareMessage)}`,
+    warpcast: `https://warpcast.com/~/compose?text=${encodeURIComponent(shareMessage)}&embeds[]=${encodeURIComponent(
+      imageUrl
+    )}`
   };
   return urls[platform];
 }
