@@ -17,6 +17,7 @@ export async function mergeProfiles({
       id: primaryProfileId
     },
     select: {
+      id: true,
       deletedAt: true,
       spaceRoles: true
     }
@@ -30,9 +31,14 @@ export async function mergeProfiles({
       id: secondaryProfileId
     },
     select: {
+      id: true,
       spaceRoles: true
     }
   });
+
+  if (secondary.id === primary.id) {
+    throw new Error('Primary and secondary profiles are the same');
+  }
 
   const matching = primary.spaceRoles.filter((role) =>
     secondary.spaceRoles.some((secondaryRole) => secondaryRole.spaceId === role.spaceId)

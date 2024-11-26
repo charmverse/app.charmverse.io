@@ -41,10 +41,14 @@ type ReviewerStats = {
   // workspaceOpens: number;
   // averageWorkspaceOpensWeekly: number;
   // // Fifth group of stats
-  totalReviewsDelayed: number;
-  intakeStepsDelayed: number;
-  superchainRubricStepsDelayed: number;
-  finalStepsDelayed: number;
+  evaluationsAssigned: number;
+  totalReviewsMissed: number;
+  intakeStepsAssigned: number;
+  intakeStepsMissed: number;
+  superchainRubricStepsAssigned: number;
+  superchainRubricStepsMissed: number;
+  finalStepsAssigned: number;
+  finalStepsMissed: number;
 }
 
 const columnOrder: (keyof ReviewerStats)[] = [
@@ -59,12 +63,14 @@ const columnOrder: (keyof ReviewerStats)[] = [
   'rubricAnswersWithComment',
   'uniqueProposalPagesCommented',
   'totalProposalPageComments',
-  // 'workspaceOpens',
-  // 'averageWorkspaceOpensWeekly',
-  'totalReviewsDelayed',
-  'intakeStepsDelayed',
-  'superchainRubricStepsDelayed',
-  'finalStepsDelayed'
+  'evaluationsAssigned',
+  'totalReviewsMissed',
+  'intakeStepsAssigned',
+  'intakeStepsMissed',
+  'superchainRubricStepsAssigned',
+  'superchainRubricStepsMissed',
+  'finalStepsAssigned',
+  'finalStepsMissed'
 ];
 
 
@@ -84,9 +90,6 @@ async function exportSummary() {
       id: true
     }
   })
-
-  const rows: any[] = [];
-
 
   const reviewerMap: Record<string, ReviewerStats> = {};
 
@@ -136,10 +139,14 @@ async function exportSummary() {
       rubricAnswersWithComment: 0,
       totalProposalPageComments: 0,
       uniqueProposalPagesCommented: 0,
-      finalStepsDelayed: 0,
-      intakeStepsDelayed: 0,
-      superchainRubricStepsDelayed: 0,
-      totalReviewsDelayed: 0
+      evaluationsAssigned: 0,
+      finalStepsMissed: 0,
+      intakeStepsMissed: 0,
+      superchainRubricStepsMissed: 0,
+      totalReviewsMissed: 0,
+      intakeStepsAssigned: 0,
+      superchainRubricStepsAssigned: 0,
+      finalStepsAssigned: 0
     }
 
 
@@ -147,7 +154,7 @@ async function exportSummary() {
   for (let i = 0; i < proposals.length; i++) {
     const proposalInfo = proposals[i];
 
-    log.info(`Processing proposal ${i + 1} of ${proposals.length}`, {proposalInfo});
+    log.info(`Processing proposal ${i + 1} of ${proposals.length}`);
 
     const proposal = proposalInfo.proposal;
 
@@ -156,6 +163,8 @@ async function exportSummary() {
         // Intake stats --------------------------
     if (intakeStep) {
       if (proposalInfo.assignedToIntake) {
+        reviewerMap[userId].evaluationsAssigned += 1;
+        reviewerMap[userId].intakeStepsAssigned += 1;
         const userIntakeReview = intakeStep.reviews.find((review) => review.reviewer.id === userId);
 
         if (userIntakeReview && userIntakeReview.result === 'fail') {
@@ -167,8 +176,8 @@ async function exportSummary() {
         }
 
         if (!userIntakeReview) {
-          reviewerMap[userId].intakeStepsDelayed += 1;
-          reviewerMap[userId].totalReviewsDelayed += 1;
+          reviewerMap[userId].intakeStepsMissed += 1;
+          reviewerMap[userId].totalReviewsMissed += 1;
         }
       }
     }
@@ -178,15 +187,16 @@ async function exportSummary() {
     if (prelimStep) {
 
       if (proposalInfo.assignedToPrelim) {
-
+        reviewerMap[userId].evaluationsAssigned += 1;
+        reviewerMap[userId].superchainRubricStepsAssigned += 1;
         const userPrelimRubricAnswers = prelimStep.rubricAnswers.filter((rubricAnswer) => rubricAnswer.userId === userId);
 
         reviewerMap[userId].rubricAnswers += userPrelimRubricAnswers.length;
         reviewerMap[userId].rubricAnswersWithComment += userPrelimRubricAnswers.filter((answer) => !!answer.comment?.length && answer.comment.length > 2).length;
 
         if (!userPrelimRubricAnswers.length) {
-          reviewerMap[userId].superchainRubricStepsDelayed += 1;
-          reviewerMap[userId].totalReviewsDelayed += 1;
+          reviewerMap[userId].superchainRubricStepsMissed += 1;
+          reviewerMap[userId].totalReviewsMissed += 1;
         }
       }
     }
@@ -195,15 +205,16 @@ async function exportSummary() {
 
     if (finalStep) {
       if (proposalInfo.assignedToFinal) {
-
+        reviewerMap[userId].evaluationsAssigned += 1;
+        reviewerMap[userId].finalStepsAssigned += 1;
         const userFinalRubricAnswers = finalStep.rubricAnswers.filter((rubricAnswer) => rubricAnswer.userId === userId);
 
         reviewerMap[userId].rubricAnswers += userFinalRubricAnswers.length;
         reviewerMap[userId].rubricAnswersWithComment += userFinalRubricAnswers.filter((answer) => !!answer.comment?.length && answer.comment.length > 2).length;
 
         if (!userFinalRubricAnswers.length) {
-          reviewerMap[userId].finalStepsDelayed += 1;
-          reviewerMap[userId].totalReviewsDelayed += 1;
+          reviewerMap[userId].finalStepsMissed += 1;
+          reviewerMap[userId].totalReviewsMissed += 1;
         }
       }
      }
