@@ -54,6 +54,18 @@ describe('recordNftMint', () => {
       paidWithPoints: true
     });
 
+    const builderEvent = await prisma.builderEvent.findFirstOrThrow({
+      where: {
+        nftPurchaseEvent: {
+          builderNftId: builderNft.id
+        }
+      }
+    });
+
+    expect(builderEvent.type).toBe('nft_purchase');
+    expect(builderEvent.builderId).toBe(builder.id);
+    expect(builderEvent.season).toBe(builderNft.season);
+
     const builderStats = await prisma.userSeasonStats.findUniqueOrThrow({
       where: {
         userId_season: {
