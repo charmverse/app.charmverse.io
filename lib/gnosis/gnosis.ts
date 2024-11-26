@@ -37,6 +37,9 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
       serviceUrl: getChainById(chainId)?.gnosisUrl as string,
       chainId,
       address: checksumAddress
+    }).catch((error) => {
+      log.error(`Error getting gnosis safes for address ${address} on Mantle chain ${chainId}`, { error });
+      return { safes: [] };
     });
 
     return Promise.all(
@@ -54,21 +57,30 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
           version: safeData.version
         };
       })
-    );
+    ).catch((error) => {
+      log.error(`Error getting gnosis safes for address ${address} on Mantle chain ${chainId}`, { error });
+      return [];
+    });
   } else {
     const { supported } = isSupportedSafeApiChain(chainId);
     if (supported) {
       const rateLimiter = RateLimit(5);
 
       const apiClient = await getSafeApiClient({ chainId });
-      return apiClient.getSafesByOwner(checksumAddress).then((userSafesResponse) =>
-        Promise.all(
-          userSafesResponse.safes.map(async (safeAddr) => {
-            await rateLimiter();
-            return apiClient.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
-          })
+      return apiClient
+        .getSafesByOwner(checksumAddress)
+        .then((userSafesResponse) =>
+          Promise.all(
+            userSafesResponse.safes.map(async (safeAddr) => {
+              await rateLimiter();
+              return apiClient.getSafeInfo(safeAddr).then((info) => ({ ...info, chainId }));
+            })
+          )
         )
-      );
+        .catch((error) => {
+          log.error(`Error getting gnosis safes for address ${address} on chain ${chainId}`, { error });
+          return [];
+        });
     } else {
       return [];
     }
@@ -86,5 +98,5 @@ export async function getSafesForAddresses(addresses: string[], enableTestnets: 
   }
 
   // de-dupe safes in case user has multiple addresses and they own the same safe
-  return uniqBy(userSafes, (safe) => safe.address);
+  return userSafes;
 }
