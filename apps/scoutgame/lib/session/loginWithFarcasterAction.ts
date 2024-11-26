@@ -27,7 +27,7 @@ export const loginWithFarcasterAction = actionClient
       log.info(`Builder logged in with invite code: ${parsedInput.inviteCode}`, { fid });
     }
 
-    const user = await findOrCreateFarcasterUser({ fid });
+    const user = await findOrCreateFarcasterUser({ fid, referralCode: parsedInput.referralCode });
     await saveSession(ctx, { scoutId: user.id });
 
     return { success: true, userId: user.id, onboarded: !!user.onboardedAt, user };

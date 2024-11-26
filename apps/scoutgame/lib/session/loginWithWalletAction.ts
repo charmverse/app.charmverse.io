@@ -30,7 +30,11 @@ export const loginWithWalletAction = actionClient
       log.info(`Builder logged in with invite code: ${parsedInput.inviteCode}`, { walletAddress });
     }
 
-    const user = await findOrCreateWalletUser({ wallet: walletAddress, newUserId });
+    const user = await findOrCreateWalletUser({
+      wallet: walletAddress,
+      newUserId,
+      referralCode: parsedInput.referralCode
+    });
     await saveSession(ctx, { scoutId: user.id });
     const sessionUser = (await getUserFromSession()) as SessionUser;
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import InfoIcon from '@mui/icons-material/Info';
 import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack } from '@mui/material';
 import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { logoutAction } from '@packages/scoutgame/session/logoutAction';
@@ -70,6 +71,9 @@ export function Header() {
               <Hidden mdDown>
                 <SiteNavigation topNav />
               </Hidden>
+              <Link href='/info'>
+                <InfoIcon color='secondary' sx={{ verticalAlign: 'middle' }} />
+              </Link>
               {user ? (
                 <Box
                   borderColor='secondary.main'

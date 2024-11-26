@@ -1,6 +1,7 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { SignInModalMessage } from '@packages/scoutgame-ui/components/common/ScoutButton/SignInModalMessage';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
@@ -12,9 +13,8 @@ import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
 
-import { SignInModalMessage } from '../../../../packages/scoutgame-ui/src/components/common/ScoutButton/SignInModalMessage';
-
-import { ClaimIcon } from './ClaimIcon';
+import { ClaimIcon } from './Icons/ClaimIcon';
+import { FriendsIcon } from './Icons/FriendsIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -99,12 +99,11 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           />
         ) : null}
         <BottomNavigationAction
+          label='Friends'
+          href='/friends'
+          value='friends'
+          icon={<FriendsIcon active />}
           LinkComponent={Link}
-          label='Info'
-          // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-          href='/info'
-          value='info'
-          icon={<PiInfoLight size='24px' />}
         />
       </StyledBottomNavigation>
       <SignInModalMessage
@@ -129,6 +128,8 @@ function getActiveButton(pathname: string) {
     return 'info';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
+  } else if (pathname.startsWith('/friends')) {
+    return 'friends';
   }
   return null;
 }
