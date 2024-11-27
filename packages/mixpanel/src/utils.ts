@@ -56,7 +56,7 @@ export function getPlatform(): ReferralPlatform {
     return platform;
   }
 
-  log.warn('Platform not found in environment variables', { platform });
+  // log.warn('Platform not found in environment variables', { platform });
 
   return 'unknown';
 }

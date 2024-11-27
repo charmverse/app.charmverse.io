@@ -43,8 +43,8 @@ export async function findOrCreateFarcasterUser({
     avatar: profile?.pfp_url,
     bio: profile?.profile?.bio?.text,
     walletAddresses: profile?.verifications,
-    displayName: profile?.display_name || displayName,
-    path: profile?.username || (await generateUserPath(displayName)),
+    displayName,
+    path: await generateUserPath(profile?.username ?? displayName),
     tierOverride,
     farcasterName: profile?.username
   });

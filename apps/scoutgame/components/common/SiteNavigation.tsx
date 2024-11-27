@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { PiBinocularsLight, PiHouseLight, PiInfoLight } from 'react-icons/pi';
+import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';

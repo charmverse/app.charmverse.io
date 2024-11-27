@@ -10,9 +10,9 @@ test.describe('Onboarding flow', () => {
     // Logged in user should be redirected
     await page.waitForURL('**/home');
 
-    await expect(homePage.container).toBeVisible();
+    await expect(homePage.getStartedButton).toBeVisible();
 
-    await homePage.signInButton.click();
+    await homePage.getStartedButton.click();
 
     await page.waitForURL('**/login');
     await expect(loginPage.container).toBeVisible();
