@@ -7,7 +7,8 @@ import type {
   ProposalEvaluationType,
   ProposalReviewer,
   ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer
+  ProposalRubricCriteriaAnswer,
+  DraftProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import {
   ProposalEvaluationResult,
@@ -36,6 +37,25 @@ type FormFieldsIncludeType = {
   } | null;
 };
 
+export type ProposalToMap = Proposal &
+  FormFieldsIncludeType & {
+    authors: ProposalAuthor[];
+    evaluations: (ProposalEvaluation & {
+      appealReviewers: ProposalAppealReviewer[];
+      reviews: ProposalEvaluationReview[];
+      appealReviews: ProposalEvaluationAppealReview[];
+      reviewers: ProposalReviewer[];
+      rubricAnswers: ProposalRubricCriteriaAnswer[];
+      rubricCriteria: ProposalRubricCriteria[];
+      draftRubricAnswers: DraftProposalRubricCriteriaAnswer[];
+    })[];
+    page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
+    rewards: { id: string }[];
+    project?: ProjectWithMembers | null;
+  } & {
+    issuedCredentials?: EASAttestationFromApi[];
+  };
+
 export function mapDbProposalToProposal({
   proposal,
   permissions,
@@ -52,24 +72,7 @@ export function mapDbProposalToProposal({
   isPublicPage?: boolean;
   proposalEvaluationReviews?: ProposalEvaluationReview[];
   proposalEvaluationAppealReviews?: ProposalEvaluationAppealReview[];
-  proposal: Proposal &
-    FormFieldsIncludeType & {
-      authors: ProposalAuthor[];
-      evaluations: (ProposalEvaluation & {
-        appealReviewers: ProposalAppealReviewer[];
-        reviews: ProposalEvaluationReview[];
-        appealReviews: ProposalEvaluationAppealReview[];
-        reviewers: ProposalReviewer[];
-        rubricAnswers: ProposalRubricCriteriaAnswer[];
-        rubricCriteria: ProposalRubricCriteria[];
-        draftRubricAnswers: ProposalRubricCriteriaAnswer[];
-      })[];
-      page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
-      rewards: { id: string }[];
-      project?: ProjectWithMembers | null;
-    } & {
-      issuedCredentials?: EASAttestationFromApi[];
-    };
+  proposal: ProposalToMap;
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
   userId?: string;

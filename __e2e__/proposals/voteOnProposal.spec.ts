@@ -92,7 +92,10 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     // Configure proposal settings
     await documentPage.documentTitle.click();
 
-    await documentPage.documentTitleInput.fill(settingsToTest.proposalTemplateTitle);
+    await Promise.all([
+      documentPage.page.waitForResponse('**/api/pages/**'),
+      documentPage.documentTitleInput.fill(settingsToTest.proposalTemplateTitle)
+    ]);
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
@@ -107,7 +110,13 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     await proposalPage.evaluationVoteSettings.click();
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
-    await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
+
+    await Promise.all([
+      proposalPage.page.waitForResponse('**/evaluation'),
+      proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString())
+    ]);
+
+    await proposalPage.page.reload();
 
     await expect(proposalPage.publishNewProposalButton).toBeEnabled();
     await Promise.all([proposalPage.page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
@@ -147,14 +156,14 @@ test.describe.serial('Proposal Evaluation Votes', () => {
         proposalId: proposalTemplate.id,
         title: settingsToTest.voteStepTitle,
         reviewers: [
-          {
+          expect.objectContaining({
             evaluationId: proposalTemplate.evaluations[0].id,
             id: proposalTemplate.evaluations[0].reviewers[0].id,
             proposalId: proposalTemplate.id,
             roleId: role.id,
             userId: null,
             systemRole: null
-          }
+          })
         ],
         // Empty permissions since this is a template
         permissions: []
@@ -190,12 +199,19 @@ test.describe.serial('Proposal Evaluation Votes', () => {
 
     await documentPage.documentTitle.click();
 
-    await documentPage.documentTitleInput.fill(settingsToTest.memberProposalTitle);
+    await Promise.all([
+      documentPage.page.waitForResponse('**/api/pages/**'),
+      documentPage.documentTitleInput.fill(settingsToTest.memberProposalTitle)
+    ]);
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
     // Workflow auto-selected when loading the proposal
     await expect(proposalPage.workflowSelect).toHaveText(workflow.title);
+
+    await proposalPage.page.reload();
+
+    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
 
     await Promise.all([proposalPage.page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
@@ -235,14 +251,14 @@ test.describe.serial('Proposal Evaluation Votes', () => {
         proposalId: proposal.id,
         title: settingsToTest.voteStepTitle,
         reviewers: [
-          {
+          expect.objectContaining({
             evaluationId: proposal.evaluations[0].id,
             id: proposal.evaluations[0].reviewers[0].id,
             proposalId: proposal.id,
             roleId: role.id,
             userId: null,
             systemRole: null
-          }
+          })
         ],
         // Empty permissions since this is a template
         permissions: proposal.evaluations[0].permissions

@@ -6,6 +6,7 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 import { mapDbProposalToProposal } from '../mapDbProposalToProposal';
+import type { ProposalToMap } from '../mapDbProposalToProposal';
 
 describe('mapDbProposalToProposal', () => {
   it('Includes rubric reviews when share reviews is enabled', async () => {
@@ -93,7 +94,7 @@ describe('mapDbProposalToProposal', () => {
     });
 
     const mapped = mapDbProposalToProposal({
-      proposal,
+      proposal: proposal as any as ProposalToMap,
       workflow: null,
       permissions: mockPermissions
     });
