@@ -146,6 +146,12 @@ export async function getAssignedProposalsInSpace({userPage, spaceId}: {userPage
         continue;
       }
 
+      console.log({card: {
+        intake: card.fields.properties[intakeStep!.id],
+        prelim: card.fields.properties[prelimStep!.id],
+        final: card.fields.properties[finalStep!.id]
+      }})
+
       const isAssignedToIntake = intakeStep && (card.fields.properties[intakeStep.id] as string[])?.includes(userPage.user.id);
       const isAssignedToPrelim = prelimStep && (card.fields.properties[prelimStep.id] as string[])?.includes(userPage.user.id);
       const isAssignedToFinal = finalStep && (card.fields.properties[finalStep.id] as string[])?.includes(userPage.user.id);
@@ -215,4 +221,4 @@ async function script() {
     }
   }
 }
-// script().then(prettyPrint);
+//  script().then(prettyPrint);

@@ -287,6 +287,22 @@ export async function mergeProfiles({
       data: {
         userId: primaryProfileId
       }
+    }),
+    prisma.userSpaceAction.updateMany({
+      where: {
+        createdBy: secondaryProfileId
+      },
+      data: {
+        createdBy: primaryProfileId
+      }
+    }),
+    prisma.proposalRubricCriteriaAnswer.updateMany({
+      where: {
+        userId: secondaryProfileId
+      },
+      data: {
+        userId: primaryProfileId
+      }
     })
   ]);
 
@@ -327,7 +343,9 @@ export async function mergeProfiles({
     'post.createdBy': results[25],
     'telegramUser.userId': results[26],
     'userGnosisSafe.userId': results[27],
-    'discordUser.userId': results[28]
+    'discordUser.userId': results[28],
+    'userSpaceAction.createdBy': results[29],
+    'proposalRubricCriteriaAnswer.userId': results[30]
   });
 }
 

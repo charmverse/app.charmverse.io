@@ -9,7 +9,7 @@ import { stringify } from 'csv-stringify/sync';
 import { log } from '@charmverse/core/log';
 
 const spaceDomain = 'op-grants';
-const summaryFile = './op-reviewer-stats.csv';
+const summaryFile = './op-reviewer-stats-brichis.csv';
 
 
 const steps = [
