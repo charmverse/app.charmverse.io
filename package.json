@@ -281,7 +281,7 @@
     "msw-storybook-addon": "^2.0.0",
     "nanoid": "^3.3.6",
     "nanoid-dictionary": "^3.0.0",
-    "next": "^14.2.15",
+    "next": "^14.2.16",
     "next-bundle-analyzer": "^0.6.8",
     "next-connect": "^0.13.0",
     "next-swagger-doc": "^0.3.6",
