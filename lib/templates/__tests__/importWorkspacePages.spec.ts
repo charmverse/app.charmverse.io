@@ -433,6 +433,8 @@ describe('importWorkspacePages - proposal content', () => {
           ]),
           reviewers: [
             {
+              createdAt: expect.any(Date),
+              updatedAt: expect.any(Date),
               roleId: sourceSpaceRole.id,
               systemRole: null,
               userId: null,
@@ -441,6 +443,8 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             },
             {
+              createdAt: expect.any(Date),
+              updatedAt: expect.any(Date),
               roleId: null,
               systemRole: null,
               userId: sourceSpaceUser.id,
@@ -449,6 +453,8 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             },
             {
+              createdAt: expect.any(Date),
+              updatedAt: expect.any(Date),
               roleId: null,
               systemRole: 'space_member',
               userId: null,
@@ -596,6 +602,8 @@ describe('importWorkspacePages - proposal content', () => {
           ]),
           reviewers: [
             {
+              createdAt: expect.any(Date),
+              updatedAt: expect.any(Date),
               roleId: targetSpaceRole.id,
               systemRole: null,
               userId: null,
@@ -604,6 +612,8 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             },
             {
+              createdAt: expect.any(Date),
+              updatedAt: expect.any(Date),
               roleId: null,
               systemRole: 'space_member',
               userId: null,

@@ -40,3 +40,10 @@ export type ProposalRubricCriteriaResponse<T extends ProposalRubricCriteriaType>
 export type ProposalRubricCriteriaAnswerWithTypedResponse<
   T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType
 > = Omit<ProposalRubricCriteriaAnswer, 'response'> & ProposalRubricCriteriaResponse<T>;
+
+export type ProposalRubricCriteriaAnswerWithTypedResponseAndTimestamps<
+  T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType
+> = ProposalRubricCriteriaAnswerWithTypedResponse<T> & {
+  createdAt: Date;
+  updatedAt: Date;
+};

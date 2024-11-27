@@ -1,4 +1,8 @@
-import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
+import type {
+  DraftProposalRubricCriteriaAnswer,
+  ProposalRubricCriteria,
+  ProposalRubricCriteriaAnswer
+} from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { DeleteOutlined } from '@mui/icons-material';
 import {
@@ -36,7 +40,7 @@ type Props = {
   evaluationId: string;
   disabled: boolean; // for non-reviewers
   answers?: ProposalRubricCriteriaAnswer[];
-  draftAnswers?: ProposalRubricCriteriaAnswer[];
+  draftAnswers?: DraftProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (props: { isDraft: boolean }) => Promise<void>;
   archived?: boolean;
@@ -220,7 +224,7 @@ export function RubricAnswersForm({
     setShowDraftAnswers(false);
   }
 
-  function mapAnswersToFormValues(_answers?: ProposalRubricCriteriaAnswer[]) {
+  function mapAnswersToFormValues(_answers?: (DraftProposalRubricCriteriaAnswer | ProposalRubricCriteriaAnswer)[]) {
     return criteriaList.map(
       (criteria) =>
         _answers?.find((a) => a.rubricCriteriaId === criteria.id) || {
