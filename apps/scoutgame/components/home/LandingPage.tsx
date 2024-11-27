@@ -160,6 +160,7 @@ function HeroSection() {
                 md: 0
               }
             }}
+            data-test='get-started-button'
           >
             <Link href='/login'>Get started</Link>
           </Button>
