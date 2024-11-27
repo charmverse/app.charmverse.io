@@ -6,24 +6,25 @@ export function LinkInterceptor() {
   useEffect(() => {
     const handleLinkClick = (event: MouseEvent) => {
       const anchor = (event.target as Element).closest('a');
-
-      if (anchor && anchor.href) {
-        const url = new URL(anchor.href);
-
-        const isExternal = url.origin !== window.location.origin;
+      const url = anchor?.href;
+      if (url) {
+        const isExternal = anchor.target === '_blank';
 
         if (isExternal) {
           event.preventDefault();
           if ('Telegram' in window) {
             (window.Telegram as any).WebApp.openLink(url);
           } else {
-            window.open(url.href, '_blank', 'noopener,noreferrer');
+            window.open(url, '_blank', 'noopener,noreferrer');
           }
         }
       }
     };
 
-    document.addEventListener('click', handleLinkClick);
+    const isTelegram = 'Telegram' in window;
+    if (isTelegram) {
+      document.addEventListener('click', handleLinkClick);
+    }
 
     return () => {
       document.removeEventListener('click', handleLinkClick);
