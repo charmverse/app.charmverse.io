@@ -7,14 +7,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 function ContainerStack({ children, ...props }: { children: React.ReactNode } & StackProps) {
-  const isDesktop = useMdScreen();
-
   return (
     <Stack
       {...props}
       sx={{
-        p: isDesktop ? 4 : 1,
-        my: isDesktop ? 3 : 2,
+        p: {
+          xs: 1,
+          md: 4
+        },
+        my: {
+          xs: 2,
+          md: 3
+        },
         width: '100%',
         bgcolor: 'background.dark',
         flexDirection: 'row',
@@ -44,18 +48,32 @@ function Step({
   const isDesktop = useMdScreen();
   return (
     <ContainerStack sx={{ flexDirection: additionalContent ? 'column' : 'row' }}>
-      <Stack flexDirection='row' width='100%' alignItems={isDesktop ? 'center' : 'flex-start'} gap={1}>
+      <Stack
+        flexDirection='row'
+        width='100%'
+        alignItems={{
+          xs: 'flex-start',
+          md: 'center'
+        }}
+        gap={1}
+      >
         <Stack
           gap={1}
           alignItems='center'
-          width={isDesktop ? '35%' : '20%'}
+          width={{
+            xs: '20%',
+            md: '35%'
+          }}
           position='relative'
-          top={isDesktop ? 0 : 3.5}
+          top={{
+            xs: 3.5,
+            md: 0
+          }}
         >
           <Typography color='secondary'>{stepNumber}</Typography>
           <Image width={isDesktop ? 85 : 50} height={isDesktop ? 85 : 50} src={iconSrc} alt={stepNumber} />
         </Stack>
-        <Stack width={isDesktop ? '65%' : '80%'} gap={1}>
+        <Stack width={{ xs: '80%', md: '65%' }} gap={1}>
           <Typography variant='h5' color='secondary'>
             {title}
           </Typography>
@@ -97,7 +115,10 @@ function HeroSection() {
       >
         <Stack
           gap={2}
-          my={isDesktop ? 4 : 2}
+          my={{
+            xs: 2,
+            md: 4
+          }}
           mr={{
             xs: 0,
             md: 12
@@ -177,7 +198,10 @@ function HowToPlaySection() {
         <Container
           maxWidth='lg'
           sx={{
-            p: isDesktop ? 2 : 0
+            p: {
+              xs: 0,
+              md: 2
+            }
           }}
         >
           <Step
@@ -231,7 +255,7 @@ function HowToPlaySection() {
 function FooterSection() {
   const isDesktop = useMdScreen();
   return (
-    <Stack position='relative' alignItems='center' gap={2} py={isDesktop ? 4 : 0} pb={isDesktop ? 0 : 3}>
+    <Stack position='relative' alignItems='center' gap={2} py={{ xs: 0, md: 4 }} mb={{ xs: 3, md: 0 }}>
       {isDesktop ? (
         <Image
           src='/images/home/landing-bg.png'
@@ -262,7 +286,11 @@ function FooterSection() {
 export function LandingPage() {
   const isDesktop = useMdScreen();
   return (
-    <Stack>
+    <Stack
+      sx={{
+        height: '100%'
+      }}
+    >
       {!isDesktop ? (
         <Image
           src='/images/home/starry-bg.png'

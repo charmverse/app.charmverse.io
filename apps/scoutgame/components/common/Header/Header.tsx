@@ -68,87 +68,96 @@ export function Header() {
               />
             </Link>
             <Stack flexDirection='row' alignItems='center'>
-              <Link href='/info'>
-                <IconButton sx={{ width: '100%' }}>
-                  <InfoIcon color='secondary' />
-                </IconButton>
-              </Link>
               <Hidden mdDown>
                 <SiteNavigation topNav />
               </Hidden>
               {user ? (
-                <Box
-                  borderColor='secondary.main'
-                  borderRadius='30px'
-                  sx={{
-                    position: 'relative',
-                    '&::before': {
-                      content: '""',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      borderColor: 'secondary.main',
-                      borderRadius: '28px',
-                      borderWidth: '2px',
-                      borderStyle: 'solid',
-                      pointerEvents: 'none'
-                    }
-                  }}
-                >
-                  <Button
-                    variant='text'
-                    disabled={isExecutingLogout}
-                    onClick={handleOpenUserMenu}
-                    sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
-                    data-test='user-menu-pill'
+                <>
+                  <Link href='/info'>
+                    <IconButton size='small' sx={{ mr: { xs: 1, md: 3 } }}>
+                      <InfoIcon color='secondary' />
+                    </IconButton>
+                  </Link>
+                  <Box
+                    borderColor='secondary.main'
+                    borderRadius='30px'
+                    sx={{
+                      position: 'relative',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        borderColor: 'secondary.main',
+                        borderRadius: '28px',
+                        borderWidth: '2px',
+                        borderStyle: 'solid',
+                        pointerEvents: 'none'
+                      }
+                    }}
                   >
-                    <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-test='user-points-balance'>
-                      {user.currentBalance}
-                    </Typography>
-                    <Image
-                      src='/images/profile/scout-game-icon.svg'
-                      width={20}
-                      height={20}
-                      alt='Scout Game points icon'
-                      priority={true}
-                    />
-                    <Avatar src={user?.avatar || undefined} size='medium' name={user.displayName} />
-                  </Button>
-                  <Menu
-                    sx={{ mt: 5 }}
-                    id='menu-appbar'
-                    slotProps={{
-                      paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
-                    }}
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right'
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right'
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                    onClick={handleCloseUserMenu}
-                  >
-                    <MenuItem>
-                      <Link href='/profile'>{user.displayName}</Link>
-                    </MenuItem>
-                    <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
-                      Sign Out
-                    </MenuItem>
-                    {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
-                  </Menu>
-                </Box>
+                    <Button
+                      variant='text'
+                      disabled={isExecutingLogout}
+                      onClick={handleOpenUserMenu}
+                      sx={{ p: 0, display: 'flex', alignItems: 'center', gap: 1 }}
+                      data-test='user-menu-pill'
+                    >
+                      <Typography fontSize='16px' sx={{ pl: 2 }} color='text.primary' data-test='user-points-balance'>
+                        {user.currentBalance}
+                      </Typography>
+                      <Image
+                        src='/images/profile/scout-game-icon.svg'
+                        width={20}
+                        height={20}
+                        alt='Scout Game points icon'
+                        priority={true}
+                      />
+                      <Avatar src={user?.avatar || undefined} size='medium' name={user.displayName} />
+                    </Button>
+                    <Menu
+                      sx={{ mt: 5 }}
+                      id='menu-appbar'
+                      slotProps={{
+                        paper: { sx: { '.MuiList-root': { pb: 0 }, maxWidth: '250px' } }
+                      }}
+                      anchorEl={anchorElUser}
+                      anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
+                      keepMounted
+                      transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right'
+                      }}
+                      open={Boolean(anchorElUser)}
+                      onClose={handleCloseUserMenu}
+                      onClick={handleCloseUserMenu}
+                    >
+                      <MenuItem>
+                        <Link href='/profile'>{user.displayName}</Link>
+                      </MenuItem>
+                      <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
+                        Sign Out
+                      </MenuItem>
+                      {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
+                    </Menu>
+                  </Box>
+                </>
               ) : (
-                <Button variant='gradient' href='/login' data-test='sign-in-button'>
-                  Sign in
-                </Button>
+                <>
+                  <Link href='/info'>
+                    <IconButton size='small' sx={{ mr: { xs: 1, md: 3 } }}>
+                      <InfoIcon color='secondary' />
+                    </IconButton>
+                  </Link>
+                  <Button variant='gradient' href='/login' data-test='sign-in-button'>
+                    Sign in
+                  </Button>
+                </>
               )}
             </Stack>
           </>
