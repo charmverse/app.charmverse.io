@@ -1,3 +1,5 @@
+import { mockScout } from '@packages/scoutgame/testing/database';
+
 import { expect, test } from './test';
 
 test.describe('Info page', () => {
@@ -32,13 +34,27 @@ test.describe('Info page', () => {
 });
 
 test.describe('Info page partners', () => {
-  test('Open Optimism from the home page', async ({ page, homePage, infoPage }) => {
+  test('Open Optimism from the home page', async ({ page, homePage, infoPage, utils }) => {
+    const newUser = await mockScout({
+      onboardedAt: new Date(),
+      agreedToTermsAt: new Date(),
+      avatar: 'https://placehold.co/256'
+    });
+    await utils.loginAsUserId(newUser.id);
+
     await page.goto('/home');
     await homePage.optimismPromoCard.click();
 
     await expect(infoPage.optimismContainer).toBeVisible();
   });
-  test('Open Moxie from the home page', async ({ page, homePage, infoPage }) => {
+  test('Open Moxie from the home page', async ({ page, homePage, infoPage, utils }) => {
+    const newUser = await mockScout({
+      onboardedAt: new Date(),
+      agreedToTermsAt: new Date(),
+      avatar: 'https://placehold.co/256'
+    });
+    await utils.loginAsUserId(newUser.id);
+
     await page.goto('/home');
     await homePage.moxiePromoCard.click();
 
