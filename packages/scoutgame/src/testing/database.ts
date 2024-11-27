@@ -28,6 +28,7 @@ export async function mockBuilder({
   farcasterId,
   farcasterName
 }: Partial<Scout & { githubUserId?: number; githubUserLogin?: string; createNft?: boolean; nftSeason?: string }> = {}) {
+  console.log('DB', process.env.DATABASE_URL);
   const result = await prisma.scout.create({
     data: {
       createdAt,
@@ -87,6 +88,7 @@ export async function mockScout({
   currentBalance?: number;
   farcasterName?: string;
 } = {}) {
+  console.log('DB', process.env.DATABASE_URL);
   const scout = await prisma.scout.create({
     data: {
       createdAt,

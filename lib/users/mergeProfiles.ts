@@ -17,6 +17,7 @@ export async function mergeProfiles({
       id: primaryProfileId
     },
     select: {
+      id: true,
       deletedAt: true,
       spaceRoles: true
     }
@@ -30,9 +31,14 @@ export async function mergeProfiles({
       id: secondaryProfileId
     },
     select: {
+      id: true,
       spaceRoles: true
     }
   });
+
+  if (secondary.id === primary.id) {
+    throw new Error('Primary and secondary profiles are the same');
+  }
 
   const matching = primary.spaceRoles.filter((role) =>
     secondary.spaceRoles.some((secondaryRole) => secondaryRole.spaceId === role.spaceId)
@@ -281,6 +287,22 @@ export async function mergeProfiles({
       data: {
         userId: primaryProfileId
       }
+    }),
+    prisma.userSpaceAction.updateMany({
+      where: {
+        createdBy: secondaryProfileId
+      },
+      data: {
+        createdBy: primaryProfileId
+      }
+    }),
+    prisma.proposalRubricCriteriaAnswer.updateMany({
+      where: {
+        userId: secondaryProfileId
+      },
+      data: {
+        userId: primaryProfileId
+      }
     })
   ]);
 
@@ -321,7 +343,9 @@ export async function mergeProfiles({
     'post.createdBy': results[25],
     'telegramUser.userId': results[26],
     'userGnosisSafe.userId': results[27],
-    'discordUser.userId': results[28]
+    'discordUser.userId': results[28],
+    'userSpaceAction.createdBy': results[29],
+    'proposalRubricCriteriaAnswer.userId': results[30]
   });
 }
 
