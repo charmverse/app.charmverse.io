@@ -11,11 +11,12 @@ import { QuestsIcon } from './Icons/QuestsIcon';
 import { ScoutIcon } from './Icons/ScoutIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
-  shouldForwardProp: (prop) => prop !== 'topNav'
-})<{ topNav?: boolean }>(({ theme, topNav }) => ({
+  shouldForwardProp: (prop) => prop !== 'topNav' && prop !== 'isTelegram'
+})<{ topNav?: boolean; isTelegram?: boolean }>(({ theme, topNav, isTelegram }) => ({
   background: topNav
     ? 'transparent'
     : 'linear-gradient(88.35deg, #96CDFF 0%, #A06CD5 29.5%, #96CDFF 75.47%, #A06CD5 100%)',
+  height: isTelegram ? '71px' : '56px',
   '& > a': {
     color: topNav ? theme.palette.text.primary : theme.palette.common.black,
     gap: '2px',
@@ -29,6 +30,7 @@ const StyledBottomNavigation = styled(BottomNavigation, {
       backgroundColor: topNav ? theme.palette.primary.main : 'rgba(44, 0, 90, 0.25)'
     },
     '&.MuiButtonBase-root': {
+      paddingBottom: isTelegram ? '15px' : '0',
       minWidth: '60px'
     },
     '& .MuiBottomNavigationAction-label': {
@@ -37,12 +39,18 @@ const StyledBottomNavigation = styled(BottomNavigation, {
   }
 }));
 
-export function SiteNavigation({ topNav }: { topNav?: boolean }) {
+export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTelegram?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
 
   return (
-    <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
+    <StyledBottomNavigation
+      showLabels
+      value={value}
+      data-test='site-navigation'
+      topNav={topNav}
+      isTelegram={isTelegram}
+    >
       <BottomNavigationAction
         label='Quests'
         href='/quests'
