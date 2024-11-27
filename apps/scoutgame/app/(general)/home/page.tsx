@@ -1,8 +1,10 @@
 import { getCurrentWeek, validateISOWeek } from '@packages/scoutgame/dates';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
+import dynamic from 'next/dynamic';
 
 import { HomePage } from 'components/home/HomePage';
-import { LandingPage } from 'components/home/LandingPage';
+
+const LandingPage = dynamic(() => import('components/home/LandingPage').then((mod) => mod.LandingPage), { ssr: false });
 
 export default async function Home({
   searchParams
