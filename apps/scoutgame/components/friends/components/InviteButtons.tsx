@@ -2,6 +2,7 @@
 
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
+import { baseUrl } from '@packages/utils/constants';
 import Link from 'next/link';
 import { useState } from 'react';
 import { LuCopy } from 'react-icons/lu';
@@ -10,7 +11,7 @@ export function InviteButtons() {
   const { user } = useUser();
   const [copied, setCopied] = useState('');
   const referral = user?.referralCode;
-  const url = `https://scoutgame.xyz/login?ref=${referral}`;
+  const url = `${baseUrl}/login?ref=${referral}`;
   const encodedUrl = encodeURIComponent(url);
   const encodedText = encodeURIComponent(
     "Join me in Scout Game. Collect builder cards to earn Scout Points, OP, Moxie and more! Use my link to sign up and we'll both earn 5 Scout Points to play.🫡"
@@ -39,7 +40,7 @@ export function InviteButtons() {
         flexDirection={{ xs: 'column', sm: 'row' }}
       >
         <Typography sx={{ width: '100%', cursor: 'pointer' }} variant='caption'>
-          https://scoutgame.xyz/login?ref={referral}
+          {baseUrl}/login?ref={referral}
         </Typography>
         <Box display='flex' gap={1} justifyContent='start'>
           <Tooltip arrow placement='top' title={copied || undefined} disableInteractive>
