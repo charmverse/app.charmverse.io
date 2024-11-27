@@ -48,45 +48,47 @@ export function ShareProfile({ userPath }: { userPath: string }) {
   };
 
   return (
-    <Tooltip title='Share profile'>
-      <IconButton size='small' onClick={handleOpenShareMenu}>
-        <ShareIcon fontSize='small' color='primary' />
-        <Menu
-          anchorEl={anchorElShare}
-          open={Boolean(anchorElShare)}
-          onClose={handleCloseShareMenu}
-          onClick={handleCloseShareMenu}
-        >
-          <MenuItem onClick={handleShareToWarpcast}>
-            <Image
-              src='/images/profile/icons/warpcast-circle-icon.svg'
-              width={20}
-              height={20}
-              alt='warpcast icon'
-              style={{ marginRight: 8 }}
-            />
-            <Typography variant='body2'>Warpcast</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleShareToX}>
-            <Image src='/images/logos/x.png' width={20} height={20} alt='x logo' style={{ marginRight: 8 }} />
-            <Typography variant='body2'>X</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleShareToTelegram}>
-            <Image
-              src='/images/logos/telegram.png'
-              width={20}
-              height={20}
-              alt='telegram logo'
-              style={{ marginRight: 8 }}
-            />
-            <Typography variant='body2'>Telegram</Typography>
-          </MenuItem>
-          <MenuItem onClick={handleCopyLink} disabled={isCopied}>
-            <FileCopyOutlinedIcon color='primary' fontSize='small' sx={{ mr: 1 }} />
-            <Typography variant='body2'>{isCopied ? 'Copied!' : 'Copy link'}</Typography>
-          </MenuItem>
-        </Menu>
-      </IconButton>
-    </Tooltip>
+    <>
+      <Tooltip title='Share profile'>
+        <IconButton size='small' onClick={handleOpenShareMenu}>
+          <ShareIcon fontSize='small' color='primary' />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        anchorEl={anchorElShare}
+        open={Boolean(anchorElShare)}
+        onClose={handleCloseShareMenu}
+        onClick={handleCloseShareMenu}
+      >
+        <MenuItem onClick={handleShareToWarpcast}>
+          <Image
+            src='/images/profile/icons/warpcast-circle-icon.svg'
+            width={20}
+            height={20}
+            alt='warpcast icon'
+            style={{ marginRight: 8 }}
+          />
+          <Typography variant='body2'>Warpcast</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleShareToX}>
+          <Image src='/images/logos/x.png' width={20} height={20} alt='x logo' style={{ marginRight: 8 }} />
+          <Typography variant='body2'>X</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleShareToTelegram}>
+          <Image
+            src='/images/logos/telegram.png'
+            width={20}
+            height={20}
+            alt='telegram logo'
+            style={{ marginRight: 8 }}
+          />
+          <Typography variant='body2'>Telegram</Typography>
+        </MenuItem>
+        <MenuItem onClick={handleCopyLink} disabled={isCopied}>
+          <FileCopyOutlinedIcon color='primary' fontSize='small' sx={{ mr: 1 }} />
+          <Typography variant='body2'>{isCopied ? 'Copied!' : 'Copy link'}</Typography>
+        </MenuItem>
+      </Menu>
+    </>
   );
 }
