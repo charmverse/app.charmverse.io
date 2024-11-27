@@ -105,7 +105,10 @@ function HeroSection() {
         />
       ) : null}
       <Stack
-        zIndex={1}
+        zIndex={{
+          xs: 0,
+          md: 1
+        }}
         mx='auto'
         flexDirection={{
           xs: 'column',
@@ -191,17 +194,21 @@ function HowToPlaySection() {
           }}
         />
       ) : null}
-      <Stack zIndex={1} alignItems='center' mt={3}>
+      <Stack
+        zIndex={{
+          xs: 0,
+          md: 1
+        }}
+        alignItems='center'
+        mt={3}
+      >
         <Typography variant='h4' color='secondary' fontWeight={500}>
           How to Play
         </Typography>
         <Container
           maxWidth='lg'
           sx={{
-            p: {
-              xs: 0,
-              md: 2
-            }
+            p: 0
           }}
         >
           <Step
@@ -255,7 +262,7 @@ function HowToPlaySection() {
 function FooterSection() {
   const isDesktop = useMdScreen();
   return (
-    <Stack position='relative' alignItems='center' gap={2} py={{ xs: 0, md: 4 }} mb={{ xs: 3, md: 0 }}>
+    <Stack position='relative' alignItems='center' gap={2} py={{ xs: 0, md: 4 }} mb={{ xs: 4, md: 0 }}>
       {isDesktop ? (
         <Image
           src='/images/home/landing-bg.png'
@@ -271,7 +278,16 @@ function FooterSection() {
           }}
         />
       ) : null}
-      <Stack mx='auto' zIndex={1} justifyContent='center' alignItems='center' gap={2}>
+      <Stack
+        mx='auto'
+        zIndex={{
+          xs: 0,
+          md: 1
+        }}
+        justifyContent='center'
+        alignItems='center'
+        gap={2}
+      >
         <Typography variant='h6' textAlign='center'>
           Pick great developers. Earn rewards. <br /> Everyone can play. No coding required!
         </Typography>
@@ -286,11 +302,7 @@ function FooterSection() {
 export function LandingPage() {
   const isDesktop = useMdScreen();
   return (
-    <Stack
-      sx={{
-        height: '100%'
-      }}
-    >
+    <Stack>
       {!isDesktop ? (
         <Image
           src='/images/home/starry-bg.png'
