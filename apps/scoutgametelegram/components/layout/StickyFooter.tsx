@@ -20,8 +20,6 @@ export function StickyFooter() {
     // @ts-ignore
     // eslint-disable-next-line react/no-this-in-sfc
     setPaddingBottom(this.safeAreaInset.bottom);
-    // @ts-ignore - https://core.telegram.org/bots/webapps#events-available-for-mini-apps
-    window.Telegram.WebApp.sendData(selectedRegions);
   }, [setPaddingBottom]);
 
   // add some padding for the bottom nav on mobile ios
