@@ -59,8 +59,17 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         </Stack>
       ) : null}
       <Stack width='100%'>
-        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' justifyContent='space-between'>
-          <Stack direction='row' gap={1} alignItems='center'>
+        <Stack direction='row' width='100%' alignItems='center' justifyContent='space-between'>
+          <Stack
+            direction='row'
+            gap={1}
+            alignItems='center'
+            flexWrap='wrap'
+            rowGap={{
+              xs: 0,
+              md: 1
+            }}
+          >
             <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
             <ProfileLinks
               farcasterName={farcasterName}
@@ -68,8 +77,9 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
               talentProfile={user.talentProfile}
               hasMoxieProfile={user.hasMoxieProfile}
             />
+            {!isDesktop ? <ShareProfile userPath={user.path} /> : null}
           </Stack>
-          <ShareProfile userPath={user.path} />
+          {isDesktop ? <ShareProfile userPath={user.path} /> : null}
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}
