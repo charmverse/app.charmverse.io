@@ -8,9 +8,9 @@ test.describe('Login page', () => {
 
     await page.goto('/');
     await page.waitForURL('**/home');
-    await expect(homePage.container).toBeVisible();
+    await expect(homePage.getStartedButton).toBeVisible();
 
-    await homePage.signInButton.click();
+    await homePage.getStartedButton.click();
     await page.waitForURL('**/login');
 
     const signInWithWarpcast = page.locator('data-test=sign-in-with-warpcast');
