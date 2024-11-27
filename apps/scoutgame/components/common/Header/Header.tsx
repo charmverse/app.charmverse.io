@@ -71,9 +71,6 @@ export function Header() {
               <Hidden mdDown>
                 <SiteNavigation topNav />
               </Hidden>
-              <Link href='/info'>
-                <InfoIcon color='secondary' sx={{ verticalAlign: 'middle' }} />
-              </Link>
               {user ? (
                 <>
                   <Link href='/info'>
