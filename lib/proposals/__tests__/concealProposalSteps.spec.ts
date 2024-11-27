@@ -49,7 +49,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 0,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         },
         {
@@ -58,7 +67,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 1,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         },
         {
@@ -67,7 +85,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 2,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ],
           appealReviewers: [
             {
@@ -139,7 +166,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 0,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         },
         {
@@ -148,7 +184,16 @@ describe('concealProposalSteps', () => {
           result: 'fail',
           index: 1,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ],
           showAuthorResultsOnRubricFail: true
         },
@@ -158,7 +203,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 2,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ],
           appealReviewers: [
             {
@@ -220,7 +274,16 @@ describe('concealProposalSteps', () => {
           result: 'pass',
           index: 1,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         },
         {
@@ -229,7 +292,16 @@ describe('concealProposalSteps', () => {
           result: 'pass',
           index: 2,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         },
         {
@@ -238,7 +310,16 @@ describe('concealProposalSteps', () => {
           result: null,
           index: 2,
           reviewers: [
-            { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+            {
+              evaluationId: '',
+              id: '',
+              proposalId: '',
+              roleId: null,
+              systemRole: null,
+              userId: reviewerUser.id,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            }
           ]
         }
       ]
