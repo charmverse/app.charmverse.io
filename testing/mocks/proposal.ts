@@ -1,10 +1,15 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { ProposalReviewer } from '@charmverse/core/prisma-client';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
 import type { OptionalNullable } from '@root/lib/utils/types';
 import { v4 as uuid } from 'uuid';
 
+type EvaluationInput = Omit<Partial<ProposalWithUsersAndRubric['evaluations'][number]>, 'reviewers'> & {
+  reviewers?: Partial<Pick<ProposalReviewer, 'evaluationId' | 'userId' | 'roleId' | 'systemRole'>>[];
+};
+
 type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations' | 'fields'>> & {
-  evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];
+  evaluations?: EvaluationInput[];
   fields?: Partial<ProposalWithUsersAndRubric['fields']>;
 };
 
@@ -47,23 +52,26 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       complete_evaluation: true
     },
     ...input,
-    evaluations: (input.evaluations || []).map((evaluation) => ({
-      id: uuid(),
-      index: 0,
-      proposalId: id,
-      type: 'rubric',
-      title: 'Rubric',
-      result: null,
-      rubricAnswers: [],
-      totalReviews: 0,
-      draftRubricAnswers: [],
-      rubricCriteria: [],
-      reviewers: [],
-      permissions: [],
-      requiredReviews: 1,
-      declineReasonOptions: [],
-      ...evaluation
-    }))
+    evaluations: (input.evaluations || []).map(
+      (evaluation) =>
+        ({
+          id: uuid(),
+          index: 0,
+          proposalId: id,
+          type: 'rubric',
+          title: 'Rubric',
+          result: null,
+          rubricAnswers: [],
+          totalReviews: 0,
+          draftRubricAnswers: [],
+          rubricCriteria: [],
+          reviewers: [],
+          permissions: [],
+          requiredReviews: 1,
+          declineReasonOptions: [],
+          ...evaluation
+        }) as ProposalWithUsersAndRubric['evaluations'][number]
+    )
   };
 }
 

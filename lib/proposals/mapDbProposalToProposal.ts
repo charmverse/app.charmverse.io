@@ -7,7 +7,8 @@ import type {
   ProposalEvaluationType,
   ProposalReviewer,
   ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer
+  ProposalRubricCriteriaAnswer,
+  DraftProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import {
   ProposalEvaluationResult,
@@ -46,7 +47,7 @@ export type ProposalToMap = Proposal &
       reviewers: ProposalReviewer[];
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
-      draftRubricAnswers: ProposalRubricCriteriaAnswer[];
+      draftRubricAnswers: DraftProposalRubricCriteriaAnswer[];
     })[];
     page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
     rewards: { id: string }[];

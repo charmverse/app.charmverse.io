@@ -25,7 +25,11 @@ import type { UpdateableRewardFields } from '@root/lib/rewards/updateRewardSetti
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
+import type {
+  ProposalRubricCriteriaAnswerWithTypedResponse,
+  RubricCriteriaTyped,
+  ProposalRubricCriteriaAnswerWithTypedResponseAndTimestamps
+} from './rubric/interfaces';
 
 export type ProposalEvaluationStatus =
   | 'in_progress'
@@ -77,7 +81,7 @@ export type ConcealableEvaluationType = ProposalEvaluationType | 'private_evalua
 
 export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'actionLabels' | 'type'> & {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
-  rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
+  rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponseAndTimestamps[];
   rubricCriteria: RubricCriteriaTyped[];
   permissions: ProposalEvaluationPermission[];
   reviewers: ProposalReviewer[];
