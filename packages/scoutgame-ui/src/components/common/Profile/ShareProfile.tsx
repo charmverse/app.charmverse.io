@@ -8,7 +8,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 export function ShareProfile({ userPath }: { userPath: string }) {
-  const shareMessage = `Discover my profile on Scout Game: ${baseUrl}/u/${userPath}`;
+  const profileUrl = `${baseUrl}/u/${userPath}`;
+  const shareMessage = `Discover my profile on Scout Game: ${profileUrl}`;
   const [isCopied, setIsCopied] = useState(false);
   const [anchorElShare, setAnchorElShare] = useState<HTMLElement | null>(null);
 
@@ -21,9 +22,9 @@ export function ShareProfile({ userPath }: { userPath: string }) {
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    handleCloseShareMenu();
+    navigator.clipboard.writeText(profileUrl);
     setIsCopied(true);
+    handleCloseShareMenu();
     setTimeout(() => {
       setIsCopied(false);
     }, 500);
