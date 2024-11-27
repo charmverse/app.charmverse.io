@@ -7,7 +7,6 @@ import type { Control } from 'react-hook-form';
 
 import { useIsMounted } from '../../../../hooks/useIsMounted';
 import { useMdScreen } from '../../../../hooks/useMediaScreens';
-import { ProfileLinks } from '../ProfileLinks';
 
 import { EditableAvatar } from './EditableAvatar';
 import { EditableBio } from './EditableBio';
