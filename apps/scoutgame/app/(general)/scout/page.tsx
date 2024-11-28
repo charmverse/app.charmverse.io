@@ -1,13 +1,23 @@
 import { ScoutPage } from 'components/scout/ScoutPage';
-import type { BuildersSort } from 'lib/builders/getSortedBuilders';
 
 export default async function Scout({
   searchParams
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const sortParam = searchParams.tab;
-  const sort = (sortParam && typeof sortParam === 'string' ? sortParam : 'top') as BuildersSort;
+  const scoutSort = (searchParams['scout-sort'] as string) || 'points';
+  const builderSort = (searchParams['builder-sort'] as string) || 'rank';
+  const builderOrder = (searchParams['builder-order'] as string) || 'asc';
+  const scoutOrder = (searchParams['scout-order'] as string) || 'desc';
+  const scoutTab = (searchParams['scout-tab'] as string) || 'scouts';
 
-  return <ScoutPage sort={sort} />;
+  return (
+    <ScoutPage
+      scoutSort={scoutSort}
+      builderSort={builderSort}
+      scoutOrder={scoutOrder}
+      builderOrder={builderOrder}
+      scoutTab={scoutTab}
+    />
+  );
 }

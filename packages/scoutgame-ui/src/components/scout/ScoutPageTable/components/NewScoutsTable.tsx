@@ -1,5 +1,5 @@
 import LaunchIcon from '@mui/icons-material/Launch';
-import { Alert, Button, Stack, Table, TableBody, TableCell, TableHead, Tooltip } from '@mui/material';
+import { Alert, Box, Button, Stack, Table, TableBody, TableCell, TableHead, Tooltip } from '@mui/material';
 import type { NewScout } from '@packages/scoutgame/scouts/getNewScouts';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
@@ -30,7 +30,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
       >
         Join now and compete for 500 OP
       </Alert>
-      <Table size='small' sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }} data-test='new-scouts-table'>
+      <Table size='small' sx={{ backgroundColor: 'background.paper' }} data-test='new-scouts-table'>
         <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
           <CommonTableRow>
             <TableCell align='center' sx={{ width: '20%' }}>

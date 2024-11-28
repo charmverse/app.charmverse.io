@@ -1,12 +1,15 @@
 import { Box, Typography } from '@mui/material';
 import { LoadingTable } from '@packages/scoutgame-ui/components/claim/components/common/LoadingTable';
-import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/home/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
+import {
+  scoutTabs,
+  ScoutTabsMenu
+} from '@packages/scoutgame-ui/components/scout/ScoutPageTable/components/ScoutTabsMenu';
+import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPageTable/ScoutPageTable';
+import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 
 import { InfoModal } from './InfoModal';
-import { scoutTabs, ScoutTabsMenu } from './ScoutPageTable/components/ScoutTabsMenu';
-import { ScoutPageTable } from './ScoutPageTable/ScoutPageTable';
 
 const HeaderMessage = dynamic(
   () => import('@packages/scoutgame-ui/components/common/Header/HeaderMessage').then((mode) => mode.HeaderMessage),

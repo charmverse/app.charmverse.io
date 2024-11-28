@@ -1,6 +1,7 @@
 import type { UserWeeklyStats } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
+import { prettyPrint } from '@packages/utils/strings';
 
 export type NewScout = {
   id: string;

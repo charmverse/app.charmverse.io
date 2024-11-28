@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 
-export type TopBuildersSortBy = 'cards' | 'points' | 'price' | 'rank';
+import { currentSeason, getCurrentWeek } from '../dates';
 
-export type TopBuilderInfo = {
+export type BuildersSortBy = 'cards' | 'points' | 'price' | 'rank';
+
+export type BuilderInfo = {
   path: string;
   avatar: string;
   displayName: string;
@@ -14,13 +15,13 @@ export type TopBuilderInfo = {
   cards: number;
 };
 
-export async function getTopBuilders({
+export async function getBuilders({
   limit = 200,
   sortBy = 'rank',
   order = 'asc'
 }: {
   limit?: number;
-  sortBy?: TopBuildersSortBy;
+  sortBy?: BuildersSortBy;
   order?: 'asc' | 'desc';
 }) {
   if (sortBy === 'rank') {
@@ -69,7 +70,7 @@ export async function getTopBuilders({
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
       rank: builder.rank || -1,
-      price: builder.user.builderNfts[0].currentPrice,
+      price: builder.user.builderNfts[0]?.currentPrice,
       points: builder.user.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       cards: builder.user.userSeasonStats[0]?.nftsSold || 0
     }));
@@ -121,7 +122,7 @@ export async function getTopBuilders({
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
       rank: builder.user.userWeeklyStats[0]?.rank || -1,
-      price: builder.user.builderNfts[0].currentPrice,
+      price: builder.user.builderNfts[0]?.currentPrice,
       points: builder.pointsEarnedAsBuilder || 0,
       cards: builder.nftsSold || 0
     }));
@@ -226,7 +227,7 @@ export async function getTopBuilders({
       avatar: builder.user.avatar as string,
       displayName: builder.user.displayName,
       rank: builder.user.userWeeklyStats[0]?.rank || -1,
-      price: builder.user.builderNfts[0].currentPrice,
+      price: builder.user.builderNfts[0]?.currentPrice,
       points: builder.pointsEarnedAsBuilder || 0,
       cards: builder.nftsSold || 0
     }));

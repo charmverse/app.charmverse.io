@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { currentSeason } from '@packages/scoutgame/dates';
 
-export type TopScoutsSortBy = 'cards' | 'points' | 'builders' | 'rank';
+import { currentSeason } from '../dates';
 
-export type TopScoutInfo = {
+export type ScoutsSortBy = 'cards' | 'points' | 'builders' | 'rank';
+
+export type ScoutInfo = {
   path: string;
   avatar: string;
   displayName: string;
@@ -14,13 +15,13 @@ export type TopScoutInfo = {
   builders: number;
 };
 
-export async function getTopScouts({
+export async function getScouts({
   limit = 200,
   sortBy = 'rank',
   order = 'asc'
 }: {
   limit?: number;
-  sortBy?: TopScoutsSortBy;
+  sortBy?: ScoutsSortBy;
   order?: 'asc' | 'desc';
 }) {
   // First get all users sorted by points to establish ranks
