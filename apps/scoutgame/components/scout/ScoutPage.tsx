@@ -48,7 +48,6 @@ export function ScoutPage({
   return (
     <>
       <HeaderMessage />
-
       <Grid container spacing={1} height='calc(100vh - 100px)'>
         <Grid
           size={{ xs: 12, md: 7 }}

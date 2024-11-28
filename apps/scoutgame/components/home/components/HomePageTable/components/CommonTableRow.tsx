@@ -12,13 +12,13 @@ const tableRowSx = {
     '&:first-of-type': {
       paddingLeft: {
         xs: '10px',
-        md: '50px'
+        md: '20px'
       }
     },
     '&:last-child': {
       paddingRight: {
         xs: '10px',
-        md: '75px'
+        md: '20px'
       }
     }
   }

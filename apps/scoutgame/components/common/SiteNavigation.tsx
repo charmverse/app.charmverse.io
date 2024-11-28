@@ -13,6 +13,7 @@ import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
 
+import { BuilderIcon } from './BuilderIcon';
 import { ClaimIcon } from './ClaimIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
@@ -76,6 +77,13 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           href='/scout'
           value='scout'
           icon={<PiBinocularsLight size='24px' />}
+          LinkComponent={Link}
+        />
+        <BottomNavigationAction
+          label='Builders'
+          href='/builders'
+          value='builders'
+          icon={<BuilderIcon />}
           LinkComponent={Link}
         />
         <BottomNavigationAction

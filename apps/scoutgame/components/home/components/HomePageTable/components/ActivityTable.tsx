@@ -86,14 +86,14 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
     <Table
       aria-label='Leaderboard table'
       size='small'
-      sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}
+      sx={{ backgroundColor: 'background.paper' }}
       data-test='activity-table'
     >
       <TableHead
         sx={{
           position: 'sticky',
-          top: 45,
-          zIndex: 1000,
+          top: 0,
+          zIndex: 1,
           backgroundColor: 'background.paper'
         }}
       >
