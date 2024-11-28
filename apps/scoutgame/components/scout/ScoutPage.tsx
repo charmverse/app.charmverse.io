@@ -48,6 +48,7 @@ export function ScoutPage({
   return (
     <>
       <HeaderMessage />
+
       <Grid container spacing={1} height='calc(100vh - 100px)'>
         <Grid
           size={{ xs: 12, md: 7 }}
@@ -58,6 +59,20 @@ export function ScoutPage({
             gap: 2
           }}
         >
+          <Typography
+            variant='h5'
+            color='secondary'
+            textAlign='center'
+            fontWeight='bold'
+            mb={2}
+            mt={{
+              xs: 0,
+              md: 2
+            }}
+            display={{ xs: 'block', md: 'none' }}
+          >
+            Scout today's HOT Builders!
+          </Typography>
           <TodaysHotBuildersCarousel />
           <Stack
             position='sticky'
