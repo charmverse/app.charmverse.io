@@ -101,6 +101,12 @@ export function SearchBuildersInput() {
           />
         )}
         noOptionsText='Search'
+        sx={{
+          position: 'sticky',
+          top: -20,
+          zIndex: 1,
+          backgroundColor: 'background.default'
+        }}
       />
     </>
   );

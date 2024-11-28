@@ -15,7 +15,7 @@ export async function ScoutPageTable({ tab, order, sort }: { tab: string; order:
     const [, builders = []] = await safeAwaitSSRData(
       getBuilders({ limit: 200, sortBy: sort as BuildersSortBy, order: order as 'asc' | 'desc' })
     );
-    return <BuildersTable builders={builders} order={order} sort={sort} />;
+    return <BuildersTable builders={[...builders, ...builders, ...builders, ...builders]} order={order} sort={sort} />;
   } else if (tab === 'scouts') {
     const [, scouts = []] = await safeAwaitSSRData(
       getScouts({ limit: 200, sortBy: sort as ScoutsSortBy, order: order as 'asc' | 'desc' })
