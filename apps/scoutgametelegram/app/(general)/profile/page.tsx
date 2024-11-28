@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCachedUserFromSession as getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { getUserStats } from '@packages/scoutgame/users/getUserStats';
+import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 import type { ProfileTab } from '@packages/scoutgame-ui/components/profile/ProfilePage';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
@@ -21,7 +22,7 @@ export default async function Profile({
     tab: ProfileTab;
   };
 }) {
-  const user = await getUserFromSession();
+  const user = await getUserFromSession({ sameSite: 'none' });
   if (!user) {
     return null;
   }
@@ -31,29 +32,31 @@ export default async function Profile({
     redirect('/welcome');
   }
 
-  const userStats = await getUserStats(user.id);
-  const userExternalProfiles = await prisma.scout.findUniqueOrThrow({
-    where: {
-      id: user.id
-    },
-    select: {
-      hasMoxieProfile: true,
-      talentProfile: {
-        select: {
-          id: true,
-          score: true
+  const [, userStats] = await safeAwaitSSRData(getUserStats(user.id));
+  const [, userExternalProfiles] = await safeAwaitSSRData(
+    prisma.scout.findUniqueOrThrow({
+      where: {
+        id: user.id
+      },
+      select: {
+        hasMoxieProfile: true,
+        talentProfile: {
+          select: {
+            id: true,
+            score: true
+          }
         }
       }
-    }
-  });
+    })
+  );
 
   return (
     <ProfilePage
       user={{
         ...user,
         ...userStats,
-        hasMoxieProfile: userExternalProfiles.hasMoxieProfile,
-        talentProfile: userExternalProfiles.talentProfile ?? undefined
+        hasMoxieProfile: userExternalProfiles?.hasMoxieProfile ?? false,
+        talentProfile: userExternalProfiles?.talentProfile ?? undefined
       }}
     />
   );

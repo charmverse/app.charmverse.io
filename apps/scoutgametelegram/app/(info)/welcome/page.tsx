@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { WelcomePage } from 'components/welcome/WelcomePage';
 
 export default async function Welcome() {
-  const user = await getUserFromSession();
+  const user = await getUserFromSession({ sameSite: 'none' });
 
   if (user?.onboardedAt && user?.agreedToTermsAt) {
     redirect('/scout');
