@@ -5,8 +5,9 @@ import { Suspense } from 'react';
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
 
 import { BuilderPageTable } from './BuilderPageTable/BuilderPageTable';
+import { PartnerRewardsCarousel } from './PartnerRewardsCarousel/PartnerRewardsCarousel';
 
-export function BuildersPage({ tab, week }: { tab: string; week: string }) {
+export function BuildersPage({ week }: { week: string }) {
   return (
     <>
       <HeaderMessage />
@@ -16,6 +17,7 @@ export function BuildersPage({ tab, week }: { tab: string; week: string }) {
             <Typography variant='h5' color='secondary' textAlign='center' my={1}>
               Partner Rewards
             </Typography>
+            <PartnerRewardsCarousel />
           </Stack>
           <Stack>
             <Typography variant='h5' color='secondary' textAlign='center' my={1}>

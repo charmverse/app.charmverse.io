@@ -20,17 +20,18 @@ export function BuildersCarousel({
   builders: BuilderInfo[];
   showPromoCards?: boolean;
 }) {
-  const isMdScreen = useMdScreen();
+  const isDesktop = useMdScreen();
   const isLgScreen = useLgScreen();
-
   const trackEvent = useTrackEvent();
-  const size = isLgScreen ? 'large' : isMdScreen ? 'small' : 'x-small';
+  const size = isLgScreen ? 'large' : isDesktop ? 'small' : 'x-small';
   const isMounted = useIsMounted();
 
   if (!isMounted) {
     // This is returned to prevent a layout shift when the carousel is mounted
     return <LoadingCards />;
   }
+
+  const slidesPerView = isDesktop ? 3 : 2.2;
 
   const builderCards = showPromoCards
     ? [
@@ -79,5 +80,5 @@ export function BuildersCarousel({
         <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
       ));
 
-  return <Carousel>{builderCards}</Carousel>;
+  return <Carousel slidesPerView={slidesPerView}>{builderCards}</Carousel>;
 }

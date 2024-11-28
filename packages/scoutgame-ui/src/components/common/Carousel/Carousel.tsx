@@ -2,10 +2,10 @@
 
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Navigation, Autoplay } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useLgScreen, useMdScreen, useSmScreen } from '../../../hooks/useMediaScreens';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
 import { LoadingCards } from '../Loading/LoadingCards';
 
 import { NextArrow, PrevArrow } from './Arrows';
@@ -15,13 +15,11 @@ import 'swiper/css/autoplay';
 
 export type CarouselProps = {
   children: React.ReactNode[];
+  slidesPerView: number;
 };
 
-export function Carousel({ children }: CarouselProps) {
-  const isSmall = useSmScreen();
+export function Carousel({ children, slidesPerView }: CarouselProps) {
   const isDesktop = useMdScreen();
-  const isLarge = useLgScreen();
-  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : isSmall ? 4.2 : 2.2;
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
 
@@ -35,7 +33,7 @@ export function Carousel({ children }: CarouselProps) {
 
   return (
     <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
+      <Box width='95%' px={isDesktop ? 4 : 0} position='relative'>
         <Swiper
           autoplay={{
             delay: 3000,

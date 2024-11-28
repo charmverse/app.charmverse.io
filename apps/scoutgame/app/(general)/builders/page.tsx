@@ -10,5 +10,5 @@ export default async function Builders({
   const tab = (searchParams.tab as string) || 'leaderboard';
   const week = searchParams.week as string | undefined;
 
-  return <BuildersPage tab={tab} week={week && validateISOWeek(week) ? week : getCurrentWeek()} />;
+  return <BuildersPage week={week && validateISOWeek(week) ? week : getCurrentWeek()} />;
 }
