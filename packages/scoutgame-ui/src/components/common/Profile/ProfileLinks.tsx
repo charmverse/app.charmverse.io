@@ -53,7 +53,7 @@ export function ProfileLinks({
             href={`https://passport.talentprotocol.com/profile/${talentProfile.id}`}
             avatar={
               <Image
-                src='/images/talent.jpg'
+                src='/images/crypto/talent.jpg'
                 alt='talent icon'
                 width={14}
                 height={14}
