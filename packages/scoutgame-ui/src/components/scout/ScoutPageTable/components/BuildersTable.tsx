@@ -48,7 +48,7 @@ export function BuildersTable({ builders, order, sort }: { builders: BuilderInfo
           position: 'sticky',
           top: {
             xs: 20,
-            md: 65
+            md: 45
           },
           zIndex: 1000,
           backgroundColor: 'background.paper'

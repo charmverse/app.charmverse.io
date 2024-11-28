@@ -47,6 +47,7 @@ export function SearchBuildersInput({ sx }: { sx?: SxProps }) {
       <StyledAutocomplete
         loading={debouncedIsLoading}
         loadingText='Loading...'
+        size='small'
         renderOption={(props, option, { inputValue }) => {
           if (inputValue && inputValue.length >= 2 && searchResults?.length === 0) {
             return (
