@@ -1,13 +1,15 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import InfoIcon from '@mui/icons-material/Info';
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
 import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPageTable/ScoutPageTable';
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
+import { isTruthy } from '@packages/utils/types';
+import Link from 'next/link';
 
+import { ScoutPageBuildersGallery } from './components/ScoutPageBuildersGallery';
 import { SearchBuildersInput } from './components/SearchBuildersInput';
 
 export const scoutTabOptions: TabItem[] = [
@@ -20,14 +22,23 @@ export function ScoutPage({
   builderSort,
   scoutOrder,
   builderOrder,
-  scoutTab
+  scoutTab,
+  buildersLayout,
+  tab
 }: {
   scoutSort: string;
   builderSort: string;
   scoutOrder: string;
   builderOrder: string;
   scoutTab: string;
+  buildersLayout: string;
+  tab: string;
 }) {
+  const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
+    .filter(([, value]) => isTruthy(value))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+
   return (
     <>
       <HeaderMessage />
@@ -60,13 +71,18 @@ export function ScoutPage({
               }}
             >
               <Stack flexDirection='row' alignItems='center' gap={1}>
-                <FormatListBulletedIcon color='disabled' />
-                <AppsIcon color='disabled' />
+                <Link href={`/scout?${urlString ? `${urlString}&` : ''}buildersLayout=table`}>
+                  <FormatListBulletedIcon color={buildersLayout === 'table' ? 'secondary' : 'disabled'} />
+                </Link>
+                <Link href={`/scout?${urlString ? `${urlString}&` : ''}buildersLayout=gallery`}>
+                  <AppsIcon color={buildersLayout === 'gallery' ? 'secondary' : 'disabled'} />
+                </Link>
               </Stack>
               <SearchBuildersInput sx={{ maxWidth: '500px' }} />
               <InfoModal builder />
             </Stack>
-            <ScoutPageTable tab='builders' order={builderOrder} sort={builderSort} />
+            {buildersLayout === 'table' && <ScoutPageTable tab='builders' order={builderOrder} sort={builderSort} />}
+            {buildersLayout === 'gallery' && <ScoutPageBuildersGallery showHotIcon />}
           </Stack>
         </Grid>
         <Grid size={5} sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>

@@ -1,18 +1,16 @@
 import { currentSeason, getCurrentWeek } from '@packages/scoutgame/dates';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
-import type { BuildersSort } from 'lib/builders/getSortedBuilders';
-import { getSortedBuilders } from 'lib/builders/getSortedBuilders';
+import { getPaginatedBuilders } from 'lib/builders/getPaginatedBuilders';
 
 import { BuildersGalleryContainer } from './BuildersGalleryContainer';
 
 export const dynamic = 'force-dynamic';
 
-export async function ScoutPageBuildersGallery({ sort, showHotIcon }: { sort: BuildersSort; showHotIcon: boolean }) {
+export async function ScoutPageBuildersGallery({ showHotIcon }: { showHotIcon: boolean }) {
   const [error, data] = await safeAwaitSSRData(
-    getSortedBuilders({
-      sort: sort as BuildersSort,
-      limit: 30,
+    getPaginatedBuilders({
+      limit: 10,
       week: getCurrentWeek(),
       season: currentSeason,
       cursor: null
@@ -25,12 +23,5 @@ export async function ScoutPageBuildersGallery({ sort, showHotIcon }: { sort: Bu
 
   const { builders, nextCursor } = data;
 
-  return (
-    <BuildersGalleryContainer
-      sort={sort}
-      initialCursor={nextCursor}
-      initialBuilders={builders}
-      showHotIcon={showHotIcon}
-    />
-  );
+  return <BuildersGalleryContainer initialCursor={nextCursor} initialBuilders={builders} showHotIcon={showHotIcon} />;
 }

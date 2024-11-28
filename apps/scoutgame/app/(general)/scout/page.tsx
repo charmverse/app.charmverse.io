@@ -10,6 +10,8 @@ export default async function Scout({
   const builderOrder = (searchParams.builderOrder as string) || 'asc';
   const scoutOrder = (searchParams.scoutOrder as string) || 'desc';
   const scoutTab = (searchParams.scoutTab as string) || 'scouts';
+  const buildersLayout = (searchParams.buildersLayout as string) || 'table';
+  const tab = (searchParams.tab as string) || 'scouts';
 
   return (
     <ScoutPage
@@ -18,6 +20,8 @@ export default async function Scout({
       scoutOrder={scoutOrder}
       builderOrder={builderOrder}
       scoutTab={scoutTab}
+      buildersLayout={buildersLayout}
+      tab={tab}
     />
   );
 }
