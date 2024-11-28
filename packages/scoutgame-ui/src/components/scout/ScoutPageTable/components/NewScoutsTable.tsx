@@ -31,7 +31,17 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
         Join now and compete for 500 OP
       </Alert>
       <Table size='small' sx={{ backgroundColor: 'background.paper' }} data-test='new-scouts-table'>
-        <TableHead sx={{ position: 'sticky', top: 45, zIndex: 1000, backgroundColor: 'background.paper' }}>
+        <TableHead
+          sx={{
+            position: 'sticky',
+            top: {
+              xs: 20,
+              md: 45
+            },
+            zIndex: 1000,
+            backgroundColor: 'background.paper'
+          }}
+        >
           <CommonTableRow>
             <TableCell align='center' sx={{ width: '20%' }}>
               RANK

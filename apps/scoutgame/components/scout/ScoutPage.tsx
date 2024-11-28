@@ -17,6 +17,12 @@ export const scoutTabOptions: TabItem[] = [
   { label: 'New Scouts', value: 'new-scouts' }
 ];
 
+export const scoutTabMobileOptions: TabItem[] = [
+  { label: 'Builders', value: 'builders' },
+  { label: 'All Scouts', value: 'scouts' },
+  { label: 'New Scouts', value: 'new-scouts' }
+];
+
 export function ScoutPage({
   scoutSort,
   builderSort,
@@ -44,7 +50,7 @@ export function ScoutPage({
       <HeaderMessage />
       <Grid container spacing={1} height='calc(100vh - 100px)'>
         <Grid
-          size={7}
+          size={{ xs: 12, md: 7 }}
           sx={{
             height: '100%',
             overflowX: 'hidden',
@@ -53,7 +59,13 @@ export function ScoutPage({
           }}
         >
           <TodaysHotBuildersCarousel />
-          <Stack position='sticky' top={0} zIndex={1} bgcolor='background.default'>
+          <Stack
+            position='sticky'
+            top={0}
+            zIndex={1}
+            bgcolor='background.default'
+            sx={{ display: { xs: 'none', md: 'flex' } }}
+          >
             <Typography color='secondary' textAlign='center' variant='h5'>
               Browser ALL Builders
             </Typography>
@@ -67,7 +79,8 @@ export function ScoutPage({
                 gap: 2,
                 backgroundColor: 'background.default',
                 alignItems: 'center',
-                py: 2
+                py: 2,
+                display: { xs: 'none', md: 'flex' }
               }}
             >
               <Stack flexDirection='row' alignItems='center' gap={1}>
@@ -84,10 +97,32 @@ export function ScoutPage({
             {buildersLayout === 'table' && <ScoutPageTable tab='builders' order={builderOrder} sort={builderSort} />}
             {buildersLayout === 'gallery' && <ScoutPageBuildersGallery showHotIcon />}
           </Stack>
+          <Stack
+            position='sticky'
+            top={0}
+            zIndex={1}
+            bgcolor='background.default'
+            sx={{ display: { xs: 'flex', md: 'none' } }}
+          >
+            <TabsMenu
+              value={scoutTab}
+              tabs={scoutTabMobileOptions}
+              queryKey='scoutTab'
+              sx={{ position: 'sticky', top: -20, zIndex: 1, backgroundColor: 'background.default' }}
+            />
+            <ScoutPageTable
+              tab={tab === 'builders' ? 'builders' : scoutTab}
+              order={tab === 'builders' ? builderOrder : scoutOrder}
+              sort={tab === 'builders' ? builderSort : scoutSort}
+            />
+          </Stack>
         </Grid>
-        <Grid size={5} sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+        <Grid
+          size={5}
+          sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}
+        >
           <Box sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'background.default' }}>
-            <TabsMenu value={scoutTab} tabs={scoutTabOptions} queryKey='scout-tab' />
+            <TabsMenu value={scoutTab} tabs={scoutTabOptions} queryKey='scoutTab' />
             <InfoModal sx={{ position: 'absolute', right: 10, top: 3.5 }} />
           </Box>
           <ScoutPageTable tab={scoutTab} order={scoutOrder} sort={scoutSort} />

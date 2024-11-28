@@ -22,7 +22,7 @@ export function BuildersYouKnowPage({ builders }: { builders: BuilderInfo[] }) {
         </Button>
       </Box>
       <Suspense fallback={<LoadingGallery />}>
-        <BuildersGalleryContainer sort='top' initialCursor={null} initialBuilders={builders} showHotIcon={false} />
+        <BuildersGalleryContainer initialCursor={null} initialBuilders={builders} showHotIcon={false} />
       </Suspense>
     </PageContainer>
   );
