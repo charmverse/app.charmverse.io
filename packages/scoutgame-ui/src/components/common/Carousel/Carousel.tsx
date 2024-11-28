@@ -1,8 +1,10 @@
 'use client';
 
+import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Navigation, Autoplay } from 'swiper/modules';
+import type { SwiperProps } from 'swiper/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useLgScreen, useMdScreen, useSmScreen } from '../../../hooks/useMediaScreens';
@@ -15,9 +17,10 @@ import 'swiper/css/autoplay';
 
 export type CarouselProps = {
   children: React.ReactNode[];
-};
+  boxProps?: BoxProps;
+} & Partial<SwiperProps>;
 
-export function Carousel({ children }: CarouselProps) {
+export function Carousel({ boxProps, children, ...restProps }: CarouselProps) {
   const isSmall = useSmScreen();
   const isDesktop = useMdScreen();
   const isLarge = useLgScreen();
@@ -34,34 +37,43 @@ export function Carousel({ children }: CarouselProps) {
   }
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
-        <Swiper
-          autoplay={{
-            delay: 3000,
-            pauseOnMouseEnter: true
-          }}
-          loop
-          className='swiper'
-          slidesPerView={slidesPerView}
-          autoHeight={true}
-          modules={[Navigation, Autoplay]}
-          navigation={{
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev'
-          }}
-        >
-          {children.map((child, index) => (
-            <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
-          ))}
-        </Swiper>
-        {isDesktop && children.length > slidesPerView && (
-          <>
-            <NextArrow className='swiper-button-next' />
-            <PrevArrow className='swiper-button-prev' />
-          </>
-        )}
-      </Box>
+    <Box
+      width='90svw'
+      display='flex'
+      alignItems='center'
+      justifyContent='center'
+      mb={2}
+      mx='auto'
+      px={{ md: 4 }}
+      position='relative'
+      {...boxProps}
+    >
+      <Swiper
+        autoplay={{
+          delay: 3000,
+          pauseOnMouseEnter: true
+        }}
+        loop
+        className='swiper'
+        slidesPerView={slidesPerView}
+        autoHeight={true}
+        modules={[Navigation, Autoplay]}
+        navigation={{
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev'
+        }}
+        {...restProps}
+      >
+        {children.map((child, index) => (
+          <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
+        ))}
+      </Swiper>
+      {isDesktop && children.length > slidesPerView && (
+        <>
+          <NextArrow className='swiper-button-next' />
+          <PrevArrow className='swiper-button-prev' />
+        </>
+      )}
     </Box>
   );
 }

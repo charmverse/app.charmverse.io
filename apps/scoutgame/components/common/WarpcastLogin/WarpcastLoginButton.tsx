@@ -38,7 +38,7 @@ export function WarpcastLoginButton() {
     result
   } = useAction(loginWithFarcasterAction, {
     onSuccess: async ({ data }) => {
-      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/home';
+      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/profile' : redirectUrl || '/home';
 
       if (!data?.success) {
         return;

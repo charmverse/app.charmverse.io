@@ -36,6 +36,7 @@ export async function getBuildersByFid({
         displayName: true,
         builderStatus: true,
         createdAt: true,
+        farcasterId: true,
         builderNfts: {
           where: {
             season
@@ -89,6 +90,7 @@ export async function getBuildersByFid({
         rank: scout.userWeeklyStats[0]?.rank ?? -1,
         nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
         builderStatus: scout.builderStatus!,
+        farcasterId: scout.farcasterId,
         last7DaysGems: ((scout.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
           .map((gem) => gem.gemsCount)
           .slice(-7)
