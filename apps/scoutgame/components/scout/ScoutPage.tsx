@@ -1,6 +1,6 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import { Box, Divider, Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
@@ -13,7 +13,7 @@ import { ScoutPageBuildersGallery } from './components/ScoutPageBuildersGallery'
 import { SearchBuildersInput } from './components/SearchBuildersInput';
 
 export const scoutTabOptions: TabItem[] = [
-  { label: 'ALL Scouts', value: 'scouts' },
+  { label: 'All Scouts', value: 'scouts' },
   { label: 'New Scouts', value: 'new-scouts' }
 ];
 
@@ -58,21 +58,11 @@ export function ScoutPage({
             gap: 2
           }}
         >
-          <Typography
-            variant='h5'
-            color='secondary'
-            textAlign='center'
-            fontWeight='bold'
-            mb={2}
-            mt={{
-              xs: 0,
-              md: 2
-            }}
-            display={{ xs: 'block', md: 'none' }}
-          >
+          <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
             Scout today's HOT Builders!
           </Typography>
           <TodaysHotBuildersCarousel />
+          <Divider sx={{ mt: 4, mb: 2 }} />
           <Stack
             position='sticky'
             top={0}

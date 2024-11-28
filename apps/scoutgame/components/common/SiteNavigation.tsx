@@ -128,6 +128,8 @@ function getActiveButton(pathname: string) {
     return 'info';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
+  } else if (pathname.startsWith('/builders')) {
+    return 'builders';
   }
   return null;
 }
