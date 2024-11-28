@@ -29,8 +29,8 @@ export function ScoutsTable({ scouts, order, sort }: { scouts: ScoutInfo[]; orde
   const handleSort = (sortBy: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('tab', 'scouts');
-    params.set('scout-sort', sortBy);
-    params.set('scout-order', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
+    params.set('scoutSort', sortBy);
+    params.set('scoutOrder', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };

@@ -30,8 +30,8 @@ export function BuildersTable({ builders, order, sort }: { builders: BuilderInfo
   const handleSort = (sortBy: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('tab', 'builders');
-    params.set('builder-sort', sortBy);
-    params.set('builder-order', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
+    params.set('builderSort', sortBy);
+    params.set('builderOrder', order === 'desc' || sort !== sortBy ? 'asc' : 'desc');
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
