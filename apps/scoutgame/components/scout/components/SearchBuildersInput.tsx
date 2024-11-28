@@ -1,6 +1,7 @@
 'use client';
 
 import SearchIcon from '@mui/icons-material/Search';
+import type { SxProps } from '@mui/material';
 import { Autocomplete, Box, CircularProgress, InputAdornment, TextField, Typography, styled } from '@mui/material';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import Link from 'next/link';
@@ -31,7 +32,7 @@ const StyledAutocomplete = styled(Autocomplete<BuilderSearchResult>)({
     borderRadius: '10px'
   }
 });
-export function SearchBuildersInput() {
+export function SearchBuildersInput({ sx }: { sx?: SxProps }) {
   const [open, setOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -101,12 +102,7 @@ export function SearchBuildersInput() {
           />
         )}
         noOptionsText='Search'
-        sx={{
-          position: 'sticky',
-          top: -20,
-          zIndex: 1,
-          backgroundColor: 'background.default'
-        }}
+        sx={sx}
       />
     </>
   );

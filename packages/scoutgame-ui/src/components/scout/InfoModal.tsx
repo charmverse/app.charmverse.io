@@ -1,9 +1,11 @@
 'use client';
 
 import InfoIcon from '@mui/icons-material/Info';
+import type { SxProps } from '@mui/material';
 import { IconButton, Stack, Typography } from '@mui/material';
-import { Dialog } from '@packages/scoutgame-ui/components/common/Dialog';
 import { useState } from 'react';
+
+import { Dialog } from '../common/Dialog';
 
 function BuilderInfoContent() {
   return (
@@ -72,19 +74,11 @@ function ScoutInfoContent() {
   );
 }
 
-export function InfoModal({ builder = false }: { builder?: boolean }) {
+export function InfoModal({ builder = false, sx }: { builder?: boolean; sx?: SxProps }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <IconButton
-        onClick={() => setOpen(true)}
-        sx={{
-          position: 'absolute',
-          right: 10,
-          top: 0,
-          color: 'secondary.main'
-        }}
-      >
+      <IconButton color='secondary' onClick={() => setOpen(true)} sx={sx}>
         <InfoIcon />
       </IconButton>
       <Dialog open={open} onClose={() => setOpen(false)}>

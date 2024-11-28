@@ -43,7 +43,7 @@ export function BuildersTable({ builders, order, sort }: { builders: BuilderInfo
       sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }}
       data-test='builders-table'
     >
-      <TableHead sx={{ position: 'sticky', top: 35, zIndex: 1000, backgroundColor: 'background.paper' }}>
+      <TableHead sx={{ position: 'sticky', top: 65, zIndex: 1000, backgroundColor: 'background.paper' }}>
         <CommonTableRow>
           <TableCell align='left' sx={{ fontSize: { xs: '10px', md: 'initial' }, py: 1 }}>
             BUILDER

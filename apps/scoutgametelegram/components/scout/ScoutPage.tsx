@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { LoadingTable } from '@packages/scoutgame-ui/components/claim/components/common/LoadingTable';
+import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
 import {
   scoutTabs,
   ScoutTabsMenu
@@ -8,8 +9,6 @@ import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPag
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-
-import { InfoModal } from './InfoModal';
 
 const HeaderMessage = dynamic(
   () => import('@packages/scoutgame-ui/components/common/Header/HeaderMessage').then((mode) => mode.HeaderMessage),
@@ -37,7 +36,7 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
         }}
       >
         <ScoutTabsMenu tab={currentTab} />
-        <InfoModal builder={currentTab === 'builders'} />
+        <InfoModal builder={currentTab === 'builders'} sx={{ position: 'absolute', right: 10, top: 3.5 }} />
       </Box>
       <Suspense key={currentTab} fallback={<LoadingTable />}>
         <ScoutPageTable tab={currentTab} order={order} sort={sort} />
