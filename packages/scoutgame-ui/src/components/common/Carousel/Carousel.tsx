@@ -35,7 +35,7 @@ export function Carousel({ children, renderBullet, slidesPerView, height }: Caro
   }
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center' mb={2} height='100%'>
+    <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
       <Box width='95%' px={isDesktop ? 4 : 0} position='relative' height='100%'>
         <Swiper
           autoplay={{
