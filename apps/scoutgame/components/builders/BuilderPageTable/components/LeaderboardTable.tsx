@@ -27,7 +27,17 @@ export function LeaderboardTable({ data, week }: { data: LeaderBoardRow[]; week:
       sx={{ px: { md: 6 }, backgroundColor: 'background.paper' }}
       data-test='leaderboard-table'
     >
-      <TableHead sx={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: 'background.paper' }}>
+      <TableHead
+        sx={{
+          position: 'sticky',
+          top: {
+            xs: -5,
+            md: 0
+          },
+          zIndex: 1000,
+          backgroundColor: 'background.paper'
+        }}
+      >
         <CommonTableRow>
           <TableCell align='center'>RANK</TableCell>
           <TableCell>BUILDER</TableCell>

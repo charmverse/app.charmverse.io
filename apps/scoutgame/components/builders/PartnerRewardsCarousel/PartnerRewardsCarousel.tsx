@@ -16,11 +16,11 @@ export function PartnerRewardsCarousel() {
       sx={{
         '& img.swiper-pagination-bullet': {
           width: {
-            xs: 20,
+            xs: 17.5,
             md: 25
           },
           height: {
-            xs: 20,
+            xs: 17.5,
             md: 25
           },
           borderRadius: '50%',
@@ -43,20 +43,16 @@ export function PartnerRewardsCarousel() {
       }}
     >
       <Carousel
-        height={isDesktop ? 300 : 125}
+        height={isDesktop ? 300 : 145}
         slidesPerView={1}
-        renderBullet={
-          isDesktop
-            ? (index, className) => `<img src="/images/crypto/${partnersLogo[index]}" class="${className}"/>`
-            : undefined
-        }
+        renderBullet={(index, className) => `<img src="/images/crypto/${partnersLogo[index]}" class="${className}"/>`}
       >
         {['talent', 'celo', 'op-supersim', 'game7', 'lit'].map((partner) => (
           <Image
             src={`/images/promos/${partner}-promo-slide.png`}
             alt={partner}
             width={isDesktop ? 750 : 250}
-            height={isDesktop ? 250 : 125}
+            height={isDesktop ? 250 : 115}
             key={partner}
             style={{ objectFit: 'contain', width: '100%' }}
           />
