@@ -1,22 +1,46 @@
 'use client';
 
+import { Box } from '@mui/material';
 import { Carousel } from '@packages/scoutgame-ui/components/common/Carousel/Carousel';
 import Image from 'next/image';
 
-const partnersLogo = ['celo.png', 'game7.png', 'lit.png', 'op.png', 'talent.jpg'];
+const partnersLogo = ['talent.jpg', 'celo.png', 'op.png', 'game7.png', 'lit.png'];
 
 export function PartnerRewardsCarousel() {
   return (
-    <Carousel
-      height={300}
-      slidesPerView={1}
-      renderBullet={(index, className) =>
-        `<img src="/images/crypto/${partnersLogo[index]}" style="position: relative; top: 0px; width: 25px; z-index: 100; height: 25px; border-radius: 50%; margin-right: 20px; margin-left: 20px; opacity: ${className === 'swiper-pagination-bullet-active' ? 1 : 0.5}" />`
-      }
+    <Box
+      sx={{
+        '& img.swiper-pagination-bullet': {
+          width: 25,
+          height: 25,
+          borderRadius: '50%',
+          marginRight: '20px !important',
+          marginLeft: '20px !important',
+          zIndex: 100,
+          position: 'relative',
+          top: 10,
+          opacity: 0.5
+        },
+        '& img.swiper-pagination-bullet-active': {
+          opacity: 1
+        }
+      }}
     >
-      {['celo', 'game7', 'lit', 'op-supersim', 'talent'].map((partner) => (
-        <Image src={`/images/promos/${partner}-promo-slide.png`} alt={partner} width={750} height={250} key={partner} />
-      ))}
-    </Carousel>
+      <Carousel
+        height={300}
+        slidesPerView={1}
+        renderBullet={(index, className) => `<img src="/images/crypto/${partnersLogo[index]}" class="${className}"/>`}
+      >
+        {['talent', 'celo', 'op-supersim', 'game7', 'lit'].map((partner) => (
+          <Image
+            src={`/images/promos/${partner}-promo-slide.png`}
+            alt={partner}
+            width={750}
+            height={250}
+            key={partner}
+          />
+        ))}
+      </Carousel>
+    </Box>
   );
 }

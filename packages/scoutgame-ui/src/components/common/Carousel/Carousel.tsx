@@ -54,7 +54,6 @@ export function Carousel({ children, renderBullet, slidesPerView, height }: Caro
           pagination={
             renderBullet
               ? {
-                  bulletActiveClass: 'swiper-pagination-bullet-active',
                   clickable: true,
                   renderBullet
                 }

@@ -1,6 +1,6 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
-import { Box, Divider, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
