@@ -28,7 +28,7 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
       >
         <Grid size={{ xs: 12, md: 7 }} sx={{ height: '100%', overflowX: 'hidden', px: 1, gap: 2 }}>
           <Stack height={{ xs: 165, md: 350 }}>
-            <Typography fontSize={{ xs: 16, md: 20 }} color='secondary' textAlign='center' my={{ xs: 0.5, md: 1 }}>
+            <Typography fontSize={{ xs: 16, md: 22 }} color='secondary' textAlign='center' my={{ xs: 0.5, md: 1 }}>
               Partner Rewards
             </Typography>
             <PartnerRewardsCarousel />
