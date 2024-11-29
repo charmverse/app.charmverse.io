@@ -52,7 +52,7 @@ function WalletLoginButton() {
     isExecuting: isLoggingIn
   } = useAction(loginWithWalletAction, {
     onSuccess: async ({ data }) => {
-      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/home';
+      const nextPage = !data?.onboarded ? '/welcome' : inviteCode ? '/welcome/builder' : redirectUrl || '/scout';
 
       if (!data?.success) {
         return;

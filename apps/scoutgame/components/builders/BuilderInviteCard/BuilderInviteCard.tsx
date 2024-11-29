@@ -1,10 +1,19 @@
 'use client';
 
-import { Link, Typography, Paper } from '@mui/material';
+import { Typography, Paper, Box } from '@mui/material';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
+import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
+import Link from 'next/link';
 
 export function BuilderPageInviteCard() {
+  const { user } = useUser();
+
   const isDesktop = useMdScreen();
+
+  if (user && user.builderStatus !== null) {
+    return null;
+  }
+
   return (
     <Paper
       sx={{
@@ -12,13 +21,9 @@ export function BuilderPageInviteCard() {
           xs: 1,
           md: 3
         },
-        mx: {
-          xs: 0,
-          md: 1
-        },
         my: {
           xs: 0.5,
-          md: 2
+          md: 1
         },
         display: 'flex',
         flexDirection: 'column',
@@ -37,9 +42,14 @@ export function BuilderPageInviteCard() {
       <Typography variant={isDesktop ? 'h6' : 'subtitle2'} fontWeight={400}>
         Scout Game rewards Builders for contributing to the onchain ecosystem.
       </Typography>
-      <Typography variant={isDesktop ? 'h6' : 'subtitle2'} fontWeight={400} color='primary' textAlign='center'>
-        <Link href='/builders'>Learn more</Link>
-      </Typography>
+
+      <Box display='flex' justifyContent='center'>
+        <Link href={!user ? '/login' : '/welcome/builder'}>
+          <Typography variant={isDesktop ? 'h6' : 'subtitle2'} fontWeight={400} color='primary'>
+            Learn more
+          </Typography>
+        </Link>
+      </Box>
     </Paper>
   );
 }

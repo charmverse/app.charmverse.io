@@ -52,7 +52,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
-    path: '/home'
+    path: '/scout'
   });
 
   const openAuthModal = isAuthenticated
@@ -65,13 +65,6 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   return (
     <>
       <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
-        <BottomNavigationAction
-          label='Home'
-          href='/home'
-          value='home'
-          icon={<PiHouseLight size='24px' />}
-          LinkComponent={Link}
-        />
         <BottomNavigationAction
           label='Scout'
           href='/scout'
@@ -116,12 +109,8 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.startsWith('/home')) {
-    return 'home';
-  } else if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
+  if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
     return 'scout';
-  } else if (pathname.startsWith('/notifications')) {
-    return 'notifications';
   } else if (pathname.startsWith('/profile')) {
     return 'profile';
   } else if (pathname.startsWith('/info')) {

@@ -302,6 +302,7 @@ function FooterSection() {
 
 export function LandingPage() {
   const isDesktop = useMdScreen();
+
   return (
     <Stack>
       {!isDesktop ? (
