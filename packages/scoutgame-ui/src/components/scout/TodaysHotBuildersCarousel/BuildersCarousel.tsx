@@ -31,7 +31,7 @@ export function BuildersCarousel({
     return <LoadingCards />;
   }
 
-  const slidesPerView = isDesktop ? 3 : 2.2;
+  const slidesPerView = isDesktop ? 3 : 2;
 
   const builderCards = showPromoCards
     ? [
