@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { PiBinocularsLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
@@ -103,7 +103,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Friends'
           href='/friends'
           value='friends'
-          icon={<FriendsIcon active />}
+          icon={<FriendsIcon />}
           LinkComponent={Link}
         />
       </StyledBottomNavigation>
