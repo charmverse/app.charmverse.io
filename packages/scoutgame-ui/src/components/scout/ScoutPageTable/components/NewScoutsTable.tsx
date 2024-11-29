@@ -14,7 +14,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
     <>
       <Alert
         sx={{ '.MuiAlert-action': { mx: 0 }, justifyContent: 'center' }}
-        icon={<Image width={20} height={20} src='/images/crypto/op64.png' alt='' />}
+        icon={<Image width={20} height={20} src='/images/crypto/op.png' alt='' />}
         action={
           <Button
             href='/info/partner-rewards/optimism'
@@ -79,7 +79,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
                     mx='auto'
                   >
                     {index + 1}
-                    {index < 10 ? <Image width={20} height={20} src='/images/crypto/op64.png' alt='' /> : <span />}
+                    {index < 10 ? <Image width={20} height={20} src='/images/crypto/op.png' alt='' /> : <span />}
                   </Stack>
                 </TableCellText>
               </TableCell>
