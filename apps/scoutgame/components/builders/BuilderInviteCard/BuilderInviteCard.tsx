@@ -23,7 +23,7 @@ export function BuilderPageInviteCard() {
         display: 'flex',
         flexDirection: 'column',
         gap: {
-          xs: 0.5,
+          xs: 0.75,
           md: 2
         }
       }}

@@ -18,10 +18,17 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
   return (
     <>
       <HeaderMessage />
-      <Grid container spacing={1} height='calc(100vh - 100px)'>
+      <Grid
+        container
+        spacing={1}
+        height={{
+          md: 'calc(100vh - 100px)',
+          xs: 'calc(100vh - 165px)'
+        }}
+      >
         <Grid size={{ xs: 12, md: 7 }} sx={{ height: '100%', overflowX: 'hidden', px: 1, gap: 2 }}>
-          <Stack height={{ xs: 175, md: 350 }}>
-            <Typography variant='h5' color='secondary' textAlign='center' my={1}>
+          <Stack height={{ xs: 165, md: 350 }}>
+            <Typography fontSize={{ xs: 16, md: 20 }} color='secondary' textAlign='center' my={{ xs: 0.5, md: 1 }}>
               Partner Rewards
             </Typography>
             <PartnerRewardsCarousel />
