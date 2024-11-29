@@ -1,18 +1,12 @@
 import { Stack } from '@mui/material';
-import { getFriends } from '@packages/scoutgame/users/getFriends';
-import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
+import type { SessionUser } from '@packages/scoutgame/session/interfaces';
+import { Info } from '@packages/scoutgame-ui/components/friends/components/Info';
+import { MyFriends } from '@packages/scoutgame-ui/components/friends/components/MyFriends';
+import { Stats } from '@packages/scoutgame-ui/components/friends/components/Stats';
 
-import { getSession } from 'lib/session/getSession';
-
-import { Info } from './components/Info';
 import { InviteButtons } from './components/InviteButtons';
-import { MyFriends } from './components/MyFriends';
-import { Stats } from './components/Stats';
 
-export async function FriendsPage() {
-  const session = await getSession();
-  const [, friends = []] = await safeAwaitSSRData(getFriends(session.scoutId));
-
+export async function FriendsPage({ friends }: { friends: SessionUser[] }) {
   return (
     <Stack px={1} gap={2} position='relative'>
       <Info />

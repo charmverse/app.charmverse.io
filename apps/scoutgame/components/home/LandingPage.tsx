@@ -180,21 +180,6 @@ function HowToPlaySection() {
   const isDesktop = useMdScreen();
   return (
     <Stack position='relative'>
-      {isDesktop ? (
-        <Image
-          src='/images/home/starry-bg.png'
-          width='500'
-          height='350'
-          alt='title icon'
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            position: 'absolute',
-            top: 0
-          }}
-        />
-      ) : null}
       <Stack
         zIndex={{
           xs: 0,
@@ -304,25 +289,25 @@ export function LandingPage() {
   const isDesktop = useMdScreen();
 
   return (
-    <Stack>
-      {!isDesktop ? (
-        <Image
-          src='/images/home/starry-bg.png'
-          width='500'
-          height='350'
-          alt='title icon'
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            position: 'absolute',
-            top: 0
-          }}
-        />
-      ) : null}
-      <HeroSection />
-      <HowToPlaySection />
-      <FooterSection />
+    <Stack height='100%' overflow='hidden'>
+      <Image
+        src='/images/home/starry-bg.png'
+        width='500'
+        height='350'
+        alt='title icon'
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          position: 'absolute',
+          top: 0
+        }}
+      />
+      <Stack height='100%' overflow='auto' zIndex={1}>
+        <HeroSection />
+        <HowToPlaySection />
+        <FooterSection />
+      </Stack>
     </Stack>
   );
 }

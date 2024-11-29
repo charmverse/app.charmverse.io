@@ -1,12 +1,11 @@
 'use client';
 
 import { Button, IconButton, Stack, Tooltip } from '@mui/material';
+import { telegramBotName } from '@packages/scoutgame/constants';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import WebApp from '@twa-dev/sdk';
 import { useState } from 'react';
 import { LuCopy } from 'react-icons/lu';
-
-import { telegramBotName } from 'lib/telegram/config';
 
 export function InviteButtons() {
   const { user } = useUser();

@@ -33,6 +33,7 @@ function WalletLoginButton() {
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
   const inviteCode = searchParams.get('invite-code');
+  const referralCode = searchParams.get('ref');
   const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
   const { refreshUser } = useUser();
   const router = useRouter();
@@ -79,7 +80,7 @@ function WalletLoginButton() {
     const siweMessage = new SiweMessage(preparedMessage);
     const message = siweMessage.prepareMessage();
     const signature = await signMessageAsync({ message });
-    loginUser({ message, signature, inviteCode });
+    await loginUser({ message, signature, inviteCode, referralCode });
   };
 
   useEffect(() => {

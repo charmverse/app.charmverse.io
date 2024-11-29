@@ -25,6 +25,7 @@ export function WarpcastLoginButton() {
   const { isAuthenticated } = useProfile();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
+  const referralCode = searchParams.get('ref');
   const inviteCode = searchParams.get('invite-code');
   const redirectUrl = redirectUrlEncoded ? decodeURIComponent(redirectUrlEncoded) : '/';
 
@@ -67,12 +68,18 @@ export function WarpcastLoginButton() {
   const onSuccessCallback = useCallback(
     async (res: StatusAPIResponse) => {
       if (res.message && res.signature) {
-        await loginUser({ message: res.message!, nonce: res.nonce, signature: res.signature, inviteCode });
+        await loginUser({
+          message: res.message!,
+          nonce: res.nonce,
+          signature: res.signature,
+          inviteCode,
+          referralCode
+        });
       } else {
         log.error('Did not receive message or signature from Farcaster', res);
       }
     },
-    [inviteCode]
+    [inviteCode, referralCode]
   );
 
   const onClick = useCallback(() => {
