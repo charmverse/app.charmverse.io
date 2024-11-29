@@ -43,18 +43,22 @@ export function PartnerRewardsCarousel() {
       }}
     >
       <Carousel
-        height={isDesktop ? 300 : 165}
+        height={isDesktop ? 300 : 125}
         slidesPerView={1}
-        renderBullet={(index, className) => `<img src="/images/crypto/${partnersLogo[index]}" class="${className}"/>`}
+        renderBullet={
+          isDesktop
+            ? (index, className) => `<img src="/images/crypto/${partnersLogo[index]}" class="${className}"/>`
+            : undefined
+        }
       >
         {['talent', 'celo', 'op-supersim', 'game7', 'lit'].map((partner) => (
           <Image
             src={`/images/promos/${partner}-promo-slide.png`}
             alt={partner}
             width={isDesktop ? 750 : 250}
-            height={isDesktop ? 250 : 150}
+            height={isDesktop ? 250 : 125}
             key={partner}
-            style={{ objectFit: 'scale-down', width: '100%' }}
+            style={{ objectFit: 'contain', width: '100%' }}
           />
         ))}
       </Carousel>

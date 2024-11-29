@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { LoadingTable } from 'components/common/Loading/LoadingTable';
 
+import { BuilderPageInviteCard } from './BuilderInviteCard/BuilderInviteCard';
 import { BuilderPageTable } from './BuilderPageTable/BuilderPageTable';
 import { PartnerRewardsCarousel } from './PartnerRewardsCarousel/PartnerRewardsCarousel';
 
@@ -19,11 +20,14 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
       <HeaderMessage />
       <Grid container spacing={1} height='calc(100vh - 100px)'>
         <Grid size={{ xs: 12, md: 7 }} sx={{ height: '100%', overflowX: 'hidden', px: 1, gap: 2 }}>
-          <Stack height={{ xs: 225, md: 350 }}>
+          <Stack height={{ xs: 175, md: 350 }}>
             <Typography variant='h5' color='secondary' textAlign='center' my={1}>
               Partner Rewards
             </Typography>
             <PartnerRewardsCarousel />
+          </Stack>
+          <Stack sx={{ display: { xs: 'block', md: 'none' } }}>
+            <BuilderPageInviteCard />
           </Stack>
           <Stack display={{ xs: 'none', md: 'block' }}>
             <Typography variant='h5' color='secondary' textAlign='center' my={1}>
@@ -41,6 +45,9 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
           </Stack>
         </Grid>
         <Grid size={5} sx={{ pr: 1, height: '100%', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}>
+          <Stack sx={{ display: { xs: 'none', md: 'block' } }}>
+            <BuilderPageInviteCard />
+          </Stack>
           <Stack>
             <Typography variant='h5' color='secondary' textAlign='center' my={1}>
               Recent Activity
