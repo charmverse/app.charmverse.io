@@ -77,7 +77,7 @@ export function ScoutPage({
               }
             }}
           >
-            <TodaysHotBuildersCarousel />
+            <TodaysHotBuildersCarousel showPromoCards />
           </Box>
           <Stack
             position='sticky'
