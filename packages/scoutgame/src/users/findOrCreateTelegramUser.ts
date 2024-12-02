@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { uuidFromNumber } from '@packages/utils/uuid';
 import type { WebAppInitData } from '@twa-dev/types/index';
 
@@ -34,6 +35,11 @@ export async function findOrCreateTelegramUser(
 
     if (users) {
       const [, referee] = users;
+
+      trackUserAction('referral_link_used', {
+        userId: user.id
+      });
+
       return { ...referee, isNew: true };
     }
   }

@@ -49,8 +49,8 @@ export const proposals = [
     evaluations: [
       {
         reviewers: [
-          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-          { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null }
+          { evaluationId: '1', roleId: null, userId: userProfile.id, systemRole: null },
+          { evaluationId: '1', roleId: null, userId: members[0].id, systemRole: null }
         ]
       }
     ]
@@ -59,9 +59,7 @@ export const proposals = [
     authors: [{ proposalId: '', userId: members[1].id }],
     evaluations: [
       {
-        reviewers: [
-          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-        ]
+        reviewers: [{ evaluationId: '1', roleId: null, userId: userProfile.id, systemRole: null }]
       }
     ],
     status: 'published'
@@ -70,9 +68,7 @@ export const proposals = [
     authors: [{ proposalId: '', userId: members[2].id }],
     evaluations: [
       {
-        reviewers: [
-          { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null }
-        ]
+        reviewers: [{ evaluationId: '1', roleId: null, userId: userProfile.id, systemRole: null }]
       }
     ],
     status: 'published'

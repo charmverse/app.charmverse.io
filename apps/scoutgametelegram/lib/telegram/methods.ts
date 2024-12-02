@@ -1,6 +1,5 @@
+import { TELEGRAM_BOT_TOKEN } from '@packages/scoutgame/constants';
 import { GET } from '@packages/utils/http';
-
-import { TELEGRAM_BOT_TOKEN } from './config';
 
 type Result<T = unknown> = { ok: boolean; result?: T; description?: string };
 

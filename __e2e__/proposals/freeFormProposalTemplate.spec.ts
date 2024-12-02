@@ -13,6 +13,7 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
+import { sleep } from 'zksync-web3/build/src/utils';
 
 import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
 
@@ -112,18 +113,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Configure reviewers for rubric evaluation
     await proposalPage.selectEvaluationReviewer('rubric', role.id);
 
-    await page.pause();
-
-    // Configure first rubric criteria added by default
     await Promise.all([
-      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria'), // let api update before continuing
-      proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title)
+      proposalPage.page.waitForResponse('**/api/proposals/**'), // let api update before continuing
+      proposalPage.editRubricCriteriaMaxScore.fill(firstRubricConfig.maxScore.toString())
     ]);
-    await proposalPage.editRubricCriteriaDescription.fill(firstRubricConfig.description);
-    await proposalPage.editRubricCriteriaMinScore.fill(firstRubricConfig.minScore.toString());
-    const updateProposalResponse = proposalPage.page.waitForResponse('**/api/proposals/**');
-    await proposalPage.editRubricCriteriaMaxScore.fill(firstRubricConfig.maxScore.toString());
-    await updateProposalResponse;
 
     // Configure vote settings
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
@@ -150,6 +143,22 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // Edit the proposal content
     await documentPage.typeText(templatePageContent.description);
+
+    // await proposalPage.page.reload();
+
+    // await Promise.all([proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria')]);
+
+    await proposalPage.editRubricCriteriaDescription.fill(firstRubricConfig.description);
+
+    await sleep(500);
+
+    await proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title);
+
+    await sleep(500);
+
+    await proposalPage.editRubricCriteriaMinScore.fill(firstRubricConfig.minScore.toString());
+
+    await proposalPage.page.reload();
 
     await proposalPage.publishNewProposalButton.isEnabled();
     await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
@@ -202,14 +211,14 @@ test.describe.serial('Create and use Proposal Template', async () => {
               ...savedProposalTemplate.proposal?.evaluations[0],
               // permissions: [] as any,
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: savedProposalTemplate.proposal?.evaluations[0].id,
                   id: savedProposalTemplate.proposal?.evaluations[0].reviewers[0].id,
                   proposalId: savedProposalTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'author',
                   userId: null
-                }
+                })
               ]
             }),
 
@@ -217,14 +226,14 @@ test.describe.serial('Create and use Proposal Template', async () => {
               ...savedProposalTemplate.proposal?.evaluations[1],
               // permissions: [] as any,
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: savedProposalTemplate.proposal?.evaluations[1].id,
                   id: savedProposalTemplate.proposal?.evaluations[1].reviewers[0].id,
                   proposalId: savedProposalTemplate.proposal?.id,
                   roleId: role.id,
                   systemRole: null,
                   userId: null
-                }
+                })
               ]
             }),
             expect.objectContaining({
@@ -244,14 +253,14 @@ test.describe.serial('Create and use Proposal Template', async () => {
               // We just want to save settings, but not create an actual vote
               vote: null,
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: savedProposalTemplate.proposal?.evaluations[2].id,
                   id: savedProposalTemplate.proposal?.evaluations[2].reviewers[0].id,
                   proposalId: savedProposalTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'space_member',
                   userId: null
-                }
+                })
               ]
             })
           ],
@@ -278,7 +287,14 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();
-    await proposalPage.documentTitleInput.fill(userProposalConfig.title);
+
+    await Promise.all([
+      proposalPage.page.waitForResponse('**/**'),
+      proposalPage.documentTitleInput.fill(userProposalConfig.title)
+    ]);
+
+    // In test env, needed to reload to get the latest data
+    await proposalPage.page.reload();
 
     await proposalPage.page.getByRole('button', { name: 'Rubric' }).click();
 
@@ -292,6 +308,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
 
     await expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
+
+    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
 
     await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
@@ -351,27 +369,27 @@ test.describe.serial('Create and use Proposal Template', async () => {
             {
               ...userProposalEvaluations?.[0],
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: userProposalEvaluations?.[0].id,
                   id: userProposalEvaluations?.[0].reviewers[0].id,
                   proposalId: savedUserProposalFromTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'author',
                   userId: null
-                }
+                })
               ]
             },
             {
               ...userProposalEvaluations?.[1],
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: userProposalEvaluations?.[1].id,
                   id: userProposalEvaluations?.[1].reviewers[0].id,
                   proposalId: savedUserProposalFromTemplate.proposal?.id,
                   roleId: role.id,
                   systemRole: null,
                   userId: null
-                }
+                })
               ]
             },
             {
@@ -390,14 +408,14 @@ test.describe.serial('Create and use Proposal Template', async () => {
               // We just want to save settings, but not create an actual vote
               vote: null,
               reviewers: [
-                {
+                expect.objectContaining({
                   evaluationId: savedUserProposalFromTemplate.proposal?.evaluations[2].id,
                   id: savedUserProposalFromTemplate.proposal?.evaluations[2].reviewers[0].id,
                   proposalId: savedUserProposalFromTemplate.proposal?.id,
                   roleId: null,
                   systemRole: 'space_member',
                   userId: null
-                }
+                })
               ]
             }
           ],

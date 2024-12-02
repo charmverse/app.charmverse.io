@@ -151,7 +151,12 @@ test.describe.serial('Proposal Evaluations', () => {
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
+
     await proposalPage.page.waitForResponse('**/evaluation');
+
+    await proposalPage.page.reload();
+
+    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
 
     await Promise.all([
       proposalPage.page.waitForResponse('**/api/proposals/**/publish'),
@@ -191,14 +196,14 @@ test.describe.serial('Proposal Evaluations', () => {
         proposalId: proposal.id,
         title: settingsToTest.evaluationFeedbackTitle,
         reviewers: [
-          {
+          expect.objectContaining({
             evaluationId: expect.any(String),
             id: expect.any(String),
             proposalId: proposal.id,
             roleId: null,
             userId: null,
             systemRole: 'author'
-          }
+          })
         ],
         permissions: expect.arrayContaining(
           proposalEvaluationPermissions[0].permissions.map((p) => expect.objectContaining(p))
@@ -241,14 +246,14 @@ test.describe.serial('Proposal Evaluations', () => {
 
     expect(proposal.evaluations[2]).toMatchObject({
       reviewers: [
-        {
+        expect.objectContaining({
           evaluationId: expect.any(String),
           id: expect.any(String),
           proposalId: proposal.id,
           roleId: role.id,
           userId: null,
           systemRole: null
-        }
+        })
       ],
       permissions: expect.arrayContaining(
         proposalEvaluationPermissions[2].permissions.map((p) => expect.objectContaining(p))
@@ -264,14 +269,14 @@ test.describe.serial('Proposal Evaluations', () => {
 
     expect(proposal.evaluations[3]).toMatchObject({
       reviewers: [
-        {
+        expect.objectContaining({
           evaluationId: expect.any(String),
           id: expect.any(String),
           proposalId: proposal.id,
           roleId: null,
           userId: null,
           systemRole: 'space_member'
-        }
+        })
       ],
       permissions: expect.arrayContaining(
         proposalEvaluationPermissions[3].permissions.map((p) => expect.objectContaining(p))

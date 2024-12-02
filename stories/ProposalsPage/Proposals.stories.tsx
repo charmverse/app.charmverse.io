@@ -146,8 +146,10 @@ ProposalInEvaluation.parameters = {
             evaluationId: '1'
           }
         ];
-        const rubricAnswers: PopulatedEvaluation['rubricAnswers'] = [
+        const rubricAnswers: Omit<PopulatedEvaluation['rubricAnswers'], 'createdAt' | 'updatedAt'> = [
           ...rubricCriteria.map((criteria) => ({
+            createdAt: new Date(),
+            updatedAt: new Date(),
             rubricCriteriaId: criteria.id,
             proposalId: criteria.proposalId,
             criteriaId: criteria.id,
@@ -157,6 +159,8 @@ ProposalInEvaluation.parameters = {
             evaluationId: criteria.evaluationId
           })),
           ...rubricCriteria.map((criteria) => ({
+            createdAt: new Date(),
+            updatedAt: new Date(),
             rubricCriteriaId: criteria.id,
             proposalId: criteria.proposalId,
             criteriaId: criteria.id,
@@ -188,9 +192,9 @@ ProposalInEvaluation.parameters = {
               rubricCriteria,
               rubricAnswers,
               reviewers: [
-                { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-                { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
-                { evaluationId: '1', id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
+                { evaluationId: '1', roleId: null, userId: userProfile.id, systemRole: null },
+                { evaluationId: '1', roleId: null, userId: members[0].id, systemRole: null },
+                { evaluationId: '1', roleId: null, userId: members[1].id, systemRole: null }
               ]
             }
           ]
