@@ -9,16 +9,16 @@ import { getConfig } from './wagmiConfig';
 
 function useMetamaskInterceptor() {
   useEffect(() => {
-    const handleLinkClick = (event: MouseEvent) => {
+    function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
       if (metamaskButton) {
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }
-    };
+    }
 
-    // true in the 3rd argument means capture phase
     if (isTouchDevice()) {
+      // passing true in the 3rd argument means listen in the capture phase
       document.addEventListener('click', handleLinkClick, true);
     }
 
@@ -29,6 +29,7 @@ function useMetamaskInterceptor() {
 
   return null;
 }
+
 function getMMDeeplink() {
   const currentUrl = window.location.host + getBrowserPath();
   const deeplink = `https://metamask.app.link/dapp/${currentUrl}`;
