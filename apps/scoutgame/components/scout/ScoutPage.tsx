@@ -55,6 +55,7 @@ export function ScoutPage({
           md: 'calc(100vh - 100px)',
           xs: 'calc(100vh - 160px)'
         }}
+        data-test='scout-page'
       >
         <Grid
           size={{ xs: 12, md: 7 }}

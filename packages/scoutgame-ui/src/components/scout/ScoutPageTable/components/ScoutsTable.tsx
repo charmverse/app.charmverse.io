@@ -40,7 +40,7 @@ export function ScoutsTable({ scouts, order, sort }: { scouts: ScoutInfo[]; orde
       aria-label='Top scouts table'
       size='small'
       sx={{ px: { md: 10 }, backgroundColor: 'background.paper' }}
-      data-test='top-scouts-table'
+      data-test='scouts-table'
     >
       <TableHead
         sx={{
