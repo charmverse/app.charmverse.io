@@ -220,6 +220,7 @@
     "@safe-global/safe-core-sdk-types": "^5.1.0",
     "@safe-global/safe-ethers-lib": "^1.9.4",
     "@safe-global/safe-service-client": "^2.0.3",
+    "@serwist/next": "^9.0.10",
     "@snapshot-labs/snapshot.js": "^0.4.60",
     "@socket.io/postgres-adapter": "^0.3.1",
     "@socket.io/redis-adapter": "^8.2.1",
