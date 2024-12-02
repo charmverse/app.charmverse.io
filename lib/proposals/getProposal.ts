@@ -13,6 +13,11 @@ type PermissionsMap = Awaited<
   ReturnType<typeof permissionsApiClient.proposals.computeAllProposalEvaluationPermissions>
 >;
 
+type WorkflowEvaluationWithTimestamps = WorkflowEvaluationJson & {
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export async function getProposal({
   id,
   permissionsByStep,
@@ -113,7 +118,7 @@ export async function getProposal({
     proposalEvaluationAppealReviews,
     workflow: workflow
       ? {
-          evaluations: workflow.evaluations as WorkflowEvaluationJson[]
+          evaluations: workflow.evaluations as any as WorkflowEvaluationJson[]
         }
       : null,
     proposal: { ...proposal, issuedCredentials: credentials },

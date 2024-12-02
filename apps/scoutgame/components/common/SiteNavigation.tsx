@@ -13,7 +13,8 @@ import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
 
-import { ClaimIcon } from './ClaimIcon';
+import { ClaimIcon } from './Icons/ClaimIcon';
+import { FriendsIcon } from './Icons/FriendsIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -97,6 +98,13 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
             onClick={(e) => openAuthModal?.(e, 'profile')}
           />
         ) : null}
+        <BottomNavigationAction
+          label='Friends'
+          href='/friends'
+          value='friends'
+          icon={<FriendsIcon active />}
+          LinkComponent={Link}
+        />
       </StyledBottomNavigation>
       <SignInModalMessage
         open={authPopup.open}
@@ -120,6 +128,8 @@ function getActiveButton(pathname: string) {
     return 'info';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
+  } else if (pathname.startsWith('/friends')) {
+    return 'friends';
   }
   return null;
 }

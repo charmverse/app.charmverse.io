@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { getENSDetails, getENSName } from '@packages/blockchain/getENSName';
 import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUsersByAddresses';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
+import { updateReferralUsers } from '@packages/scoutgame/referrals/updateReferralUsers';
 import { findOrCreateUser } from '@packages/scoutgame/users/findOrCreateUser';
 import type { FindOrCreateUserResult } from '@packages/scoutgame/users/findOrCreateUser';
 import { generateRandomName } from '@packages/scoutgame/users/generateRandomName';
@@ -9,10 +11,12 @@ import { getAddress } from 'viem';
 
 export async function findOrCreateWalletUser({
   wallet,
-  newUserId
+  newUserId,
+  referralCode
 }: {
   wallet: string;
   newUserId?: string;
+  referralCode?: string | null;
 }): Promise<FindOrCreateUserResult> {
   const ens = await getENSName(wallet).catch((error) => {
     log.warn('Could not retrieve ENS while creating a user', { error, wallet });
@@ -35,7 +39,7 @@ export async function findOrCreateWalletUser({
     log.warn('Could not retrieve Farcaster user', { error, wallet });
   }
 
-  return findOrCreateUser({
+  const user = await findOrCreateUser({
     newUserId,
     walletENS: ens || undefined,
     avatar: ensDetails?.avatar || undefined,
@@ -45,4 +49,24 @@ export async function findOrCreateWalletUser({
     farcasterName,
     farcasterId
   });
+
+  if (user?.isNew && referralCode) {
+    const users = await updateReferralUsers(referralCode, user.id).catch((error) => {
+      // There can be a case where the referrer is not found. Maybe someone will try to guess referral codes to get rewards.
+      log.warn('Error creating referral event.', { error, startParam: referralCode, referrerId: user.id });
+      return null;
+    });
+
+    if (users) {
+      const [, referee] = users;
+
+      trackUserAction('referral_link_used', {
+        userId: user.id
+      });
+
+      return { ...referee, isNew: true };
+    }
+  }
+
+  return user;
 }

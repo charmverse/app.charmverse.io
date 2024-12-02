@@ -1,8 +1,8 @@
+import { getSession } from '@packages/scoutgame/session/getSession';
 import { getFriends } from '@packages/scoutgame/users/getFriends';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { FriendsPage } from 'components/friends/FriendsPage';
-import { getSession } from 'lib/session/getSession';
 
 export default async function Friends() {
   const session = await getSession();

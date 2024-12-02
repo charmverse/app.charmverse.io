@@ -7,7 +7,7 @@ export function Stats({ friends }: { friends: SessionUser[] }) {
   const pointsEarned = friends.length * rewardPoints;
 
   return (
-    <Stack flexDirection='row' justifyContent='space-between' px={4}>
+    <Stack flexDirection='row' justifyContent='space-between' px={4} width='100%'>
       <Box>
         <Typography textAlign='center' variant='body2' mb={1} fontWeight={600}>
           FRIENDS JOINED
