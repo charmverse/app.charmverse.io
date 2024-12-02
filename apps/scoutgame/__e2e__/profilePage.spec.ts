@@ -3,7 +3,7 @@ import { mockBuilder } from '@packages/scoutgame/testing/database';
 import { expect, test } from './test';
 
 test.describe('Profile page', () => {
-  test('Should redirect non-logged in users to login page', async ({ page, loginPage }) => {
+  test('Should redirect non-logged in users to login page', async ({ page }) => {
     await page.goto('/profile');
 
     await page.waitForURL('**/login');
@@ -11,14 +11,14 @@ test.describe('Profile page', () => {
     await expect(container).toBeVisible();
   });
 
-  test('An onboarded user can access the profile page', async ({ page, profilePage, utils }) => {
+  test('An onboarded user can access the profile page', async ({ page, utils }) => {
     const builder = await mockBuilder({
       agreedToTermsAt: new Date(),
       onboardedAt: new Date()
     });
     await utils.loginAsUserId(builder.id);
 
-    await page.goto('/home');
+    await page.goto('/scout');
     const link = page.locator(`data-test=site-navigation >> [href*="/profile"]`).first();
     await link.click();
 
