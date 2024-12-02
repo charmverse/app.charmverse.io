@@ -12,6 +12,7 @@ import type { ReactNode } from 'react';
 
 import theme from '../theme/theme';
 
+import { LinkInterceptor } from './LinkInterceptor';
 import { SWRProvider } from './SwrProvider';
 import { WagmiProvider } from './WagmiProvider';
 
@@ -26,6 +27,7 @@ export function AppProviders({ children, user }: { children: ReactNode; user: Se
         <ThemeProvider theme={theme}>
           <CssBaseline enableColorScheme />
           <SWRProvider>
+            <LinkInterceptor />
             <UserProvider userSession={user}>
               <SnackbarProvider>
                 <PurchaseProvider>{children}</PurchaseProvider>
