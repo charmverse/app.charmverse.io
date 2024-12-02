@@ -28,7 +28,7 @@ export function WalletLogin() {
 
 function WalletLoginButton() {
   const [isConnecting, setIsConnecting] = useState(false);
-  const { openConnectModal } = useConnectModal();
+  const { openConnectModal, connectModalOpen } = useConnectModal();
   const { address, chainId, isConnected } = useAccount();
   const searchParams = useSearchParams();
   const redirectUrlEncoded = searchParams.get('redirectUrl');
@@ -83,6 +83,11 @@ function WalletLoginButton() {
     await loginUser({ message, signature, inviteCode, referralCode });
   };
 
+  function onClick() {
+    openConnectModal!();
+    setIsConnecting(true);
+  }
+
   useEffect(() => {
     if (address && isConnected && isConnecting) {
       handleWalletConnect(address).finally(() => {
@@ -90,6 +95,13 @@ function WalletLoginButton() {
       });
     }
   }, [address, isConnected, isConnecting]);
+
+  // If rainbowkit modal was closed by user
+  useEffect(() => {
+    if (!connectModalOpen && isConnecting && !address) {
+      setIsConnecting(false);
+    }
+  }, [connectModalOpen, address, isConnecting]);
 
   const isLoading = isConnecting || isLoggingIn;
 
@@ -104,6 +116,7 @@ function WalletLoginButton() {
         loading={isLoading}
         size='large'
         variant='contained'
+        onClick={onClick}
         sx={{
           '& .MuiLoadingButton-label': {
             width: '100%'
@@ -115,14 +128,7 @@ function WalletLoginButton() {
       >
         <Stack direction='row' alignItems='center' gap={1} justifyContent='flex-start' width='100%'>
           <AccountBalanceWalletOutlinedIcon />
-          <Typography
-            fontWeight={600}
-            color='white'
-            onClick={() => {
-              openConnectModal?.();
-              setIsConnecting(true);
-            }}
-          >
+          <Typography fontWeight={600} color='white'>
             {isLoading ? '' : 'Sign in with wallet'}
           </Typography>
         </Stack>
