@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
+import { useTrackEvent } from '@packages/scoutgame-ui/hooks/useTrackEvent';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -9,6 +10,7 @@ import { LuCopy } from 'react-icons/lu';
 export function InviteButtons() {
   const { user } = useUser();
   const [copied, setCopied] = useState('');
+  const trackEvent = useTrackEvent();
   const referral = user?.referralCode;
   const url = `https://scoutgame.xyz/login?ref=${referral}`;
   const encodedUrl = encodeURIComponent(url);
@@ -20,6 +22,7 @@ export function InviteButtons() {
     try {
       await navigator.clipboard.writeText(url);
       setCopied('Copied!');
+      trackEvent('copy_referral_link');
     } catch (_) {
       setCopied('You need to give access to copy the link');
     }

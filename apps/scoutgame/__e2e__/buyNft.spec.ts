@@ -53,10 +53,12 @@ test.describe('Buy Nft', () => {
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();
+    await expect(scoutButton).toBeVisible();
     await scoutButton.click();
 
     // NFT buy button
     const buyButton = page.locator('data-test=purchase-button').first();
+    await expect(buyButton).toBeVisible();
     await buyButton.click();
 
     // Success view after purchase
@@ -124,6 +126,7 @@ test.describe('Buy Nft', () => {
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();
+    await expect(scoutButton).toBeVisible();
     await scoutButton.click();
 
     // NFT buy button
