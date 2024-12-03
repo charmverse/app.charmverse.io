@@ -90,9 +90,9 @@ function WalletLoginButton() {
 
   useEffect(() => {
     if (address && isConnected && isConnecting) {
-      handleWalletConnect(address).finally(() => {
-        setIsConnecting(false);
-      });
+      // handleWalletConnect(address).finally(() => {
+      //   setIsConnecting(false);
+      // });
     }
   }, [address, isConnected, isConnecting]);
 
