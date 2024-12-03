@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { generateRandomName } from '@packages/scoutgame/users/generateRandomName';
 import { generateUserPath } from '@packages/scoutgame/users/generateUserPath';
 import { uuidFromNumber } from '@packages/utils/uuid';
@@ -58,6 +59,11 @@ export async function findOrCreateFarcasterUser({
 
     if (users) {
       const [, referee] = users;
+
+      trackUserAction('referral_link_used', {
+        userId: user.id
+      });
+
       return { ...referee, isNew: true };
     }
   }

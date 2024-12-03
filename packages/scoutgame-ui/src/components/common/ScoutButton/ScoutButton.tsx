@@ -27,7 +27,7 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
   const [dialogLoadingStatus, setDialogLoadingStatus] = useState<boolean>(false);
-  const { user } = useUser();
+  const { user, isLoading } = useUser();
   const isAuthenticated = Boolean(user?.id);
 
   const purchaseCostInPoints = convertCostToPoints(builder?.price || BigInt(0));
@@ -59,7 +59,7 @@ export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] 
           onClick={handleClick}
           // @ts-ignore
           variant='buy'
-          data-test='scout-button'
+          data-test={isLoading ? '' : 'scout-button'}
         >
           {purchaseCostInPoints}
           <Image

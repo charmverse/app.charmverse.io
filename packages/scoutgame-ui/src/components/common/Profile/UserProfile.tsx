@@ -9,6 +9,7 @@ import type { AvatarSize } from '../Avatar';
 import { Avatar } from '../Avatar';
 
 import { ProfileLinks } from './ProfileLinks';
+import { ShareProfile } from './ShareProfile';
 
 // Use a unique type since sometimes this prop comes from the session user, but sometimes it comes from the builder queries
 type UserProfileData = Pick<Scout, 'id' | 'path'> & {
@@ -58,14 +59,27 @@ export function UserProfile({ user, avatarSize = 'xLarge' }: UserProfileProps) {
         </Stack>
       ) : null}
       <Stack width='100%'>
-        <Stack direction='row' width='100%' alignItems='center' flexWrap='wrap' gap={1}>
-          <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
-          <ProfileLinks
-            farcasterName={farcasterName}
-            githubLogin={githubLogin}
-            talentProfile={user.talentProfile}
-            hasMoxieProfile={user.hasMoxieProfile}
-          />
+        <Stack direction='row' width='100%' alignItems='center' justifyContent='space-between'>
+          <Stack
+            direction='row'
+            gap={1}
+            alignItems='center'
+            flexWrap='wrap'
+            rowGap={{
+              xs: 0,
+              md: 1
+            }}
+          >
+            <Typography variant={isDesktop ? 'h5' : 'h6'}>{displayName}</Typography>
+            <ProfileLinks
+              farcasterName={farcasterName}
+              githubLogin={githubLogin}
+              talentProfile={user.talentProfile}
+              hasMoxieProfile={user.hasMoxieProfile}
+            />
+            {!isDesktop ? <ShareProfile userPath={user.path} /> : null}
+          </Stack>
+          {isDesktop ? <ShareProfile userPath={user.path} /> : null}
         </Stack>
         <Typography
           variant={isDesktop ? 'body2' : 'caption'}

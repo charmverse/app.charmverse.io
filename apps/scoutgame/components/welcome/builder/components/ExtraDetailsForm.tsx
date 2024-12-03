@@ -107,6 +107,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
               avatarSize={75}
               isLoading={isExecuting}
               control={control}
+              hideShareProfile
             />
             <FormLabel id='form-email' required>
               Email

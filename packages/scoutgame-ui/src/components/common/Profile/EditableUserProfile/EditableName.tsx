@@ -8,6 +8,7 @@ import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
 import { ProfileLinks } from '../ProfileLinks';
+import { ShareProfile } from '../ShareProfile';
 
 type EditableDisplayNameProps = {
   displayName: string;
@@ -18,6 +19,8 @@ type EditableDisplayNameProps = {
   farcasterName?: string | null;
   hasMoxieProfile?: boolean;
   talentProfile?: TalentProfile;
+  userPath: string;
+  hideShareProfile?: boolean;
 };
 
 export function EditableName({
@@ -28,7 +31,9 @@ export function EditableName({
   githubLogin,
   farcasterName,
   hasMoxieProfile,
-  talentProfile
+  talentProfile,
+  userPath,
+  hideShareProfile
 }: EditableDisplayNameProps) {
   const {
     field: displayNameField,
@@ -101,6 +106,7 @@ export function EditableName({
                 talentProfile={talentProfile}
               />
             ) : null}
+            {!hideShareProfile ? <ShareProfile userPath={userPath} /> : null}
           </Stack>
         )}
       </Stack>
