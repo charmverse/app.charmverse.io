@@ -3,7 +3,8 @@
 import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
+import type { SwiperProps } from 'swiper/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 import { useMdScreen } from '../../../hooks/useMediaScreens';
@@ -17,14 +18,12 @@ import 'swiper/css/pagination';
 
 export type CarouselProps = {
   children: React.ReactNode[];
-  slidesPerView: number;
   renderBullet?: (index: number, className: string) => string;
-  height?: number;
-  autoplay?: boolean;
-  boxProps?: BoxProps;
-};
+  slidesPerView?: number;
+  boxProps?: Partial<BoxProps>;
+} & Partial<SwiperProps>;
 
-export function Carousel({ children, renderBullet, slidesPerView, height, autoplay = true, boxProps }: CarouselProps) {
+export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: CarouselProps) {
   const isDesktop = useMdScreen();
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
@@ -38,46 +37,46 @@ export function Carousel({ children, renderBullet, slidesPerView, height, autopl
   }
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center' height='100%' {...boxProps}>
-      <Box width={isDesktop ? '95%' : '100%'} px={isDesktop ? 4 : 0} position='relative' height='100%'>
-        <Swiper
-          autoplay={
-            autoplay
-              ? {
-                  delay: 3000,
-                  pauseOnMouseEnter: true
-                }
-              : undefined
-          }
-          loop
-          style={{ height }}
-          className='swiper'
-          slidesPerView={slidesPerView}
-          modules={[Navigation, Autoplay, ...(renderBullet ? [Pagination] : [])]}
-          navigation={{
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev'
-          }}
-          pagination={
-            renderBullet
-              ? {
-                  clickable: true,
-                  renderBullet
-                }
-              : undefined
-          }
-        >
-          {children.map((child, index) => (
-            <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
-          ))}
-        </Swiper>
-        {isDesktop && children.length > slidesPerView && (
-          <>
-            <NextArrow className='swiper-button-next' />
-            <PrevArrow className='swiper-button-prev' />
-          </>
-        )}
-      </Box>
+    <Box
+      width='90svw'
+      display='flex'
+      alignItems='center'
+      justifyContent='center'
+      mb={2}
+      mx='auto'
+      px={{ md: 4 }}
+      position='relative'
+      {...boxProps}
+    >
+      <Swiper
+        autoplay={
+          swiperProps.autoplay
+            ? {
+                delay: 3000,
+                pauseOnMouseEnter: true
+              }
+            : undefined
+        }
+        loop
+        className='swiper'
+        autoHeight={true}
+        modules={[Navigation, Autoplay]}
+        navigation={{
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev'
+        }}
+        {...swiperProps}
+      >
+        {children.map((child, index) => (
+          <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
+        ))}
+      </Swiper>
+      {isDesktop && swiperProps.slidesPerView && children.length > swiperProps.slidesPerView && (
+        <>
+          <NextArrow className='swiper-button-next' />
+          <PrevArrow className='swiper-button-prev' />
+        </>
+      )}
     </Box>
   );
 }
