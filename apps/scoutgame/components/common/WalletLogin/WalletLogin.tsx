@@ -6,6 +6,7 @@ import { LoadingButton } from '@mui/lab';
 import { Box, Stack, Typography } from '@mui/material';
 import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
+import { isWebView } from '@packages/utils/browser';
 import { useConnectModal, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
@@ -27,6 +28,7 @@ export function WalletLogin() {
 }
 
 function WalletLoginButton() {
+  const [platform, setPlatform] = useState<{ isWebView: boolean; ua: string; platform: string } | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const { openConnectModal, connectModalOpen } = useConnectModal();
   const { address, chainId, isConnected } = useAccount();
@@ -47,6 +49,13 @@ function WalletLoginButton() {
 
   const { executeAsync: revalidatePath } = useAction(revalidatePathAction);
 
+  useEffect(() => {
+    setPlatform({
+      platform: navigator.platform,
+      isWebView: isWebView(navigator.userAgent),
+      ua: navigator.userAgent
+    });
+  }, []);
   const {
     executeAsync: loginUser,
     result,
@@ -113,6 +122,15 @@ function WalletLoginButton() {
         </Typography>
       )}
       {address}
+      <br />
+      {platform?.platform}
+      <br />
+      {platform?.ua}
+      <br />
+      {platform?.isWebView ? 'true' : 'false'}
+      <br />
+
+      {isWebView(navigator.userAgent)}
       <LoadingButton
         loading={isLoading}
         size='large'
