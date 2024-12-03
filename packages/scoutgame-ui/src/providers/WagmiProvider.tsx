@@ -36,8 +36,8 @@ function getMMDeeplink() {
   const currentUrl = window.location.host + getBrowserPath();
   // use a custom scheme to avoid redirect to the app store
   // this breaks if user does not have metamask installed but its a decent tradeoff
-  const deeplink = `metamask://dapp/${currentUrl}`;
-
+  const deeplink = `dapp://${currentUrl}`;
+  // https://metamask.app.link/dapp/${currentUrl}
   return deeplink;
 }
 
