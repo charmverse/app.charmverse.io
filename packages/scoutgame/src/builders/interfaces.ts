@@ -23,6 +23,7 @@ export type BuilderMetrics = {
 export type BuilderInfo = BasicUserInfo &
   BuilderMetrics & {
     builderStatus: BuilderStatus;
+    farcasterId?: number | null;
     nftImageUrl?: string | null;
     nftsSoldToScout?: number;
   };

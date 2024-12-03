@@ -1,3 +1,6 @@
+import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterpackBuilders';
+import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
+
 import { ScoutPage } from 'components/scout/ScoutPage';
 
 export default async function Scout({
@@ -13,6 +16,8 @@ export default async function Scout({
   const buildersLayout = (searchParams.buildersLayout as string) || 'table';
   const tab = (searchParams.tab as string) || 'scouts';
 
+  const [_, builders] = await safeAwaitSSRData(getStarterpackBuilders());
+
   return (
     <ScoutPage
       scoutSort={scoutSort}
@@ -22,6 +27,7 @@ export default async function Scout({
       scoutTab={scoutTab}
       buildersLayout={buildersLayout}
       tab={tab}
+      starterpackBuilders={builders ?? []}
     />
   );
 }

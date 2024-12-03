@@ -8,6 +8,7 @@ export type TopBuilderInfo = {
   id: string;
   displayName: string;
   path: string;
+  bio?: string | null;
   avatar: string | null;
   seasonPoints: number;
   builderStatus: BuilderStatus;
@@ -39,6 +40,7 @@ export async function getTopBuilders({
           id: true,
           builderStatus: true,
           path: true,
+          bio: true,
           displayName: true,
           avatar: true,
           userAllTimeStats: {
@@ -81,6 +83,7 @@ export async function getTopBuilders({
         path: path!,
         displayName,
         avatar,
+        bio: user.bio,
         nftImageUrl: nft.imageUrl,
         seasonPoints: pointsEarnedAsBuilder,
         allTimePoints: builder.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,

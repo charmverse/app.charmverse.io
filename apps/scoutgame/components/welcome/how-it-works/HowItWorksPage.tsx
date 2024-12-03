@@ -8,7 +8,7 @@ export function HowItWorksPage() {
   return (
     <SinglePageLayout>
       <InfoBackgroundImage />
-      <SinglePageWrapper bgcolor='background.default'>
+      <SinglePageWrapper bgcolor='background.default' height='initial'>
         <HowItWorksContent />
       </SinglePageWrapper>
     </SinglePageLayout>

@@ -41,11 +41,11 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
       // update the user object with the new terms of service agreement
       await refreshUser();
       // If builder already has a status, show the spam policy page
-      // Otherwise show the github connection page
+      // Otherwise show the scout info page
       if (user.builderStatus) {
         router.push('/welcome/spam-policy');
       } else {
-        router.push('/welcome/builder');
+        router.push('/welcome/scout-info');
       }
     },
     onError(err) {

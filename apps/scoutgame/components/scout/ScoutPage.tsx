@@ -4,6 +4,7 @@ import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
+import { ScoutBuilderCarousel } from '@packages/scoutgame-ui/components/scout/ScoutBuilderCarousel';
 import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPageTable/ScoutPageTable';
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import { isTruthy } from '@packages/utils/types';
@@ -66,6 +67,12 @@ export function ScoutPage({
             gap: 2
           }}
         >
+          <Stack gap={2} my={2}>
+            <Typography variant='h4' color='secondary' fontWeight={600} textAlign='center'>
+              Scout your Starter Pack
+            </Typography>
+            <ScoutBuilderCarousel builders={[]} />
+          </Stack>
           <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
             Scout today's HOT Builders!
           </Typography>
