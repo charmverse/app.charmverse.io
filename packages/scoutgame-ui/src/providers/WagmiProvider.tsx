@@ -1,5 +1,6 @@
 'use client';
 
+import { log } from '@charmverse/core/log';
 import { getBrowserPath, isTouchDevice, isWebView } from '@packages/utils/browser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
@@ -12,6 +13,7 @@ function useMetamaskInterceptor() {
     function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
       if (metamaskButton && !isWebView(navigator.platform)) {
+        log.debug('Send user to Metamask', { platform: navigator.platform });
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }
@@ -32,7 +34,9 @@ function useMetamaskInterceptor() {
 
 function getMMDeeplink() {
   const currentUrl = window.location.host + getBrowserPath();
-  const deeplink = `https://metamask.app.link/dapp/${currentUrl}`;
+  // the "\" is important to open the app on Android
+  // source: https://github.com/MetaMask/metamask-mobile/issues/3855
+  const deeplink = `https://metamask.app.link/dapp/${currentUrl}\\`;
 
   return deeplink;
 }

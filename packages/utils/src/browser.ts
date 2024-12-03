@@ -55,7 +55,7 @@ export function setCookie({
 
 // decode the path to handle special characters
 export function getBrowserPath() {
-  return decodeURIComponent(window.location.pathname + window.location.search);
+  return decodeURIComponent(window.location.pathname + window.location.search || '');
 }
 
 /** Based on https://developer.mozilla.org/docs/Web/HTTP/Browser_detection_using_the_user_agent */
