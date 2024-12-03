@@ -36,6 +36,7 @@ type UserProfileProps = {
   onDisplayNameChange?: (displayName: string) => void;
   isLoading?: boolean;
   onBioChange?: (bio: string) => void;
+  hideShareProfile?: boolean;
 };
 
 export function EditableUserProfile({
@@ -45,7 +46,8 @@ export function EditableUserProfile({
   onDisplayNameChange,
   isLoading,
   onBioChange,
-  avatarSize = 100
+  avatarSize = 100,
+  hideShareProfile
 }: UserProfileProps) {
   const isDesktop = useMdScreen();
   const isMounted = useIsMounted();
@@ -78,6 +80,7 @@ export function EditableUserProfile({
           talentProfile={user.talentProfile}
           hasMoxieProfile={user.hasMoxieProfile}
           userPath={user.path}
+          hideShareProfile={hideShareProfile}
         />
         <EditableBio bio={user.bio} onBioChange={onBioChange} control={control} isDesktop={isDesktop} />
       </Stack>
