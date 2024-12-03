@@ -34,7 +34,7 @@ test.describe('Info page', () => {
 });
 
 test.describe('Info page partners', () => {
-  test('Open Optimism from the home page', async ({ page, homePage, infoPage, utils }) => {
+  test('Open Optimism from the scout page', async ({ page, scoutPage, infoPage, utils }) => {
     const newUser = await mockScout({
       onboardedAt: new Date(),
       agreedToTermsAt: new Date(),
@@ -42,12 +42,12 @@ test.describe('Info page partners', () => {
     });
     await utils.loginAsUserId(newUser.id);
 
-    await page.goto('/home');
-    await homePage.optimismPromoCard.click();
+    await page.goto('/scout');
+    await scoutPage.optimismPromoCard.click();
 
     await expect(infoPage.optimismContainer).toBeVisible();
   });
-  test('Open Moxie from the home page', async ({ page, homePage, infoPage, utils }) => {
+  test('Open Moxie from the scout page', async ({ page, scoutPage, infoPage, utils }) => {
     const newUser = await mockScout({
       onboardedAt: new Date(),
       agreedToTermsAt: new Date(),
@@ -55,8 +55,8 @@ test.describe('Info page partners', () => {
     });
     await utils.loginAsUserId(newUser.id);
 
-    await page.goto('/home');
-    await homePage.moxiePromoCard.click();
+    await page.goto('/scout');
+    await scoutPage.moxiePromoCard.click();
 
     await expect(infoPage.moxieContainer).toBeVisible();
   });

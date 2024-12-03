@@ -12,9 +12,10 @@ type TabsMenuProps = {
   value: string;
   tabs: TabItem[];
   sx?: SxProps;
+  queryKey?: string;
 };
 
-export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
+export function TabsMenu({ value, tabs, sx, queryKey = 'tab' }: TabsMenuProps) {
   const tabValue = tabs.some((t) => t.value === value) ? value : false;
   return (
     <Box sx={sx}>
@@ -60,7 +61,7 @@ export function TabsMenu({ value, tabs, sx }: TabsMenuProps) {
               </Badge>
             }
             href={{
-              query: { tab: tab.value }
+              query: { [queryKey]: tab.value }
             }}
             value={tab.value}
             scroll={false}

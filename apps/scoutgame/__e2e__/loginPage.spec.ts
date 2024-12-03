@@ -3,11 +3,11 @@ import { mockBuilder } from '@packages/scoutgame/testing/database';
 import { expect, test } from './test';
 
 test.describe('Login page', () => {
-  test('Should redirect logged-in users to home page', async ({ homePage, utils, page }) => {
+  test('Should redirect logged-in users to scout page', async ({ scoutPage, homePage, utils, page }) => {
     const builder = await mockBuilder({});
 
     await page.goto('/');
-    await page.waitForURL('**/home');
+    await page.waitForURL('**/');
     await expect(homePage.getStartedButton).toBeVisible();
 
     await homePage.getStartedButton.click();
@@ -22,9 +22,9 @@ test.describe('Login page', () => {
 
     await utils.loginAsUserId(builder.id);
 
-    await page.goto('/home');
-    await page.waitForURL('**/home');
-    await expect(homePage.container).toBeVisible();
+    await page.goto('/scout');
+    await page.waitForURL('**/scout');
+    await expect(scoutPage.container).toBeVisible();
 
     const userPill = page.locator('data-test=user-menu-pill');
     await expect(userPill).toBeVisible();

@@ -24,7 +24,7 @@ export async function generateBuilder({ index }: { index: number }) {
         firstName
       })
     : undefined;
-  const avatar = faker.image.url();
+  const avatar = `https://avatars.githubusercontent.com/u/${faker.number.int({ min: 1, max: 250000 })}`;
   const currentBuilderCount = index + 1;
 
   const githubUser = {
@@ -39,9 +39,8 @@ export async function generateBuilder({ index }: { index: number }) {
 
   let builderNft: undefined | Prisma.BuilderNftCreateWithoutBuilderInput;
   if (builderStatus === 'approved') {
-    const imageUrl = faker.datatype.boolean() ? avatar : faker.image.url();
     const nftImageBuffer = await generateNftImage({
-      avatar: imageUrl,
+      avatar,
       displayName
     });
 

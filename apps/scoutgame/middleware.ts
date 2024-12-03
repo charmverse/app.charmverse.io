@@ -11,10 +11,6 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const response = NextResponse.next(); // Create a response object to set cookies
 
-  // We don't have a '/' page anymore since we need to handle 2 different layouts
-  if (path === '/') {
-    return NextResponse.redirect(new URL('/home', request.url));
-  }
   // Redirect to login if anonymous user clicks on private links
   if (!isLoggedIn && privateLinks.some((link) => path.startsWith(link))) {
     // eslint-disable-next-line no-console
@@ -23,10 +19,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect to home if logged in user clicks on login
-  if (isLoggedIn && path === '/login') {
+  if (isLoggedIn && (path === '/login' || path === '/')) {
     // eslint-disable-next-line no-console
     console.log('Redirecting to home page', session);
-    return NextResponse.redirect(new URL('/home', request.url));
+    return NextResponse.redirect(new URL('/scout', request.url));
   }
 
   return response;

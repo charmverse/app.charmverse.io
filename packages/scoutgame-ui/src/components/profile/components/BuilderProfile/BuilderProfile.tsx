@@ -51,7 +51,6 @@ export async function BuilderProfile({
       <Stack gap={2} alignItems='center'>
         <Typography>Connect your GitHub account to apply as a Builder.</Typography>
         <Suspense>
-          {/* TODO: Re-enable this once we have a way to connect GitHub accounts */}
           <JoinGithubButton />
         </Suspense>
       </Stack>

@@ -8,19 +8,17 @@ import { LoadingCards } from '@packages/scoutgame-ui/components/common/Loading/L
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-import type { BuildersSort, CompositeCursor } from 'lib/builders/getSortedBuilders';
-import { getSortedBuildersAction } from 'lib/builders/getSortedBuildersAction';
+import type { CompositeCursor } from 'lib/builders/getPaginatedBuilders';
+import { getPaginatedBuildersAction } from 'lib/builders/getPaginatedBuildersAction';
 
 export function BuildersGalleryContainer({
   initialBuilders,
   showHotIcon,
-  sort,
   initialCursor
 }: {
   initialCursor: CompositeCursor | null;
   initialBuilders: BuilderInfo[];
   showHotIcon: boolean;
-  sort: BuildersSort;
 }) {
   const [error, setError] = useState<string | null>(null);
   const isDesktop = useMdScreen();
@@ -34,7 +32,7 @@ export function BuildersGalleryContainer({
 
     setIsLoading(true);
     try {
-      const actionResponse = await getSortedBuildersAction({ sort, cursor: nextCursor });
+      const actionResponse = await getPaginatedBuildersAction({ cursor: nextCursor });
       if (actionResponse?.data) {
         const { builders: newBuilders, nextCursor: newCursor } = actionResponse.data;
         setBuilders((prev) => [...prev, ...newBuilders]);
@@ -43,7 +41,6 @@ export function BuildersGalleryContainer({
         setError(actionResponse.serverError.message);
         log.warn('Error fetching more builders', {
           error: actionResponse.serverError,
-          sort,
           cursor: nextCursor
         });
       }
@@ -52,7 +49,7 @@ export function BuildersGalleryContainer({
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, nextCursor, sort]);
+  }, [isLoading, nextCursor]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -79,12 +76,7 @@ export function BuildersGalleryContainer({
 
   return (
     <>
-      <BuildersGallery
-        builders={builders}
-        showHotIcon={showHotIcon}
-        size={isDesktop ? 'medium' : 'small'}
-        columns={5}
-      />
+      <BuildersGallery builders={builders} showHotIcon={showHotIcon} size={isDesktop ? 'large' : 'small'} columns={3} />
       {nextCursor && <div ref={observerTarget} style={{ height: '20px', width: '100%' }} />}
       {isLoading && (
         <Box my={2}>
