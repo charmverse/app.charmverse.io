@@ -12,8 +12,8 @@ function useMetamaskInterceptor() {
   useEffect(() => {
     function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
-      if (metamaskButton && !isWebView(navigator.platform)) {
-        log.debug('Send user to Metamask', { platform: navigator.platform });
+      if (metamaskButton && !isWebView(navigator.userAgent)) {
+        log.debug('Send user to Metamask', { ua: navigator.userAgent, platform: navigator.platform });
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }
@@ -34,9 +34,7 @@ function useMetamaskInterceptor() {
 
 function getMMDeeplink() {
   const currentUrl = window.location.host + getBrowserPath();
-  // the "\" is important to open the app on Android
-  // source: https://github.com/MetaMask/metamask-mobile/issues/3855
-  const deeplink = `https://metamask.app.link/dapp/${currentUrl}\\`;
+  const deeplink = `https://metamask.app.link/dapp/${currentUrl}`;
 
   return deeplink;
 }
