@@ -1,4 +1,4 @@
-import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterpackBuilders';
+import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
 import { ScoutPage } from 'components/scout/ScoutPage';

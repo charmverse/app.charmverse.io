@@ -42,6 +42,7 @@ export async function getBuildersByFid({
             season
           },
           select: {
+            contractAddress: true,
             imageUrl: true,
             currentPrice: true,
             nftSoldEvents: {
@@ -93,7 +94,8 @@ export async function getBuildersByFid({
         farcasterId: scout.farcasterId,
         last7DaysGems: ((scout.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
           .map((gem) => gem.gemsCount)
-          .slice(-7)
+          .slice(-7),
+        contractAddress: scout.builderNfts[0]?.contractAddress || ''
       }));
     });
 

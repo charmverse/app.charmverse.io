@@ -9,7 +9,7 @@ import 'swiper/css/autoplay';
 
 export function ScoutBuilderCarousel({ builders }: { builders: BuilderInfo[] }) {
   return (
-    <Carousel slidesPerView={1} autoplay={false} boxProps={{ width: { md: '70svw' } }}>
+    <Carousel slidesPerView={3} autoplay={false} boxProps={{ width: { md: '70svw' } }}>
       {builders.map((builder) => (
         <Stack key={builder.id} flexDirection={{ md: 'row' }} component={Paper} gap={2} p={{ xs: 2, md: 4 }}>
           <Box>

@@ -47,6 +47,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           season: currentSeason
         },
         select: {
+          contractAddress: true,
           imageUrl: true,
           currentPrice: true
         }
@@ -85,7 +86,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       price: builder.builderNfts[0]?.currentPrice ?? 0,
       last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
         .map((gem) => gem.gemsCount)
-        .slice(-7)
+        .slice(-7),
+      contractAddress: builder.builderNfts[0]?.contractAddress || ''
     };
   });
 }

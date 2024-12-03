@@ -1,6 +1,7 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
@@ -31,7 +32,8 @@ export function ScoutPage({
   builderOrder,
   scoutTab,
   buildersLayout,
-  tab
+  tab,
+  starterpackBuilders
 }: {
   scoutSort: string;
   builderSort: string;
@@ -40,6 +42,7 @@ export function ScoutPage({
   scoutTab: string;
   buildersLayout: string;
   tab: string;
+  starterpackBuilders: BuilderInfo[];
 }) {
   const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
     .filter(([, value]) => isTruthy(value))
@@ -71,7 +74,7 @@ export function ScoutPage({
             <Typography variant='h4' color='secondary' fontWeight={600} textAlign='center'>
               Scout your Starter Pack
             </Typography>
-            <ScoutBuilderCarousel builders={[]} />
+            <ScoutBuilderCarousel builders={starterpackBuilders} />
           </Stack>
           <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
             Scout today's HOT Builders!

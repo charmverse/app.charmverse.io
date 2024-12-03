@@ -20,9 +20,11 @@ export type CarouselProps = {
   slidesPerView: number;
   renderBullet?: (index: number, className: string) => string;
   height?: number;
+  autoplay?: boolean;
+  boxProps?: BoxProps;
 };
 
-export function Carousel({ children, renderBullet, slidesPerView, height }: CarouselProps) {
+export function Carousel({ children, renderBullet, slidesPerView, height, autoplay = true, boxProps }: CarouselProps) {
   const isDesktop = useMdScreen();
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
@@ -36,13 +38,17 @@ export function Carousel({ children, renderBullet, slidesPerView, height }: Caro
   }
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
+    <Box display='flex' alignItems='center' justifyContent='center' height='100%' {...boxProps}>
       <Box width={isDesktop ? '95%' : '100%'} px={isDesktop ? 4 : 0} position='relative' height='100%'>
         <Swiper
-          autoplay={{
-            delay: 3000,
-            pauseOnMouseEnter: true
-          }}
+          autoplay={
+            autoplay
+              ? {
+                  delay: 3000,
+                  pauseOnMouseEnter: true
+                }
+              : undefined
+          }
           loop
           style={{ height }}
           className='swiper'
