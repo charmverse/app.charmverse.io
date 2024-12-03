@@ -3,11 +3,26 @@ import { ScoutPage } from 'components/scout/ScoutPage';
 export default async function Scout({
   searchParams
 }: {
-  searchParams: { tab: string | undefined; order: string | undefined; sort: string | undefined };
+  searchParams: {
+    tab: string | undefined;
+    builderSort: string | undefined;
+    scoutSort: string | undefined;
+    scoutOrder: string | undefined;
+    builderOrder: string | undefined;
+  };
 }) {
   const tab = searchParams.tab || 'builders';
-  const sort = searchParams.sort || 'rank';
-  // For scouts default to descending rank
-  const order = searchParams.order || (tab === 'scouts' ? 'desc' : 'asc');
-  return <ScoutPage tab={tab} order={order} sort={sort} />;
+  const builderSort = searchParams.builderSort || 'rank';
+  const scoutSort = searchParams.scoutSort || 'rank';
+  const scoutOrder = searchParams.scoutOrder || 'asc';
+  const builderOrder = searchParams.builderOrder || 'asc';
+  return (
+    <ScoutPage
+      tab={tab}
+      builderSort={builderSort}
+      scoutSort={scoutSort}
+      scoutOrder={scoutOrder}
+      builderOrder={builderOrder}
+    />
+  );
 }
