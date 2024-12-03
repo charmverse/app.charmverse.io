@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { registerBuilderNFT } from '../builderNfts/registerBuilderNFT';
+import { registerBuilderNFT } from '../builderNfts/builderRegistration/registerBuilderNFT';
 import type { Season } from '../dates';
 import { currentSeason } from '../dates';
 import { importReposByUser } from '../importReposByUser';

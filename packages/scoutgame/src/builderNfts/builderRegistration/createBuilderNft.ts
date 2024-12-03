@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { currentSeason } from '../dates';
-
-import { uploadArtwork, uploadArtworkCongrats } from './artwork/uploadArtwork';
-import { uploadMetadata } from './artwork/uploadMetadata';
-import { builderContractReadonlyApiClient } from './clients/builderContractReadClient';
-import { getBuilderContractAddress, builderNftChain } from './constants';
+import { currentSeason } from '../../dates';
+import { uploadArtwork, uploadArtworkCongrats } from '../artwork/uploadArtwork';
+import { uploadMetadata } from '../artwork/uploadMetadata';
+import { builderContractReadonlyApiClient } from '../clients/builderContractReadClient';
+import { getBuilderContractAddress, builderNftChain } from '../constants';
 
 export async function createBuilderNft({
   imageHostingBaseUrl,

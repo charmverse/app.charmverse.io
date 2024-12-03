@@ -7,14 +7,22 @@ export function getNftTokenUrlPath({
   filename
 }: {
   season: string;
-  filename: 'artwork.png' | 'metadata.json';
+  filename: `${'starter-pack-' | ''}${'artwork.png' | 'metadata.json'}`;
   tokenId: number;
 }) {
   return `seasons/${season}/${contractName}/${tokenId}/${filename}`;
 }
 
-export function getNftCongratsPath({ season, tokenId }: { season: string; tokenId: number }) {
-  return `seasons/${season}/${contractName}/${tokenId}/congrats.png`;
+export function getNftCongratsPath({
+  season,
+  tokenId,
+  starterPack
+}: {
+  season: string;
+  tokenId: number;
+  starterPack?: boolean;
+}) {
+  return `seasons/${season}/${contractName}/${tokenId}/${starterPack ? 'starter-pack-' : ''}${'congrats.png'}`;
 }
 
 export const imageDomain = 'https://nft.scoutgame.xyz';

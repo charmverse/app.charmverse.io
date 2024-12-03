@@ -14,7 +14,7 @@ jest.unstable_mockModule('../../importReposByUser', () => ({
 
 const { approveBuilder } = await import('../approveBuilder');
 
-const { registerBuilderNFT } = await import('../../builderNfts/registerBuilderNFT');
+const { registerBuilderNFT } = await import('../../builderNfts/builderRegistration/registerBuilderNFT');
 
 describe('approveBuilder', () => {
   beforeEach(() => {

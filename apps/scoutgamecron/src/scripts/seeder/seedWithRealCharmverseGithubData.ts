@@ -1,6 +1,6 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
+import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/builderRegistration/registerBuilderNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
 import { currentSeason } from '@packages/scoutgame/dates';
@@ -17,20 +17,20 @@ type DevUser = {
 };
 
 const devUsers: Record<string, DevUser> = {
-  // mattcasey: {
-  //   id: 305398,
-  //   avatar: 'https://app.charmverse.io/favicon.png'
-  // },
-  // motechFR: {
-  //   id: 18669748,
-  //   avatar:
-  //     'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
-  // },
-  // Devorein: {
-  //   id: 25636858,
-  //   avatar:
-  //     'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
-  // },
+  mattcasey: {
+    id: 305398,
+    avatar: 'https://app.charmverse.io/favicon.png'
+  },
+  motechFR: {
+    id: 18669748,
+    avatar:
+      'https://cdn.charmverse.io/user-content/e0ec0ec8-0c1f-4745-833d-52c448482d9c/0dd0e3c0-821c-49fc-bd1a-7589ada03019/1ff23917d3954f92aed4351b9c8caa36.jpg'
+  },
+  Devorein: {
+    id: 25636858,
+    avatar:
+      'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
+  },
   valentinludu: {
     id: 34683631,
     avatar:
