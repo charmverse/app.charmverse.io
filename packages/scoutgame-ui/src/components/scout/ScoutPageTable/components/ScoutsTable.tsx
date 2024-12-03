@@ -122,7 +122,7 @@ export function ScoutsTable({ scouts, order, sort }: { scouts: ScoutInfo[]; orde
             style={{ cursor: 'pointer' }}
           >
             <TableCell>
-              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '85px', md: 'initial' }}>
+              <Stack alignItems='center' flexDirection='row' gap={1} maxWidth={{ xs: '85px', md: '100px' }}>
                 <Avatar src={scout.avatar} name={scout.displayName} size='small' />
                 <TableCellText noWrap>{scout.displayName}</TableCellText>
               </Stack>

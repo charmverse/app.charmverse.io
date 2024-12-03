@@ -80,9 +80,6 @@ export async function getBuilders({
         user: {
           builderStatus: 'approved'
         },
-        pointsEarnedAsBuilder: {
-          gt: 0
-        },
         season: currentSeason
       },
       orderBy: {
@@ -117,6 +114,7 @@ export async function getBuilders({
         pointsEarnedAsBuilder: true
       }
     });
+
     return builders.map((builder) => ({
       path: builder.user.path,
       avatar: builder.user.avatar as string,

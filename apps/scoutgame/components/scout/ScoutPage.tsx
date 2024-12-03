@@ -58,7 +58,7 @@ export function ScoutPage({
         data-test='scout-page'
       >
         <Grid
-          size={{ xs: 12, md: 7 }}
+          size={{ xs: 12, md: 8 }}
           sx={{
             height: '100%',
             overflowX: 'hidden',
@@ -141,7 +141,7 @@ export function ScoutPage({
           </Stack>
         </Grid>
         <Grid
-          size={5}
+          size={4}
           sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}
         >
           <Box sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'background.default' }}>

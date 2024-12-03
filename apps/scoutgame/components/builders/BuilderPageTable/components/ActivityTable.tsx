@@ -102,7 +102,10 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
           <TableCell>ACTION</TableCell>
           <TableCell align='right'>
             <Stack display='inline-flex' flexDirection='row' gap={0.5} alignItems='center'>
-              EARNED <GemsIcon />
+              <Typography variant='body2' sx={{ display: { xs: 'none', md: 'initial' } }}>
+                EARNED
+              </Typography>
+              <GemsIcon />
             </Stack>
           </TableCell>
           <TableCell align='center'>BONUS</TableCell>
@@ -123,7 +126,7 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
                 alignItems='center'
                 flexDirection='row'
                 gap={1}
-                maxWidth={{ xs: '120px', md: '150px' }}
+                maxWidth={{ xs: '100px', md: '150px' }}
               >
                 <Avatar src={activity.avatar} name={activity.displayName} size='small' />
                 <TableCellText noWrap>{activity.displayName}</TableCellText>
@@ -131,7 +134,7 @@ export function ActivityTable({ activities }: { activities: BuilderActivity[] })
             </TableCell>
             <TableCell
               sx={{
-                maxWidth: { xs: '150px', md: 'initial' },
+                maxWidth: { xs: '100px', md: '200px' },
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
