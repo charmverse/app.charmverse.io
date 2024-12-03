@@ -80,3 +80,12 @@ export async function sendPointsForMiscEvent({
     return prisma.$transaction(txHandler);
   }
 }
+
+// sendPointsForMiscEvent({
+//   builderId: '3320051c-00a9-4198-bb23-a45f9bd1ab14',
+//   claimed: true,
+//   description: 'Test points',
+//   points: 1000,
+//   earnedAs: 'scout',
+//   hideFromNotifications: true
+// }).then(console.log);

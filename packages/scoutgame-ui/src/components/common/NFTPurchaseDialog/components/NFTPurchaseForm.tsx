@@ -1,6 +1,7 @@
 'use client';
 
 import env from '@beam-australia/react-env';
+import type { BuilderNftType } from '@charmverse/core/prisma';
 import { ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
@@ -23,6 +24,7 @@ import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/b
 import {
   builderNftChain,
   getBuilderContractAddress,
+  getBuilderStarterPackContractAddress,
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
@@ -57,7 +59,11 @@ import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
 export type NFTPurchaseProps = {
-  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
+  builder: MinimalUserInfo & {
+    nftType: BuilderNftType;
+    price?: bigint;
+    nftImageUrl?: string | null;
+  };
 };
 
 const PRICE_POLLING_INTERVAL = 60000;
@@ -204,6 +210,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     builderTokenId,
     scoutId: user?.id as string,
     paymentAmountOut: purchaseCost,
+    contractAddress:
+      builder.nftType === 'season_1_starter_pack'
+        ? getBuilderStarterPackContractAddress()
+        : getBuilderContractAddress(),
     sourceChainId: selectedPaymentOption.chainId,
     sourceToken: getCurrencyContract(selectedPaymentOption),
     tokensToPurchase: BigInt(tokensToBuy)
@@ -231,7 +241,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       await purchaseWithPoints({
         builderId: builder.id,
         recipientAddress: address as `0x${string}`,
-        amount: tokensToBuy
+        amount: tokensToBuy,
+        nftType: builder.nftType
       });
       await refreshUser();
     } else {
