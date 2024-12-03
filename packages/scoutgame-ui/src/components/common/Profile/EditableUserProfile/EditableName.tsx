@@ -20,6 +20,7 @@ type EditableDisplayNameProps = {
   hasMoxieProfile?: boolean;
   talentProfile?: TalentProfile;
   userPath: string;
+  hideShareProfile?: boolean;
 };
 
 export function EditableName({
@@ -31,7 +32,8 @@ export function EditableName({
   farcasterName,
   hasMoxieProfile,
   talentProfile,
-  userPath
+  userPath,
+  hideShareProfile
 }: EditableDisplayNameProps) {
   const {
     field: displayNameField,
@@ -104,7 +106,7 @@ export function EditableName({
                 talentProfile={talentProfile}
               />
             ) : null}
-            <ShareProfile userPath={userPath} />
+            {!hideShareProfile ? <ShareProfile userPath={userPath} /> : null}
           </Stack>
         )}
       </Stack>
