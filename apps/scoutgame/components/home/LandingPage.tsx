@@ -1,8 +1,6 @@
-'use client';
-
 import type { StackProps } from '@mui/material';
 import { Button, Container, Stack, Typography } from '@mui/material';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
+import { Hidden } from '@packages/scoutgame-ui/components/common/Hidden';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -45,7 +43,6 @@ function Step({
   iconSrc: string;
   additionalContent?: React.ReactNode;
 }) {
-  const isDesktop = useMdScreen();
   return (
     <ContainerStack sx={{ flexDirection: additionalContent ? 'column' : 'row' }}>
       <Stack
@@ -71,7 +68,12 @@ function Step({
           }}
         >
           <Typography color='secondary'>{stepNumber}</Typography>
-          <Image width={isDesktop ? 85 : 50} height={isDesktop ? 85 : 50} src={iconSrc} alt={stepNumber} />
+          <Hidden mdDown>
+            <Image width={85} height={85} src={iconSrc} alt={stepNumber} />
+          </Hidden>
+          <Hidden mdUp>
+            <Image width={50} height={50} src={iconSrc} alt={stepNumber} />
+          </Hidden>
         </Stack>
         <Stack width={{ xs: '80%', md: '65%' }} gap={1}>
           <Typography variant='h5' color='secondary'>
@@ -86,11 +88,9 @@ function Step({
 }
 
 function HeroSection() {
-  const isDesktop = useMdScreen();
-
   return (
     <Stack sx={{ position: 'relative' }}>
-      {isDesktop ? (
+      <Hidden mdDown>
         <Image
           src='/images/home/landing-bg.png'
           width='500'
@@ -103,7 +103,7 @@ function HeroSection() {
             top: 0
           }}
         />
-      ) : null}
+      </Hidden>
       <Stack
         zIndex={{
           xs: 0,
@@ -139,17 +139,20 @@ function HeroSection() {
           >
             Fantasy Sports for <br /> Onchain Builders
           </Typography>
-          <Typography
-            variant={isDesktop ? 'h5' : 'h6'}
-            textAlign={{
-              xs: 'center',
-              md: 'left'
-            }}
-          >
-            Pick great developers. Earn rewards.
-            <br />
-            Everyone can play. No coding required!
-          </Typography>
+          <Hidden mdUp>
+            <Typography variant='h6' textAlign='center'>
+              Pick great developers. Earn rewards.
+              <br />
+              Everyone can play. No coding required!
+            </Typography>
+          </Hidden>
+          <Hidden mdDown>
+            <Typography variant='h5' textAlign='left'>
+              Pick great developers. Earn rewards.
+              <br />
+              Everyone can play. No coding required!
+            </Typography>
+          </Hidden>
           <Button
             variant='contained'
             sx={{
@@ -165,19 +168,18 @@ function HeroSection() {
             <Link href='/login'>Get started</Link>
           </Button>
         </Stack>
-        <Image
-          src='/images/home/cool-dev.png'
-          width={isDesktop ? 350 : 250}
-          height={isDesktop ? 350 : 250}
-          alt='Cool dev'
-        />
+        <Hidden mdDown>
+          <Image src='/images/home/cool-dev.png' width={350} height={350} alt='Cool dev' />
+        </Hidden>
+        <Hidden mdUp>
+          <Image src='/images/home/cool-dev.png' width={250} height={250} alt='Cool dev' />
+        </Hidden>
       </Stack>
     </Stack>
   );
 }
 
 function HowToPlaySection() {
-  const isDesktop = useMdScreen();
   return (
     <Stack position='relative'>
       <Stack
@@ -213,17 +215,34 @@ function HowToPlaySection() {
                 <Typography variant='h6' color='secondary' mt={2} mb={1} textAlign='center'>
                   carl's Builder Card
                 </Typography>
-                <Image
-                  src={isDesktop ? '/images/home/card-diagram.png' : '/images/home/card-diagram-mobile.png'}
-                  width='350'
-                  height='350'
-                  alt='Collect cards'
-                  style={{
-                    height: '100%',
-                    width: isDesktop ? '100%' : '75%',
-                    objectFit: isDesktop ? 'contain' : 'cover'
-                  }}
-                />
+                <Hidden mdDown>
+                  <Image
+                    src='/images/home/card-diagram.png'
+                    width='350'
+                    height='350'
+                    alt='Collect cards'
+                    style={{
+                      height: '100%',
+                      width: '100%',
+                      objectFit: 'contain'
+                    }}
+                  />
+                </Hidden>
+                <Hidden mdUp>
+                  <Stack alignItems='center'>
+                    <Image
+                      src='/images/home/card-diagram-mobile.png'
+                      width='350'
+                      height='350'
+                      alt='Collect cards'
+                      style={{
+                        height: '100%',
+                        width: '75%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </Stack>
+                </Hidden>
               </Stack>
             }
           />
@@ -246,10 +265,9 @@ function HowToPlaySection() {
 }
 
 function FooterSection() {
-  const isDesktop = useMdScreen();
   return (
     <Stack position='relative' alignItems='center' gap={2} py={{ xs: 0, md: 4 }} mb={{ xs: 4, md: 0 }}>
-      {isDesktop ? (
+      <Hidden mdDown>
         <Image
           src='/images/home/landing-bg.png'
           width='500'
@@ -260,10 +278,11 @@ function FooterSection() {
             height: '100%',
             objectFit: 'cover',
             position: 'absolute',
-            top: 0
+            top: 0,
+            left: 0
           }}
         />
-      ) : null}
+      </Hidden>
       <Stack
         mx='auto'
         zIndex={{
@@ -286,8 +305,6 @@ function FooterSection() {
 }
 
 export function LandingPage() {
-  const isDesktop = useMdScreen();
-
   return (
     <Stack height='100%' overflow='hidden'>
       <Image
