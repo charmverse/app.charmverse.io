@@ -25,6 +25,7 @@
     "@packages/scoutgame": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@rainbow-me/rainbowkit": "^2.2.0",
+    "is-ua-webview": "^1.1.2",
     "puppeteer": "^23.8.0",
     "swiper": "^11.1.14"
   }

@@ -44,3 +44,50 @@ export function setCookie({
     expiresAfterSession ? '' : ` expires=${expires.toUTCString()};`
   } path=/; ${secure ? 'secure;' : ''}}`;
 }
+
+// decode the path to handle special characters
+export function getBrowserPath() {
+  return decodeURIComponent(window.location.pathname + window.location.search || '');
+}
+
+/** Based on https://developer.mozilla.org/docs/Web/HTTP/Browser_detection_using_the_user_agent */
+export function isTouchDevice() {
+  let hasTouchScreen = false;
+  if ('maxTouchPoints' in navigator) {
+    hasTouchScreen = navigator.maxTouchPoints > 0;
+  } else if ('msMaxTouchPoints' in navigator) {
+    // @ts-ignore
+    hasTouchScreen = navigator.msMaxTouchPoints > 0;
+  } else {
+    const mQ = typeof window !== 'undefined' && window.matchMedia('(pointer:coarse)');
+    if (mQ && mQ.media === '(pointer:coarse)') {
+      hasTouchScreen = !!mQ.matches;
+    } else if ('orientation' in window) {
+      hasTouchScreen = true; // deprecated, but good fallback
+    } else {
+      // Only as a last resort, fall back to user agent sniffing
+      // @ts-ignore
+      const UA = navigator.userAgent;
+      hasTouchScreen =
+        /\b(BlackBerry|webOS|iPhone|IEMobile)\b/i.test(UA) || /\b(Android|Windows Phone|iPad|iPod)\b/i.test(UA);
+    }
+  }
+  return hasTouchScreen;
+}
+
+// ref: https://github.com/atomantic/is-ua-webview/tree/main
+export function isWebView(ua: string) {
+  const rules = [
+    // if it says it's a webview, let's go with that
+    'WebView',
+    // iOS webview will be the same as safari but missing "Safari"
+    '(iPhone|iPod|iPad)(?!.*Safari)',
+    // Android Lollipop and Above: webview will be the same as native but it will contain "wv"
+    // Android KitKat to Lollipop webview will put Version/X.X Chrome/{version}.0.0.0
+    'Android.*(;\\s+wv|Version/\\d.\\d\\s+Chrome/\\d+(\\.0){3})',
+    // old chrome android webview agent
+    'Linux; U; Android'
+  ];
+  const webviewRegExp = new RegExp(`(${rules.join('|')})`, 'ig');
+  return !!ua.match(webviewRegExp);
+}
