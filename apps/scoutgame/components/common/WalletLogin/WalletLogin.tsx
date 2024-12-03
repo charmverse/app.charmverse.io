@@ -99,9 +99,9 @@ function WalletLoginButton() {
 
   useEffect(() => {
     if (address && isConnected && isConnecting) {
-      // handleWalletConnect(address).finally(() => {
-      //   setIsConnecting(false);
-      // });
+      handleWalletConnect(address).finally(() => {
+        setIsConnecting(false);
+      });
     }
   }, [address, isConnected, isConnecting]);
 
@@ -121,15 +121,6 @@ function WalletLoginButton() {
           {errorWalletMessage || 'There was an error while logging in with your wallet'}
         </Typography>
       )}
-      {address}
-      <br />
-      {platform?.platform}
-      <br />
-      <br />
-      {platform?.ua}
-      <br />
-      {platform?.isWebView ? 'true' : 'false'}
-      <br />
       <LoadingButton
         loading={isLoading}
         size='large'
