@@ -21,6 +21,7 @@ export async function createBuilderNft({
   avatar: string | null;
   tokenId: bigint;
   builderId: string;
+  starterNft?: boolean;
 }) {
   const currentPrice = await builderContractReadonlyApiClient.getTokenPurchasePrice({
     args: { tokenId, amount: BigInt(1) }
