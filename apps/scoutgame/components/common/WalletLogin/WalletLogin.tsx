@@ -112,6 +112,7 @@ function WalletLoginButton() {
           {errorWalletMessage || 'There was an error while logging in with your wallet'}
         </Typography>
       )}
+      {address}
       <LoadingButton
         loading={isLoading}
         size='large'
