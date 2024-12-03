@@ -10,14 +10,6 @@ export function isMac() {
   );
 }
 
-// https://stackoverflow.com/questions/9038625/detect-if-device-is-ios
-export function isIOS() {
-  if (typeof navigator === 'undefined') {
-    return false;
-  }
-  return navigator.platform.startsWith('iP') || (navigator.platform.startsWith('Mac') && navigator.maxTouchPoints > 4);
-}
-
 export function getCookie(name: string): string | undefined {
   if (typeof document === 'undefined') {
     return undefined;
