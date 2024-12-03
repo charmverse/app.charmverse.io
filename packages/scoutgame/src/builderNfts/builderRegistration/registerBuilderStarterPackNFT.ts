@@ -5,6 +5,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { builderContractReadonlyApiClient } from '../clients/builderContractReadClient';
 import { getBuilderContractStarterPackMinterClient } from '../clients/builderContractStarterPackMinterWriteClient';
+import { builderContractStarterPackReadonlyApiClient } from '../clients/builderContractStarterPackReadClient';
 import { builderNftChain } from '../constants';
 import { refreshBuilderNftPrice } from '../refreshBuilderNftPrice';
 
@@ -63,10 +64,20 @@ export async function registerBuilderStarterPackNFT({
     throw new InvalidInputError('Builder NFT not found');
   }
 
-  // Register the builder token on the starter pack contract so that it can be minted
-  await getBuilderContractStarterPackMinterClient().registerBuilderToken({
-    args: { builderId, builderTokenId: tokenId }
-  });
+  const existingStarterPackTokenId = await builderContractStarterPackReadonlyApiClient
+    .getTokenIdForBuilder({
+      args: { builderId }
+    })
+    .catch(() => null);
+
+  if (existingStarterPackTokenId && existingStarterPackTokenId !== tokenId) {
+    throw new InvalidInputError('Builder NFT already registered on starter pack contract but with a different tokenId');
+  } else if (!existingStarterPackTokenId) {
+    // Register the builder token on the starter pack contract so that it can be minted
+    await getBuilderContractStarterPackMinterClient().registerBuilderToken({
+      args: { builderId, builderTokenId: tokenId }
+    });
+  }
 
   const builderNft = await createBuilderNftStarterPack({
     imageHostingBaseUrl,

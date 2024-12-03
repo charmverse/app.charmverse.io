@@ -30,9 +30,10 @@ export async function BuilderProfile({
       ? await Promise.all([
           prisma.builderNft.findUnique({
             where: {
-              builderId_season: {
+              builderId_season_nftType: {
                 builderId: builder.id,
-                season: currentSeason
+                season: currentSeason,
+                nftType: 'default'
               }
             },
             select: {

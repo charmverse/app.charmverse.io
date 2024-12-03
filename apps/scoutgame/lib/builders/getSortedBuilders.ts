@@ -1,4 +1,5 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { NFTType } from '@airstack/frames';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { getPreviousWeek } from '@packages/scoutgame/dates';
@@ -31,7 +32,8 @@ export async function getSortedBuilders({
             builderStatus: 'approved',
             builderNfts: {
               some: {
-                season
+                season,
+                nftType: BuilderNftType.default
               }
             }
           },
@@ -49,7 +51,8 @@ export async function getSortedBuilders({
             createdAt: true,
             builderNfts: {
               where: {
-                season
+                season,
+                nftType: BuilderNftType.default
               },
               select: {
                 imageUrl: true,
@@ -117,7 +120,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  nftType: BuilderNftType.default
                 }
               }
             },
@@ -147,7 +151,8 @@ export async function getSortedBuilders({
                 builderStatus: true,
                 builderNfts: {
                   where: {
-                    season
+                    season,
+                    nftType: BuilderNftType.default
                   },
                   select: {
                     currentPrice: true,
@@ -198,6 +203,7 @@ export async function getSortedBuilders({
         );
       const userId = builders[builders.length - 1]?.id;
       const rank = builders[builders.length - 1]?.rank;
+
       return { builders, nextCursor: builders.length === limit ? { userId, rank } : null };
     }
 
@@ -213,7 +219,8 @@ export async function getSortedBuilders({
               builderStatus: 'approved',
               builderNfts: {
                 some: {
-                  season
+                  season,
+                  nftType: BuilderNftType.default
                 }
               }
             }
@@ -266,7 +273,8 @@ export async function getSortedBuilders({
                 },
                 builderNfts: {
                   where: {
-                    season
+                    season,
+                    nftType: BuilderNftType.default
                   },
                   select: {
                     currentPrice: true,

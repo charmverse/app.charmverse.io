@@ -1,6 +1,7 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
 import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/builderRegistration/registerBuilderNFT';
+import { registerBuilderStarterPackNFT } from '@packages/scoutgame/builderNfts/builderRegistration/registerBuilderStarterPackNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
 import { currentSeason } from '@packages/scoutgame/dates';
@@ -130,6 +131,8 @@ async function seedBuilderNFTs() {
 
   for (const { builderId } of githubUser) {
     const nft = await registerBuilderNFT({ builderId: builderId as string, season: currentSeason });
+
+    await registerBuilderStarterPackNFT({ builderId: nft.builderId, season: currentSeason });
 
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 

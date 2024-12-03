@@ -13,7 +13,7 @@ import { BuilderShareImage } from '../components/BuilderShareImage';
 
 // fails inside of Next.js
 function getAssetsFromDisk() {
-  const folder = process.env.NFT_ASSETS_FOLDER || path.join(path.resolve(__dirname, '../../'), 'assets');
+  const folder = process.env.NFT_ASSETS_FOLDER || path.join(path.resolve(__dirname, '../../../'), 'assets');
   const overlayFiles = fs.readdirSync(`${folder}/overlays`);
   const overlaysBase64 = overlayFiles.map((file) => {
     const filePath = path.join(`${folder}/overlays`, file);
