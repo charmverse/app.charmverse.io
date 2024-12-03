@@ -34,7 +34,7 @@ function useMetamaskInterceptor() {
 
 function getMMDeeplink() {
   const currentUrl = window.location.host + getBrowserPath();
-  const deeplink = `https://metamask.app.link/dapp/${currentUrl}`;
+  const deeplink = `metamask://dapp/${currentUrl}`;
 
   return deeplink;
 }
