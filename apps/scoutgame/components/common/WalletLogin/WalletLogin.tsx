@@ -130,8 +130,6 @@ function WalletLoginButton() {
       <br />
       {platform?.isWebView ? 'true' : 'false'}
       <br />
-
-      {isWebView(navigator.userAgent) ? 'true' : 'false'}
       <LoadingButton
         loading={isLoading}
         size='large'

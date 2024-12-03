@@ -1,6 +1,6 @@
 'use client';
 
-import { getBrowserPath, isTouchDevice } from '@packages/utils/browser';
+import { getBrowserPath, isTouchDevice, isWebView } from '@packages/utils/browser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import { WagmiProvider as OriginalWagmiProvider, cookieToInitialState } from 'wagmi';
@@ -11,7 +11,7 @@ function useMetamaskInterceptor() {
   useEffect(() => {
     function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
-      if (metamaskButton) {
+      if (metamaskButton && !isWebView(navigator.platform)) {
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }
