@@ -29,7 +29,7 @@ test.describe('Buy Nft', () => {
       currentBalance: 200
     });
 
-    const builderNft = await mockBuilderNft({
+    await mockBuilderNft({
       builderId: builder.id,
       chainId: 10,
       contractAddress: getBuilderContractAddress(),
@@ -45,18 +45,20 @@ test.describe('Buy Nft', () => {
     });
 
     await utils.loginAsUserId(builder.id);
-    await page.goto(`/home`);
-    await page.waitForURL('**/home');
+    await page.goto(`/scout`);
+    await page.waitForURL('**/scout');
 
     await page.goto(`/u/${builder.path}`);
     await page.waitForURL(`**/u/${builder.path}`);
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();
+    await expect(scoutButton).toBeVisible();
     await scoutButton.click();
 
     // NFT buy button
     const buyButton = page.locator('data-test=purchase-button').first();
+    await expect(buyButton).toBeVisible();
     await buyButton.click();
 
     // Success view after purchase
@@ -100,7 +102,7 @@ test.describe('Buy Nft', () => {
       currentBalance: 200
     });
 
-    const builderNft = await mockBuilderNft({
+    await mockBuilderNft({
       builderId: builder.id,
       chainId: 10,
       contractAddress: getBuilderContractAddress(),
@@ -116,18 +118,19 @@ test.describe('Buy Nft', () => {
     });
 
     await utils.loginAsUserId(builder.id);
-    await page.goto(`/home`);
-    await page.waitForURL('**/home');
+    await page.goto(`/scout`);
+    await page.waitForURL('**/scout');
 
     await page.goto(`/u/${builder.path}`);
     await page.waitForURL(`**/u/${builder.path}`);
 
     // Card CTA button
     const scoutButton = page.locator('data-test=scout-button').first();
+    await expect(scoutButton).toBeVisible();
     await scoutButton.click();
 
     // NFT buy button
     await expect(page.locator('data-test=purchase-button').first()).toBeDisabled();
-    expect(await page.locator('data-test=address-error')).toBeVisible();
+    expect(page.locator('data-test=address-error')).toBeVisible();
   });
 });

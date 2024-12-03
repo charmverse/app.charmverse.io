@@ -3,13 +3,13 @@
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
-import { baseUrl } from '@packages/utils/constants';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 
 export function ShareProfile({ userPath }: { userPath: string }) {
-  const profileUrl = `${baseUrl}/u/${userPath}`;
+  const origin = window.location.origin;
+  const profileUrl = `${origin}/u/${userPath}`;
   const shareMessage = `Discover my profile on Scout Game: ${profileUrl}`;
   const [isCopied, setIsCopied] = useState(false);
   const [anchorElShare, setAnchorElShare] = useState<HTMLElement | null>(null);

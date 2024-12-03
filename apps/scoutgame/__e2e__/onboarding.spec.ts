@@ -7,18 +7,13 @@ import { expect, test } from './test';
 test.describe('Onboarding flow', () => {
   test('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
     await page.goto('/');
-    // Logged in user should be redirected
-    await page.waitForURL('**/home');
-
     await expect(homePage.getStartedButton).toBeVisible();
-
     await homePage.getStartedButton.click();
-
     await page.waitForURL('**/login');
     await expect(loginPage.container).toBeVisible();
   });
 
-  test('Save new user preferences and get through onboarding', async ({ welcomePage, homePage, page, utils }) => {
+  test('Save new user preferences and get through onboarding', async ({ welcomePage, scoutPage, page, utils }) => {
     const newUser = await mockScout({
       onboardedAt: null,
       agreedToTermsAt: null,
@@ -67,9 +62,9 @@ test.describe('Onboarding flow', () => {
 
     await Promise.all([page.waitForURL('**/welcome/how-it-works'), welcomePage.continueButton.click()]);
 
-    await Promise.all([page.waitForURL('**/home', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
+    await Promise.all([page.waitForURL('**/scout', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
 
-    await expect(homePage.container).toBeVisible();
+    await expect(scoutPage.container).toBeVisible();
 
     // make sure we saved onboarding preferences
     const userAfterOnboarding = await prisma.scout.findFirstOrThrow({
@@ -97,7 +92,7 @@ test.describe('Onboarding flow', () => {
     await utils.loginAsUserId(onboardedUser.id);
 
     // Test redirect from home page
-    await page.goto('/home');
+    await page.goto('/scout');
     await page.waitForURL('**/welcome');
     await expect(welcomePage.container).toBeVisible();
   });
@@ -110,7 +105,7 @@ test.describe('Onboarding flow', () => {
     await utils.loginAsUserId(newUser.id);
 
     // Test redirect from home page
-    await page.goto('/home');
+    await page.goto('/');
     await page.waitForURL('**/welcome');
     await expect(welcomePage.container).toBeVisible();
 

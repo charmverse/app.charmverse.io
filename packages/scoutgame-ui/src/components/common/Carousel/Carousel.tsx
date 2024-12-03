@@ -2,26 +2,27 @@
 
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Navigation, Autoplay } from 'swiper/modules';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
-import { useLgScreen, useMdScreen, useSmScreen } from '../../../hooks/useMediaScreens';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
 import { LoadingCards } from '../Loading/LoadingCards';
 
 import { NextArrow, PrevArrow } from './Arrows';
 
 import 'swiper/css';
 import 'swiper/css/autoplay';
+import 'swiper/css/pagination';
 
 export type CarouselProps = {
   children: React.ReactNode[];
+  slidesPerView: number;
+  renderBullet?: (index: number, className: string) => string;
+  height?: number;
 };
 
-export function Carousel({ children }: CarouselProps) {
-  const isSmall = useSmScreen();
+export function Carousel({ children, renderBullet, slidesPerView, height }: CarouselProps) {
   const isDesktop = useMdScreen();
-  const isLarge = useLgScreen();
-  const slidesPerView = isDesktop ? 5 : isLarge ? 6 : isSmall ? 4.2 : 2.2;
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
 
@@ -34,22 +35,30 @@ export function Carousel({ children }: CarouselProps) {
   }
 
   return (
-    <Box display='flex' alignItems='center' justifyContent='center' mb={2}>
-      <Box width='90svw' px={isDesktop ? 4 : 0} position='relative'>
+    <Box display='flex' alignItems='center' justifyContent='center' height='100%'>
+      <Box width={isDesktop ? '95%' : '100%'} px={isDesktop ? 4 : 0} position='relative' height='100%'>
         <Swiper
           autoplay={{
             delay: 3000,
             pauseOnMouseEnter: true
           }}
           loop
+          style={{ height }}
           className='swiper'
           slidesPerView={slidesPerView}
-          autoHeight={true}
-          modules={[Navigation, Autoplay]}
+          modules={[Navigation, Autoplay, ...(renderBullet ? [Pagination] : [])]}
           navigation={{
             nextEl: '.swiper-button-next',
             prevEl: '.swiper-button-prev'
           }}
+          pagination={
+            renderBullet
+              ? {
+                  clickable: true,
+                  renderBullet
+                }
+              : undefined
+          }
         >
           {children.map((child, index) => (
             <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>

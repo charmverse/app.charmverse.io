@@ -17,12 +17,12 @@ export function BuildersYouKnowPage({ builders }: { builders: BuilderInfo[] }) {
         We found some Builders you might know
       </Typography>
       <Box display='flex' flexDirection='column' mb={4}>
-        <Button variant='contained' LinkComponent={Link} href='/home' sx={{ margin: 'auto', px: 2 }}>
+        <Button variant='contained' LinkComponent={Link} href='/scout' sx={{ margin: 'auto', px: 2 }}>
           See all builders
         </Button>
       </Box>
       <Suspense fallback={<LoadingGallery />}>
-        <BuildersGalleryContainer sort='top' initialCursor={null} initialBuilders={builders} showHotIcon={false} />
+        <BuildersGalleryContainer initialCursor={null} initialBuilders={builders} showHotIcon={false} />
       </Suspense>
     </PageContainer>
   );

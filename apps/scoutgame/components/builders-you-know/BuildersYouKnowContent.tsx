@@ -1,11 +1,8 @@
 'use client';
 
-import { Box, Button, Grid2, List, ListItem, ListItemAvatar, Paper, Stack, Typography } from '@mui/material';
+import { Button, Grid2, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
-import { BuilderCard } from '@packages/scoutgame-ui/components/common/Card/BuilderCard/BuilderCard';
 import { BuildersGallery } from '@packages/scoutgame-ui/components/common/Gallery/BuildersGallery';
-import { BuildersCarousel } from '@packages/scoutgame-ui/components/home/TodaysHotBuildersCarousel/BuildersCarousel';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Link from 'next/link';
 import React from 'react';
 
@@ -16,8 +13,6 @@ export function BuildersYouKnowContent({
   onClickContinue?: React.MouseEventHandler;
   builders: BuilderInfo[];
 }) {
-  const isMdScreen = useMdScreen();
-  const iconSize = isMdScreen ? 24 : 18;
   return (
     <Grid2 gap={2}>
       <Grid2 size={{ xs: 12 }}>

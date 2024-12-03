@@ -38,7 +38,8 @@ export type EventType =
   | 'click_share_on_warpcast'
   | 'click_share_on_twitter'
   | 'click_powered_by_charmverse'
-  | 'click_need_help';
+  | 'click_need_help'
+  | 'copy_referral_link';
 
 export type MixpanelEventMap = {
   sign_up: BaseEvent;
@@ -49,6 +50,7 @@ export type MixpanelEventMap = {
   click_moxie_promo: FrontendEvent;
   click_optimism_promo: FrontendEvent;
   page_view: FrontendEvent;
+  referral_link_used: BaseEvent;
 } & Record<EventType, FrontendEvent>;
 
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];

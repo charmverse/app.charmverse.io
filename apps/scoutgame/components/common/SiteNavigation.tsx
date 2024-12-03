@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
-import { PiBinocularsLight, PiHouseLight } from 'react-icons/pi';
+import { PiBinocularsLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
 import { useGetClaimablePoints } from 'hooks/api/session';
 
+import { BuilderIcon } from './BuilderIcon';
 import { ClaimIcon } from './Icons/ClaimIcon';
 import { FriendsIcon } from './Icons/FriendsIcon';
 
@@ -52,7 +53,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
-    path: '/home'
+    path: '/scout'
   });
 
   const openAuthModal = isAuthenticated
@@ -66,17 +67,17 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
     <>
       <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
         <BottomNavigationAction
-          label='Home'
-          href='/home'
-          value='home'
-          icon={<PiHouseLight size='24px' />}
-          LinkComponent={Link}
-        />
-        <BottomNavigationAction
           label='Scout'
           href='/scout'
           value='scout'
           icon={<PiBinocularsLight size='24px' />}
+          LinkComponent={Link}
+        />
+        <BottomNavigationAction
+          label='Builders'
+          href='/builders'
+          value='builders'
+          icon={<BuilderIcon />}
           LinkComponent={Link}
         />
         <BottomNavigationAction
@@ -102,7 +103,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Friends'
           href='/friends'
           value='friends'
-          icon={<FriendsIcon active />}
+          icon={<FriendsIcon />}
           LinkComponent={Link}
         />
       </StyledBottomNavigation>
@@ -116,18 +117,16 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
 }
 
 function getActiveButton(pathname: string) {
-  if (pathname.startsWith('/home')) {
-    return 'home';
-  } else if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
+  if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
     return 'scout';
-  } else if (pathname.startsWith('/notifications')) {
-    return 'notifications';
   } else if (pathname.startsWith('/profile')) {
     return 'profile';
   } else if (pathname.startsWith('/info')) {
     return 'info';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
+  } else if (pathname.startsWith('/builders')) {
+    return 'builders';
   } else if (pathname.startsWith('/friends')) {
     return 'friends';
   }
