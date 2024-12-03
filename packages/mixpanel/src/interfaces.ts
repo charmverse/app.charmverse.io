@@ -39,7 +39,8 @@ export type EventType =
   | 'click_share_on_twitter'
   | 'click_powered_by_charmverse'
   | 'click_need_help'
-  | 'copy_referral_link';
+  | 'copy_referral_link'
+  | 'click_telegram_refer_friend_button';
 
 export type MixpanelEventMap = {
   sign_up: BaseEvent;
