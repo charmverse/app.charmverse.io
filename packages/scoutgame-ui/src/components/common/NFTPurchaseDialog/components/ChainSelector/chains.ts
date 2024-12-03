@@ -22,7 +22,7 @@ export const chainOptionsMainnet: ChainOption[] = [
   {
     name: 'Optimism',
     id: optimism.id,
-    icon: '/images/crypto/op64.png',
+    icon: '/images/crypto/op.png',
     chain: optimism,
     usdcAddress: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85'
   },
@@ -54,7 +54,7 @@ export const chainOptionsTestnet: ChainOption[] = [
   {
     name: 'Optimism Sepolia',
     id: optimismSepolia.id,
-    icon: '/images/crypto/op64.png',
+    icon: '/images/crypto/op.png',
     chain: optimismSepolia,
     usdcAddress: '0x5fd84259d66Cd46123540766Be93DFE6D43130D7'
   },

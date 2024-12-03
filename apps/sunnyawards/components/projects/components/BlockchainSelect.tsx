@@ -5,7 +5,7 @@ import type { ReactNode, Ref } from 'react';
 import { forwardRef } from 'react';
 
 const chainOptions: { name: string; id: number; icon: string }[] = [
-  { name: 'Optimism', id: 10, icon: '/images/crypto/op64.png' },
+  { name: 'Optimism', id: 10, icon: '/images/crypto/op.png' },
   { name: 'Zora', id: 7777777, icon: '/images/crypto/zora64.png' },
   { name: 'Base', id: 8453, icon: '/images/crypto/base64.png' },
   { name: 'Mode', id: 34443, icon: '/images/crypto/mode64.png' },
