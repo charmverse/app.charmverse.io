@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason, validateISOWeek } from '@packages/scoutgame/dates';
 
 export type LeaderBoardRow = {
@@ -55,6 +55,10 @@ export async function getLeaderboard({
           displayName: true,
           builderStatus: true,
           builderNfts: {
+            where: {
+              season,
+              nftType: BuilderNftType.default
+            },
             select: {
               currentPrice: true,
               season: true,
