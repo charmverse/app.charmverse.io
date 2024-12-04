@@ -32,20 +32,25 @@ export function PointsClaimScreen({
   }[];
   repos: string[];
 }) {
-  const { executeAsync, isExecuting, result } = useAction(claimPointsAction);
+  const { executeAsync: claimPoints, isExecuting, result } = useAction(claimPointsAction);
   const { refreshUser, user } = useUser();
   const [showModal, setShowModal] = useState(false);
   const { executeAsync: revalidateClaimPoints } = useAction(revalidateClaimPointsAction);
 
   const handleClaim = async () => {
-    await executeAsync();
+    await claimPoints();
     await refreshUser();
-    setShowModal(true);
+    // only show the modal if there's something worth showing, eg points only came from selling NFTs
+    if (builders.length > 0 || repos.length > 0) {
+      setShowModal(true);
+    } else {
+      await revalidateClaimPoints();
+    }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = async () => {
     setShowModal(false);
-    revalidateClaimPoints();
+    await revalidateClaimPoints();
   };
 
   return (
