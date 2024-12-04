@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { QuestsRecord } from '@packages/scoutgame-ui/components/quests/QuestsList/QuestsRecord';
 
 import { mockBuilder } from '../../testing/database';
 import { completeQuest } from '../completeQuest';
-import { QuestsRecord } from '../getQuests';
 
 describe('completeQuest', () => {
   it('should throw an error if the quest is already completed', async () => {
