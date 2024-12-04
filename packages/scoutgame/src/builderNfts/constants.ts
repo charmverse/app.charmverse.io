@@ -1,5 +1,6 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
+import type { BuilderNftType } from '@charmverse/core/prisma';
 import type { Chain } from 'viem/chains';
 import { optimism, optimismSepolia } from 'viem/chains';
 
@@ -33,6 +34,10 @@ export function getBuilderContractAddress(): `0x${string}` {
 export function getBuilderStarterPackContractAddress(): `0x${string}` {
   return (env('BUILDER_STARTER_PACK_CONTRACT_ADDRESS') ||
     process.env.REACT_APP_BUILDER_STARTER_PACK_CONTRACT_ADDRESS) as `0x${string}`;
+}
+
+export function getBuilderContractAddressForNftType(nftType: BuilderNftType): `0x${string}` {
+  return nftType === 'season_1_starter_pack' ? getBuilderStarterPackContractAddress() : getBuilderContractAddress();
 }
 
 // USDC Contract we use for payments

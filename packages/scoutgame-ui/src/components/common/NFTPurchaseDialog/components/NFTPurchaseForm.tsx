@@ -25,7 +25,7 @@ import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/b
 import {
   builderNftChain,
   getBuilderContractAddress,
-  getBuilderStarterPackContractAddress,
+  getBuilderContractAddressForNftType,
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
@@ -219,10 +219,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     builderTokenId,
     scoutId: user?.id as string,
     paymentAmountOut: purchaseCost,
-    contractAddress:
-      builder.nftType === 'season_1_starter_pack'
-        ? getBuilderStarterPackContractAddress()
-        : getBuilderContractAddress(),
+    contractAddress: getBuilderContractAddressForNftType(builder.nftType),
     sourceChainId: selectedPaymentOption.chainId,
     sourceToken: getCurrencyContract(selectedPaymentOption),
     tokensToPurchase: BigInt(tokensToBuy)
@@ -280,6 +277,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           value: _value
         },
         txMetadata: {
+          contractAddress: getBuilderContractAddressForNftType(builder.nftType),
           fromAddress: address as Address,
           sourceChainId: selectedPaymentOption.chainId,
           builderTokenId: Number(builderTokenId),
