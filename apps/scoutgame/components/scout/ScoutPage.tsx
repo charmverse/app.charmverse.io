@@ -82,7 +82,6 @@ export function ScoutPage({
           <Stack
             position='sticky'
             top={0}
-            zIndex={1}
             bgcolor='background.default'
             sx={{ display: { xs: 'none', md: 'flex' }, mt: 4 }}
           >
