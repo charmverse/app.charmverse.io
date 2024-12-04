@@ -12,7 +12,7 @@ test.describe('Claim points', () => {
     await utils.loginAsUserId(newUser.id);
 
     await mockGemPayoutEvent({
-      builderId: newUser.id,
+      builderId: builder.id,
       recipientId: newUser.id,
       amount: 10,
       season: currentSeason
