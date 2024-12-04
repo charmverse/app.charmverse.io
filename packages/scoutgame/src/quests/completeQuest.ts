@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { sendPointsForSocialQuest } from '@packages/scoutgame/points/builderEvents/sendPointsForSocialQuest';
+import { QuestsRecord } from '@packages/scoutgame-ui/components/quests/QuestsList/QuestsRecord';
 
-import { QuestsRecord } from './getQuests';
+import { sendPointsForSocialQuest } from '../points/builderEvents/sendPointsForSocialQuest';
 
 export async function completeQuest(userId: string, questType: string) {
   const points = QuestsRecord[questType].points;

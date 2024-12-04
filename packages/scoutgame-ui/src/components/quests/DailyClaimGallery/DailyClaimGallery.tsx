@@ -1,14 +1,18 @@
 import { Grid2 as Grid, Stack, Typography } from '@mui/material';
+import type { DailyClaim } from '@packages/scoutgame/claims/getDailyClaims';
+import { DailyClaimCard } from '@packages/scoutgame-ui/components/quests/DailyClaimGallery/DailyClaimCard';
 import dynamic from 'next/dynamic';
 
-import type { DailyClaim } from 'lib/claims/getDailyClaims';
-
-import { DailyClaimCard } from './DailyClaimCard';
-
 // A time based component needs to be rendered only on the client since the server and client will not match
-const NextClaimCountdown = dynamic(() => import('./NextClaimCountdown').then((mod) => mod.NextClaimCountdown), {
-  ssr: false
-});
+const NextClaimCountdown = dynamic(
+  () =>
+    import('@packages/scoutgame-ui/components/quests/DailyClaimGallery/NextClaimCountdown').then(
+      (mod) => mod.NextClaimCountdown
+    ),
+  {
+    ssr: false
+  }
+);
 
 export function DailyClaimGallery({ dailyClaims }: { dailyClaims: DailyClaim[] }) {
   return (

@@ -2,13 +2,13 @@
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
+import { completeQuestAction } from '@packages/scoutgame/quests/completeQuestAction';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 
-import { completeQuestAction } from 'lib/quests/completeQuestAction';
-import { QuestsRecord, type QuestInfo } from 'lib/quests/getQuests';
+import type { QuestInfo } from './QuestsRecord';
 
 export function QuestCard({ quest }: { quest: QuestInfo }) {
   const { refreshUser } = useUser();
@@ -18,8 +18,20 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
     }
   });
 
+  const handleClick = async () => {
+    if (!quest.completed && !isExecuting) {
+      execute({ questType: quest.type });
+      const link = quest.link;
+      if (link) {
+        window.open(link, link.startsWith('http') ? '_blank' : '_self');
+      }
+    }
+  };
+
   return (
     <Stack
+      component={Button}
+      onClick={handleClick}
       sx={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -31,23 +43,14 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         borderRadius: 1,
         p: 1.5
       }}
-      onClick={() => {
-        if (!quest.completed && !isExecuting) {
-          execute({ questType: quest.type });
-          const link = QuestsRecord[quest.type].link;
-          if (link) {
-            window.open(link, link.startsWith('http') ? '_blank' : '_self');
-          }
-        }
-      }}
     >
       <Stack direction='row' gap={3.5} alignItems='center'>
-        {QuestsRecord[quest.type].icon}
+        {quest.icon}
         <Stack gap={1}>
-          <Typography fontWeight={500}>{QuestsRecord[quest.type].label}</Typography>
+          <Typography fontWeight={500}>{quest.label}</Typography>
           <Stack direction='row' gap={0.5} alignItems='center'>
             <Typography variant='body2' fontWeight={500}>
-              +{QuestsRecord[quest.type].points}
+              +{quest.points}
             </Typography>
             <Image src='/images/scout-game-profile-icon.png' alt='Scoutgame icon' width={18.5} height={12} />
           </Stack>

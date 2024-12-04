@@ -1,23 +1,21 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import XIcon from '@mui/icons-material/X';
 import Image from 'next/image';
-import React from 'react';
+import type { ReactNode } from 'react';
+
+type QuestRecord = {
+  points: number;
+  icon: ReactNode;
+  label: string;
+  link?: string;
+};
 
 export type QuestInfo = {
   type: string;
   completed: boolean;
-};
+} & QuestRecord;
 
-export const QuestsRecord: Record<
-  string,
-  {
-    points: number;
-    icon: React.ReactNode;
-    label: string;
-    link?: string;
-  }
-> = {
+export const QuestsRecord: Record<string, QuestRecord> = {
   'follow-x-account': {
     points: 50,
     icon: <XIcon fontSize='large' />,
@@ -29,7 +27,7 @@ export const QuestsRecord: Record<
     icon: <XIcon fontSize='large' />,
     label: 'Share this channel',
     link: `https://x.com/intent/tweet?text=${encodeURIComponent(
-      'I’m playing @scoutgamexyz on Telegram! 🕹️ Come join me, play in the channel, and discover top builders while earning points and rewards. Let’s scout together! 👉 https://t.me/+J0dl4_uswBY2NTkx #PlayAndEarn'
+      "I'm playing @scoutgamexyz on Telegram! 🕹️ Come join me, play in the channel, and discover top builders while earning points and rewards. Let’s scout together! 👉 https://t.me/+J0dl4_uswBY2NTkx #PlayAndEarn"
     )}`
   },
   'watch-gameplay-video': {
@@ -45,17 +43,3 @@ export const QuestsRecord: Record<
     link: '/friends'
   }
 };
-
-export async function getQuests(userId: string): Promise<QuestInfo[]> {
-  const socialQuests = await prisma.scoutSocialQuest.findMany({
-    where: {
-      userId
-    }
-  });
-
-  return Object.keys(QuestsRecord).map((type) => ({
-    type,
-    completed: socialQuests.some((quest) => quest.type === type),
-    ...QuestsRecord[type]
-  }));
-}

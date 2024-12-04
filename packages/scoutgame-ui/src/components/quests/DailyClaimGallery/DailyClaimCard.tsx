@@ -2,14 +2,13 @@
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Stack, Typography } from '@mui/material';
+import { claimDailyRewardAction } from '@packages/scoutgame/claims/claimDailyRewardAction';
+import type { DailyClaim } from '@packages/scoutgame/claims/getDailyClaims';
 import { DailyClaimGift } from '@packages/scoutgame-ui/components/claim/components/common/DailyClaimGift';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
-
-import { claimDailyRewardAction } from 'lib/claims/claimDailyRewardAction';
-import type { DailyClaim } from 'lib/claims/getDailyClaims';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
