@@ -42,7 +42,7 @@ export function ScoutPage({
   scoutTab: string;
   buildersLayout: string;
   tab: string;
-  starterpackBuilders: BuilderInfo[];
+  starterpackBuilders: BuilderInfo[] | null;
 }) {
   const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
     .filter(([, value]) => isTruthy(value))
@@ -70,12 +70,14 @@ export function ScoutPage({
             gap: 2
           }}
         >
-          <Stack gap={2} my={2}>
-            <Typography variant='h5' color='secondary' fontWeight={600} textAlign='center'>
-              Scout your Starter Pack
-            </Typography>
-            <ScoutBuilderCarousel builders={starterpackBuilders} />
-          </Stack>
+          {starterpackBuilders && (
+            <Stack gap={2} my={2}>
+              <Typography variant='h5' color='secondary' fontWeight={600} textAlign='center'>
+                Scout your Starter Pack
+              </Typography>
+              <ScoutBuilderCarousel builders={starterpackBuilders} />
+            </Stack>
+          )}
           <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
             Scout today's HOT Builders!
           </Typography>
