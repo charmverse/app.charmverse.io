@@ -48,7 +48,7 @@ export function HowItWorksContent({ onClickContinue }: { onClickContinue?: React
         </ListItem>
         <Stack flexDirection='row' gap={2} width='100%' justifyContent='center' my={2}>
           <img src='/images/crypto/ethereum-circle.png' alt='Ethereum' title='Ethereum' width='24' height='24' />
-          <img src='/images/crypto/op64.png' alt='OP' title='Optimism' width='24' height='24' />
+          <img src='/images/crypto/op.png' alt='OP' title='Optimism' width='24' height='24' />
           <img src='/images/crypto/arbitrum.png' alt='Arbitrum' title='Arbitrum' width='24' height='24' />
           <img src='/images/crypto/base64.png' alt='Base' title='Base' width='24' height='24' />
           <img src='/images/crypto/zora64.png' alt='Zora' title='Zora' width='24' height='24' />

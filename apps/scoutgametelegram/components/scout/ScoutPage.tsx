@@ -17,7 +17,19 @@ const HeaderMessage = dynamic(
   }
 );
 
-export function ScoutPage({ tab, order, sort }: { tab: string; order: string; sort: string }) {
+export function ScoutPage({
+  tab,
+  builderSort,
+  scoutSort,
+  scoutOrder,
+  builderOrder
+}: {
+  tab: string;
+  builderSort: string;
+  scoutSort: string;
+  scoutOrder: string;
+  builderOrder: string;
+}) {
   const currentTab = scoutTabs.some((t) => t.value === tab) ? tab : 'builders';
 
   return (
@@ -26,7 +38,13 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
       <Typography variant='h4' color='secondary' textAlign='center' fontWeight='bold' my={2}>
         Scout today's HOT Builders!
       </Typography>
-      <TodaysHotBuildersCarousel />
+      <Box
+        sx={{
+          height: 250
+        }}
+      >
+        <TodaysHotBuildersCarousel />
+      </Box>
       <Box
         sx={{
           position: 'sticky',
@@ -39,7 +57,11 @@ export function ScoutPage({ tab, order, sort }: { tab: string; order: string; so
         <InfoModal builder={currentTab === 'builders'} sx={{ position: 'absolute', right: 10, top: 3.5 }} />
       </Box>
       <Suspense key={currentTab} fallback={<LoadingTable />}>
-        <ScoutPageTable tab={currentTab} order={order} sort={sort} />
+        <ScoutPageTable
+          tab={currentTab}
+          sort={currentTab === 'builders' ? builderSort : scoutSort}
+          order={currentTab === 'builders' ? builderOrder : scoutOrder}
+        />
       </Suspense>
     </>
   );

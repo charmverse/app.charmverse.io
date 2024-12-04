@@ -320,7 +320,7 @@ export function LandingPage() {
           top: 0
         }}
       />
-      <Stack height='100%' overflow='auto' zIndex={1}>
+      <Stack height='100%' overflow='auto'>
         <HeroSection />
         <HowToPlaySection />
         <FooterSection />
