@@ -65,6 +65,7 @@ export async function getStarterpackBuilders(): Promise<BuilderInfo[]> {
     nftsSold: builder.user.userSeasonStats[0]?.nftsSold || 0,
     builderStatus: 'approved',
     nftImageUrl: builder.user.builderNfts[0]?.imageUrl || '',
-    contractAddress: builder.user.builderNfts[0]?.contractAddress || ''
+    contractAddress: builder.user.builderNfts[0]?.contractAddress || '',
+    nftType: BuilderNftType.season_1_starter_pack
   }));
 }

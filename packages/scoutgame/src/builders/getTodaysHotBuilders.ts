@@ -119,7 +119,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
         .map((gem) => gem.gemsCount)
         .slice(-7),
-      contractAddress: builder.builderNfts[0]?.contractAddress || ''
+      contractAddress: builder.builderNfts[0]?.contractAddress || '',
+      nftType: BuilderNftType.default
     };
   });
 }

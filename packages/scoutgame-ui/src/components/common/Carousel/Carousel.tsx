@@ -65,7 +65,16 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
           nextEl: '.swiper-button-next',
           prevEl: '.swiper-button-prev'
         }}
+        pagination={
+          renderBullet
+            ? {
+                clickable: true,
+                renderBullet
+              }
+            : undefined
+        }
         {...swiperProps}
+        style={{ width: '100%', ...swiperProps.style }}
       >
         {children.map((child, index) => (
           <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>

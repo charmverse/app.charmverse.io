@@ -17,7 +17,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       tokensPurchased: true,
       builderNFT: {
         select: {
-          builderId: true
+          builderId: true,
+          nftType: true
         }
       }
     }
@@ -49,7 +50,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
         select: {
           contractAddress: true,
           imageUrl: true,
-          currentPrice: true
+          currentPrice: true,
+          nftType: true
         }
       },
       builderCardActivities: {
@@ -87,7 +89,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
         .map((gem) => gem.gemsCount)
         .slice(-7),
-      contractAddress: builder.builderNfts[0]?.contractAddress || ''
+      contractAddress: builder.builderNfts[0]?.contractAddress || '',
+      nftType: builder.builderNfts[0]?.nftType || 'default'
     };
   });
 }

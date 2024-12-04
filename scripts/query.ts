@@ -9,21 +9,55 @@ const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 
 const currentSeason = currentSeasonStartDate.toFormat(`kkkk-'W'WW`);
 
 async function query() {
-  const scouts = await prisma.scout.findMany({ where: { builderStatus: 'applied' }, include: { githubUser: true } });
-  console.log(scouts.length);
-  let rejected = 0;
-  for (const scout of scouts) {
-    const commits = await getCommitsByUser({ login: scout.githubUser[0].login, after: afterDate });
-    console.log(commits.length);
-    if (commits.length === 0) {
-      // await prisma.scout.update({ where: { id: scout.id }, data: { builderStatus: 'rejected' } });
-      rejected++;
-      console.log(`Rejected ${scout.githubUser[0].login}`);
-    } else {
-      console.log(`Accepted ${scout.githubUser[0].login}`);
+  const proposal = await prisma.proposal.findFirstOrThrow({
+    where: {
+      space: {
+        domain: 'op-grants'
+      },
+      page: {
+        path: 'pike-unlocking-the-multichain-utility-of-op-10175721236250412'
+      }
+    },
+    include: {
+      authors: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              email: true
+            }
+          }
+        }
+      }
     }
-  }
-  console.log(`Rejected ${rejected} scouts`);
+  });
+
+  const user = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          email: 'terry@nuts.finance'
+        },
+        {
+          verifiedEmails: {
+            some: {
+              email: 'terry@nuts.finance'
+            }
+          }
+        },
+        {
+          googleAccounts: {
+            some: {
+              email: 'terry@nuts.finance'
+            }
+          }
+        }
+      ]
+    }
+  });
+
+  prettyPrint({proposal});
 }
 
 query();

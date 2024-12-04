@@ -20,6 +20,7 @@ import {
   Typography
 } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { builderContractStarterPackReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractStarterPackReadClient';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
@@ -148,9 +149,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
-      const _price = await builderContractReadonlyApiClient.getTokenPurchasePrice({
-        args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
-      });
+      const _price =
+        builder.nftType === 'season_1_starter_pack'
+          ? await builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
+              args: { amount: BigInt(amount) }
+            })
+          : await builderContractReadonlyApiClient.getTokenPurchasePrice({
+              args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
+            });
       setPurchaseCost(_price);
     },
     [setPurchaseCost]
@@ -161,7 +167,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     let _builderTokenId: bigint | undefined;
     try {
       setIsFetchingPrice(true);
-      _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
+      _builderTokenId =
+        builder.nftType === 'season_1_starter_pack'
+          ? await builderContractStarterPackReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } })
+          : await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
 
       setBuilderTokenId(_builderTokenId);
 

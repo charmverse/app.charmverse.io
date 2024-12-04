@@ -1,6 +1,6 @@
 'use client';
 
-import type { BuilderStatus } from '@charmverse/core/prisma';
+import type { BuilderNftType, BuilderStatus } from '@charmverse/core/prisma';
 import { Box, Paper, Stack, styled, Typography } from '@mui/material';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
 import type { BuilderScouts } from '@packages/scoutgame/builders/getBuilderScouts';

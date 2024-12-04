@@ -63,6 +63,7 @@ export async function getPaginatedBuilders({
                 contractAddress: true,
                 currentPrice: true,
                 imageUrl: true,
+                nftType: true,
                 nftSoldEvents: {
                   distinct: 'scoutId'
                 }
@@ -96,6 +97,7 @@ export async function getPaginatedBuilders({
         rank: stat.rank ?? -1,
         nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
         contractAddress: stat.user.builderNfts[0]?.contractAddress,
+        nftType: stat.user.builderNfts[0]?.nftType,
         path: stat.user.path,
         displayName: stat.user.displayName,
         builderPoints: stat.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,
