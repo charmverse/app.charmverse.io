@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from '@packages/utils/strings';
 
 import type { Last7DaysGems } from '../builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '../builders/interfaces';
@@ -72,9 +71,6 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
       }
     }
   });
-
-  // prettyPrint({ scoutId });
-  prettyPrint({ builders });
 
   return builders.flatMap((builder) => {
     return builder.builderNfts.map((nft) => {

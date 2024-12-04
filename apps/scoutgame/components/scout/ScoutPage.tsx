@@ -71,7 +71,7 @@ export function ScoutPage({
           }}
         >
           <Stack gap={2} my={2}>
-            <Typography variant='h4' color='secondary' fontWeight={600} textAlign='center'>
+            <Typography variant='h5' color='secondary' fontWeight={600} textAlign='center'>
               Scout your Starter Pack
             </Typography>
             <ScoutBuilderCarousel builders={starterpackBuilders} />
