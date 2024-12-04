@@ -1,5 +1,8 @@
-// Dev chat group
+// To get the chat id for a group: https://api.telegram.org/bot<YourBOTToken>/getUpdates
+
+// Matt's Dev chat group
 // const chatId = '-1002453163872';
+
 // Official Scout Game group
 const chatId = '-1002258724294';
 
@@ -16,9 +19,8 @@ const url = `https://api.telegram.org/bot${botApiKey}/sendMessage?chat_id=${chat
   replyMarkup
 )}`;
 
+// send message
 (async () => {
   const res = await fetch(url);
   console.log(res);
 })();
-
-// To get the chat id for a group: https://api.telegram.org/bot<YourBOTToken>/getUpdates
