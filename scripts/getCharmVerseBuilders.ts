@@ -201,11 +201,11 @@ function generateCsv() {
   const csvContent = [
     headers.join(','),
     ...builders
-      .filter((b) => b.email && b.email.includes('@'))
-      .map((builder) =>
+      .filter((b: any) => b.email && b.email.includes('@'))
+      .map((builder: any) =>
         headers
           .map((header) => {
-            const value = builder[header] || '';
+            const value = builder[header as string] || '';
             // Escape commas and quotes in values
             return `"${String(value).replace(/"/g, '""')}"`;
           })
