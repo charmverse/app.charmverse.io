@@ -22,6 +22,6 @@ test.describe('Claim points', () => {
 
     await claimPage.claimPointsButton.click();
     await expect(claimPage.successModal).toBeVisible();
-    await expect(claimPage.headerPointsBalance.textContent()).toEqual('10');
+    await expect(await claimPage.headerPointsBalance.textContent()).toEqual('10');
   });
 });
