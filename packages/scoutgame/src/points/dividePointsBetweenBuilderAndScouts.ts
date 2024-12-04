@@ -31,14 +31,26 @@ export async function dividePointsBetweenBuilderAndScouts({
         season,
         builderId
       }
+    },
+    select: {
+      scoutId: true,
+      tokensPurchased: true,
+      builderNFT: {
+        select: {
+          nftType: true
+        }
+      }
     }
   });
 
   const { totalNftsPurchased, nftsByScout } = nftPurchaseEvents.reduce(
     (acc, purchaseEvent) => {
-      acc.totalNftsPurchased += purchaseEvent.tokensPurchased;
-      acc.nftsByScout[purchaseEvent.scoutId] =
-        (acc.nftsByScout[purchaseEvent.scoutId] || 0) + purchaseEvent.tokensPurchased;
+      // Normal NFTs are 10x more valuable than Starter Pack NFTs
+      const multiplier = purchaseEvent.builderNFT.nftType === 'season_1_starter_pack' ? 1 : 10;
+      const totalPurchased = purchaseEvent.tokensPurchased * multiplier;
+
+      acc.totalNftsPurchased += totalPurchased;
+      acc.nftsByScout[purchaseEvent.scoutId] = (acc.nftsByScout[purchaseEvent.scoutId] || 0) + totalPurchased;
       return acc;
     },
     {
