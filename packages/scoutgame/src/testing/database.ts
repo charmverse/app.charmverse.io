@@ -344,6 +344,7 @@ export async function mockBuilderNft({
   for (const owner of owners) {
     await mockNFTPurchaseEvent({
       builderId,
+      season: nft.season,
       scoutId: typeof owner === 'string' ? owner : owner.id
     });
   }
