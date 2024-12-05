@@ -158,7 +158,7 @@ async function query() {
       githubUsers: true
     }
   });
-  const scoutGithubs = scouts.flatMap((s) => s.githubUser?.map((gu) => gu.login));
+  const scoutGithubs = scouts.flatMap((s) => s.githubUsers.map((gu) => gu.login));
 
   console.log(rows.length, 'logins');
   console.log('found', scouts.length, 'scouts', scoutGithubs.length);

@@ -16,7 +16,7 @@ async function getThisWeeksPrs() {
   const githubEvents = await prisma.githubEvent.findMany({
     select: {
       title: true,
-      githubUsers: {
+      githubUser: {
         select: {
           login: true,
           builderId: true
