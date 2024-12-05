@@ -33,6 +33,7 @@ export const saveOnboardingDetailsAction = authActionClient
         email: parsedInput.email,
         sendMarketing: parsedInput.sendMarketing,
         agreedToTermsAt: new Date(),
+        onboardedAt: new Date(),
         avatar: parsedInput.avatar,
         displayName: parsedInput.displayName,
         path,

@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { mockScout } from '@packages/scoutgame/testing/database';
+import { prettyPrint } from '@packages/utils/strings';
 import { randomIntFromInterval } from '@root/lib/utils/random';
 
 import { expect, test } from './test';
 
 test.describe('Onboarding flow', () => {
-  test.skip('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
+  test('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
     await page.goto('/');
     await expect(homePage.getStartedButton).toBeVisible();
     await homePage.getStartedButton.click();
@@ -41,7 +42,7 @@ test.describe('Onboarding flow', () => {
 
     await welcomePage.submitExtraDetails.click();
 
-    await page.waitForURL('**/welcome/builder');
+    await page.waitForURL('**/welcome/how-it-works', { waitUntil: 'load' });
 
     // make sure we saved onboarding preferences
     const user = await prisma.scout.findFirstOrThrow({
@@ -59,8 +60,6 @@ test.describe('Onboarding flow', () => {
     expect(user.sendMarketing).toBe(true);
     expect(user.agreedToTermsAt).not.toBeNull();
     expect(user.email).toBe(email);
-
-    await Promise.all([page.waitForURL('**/welcome/how-it-works'), welcomePage.continueButton.click()]);
 
     await Promise.all([page.waitForURL('**/scout', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
 
@@ -80,7 +79,7 @@ test.describe('Onboarding flow', () => {
     expect(!!userAfterOnboarding.onboardedAt).toBe(true);
   });
 
-  test.skip('Require terms of service agreement for user that was onboarded somehow', async ({
+  test('Require terms of service agreement for user that was onboarded somehow', async ({
     page,
     welcomePage,
     utils
@@ -97,7 +96,7 @@ test.describe('Onboarding flow', () => {
     await expect(welcomePage.container).toBeVisible();
   });
 
-  test.skip('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
+  test('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
     const newUser = await mockScout({
       agreedToTermsAt: null,
       onboardedAt: null

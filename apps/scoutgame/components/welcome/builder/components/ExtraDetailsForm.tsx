@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  Box,
   Button,
   Checkbox,
   FormControl,
@@ -11,8 +12,7 @@ import {
   Link,
   Stack,
   TextField,
-  Typography,
-  Box
+  Typography
 } from '@mui/material';
 import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 import { FormErrors } from '@packages/scoutgame-ui/components/common/FormErrors';
@@ -28,8 +28,8 @@ import type { FieldErrors } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 import { saveOnboardingDetailsAction } from 'lib/users/saveOnboardingDetailsAction';
-import { saveOnboardingDetailsSchema } from 'lib/users/saveOnboardingDetailsSchema';
 import type { SaveOnboardingDetailsFormValues } from 'lib/users/saveOnboardingDetailsSchema';
+import { saveOnboardingDetailsSchema } from 'lib/users/saveOnboardingDetailsSchema';
 
 export function ExtraDetailsForm({ user }: { user: SessionUser }) {
   const router = useRouter();
