@@ -111,7 +111,6 @@ export async function seedWithRealCharmverseGithubData() {
               builderStatus: 'approved',
               avatar,
               farcasterId,
-              referralCode: uuidv4()
             }
           }
         }
@@ -130,7 +129,6 @@ export async function seedWithRealCharmverseGithubData() {
               builderStatus: 'approved',
               avatar: avatar,
               farcasterId: farcasterId,
-              referralCode: uuidv4()
             }
           }
         }

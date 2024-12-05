@@ -63,8 +63,7 @@ async function createBuilders() {
                 displayName: githubUser.data.name,
                 email: githubUser.data.email
               }
-            },
-            referralCode: uuidv4()
+            }
           }
         });
         log.info(`Created builder for ${login}`, { builderId: builder.id });

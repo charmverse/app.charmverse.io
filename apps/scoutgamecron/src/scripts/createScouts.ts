@@ -29,8 +29,7 @@ async function createScouts(farcasterUsernames: string[]) {
           bio,
           farcasterId: fid,
           farcasterName: farcasterUsername,
-          currentBalance: 10,
-          referralCode: uuidv4()
+          currentBalance: 10
         }
       });
       log.info(`Created scout for ${farcasterUsername}`, { scoutId: scout.id });
