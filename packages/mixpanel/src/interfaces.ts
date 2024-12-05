@@ -58,6 +58,9 @@ export type MixpanelEventMap = {
     referralCode: string;
     referrerPath: string;
   };
+  complete_quest: BaseEvent & {
+    questType: string;
+  };
 } & Record<EventType, FrontendEvent>;
 
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
