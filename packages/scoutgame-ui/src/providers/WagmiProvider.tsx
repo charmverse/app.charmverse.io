@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { getPlatform } from '@packages/mixpanel/utils';
 import { getBrowserPath, isTouchDevice, isWebView } from '@packages/utils/browser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
@@ -19,7 +20,8 @@ function useMetamaskInterceptor() {
       }
     }
 
-    if (isTouchDevice()) {
+    // Only listen for clicks in webapp, not in telegram or other miniapps
+    if (isTouchDevice() && getPlatform() === 'webapp') {
       // passing true in the 3rd argument means listen in the capture phase
       document.addEventListener('click', handleLinkClick, true);
     }
