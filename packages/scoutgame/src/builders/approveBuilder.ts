@@ -40,13 +40,4 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
       builderStatus: 'approved'
     }
   });
-
-  // do not wait for git to complete
-  importReposByUser(scout.githubUser[0]?.login).catch((error) => {
-    log.error('Error importing repos for new builder', {
-      error,
-      githubLogin: scout.githubUser[0]?.login,
-      userId: builderId
-    });
-  });
 }

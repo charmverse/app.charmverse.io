@@ -1,17 +1,18 @@
 import { currentSeason } from '@packages/scoutgame/dates';
-import { mockGemPayoutEvent, mockScout } from '@packages/scoutgame/testing/database';
+import { mockGemPayoutEvent, mockScout, mockBuilder } from '@packages/scoutgame/testing/database';
 
 import { expect, test } from './test';
 
 test.describe('Claim points', () => {
-  test('Claim points and assert current balance', async ({ page, utils }) => {
+  test('Claim points and assert current balance', async ({ page, claimPage, utils }) => {
     // add some mock data
-    const newUser = await mockScout();
+    const builder = await mockBuilder({ createNft: true });
+    const newUser = await mockScout({ builderId: builder.id });
 
     await utils.loginAsUserId(newUser.id);
 
     await mockGemPayoutEvent({
-      builderId: newUser.id,
+      builderId: builder.id,
       recipientId: newUser.id,
       amount: 10,
       season: currentSeason
@@ -19,9 +20,8 @@ test.describe('Claim points', () => {
 
     await page.goto('/claim');
 
-    await page.locator('[data-test="claim-points-button"]').click();
-    await expect(page.locator('[data-test="claim-points-success-modal"]')).toBeVisible();
-    const balance = await page.locator('[data-test="user-points-balance"]').textContent();
-    expect(balance).toEqual('10');
+    await claimPage.claimPointsButton.click();
+    await expect(claimPage.successModal).toBeVisible();
+    await expect(await claimPage.headerPointsBalance.textContent()).toEqual('10');
   });
 });

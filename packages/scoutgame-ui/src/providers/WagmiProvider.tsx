@@ -1,6 +1,7 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
+import { getPlatform } from '@packages/mixpanel/utils';
 import { getBrowserPath, isTouchDevice, isWebView } from '@packages/utils/browser';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
@@ -13,13 +14,18 @@ function useMetamaskInterceptor() {
     function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
       if (metamaskButton && !isWebView(navigator.userAgent)) {
-        log.debug('Send user to Metamask', { ua: navigator.userAgent, platform: navigator.platform });
+        log.debug('Send user to Metamask', {
+          ua: navigator.userAgent,
+          platform: navigator.platform,
+          appPlatform: getPlatform()
+        });
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }
     }
 
-    if (isTouchDevice()) {
+    // Only listen for clicks in webapp, not in telegram or other miniapps
+    if (isTouchDevice() && getPlatform() === 'webapp') {
       // passing true in the 3rd argument means listen in the capture phase
       document.addEventListener('click', handleLinkClick, true);
     }

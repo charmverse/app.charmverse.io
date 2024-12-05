@@ -91,7 +91,6 @@ export function ScoutPage({
           <Stack
             position='sticky'
             top={0}
-            zIndex={1}
             bgcolor='background.default'
             sx={{ display: { xs: 'none', md: 'flex' }, mt: 4 }}
           >
@@ -126,13 +125,7 @@ export function ScoutPage({
             {buildersLayout === 'table' && <ScoutPageTable tab='builders' order={builderOrder} sort={builderSort} />}
             {buildersLayout === 'gallery' && <ScoutPageBuildersGallery showHotIcon />}
           </Stack>
-          <Stack
-            position='sticky'
-            top={0}
-            zIndex={1}
-            bgcolor='background.default'
-            sx={{ display: { xs: 'flex', md: 'none' } }}
-          >
+          <Stack position='sticky' top={0} bgcolor='background.default' sx={{ display: { xs: 'flex', md: 'none' } }}>
             <Box sx={{ position: 'absolute', right: 0, top: 3.5, zIndex: 2 }}>
               <InfoModal builder={tab === 'builders'} />
             </Box>
