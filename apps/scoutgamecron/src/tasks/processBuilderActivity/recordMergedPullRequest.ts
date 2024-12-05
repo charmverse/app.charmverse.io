@@ -206,7 +206,7 @@ export async function recordMergedPullRequest({
           // It's a new event, we can record notification
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
-              builderNFT: {
+              builderNft: {
                 season,
                 builderId: githubUser.builderId
               }

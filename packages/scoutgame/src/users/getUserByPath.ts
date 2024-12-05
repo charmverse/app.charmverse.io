@@ -53,7 +53,7 @@ export async function getUserByPath(path: string): Promise<
     ...user,
     nftImageUrl: user?.builderNfts[0]?.imageUrl,
     congratsImageUrl: user?.builderNfts[0]?.congratsImageUrl,
-    githubLogin: user?.githubUser[0]?.login,
+    githubLogin: user?.githubUsers[0]?.login,
     talentProfile: user.talentProfile,
     hasMoxieProfile: user.hasMoxieProfile
   };

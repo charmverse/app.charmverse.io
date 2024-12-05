@@ -186,7 +186,7 @@ async function clearNfts() {
   await prisma.builderNft.deleteMany({
     where: {
       builder: {
-        githubUser: {
+        githubUsers: {
           some: {
             login: {
               in: Object.keys(devUsers)

@@ -18,7 +18,7 @@ export async function getLastWeekTopNewScouts() {
     },
     select: {
       scoutId: true,
-      builderNFT: {
+      builderNft: {
         select: {
           builderId: true
         }
@@ -28,7 +28,7 @@ export async function getLastWeekTopNewScouts() {
 
   const scoutIds = nftsSold.map((nft) => nft.scoutId);
   const scoutBuilderIdsRecord = nftsSold.reduce<Record<string, string[]>>((acc, nft) => {
-    acc[nft.scoutId] = [...(acc[nft.scoutId] || []), nft.builderNFT.builderId];
+    acc[nft.scoutId] = [...(acc[nft.scoutId] || []), nft.builderNft.builderId];
     return acc;
   }, {});
 

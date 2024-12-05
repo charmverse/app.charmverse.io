@@ -20,7 +20,7 @@ export async function approveBuilder({ builderId, season = currentSeason }: { bu
     },
     select: {
       id: true,
-      githubUser: true
+      githubUsers: true
     }
   });
 

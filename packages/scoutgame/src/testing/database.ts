@@ -39,7 +39,7 @@ export async function mockBuilder({
       farcasterId,
       referralCode,
       farcasterName,
-      githubUser: {
+      githubUsers: {
         create: {
           id: githubUserId,
           login: githubUserLogin
@@ -47,15 +47,15 @@ export async function mockBuilder({
       }
     },
     include: {
-      githubUser: true
+      githubUsers: true
     }
   });
 
   if (createNft) {
     await mockBuilderNft({ builderId: result.id, season: nftSeason });
   }
-  const { githubUser, ...scout } = result;
-  return { ...scout, githubUser: githubUser[0]! };
+  const { githubUsers, ...scout } = result;
+  return { ...scout, githubUser: githubUsers[0]! };
 }
 
 export type MockBuilder = Awaited<ReturnType<typeof mockBuilder>>;

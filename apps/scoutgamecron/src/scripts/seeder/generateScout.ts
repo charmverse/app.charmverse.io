@@ -29,7 +29,7 @@ export async function generateScout({ index }: { index: number }) {
       referralCode: randomString(),
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
-      scoutWallet: {
+      wallets: {
         create: {
           address: faker.finance.ethereumAddress()
         }
