@@ -23,6 +23,7 @@ async function createScouts(farcasterUsernames: string[]) {
         update: {},
         create: {
           displayName,
+          referralCode: farcasterUsername + Math.random().toString().replace('.', '').slice(0, 6),
           path: farcasterUsername,
           avatar: avatarUrl,
           bio,

@@ -26,5 +26,6 @@ export type BuilderInfo = BasicUserInfo &
     builderStatus: BuilderStatus;
     farcasterId?: number | null;
     nftImageUrl?: string | null;
+    congratsImageUrl: string | null;
     nftsSoldToScout?: number;
   };

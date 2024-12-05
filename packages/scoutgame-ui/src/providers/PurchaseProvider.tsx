@@ -14,7 +14,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from 'react
 import type { Address } from 'viem';
 import { useSendTransaction } from 'wagmi';
 
-import { useRefreshCongratsImage } from '../hooks/api/builders';
+import { useRefreshShareImage } from '../hooks/api/builders';
 
 import { useSnackbar } from './SnackbarContext';
 import { useUser } from './UserProvider';
@@ -52,7 +52,7 @@ export const PurchaseContext = createContext<Readonly<PurchaseContext | null>>(n
 
 export function PurchaseProvider({ children }: { children: ReactNode }) {
   const { showMessage } = useSnackbar();
-  const { trigger: refreshCongratsImage } = useRefreshCongratsImage();
+  const { trigger: refreshShareImage } = useRefreshShareImage();
   const { refreshUser } = useUser();
   const { sendTransactionAsync } = useSendTransaction();
 
@@ -82,7 +82,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     async onSuccess(res) {
       if (res.data?.id) {
         // Refresh the congrats image without awaiting it since we don't want to slow down the process
-        refreshCongratsImage({ builderId: res.input.user.id });
+        refreshShareImage({ builderId: res.input.user.id });
 
         const checkResult = await checkDecentTransaction({
           pendingTransactionId: res.data.id,

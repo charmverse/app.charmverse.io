@@ -25,4 +25,8 @@ export function getNftCongratsPath({
   return `seasons/${season}/${contractName}/${tokenId}/${starterPack ? 'starter-pack-' : ''}${'congrats.png'}`;
 }
 
+export function getShareImagePath({ season, tokenId }: { season: string; tokenId: number }) {
+  return `seasons/${season}/${contractName}/${tokenId}/congrats.png`;
+}
+
 export const imageDomain = 'https://nft.scoutgame.xyz';

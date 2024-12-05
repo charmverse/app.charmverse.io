@@ -12,11 +12,6 @@ on:
     branches: ['**']
     paths-ignore:
       - 'apps/**'
-  workflow_dispatch:
-    inputs:
-      core_pkg_version:
-        description: 'Core pkg version to update to'
-        required: true
 
 concurrency:
   group: webapp-${{ github.event_name }}-${{ github.ref }}
@@ -43,9 +38,6 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          commit_core_pkg_upgrade: true
 
       - name: Build app
         uses: ./.github/actions/build

@@ -106,6 +106,7 @@ export async function seedWithRealCharmverseGithubData() {
           builder: {
             create: {
               displayName: builder,
+              referralCode: builder + Math.random().toString().replace('.', '').slice(0, 6),
               path: builder + Math.random().toString().replace('.', '').slice(0, 6),
               builderStatus: 'approved',
               avatar,
@@ -123,6 +124,7 @@ export async function seedWithRealCharmverseGithubData() {
         data: {
           builder: {
             create: {
+              referralCode: builder + Math.random().toString().replace('.', '').slice(0, 6),
               displayName: builder,
               path: builder,
               builderStatus: 'approved',

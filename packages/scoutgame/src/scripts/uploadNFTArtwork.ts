@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { uploadArtwork, uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
+import { uploadArtwork } from '../builderNfts/artwork/uploadArtwork';
+import { uploadShareImage } from '../builderNfts/artwork/uploadShareImage';
 import { currentSeason } from '../dates';
 import { log } from '@charmverse/core/log';
 
@@ -34,7 +35,7 @@ async function uploadNFTArtwork() {
         avatar: builder.avatar,
         tokenId: builderNft.tokenId
       });
-      const congratsImageUrl = await uploadArtworkCongrats({
+      const congratsImageUrl = await uploadShareImage({
         season: currentSeason,
         tokenId: builderNft.tokenId,
         userImage: imageUrl,

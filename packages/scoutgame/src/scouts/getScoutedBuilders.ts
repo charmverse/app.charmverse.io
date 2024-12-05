@@ -52,7 +52,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           imageUrl: true,
           currentPrice: true,
           nftType: true,
-          nftSoldEvents: true
+          nftSoldEvents: true,
+          congratsImageUrl: true
         }
       },
       builderCardActivities: {
@@ -99,7 +100,8 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           .map((gem) => gem.gemsCount)
           .slice(-7),
         contractAddress: nft.contractAddress || '',
-        nftType: nft.nftType || 'default'
+        nftType: nft.nftType || 'default',
+        congratsImageUrl: nft.congratsImageUrl
       };
 
       return nftData;

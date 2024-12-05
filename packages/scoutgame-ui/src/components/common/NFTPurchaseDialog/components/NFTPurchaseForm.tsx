@@ -62,9 +62,10 @@ import { SuccessView } from './SuccessView';
 
 export type NFTPurchaseProps = {
   builder: MinimalUserInfo & {
-    nftType: BuilderNftType;
     price?: bigint;
+    congratsImageUrl?: string | null;
     nftImageUrl?: string | null;
+    nftType: BuilderNftType;
   };
 };
 
