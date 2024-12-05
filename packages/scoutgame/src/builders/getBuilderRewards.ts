@@ -20,12 +20,12 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
     select: {
       nftPurchaseEvents: {
         where: {
-          builderNFT: {
+          builderNft: {
             season: currentSeason
           }
         },
         select: {
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }
@@ -108,12 +108,12 @@ export async function getWeeklyBuilderRewards({
               lte: week
             }
           },
-          builderNFT: {
+          builderNft: {
             season: currentSeason
           }
         },
         select: {
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }

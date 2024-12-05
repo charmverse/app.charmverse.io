@@ -141,7 +141,7 @@ export async function getNewScouts({ week, season }: { week: string; season: str
             week,
             season
           },
-          builderNFT: {
+          builderNft: {
             builder: {
               builderStatus: 'approved'
             }
@@ -154,7 +154,7 @@ export async function getNewScouts({ week, season }: { week: string; season: str
               season: true
             }
           },
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }

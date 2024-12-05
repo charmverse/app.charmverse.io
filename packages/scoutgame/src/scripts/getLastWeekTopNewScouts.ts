@@ -18,7 +18,7 @@ export async function getLastWeekTopNewScouts() {
     },
     select: {
       scoutId: true,
-      builderNFT: {
+      builderNft: {
         select: {
           builderId: true
         }

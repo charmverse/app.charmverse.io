@@ -1,13 +1,14 @@
-import { log } from "@charmverse/core/log";
-import { prisma } from "@charmverse/core/prisma-client";
-import { prettyPrint } from "@packages/utils/strings";
-
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from '@packages/utils/strings';
 
 async function detectDuplicateRecordings() {
-  const duplicatePurchaseEvents = await prisma.nFTPurchaseEvent.groupBy({
-    by: 'txHash',
-    _count: true,
-  }).then(events => events.filter(ev => ev._count > 1));
+  const duplicatePurchaseEvents = await prisma.nFTPurchaseEvent
+    .groupBy({
+      by: 'txHash',
+      _count: true
+    })
+    .then((events) => events.filter((ev) => ev._count > 1));
 
   if (!duplicatePurchaseEvents.length) {
     log.info(`No duplicate events found`);
@@ -17,7 +18,7 @@ async function detectDuplicateRecordings() {
   const sourceEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       txHash: {
-        in: duplicatePurchaseEvents.map(ev => ev.txHash),
+        in: duplicatePurchaseEvents.map((ev) => ev.txHash),
         mode: 'insensitive'
       }
     },
@@ -30,7 +31,7 @@ async function detectDuplicateRecordings() {
       paidInPoints: true,
       pointsValue: true,
       txHash: true,
-      builderNFT: {
+      builderNft: {
         select: {
           tokenId: true
         }
@@ -38,10 +39,12 @@ async function detectDuplicateRecordings() {
     }
   });
 
-  const eventsWithSource = duplicatePurchaseEvents.map(ev => ({...ev, sourceEvents: sourceEvents.filter(source => source.txHash.toLowerCase() === ev.txHash.toLowerCase())}));
+  const eventsWithSource = duplicatePurchaseEvents.map((ev) => ({
+    ...ev,
+    sourceEvents: sourceEvents.filter((source) => source.txHash.toLowerCase() === ev.txHash.toLowerCase())
+  }));
 
-  log.info(`Detected ${eventsWithSource.length} duplicated tx hashes `)
+  log.info(`Detected ${eventsWithSource.length} duplicated tx hashes `);
 
   return eventsWithSource;
-
 }

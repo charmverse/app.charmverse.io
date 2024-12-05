@@ -56,7 +56,7 @@ async function createBuilders() {
             builderStatus: 'applied',
             farcasterId: fid,
             farcasterName: username,
-            githubUser: {
+            githubUsers: {
               create: {
                 id: githubUser.data.id,
                 login,

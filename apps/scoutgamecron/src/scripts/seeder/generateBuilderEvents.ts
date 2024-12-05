@@ -100,7 +100,7 @@ export async function generateBuilderEvents({
   repoPRCounters
 }: {
   builderId: string;
-  githubUser: Pick<GithubUser, 'id' | 'login'>;
+  githubUsers: Pick<GithubUser, 'id' | 'login'>;
   githubRepos: GithubRepo[];
   repoPRCounters: Map<number, number>;
   date: DateTime;

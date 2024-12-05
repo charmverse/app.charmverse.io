@@ -21,13 +21,13 @@ const windowStart = DateTime.fromISO('2024-10-28', { zone: 'utc' }).toJSDate();
   // return;
   const builder = await prisma.scout.findFirstOrThrow({
     where: { path: 'mdqst' },
-    include: { githubUser: true }
+    include: { githubUsers: true }
   });
 
-  await deleteBuilderEvents(builder.id, builder.githubUser[0]!.id);
+  await deleteBuilderEvents(builder.id, builder.githubUsers[0]!.id);
   await processBuilderActivity({
     builderId: builder.id,
-    githubUser: builder.githubUser[0]!,
+    githubUsers: builder.githubUsers[0]!,
     createdAfter: windowStart,
     season: currentSeason
   });
@@ -35,12 +35,12 @@ const windowStart = DateTime.fromISO('2024-10-28', { zone: 'utc' }).toJSDate();
   console.log('Getting builder activity');
   const w = await prisma.scout.findFirst({
     where: { path: 'mdqst' },
-    include: { githubUser: true }
+    include: { githubUsers: true }
   });
 
   const { commits, pullRequests } = await getBuilderActivity({
     login: 'mdqst',
-    githubUserId: w?.githubUser[0]?.id,
+    githubUserId: w?.githubUsers[0]?.id,
     after: DateTime.fromISO('2024-10-28', { zone: 'utc' }).toJSDate()
   });
   console.log(commits.length);

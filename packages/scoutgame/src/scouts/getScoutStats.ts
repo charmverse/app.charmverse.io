@@ -25,12 +25,12 @@ export async function getScoutStats(scoutId: string) {
       nftPurchaseEvents: {
         where: {
           scoutId,
-          builderNFT: {
+          builderNft: {
             season: currentSeason
           }
         },
         select: {
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }

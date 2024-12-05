@@ -31,12 +31,12 @@ export async function getTopScouts({ limit }: { limit: number }): Promise<TopSco
           avatar: true,
           nftPurchaseEvents: {
             where: {
-              builderNFT: {
+              builderNft: {
                 season: currentSeason
               }
             },
             select: {
-              builderNFT: {
+              builderNft: {
                 select: {
                   builderId: true
                 }

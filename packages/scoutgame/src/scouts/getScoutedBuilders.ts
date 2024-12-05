@@ -8,14 +8,14 @@ import { BasicUserInfoSelect } from '../users/queries';
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      builderNFT: {
+      builderNft: {
         season: currentSeason
       },
       scoutId
     },
     select: {
       tokensPurchased: true,
-      builderNFT: {
+      builderNft: {
         select: {
           builderId: true
         }

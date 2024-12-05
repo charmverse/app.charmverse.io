@@ -80,7 +80,7 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
         scout: {
           select: {
             nftPurchaseEvents: true,
-            githubUser: true
+            githubUsers: true
           }
         }
       }

@@ -32,7 +32,7 @@ export async function processAllBuilderActivity(
     select: {
       createdAt: true,
       id: true,
-      githubUser: {
+      githubUsers: {
         select: {
           events: {
             take: 1,
@@ -51,18 +51,18 @@ export async function processAllBuilderActivity(
 
   for (const builder of builders) {
     // If the builder was created less than and hr and has no existing events
-    const newBuilder = builder.createdAt > new Date(Date.now() - 60 * 60 * 1000) && !builder.githubUser[0]?.events[0];
+    const newBuilder = builder.createdAt > new Date(Date.now() - 60 * 60 * 1000) && !builder.githubUsers[0]?.events[0];
 
     if (newBuilder) {
       log.info(`Detected new builder. Pulling in github data for this season`, {
         userId: builder.id,
-        githubUserId: builder.githubUser[0]?.id
+        githubUserId: builder.githubUsers[0]?.id
       });
     }
 
     await processBuilderActivity({
       builderId: builder.id,
-      githubUser: builder.githubUser[0]!,
+      githubUsers: builder.githubUsers[0]!,
       createdAfter: newBuilder ? getDateFromISOWeek(getCurrentWeek()).toJSDate() : createdAfter,
       season
     });
@@ -72,7 +72,7 @@ export async function processAllBuilderActivity(
         lastId: builder.id, // log last id in case we want to start in the middle of the process
         builders: builders
           .slice(builders.indexOf(builder), builders.indexOf(builder) + 10)
-          .map((b) => b.githubUser[0].login)
+          .map((b) => b.githubUsers[0].login)
       });
     }
   }

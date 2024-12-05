@@ -238,7 +238,7 @@ describe('recordClosedPullRequest', () => {
 
     const githubEventsCount = await prisma.githubEvent.count({
       where: {
-        githubUser: {
+        githubUsers: {
           id: builder.githubUser.id
         }
       }

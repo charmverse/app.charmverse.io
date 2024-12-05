@@ -42,7 +42,7 @@ export async function registerBuilderNFT({
       id: builderId
     },
     select: {
-      githubUser: true,
+      githubUsers: true,
       avatar: true,
       path: true,
       displayName: true,
