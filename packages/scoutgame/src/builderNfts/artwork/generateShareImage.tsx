@@ -124,6 +124,7 @@ export async function generateShareImage({
         nftImageUrl={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
         size={size}
         builderPrice={builderPrice}
+        imageHostingBaseUrl={imageHostingBaseUrl}
       />
     ),
     {
