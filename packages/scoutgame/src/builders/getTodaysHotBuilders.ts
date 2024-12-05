@@ -1,4 +1,5 @@
 import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
+import { prettyPrint } from '@packages/utils/strings';
 
 import { currentSeason, getCurrentWeek, getLastWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';

@@ -1,5 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
-
 import type { MockBuilder } from '../../testing/database';
 import { mockBuilder, mockBuilderNft, mockNFTPurchaseEvent, mockScout } from '../../testing/database';
 import { dividePointsBetweenBuilderAndScouts } from '../dividePointsBetweenBuilderAndScouts';

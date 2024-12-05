@@ -7,7 +7,7 @@ import {
 } from '../artwork/starterPack/uploadStarterPackArtwork';
 import { uploadMetadata } from '../artwork/uploadMetadata';
 import { builderContractStarterPackReadonlyApiClient } from '../clients/builderContractStarterPackReadClient';
-import { builderNftChain, getBuilderContractAddress, getBuilderStarterPackContractAddress } from '../constants';
+import { builderNftChain, getBuilderStarterPackContractAddress } from '../constants';
 
 export async function createBuilderNftStarterPack({
   imageHostingBaseUrl,
@@ -48,7 +48,8 @@ export async function createBuilderNftStarterPack({
   await uploadMetadata({
     season: currentSeason,
     tokenId,
-    path
+    path,
+    starterPack: true
   });
 
   const builderNft = await prisma.builderNft.create({

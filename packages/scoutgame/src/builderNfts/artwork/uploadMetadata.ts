@@ -114,22 +114,32 @@ export async function uploadMetadata({
   path,
   season,
   tokenId,
-  attributes
+  attributes,
+  starterPack
 }: {
   path: string;
   season: string;
   tokenId: bigint | number;
   attributes?: { trait_type: string; value: string | number }[];
+  starterPack?: boolean;
 }): Promise<string> {
   // Define the S3 path for metadata
-  const metadataPath = getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'metadata.json' });
+  const metadataPath = getNftTokenUrlPath({
+    season,
+    tokenId: Number(tokenId),
+    filename: starterPack ? 'starter-pack-metadata.json' : 'metadata.json'
+  });
 
   // Generate the metadata object
   const metadata: OpenSeaMetadata = {
     name: `ScoutGame Builders NFT #${tokenId}`,
     description: '',
     external_url: `${process.env.DOMAIN}/u/${path}`,
-    image: `${imageDomain}/${getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'artwork.png' })}`,
+    image: `${imageDomain}/${getNftTokenUrlPath({
+      season,
+      tokenId: Number(tokenId),
+      filename: starterPack ? 'starter-pack-artwork.png' : 'artwork.png'
+    })}`,
     attributes: attributes || []
   };
 
