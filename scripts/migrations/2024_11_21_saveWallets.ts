@@ -15,7 +15,7 @@ async function syncNFTWallets() {
         some: {}
       }
     },
-    include: { scoutWallet: true }
+    include: { wallets: true }
   });
 
   // from block is somewhat arbitrary, but is early enough to grabs all events
@@ -30,7 +30,7 @@ async function syncNFTWallets() {
         .filter(Boolean)
     );
     const newWallets = walletsFromOnchain.filter(
-      (address) => !user.scoutWallet.some((w) => w.address === address.toLowerCase())
+      (address) => !user.wallets.some((w) => w.address === address.toLowerCase())
     );
 
     await saveUserWallets(user.id, newWallets);
@@ -50,14 +50,14 @@ async function syncFarcasterWallets() {
         not: null
       }
     },
-    include: { scoutWallet: true }
+    include: { wallets: true }
   });
   console.log(`Found ${users.length} users with Farcaster profiles`);
 
   for (const user of users) {
     const farcasterProfile = await getFarcasterUserById(user.farcasterId!);
     const newWallets = farcasterProfile?.verifications.filter(
-      (address) => !user.scoutWallet.some((w) => w.address === address.toLowerCase())
+      (address) => !user.wallets.some((w) => w.address === address.toLowerCase())
     );
 
     await saveUserWallets(user.id, newWallets);
@@ -80,13 +80,13 @@ async function saveUserWallets(userId: string, newWallets: string[]) {
         scout: {
           select: {
             nftPurchaseEvents: true,
-            githubUser: true
+            githubUsers: true
           }
         }
       }
     });
     const existingButUnused = existing.filter(
-      (w) => w.scout.nftPurchaseEvents.length === 0 && w.scout.githubUser.length === 0
+      (w) => w.scout.nftPurchaseEvents.length === 0 && w.scout.githubUsers.length === 0
     );
     if (existingButUnused.length > 0) {
       console.log('Wallet already exists but is unused, so switch the ownership', {

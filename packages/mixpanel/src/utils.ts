@@ -1,6 +1,7 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ReferralPlatform } from '@charmverse/core/prisma';
+import { isProdEnv } from '@packages/utils/constants';
 import { capitalize } from '@packages/utils/strings';
 
 export function eventNameToHumanFormat(eventName: string) {
@@ -57,7 +58,9 @@ export function getPlatform(): ReferralPlatform {
     return platform;
   }
 
-  // log.warn('Platform not found in environment variables', { platform });
+  if (platform || isProdEnv) {
+    log.warn(`Unknown value for REACT_APP_SCOUTGAME_PLATFORM: ${platform}`);
+  }
 
   return 'unknown';
 }

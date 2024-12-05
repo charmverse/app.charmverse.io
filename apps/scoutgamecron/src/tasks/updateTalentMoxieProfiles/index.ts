@@ -18,7 +18,7 @@ export async function updateTalentMoxieProfiles() {
       },
       farcasterId: true,
       id: true,
-      scoutWallet: {
+      wallets: {
         select: {
           address: true
         }
@@ -39,7 +39,7 @@ export async function updateTalentMoxieProfiles() {
         // If the builder has a talent profile, use the wallet address, otherwise use the scout wallet
         wallets: builder.talentProfile
           ? [builder.talentProfile.address]
-          : builder.scoutWallet.map((wallet) => wallet.address)
+          : builder.wallets.map((wallet) => wallet.address)
       });
       updatedTalentProfiles += 1;
     } catch (error) {

@@ -8,14 +8,14 @@ import { BasicUserInfoSelect } from '../users/queries';
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      builderNFT: {
+      builderNft: {
         season: currentSeason
       },
       scoutId
     },
     select: {
       tokensPurchased: true,
-      builderNFT: {
+      builderNft: {
         select: {
           builderId: true
         }
@@ -23,7 +23,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     }
   });
 
-  const uniqueBuilderIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.builderNFT.builderId)));
+  const uniqueBuilderIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.builderNft.builderId)));
 
   const builders = await prisma.scout.findMany({
     where: {
@@ -48,6 +48,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
         },
         select: {
           imageUrl: true,
+          congratsImageUrl: true,
           currentPrice: true
         }
       },
@@ -70,11 +71,12 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
 
   return builders.map((builder) => {
     const nftsSoldToScout = nftPurchaseEvents
-      .filter((event) => event.builderNFT.builderId === builder.id)
+      .filter((event) => event.builderNft.builderId === builder.id)
       .reduce((acc, event) => acc + event.tokensPurchased, 0);
     return {
       id: builder.id,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
+      congratsImageUrl: builder.builderNfts[0]?.congratsImageUrl,
       path: builder.path,
       displayName: builder.displayName,
       builderStatus: builder.builderStatus!,

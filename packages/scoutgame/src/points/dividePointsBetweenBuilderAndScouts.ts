@@ -27,7 +27,7 @@ export async function dividePointsBetweenBuilderAndScouts({
 }) {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      builderNFT: {
+      builderNft: {
         season,
         builderId
       }

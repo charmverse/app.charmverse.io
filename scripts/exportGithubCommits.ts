@@ -80,12 +80,12 @@ async function query() {
   const builders = await prisma.scout.findMany({
     where: {
       builderStatus: 'approved',
-      githubUser: {
+      githubUsers: {
         some: {}
       }
     },
     select: {
-      githubUser: {
+      githubUsers: {
         select: {
           id: true,
           login: true
@@ -99,7 +99,7 @@ async function query() {
   const results = [];
 
   for (const builder of builders) {
-    const login = builder.githubUser[0].login;
+    const login = builder.githubUsers[0].login;
     if (processedLogins.includes(login)) {
       console.log(`Skipping ${login} as it has already been processed.`);
       continue;
@@ -137,7 +137,7 @@ async function query() {
   );
   console.log('builders with commits', results.filter((r) => r.totalCommits > 0).length);
   // for (const builder of builders) {
-  //   const { commitCount, repos } = await getCommitCountsAndRepos(builder.githubUser[0].login, '2024-09-29');
+  //   const { commitCount, repos } = await getCommitCountsAndRepos(builder.githubUsers[0].login, '2024-09-29');
   // }
   // console.log('done!');
 }

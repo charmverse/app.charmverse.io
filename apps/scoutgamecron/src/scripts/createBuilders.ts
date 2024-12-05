@@ -49,13 +49,14 @@ async function createBuilders() {
           update: {},
           create: {
             displayName,
+            referralCode: username + Math.random().toString().replace('.', '').slice(0, 6),
             path: username,
             avatar: avatarUrl,
             bio,
             builderStatus: 'applied',
             farcasterId: fid,
             farcasterName: username,
-            githubUser: {
+            githubUsers: {
               create: {
                 id: githubUser.data.id,
                 login,

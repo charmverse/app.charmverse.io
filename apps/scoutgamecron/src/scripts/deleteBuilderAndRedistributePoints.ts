@@ -15,7 +15,7 @@ async function deleteBuilderAndRedistributePoints({ builderPath }: { builderPath
 
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      builderNFT: {
+      builderNft: {
         season: currentSeason,
         builder: {
           path: builderPath
@@ -64,7 +64,7 @@ async function deleteBuilderAndRedistributePoints({ builderPath }: { builderPath
           points,
           description: `You received a ${points} point gift from Scout Game`,
           claimed: true,
-          earnedAs: 'scout',
+          earnedAs: 'scout'
         });
         await prisma.userSeasonStats.update({
           where: {

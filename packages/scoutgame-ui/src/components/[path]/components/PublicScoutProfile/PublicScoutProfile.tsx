@@ -28,7 +28,7 @@ export async function PublicScoutProfile({ publicUser }: { publicUser: BasicUser
     <PublicScoutProfileContainer
       scout={{
         ...scout,
-        githubLogin: scout.githubUser[0]?.login
+        githubLogin: scout.githubUsers[0]?.login
       }}
       allTimePoints={allTimePoints}
       seasonPoints={seasonPoints}

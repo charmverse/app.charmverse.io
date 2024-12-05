@@ -5,7 +5,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { getBuilderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { generateNftImage } from '@packages/scoutgame/builderNfts/artwork/generateNftImage';
+import { generateArtwork } from '@packages/scoutgame/builderNfts/artwork/generateArtwork';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { randomString } from '@packages/utils/strings';
 
@@ -39,7 +39,7 @@ export async function generateBuilder({ index }: { index: number }) {
 
   let builderNft: undefined | Prisma.BuilderNftCreateWithoutBuilderInput;
   if (builderStatus === 'approved') {
-    const nftImageBuffer = await generateNftImage({
+    const nftImageBuffer = await generateArtwork({
       avatar,
       displayName
     });
@@ -101,7 +101,7 @@ export async function generateBuilder({ index }: { index: number }) {
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
       referralCode: randomString(),
-      scoutWallet: {
+      wallets: {
         create: {
           address: faker.finance.ethereumAddress()
         }
@@ -109,7 +109,7 @@ export async function generateBuilder({ index }: { index: number }) {
       farcasterId: faker.number.int({ min: 1, max: 5000000 }) + index,
       farcasterName: path,
       builderStatus,
-      githubUser: {
+      githubUsers: {
         create: githubUser
       },
       builderNfts:

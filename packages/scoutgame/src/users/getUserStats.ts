@@ -15,7 +15,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
       id: userId
     },
     select: {
-      githubUser: {
+      githubUsers: {
         select: {
           login: true
         }
@@ -38,7 +38,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     }
   });
 
-  const githubUser = currentUser?.githubUser[0];
+  const githubUser = currentUser?.githubUsers[0];
   const seasonPoints = currentUser?.userSeasonStats[0];
   const allTimePoints = currentUser?.userAllTimeStats[0];
 

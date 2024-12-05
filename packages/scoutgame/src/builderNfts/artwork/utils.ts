@@ -13,7 +13,7 @@ export function getNftTokenUrlPath({
   return `seasons/${season}/${contractName}/${tokenId}/${filename}`;
 }
 
-export function getNftCongratsPath({ season, tokenId }: { season: string; tokenId: number }) {
+export function getShareImagePath({ season, tokenId }: { season: string; tokenId: number }) {
   return `seasons/${season}/${contractName}/${tokenId}/congrats.png`;
 }
 

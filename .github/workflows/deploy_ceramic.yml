@@ -26,11 +26,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/ceramic/**'
-  workflow_dispatch:
-    inputs:
-      core_pkg_version:
-        description: 'Core pkg version to update to'
-        required: true
 
 concurrency:
   group: ci-ceramic-${{ github.event_name }}-${{ github.ref }}
@@ -67,8 +62,6 @@ jobs:
         uses: ./.github/actions/install
         with:
           app_name: ceramic
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          commit_core_pkg_upgrade: true
 
       - name: Build app
         uses: ./.github/actions/build_app

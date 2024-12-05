@@ -94,10 +94,10 @@ async function getRepos() {
       builderStatus: 'approved'
     },
     select: {
-      githubUser: true
+      githubUsers: true
     }
   });
-  const uniqueOwners = builders.map((builder) => builder.githubUser[0].login);
+  const uniqueOwners = builders.map((builder) => builder.githubUsers[0].login);
   // retrieve a list of all the owners we have in the gitRepo database
   const owners = await prisma.githubRepo.findMany({
     where: {

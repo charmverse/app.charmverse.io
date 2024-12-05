@@ -16,7 +16,8 @@ export function BuilderShareImage({
   builderScouts,
   stats,
   builderPrice,
-  size = 550
+  size = 550,
+  imageHostingBaseUrl = process.env.DOMAIN
 }: {
   nftImageUrl: string | null;
   activities: BuilderActivity[];
@@ -24,6 +25,7 @@ export function BuilderShareImage({
   stats: BuilderStats;
   builderPrice: bigint;
   size?: number;
+  imageHostingBaseUrl?: string;
 }) {
   const overlays = [
     { name: 'red', src: `/images/profile/builder/red-sky.jpg`, color: '#661933' },
@@ -32,8 +34,7 @@ export function BuilderShareImage({
     { name: 'blue', src: '/images/profile/builder/blue-sky.jpg', color: '#02143C' }
   ];
 
-  const domain = process.env.DOMAIN || 'http://localhost:3000';
-
+  const domain = imageHostingBaseUrl;
   const random = randomInt(0, 3);
 
   const { rank = 0, seasonPoints = 0, allTimePoints = 0, gemsCollected = 0 } = stats;

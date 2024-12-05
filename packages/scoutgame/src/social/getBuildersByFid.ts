@@ -42,6 +42,7 @@ export async function getBuildersByFid({
           },
           select: {
             imageUrl: true,
+            congratsImageUrl: true,
             currentPrice: true,
             nftSoldEvents: {
               distinct: 'scoutId'
@@ -81,6 +82,7 @@ export async function getBuildersByFid({
       return scouts.map((scout) => ({
         id: scout.id,
         nftImageUrl: scout.builderNfts[0]?.imageUrl,
+        congratsImageUrl: scout.builderNfts[0]?.congratsImageUrl,
         path: scout.path,
         displayName: scout.displayName,
         builderPoints: scout.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,

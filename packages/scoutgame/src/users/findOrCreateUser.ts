@@ -67,7 +67,7 @@ export async function findOrCreateUser({
       ? { farcasterId }
       : telegramId
         ? { telegramId }
-        : { scoutWallet: { some: { address: { in: lowercaseAddresses } } } },
+        : { wallets: { some: { address: { in: lowercaseAddresses } } } },
     select: {
       id: true,
       onboardedAt: true,
@@ -143,7 +143,7 @@ export async function findOrCreateUser({
     data: {
       ...userProps,
       id: userId,
-      scoutWallet: lowercaseAddresses?.length
+      wallets: lowercaseAddresses?.length
         ? {
             create: lowercaseAddresses?.map((address) => ({
               address

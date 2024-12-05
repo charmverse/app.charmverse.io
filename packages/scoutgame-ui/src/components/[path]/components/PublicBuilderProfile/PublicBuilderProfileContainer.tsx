@@ -22,6 +22,7 @@ export type BuilderProfileProps = {
     builderStatus: BuilderStatus;
     price?: bigint;
     nftImageUrl?: string;
+    congratsImageUrl?: string;
   };
   builderActivities: BuilderActivity[];
 } & BuilderStats &

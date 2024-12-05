@@ -14,7 +14,11 @@ function useMetamaskInterceptor() {
     function handleLinkClick(event: MouseEvent) {
       const metamaskButton = (event.target as Element).closest('[data-testid=rk-wallet-option-metaMask]');
       if (metamaskButton && !isWebView(navigator.userAgent)) {
-        log.debug('Send user to Metamask', { ua: navigator.userAgent, platform: navigator.platform });
+        log.debug('Send user to Metamask', {
+          ua: navigator.userAgent,
+          platform: navigator.platform,
+          appPlatform: getPlatform()
+        });
         event.stopImmediatePropagation();
         window.location.replace(getMMDeeplink());
       }

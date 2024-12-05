@@ -52,7 +52,8 @@ async function createBuilder({ fid, githubLogin }: { fid: number; githubLogin: s
       builderStatus: 'applied',
       farcasterId: fid,
       farcasterName: username,
-      githubUser: githubUserDB
+      referralCode: username + Math.random().toString().replace('.', '').slice(0, 6),
+      githubUsers: githubUserDB
         ? { connect: { id: githubUserDB.id } }
         : {
             create: {

@@ -12,7 +12,7 @@ export const BasicUserInfoSelect = {
   avatar: true,
   bio: true,
   referralCode: true,
-  githubUser: {
+  githubUsers: {
     select: {
       login: true
     }
