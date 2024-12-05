@@ -17,7 +17,7 @@ concurrency:
   group: webapp-${{ github.event_name }}-${{ github.ref }}
 
 env:
-  SELECTED_PERMISSION_API_TAG: extend-proposal-permissions
+  SELECTED_PERMISSION_API_TAG: main
 
 jobs:
   build-app:
