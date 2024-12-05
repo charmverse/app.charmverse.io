@@ -7,6 +7,8 @@ import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { log } from '@charmverse/core/log';
 
+import { v4 as uuidv4 } from 'uuid';
+
 function getRandomValue<T>(arr: T[]): T {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
@@ -107,7 +109,8 @@ export async function seedWithRealCharmverseGithubData() {
               path: builder + Math.random().toString().replace('.', '').slice(0, 6),
               builderStatus: 'approved',
               avatar,
-              farcasterId
+              farcasterId,
+              referralCode: uuidv4()
             }
           }
         }
@@ -124,7 +127,8 @@ export async function seedWithRealCharmverseGithubData() {
               path: builder,
               builderStatus: 'approved',
               avatar: avatar,
-              farcasterId: farcasterId
+              farcasterId: farcasterId,
+              referralCode: uuidv4()
             }
           }
         }
