@@ -104,28 +104,4 @@ describe('dividePointsBetweenBuilderAndScouts', () => {
       })
     ).rejects.toThrow('Invalid rank provided');
   });
-
-  // it('should throw an error if season is invalid', async () => {
-  //   await expect(
-  //     dividePointsBetweenBuilderAndScouts({
-  //       builderId,
-  //       season: 'invalid-season',
-  //       rank,
-  //       weeklyAllocatedPoints,
-  //       normalisationFactor
-  //     })
-  //   ).rejects.toThrow('No NFT purchase events found for season');
-  // });
-
-  // it('should throw an error if weeklyAllocatedPoints is invalid', async () => {
-  //   await expect(
-  //     dividePointsBetweenBuilderAndScouts({
-  //       builderId,
-  //       season,
-  //       rank,
-  //       weeklyAllocatedPoints: -100,
-  //       normalisationFactor
-  //     })
-  //   ).rejects.toThrow('Weekly allocated points must be greater than zero');
-  // });
 });

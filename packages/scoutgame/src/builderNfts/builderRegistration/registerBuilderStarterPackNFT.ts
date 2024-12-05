@@ -7,9 +7,7 @@ import { builderContractReadonlyApiClient } from '../clients/builderContractRead
 import { getBuilderContractStarterPackMinterClient } from '../clients/builderContractStarterPackMinterWriteClient';
 import { builderContractStarterPackReadonlyApiClient } from '../clients/builderContractStarterPackReadClient';
 import { builderNftChain } from '../constants';
-import { refreshBuilderNftPrice } from '../refreshBuilderNftPrice';
 
-import { createBuilderNft } from './createBuilderNft';
 import { createBuilderNftStarterPack } from './createBuilderNftStarterPack';
 
 export async function registerBuilderStarterPackNFT({

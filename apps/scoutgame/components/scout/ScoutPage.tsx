@@ -5,8 +5,8 @@ import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
-import { ScoutBuilderCarousel } from '@packages/scoutgame-ui/components/scout/ScoutBuilderCarousel';
 import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPageTable/ScoutPageTable';
+import { StarterPackCarousel } from '@packages/scoutgame-ui/components/scout/StarterPackCarousel/StarterPackCarousel';
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import { isTruthy } from '@packages/utils/types';
 import Link from 'next/link';
@@ -70,15 +70,8 @@ export function ScoutPage({
             gap: 2
           }}
         >
-          {starterpackBuilders.length ? (
-            <Stack gap={2} my={2}>
-              <Typography variant='h5' color='secondary' fontWeight={600} textAlign='center'>
-                Scout your Starter Pack
-              </Typography>
-              <ScoutBuilderCarousel builders={starterpackBuilders} />
-            </Stack>
-          ) : null}
-          <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
+          {starterpackBuilders.length ? <StarterPackCarousel builders={starterpackBuilders} /> : null}
+          <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2} mt={2}>
             Scout today's HOT Builders!
           </Typography>
           <Box

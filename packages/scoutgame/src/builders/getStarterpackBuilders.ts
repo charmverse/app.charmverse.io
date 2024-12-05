@@ -24,6 +24,7 @@ export async function getStarterpackBuilders({ season }: { season: Season }): Pr
           path: true,
           avatar: true,
           displayName: true,
+          farcasterId: true,
           builderNfts: {
             where: {
               season,
@@ -64,6 +65,7 @@ export async function getStarterpackBuilders({ season }: { season: Season }): Pr
     nftsSold: builder.user.userSeasonStats[0]?.nftsSold || 0,
     builderStatus: 'approved',
     nftImageUrl: builder.user.builderNfts[0]?.imageUrl || '',
-    nftType: BuilderNftType.season_1_starter_pack
+    nftType: BuilderNftType.season_1_starter_pack,
+    farcasterId: builder.user.farcasterId
   }));
 }
