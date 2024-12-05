@@ -1,12 +1,7 @@
 import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 
-import { getBuilderActivities } from '../../builders/getBuilderActivities';
-import { getBuilderNft } from '../../builders/getBuilderNft';
-import { getBuilderScouts } from '../../builders/getBuilderScouts';
-import { getBuilderStats } from '../../builders/getBuilderStats';
-
-import { generateArtwork, generateNftCongrats, updateArtwork } from './generateArtwork';
-import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from './utils';
+import { generateArtwork, updateArtwork } from './generateArtwork';
+import { getNftTokenUrlPath, imageDomain } from './utils';
 
 export async function uploadArtwork({
   imageHostingBaseUrl,
