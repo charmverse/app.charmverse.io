@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { Autoplay, Navigation } from 'swiper/modules';
 import type { SwiperProps } from 'swiper/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import type { NavigationOptions } from 'swiper/types';
 
 import { useMdScreen } from '../../../hooks/useMediaScreens';
 import { LoadingCards } from '../Loading/LoadingCards';
@@ -31,6 +32,10 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
   useEffect(() => {
     setIsClientSide(true);
   }, []);
+
+  const prevButtonId =
+    ((swiperProps.navigation as NavigationOptions)?.prevEl as string | undefined) ?? '.swiper-button-prev';
+  const nextButtonId = (swiperProps.navigation as NavigationOptions)?.nextEl ?? '.swiper-button-next';
 
   if (!isClientSide) {
     return <LoadingCards />;
@@ -62,8 +67,8 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
         autoHeight={true}
         modules={[Navigation, Autoplay]}
         navigation={{
-          nextEl: '.swiper-button-next',
-          prevEl: '.swiper-button-prev'
+          nextEl: nextButtonId,
+          prevEl: prevButtonId
         }}
         pagination={
           renderBullet
@@ -82,8 +87,8 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
       </Swiper>
       {isDesktop && swiperProps.slidesPerView && children.length > swiperProps.slidesPerView && (
         <>
-          <NextArrow className='swiper-button-next' />
-          <PrevArrow className='swiper-button-prev' />
+          <NextArrow className={(nextButtonId as string).replace('.', '')} />
+          <PrevArrow className={(prevButtonId as string).replace('.', '')} />
         </>
       )}
     </Box>
