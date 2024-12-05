@@ -19,7 +19,7 @@ export const bonusPartnersRecord = {
   },
   lit_protocol: {
     name: 'Lit Protocol',
-    icon: '/images/logos/lit-protocol.png'
+    icon: 'https://scoutgame.xyz/images/logos/lit-protocol.png'
   },
   op_supersim: {
     name: 'OP Supersim',
