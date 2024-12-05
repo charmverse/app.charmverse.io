@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { refreshCongratsImage } from '@packages/scoutgame/builders/refreshCongratsImage';
+import { refreshShareImage } from '@packages/scoutgame/builders/refreshShareImage';
 import { currentSeason } from '@packages/scoutgame/dates';
 
-export async function refreshCongratsImages() {
+export async function refreshShareImages() {
   const builderNfts = await prisma.builderNft.findMany({
     where: {
       season: currentSeason
@@ -12,7 +12,7 @@ export async function refreshCongratsImages() {
 
   for (const builderNft of builderNfts) {
     if (builderNft?.tokenId) {
-      const updatedBuilderNft = await refreshCongratsImage(builderNft).catch((error) => {
+      const updatedBuilderNft = await refreshShareImage(builderNft).catch((error) => {
         log.error(`Error refreshing congrats image for ${builderNft.builderId}`, { error });
         return null;
       });

@@ -6,12 +6,6 @@ import React from 'react';
 import type { Font } from 'satori';
 import sharp from 'sharp';
 
-import type { BuilderActivity } from '../../builders/getBuilderActivities';
-import type { BuilderScouts } from '../../builders/getBuilderScouts';
-import type { BuilderStats } from '../../builders/getBuilderStats';
-
-import { BuilderShareImage } from './components/BuilderShareImage';
-
 // fails inside of Next.js
 function getAssetsFromDisk() {
   const folder = process.env.NFT_ASSETS_FOLDER || path.join(path.resolve(__dirname, '../../'), 'assets');
@@ -87,7 +81,7 @@ function calculateFontSize(text: string, maxWidth: number, initialFontSize: numb
   return minFontSize;
 }
 
-export async function updateNftImage({
+export async function updateArtwork({
   displayName,
   currentNftImage
 }: {
@@ -157,7 +151,7 @@ export async function updateNftImage({
   return imageBuffer;
 }
 
-export async function generateNftImage({
+export async function generateArtwork({
   avatar,
   displayName,
   imageHostingBaseUrl
@@ -237,63 +231,6 @@ export async function generateNftImage({
       width: cutoutWidth,
       height: cutoutHeight,
       fonts: [font]
-    }
-  );
-
-  const baseImageBuffer = await baseImage.arrayBuffer();
-  const imageBuffer = await sharp(Buffer.from(baseImageBuffer)).png().toBuffer();
-
-  return imageBuffer;
-}
-
-export async function generateNftCongrats({
-  imageHostingBaseUrl,
-  userImage,
-  activities,
-  builderPrice,
-  stats,
-  builderScouts
-}: {
-  imageHostingBaseUrl?: string;
-  userImage: string | null;
-  activities: BuilderActivity[];
-  stats: BuilderStats;
-  builderScouts: BuilderScouts;
-  builderPrice: bigint;
-}): Promise<Buffer> {
-  let avatarBuffer: Buffer | null = null;
-  const size = 550;
-
-  const { noPfpAvatarBase64 } = await getAssets(imageHostingBaseUrl);
-
-  if (userImage) {
-    const response = await fetch(userImage);
-    const arrayBuffer = await response.arrayBuffer();
-    avatarBuffer = await sharp(Buffer.from(arrayBuffer)).resize(150, 200).png().toBuffer();
-  }
-  // Just for testing
-  // const activities = await getBuilderActivities({ builderId: '745c9ffd-278f-4e91-8b94-beaded2ebcd1', limit: 3 });
-  // const stats = await getBuilderStats('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
-  // const builderScouts = await getBuilderScouts('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
-  // const builderNft = await getBuilderNft('745c9ffd-278f-4e91-8b94-beaded2ebcd1');
-
-  const { ImageResponse } = await import('@vercel/og');
-
-  const baseImage = new ImageResponse(
-    (
-      <BuilderShareImage
-        activities={activities}
-        builderScouts={builderScouts}
-        stats={stats}
-        nftImageUrl={avatarBuffer ? `data:image/png;base64,${avatarBuffer.toString('base64')}` : noPfpAvatarBase64}
-        size={size}
-        builderPrice={builderPrice}
-      />
-    ),
-    {
-      width: size,
-      height: size,
-      emoji: 'noto'
     }
   );
 
