@@ -50,8 +50,8 @@ cron:
     # Every day at midnight
     schedule: '0 0 * * *'
 
-  - name: 'nft-congrats-image'
-    url: '/nft-congrats-image'
+  - name: 'refresh-nft-share-images'
+    url: '/refresh-nft-share-images'
     # Every 1 hour
     schedule: '0 * * * *'
 

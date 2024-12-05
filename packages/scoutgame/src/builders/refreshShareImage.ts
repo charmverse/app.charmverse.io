@@ -1,21 +1,21 @@
 import type { BuilderNft } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/utils/constants';
 
-import { uploadArtworkCongrats } from '../builderNfts/artwork/uploadArtwork';
-import { currentSeason } from '../dates';
+import { uploadShareImage } from '../builderNfts/artwork/uploadShareImage';
 
-export async function refreshCongratsImage(builderNft: BuilderNft) {
-  const congratsImageUrl = await uploadArtworkCongrats({
-    season: currentSeason,
+export async function refreshShareImage(builderNft: BuilderNft, imageHostingBaseUrl = baseUrl) {
+  const congratsImageUrl = await uploadShareImage({
+    season: builderNft.season,
     tokenId: builderNft.tokenId,
     userImage: builderNft.imageUrl || null,
     builderId: builderNft.builderId,
-    imageHostingBaseUrl: process.env.DOMAIN
+    imageHostingBaseUrl
   });
 
   const updatedBuilderNft = await prisma.builderNft.update({
     where: {
-      id: builderNft?.id
+      id: builderNft.id
     },
     data: {
       congratsImageUrl

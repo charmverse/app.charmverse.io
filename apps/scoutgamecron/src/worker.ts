@@ -6,12 +6,12 @@ import { DateTime } from 'luxon';
 import * as middleware from './middleware';
 import { alertLowWalletGasBalance } from './tasks/alertLowWalletGasBalance';
 import { issueGemsOnchain } from './tasks/issueGemsOnchain';
-import { nftCongratsImageTask } from './tasks/nftCongratsImage';
 import { processAllBuilderActivity } from './tasks/processBuilderActivity';
 import { processGemsPayout } from './tasks/processGemsPayout';
 import { processOnchainGemsPayout } from './tasks/processGemsPayout/processOnchainGemsPayout';
 import { processNftMints } from './tasks/processNftMints';
 import { sendNotifications } from './tasks/pushNotifications/sendNotifications';
+import { refreshShareImagesTask } from './tasks/refreshShareImages';
 import { resolveBalanceIssues } from './tasks/resolveBalanceIssues/resolveBalanceIssues';
 import { resolveMissingPurchasesTask } from './tasks/resolveMissingPurchases';
 import { updateAllBuilderCardActivities } from './tasks/updateBuilderCardActivity';
@@ -70,7 +70,7 @@ addTask('/resync-nft-purchases', resolveMissingPurchasesTask);
 
 addTask('/resolve-balance-issues', resolveBalanceIssues);
 
-addTask('/nft-congrats-image', nftCongratsImageTask);
+addTask('/refresh-nft-share-images', refreshShareImagesTask);
 
 // Standard health check used by Beanstalk
 // Onchain tasks -------

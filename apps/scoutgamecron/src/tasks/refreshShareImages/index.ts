@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type Koa from 'koa';
 
-import { refreshCongratsImages } from './refreshCongratsImages';
+import { refreshShareImages } from './refreshShareImages';
 
-export async function nftCongratsImageTask(ctx: Koa.Context) {
+export async function refreshShareImagesTask(ctx: Koa.Context) {
   log.info('Refreshing NFT congrats images for all builders');
-  await refreshCongratsImages();
+  await refreshShareImages();
   log.info(`Syncing complete`);
 }

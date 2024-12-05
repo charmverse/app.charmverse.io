@@ -5,7 +5,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { faker } from '@faker-js/faker';
 import { getBuilderContractAddress, builderNftChain } from '@packages/scoutgame/builderNfts/constants';
-import { generateNftImage } from '@packages/scoutgame/builderNfts/artwork/generateNftImage';
+import { generateArtwork } from '@packages/scoutgame/builderNfts/artwork/generateArtwork';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { randomString } from '@packages/utils/strings';
 
@@ -39,7 +39,7 @@ export async function generateBuilder({ index }: { index: number }) {
 
   let builderNft: undefined | Prisma.BuilderNftCreateWithoutBuilderInput;
   if (builderStatus === 'approved') {
-    const nftImageBuffer = await generateNftImage({
+    const nftImageBuffer = await generateArtwork({
       avatar,
       displayName
     });
