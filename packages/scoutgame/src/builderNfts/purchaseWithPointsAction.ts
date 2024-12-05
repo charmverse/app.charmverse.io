@@ -36,7 +36,7 @@ export const purchaseWithPointsAction = authActionClient
       })
     ]);
 
-    const currentPrice = await (parsedInput.nftType === 'season_1_starter_pack'
+    const currentPrice = await (parsedInput.nftType === 'starter_pack'
       ? builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
           args: { amount: BigInt(parsedInput.amount) }
         })

@@ -62,7 +62,7 @@ export async function createBuilderNftStarterPack({
       currentPrice,
       imageUrl: fileUrl,
       congratsImageUrl,
-      nftType: 'season_1_starter_pack'
+      nftType: 'starter_pack'
     }
   });
 

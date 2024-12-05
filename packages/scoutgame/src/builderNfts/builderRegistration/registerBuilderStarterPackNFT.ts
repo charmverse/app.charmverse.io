@@ -28,7 +28,7 @@ export async function registerBuilderStarterPackNFT({
       builderId,
       chainId: builderNftChain.id,
       season,
-      nftType: 'season_1_starter_pack'
+      nftType: 'starter_pack'
     }
   });
 
@@ -91,7 +91,7 @@ export async function registerBuilderStarterPackNFT({
     builderPath: builder.path,
     tokenId,
     season,
-    nftType: 'season_1_starter_pack'
+    nftType: 'starter_pack'
   });
 
   return builderNft;

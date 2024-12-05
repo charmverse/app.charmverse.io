@@ -19,11 +19,11 @@ import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 const startBlockNumberForReindexing = 128000000;
 
 export async function findAndIndexMissingPurchases({ nftType }: { nftType: BuilderNftType }) {
-  const builderScoutedEvents = await (nftType === BuilderNftType.season_1_starter_pack
+  const builderScoutedEvents = await (nftType === BuilderNftType.starter_pack
     ? getBuilderStarterPackScoutedEvents({ fromBlock: startBlockNumberForReindexing })
     : getBuilderScoutedEvents({ fromBlock: startBlockNumberForReindexing }));
   const transferSingleEvents = await (
-    nftType === BuilderNftType.season_1_starter_pack
+    nftType === BuilderNftType.starter_pack
       ? getStarterPackTransferSingleEvents({ fromBlock: startBlockNumberForReindexing })
       : getTransferSingleEvents({ fromBlock: startBlockNumberForReindexing })
   ).then((events) =>
@@ -97,7 +97,7 @@ export async function findAndIndexMissingPurchases({ nftType }: { nftType: Build
         continue;
       }
 
-      const price = await (nftType === BuilderNftType.season_1_starter_pack
+      const price = await (nftType === BuilderNftType.starter_pack
         ? builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
             args: {
               amount: BigInt(missingTx.args.amount)

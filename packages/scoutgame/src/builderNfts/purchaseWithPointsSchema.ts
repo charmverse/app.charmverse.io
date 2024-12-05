@@ -8,7 +8,7 @@ export const schema = yup.object({
   nftType: yup
     .string()
     .required()
-    .oneOf(['default', 'season_1_starter_pack'] as BuilderNftType[])
+    .oneOf(['default', 'starter_pack'] as BuilderNftType[])
 });
 
 export type FormValues = yup.InferType<typeof schema>;

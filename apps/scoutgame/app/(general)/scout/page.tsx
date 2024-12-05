@@ -30,7 +30,7 @@ export default async function Scout({
   if (user?.id) {
     const purchases = await prisma.nFTPurchaseEvent
       .aggregate({
-        where: { builderNFT: { nftType: 'season_1_starter_pack', season: currentSeason }, scoutId: user.id },
+        where: { builderNFT: { nftType: 'starter_pack', season: currentSeason }, scoutId: user.id },
         _sum: { tokensPurchased: true }
       })
       .then((res) => res._sum.tokensPurchased || 0);

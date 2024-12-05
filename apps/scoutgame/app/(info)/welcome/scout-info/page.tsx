@@ -21,7 +21,7 @@ export default async function ScoutInfo() {
     // piesrtasty
     fids: [547807],
     season: currentSeason,
-    nftType: BuilderNftType.season_1_starter_pack,
+    nftType: BuilderNftType.starter_pack,
     limit: 1
   });
 

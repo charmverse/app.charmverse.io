@@ -151,7 +151,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
       const _price =
-        builder.nftType === 'season_1_starter_pack'
+        builder.nftType === 'starter_pack'
           ? await builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
               args: { amount: BigInt(amount) }
             })
@@ -169,7 +169,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     try {
       setIsFetchingPrice(true);
       _builderTokenId =
-        builder.nftType === 'season_1_starter_pack'
+        builder.nftType === 'starter_pack'
           ? await builderContractStarterPackReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } })
           : await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
 

@@ -7,7 +7,7 @@ import { builderPointsShare, scoutPointsShare } from '../builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '../points/calculatePoints';
 
 const nftTypeMultipliers: Record<BuilderNftType, number> = {
-  season_1_starter_pack: 1,
+  starter_pack: 1,
   default: 10
 };
 

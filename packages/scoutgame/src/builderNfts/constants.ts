@@ -42,7 +42,7 @@ export function getBuilderStarterPackContractAddress(): `0x${string}` {
 export const MAX_STARTER_PACK_PURCHASES = 3;
 
 export function getBuilderContractAddressForNftType(nftType: BuilderNftType): `0x${string}` {
-  return nftType === 'season_1_starter_pack' ? getBuilderStarterPackContractAddress() : getBuilderContractAddress();
+  return nftType === 'starter_pack' ? getBuilderStarterPackContractAddress() : getBuilderContractAddress();
 }
 
 // USDC Contract we use for payments

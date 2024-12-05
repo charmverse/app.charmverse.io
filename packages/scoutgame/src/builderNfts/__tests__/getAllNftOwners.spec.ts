@@ -32,7 +32,7 @@ describe('getAllNftOwners', () => {
     const result = await getAllNftOwners({
       builderId: builder.id,
       season: '1',
-      nftType: BuilderNftType.season_1_starter_pack
+      nftType: BuilderNftType.starter_pack
     });
 
     // Assertions

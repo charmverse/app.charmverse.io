@@ -23,9 +23,7 @@ export async function mintNFT(params: MintNFTParams) {
     }
   });
   const apiClient =
-    nftType === 'season_1_starter_pack'
-      ? getBuilderContractStarterPackMinterClient()
-      : getBuilderContractMinterClient();
+    nftType === 'starter_pack' ? getBuilderContractStarterPackMinterClient() : getBuilderContractMinterClient();
 
   // Proceed with minting
   const txResult = await apiClient.mintTo({

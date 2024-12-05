@@ -18,7 +18,7 @@ export async function getStarterpackBuilders({
         builderNfts: {
           some: {
             season,
-            nftType: BuilderNftType.season_1_starter_pack
+            nftType: BuilderNftType.starter_pack
           }
         }
       }
@@ -35,7 +35,7 @@ export async function getStarterpackBuilders({
           builderNfts: {
             where: {
               season,
-              nftType: BuilderNftType.season_1_starter_pack
+              nftType: BuilderNftType.starter_pack
             },
             select: {
               imageUrl: true,
@@ -72,7 +72,7 @@ export async function getStarterpackBuilders({
     nftsSold: builder.user.userSeasonStats[0]?.nftsSold || 0,
     builderStatus: 'approved',
     nftImageUrl: builder.user.builderNfts[0]?.imageUrl || '',
-    nftType: BuilderNftType.season_1_starter_pack,
+    nftType: BuilderNftType.starter_pack,
     farcasterId: builder.user.farcasterId
   }));
 }

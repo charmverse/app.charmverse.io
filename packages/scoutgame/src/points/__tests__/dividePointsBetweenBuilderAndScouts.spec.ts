@@ -21,7 +21,7 @@ describe('dividePointsBetweenBuilderAndScouts', () => {
     builder = await mockBuilder({ createNft: true });
 
     builderNft = await mockBuilderNft({ builderId: builder.id, season });
-    starterPackNft = await mockBuilderNft({ builderId: builder.id, season, nftType: 'season_1_starter_pack' });
+    starterPackNft = await mockBuilderNft({ builderId: builder.id, season, nftType: 'starter_pack' });
 
     scout1 = await mockScout();
     scout2 = await mockScout();
@@ -45,7 +45,7 @@ describe('dividePointsBetweenBuilderAndScouts', () => {
       scoutId: scout1.id,
       season,
       tokensPurchased: 10,
-      nftType: 'season_1_starter_pack'
+      nftType: 'starter_pack'
     });
   });
 
