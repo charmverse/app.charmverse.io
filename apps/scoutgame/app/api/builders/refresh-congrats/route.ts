@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { refreshCongratsImage } from '@packages/scoutgame/builders/refreshCongratsImage';
+import { refreshShareImage } from '@packages/scoutgame/builders/refreshShareImage';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 export async function PUT(request: Request) {
@@ -19,11 +19,11 @@ export async function PUT(request: Request) {
       }
     });
 
-    await refreshCongratsImage(existingNft);
+    await refreshShareImage(existingNft);
 
     return Response.json({});
   } catch (error) {
-    log.error('Error refreshing congrats image', { error, search });
+    log.error('Error refreshing share image', { error, search });
     return new Response(`Unknown error: ${(error as Error).message}`, { status: 500 });
   }
 }

@@ -231,7 +231,7 @@ export function BuilderShareImage({
                     <img
                       width={20}
                       height={20}
-                      src={bonusPartnersRecord[activity.bonusPartner as BonusPartner].icon}
+                      src={`${domain}${bonusPartnersRecord[activity.bonusPartner as BonusPartner].icon}`}
                       alt='Bonus Partner'
                     />
                   ) : null}
