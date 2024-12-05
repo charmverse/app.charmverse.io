@@ -4,7 +4,7 @@ import { mockBuilder } from '@packages/scoutgame/testing/database';
 
 import { currentSeason } from '../../dates';
 
-jest.unstable_mockModule('../../builderNfts/registerBuilderNFT', () => ({
+jest.unstable_mockModule('../../builderNfts/builderRegistration/registerBuilderNFT', () => ({
   registerBuilderNFT: jest.fn()
 }));
 

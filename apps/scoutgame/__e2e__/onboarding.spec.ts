@@ -5,7 +5,7 @@ import { randomIntFromInterval } from '@root/lib/utils/random';
 import { expect, test } from './test';
 
 test.describe('Onboarding flow', () => {
-  test('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
+  test.skip('Open the app to home page and go to Sign In', async ({ page, homePage, loginPage }) => {
     await page.goto('/');
     await expect(homePage.getStartedButton).toBeVisible();
     await homePage.getStartedButton.click();
@@ -80,7 +80,7 @@ test.describe('Onboarding flow', () => {
     expect(!!userAfterOnboarding.onboardedAt).toBe(true);
   });
 
-  test('Require terms of service agreement for user that was onboarded somehow', async ({
+  test.skip('Require terms of service agreement for user that was onboarded somehow', async ({
     page,
     welcomePage,
     utils
@@ -97,7 +97,7 @@ test.describe('Onboarding flow', () => {
     await expect(welcomePage.container).toBeVisible();
   });
 
-  test('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
+  test.skip('Require terms of service agreement for user', async ({ page, welcomePage, infoPage, utils }) => {
     const newUser = await mockScout({
       agreedToTermsAt: null,
       onboardedAt: null

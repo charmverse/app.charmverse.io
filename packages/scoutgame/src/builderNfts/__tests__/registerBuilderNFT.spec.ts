@@ -22,7 +22,7 @@ jest.unstable_mockModule('../clients/builderContractReadClient', () => ({
   }
 }));
 
-jest.unstable_mockModule('../createBuilderNft', () => ({
+jest.unstable_mockModule('../builderRegistration/createBuilderNft', () => ({
   createBuilderNft: jest.fn()
 }));
 
