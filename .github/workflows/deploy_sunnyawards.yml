@@ -34,11 +34,6 @@ on:
       - 'config/**'
       - 'hooks/**'
       - 'lib/**'
-  workflow_dispatch:
-    inputs:
-      core_pkg_version:
-        description: 'Core pkg version to update to'
-        required: true
 
 concurrency:
   group: sunnyawards-prd-${{ github.event_name }}-${{ github.ref }}
@@ -75,8 +70,6 @@ jobs:
         uses: ./.github/actions/install
         with:
           app_name: sunnyawards
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          commit_core_pkg_upgrade: true
 
       - name: Build app
         uses: ./.github/actions/build_app

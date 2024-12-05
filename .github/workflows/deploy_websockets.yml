@@ -35,11 +35,6 @@ on:
       # include some paths so that we trigger deploy for web app staging
       - 'components/**'
       - 'pages/**'
-  workflow_dispatch:
-    inputs:
-      core_pkg_version:
-        description: 'Core pkg version to update to'
-        required: true
 
 concurrency:
   group: ci-websockets-${{ github.event_name }}-${{ github.ref }}
@@ -76,8 +71,6 @@ jobs:
         uses: ./.github/actions/install
         with:
           app_name: websockets
-          core_pkg_version: ${{ inputs.core_pkg_version }}
-          commit_core_pkg_upgrade: true
 
       - name: Build app
         uses: ./.github/actions/build_app

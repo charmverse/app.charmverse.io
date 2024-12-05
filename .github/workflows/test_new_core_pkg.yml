@@ -30,6 +30,44 @@ jobs:
         with:
           REACT_APP_APP_ENV: 'test'
 
+  test-compile:
+    name: Typecheck apps
+    runs-on: ubuntu-latest
+    needs: build-test-env
+    strategy:
+      max-parallel: 6
+      fail-fast: false
+      matrix:
+        include:
+          - test_name: 'Typecheck webapp'
+            test_command: 'npm run typecheck'
+          - test_name: 'Typecheck cron'
+            test_command: 'npm run typecheck -w apps/cron'
+          - test_name: 'Typecheck websockets'
+            test_command: 'npm run typecheck -w apps/websockets'
+          - test_name: 'Typecheck scoutgame'
+            test_command: 'npm run typecheck -w apps/scoutgame'
+          - test_name: 'Typecheck scoutgame telegram'
+            test_command: 'npm run typecheck -w apps/scoutgametelegram'
+          - test_name: 'Typecheck scoutgame cron'
+            test_command: 'npm run typecheck -w apps/scoutgamecron'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore dependencies from cache
+        uses: ./.github/actions/install
+        with:
+          core_pkg_version: ${{ inputs.core_pkg_version }}
+
+      - name: Restore app from cache
+        uses: ./.github/actions/build
+        with:
+          REACT_APP_APP_ENV: 'test'
+
+      - name: Run ${{matrix.test_name}}
+        run: ${{matrix.test_command}}
+
   integration-test:
     name: Tests
     runs-on: ubuntu-latest
@@ -55,8 +93,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - test_name: 'Type check'
-            test_command: 'npm run typecheck'
           - test_name: 'Basic tests #1'
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/3'
           - test_name: 'Basic tests #2'
