@@ -1,9 +1,9 @@
+import { log } from '@charmverse/core/log';
 import { BuilderNftType } from '@charmverse/core/prisma-client';
-import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersByFid } from '@packages/scoutgame/social/getBuildersByFid';
-import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
 import { ScoutInfoPage } from 'components/welcome/scout-info/ScoutInfoPage';
 
@@ -17,8 +17,6 @@ export const metadata: Metadata = {
 };
 
 export default async function ScoutInfo() {
-  const starterPackBuilders = await getStarterpackBuilders({ season: currentSeason, limit: 1 });
-
   const starterPackBuilder = await getBuildersByFid({
     // piesrtasty
     fids: [547807],
@@ -28,7 +26,8 @@ export default async function ScoutInfo() {
   });
 
   if (!starterPackBuilder.builders[0]) {
-    return null;
+    log.warn('No starter pack builder found, redirecting to how it works');
+    redirect('/welcome/how-it-works');
   }
 
   return <ScoutInfoPage builder={starterPackBuilder.builders[0]} />;
