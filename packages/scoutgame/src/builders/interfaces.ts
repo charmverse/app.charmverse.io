@@ -24,5 +24,6 @@ export type BuilderInfo = BasicUserInfo &
   BuilderMetrics & {
     builderStatus: BuilderStatus;
     nftImageUrl?: string | null;
+    congratsImageUrl: string | null;
     nftsSoldToScout?: number;
   };

@@ -57,7 +57,7 @@ import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
 export type NFTPurchaseProps = {
-  builder: MinimalUserInfo & { price?: bigint; nftImageUrl?: string | null };
+  builder: MinimalUserInfo & { price?: bigint; congratsImageUrl?: string | null; nftImageUrl?: string | null };
 };
 
 const PRICE_POLLING_INTERVAL = 60000;
