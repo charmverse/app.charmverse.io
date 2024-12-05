@@ -36,6 +36,11 @@ export function getBuilderStarterPackContractAddress(): `0x${string}` {
     process.env.REACT_APP_BUILDER_STARTER_PACK_CONTRACT_ADDRESS) as `0x${string}`;
 }
 
+/**
+ * Max amount of starter pack NFTs a user can mint
+ */
+export const MAX_STARTER_PACK_PURCHASES = 3;
+
 export function getBuilderContractAddressForNftType(nftType: BuilderNftType): `0x${string}` {
   return nftType === 'season_1_starter_pack' ? getBuilderStarterPackContractAddress() : getBuilderContractAddress();
 }

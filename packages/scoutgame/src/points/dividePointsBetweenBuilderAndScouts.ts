@@ -1,5 +1,7 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { BuilderNftType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { builderPointsShare, scoutPointsShare } from '../builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '../points/calculatePoints';
@@ -31,6 +33,14 @@ export async function dividePointsBetweenBuilderAndScouts({
   weeklyAllocatedPoints: number;
   normalisationFactor: number;
 }) {
+  if (!stringUtils.isUUID(builderId)) {
+    throw new InvalidInputError('Invalid builderId must be a valid UUID');
+  }
+
+  if (rank < 1 || typeof rank !== 'number') {
+    throw new InvalidInputError('Invalid rank provided. Must be a number greater than 0');
+  }
+
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
       builderNFT: {

@@ -1,3 +1,5 @@
+import { InvalidInputError } from '@charmverse/core/errors';
+
 import type { MockBuilder } from '../../testing/database';
 import { mockBuilder, mockBuilderNft, mockNFTPurchaseEvent, mockScout } from '../../testing/database';
 import { dividePointsBetweenBuilderAndScouts } from '../dividePointsBetweenBuilderAndScouts';
@@ -78,45 +80,30 @@ describe('dividePointsBetweenBuilderAndScouts', () => {
     expect(totalPointsDistributed + result.pointsForBuilder).toBeLessThanOrEqual(result.earnableScoutPoints);
   });
 
-  // it('should apply correct multipliers for NFT types', async () => {
-  //   const result = await dividePointsBetweenBuilderAndScouts({
-  //     builderId: builder.id,
-  //     season,
-  //     rank,
-  //     weeklyAllocatedPoints,
-  //     normalisationFactor
-  //   });
+  // Error Cases
+  it('should throw an error if builderId is invalid', async () => {
+    await expect(
+      dividePointsBetweenBuilderAndScouts({
+        builderId: 'invalid-builder-id',
+        season,
+        rank,
+        weeklyAllocatedPoints,
+        normalisationFactor
+      })
+    ).rejects.toThrow(InvalidInputError);
+  });
 
-  //   const scout1Points = result.pointsPerScout.find((scout) => scout.scoutId === scout1.id);
-  //   const scout2Points = result.pointsPerScout.find((scout) => scout.scoutId === scout2.id);
-
-  //   expect(scout1Points.scoutPoints).toBeLessThan(scout2Points.scoutPoints);
-  // });
-
-  // // Error Cases
-  // it('should throw an error if builderId is invalid', async () => {
-  //   await expect(
-  //     dividePointsBetweenBuilderAndScouts({
-  //       builderId: 'invalid-builder-id',
-  //       season,
-  //       rank,
-  //       weeklyAllocatedPoints,
-  //       normalisationFactor
-  //     })
-  //   ).rejects.toThrow('No NFT purchase events found for builderId');
-  // });
-
-  // it('should throw an error if rank is invalid', async () => {
-  //   await expect(
-  //     dividePointsBetweenBuilderAndScouts({
-  //       builderId,
-  //       season,
-  //       rank: -1,
-  //       weeklyAllocatedPoints,
-  //       normalisationFactor
-  //     })
-  //   ).rejects.toThrow('Invalid rank provided');
-  // });
+  it('should throw an error if rank is invalid', async () => {
+    await expect(
+      dividePointsBetweenBuilderAndScouts({
+        builderId: builder.id,
+        season,
+        rank: -1,
+        weeklyAllocatedPoints,
+        normalisationFactor
+      })
+    ).rejects.toThrow('Invalid rank provided');
+  });
 
   // it('should throw an error if season is invalid', async () => {
   //   await expect(

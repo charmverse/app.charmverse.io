@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { MAX_STARTER_PACK_PURCHASES } from '@packages/scoutgame/builderNfts/constants';
 import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
-import { MAX_STARTER_PACK_PURCHASES } from '@packages/scoutgame/constants';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
