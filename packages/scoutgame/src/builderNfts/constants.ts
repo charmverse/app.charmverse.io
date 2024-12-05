@@ -32,8 +32,8 @@ export function getBuilderContractAddress(): `0x${string}` {
 }
 
 export function getBuilderStarterPackContractAddress(): `0x${string}` {
-  return (env('BUILDER_STARTER_PACK_CONTRACT_ADDRESS') ||
-    process.env.REACT_APP_BUILDER_STARTER_PACK_CONTRACT_ADDRESS) as `0x${string}`;
+  return (env('BUILDER_NFT_STARTER_PACK_CONTRACT_ADDRESS') ||
+    process.env.REACT_APP_BUILDER_NFT_STARTER_PACK_CONTRACT_ADDRESS) as `0x${string}`;
 }
 
 /**
