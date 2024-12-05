@@ -48,6 +48,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
         },
         select: {
           imageUrl: true,
+          congratsImageUrl: true,
           currentPrice: true
         }
       },
@@ -75,6 +76,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     return {
       id: builder.id,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
+      congratsImageUrl: builder.builderNfts[0]?.congratsImageUrl,
       path: builder.path,
       displayName: builder.displayName,
       builderStatus: builder.builderStatus!,

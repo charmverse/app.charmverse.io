@@ -38,7 +38,8 @@ const userSelect = {
     },
     select: {
       currentPrice: true,
-      imageUrl: true
+      imageUrl: true,
+      congratsImageUrl: true
     }
   }
 };
@@ -106,6 +107,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
       price: builder.builderNfts[0]?.currentPrice ?? 0,
       nftImageUrl: builder.builderNfts[0]?.imageUrl,
+      congratsImageUrl: builder.builderNfts[0]?.congratsImageUrl,
       nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
       builderStatus: builder.builderStatus!,
       rank: builder.userWeeklyStats[0]?.rank || -1,
