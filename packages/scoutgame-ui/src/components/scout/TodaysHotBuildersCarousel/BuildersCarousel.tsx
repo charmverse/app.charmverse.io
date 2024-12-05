@@ -80,5 +80,9 @@ export function BuildersCarousel({
         <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
       ));
 
-  return <Carousel slidesPerView={slidesPerView}>{builderCards}</Carousel>;
+  return (
+    <Carousel slidesPerView={slidesPerView} boxProps={{ width: { xs: '100%', md: '90%' }, margin: '0 auto' }}>
+      {builderCards}
+    </Carousel>
+  );
 }

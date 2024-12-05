@@ -22,7 +22,7 @@ export function StarterPackCarousel({
       <Carousel
         slidesPerView={1}
         autoplay={false}
-        boxProps={{ width: { xs: '100%', md: '80%' }, margin: '0 auto' }}
+        boxProps={{ width: { xs: '100%', md: '90%' }, margin: '0 auto' }}
         navigation={{
           nextEl: '.swiper-starter-pack-button-next',
           prevEl: '.swiper-starter-pack-button-prev'
