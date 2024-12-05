@@ -75,7 +75,7 @@ export function PointsClaimScoutScreen({
         SCOUT GAME!
       </div>
 
-      {builders.length && (
+      {builders.length ? (
         <div
           style={{
             display: 'flex',
@@ -129,7 +129,7 @@ export function PointsClaimScoutScreen({
 
           <img src={`${baseUrl}/images/profile/builder-dog.png`} alt='Builder Dog' width={200} height={200} />
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

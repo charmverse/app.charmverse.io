@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ReferralPlatform } from '@charmverse/core/prisma';
 import { capitalize } from '@packages/utils/strings';
@@ -43,7 +44,7 @@ export function getUTMParamsFromSearch(searchString: string): UTMParams | undefi
   };
 }
 
-const platform = process.env.SCOUTGAME_PLATFORM;
+const platform = env('SCOUTGAME_PLATFORM') || process.env.REACT_APP_SCOUTGAME_PLATFORM;
 
 function isPlatform(_platform: string = ''): _platform is ReferralPlatform {
   const availablePlatforms = Object.values(ReferralPlatform);
