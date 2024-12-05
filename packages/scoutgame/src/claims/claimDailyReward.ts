@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { sendPointsForDailyClaim } from '@packages/scoutgame/points/builderEvents/sendPointsForDailyClaim';
 import { sendPointsForDailyClaimStreak } from '@packages/scoutgame/points/builderEvents/sendPointsForDailyClaimStreak';
@@ -32,6 +33,9 @@ export async function claimDailyReward({
       builderId: userId,
       points: 3
     });
+    trackUserAction('daily_claim_streak', {
+      userId
+    });
   } else {
     const existingEvent = await prisma.scoutDailyClaimEvent.findFirst({
       where: {
@@ -49,6 +53,9 @@ export async function claimDailyReward({
       builderId: userId,
       points: 1,
       dayOfWeek
+    });
+    trackUserAction('daily_claim', {
+      userId
     });
   }
 }

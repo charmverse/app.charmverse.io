@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 
 import type { Season } from '../dates';
 import { currentSeason } from '../dates';
@@ -30,5 +31,8 @@ export async function claimPoints({ season = currentSeason, userId }: { season?:
       }
     })
   ]);
+
+  trackUserAction('claim_points', { userId });
+
   return { total: points };
 }
