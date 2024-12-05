@@ -10,7 +10,7 @@ export function generatePullRequest({
   createdAt
 }: {
   githubRepo: GithubRepo;
-  githubUsers: Pick<GithubUser, 'id' | 'login'>;
+  githubUser: Pick<GithubUser, 'id' | 'login'>;
   pullRequestNumber: number;
   createdAt: DateTime;
 }): PullRequest {

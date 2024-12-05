@@ -46,7 +46,7 @@ export async function refreshUserStats({
       recipientId: userId,
       event: {
         githubEvent: {
-          githubUsers: {
+          githubUser: {
             builderId: userId
           }
         }

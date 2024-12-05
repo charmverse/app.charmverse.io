@@ -22,7 +22,7 @@ export type BuilderInfo = {
   builderNftId?: string;
   nftPrice?: number;
   assignedRepos: GithubRepo[];
-  githubUsers: Pick<GithubUser, 'id' | 'login'>;
+  githubUser: Pick<GithubUser, 'id' | 'login'>;
 };
 
 function assignReposToBuilder(githubRepos: GithubRepo[]): GithubRepo[] {
@@ -144,7 +144,7 @@ export async function generateSeedData(
       builders.map(async (builder) => {
         const dailyGithubEvents = await generateBuilderEvents({
           builderId: builder.id,
-          githubUsers: builder.githubUser,
+          githubUser: builder.githubUser,
           githubRepos: builder.assignedRepos,
           repoPRCounters,
           date
