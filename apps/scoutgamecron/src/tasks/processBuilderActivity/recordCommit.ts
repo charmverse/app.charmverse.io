@@ -135,7 +135,7 @@ export async function recordCommit({ commit, season }: { commit: RequiredCommitF
           // It's a new event, we can record notification
           const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
             where: {
-              builderNFT: {
+              builderNft: {
                 season,
                 builderId: githubUser.builderId
               }

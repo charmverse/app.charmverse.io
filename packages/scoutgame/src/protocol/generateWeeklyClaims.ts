@@ -113,13 +113,13 @@ export async function calculateWeeklyClaims({ week }: { week: string }): Promise
       },
       select: {
         id: true,
-        scoutWallet: true
+        wallets: true
       }
     })
     .then((_scouts) =>
       _scouts.reduce(
         (acc, val) => {
-          const address = val.scoutWallet[0]?.address as Address;
+          const address = val.wallets[0]?.address as Address;
 
           if (address) {
             acc[val.id] = address;

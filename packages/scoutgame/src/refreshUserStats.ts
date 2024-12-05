@@ -75,7 +75,7 @@ export async function refreshUserStats({
   const nftsBought = await prisma.nFTPurchaseEvent.count({
     where: {
       scoutId: userId,
-      builderNFT: {
+      builderNft: {
         season: currentSeason
       }
     }

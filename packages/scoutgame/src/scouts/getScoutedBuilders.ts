@@ -8,14 +8,14 @@ import { BasicUserInfoSelect } from '../users/queries';
 export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Promise<BuilderInfo[]> {
   const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
     where: {
-      builderNFT: {
+      builderNft: {
         season: currentSeason
       },
       scoutId
     },
     select: {
       tokensPurchased: true,
-      builderNFT: {
+      builderNft: {
         select: {
           builderId: true,
           nftType: true
@@ -24,7 +24,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
     }
   });
 
-  const uniqueBuilderIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.builderNFT.builderId)));
+  const uniqueBuilderIds = Array.from(new Set(nftPurchaseEvents.map((event) => event.builderNft.builderId)));
 
   const builders = await prisma.scout.findMany({
     where: {
@@ -99,7 +99,6 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
         last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
           .map((gem) => gem.gemsCount)
           .slice(-7),
-        contractAddress: nft.contractAddress || '',
         nftType: nft.nftType || 'default',
         congratsImageUrl: nft.congratsImageUrl
       };

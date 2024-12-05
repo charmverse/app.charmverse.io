@@ -20,12 +20,12 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
     select: {
       nftPurchaseEvents: {
         where: {
-          builderNFT: {
+          builderNft: {
             season: currentSeason
           }
         },
         select: {
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }
@@ -61,7 +61,7 @@ export async function getSeasonBuilderRewards({ userId }: { userId: string }): P
   const builderTokensRecord: Record<string, number> = {};
 
   scout.nftPurchaseEvents.forEach((event) => {
-    const builderId = event.builderNFT.builderId;
+    const builderId = event.builderNft.builderId;
     builderTokensRecord[builderId] = (builderTokensRecord[builderId] || 0) + event.tokensPurchased;
   });
 
@@ -108,12 +108,12 @@ export async function getWeeklyBuilderRewards({
               lte: week
             }
           },
-          builderNFT: {
+          builderNft: {
             season: currentSeason
           }
         },
         select: {
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }
@@ -158,7 +158,7 @@ export async function getWeeklyBuilderRewards({
   const builderTokensRecord: Record<string, number> = {};
 
   scout.nftPurchaseEvents.forEach((event) => {
-    const builderId = event.builderNFT.builderId;
+    const builderId = event.builderNft.builderId;
     builderTokensRecord[builderId] = (builderTokensRecord[builderId] || 0) + event.tokensPurchased;
   });
 

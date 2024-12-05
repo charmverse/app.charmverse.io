@@ -30,7 +30,7 @@ export async function recordClosedPullRequest({
 }) {
   const builder = await prisma.scout.findFirst({
     where: {
-      githubUser: {
+      githubUsers: {
         some: {
           id: pullRequest.author.id
         }
@@ -87,7 +87,7 @@ export async function recordClosedPullRequest({
 
     const nftPurchaseEvents = await prisma.nFTPurchaseEvent.findMany({
       where: {
-        builderNFT: {
+        builderNft: {
           season,
           builderId: builder.id
         }

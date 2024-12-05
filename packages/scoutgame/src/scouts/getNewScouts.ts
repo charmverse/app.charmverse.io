@@ -36,7 +36,7 @@ export async function getRankedNewScoutsForCurrentWeek({
   }, {});
   return newScouts
     .map((scout): NewScout => {
-      const buildersScouted = Array.from(new Set(scout.nftPurchaseEvents.map((event) => event.builderNFT.builderId)));
+      const buildersScouted = Array.from(new Set(scout.nftPurchaseEvents.map((event) => event.builderNft.builderId)));
       const nftsHeld = scout.userSeasonStats[0]?.nftsPurchased || 0;
       const builderGemsCollected = buildersScouted
         .map((builderId) => weeklyStatsByUserId[builderId]?.gemsCollected || 0)
@@ -130,7 +130,7 @@ export async function getNewScouts({ week, season }: { week: string; season: str
       path: true,
       displayName: true,
       avatar: true,
-      scoutWallet: {
+      wallets: {
         select: {
           address: true
         }
@@ -141,7 +141,7 @@ export async function getNewScouts({ week, season }: { week: string; season: str
             week,
             season
           },
-          builderNFT: {
+          builderNft: {
             builder: {
               builderStatus: 'approved'
             }
@@ -154,7 +154,7 @@ export async function getNewScouts({ week, season }: { week: string; season: str
               season: true
             }
           },
-          builderNFT: {
+          builderNft: {
             select: {
               builderId: true
             }
