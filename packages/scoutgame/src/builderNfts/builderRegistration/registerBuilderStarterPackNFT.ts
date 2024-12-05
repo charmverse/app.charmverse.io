@@ -41,7 +41,7 @@ export async function registerBuilderStarterPackNFT({
       id: builderId
     },
     select: {
-      githubUser: true,
+      githubUsers: true,
       avatar: true,
       path: true,
       displayName: true,
@@ -49,7 +49,7 @@ export async function registerBuilderStarterPackNFT({
     }
   });
 
-  if (!builder.githubUser) {
+  if (!builder.githubUsers.length) {
     throw new InvalidInputError('Scout profile does not have a github user');
   }
 

@@ -51,7 +51,7 @@ export async function dividePointsBetweenBuilderAndScouts({
     select: {
       scoutId: true,
       tokensPurchased: true,
-      builderNFT: {
+      builderNft: {
         select: {
           nftType: true
         }
@@ -62,7 +62,7 @@ export async function dividePointsBetweenBuilderAndScouts({
   const { totalNftsPurchased, nftsByScout } = nftPurchaseEvents.reduce(
     (acc, purchaseEvent) => {
       // Normal NFTs are 10x more valuable than Starter Pack NFTs
-      const multiplier = nftTypeMultipliers[purchaseEvent.builderNFT.nftType];
+      const multiplier = nftTypeMultipliers[purchaseEvent.builderNft.nftType];
       const totalPurchased = purchaseEvent.tokensPurchased * multiplier;
 
       acc.totalNftsPurchased += totalPurchased;
