@@ -49,6 +49,7 @@ async function createBuilders() {
           update: {},
           create: {
             displayName,
+            referralCode: username + Math.random().toString().replace('.', '').slice(0, 6),
             path: username,
             avatar: avatarUrl,
             bio,
