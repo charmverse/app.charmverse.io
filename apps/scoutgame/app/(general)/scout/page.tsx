@@ -23,7 +23,7 @@ export default async function Scout({
 
   const user = await getUserFromSession();
 
-  let builders: BuilderInfo[] | null = null;
+  let builders: BuilderInfo[] = [];
 
   if (user?.id) {
     const purchases = await prisma.nFTPurchaseEvent.count({
@@ -31,8 +31,8 @@ export default async function Scout({
     });
 
     if (purchases < MAX_STARTER_PACK_PURCHASES) {
-      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders());
-      builders = starterPackBuilders ?? null;
+      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders({ season: currentSeason }));
+      builders = starterPackBuilders ?? [];
     }
   }
 

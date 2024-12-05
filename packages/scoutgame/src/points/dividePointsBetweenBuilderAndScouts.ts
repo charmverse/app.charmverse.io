@@ -1,7 +1,13 @@
+import type { BuilderNftType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { builderPointsShare, scoutPointsShare } from '../builderNfts/constants';
 import { calculateEarnableScoutPointsForRank } from '../points/calculatePoints';
+
+const nftTypeMultipliers: Record<BuilderNftType, number> = {
+  season_1_starter_pack: 1,
+  default: 10
+};
 
 /**
  * Function to calculate scout points
@@ -46,7 +52,7 @@ export async function dividePointsBetweenBuilderAndScouts({
   const { totalNftsPurchased, nftsByScout } = nftPurchaseEvents.reduce(
     (acc, purchaseEvent) => {
       // Normal NFTs are 10x more valuable than Starter Pack NFTs
-      const multiplier = purchaseEvent.builderNFT.nftType === 'season_1_starter_pack' ? 1 : 10;
+      const multiplier = nftTypeMultipliers[purchaseEvent.builderNFT.nftType];
       const totalPurchased = purchaseEvent.tokensPurchased * multiplier;
 
       acc.totalNftsPurchased += totalPurchased;

@@ -1,17 +1,17 @@
 import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 
-import { currentSeason } from '../dates';
+import type { Season } from '../dates';
 
 import type { BuilderInfo } from './interfaces';
 
-export async function getStarterpackBuilders(): Promise<BuilderInfo[]> {
+export async function getStarterpackBuilders({ season }: { season: Season }): Promise<BuilderInfo[]> {
   const starterPackBuilders = await prisma.userWeeklyStats.findMany({
     where: {
       user: {
         builderStatus: 'approved',
         builderNfts: {
           some: {
-            season: currentSeason,
+            season,
             nftType: BuilderNftType.season_1_starter_pack
           }
         }
@@ -26,11 +26,10 @@ export async function getStarterpackBuilders(): Promise<BuilderInfo[]> {
           displayName: true,
           builderNfts: {
             where: {
-              season: currentSeason,
+              season,
               nftType: BuilderNftType.season_1_starter_pack
             },
             select: {
-              contractAddress: true,
               imageUrl: true,
               currentPrice: true
             }
@@ -38,7 +37,7 @@ export async function getStarterpackBuilders(): Promise<BuilderInfo[]> {
           builderCardActivities: true,
           userSeasonStats: {
             where: {
-              season: currentSeason
+              season
             },
             select: {
               pointsEarnedAsBuilder: true,
@@ -65,7 +64,6 @@ export async function getStarterpackBuilders(): Promise<BuilderInfo[]> {
     nftsSold: builder.user.userSeasonStats[0]?.nftsSold || 0,
     builderStatus: 'approved',
     nftImageUrl: builder.user.builderNfts[0]?.imageUrl || '',
-    contractAddress: builder.user.builderNfts[0]?.contractAddress || '',
     nftType: BuilderNftType.season_1_starter_pack
   }));
 }
