@@ -65,7 +65,7 @@ describe('processBuilderActivity', () => {
 
     await processBuilderActivity({
       builderId: builder.id,
-      githubUsers: builder.githubUser,
+      githubUser: builder.githubUser,
       createdAfter: new Date(),
       season: mockSeason as Season
     });
@@ -113,7 +113,7 @@ describe('processBuilderActivity', () => {
 
     await processBuilderActivity({
       builderId: builder.id,
-      githubUsers: builder.githubUser,
+      githubUser: builder.githubUser,
       createdAfter: new Date(),
       season: mockSeason as Season
     });

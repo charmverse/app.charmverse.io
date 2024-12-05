@@ -101,7 +101,7 @@ export async function generateBuilder({ index }: { index: number }) {
       agreedToTermsAt: new Date(),
       onboardedAt: new Date(),
       referralCode: randomString(),
-      scoutWallet: {
+      wallets: {
         create: {
           address: faker.finance.ethereumAddress()
         }

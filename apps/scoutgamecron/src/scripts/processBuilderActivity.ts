@@ -27,7 +27,7 @@ const windowStart = DateTime.fromISO('2024-10-28', { zone: 'utc' }).toJSDate();
   await deleteBuilderEvents(builder.id, builder.githubUsers[0]!.id);
   await processBuilderActivity({
     builderId: builder.id,
-    githubUsers: builder.githubUsers[0]!,
+    githubUser: builder.githubUsers[0]!,
     createdAfter: windowStart,
     season: currentSeason
   });

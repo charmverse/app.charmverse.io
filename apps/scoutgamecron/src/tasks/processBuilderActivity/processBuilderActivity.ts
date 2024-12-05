@@ -11,7 +11,7 @@ import { recordMergedPullRequest } from './recordMergedPullRequest';
 
 type Props = {
   builderId: string;
-  githubUsers: {
+  githubUser: {
     id: number;
     login: string;
   };

@@ -44,6 +44,6 @@ export async function getScoutStats(scoutId: string) {
     allTimePoints: scout.userAllTimeStats[0]?.pointsEarnedAsScout,
     seasonPoints: scout.userSeasonStats[0]?.pointsEarnedAsScout,
     nftsPurchased: scout.userSeasonStats[0]?.nftsPurchased,
-    buildersScouted: Array.from(new Set(scout.nftPurchaseEvents.map((event) => event.builderNFT.builderId))).length
+    buildersScouted: Array.from(new Set(scout.nftPurchaseEvents.map((event) => event.builderNft.builderId))).length
   };
 }
