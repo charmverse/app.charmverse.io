@@ -39,7 +39,8 @@ export async function getStarterpackBuilders({
             },
             select: {
               imageUrl: true,
-              currentPrice: true
+              currentPrice: true,
+              congratsImageUrl: true
             }
           },
           builderCardActivities: true,
@@ -73,6 +74,7 @@ export async function getStarterpackBuilders({
     builderStatus: 'approved',
     nftImageUrl: builder.user.builderNfts[0]?.imageUrl || '',
     nftType: BuilderNftType.starter_pack,
-    farcasterId: builder.user.farcasterId
+    farcasterId: builder.user.farcasterId,
+    congratsImageUrl: builder.user.builderNfts[0]?.congratsImageUrl || ''
   }));
 }
