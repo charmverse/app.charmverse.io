@@ -38,10 +38,10 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         alignItems: 'center',
         gap: 1,
         cursor: !quest.completed ? 'pointer' : 'default',
-        zIndex: 1,
         bgcolor: quest.completed ? 'background.light' : 'primary.main',
         borderRadius: 1,
-        p: 1.5
+        p: 1.5,
+        color: 'secondary'
       }}
     >
       <Stack direction='row' gap={3.5} alignItems='center'>
@@ -52,7 +52,7 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
             <Typography variant='body2' fontWeight={500}>
               +{quest.points}
             </Typography>
-            <Image src='/images/scout-game-profile-icon.png' alt='Scoutgame icon' width={18.5} height={12} />
+            <Image src='/images/profile/scout-game-profile-icon.png' alt='Scoutgame icon' width={18.5} height={12} />
           </Stack>
         </Stack>
       </Stack>

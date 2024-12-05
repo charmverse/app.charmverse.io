@@ -13,5 +13,6 @@ export default async function Quests() {
   const [, friends = []] = await safeAwaitSSRData(getFriends(user.id));
   const [, dailyClaims = []] = await safeAwaitSSRData(getDailyClaims(user.id));
   const [, quests = []] = await safeAwaitSSRData(getQuests(user.id));
+
   return <QuestsPage dailyClaims={dailyClaims} quests={quests} friends={friends} />;
 }

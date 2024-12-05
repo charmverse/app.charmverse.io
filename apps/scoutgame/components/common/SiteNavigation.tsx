@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
+import { ImGift as QuestsIcon } from 'react-icons/im';
 import { PiBinocularsLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
@@ -15,7 +16,6 @@ import { useGetClaimablePoints } from 'hooks/api/session';
 
 import { BuilderIcon } from './BuilderIcon';
 import { ClaimIcon } from './Icons/ClaimIcon';
-import { FriendsIcon } from './Icons/FriendsIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -100,10 +100,10 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           />
         ) : null}
         <BottomNavigationAction
-          label='Friends'
-          href='/friends'
-          value='friends'
-          icon={<FriendsIcon />}
+          label='Quests'
+          href='/quests'
+          value='quests'
+          icon={<QuestsIcon size='19px' />}
           LinkComponent={Link}
         />
       </StyledBottomNavigation>
@@ -127,8 +127,8 @@ function getActiveButton(pathname: string) {
     return 'claim';
   } else if (pathname.startsWith('/builders')) {
     return 'builders';
-  } else if (pathname.startsWith('/friends')) {
-    return 'friends';
+  } else if (pathname.startsWith('/quests')) {
+    return 'quests';
   }
   return null;
 }

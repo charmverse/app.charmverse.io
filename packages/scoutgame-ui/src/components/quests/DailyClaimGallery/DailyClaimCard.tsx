@@ -77,7 +77,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
         )}
         <Stack direction='row' gap={0.5} alignItems='center' zIndex={1} top={7.5} position='relative'>
           <Typography fontWeight={600}>{dailyClaim.isBonus ? '+3' : '+1'}</Typography>
-          <Image src='/images/scout-game-profile-icon.png' alt='Scout game icon' width={15} height={8.5} />
+          <Image src='/images/profile/scout-game-profile-icon.png' alt='Scout game icon' width={15} height={8.5} />
         </Stack>
       </Stack>
       <Typography
