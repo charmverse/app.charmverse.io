@@ -1,6 +1,7 @@
 'use client';
 
 import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
 import type { BuilderNftType } from '@charmverse/core/prisma';
 import { ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
@@ -171,6 +172,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
         builder.nftType === 'season_1_starter_pack'
           ? await builderContractStarterPackReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } })
           : await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
+
+      log.info('Fetched token id', { _builderTokenId });
 
       setBuilderTokenId(_builderTokenId);
 

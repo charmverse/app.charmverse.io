@@ -41,6 +41,25 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     {
       inputs: [
         {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256'
+        }
+      ],
+      name: 'totalSupply',
+      outputs: [
+        {
+          internalType: 'uint256',
+          name: '',
+          type: 'uint256'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
           internalType: 'string',
           name: 'builderId',
           type: 'string'
@@ -70,25 +89,6 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
           internalType: 'string',
           name: '',
           type: 'string'
-        }
-      ],
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      inputs: [
-        {
-          internalType: 'uint256',
-          name: 'tokenId',
-          type: 'uint256'
-        }
-      ],
-      name: 'totalSupply',
-      outputs: [
-        {
-          internalType: 'uint256',
-          name: '',
-          type: 'uint256'
         }
       ],
       stateMutability: 'view',
@@ -138,25 +138,6 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     {
       inputs: [
         {
-          internalType: 'uint256',
-          name: 'tokenId',
-          type: 'uint256'
-        }
-      ],
-      name: 'getBuilderIdForToken',
-      outputs: [
-        {
-          internalType: 'string',
-          name: '',
-          type: 'string'
-        }
-      ],
-      stateMutability: 'view',
-      type: 'function'
-    },
-    {
-      inputs: [
-        {
           internalType: 'string',
           name: 'builderId',
           type: 'string'
@@ -168,6 +149,25 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
           internalType: 'uint256',
           name: '',
           type: 'uint256'
+        }
+      ],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [
+        {
+          internalType: 'uint256',
+          name: 'tokenId',
+          type: 'uint256'
+        }
+      ],
+      name: 'getBuilderIdForToken',
+      outputs: [
+        {
+          internalType: 'string',
+          name: '',
+          type: 'string'
         }
       ],
       stateMutability: 'view',
@@ -228,6 +228,29 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     }
   }
 
+  async totalSupply(params: { args: { tokenId: bigint } }): Promise<bigint> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'totalSupply',
+      args: [params.args.tokenId]
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'totalSupply',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as bigint;
+  }
+
   async registerBuilderToken(params: {
     args: { builderId: string; builderTokenId: bigint };
     value?: bigint;
@@ -278,29 +301,6 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
 
     // Parse the result based on the return type
     return result as string;
-  }
-
-  async totalSupply(params: { args: { tokenId: bigint } }): Promise<bigint> {
-    const txData = encodeFunctionData({
-      abi: this.abi,
-      functionName: 'totalSupply',
-      args: [params.args.tokenId]
-    });
-
-    const { data } = await this.publicClient.call({
-      to: this.contractAddress,
-      data: txData
-    });
-
-    // Decode the result based on the expected return type
-    const result = decodeFunctionResult({
-      abi: this.abi,
-      functionName: 'totalSupply',
-      data: data as `0x${string}`
-    });
-
-    // Parse the result based on the return type
-    return result as bigint;
   }
 
   async totalBuilderTokens(): Promise<bigint> {
@@ -355,29 +355,6 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     return this.walletClient.waitForTransactionReceipt({ hash: tx });
   }
 
-  async getBuilderIdForToken(params: { args: { tokenId: bigint } }): Promise<string> {
-    const txData = encodeFunctionData({
-      abi: this.abi,
-      functionName: 'getBuilderIdForToken',
-      args: [params.args.tokenId]
-    });
-
-    const { data } = await this.publicClient.call({
-      to: this.contractAddress,
-      data: txData
-    });
-
-    // Decode the result based on the expected return type
-    const result = decodeFunctionResult({
-      abi: this.abi,
-      functionName: 'getBuilderIdForToken',
-      data: data as `0x${string}`
-    });
-
-    // Parse the result based on the return type
-    return result as string;
-  }
-
   async getTokenIdForBuilder(params: { args: { builderId: string } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
@@ -401,7 +378,30 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     return result as bigint;
   }
 
-  async getTokenPurchasePrice(params: { args: { amount: bigint }; blockNumber?: bigint }): Promise<bigint> {
+  async getBuilderIdForToken(params: { args: { tokenId: bigint } }): Promise<string> {
+    const txData = encodeFunctionData({
+      abi: this.abi,
+      functionName: 'getBuilderIdForToken',
+      args: [params.args.tokenId]
+    });
+
+    const { data } = await this.publicClient.call({
+      to: this.contractAddress,
+      data: txData
+    });
+
+    // Decode the result based on the expected return type
+    const result = decodeFunctionResult({
+      abi: this.abi,
+      functionName: 'getBuilderIdForToken',
+      data: data as `0x${string}`
+    });
+
+    // Parse the result based on the return type
+    return result as string;
+  }
+
+  async getTokenPurchasePrice(params: { args: { amount: bigint } }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
       functionName: 'getTokenPurchasePrice',
@@ -410,8 +410,7 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
 
     const { data } = await this.publicClient.call({
       to: this.contractAddress,
-      data: txData,
-      blockNumber: params.blockNumber
+      data: txData
     });
 
     // Decode the result based on the expected return type
