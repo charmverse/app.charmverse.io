@@ -401,7 +401,7 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
     return result as string;
   }
 
-  async getTokenPurchasePrice(params: { args: { amount: bigint } }): Promise<bigint> {
+  async getTokenPurchasePrice(params: { args: { amount: bigint }; blockNumber?: bigint }): Promise<bigint> {
     const txData = encodeFunctionData({
       abi: this.abi,
       functionName: 'getTokenPurchasePrice',
@@ -410,7 +410,8 @@ export class BuilderNFTSeasonOneStarterPackImplementationClient {
 
     const { data } = await this.publicClient.call({
       to: this.contractAddress,
-      data: txData
+      data: txData,
+      blockNumber: params.blockNumber
     });
 
     // Decode the result based on the expected return type

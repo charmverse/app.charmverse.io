@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserByUsername } from '@packages/farcaster/getFarcasterUserByUsername';
+import { v4 as uuidv4 } from 'uuid';
 
 async function createScouts(farcasterUsernames: string[]) {
   for (const farcasterUsername of farcasterUsernames) {
@@ -27,7 +28,8 @@ async function createScouts(farcasterUsernames: string[]) {
           bio,
           farcasterId: fid,
           farcasterName: farcasterUsername,
-          currentBalance: 10
+          currentBalance: 10,
+          referralCode: uuidv4()
         }
       });
       log.info(`Created scout for ${farcasterUsername}`, { scoutId: scout.id });

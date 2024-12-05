@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { octokit } from '@packages/github/client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
-
+import { v4 as uuidv4 } from 'uuid';
 const builderWaitlistLogins: string[] = [];
 
 async function createBuilders() {
@@ -62,7 +62,8 @@ async function createBuilders() {
                 displayName: githubUser.data.name,
                 email: githubUser.data.email
               }
-            }
+            },
+            referralCode: uuidv4()
           }
         });
         log.info(`Created builder for ${login}`, { builderId: builder.id });
