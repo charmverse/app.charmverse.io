@@ -4,7 +4,13 @@ import type { Season } from '../dates';
 
 import type { BuilderInfo } from './interfaces';
 
-export async function getStarterpackBuilders({ season }: { season: Season }): Promise<BuilderInfo[]> {
+export async function getStarterpackBuilders({
+  season,
+  limit
+}: {
+  season: Season;
+  limit?: number;
+}): Promise<BuilderInfo[]> {
   const starterPackBuilders = await prisma.userWeeklyStats.findMany({
     where: {
       user: {
@@ -17,6 +23,7 @@ export async function getStarterpackBuilders({ season }: { season: Season }): Pr
         }
       }
     },
+    take: limit,
     select: {
       user: {
         select: {

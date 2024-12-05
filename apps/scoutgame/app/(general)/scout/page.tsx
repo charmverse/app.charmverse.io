@@ -25,10 +25,17 @@ export default async function Scout({
 
   let builders: BuilderInfo[] = [];
 
+  let remainingStarterCards = MAX_STARTER_PACK_PURCHASES;
+
   if (user?.id) {
-    const purchases = await prisma.nFTPurchaseEvent.count({
-      where: { builderNFT: { nftType: 'season_1_starter_pack', season: currentSeason }, scoutId: user.id }
-    });
+    const purchases = await prisma.nFTPurchaseEvent
+      .aggregate({
+        where: { builderNFT: { nftType: 'season_1_starter_pack', season: currentSeason }, scoutId: user.id },
+        _sum: { tokensPurchased: true }
+      })
+      .then((res) => res._sum.tokensPurchased || 0);
+
+    remainingStarterCards = MAX_STARTER_PACK_PURCHASES - purchases;
 
     if (purchases < MAX_STARTER_PACK_PURCHASES) {
       const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders({ season: currentSeason }));
@@ -46,6 +53,7 @@ export default async function Scout({
       buildersLayout={buildersLayout}
       tab={tab}
       starterpackBuilders={builders}
+      remainingStarterCards={remainingStarterCards}
     />
   );
 }

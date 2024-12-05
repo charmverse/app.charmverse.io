@@ -16,6 +16,7 @@ type DevUser = {
   id: number;
   avatar: string;
   farcasterId?: number;
+  createStarterPack?: boolean;
 };
 
 const devUsers: Record<string, DevUser> = {
@@ -46,12 +47,14 @@ const devUsers: Record<string, DevUser> = {
   piesrtasty: {
     id: 339341,
     avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/ea9d8fd1-fbf4-4ae3-21a2-c1ca069bf200/original',
-    farcasterId: 547807
+    farcasterId: 547807,
+    createStarterPack: true
   },
   maurelian: {
     id: 23033765,
     avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/e2beaac4-eacd-472b-9e96-6ca93d9d3000/original',
-    farcasterId: 4179
+    farcasterId: 4179,
+    createStarterPack: true
   }
 };
 
@@ -145,7 +148,9 @@ async function seedBuilderNFTs() {
     log.info(`-- Processing builder ${login}`);
     const nft = await registerBuilderNFT({ builderId: builderId as string, season: currentSeason });
 
-    await registerBuilderStarterPackNFT({ builderId: nft.builderId, season: currentSeason });
+    if (devUsers[login].createStarterPack) {  
+      await registerBuilderStarterPackNFT({ builderId: nft.builderId, season: currentSeason });
+    }
 
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 

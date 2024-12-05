@@ -1,3 +1,4 @@
+import type { BuilderNftType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
@@ -7,11 +8,13 @@ import { uniqueValues } from '@packages/utils/array';
 export async function getBuildersByFid({
   fids,
   limit,
-  season
+  season,
+  nftType = 'default'
 }: {
   fids: number[];
   limit: number;
   season: string;
+  nftType?: BuilderNftType;
 }): Promise<{ builders: BuilderInfo[] }> {
   const builders = await prisma.scout
     .findMany({
@@ -19,7 +22,8 @@ export async function getBuildersByFid({
         builderStatus: 'approved',
         builderNfts: {
           some: {
-            season
+            season,
+            nftType
           }
         },
         farcasterId: {
@@ -40,7 +44,7 @@ export async function getBuildersByFid({
         builderNfts: {
           where: {
             season,
-            nftType: 'default'
+            nftType
           },
           select: {
             contractAddress: true,

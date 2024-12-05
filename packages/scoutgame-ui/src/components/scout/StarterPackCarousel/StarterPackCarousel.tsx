@@ -7,13 +7,18 @@ import { Carousel } from '../../../components/common/Carousel/Carousel';
 import 'swiper/css';
 import 'swiper/css/autoplay';
 import { getEditorialDescription } from './editorial';
+import { StarterPackInfo } from './StarterPackInfo';
 
-export function StarterPackCarousel({ builders }: { builders: BuilderInfo[] }) {
+export function StarterPackCarousel({
+  builders,
+  remainingStarterCards
+}: {
+  builders: BuilderInfo[];
+  remainingStarterCards?: number;
+}) {
   return (
     <Stack gap={2}>
-      <Typography variant='h5' color='secondary' fontWeight={600} textAlign='center'>
-        Scout your Starter Pack
-      </Typography>
+      <StarterPackInfo remainingStarterCards={remainingStarterCards} />
       <Carousel slidesPerView={1} autoplay={false} boxProps={{ width: { xs: '100%', md: '80%' }, margin: '0 auto' }}>
         {builders.map((builder) => (
           <Stack

@@ -17,7 +17,7 @@ export function ScoutInfoContent({ builder }: { builder: BuilderInfo }) {
       </Typography>
       <Box>
         <Box my={2}>
-          <BuilderCard builder={builder} />
+          <BuilderCard builder={builder} disableProfileUrl />
         </Box>
         <Typography my={2}>
           You score points by collecting the NFTs of Builders. You can Scout your first 3 builders for 95% off their

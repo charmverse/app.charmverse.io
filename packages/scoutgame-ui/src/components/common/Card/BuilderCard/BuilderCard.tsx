@@ -15,13 +15,15 @@ export function BuilderCard({
   showPurchaseButton = false,
   hideDetails = false,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  disableProfileUrl = false
 }: {
   size?: 'x-small' | 'small' | 'medium' | 'large';
   builder: Omit<Partial<BuilderInfo>, RequiredBuilderInfoFields> & Pick<BuilderInfo, RequiredBuilderInfoFields>;
   hideDetails?: boolean;
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;
+  disableProfileUrl?: boolean;
 }) {
   return (
     <Card
@@ -39,6 +41,7 @@ export function BuilderCard({
         showHotIcon={showHotIcon}
         size={size}
         hideDetails={hideDetails}
+        disableProfileUrl={disableProfileUrl}
       >
         {builder.builderStatus === 'banned' ? (
           <Typography textAlign='center'>SUSPENDED</Typography>

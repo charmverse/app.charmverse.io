@@ -1,3 +1,5 @@
+import { BuilderNftType } from '@charmverse/core/prisma-client';
+import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { getBuildersByFid } from '@packages/scoutgame/social/getBuildersByFid';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
@@ -15,16 +17,19 @@ export const metadata: Metadata = {
 };
 
 export default async function ScoutInfo() {
-  // FID of the builder that we want to show in the ScoutInfoPage
-  const builderfId = 547807;
-  const [, builderByFid] = await safeAwaitSSRData(
-    getBuildersByFid({ fids: [builderfId], limit: 1, season: currentSeason })
-  );
-  const builder = builderByFid?.builders?.at(0);
+  const starterPackBuilders = await getStarterpackBuilders({ season: currentSeason, limit: 1 });
 
-  if (!builder) {
+  const starterPackBuilder = await getBuildersByFid({
+    // piesrtasty
+    fids: [547807],
+    season: currentSeason,
+    nftType: BuilderNftType.season_1_starter_pack,
+    limit: 1
+  });
+
+  if (!starterPackBuilder.builders[0]) {
     return null;
   }
 
-  return <ScoutInfoPage builder={builder} />;
+  return <ScoutInfoPage builder={starterPackBuilder.builders[0]} />;
 }
