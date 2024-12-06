@@ -61,7 +61,7 @@ test.describe('Onboarding flow', () => {
     expect(user.agreedToTermsAt).not.toBeNull();
     expect(user.email).toBe(email);
 
-    await Promise.all([page.waitForURL('**/scout', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
+    await Promise.all([page.waitForURL('**/quests', { waitUntil: 'load' }), welcomePage.continueButton.click()]);
 
     await expect(scoutPage.container).toBeVisible();
 
