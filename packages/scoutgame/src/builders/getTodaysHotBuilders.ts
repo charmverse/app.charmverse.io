@@ -34,7 +34,8 @@ const userSelect = {
   },
   builderNfts: {
     where: {
-      season: currentSeason
+      season: currentSeason,
+      nftType: BuilderNftType.default
     },
     select: {
       currentPrice: true,
