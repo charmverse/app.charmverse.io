@@ -79,7 +79,8 @@ export function validateInitData(value: string, token: string, options?: { expir
         }
       : undefined,
     chat_type: (data.chat_type as WebAppInitData['chat_type']) || undefined,
-    chat_instance: data.chat_instance || undefined
+    chat_instance: data.chat_instance || undefined,
+    signature: data.signature
   };
 
   return response;
