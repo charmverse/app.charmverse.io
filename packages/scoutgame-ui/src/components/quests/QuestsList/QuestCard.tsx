@@ -29,9 +29,11 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
   };
 
   return (
-    <Stack
-      component={Button}
+    <Button
+      disabled={quest.completed}
       onClick={handleClick}
+      variant='contained'
+      data-test={`quest-${quest.type}`}
       sx={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -41,7 +43,11 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         bgcolor: quest.completed ? 'background.light' : 'primary.main',
         borderRadius: 1,
         p: 1.5,
-        color: 'secondary'
+        color: 'secondary',
+        '&.Mui-disabled': {
+          color: 'secondary',
+          bgcolor: quest.completed ? 'background.light' : 'primary.main'
+        }
       }}
     >
       <Stack direction='row' gap={3.5} alignItems='center'>
@@ -57,6 +63,6 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         </Stack>
       </Stack>
       {quest.completed ? <CheckCircleIcon color='secondary' /> : <KeyboardArrowRightIcon />}
-    </Stack>
+    </Button>
   );
 }

@@ -9,7 +9,7 @@ import { Stats } from '../../friends/components/Stats';
 
 export function FriendlyQuest({ friends, title }: { friends: SessionUser[]; title?: string }) {
   return (
-    <Stack gap={2} my={{ md: 2 }} bgcolor='black.main'>
+    <Stack gap={2} py={{ md: 2 }} bgcolor='black.main' data-test='friendly-quest'>
       {title && (
         <Typography variant='h4' textAlign='center' color='secondary' fontWeight='600'>
           {title}

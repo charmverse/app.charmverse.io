@@ -95,6 +95,7 @@ export function InviteButtons({ stats, friends }: { stats?: ReactNode; friends: 
               borderRadius: '10px'
             }}
             onClick={onCopy}
+            data-test='copy-referral-link'
           >
             <LuCopy />
           </IconButton>

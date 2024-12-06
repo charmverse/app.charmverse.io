@@ -45,6 +45,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
         position: 'relative',
         cursor: canClaim ? 'pointer' : 'default'
       }}
+      data-test={`daily-claim-${canClaim ? 'enabled' : 'disabled'}`}
       onClick={() => {
         if (canClaim) {
           claimDailyReward({ isBonus: dailyClaim.isBonus, dayOfWeek: currentWeekDay });
@@ -68,6 +69,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
           <CheckCircleIcon
             fontSize='small'
             color='secondary'
+            data-test='claimed-icon'
             sx={{
               position: 'absolute',
               top: 5,

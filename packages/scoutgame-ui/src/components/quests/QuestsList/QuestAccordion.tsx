@@ -7,7 +7,7 @@ import type { QuestInfo } from './QuestsRecord';
 
 export function QuestAccordion({ quest, children }: { quest: QuestInfo; children: ReactNode }) {
   return (
-    <Accordion sx={{ bgcolor: 'transparent' }} disableGutters>
+    <Accordion sx={{ bgcolor: 'transparent' }} disableGutters data-test={`quest-${quest.type}`}>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         aria-controls={`${quest.type}-content`}

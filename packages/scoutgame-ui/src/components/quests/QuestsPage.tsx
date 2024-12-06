@@ -37,7 +37,7 @@ export function QuestsPage({
             <QuestsList quests={quests} friends={friends} />
           </Box>
         </Grid>
-        <Grid size={{ xs: 0, md: 4 }}>
+        <Grid size={{ xs: 0, md: 4 }} data-test='quest-sidebar'>
           <Hidden mdDown height='100%' bgcolor='black.main' px={1}>
             <FriendlyQuest friends={friends} title='Friendly Quest' />
           </Hidden>
