@@ -43,9 +43,9 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
         bgcolor: quest.completed ? 'background.light' : 'primary.main',
         borderRadius: 1,
         p: 1.5,
-        color: 'secondary',
+        color: 'text.primary',
         '&.Mui-disabled': {
-          color: 'secondary',
+          color: 'text.primary',
           bgcolor: quest.completed ? 'background.light' : 'primary.main'
         }
       }}

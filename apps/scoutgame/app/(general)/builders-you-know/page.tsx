@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function BuildersYouKnow() {
   const user = await getUserFromSession();
 
-  const redirectPath = '/scout';
+  const redirectPath = '/quests';
 
   if (!user?.farcasterId) {
     redirect(redirectPath);

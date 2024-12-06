@@ -57,7 +57,7 @@ export function Header() {
           variant='dense'
         >
           <>
-            <Link href={user ? '/scout' : '/'}>
+            <Link href={user ? '/quests' : '/'}>
               <Image
                 src='/images/scout-game-logo.png'
                 width={100}

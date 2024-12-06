@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 // These are the links that are only accessible to logged in users
-const privateLinks = ['/profile', '/notifications', '/welcome', '/claim', '/builders-you-know', '/friends'];
+const privateLinks = ['/profile', '/notifications', '/welcome', '/claim', '/builders-you-know', '/quests'];
 
 export async function middleware(request: NextRequest) {
   const session = await getSession();
@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
   if (isLoggedIn && (path === '/login' || path === '/')) {
     // eslint-disable-next-line no-console
     console.log('Redirecting to home page', session);
-    return NextResponse.redirect(new URL('/scout', request.url));
+    return NextResponse.redirect(new URL('/quests', request.url));
   }
 
   return response;

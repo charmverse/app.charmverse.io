@@ -53,7 +53,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
-    path: '/scout'
+    path: '/quests'
   });
 
   const openAuthModal = isAuthenticated
@@ -105,6 +105,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           value='quests'
           icon={<QuestsIcon size='19px' />}
           LinkComponent={Link}
+          onClick={(e) => openAuthModal?.(e, 'quests')}
         />
       </StyledBottomNavigation>
       <SignInModalMessage
