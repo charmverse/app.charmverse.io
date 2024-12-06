@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 
@@ -25,7 +25,8 @@ export async function getPaginatedBuilders({
           builderStatus: 'approved',
           builderNfts: {
             some: {
-              season
+              season,
+              nftType: BuilderNftType.default
             }
           }
         },
@@ -55,11 +56,14 @@ export async function getPaginatedBuilders({
             builderStatus: true,
             builderNfts: {
               where: {
-                season
+                season,
+                nftType: BuilderNftType.default
               },
               select: {
+                contractAddress: true,
                 currentPrice: true,
                 imageUrl: true,
+                nftType: true,
                 congratsImageUrl: true,
                 nftSoldEvents: {
                   distinct: 'scoutId'
@@ -93,6 +97,8 @@ export async function getPaginatedBuilders({
         id: stat.user.id,
         rank: stat.rank ?? -1,
         nftImageUrl: stat.user.builderNfts[0]?.imageUrl,
+        contractAddress: stat.user.builderNfts[0]?.contractAddress,
+        nftType: stat.user.builderNfts[0]?.nftType,
         congratsImageUrl: stat.user.builderNfts[0]?.congratsImageUrl,
         path: stat.user.path,
         displayName: stat.user.displayName,

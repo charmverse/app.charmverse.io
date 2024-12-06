@@ -1,10 +1,12 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
 import { ScoutPageTable } from '@packages/scoutgame-ui/components/scout/ScoutPageTable/ScoutPageTable';
+import { StarterPackCarousel } from '@packages/scoutgame-ui/components/scout/StarterPackCarousel/StarterPackCarousel';
 import { TodaysHotBuildersCarousel } from '@packages/scoutgame-ui/components/scout/TodaysHotBuildersCarousel/TodaysHotBuildersCarousel';
 import { isTruthy } from '@packages/utils/types';
 import Link from 'next/link';
@@ -30,7 +32,9 @@ export function ScoutPage({
   builderOrder,
   scoutTab,
   buildersLayout,
-  tab
+  tab,
+  starterpackBuilders,
+  remainingStarterCards
 }: {
   scoutSort: string;
   builderSort: string;
@@ -39,6 +43,8 @@ export function ScoutPage({
   scoutTab: string;
   buildersLayout: string;
   tab: string;
+  starterpackBuilders: BuilderInfo[];
+  remainingStarterCards?: number;
 }) {
   const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
     .filter(([, value]) => isTruthy(value))
@@ -66,19 +72,26 @@ export function ScoutPage({
             gap: 2
           }}
         >
-          <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2}>
-            Scout today's HOT Builders!
-          </Typography>
-          <Box
-            sx={{
-              height: {
-                xs: 250,
-                md: 325
-              }
-            }}
-          >
-            <TodaysHotBuildersCarousel showPromoCards />
-          </Box>
+          {starterpackBuilders.length ? (
+            <StarterPackCarousel builders={starterpackBuilders} remainingStarterCards={remainingStarterCards} />
+          ) : (
+            <>
+              <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2} mt={2}>
+                Scout today's HOT Builders!
+              </Typography>
+              <Box
+                sx={{
+                  height: {
+                    xs: 250,
+                    md: 325
+                  }
+                }}
+              >
+                <TodaysHotBuildersCarousel showPromoCards />
+              </Box>
+            </>
+          )}
+
           <Stack
             position='sticky'
             top={0}

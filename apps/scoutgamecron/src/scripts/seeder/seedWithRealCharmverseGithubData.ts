@@ -1,9 +1,13 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
-import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/registerBuilderNFT';
+import { registerBuilderNFT } from '@packages/scoutgame/builderNfts/builderRegistration/registerBuilderNFT';
+import { registerBuilderStarterPackNFT } from '@packages/scoutgame/builderNfts/builderRegistration/registerBuilderStarterPackNFT';
 import { refreshUserStats } from '@packages/scoutgame/refreshUserStats';
 
 import { currentSeason } from '@packages/scoutgame/dates';
+import { log } from '@charmverse/core/log';
+
+import { v4 as uuidv4 } from 'uuid';
 
 function getRandomValue<T>(arr: T[]): T {
   const randomIndex = Math.floor(Math.random() * arr.length);
@@ -14,6 +18,7 @@ type DevUser = {
   id: number;
   avatar: string;
   farcasterId?: number;
+  createStarterPack?: boolean;
 };
 
 const devUsers: Record<string, DevUser> = {
@@ -31,15 +36,27 @@ const devUsers: Record<string, DevUser> = {
   //   avatar:
   //     'https://cdn.charmverse.io/user-content/5906c806-9497-43c7-9ffc-2eecd3c3a3ec/cbed10a8-4f05-4b35-9463-fe8f15413311/b30047899c1514539cc32cdb3db0c932.jpg'
   // },
-  valentinludu: {
-    id: 34683631,
-    avatar:
-      'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/42697dc0-35ad-4361-8311-a92702c76062/breaking_wave.jpg'
+  // valentinludu: {
+  //   id: 34683631,
+  //   avatar:
+  //     'https://cdn.charmverse.io/user-content/f50534c5-22e7-47ee-96cb-54f4ce1a0e3e/42697dc0-35ad-4361-8311-a92702c76062/breaking_wave.jpg'
+  // },
+  // ccarella: {
+  //   id: 199823,
+  //   avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3',
+  //   farcasterId: 472
+  // },
+  piesrtasty: {
+    id: 339341,
+    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/ea9d8fd1-fbf4-4ae3-21a2-c1ca069bf200/original',
+    farcasterId: 547807,
+    createStarterPack: true
   },
-  ccarella: {
-    id: 199823,
-    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/43760426-bca9-406b-4afe-20138acd5f00/rectcrop3',
-    farcasterId: 472
+  maurelian: {
+    id: 23033765,
+    avatar: 'https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/e2beaac4-eacd-472b-9e96-6ca93d9d3000/original',
+    farcasterId: 4179,
+    createStarterPack: true
   }
 };
 
@@ -92,7 +109,8 @@ export async function seedWithRealCharmverseGithubData() {
               referralCode: builder + Math.random().toString().replace('.', '').slice(0, 6),
               path: builder + Math.random().toString().replace('.', '').slice(0, 6),
               builderStatus: 'approved',
-              avatar
+              avatar,
+              farcasterId,
             }
           }
         }
@@ -110,7 +128,7 @@ export async function seedWithRealCharmverseGithubData() {
               path: builder,
               builderStatus: 'approved',
               avatar: avatar,
-              farcasterId: farcasterId
+              farcasterId: farcasterId,
             }
           }
         }
@@ -130,8 +148,13 @@ async function seedBuilderNFTs() {
 
   console.log('githubUser', githubUser);
 
-  for (const { builderId } of githubUser) {
+  for (const { builderId, login } of githubUser) {
+    log.info(`-- Processing builder ${login}`);
     const nft = await registerBuilderNFT({ builderId: builderId as string, season: currentSeason });
+
+    if (devUsers[login].createStarterPack) {  
+      await registerBuilderStarterPackNFT({ builderId: nft.builderId, season: currentSeason });
+    }
 
     await generateNftPurchaseEvents({ builderId: nft.builderId, amount: 4 });
 

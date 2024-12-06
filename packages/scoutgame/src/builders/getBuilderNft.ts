@@ -5,9 +5,10 @@ import { currentSeason } from '../dates';
 export async function getBuilderNft(builderId: string) {
   return prisma.builderNft.findUnique({
     where: {
-      builderId_season: {
+      builderId_season_nftType: {
         builderId,
-        season: currentSeason
+        season: currentSeason,
+        nftType: 'default'
       }
     },
     select: {

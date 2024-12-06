@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason, getCurrentWeek, getLastWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
@@ -34,7 +34,8 @@ const userSelect = {
   },
   builderNfts: {
     where: {
-      season: currentSeason
+      season: currentSeason,
+      nftType: BuilderNftType.default
     },
     select: {
       currentPrice: true,
@@ -49,6 +50,12 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
     where: {
       user: {
         builderStatus: 'approved',
+        builderNfts: {
+          some: {
+            season: currentSeason,
+            nftType: BuilderNftType.default
+          }
+        },
         userWeeklyStats: {
           some: {
             week: getCurrentWeek(),
@@ -113,7 +120,8 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       rank: builder.userWeeklyStats[0]?.rank || -1,
       last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
         .map((gem) => gem.gemsCount)
-        .slice(-7)
+        .slice(-7),
+      nftType: BuilderNftType.default
     };
   });
 }

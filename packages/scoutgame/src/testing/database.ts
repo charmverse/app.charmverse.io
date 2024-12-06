@@ -1,4 +1,4 @@
-import type { BuilderEvent, BuilderEventType, GithubRepo, Scout } from '@charmverse/core/prisma';
+import type { BuilderEvent, BuilderEventType, BuilderNftType, GithubRepo, Scout } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { randomString } from '@packages/utils/strings';
 import { v4 as uuid } from 'uuid';
@@ -250,7 +250,8 @@ export async function mockNFTPurchaseEvent({
   points = 0,
   week = getCurrentWeek(),
   season = mockSeason,
-  tokensPurchased = 1
+  tokensPurchased = 1,
+  nftType
 }: {
   builderId: string;
   scoutId: string;
@@ -258,10 +259,13 @@ export async function mockNFTPurchaseEvent({
   season?: string;
   tokensPurchased?: number;
   week?: string;
+  nftType?: BuilderNftType;
 }) {
   const builderNft = await prisma.builderNft.findFirstOrThrow({
     where: {
-      builderId
+      builderId,
+      season,
+      nftType: nftType ?? 'default'
     }
   });
 
@@ -303,7 +307,8 @@ export async function mockBuilderNft({
   contractAddress = '0x1',
   owners = [],
   season = mockSeason,
-  currentPrice = 100
+  currentPrice = 100,
+  nftType
 }: {
   builderId: string;
   chainId?: number;
@@ -312,6 +317,7 @@ export async function mockBuilderNft({
   owners?: (string | { id: string })[];
   season?: string;
   tokenId?: number;
+  nftType?: BuilderNftType;
 }) {
   const nft = await prisma.builderNft.create({
     data: {
@@ -322,6 +328,7 @@ export async function mockBuilderNft({
       season,
       imageUrl: 'https://placehold.co/600x400',
       tokenId,
+      nftType: nftType ?? 'default',
       nftSoldEvents: {
         createMany: {
           data: owners.map((owner) => ({
@@ -337,6 +344,7 @@ export async function mockBuilderNft({
   for (const owner of owners) {
     await mockNFTPurchaseEvent({
       builderId,
+      season: nft.season,
       scoutId: typeof owner === 'string' ? owner : owner.id
     });
   }

@@ -1,5 +1,6 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
+import type { BuilderNftType } from '@charmverse/core/prisma';
 import type { Chain } from 'viem/chains';
 import { optimism, optimismSepolia } from 'viem/chains';
 
@@ -28,6 +29,20 @@ export const realOptimismMainnetBuildersContract = '0x743ec903fe6d05e73b19a6db80
 
 export function getBuilderContractAddress(): `0x${string}` {
   return (env('BUILDER_NFT_CONTRACT_ADDRESS') || process.env.REACT_APP_BUILDER_NFT_CONTRACT_ADDRESS) as `0x${string}`;
+}
+
+export function getBuilderStarterPackContractAddress(): `0x${string}` {
+  return (env('BUILDER_NFT_STARTER_PACK_CONTRACT_ADDRESS') ||
+    process.env.REACT_APP_BUILDER_NFT_STARTER_PACK_CONTRACT_ADDRESS) as `0x${string}`;
+}
+
+/**
+ * Max amount of starter pack NFTs a user can mint
+ */
+export const MAX_STARTER_PACK_PURCHASES = 3;
+
+export function getBuilderContractAddressForNftType(nftType: BuilderNftType): `0x${string}` {
+  return nftType === 'starter_pack' ? getBuilderStarterPackContractAddress() : getBuilderContractAddress();
 }
 
 // USDC Contract we use for payments

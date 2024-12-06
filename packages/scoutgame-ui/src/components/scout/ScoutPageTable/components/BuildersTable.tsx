@@ -4,7 +4,7 @@ import NorthIcon from '@mui/icons-material/North';
 import SouthIcon from '@mui/icons-material/South';
 import { Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
-import type { BuilderInfo } from '@packages/scoutgame/builders/getBuilders';
+import type { BuilderMetadata } from '@packages/scoutgame/builders/getBuilders';
 import Image from 'next/image';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
@@ -22,7 +22,7 @@ function SortIcon({ columnName, order, sort }: { columnName: string; order: stri
   );
 }
 
-export function BuildersTable({ builders, order, sort }: { builders: BuilderInfo[]; order: string; sort: string }) {
+export function BuildersTable({ builders, order, sort }: { builders: BuilderMetadata[]; order: string; sort: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

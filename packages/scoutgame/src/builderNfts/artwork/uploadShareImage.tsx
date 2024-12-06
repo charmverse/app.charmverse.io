@@ -5,6 +5,7 @@ import { getBuilderNft } from '../../builders/getBuilderNft';
 import { getBuilderScouts } from '../../builders/getBuilderScouts';
 import { getBuilderStats } from '../../builders/getBuilderStats';
 
+import { builderNftArtworkContractName } from './constants';
 import { generateShareImage } from './generateShareImage';
 import { getShareImagePath, imageDomain } from './utils';
 
@@ -42,7 +43,11 @@ export async function uploadShareImage({
     builderPrice: builderNft?.currentPrice || BigInt(0)
   });
 
-  const imagePath = getShareImagePath({ season, tokenId: Number(tokenId) });
+  const imagePath = getShareImagePath({
+    season,
+    tokenId: Number(tokenId),
+    contractName: builderNftArtworkContractName
+  });
 
   await uploadFileToS3({
     pathInS3: `nft/${imagePath}`,

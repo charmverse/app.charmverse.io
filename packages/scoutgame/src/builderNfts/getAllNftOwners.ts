@@ -1,11 +1,21 @@
+import type { BuilderNftType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function getAllNftOwners({ builderId, season }: { builderId: string; season: string }): Promise<string[]> {
+export async function getAllNftOwners({
+  builderId,
+  season,
+  nftType
+}: {
+  builderId: string;
+  season: string;
+  nftType: BuilderNftType;
+}): Promise<string[]> {
   const builderNft = await prisma.builderNft.findUnique({
     where: {
-      builderId_season: {
+      builderId_season_nftType: {
         season,
-        builderId
+        builderId,
+        nftType
       }
     },
     select: {

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getTodaysHotBuilders } from '@packages/scoutgame/builders/getTodaysHotBuilders';
-import { getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
+import { currentSeason, getCurrentWeek, getLastWeek } from '@packages/scoutgame/dates';
 import { mockBuilder, mockUserWeeklyStats } from '@packages/scoutgame/testing/database';
 
 beforeEach(async () => {
@@ -11,15 +11,15 @@ beforeEach(async () => {
 describe('getTodaysHotBuilders', () => {
   it('should filter banned builders and return current and previous week builders', async () => {
     const currentWeekBuilders = await Promise.all([
-      mockBuilder(),
+      mockBuilder({ nftSeason: currentSeason, createNft: true }),
       mockBuilder({
         builderStatus: 'banned'
       }),
-      mockBuilder()
+      mockBuilder({ nftSeason: currentSeason, createNft: true })
     ]);
     const previousWeekBuilders = await Promise.all([
-      mockBuilder(),
-      mockBuilder(),
+      mockBuilder({ nftSeason: currentSeason }),
+      mockBuilder({ nftSeason: currentSeason }),
       mockBuilder({
         builderStatus: 'banned'
       })

@@ -13,16 +13,17 @@ describe('mockNFTPurchaseEvent', () => {
 
     const currentSeason = 'current-mock-season';
 
-    await mockBuilderNft({
-      builderId: builder.id
+    const builderNft = await mockBuilderNft({
+      builderId: builder.id,
+      season: currentSeason
     });
 
     const result = await mockNFTPurchaseEvent({
       builderId: builder.id,
       scoutId: scout.id,
       points,
-      season: currentSeason,
-      tokensPurchased
+      tokensPurchased,
+      season: currentSeason
     });
 
     // Verify builderEvent and nftPurchaseEvent creation
