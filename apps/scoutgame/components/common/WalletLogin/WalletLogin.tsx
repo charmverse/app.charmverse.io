@@ -83,8 +83,11 @@ function WalletLoginButton() {
     await loginUser({ message, signature, inviteCode, referralCode });
   };
 
-  function onClick() {
-    openConnectModal?.();
+  function onClick() 
+    if (!address) {
+      // openConnectModal exists if wallet is already connected
+      openConnectModal!();
+    }
     setIsConnecting(true);
   }
 
