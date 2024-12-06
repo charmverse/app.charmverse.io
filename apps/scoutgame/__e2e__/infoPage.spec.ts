@@ -35,11 +35,7 @@ test.describe('Info page', () => {
 
 test.describe('Info page partners', () => {
   test('Open Optimism from the scout page', async ({ page, scoutPage, infoPage, utils }) => {
-    const newUser = await mockScout({
-      onboardedAt: new Date(),
-      agreedToTermsAt: new Date(),
-      avatar: 'https://placehold.co/256'
-    });
+    const newUser = await mockScout();
     await utils.loginAsUserId(newUser.id);
 
     await page.goto('/scout');
@@ -48,16 +44,21 @@ test.describe('Info page partners', () => {
     await expect(infoPage.optimismContainer).toBeVisible();
   });
   test('Open Moxie from the scout page', async ({ page, scoutPage, infoPage, utils }) => {
-    const newUser = await mockScout({
-      onboardedAt: new Date(),
-      agreedToTermsAt: new Date(),
-      avatar: 'https://placehold.co/256'
-    });
+    const newUser = await mockScout();
     await utils.loginAsUserId(newUser.id);
 
     await page.goto('/scout');
     await scoutPage.moxiePromoCard.click();
 
     await expect(infoPage.moxieContainer).toBeVisible();
+  });
+  test('Open Glo from the scout page', async ({ page, scoutPage, infoPage, utils }) => {
+    const newUser = await mockScout();
+    await utils.loginAsUserId(newUser.id);
+
+    await page.goto('/scout');
+    await scoutPage.gloCard.click();
+
+    await expect(infoPage.gloContainer).toBeVisible();
   });
 });
