@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason, getCurrentWeek } from '../dates';
 
@@ -44,7 +44,8 @@ export async function getBuilders({
             displayName: true,
             builderNfts: {
               where: {
-                season: currentSeason
+                season: currentSeason,
+                nftType: BuilderNftType.default
               },
               select: {
                 currentPrice: true
@@ -102,7 +103,8 @@ export async function getBuilders({
             },
             builderNfts: {
               where: {
-                season: currentSeason
+                season: currentSeason,
+                nftType: BuilderNftType.default
               },
               select: {
                 currentPrice: true
@@ -161,7 +163,8 @@ export async function getBuilders({
             },
             builderNfts: {
               where: {
-                season: currentSeason
+                season: currentSeason,
+                nftType: BuilderNftType.default
               },
               select: {
                 currentPrice: true
@@ -210,7 +213,8 @@ export async function getBuilders({
             },
             builderNfts: {
               where: {
-                season: currentSeason
+                season: currentSeason,
+                nftType: BuilderNftType.default
               }
             }
           }
