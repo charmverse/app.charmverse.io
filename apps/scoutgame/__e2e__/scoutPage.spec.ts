@@ -19,9 +19,7 @@ test.describe('Scout page', () => {
 
     await page.goto('/');
     // Logged in user should be redirected
-    await page.waitForURL('**/scout');
-
-    await expect(scoutPage.container).toBeVisible();
+    await page.waitForURL('**/welcome');
   });
   test('Can navigate to each scouts table tab', async ({ page, scoutPage, utils }) => {
     // add some mock data
