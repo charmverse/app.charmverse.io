@@ -84,7 +84,9 @@ function WalletLoginButton() {
   };
 
   function onClick() {
-    openConnectModal!();
+    if (!address) {
+      openConnectModal();
+    }
     setIsConnecting(true);
   }
 
