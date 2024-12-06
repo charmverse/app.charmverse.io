@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { BuilderNft } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { BuilderNft } from '@charmverse/core/prisma';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { scoutgameMintsLogger } from '../loggers/mintsLogger';
@@ -30,7 +30,8 @@ export async function refreshBuilderNftPrice({
     const existingNft = await prisma.builderNft.findFirstOrThrow({
       where: {
         builderId,
-        season
+        season,
+        nftType: BuilderNftType.default
       }
     });
 

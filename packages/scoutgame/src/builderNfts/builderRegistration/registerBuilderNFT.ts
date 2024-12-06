@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getBuilderContractMinterClient } from '../clients/builderContractMinterWriteClient';
@@ -28,7 +28,8 @@ export async function registerBuilderNFT({
     where: {
       builderId,
       chainId: builderNftChain.id,
-      season
+      season,
+      nftType: BuilderNftType.default
     }
   });
 
