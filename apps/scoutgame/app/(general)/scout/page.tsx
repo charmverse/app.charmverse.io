@@ -38,7 +38,7 @@ export default async function Scout({
     remainingStarterCards = MAX_STARTER_PACK_PURCHASES - purchases;
 
     if (purchases < MAX_STARTER_PACK_PURCHASES) {
-      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders({ season: currentSeason }));
+      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders());
       builders = starterPackBuilders ?? [];
     }
   }
