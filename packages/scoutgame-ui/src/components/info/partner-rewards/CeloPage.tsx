@@ -22,6 +22,29 @@ export function CeloPage() {
   );
 }
 
+const tiers = [
+  {
+    name: 'Common',
+    reward: '50 cUSD'
+  },
+  {
+    name: 'Rare',
+    reward: '150 cUSD'
+  },
+  {
+    name: 'Epic',
+    reward: '250 cUSD'
+  },
+  {
+    name: 'Legendary',
+    reward: '350 cUSD'
+  },
+  {
+    name: 'Mythic',
+    reward: '450 cUSD'
+  }
+];
+
 function Document() {
   return (
     <InfoCard>
@@ -36,30 +59,22 @@ function Document() {
         Qualified projects will mark their issues with a Tier in GitHub. The Tier determines the builder's reward for
         merging a PR that addresses the issue. Unmarked issues will default to the Common Tier.
       </Typography>
-      <TableContainer component={Paper}>
-        <Table sx={{ '& th, & td': { px: 0 } }} aria-label='Celo tiers table'>
-          <TableHead>
-            <TableRow>
-              <TableCell>GitHub Issue Tier</TableCell>
-              <TableCell align='right'>Reward</TableCell>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>GitHub Issue Tier</TableCell>
+            <TableCell align='right'>Reward</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {tiers.map((tier) => (
+            <TableRow key={tier.name}>
+              <TableCell>{tier.name}</TableCell>
+              <TableCell align='right'>{tier.reward}</TableCell>
             </TableRow>
-          </TableHead>
-          <TableBody sx={{ '& td, & th': { border: 0 } }}>
-            <TableRow>
-              <TableCell>Common</TableCell>
-              <TableCell align='right'>50 cUSD</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Rare</TableCell>
-              <TableCell align='right'>150 cUSD</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Epic</TableCell>
-              <TableCell align='right'>250 cUSD</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+          ))}
+        </TableBody>
+      </Table>
       <Typography variant='h6' color='secondary' mt={2}>
         How to contribute
       </Typography>
