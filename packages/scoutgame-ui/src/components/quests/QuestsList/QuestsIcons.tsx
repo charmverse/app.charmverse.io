@@ -7,6 +7,5 @@ import type { ReactNode } from 'react';
 export const QuestIcon: Record<QuestType, ReactNode> = {
   'follow-x-account': <XIcon fontSize='large' />,
   'share-x-channel': <XIcon fontSize='large' />,
-  'watch-gameplay-video': <PlayCircleOutlineIcon fontSize='large' />,
   'invite-friend': <Image src='/images/friends-icon.svg' alt='Friends icon' width={35} height={35} />
 };

@@ -4,7 +4,7 @@ type QuestRecord = {
   link?: string;
 };
 
-export type QuestType = 'follow-x-account' | 'share-x-channel' | 'watch-gameplay-video' | 'invite-friend';
+export type QuestType = 'follow-x-account' | 'share-x-channel' | 'invite-friend';
 
 export type QuestInfo = {
   type: QuestType;
@@ -24,14 +24,8 @@ export const questsRecord: Record<QuestType, QuestRecord> = {
       "I'm playing @scoutgamexyz on Telegram! 🕹️ Come join me, play in the channel, and discover top builders while earning points and rewards. Let’s scout together! 👉 https://t.me/+J0dl4_uswBY2NTkx #PlayAndEarn"
     )}`
   },
-  'watch-gameplay-video': {
-    points: 50,
-    label: 'Watch game play video',
-    link: 'https://www.youtube.com/@scoutgamexyz'
-  },
   'invite-friend': {
     points: 5,
-    label: 'Invite a friend',
-    link: '/friends'
+    label: 'Invite a friend'
   }
 };
