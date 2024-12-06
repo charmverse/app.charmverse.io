@@ -72,25 +72,25 @@ export function ScoutPage({
             gap: 2
           }}
         >
-          {/* {starterpackBuilders.length ? (
+          {starterpackBuilders.length ? (
             <StarterPackCarousel builders={starterpackBuilders} remainingStarterCards={remainingStarterCards} />
-          ) : ( */}
-          <>
-            <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2} mt={2}>
-              Scout today's HOT Builders!
-            </Typography>
-            <Box
-              sx={{
-                height: {
-                  xs: 250,
-                  md: 325
-                }
-              }}
-            >
-              <TodaysHotBuildersCarousel showPromoCards />
-            </Box>
-          </>
-          {/* )} */}
+          ) : (
+            <>
+              <Typography variant='h5' color='secondary' textAlign='center' fontWeight='bold' mb={2} mt={2}>
+                Scout today's HOT Builders!
+              </Typography>
+              <Box
+                sx={{
+                  height: {
+                    xs: 250,
+                    md: 325
+                  }
+                }}
+              >
+                <TodaysHotBuildersCarousel showPromoCards />
+              </Box>
+            </>
+          )}
 
           <Stack
             position='sticky'
