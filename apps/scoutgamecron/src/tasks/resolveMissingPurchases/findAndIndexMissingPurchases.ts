@@ -1,9 +1,16 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import type { BuilderScoutedEvent } from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
-import { getBuilderScoutedEvents } from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
+import {
+  getBuilderScoutedEvents,
+  getBuilderStarterPackScoutedEvents
+} from '@packages/scoutgame/builderNfts/accounting/getBuilderScoutedEvents';
 import type { TransferSingleEvent } from '@packages/scoutgame/builderNfts/accounting/getTransferSingleEvents';
-import { getTransferSingleEvents } from '@packages/scoutgame/builderNfts/accounting/getTransferSingleEvents';
+import {
+  getStarterPackTransferSingleEvents,
+  getTransferSingleEvents
+} from '@packages/scoutgame/builderNfts/accounting/getTransferSingleEvents';
 import { builderContractReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractReadClient';
+import { builderContractStarterPackReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractStarterPackReadClient';
 import { recordNftMint } from '@packages/scoutgame/builderNfts/recordNftMint';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
@@ -11,18 +18,23 @@ import { scoutgameMintsLogger } from '@packages/scoutgame/loggers/mintsLogger';
 // Start block number for refetching events - Nov.14th 2024 - Last manual reindexing was Nov. 17th 2024
 const startBlockNumberForReindexing = 128000000;
 
-export async function findAndIndexMissingPurchases() {
-  const builderScoutedEvents = await getBuilderScoutedEvents({ fromBlock: startBlockNumberForReindexing });
-  const transferSingleEvents = await getTransferSingleEvents({ fromBlock: startBlockNumberForReindexing }).then(
-    (events) =>
-      events.reduce(
-        (acc, val) => {
-          acc[val.transactionHash] = val;
+export async function findAndIndexMissingPurchases({ nftType }: { nftType: BuilderNftType }) {
+  const builderScoutedEvents = await (nftType === BuilderNftType.starter_pack
+    ? getBuilderStarterPackScoutedEvents({ fromBlock: startBlockNumberForReindexing })
+    : getBuilderScoutedEvents({ fromBlock: startBlockNumberForReindexing }));
+  const transferSingleEvents = await (
+    nftType === BuilderNftType.starter_pack
+      ? getStarterPackTransferSingleEvents({ fromBlock: startBlockNumberForReindexing })
+      : getTransferSingleEvents({ fromBlock: startBlockNumberForReindexing })
+  ).then((events) =>
+    events.reduce(
+      (acc, val) => {
+        acc[val.transactionHash] = val;
 
-          return acc;
-        },
-        {} as Record<string, TransferSingleEvent>
-      )
+        return acc;
+      },
+      {} as Record<string, TransferSingleEvent>
+    )
   );
 
   const missingEvents: typeof builderScoutedEvents = [];
@@ -50,6 +62,7 @@ export async function findAndIndexMissingPurchases() {
   const groupedByTokenId = missingEvents.reduce(
     (acc, val) => {
       const tokenId = Number(val.args.tokenId);
+
       if (!acc[tokenId]) {
         acc[tokenId] = { records: [] };
       }
@@ -67,7 +80,8 @@ export async function findAndIndexMissingPurchases() {
     where: {
       tokenId: {
         in: allTokenIdsAsString.map((key) => Number(key))
-      }
+      },
+      nftType
     }
   });
 
@@ -83,10 +97,17 @@ export async function findAndIndexMissingPurchases() {
         continue;
       }
 
-      const price = await builderContractReadonlyApiClient.getTokenPurchasePrice({
-        args: { tokenId: BigInt(key), amount: BigInt(missingTx.args.amount) },
-        blockNumber: missingTx.blockNumber
-      });
+      const price = await (nftType === BuilderNftType.starter_pack
+        ? builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
+            args: {
+              amount: BigInt(missingTx.args.amount)
+            },
+            blockNumber: missingTx.blockNumber
+          })
+        : builderContractReadonlyApiClient.getTokenPurchasePrice({
+            args: { tokenId: BigInt(key), amount: BigInt(missingTx.args.amount) },
+            blockNumber: missingTx.blockNumber
+          }));
 
       const asPoints = convertCostToPoints(price);
 

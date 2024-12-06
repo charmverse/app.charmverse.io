@@ -5,7 +5,7 @@ import { currentSeason, getCurrentWeek } from '../dates';
 
 export type BuildersSortBy = 'cards' | 'points' | 'price' | 'rank';
 
-export type BuilderInfo = {
+export type BuilderMetadata = {
   path: string;
   avatar: string;
   displayName: string;
@@ -23,7 +23,7 @@ export async function getBuilders({
   limit?: number;
   sortBy?: BuildersSortBy;
   order?: 'asc' | 'desc';
-}) {
+}): Promise<BuilderMetadata[]> {
   if (sortBy === 'rank') {
     const builders = await prisma.userWeeklyStats.findMany({
       where: {

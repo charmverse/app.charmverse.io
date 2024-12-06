@@ -87,7 +87,7 @@ async function getBuildersFollowingUser({
 
     const typedData = data as SocialFollowersResponse;
 
-    if (typedData.SocialFollowers?.Follower) {
+    if (typedData?.SocialFollowers?.Follower) {
       records.push(...typedData.SocialFollowers.Follower);
 
       if (
@@ -146,7 +146,7 @@ async function getBuildersFollowedByUser({
   const records: SocialFollowingResponse['SocialFollowings']['Following'] = [];
 
   async function fetchData(cursor?: string, refetchCount = 0) {
-    const { data, hasNextPage } = await fetchQueryWithPagination(query, {
+    const { data, hasNextPage, error } = await fetchQueryWithPagination(query, {
       fid: fid.toString(),
       selectedFids: uniqueBuilderFids.map(String),
       cursor
@@ -154,7 +154,7 @@ async function getBuildersFollowedByUser({
 
     const typedData = data as SocialFollowingResponse;
 
-    if (typedData.SocialFollowings?.Following) {
+    if (typedData?.SocialFollowings?.Following) {
       records.push(...typedData.SocialFollowings.Following);
 
       if (

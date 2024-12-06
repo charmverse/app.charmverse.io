@@ -21,6 +21,7 @@ type DecentTransactionProps = {
   builderTokenId: bigint;
   tokensToPurchase: bigint;
   scoutId: string;
+  contractAddress?: string;
 };
 
 async function prepareDecentTransaction({ txConfig }: { txConfig: BoxActionRequest }): Promise<BoxActionResponse> {
@@ -60,7 +61,8 @@ export function useDecentTransaction({
   sourceToken,
   builderTokenId,
   scoutId,
-  tokensToPurchase
+  tokensToPurchase,
+  contractAddress
 }: DecentTransactionProps) {
   const decentAPIParams: BoxActionRequest = {
     sender: address as `0x${string}`,
@@ -72,7 +74,7 @@ export function useDecentTransaction({
     actionType: ActionType.NftMint,
     actionConfig: {
       chainId: optimism.id,
-      contractAddress: getBuilderContractAddress(),
+      contractAddress: contractAddress || getBuilderContractAddress(),
       cost: {
         amount: bigIntToString(paymentAmountOut) as any,
         isNative: false,

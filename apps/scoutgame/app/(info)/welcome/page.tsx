@@ -18,11 +18,6 @@ export default async function Welcome() {
   const user = await getUserFromSession();
 
   if (user?.onboardedAt && user?.agreedToTermsAt && !user?.builderStatus) {
-    log.debug('Redirect user to github connect page from Welcome page', { userId: user?.id });
-    redirect('/welcome/builder');
-  }
-
-  if (user?.agreedToTermsAt && user?.onboardedAt) {
     log.debug('Redirect user to home page from Welcome page', { userId: user.id });
     redirect('/');
   }

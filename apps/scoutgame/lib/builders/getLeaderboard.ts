@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason, validateISOWeek } from '@packages/scoutgame/dates';
 
 export type LeaderBoardRow = {
@@ -12,6 +12,7 @@ export type LeaderBoardRow = {
   progress: number;
   gemsCollected: number;
   price: bigint;
+  nftType: BuilderNftType;
   congratsImageUrl?: string | null;
 };
 
@@ -55,10 +56,15 @@ export async function getLeaderboard({
           displayName: true,
           builderStatus: true,
           builderNfts: {
+            where: {
+              season,
+              nftType: BuilderNftType.default
+            },
             select: {
               currentPrice: true,
               season: true,
               imageUrl: true,
+              nftType: true,
               congratsImageUrl: true
             }
           }
@@ -83,6 +89,7 @@ export async function getLeaderboard({
         progress,
         price,
         nftImageUrl: nft?.imageUrl,
+        nftType: nft?.nftType ?? BuilderNftType.default,
         congratsImageUrl: nft?.congratsImageUrl
       };
     })

@@ -1,4 +1,4 @@
-import type { BuilderStatus } from '@charmverse/core/prisma';
+import type { BuilderNftType, BuilderStatus } from '@charmverse/core/prisma';
 
 import type { BasicUserInfo } from '../users/interfaces';
 
@@ -22,7 +22,9 @@ export type BuilderMetrics = {
 
 export type BuilderInfo = BasicUserInfo &
   BuilderMetrics & {
+    nftType: BuilderNftType;
     builderStatus: BuilderStatus;
+    farcasterId?: number | null;
     nftImageUrl?: string | null;
     congratsImageUrl: string | null;
     nftsSoldToScout?: number;

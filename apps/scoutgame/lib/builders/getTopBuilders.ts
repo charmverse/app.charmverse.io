@@ -1,5 +1,5 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import type { Season } from '@packages/scoutgame/dates';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { isTruthy } from '@packages/utils/types';
@@ -8,6 +8,7 @@ export type TopBuilderInfo = {
   id: string;
   displayName: string;
   path: string;
+  bio?: string | null;
   avatar: string | null;
   seasonPoints: number;
   builderStatus: BuilderStatus;
@@ -39,6 +40,7 @@ export async function getTopBuilders({
           id: true,
           builderStatus: true,
           path: true,
+          bio: true,
           displayName: true,
           avatar: true,
           userAllTimeStats: {
@@ -48,7 +50,8 @@ export async function getTopBuilders({
           },
           builderNfts: {
             where: {
-              season
+              season,
+              nftType: BuilderNftType.default
             },
             select: {
               currentPrice: true,
@@ -80,6 +83,7 @@ export async function getTopBuilders({
         path: path!,
         displayName,
         avatar,
+        bio: user.bio,
         nftImageUrl: nft.imageUrl,
         seasonPoints: pointsEarnedAsBuilder,
         allTimePoints: builder.user.userAllTimeStats[0]?.pointsEarnedAsBuilder ?? 0,

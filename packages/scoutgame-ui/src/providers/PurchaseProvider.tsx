@@ -27,6 +27,7 @@ type MintTransactionInput = {
   };
   txMetadata: {
     fromAddress: Address;
+    contractAddress: Address;
     sourceChainId: number;
     builderTokenId: number;
     builderId: string;
@@ -124,7 +125,15 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
     async (input: MintTransactionInput) => {
       const {
         txData: { to, data, value: _txValue },
-        txMetadata: { sourceChainId, builderTokenId, purchaseCost, tokensToBuy, fromAddress, builderId }
+        txMetadata: {
+          sourceChainId,
+          builderTokenId,
+          purchaseCost,
+          tokensToBuy,
+          fromAddress,
+          builderId,
+          contractAddress
+        }
       } = input;
       return sendTransactionAsync(
         {
@@ -148,7 +157,7 @@ export function PurchaseProvider({ children }: { children: ReactNode }) {
               purchaseInfo: {
                 quotedPrice: Number(purchaseCost),
                 tokenAmount: tokensToBuy,
-                builderContractAddress: getBuilderContractAddress(),
+                builderContractAddress: contractAddress,
                 tokenId: Number(builderTokenId),
                 quotedPriceCurrency: optimismUsdcContractAddress
               }
