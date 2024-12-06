@@ -46,6 +46,10 @@ export function PartnerRewardsCarousel() {
         },
         '& img.swiper-pagination-bullet-active': {
           opacity: 1
+        },
+        '& .swiper-pagination': {
+          position: 'relative',
+          bottom: 5
         }
       }}
     >
@@ -55,6 +59,7 @@ export function PartnerRewardsCarousel() {
         renderBullet={(index, className) =>
           `<img src="/images/crypto/${partnerInfos[index].logo}" class="${className}"/>`
         }
+        boxProps={{ width: { xs: '100%', md: '95%' } }}
       >
         {partnerInfos.map((partner) => (
           <Link href={`/info/partner-rewards/${partner.infoPath}`} key={partner.name}>

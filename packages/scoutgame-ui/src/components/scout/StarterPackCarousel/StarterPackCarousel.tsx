@@ -28,6 +28,7 @@ export function StarterPackCarousel({
           prevEl: '.swiper-starter-pack-button-prev'
         }}
         mobileMinHeight='550px'
+        showMobileNavigationArrows
       >
         {builders.map((builder) => (
           <Stack

@@ -81,7 +81,11 @@ export function BuildersCarousel({
       ));
 
   return (
-    <Carousel slidesPerView={slidesPerView} boxProps={{ width: { xs: '100%', md: '90%' }, margin: '0 auto' }}>
+    <Carousel
+      slidesPerView={slidesPerView}
+      boxProps={{ width: { xs: '100%', md: '90%' }, margin: '0 auto' }}
+      showMobileNavigationArrows
+    >
       {builderCards}
     </Carousel>
   );

@@ -3,7 +3,7 @@
 import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { Autoplay, Navigation } from 'swiper/modules';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import type { SwiperProps } from 'swiper/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { NavigationOptions } from 'swiper/types';
@@ -23,9 +23,17 @@ export type CarouselProps = {
   slidesPerView?: number;
   boxProps?: Partial<BoxProps>;
   mobileMinHeight?: string;
+  showMobileNavigationArrows?: boolean;
 } & Partial<SwiperProps>;
 
-export function Carousel({ children, renderBullet, boxProps, mobileMinHeight, ...swiperProps }: CarouselProps) {
+export function Carousel({
+  children,
+  renderBullet,
+  boxProps,
+  mobileMinHeight,
+  showMobileNavigationArrows,
+  ...swiperProps
+}: CarouselProps) {
   const isDesktop = useMdScreen();
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
@@ -44,7 +52,6 @@ export function Carousel({ children, renderBullet, boxProps, mobileMinHeight, ..
 
   return (
     <Box
-      width='90svw'
       display='flex'
       alignItems='center'
       justifyContent='center'
@@ -66,7 +73,7 @@ export function Carousel({ children, renderBullet, boxProps, mobileMinHeight, ..
         loop
         className='swiper'
         autoHeight={true}
-        modules={[Navigation, Autoplay]}
+        modules={[Navigation, Autoplay, ...(renderBullet ? [Pagination] : [])]}
         navigation={{
           nextEl: nextButtonId,
           prevEl: prevButtonId
@@ -92,12 +99,15 @@ export function Carousel({ children, renderBullet, boxProps, mobileMinHeight, ..
           <PrevArrow className={(prevButtonId as string).replace('.', '')} />
         </>
       )}
-      {!isDesktop && swiperProps.slidesPerView && children.length > swiperProps.slidesPerView && (
-        <>
-          <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
-          <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
-        </>
-      )}
+      {!isDesktop &&
+        showMobileNavigationArrows &&
+        swiperProps.slidesPerView &&
+        children.length > swiperProps.slidesPerView && (
+          <>
+            <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
+            <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
+          </>
+        )}
     </Box>
   );
 }
