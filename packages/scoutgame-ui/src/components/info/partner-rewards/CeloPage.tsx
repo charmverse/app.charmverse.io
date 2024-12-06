@@ -36,11 +36,11 @@ const tiers = [
     reward: '250 cUSD'
   },
   {
-    name: 'Legendary',
+    name: 'Mythic',
     reward: '350 cUSD'
   },
   {
-    name: 'Mythic',
+    name: 'Legendary',
     reward: '450 cUSD'
   }
 ];
