@@ -11,7 +11,7 @@ import { LoadingCards } from '../../common/Loading/LoadingCards';
 
 import { PromoCard } from './PromoCard';
 
-const secondPromoInsertIndex = 4;
+const promoInsertIndex = 2;
 
 export function BuildersCarousel({
   builders,
@@ -32,53 +32,47 @@ export function BuildersCarousel({
   }
 
   const slidesPerView = isDesktop ? 3 : 2;
+  const builderCardsList = builders.map((builder) => (
+    <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
+  ));
 
   const builderCards = showPromoCards
     ? [
-        ...[
-          showPromoCards
-            ? [
-                <PromoCard
-                  data-test='promo-card-optimism'
-                  key='op-new-scout-ad'
-                  size={size}
-                  path='/info/partner-rewards/optimism'
-                  src='/images/home/op-new-scout-ad.png'
-                  onClick={() => {
-                    trackEvent('click_optimism_promo');
-                  }}
-                />
-              ]
-            : []
-        ],
-        ...builders
-          .slice(0, secondPromoInsertIndex)
-          .map((builder) => (
-            <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
-          )),
-        ...(showPromoCards
-          ? [
-              <PromoCard
-                data-test='promo-card-moxie'
-                key='moxie-fan-reward-ad'
-                size={size}
-                path='/info/partner-rewards/moxie'
-                src='/images/home/moxie-fan-reward-ad.png'
-                onClick={() => {
-                  trackEvent('click_moxie_promo');
-                }}
-              />
-            ]
-          : []),
-        ...builders
-          .slice(secondPromoInsertIndex)
-          .map((builder) => (
-            <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
-          ))
+        <PromoCard
+          data-test='promo-card-optimism'
+          key='op-new-scout-ad'
+          size={size}
+          path='/info/partner-rewards/optimism'
+          src='/images/home/op-new-scout-ad.png'
+          onClick={() => {
+            trackEvent('click_optimism_promo');
+          }}
+        />,
+        ...builderCardsList.slice(0, promoInsertIndex),
+        <PromoCard
+          data-test='promo-card-moxie'
+          key='moxie-fan-reward-ad'
+          size={size}
+          path='/info/partner-rewards/moxie'
+          src='/images/home/moxie-fan-reward-ad.png'
+          onClick={() => {
+            trackEvent('click_moxie_promo');
+          }}
+        />,
+        ...builderCardsList.slice(promoInsertIndex, promoInsertIndex * 2),
+        <PromoCard
+          data-test='promo-card-glo'
+          key='glo-ad'
+          size={size}
+          path='/info/partner-rewards/glo'
+          src='/images/home/glo-ad.png'
+          onClick={() => {
+            trackEvent('click_moxie_promo');
+          }}
+        />,
+        ...builderCardsList.slice(promoInsertIndex * 2)
       ]
-    : builders.map((builder) => (
-        <BuilderCard size={size} key={builder.id} builder={builder} showPurchaseButton showHotIcon />
-      ));
+    : builderCardsList;
 
   return (
     <Carousel
