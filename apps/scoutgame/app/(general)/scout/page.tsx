@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { MAX_STARTER_PACK_PURCHASES } from '@packages/scoutgame/builderNfts/constants';
-import { getStarterpackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
+import { getStarterPackBuilders } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { currentSeason } from '@packages/scoutgame/dates';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
@@ -38,7 +38,7 @@ export default async function Scout({
     remainingStarterCards = MAX_STARTER_PACK_PURCHASES - purchases;
 
     if (purchases < MAX_STARTER_PACK_PURCHASES) {
-      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterpackBuilders());
+      const [_, starterPackBuilders] = await safeAwaitSSRData(getStarterPackBuilders());
       builders = starterPackBuilders ?? [];
     }
   }
