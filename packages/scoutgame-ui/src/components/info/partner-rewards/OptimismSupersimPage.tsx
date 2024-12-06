@@ -73,14 +73,14 @@ function Document() {
           Supersim to provide an even better local development experience
         </ListItem>
       </List>
-      <Table sx={{ '& th, & td': { px: 0 } }} aria-label='Celo tiers table'>
+      <Table>
         <TableHead>
           <TableRow>
             <TableCell>Issue</TableCell>
             <TableCell align='right'>Reward</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody sx={{ '& td, & th': { border: 0 } }}>
+        <TableBody>
           <TableRow>
             <TableCell>
               <Link
@@ -109,7 +109,6 @@ function Document() {
           </TableRow>
         </TableBody>
       </Table>
-      <Divider />
       <Typography variant='caption'>* See list of high priority additional features above for inspiration.</Typography>
       <Typography variant='caption'>
         ** Optimism will determine the reward based on the complexity and priority of the issue.
