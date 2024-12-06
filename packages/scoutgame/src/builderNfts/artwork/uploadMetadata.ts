@@ -8,6 +8,9 @@ import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 
+import { getBuilderStarterPackContractAddress } from '../constants';
+
+import { builderNftArtworkContractName } from './constants';
 import { getNftTokenUrlPath, imageDomain } from './utils';
 
 type OpenSeaMetadata = {
@@ -127,7 +130,8 @@ export async function uploadMetadata({
   const metadataPath = getNftTokenUrlPath({
     season,
     tokenId: Number(tokenId),
-    filename: starterPack ? 'starter-pack-metadata.json' : 'metadata.json'
+    filename: starterPack ? 'starter-pack-metadata.json' : 'metadata.json',
+    contractName: starterPack ? getBuilderStarterPackContractAddress() : builderNftArtworkContractName
   });
 
   // Generate the metadata object
@@ -138,7 +142,8 @@ export async function uploadMetadata({
     image: `${imageDomain}/${getNftTokenUrlPath({
       season,
       tokenId: Number(tokenId),
-      filename: starterPack ? 'starter-pack-artwork.png' : 'artwork.png'
+      filename: starterPack ? 'starter-pack-artwork.png' : 'artwork.png',
+      contractName: starterPack ? getBuilderStarterPackContractAddress() : builderNftArtworkContractName
     })}`,
     attributes: attributes || []
   };

@@ -6,6 +6,7 @@ import { getBuilderActivities } from '../../../builders/getBuilderActivities';
 import { getBuilderNft } from '../../../builders/getBuilderNft';
 import { getBuilderScouts } from '../../../builders/getBuilderScouts';
 import { getBuilderStats } from '../../../builders/getBuilderStats';
+import { getBuilderStarterPackContractAddress } from '../../constants';
 import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from '../utils';
 
 import {
@@ -56,7 +57,12 @@ export async function uploadStarterPackArtwork({
         imageHostingBaseUrl
       });
 
-  const imagePath = getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'starter-pack-artwork.png' });
+  const imagePath = getNftTokenUrlPath({
+    season,
+    tokenId: Number(tokenId),
+    filename: 'starter-pack-artwork.png',
+    contractName: getBuilderStarterPackContractAddress()
+  });
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',
@@ -103,7 +109,12 @@ export async function uploadStarterPackArtworkCongrats({
     builderPrice: builderNft?.currentPrice || BigInt(0)
   });
 
-  const imagePath = getNftCongratsPath({ season, tokenId: Number(tokenId), starterPack: true });
+  const imagePath = getNftCongratsPath({
+    season,
+    tokenId: Number(tokenId),
+    starterPack: true,
+    contractName: getBuilderStarterPackContractAddress()
+  });
 
   const params: PutObjectCommandInput = {
     ACL: 'public-read',

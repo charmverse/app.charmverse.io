@@ -1,5 +1,6 @@
 import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 
+import { builderNftArtworkContractName } from './constants';
 import { generateArtwork, updateArtwork } from './generateArtwork';
 import { getNftTokenUrlPath, imageDomain } from './utils';
 
@@ -29,7 +30,12 @@ export async function uploadArtwork({
         imageHostingBaseUrl
       });
 
-  const imagePath = getNftTokenUrlPath({ season, tokenId: Number(tokenId), filename: 'artwork.png' });
+  const imagePath = getNftTokenUrlPath({
+    season,
+    tokenId: Number(tokenId),
+    filename: 'artwork.png',
+    contractName: builderNftArtworkContractName
+  });
 
   await uploadFileToS3({
     pathInS3: `nft/${imagePath}`,
