@@ -27,7 +27,7 @@ export function ScoutInfoContent({ builder }: { builder: BuilderInfo }) {
       <Button
         LinkComponent={Link}
         variant='contained'
-        href='/welcome/how-it-works'
+        href='/builders-you-know'
         data-test='start-scouting-button'
         sx={{ margin: '8px auto', display: 'flex', width: 'fit-content' }}
       >

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export default async function Welcome() {
   const user = await getUserFromSession();
 
-  if (user?.agreedToTermsAt && user?.onboardedAt) {
+  if (user?.onboardedAt && user?.agreedToTermsAt && !user?.builderStatus) {
     log.debug('Redirect user to home page from Welcome page', { userId: user.id });
     redirect('/');
   }

@@ -174,8 +174,6 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           ? await builderContractStarterPackReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } })
           : await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
 
-      log.info('Fetched token id', { _builderTokenId });
-
       setBuilderTokenId(_builderTokenId);
 
       await refreshAsk({ _builderTokenId, amount: tokensToBuy });

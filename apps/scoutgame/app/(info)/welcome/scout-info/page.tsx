@@ -26,8 +26,8 @@ export default async function ScoutInfo() {
   });
 
   if (!starterPackBuilder.builders[0]) {
-    log.warn('No starter pack builder found, redirecting to how it works');
-    redirect('/welcome/how-it-works');
+    log.warn('No starter pack builder found, redirecting to builders you know');
+    redirect('/builders-you-know');
   }
 
   return <ScoutInfoPage builder={starterPackBuilder.builders[0]} />;

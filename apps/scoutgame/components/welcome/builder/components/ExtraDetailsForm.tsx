@@ -45,7 +45,7 @@ export function ExtraDetailsForm({ user }: { user: SessionUser }) {
       if (user.builderStatus) {
         router.push('/welcome/spam-policy');
       } else {
-        router.push('/welcome/scout-info');
+        router.push('/welcome/how-it-works');
       }
     },
     onError(err) {
