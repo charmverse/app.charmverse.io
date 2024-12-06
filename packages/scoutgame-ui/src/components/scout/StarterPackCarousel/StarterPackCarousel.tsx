@@ -1,4 +1,5 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
+import { getEditorialDescription } from '@packages/scoutgame/builderNfts/builderRegistration/starterPack/starterPackBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 
 import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
@@ -6,7 +7,7 @@ import { Carousel } from '../../common/Carousel/Carousel';
 
 import 'swiper/css';
 import 'swiper/css/autoplay';
-import { getEditorialDescription } from './editorial';
+
 import { StarterPackInfo } from './StarterPackInfo';
 
 export function StarterPackCarousel({

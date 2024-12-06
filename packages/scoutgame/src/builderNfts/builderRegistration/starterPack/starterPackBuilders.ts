@@ -1,7 +1,4 @@
-import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
-import { currentSeason } from '@packages/scoutgame/dates';
-
-const fids = [
+export const starterPackBuilders = [
   {
     fid: 547807,
     description:
@@ -60,6 +57,6 @@ const fids = [
 ];
 
 export async function getEditorialDescription({ fid }: { fid: number }) {
-  const description = fids.find((f) => f.fid === fid)?.description;
+  const description = starterPackBuilders.find((f) => f.fid === fid)?.description;
   return description ?? '';
 }

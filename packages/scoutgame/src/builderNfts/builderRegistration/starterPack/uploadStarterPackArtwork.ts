@@ -6,8 +6,8 @@ import { getBuilderActivities } from '../../../builders/getBuilderActivities';
 import { getBuilderNft } from '../../../builders/getBuilderNft';
 import { getBuilderScouts } from '../../../builders/getBuilderScouts';
 import { getBuilderStats } from '../../../builders/getBuilderStats';
+import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from '../../artwork/utils';
 import { getBuilderStarterPackContractAddress } from '../../constants';
-import { getNftCongratsPath, getNftTokenUrlPath, imageDomain } from '../utils';
 
 import {
   generateNftStarterPackImage,

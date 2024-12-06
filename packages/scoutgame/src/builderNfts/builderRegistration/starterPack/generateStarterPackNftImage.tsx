@@ -9,7 +9,7 @@ import sharp from 'sharp';
 import type { BuilderActivity } from '../../../builders/getBuilderActivities';
 import type { BuilderScouts } from '../../../builders/getBuilderScouts';
 import type { BuilderStats } from '../../../builders/getBuilderStats';
-import { BuilderShareImage } from '../components/BuilderShareImage';
+import { BuilderShareImage } from '../../artwork/components/BuilderShareImage';
 
 // fails inside of Next.js
 function getAssetsFromDisk() {
