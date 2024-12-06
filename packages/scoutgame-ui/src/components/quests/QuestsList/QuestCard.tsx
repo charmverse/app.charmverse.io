@@ -4,11 +4,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Button, Stack, Typography } from '@mui/material';
 import { completeQuestAction } from '@packages/scoutgame/quests/completeQuestAction';
+import type { QuestInfo } from '@packages/scoutgame/quests/questRecords';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import { useAction } from 'next-safe-action/hooks';
 
-import type { QuestInfo } from './QuestsRecord';
+import { QuestIcon } from './QuestsIcons';
 
 export function QuestCard({ quest }: { quest: QuestInfo }) {
   const { refreshUser } = useUser();
@@ -27,6 +28,8 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
       }
     }
   };
+
+  const icon = QuestIcon[quest.type] || null;
 
   return (
     <Button
@@ -51,7 +54,7 @@ export function QuestCard({ quest }: { quest: QuestInfo }) {
       }}
     >
       <Stack direction='row' gap={3.5} alignItems='center'>
-        {quest.icon}
+        {icon}
         <Stack gap={1}>
           <Typography fontWeight={500}>{quest.label}</Typography>
           <Stack direction='row' gap={0.5} alignItems='center'>

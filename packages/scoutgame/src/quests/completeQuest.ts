@@ -1,11 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/mixpanel/trackUserAction';
-import { QuestsRecord } from '@packages/scoutgame-ui/components/quests/QuestsList/QuestsRecord';
 
 import { sendPointsForSocialQuest } from '../points/builderEvents/sendPointsForSocialQuest';
 
-export async function completeQuest(userId: string, questType: string) {
-  const points = QuestsRecord[questType].points;
+import type { QuestType } from './questRecords';
+import { questsRecord } from './questRecords';
+
+export async function completeQuest(userId: string, questType: QuestType) {
+  const points = questsRecord[questType].points;
   const quest = await prisma.scoutSocialQuest.findFirst({
     where: {
       type: questType,

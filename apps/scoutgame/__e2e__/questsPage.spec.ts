@@ -1,5 +1,5 @@
+import { questsRecord } from '@packages/scoutgame/quests/questRecords';
 import { mockScout } from '@packages/scoutgame/testing/database';
-import { QuestsRecord } from '@packages/scoutgame-ui/components/quests/QuestsList/QuestsRecord';
 
 import { expect, test } from './test';
 
@@ -37,7 +37,7 @@ test.describe('Quests page', () => {
     await expect(questsPage.container).toBeVisible();
 
     // Get all quests except invite-friend which is separate
-    const map = Object.keys(QuestsRecord)
+    const map = Object.keys(questsRecord)
       .filter((item) => item !== 'invite-friend')
       .map(async (key) => {
         const locator = page.locator(`data-test=quest-${key}`);

@@ -1,11 +1,13 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Accordion, AccordionDetails, AccordionSummary, Stack, Typography } from '@mui/material';
+import type { QuestInfo } from '@packages/scoutgame/quests/questRecords';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
-import type { QuestInfo } from './QuestsRecord';
+import { QuestIcon } from './QuestsIcons';
 
 export function QuestAccordion({ quest, children }: { quest: QuestInfo; children: ReactNode }) {
+  const icon = QuestIcon[quest.type] || null;
   return (
     <Accordion sx={{ bgcolor: 'transparent' }} disableGutters data-test={`quest-${quest.type}`}>
       <AccordionSummary
@@ -15,7 +17,7 @@ export function QuestAccordion({ quest, children }: { quest: QuestInfo; children
         sx={{ bgcolor: 'primary.main', borderRadius: 1 }}
       >
         <Stack direction='row' gap={3.5} alignItems='center'>
-          {quest.icon}
+          {icon}
           <Stack gap={1}>
             <Typography fontWeight={500}>{quest.label}</Typography>
             <Stack direction='row' gap={0.5} alignItems='center'>

@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { QuestsRecord } from '@packages/scoutgame-ui/components/quests/QuestsList/QuestsRecord';
 
 import { mockBuilder } from '../../testing/database';
 import { completeQuest } from '../completeQuest';
+import { questsRecord } from '../questRecords';
 
 describe('completeQuest', () => {
   it('should throw an error if the quest is already completed', async () => {
@@ -35,7 +35,7 @@ describe('completeQuest', () => {
     });
 
     expect(points.length).toBe(1);
-    expect(points[0].value).toBe(QuestsRecord['follow-x-account'].points);
+    expect(points[0].value).toBe(questsRecord['follow-x-account'].points);
 
     const scout = await prisma.scout.findUniqueOrThrow({
       where: {
@@ -46,6 +46,6 @@ describe('completeQuest', () => {
       }
     });
 
-    expect(scout.currentBalance).toBe(QuestsRecord['follow-x-account'].points);
+    expect(scout.currentBalance).toBe(questsRecord['follow-x-account'].points);
   });
 });
