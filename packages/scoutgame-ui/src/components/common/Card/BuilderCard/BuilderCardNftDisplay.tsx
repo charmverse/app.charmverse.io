@@ -27,7 +27,8 @@ export function BuilderCardNftDisplay({
   path,
   showHotIcon = false,
   size = 'medium',
-  hideDetails = false
+  hideDetails = false,
+  disableProfileUrl = false
 }: {
   path: string;
   nftImageUrl?: string | null;
@@ -35,6 +36,7 @@ export function BuilderCardNftDisplay({
   children?: React.ReactNode;
   size?: 'x-small' | 'small' | 'medium' | 'large';
   hideDetails?: boolean;
+  disableProfileUrl?: boolean;
 }) {
   const width = nftDisplaySize[size].width;
   const height = nftDisplaySize[size].height;
@@ -42,6 +44,7 @@ export function BuilderCardNftDisplay({
   return (
     <Box overflow='hidden' width={width} height={height} sx={{ backgroundColor: 'black.dark', borderRadius: '4px' }}>
       <CardActionArea
+        disabled={disableProfileUrl}
         LinkComponent={Link}
         href={`/u/${path}`}
         sx={{

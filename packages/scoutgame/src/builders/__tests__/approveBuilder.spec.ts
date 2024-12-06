@@ -4,7 +4,7 @@ import { mockBuilder } from '@packages/scoutgame/testing/database';
 
 import { currentSeason } from '../../dates';
 
-jest.unstable_mockModule('../../builderNfts/registerBuilderNFT', () => ({
+jest.unstable_mockModule('../../builderNfts/builderRegistration/registerBuilderNFT', () => ({
   registerBuilderNFT: jest.fn()
 }));
 
@@ -14,7 +14,7 @@ jest.unstable_mockModule('../../importReposByUser', () => ({
 
 const { approveBuilder } = await import('../approveBuilder');
 
-const { registerBuilderNFT } = await import('../../builderNfts/registerBuilderNFT');
+const { registerBuilderNFT } = await import('../../builderNfts/builderRegistration/registerBuilderNFT');
 
 describe('approveBuilder', () => {
   beforeEach(() => {

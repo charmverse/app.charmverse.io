@@ -11,7 +11,12 @@ import { scoutgameMintsLogger } from '../loggers/mintsLogger';
 import type { MintNFTParams } from './mintNFT';
 
 export async function recordNftMint(
-  params: MintNFTParams & { createdAt?: Date; mintTxHash: string; skipMixpanel?: boolean; skipPriceRefresh?: boolean }
+  params: Omit<MintNFTParams, 'nftType'> & {
+    createdAt?: Date;
+    mintTxHash: string;
+    skipMixpanel?: boolean;
+    skipPriceRefresh?: boolean;
+  }
 ) {
   const {
     amount,

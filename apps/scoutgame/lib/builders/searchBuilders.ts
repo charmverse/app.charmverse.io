@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 export type BuilderSearchResult = {
@@ -60,7 +60,8 @@ export async function searchBuilders({
       },
       builderNfts: {
         where: {
-          season: currentSeason
+          season: currentSeason,
+          nftType: BuilderNftType.default
         },
         select: {
           currentPrice: true,

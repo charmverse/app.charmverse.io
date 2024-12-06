@@ -3,10 +3,11 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getBuilderContractMinterClient } from './clients/builderContractMinterWriteClient';
-import { builderNftChain } from './constants';
+import { getBuilderContractMinterClient } from '../clients/builderContractMinterWriteClient';
+import { builderNftChain } from '../constants';
+import { refreshBuilderNftPrice } from '../refreshBuilderNftPrice';
+
 import { createBuilderNft } from './createBuilderNft';
-import { refreshBuilderNftPrice } from './refreshBuilderNftPrice';
 
 export async function registerBuilderNFT({
   builderId,

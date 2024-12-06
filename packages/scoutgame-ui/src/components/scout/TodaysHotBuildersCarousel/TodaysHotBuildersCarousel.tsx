@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { Box } from '@mui/material';
 import { getTodaysHotBuilders } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
 
@@ -13,5 +14,9 @@ export async function TodaysHotBuildersCarousel({ showPromoCards = false }: { sh
     return <ErrorSSRMessage />;
   }
 
-  return <BuildersCarousel builders={builders} showPromoCards={showPromoCards} />;
+  return (
+    <Box>
+      <BuildersCarousel builders={builders} showPromoCards={showPromoCards} />
+    </Box>
+  );
 }

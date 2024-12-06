@@ -1,6 +1,8 @@
 'use client';
 
 import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
+import type { BuilderNftType } from '@charmverse/core/prisma';
 import { ChainId } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { InfoOutlined as InfoIcon } from '@mui/icons-material';
@@ -19,10 +21,12 @@ import {
   Typography
 } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { builderContractStarterPackReadonlyApiClient } from '@packages/scoutgame/builderNfts/clients/builderContractStarterPackReadClient';
 import { BuilderNFTSeasonOneImplementation01Client } from '@packages/scoutgame/builderNfts/clients/builderNFTSeasonOneClient';
 import {
   builderNftChain,
   getBuilderContractAddress,
+  getBuilderContractAddressForNftType,
   treasuryAddress,
   useTestnets
 } from '@packages/scoutgame/builderNfts/constants';
@@ -57,7 +61,12 @@ import { NumberInputField } from './NumberField';
 import { SuccessView } from './SuccessView';
 
 export type NFTPurchaseProps = {
-  builder: MinimalUserInfo & { price?: bigint; congratsImageUrl?: string | null; nftImageUrl?: string | null };
+  builder: MinimalUserInfo & {
+    price?: bigint;
+    congratsImageUrl?: string | null;
+    nftImageUrl?: string | null;
+    nftType: BuilderNftType;
+  };
 };
 
 const PRICE_POLLING_INTERVAL = 60000;
@@ -142,9 +151,14 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
 
   const refreshAsk = useCallback(
     async ({ _builderTokenId, amount }: { _builderTokenId: bigint | number; amount: bigint | number }) => {
-      const _price = await builderContractReadonlyApiClient.getTokenPurchasePrice({
-        args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
-      });
+      const _price =
+        builder.nftType === 'starter_pack'
+          ? await builderContractStarterPackReadonlyApiClient.getTokenPurchasePrice({
+              args: { amount: BigInt(amount) }
+            })
+          : await builderContractReadonlyApiClient.getTokenPurchasePrice({
+              args: { amount: BigInt(amount), tokenId: BigInt(_builderTokenId) }
+            });
       setPurchaseCost(_price);
     },
     [setPurchaseCost]
@@ -155,7 +169,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     let _builderTokenId: bigint | undefined;
     try {
       setIsFetchingPrice(true);
-      _builderTokenId = await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
+      _builderTokenId =
+        builder.nftType === 'starter_pack'
+          ? await builderContractStarterPackReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } })
+          : await builderContractReadonlyApiClient.getTokenIdForBuilder({ args: { builderId } });
 
       setBuilderTokenId(_builderTokenId);
 
@@ -204,6 +221,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
     builderTokenId,
     scoutId: user?.id as string,
     paymentAmountOut: purchaseCost,
+    contractAddress: getBuilderContractAddressForNftType(builder.nftType),
     sourceChainId: selectedPaymentOption.chainId,
     sourceToken: getCurrencyContract(selectedPaymentOption),
     tokensToPurchase: BigInt(tokensToBuy)
@@ -231,7 +249,8 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
       await purchaseWithPoints({
         builderId: builder.id,
         recipientAddress: address as `0x${string}`,
-        amount: tokensToBuy
+        amount: tokensToBuy,
+        nftType: builder.nftType
       });
       await refreshUser();
     } else {
@@ -260,6 +279,7 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           value: _value
         },
         txMetadata: {
+          contractAddress: getBuilderContractAddressForNftType(builder.nftType),
           fromAddress: address as Address,
           sourceChainId: selectedPaymentOption.chainId,
           builderTokenId: Number(builderTokenId),

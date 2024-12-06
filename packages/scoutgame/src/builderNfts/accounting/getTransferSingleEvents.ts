@@ -2,7 +2,7 @@ import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import type { Address } from 'viem';
 import { parseEventLogs } from 'viem';
 
-import { builderNftChain, getBuilderContractAddress } from '../constants';
+import { builderNftChain, getBuilderContractAddress, getBuilderStarterPackContractAddress } from '../constants';
 
 import type { BlockRange } from './convertBlockRange';
 import { convertBlockRange } from './convertBlockRange';
@@ -32,6 +32,22 @@ export function getTransferSingleEvents({ fromBlock, toBlock }: BlockRange): Pro
     .getLogs({
       ...convertBlockRange({ fromBlock, toBlock }),
       address: getBuilderContractAddress(),
+      event: transferSingleAbi
+    })
+    .then((logs) =>
+      parseEventLogs({
+        abi: [transferSingleAbi],
+        logs,
+        eventName: 'TransferSingle'
+      })
+    );
+}
+
+export function getStarterPackTransferSingleEvents({ fromBlock, toBlock }: BlockRange): Promise<TransferSingleEvent[]> {
+  return getPublicClient(builderNftChain.id)
+    .getLogs({
+      ...convertBlockRange({ fromBlock, toBlock }),
+      address: getBuilderStarterPackContractAddress(),
       event: transferSingleAbi
     })
     .then((logs) =>

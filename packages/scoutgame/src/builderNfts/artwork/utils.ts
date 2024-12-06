@@ -1,19 +1,40 @@
-// something to differentiate between different deployments of a contract
-const contractName = process.env.SCOUTGAME_CONTRACT_NAME || 'dev';
-
 export function getNftTokenUrlPath({
   season,
   tokenId,
-  filename
+  filename,
+  contractName
 }: {
   season: string;
-  filename: 'artwork.png' | 'metadata.json';
+  filename: `${'starter-pack-' | ''}${'artwork.png' | 'metadata.json'}`;
   tokenId: number;
+  contractName: string;
 }) {
   return `seasons/${season}/${contractName}/${tokenId}/${filename}`;
 }
 
-export function getShareImagePath({ season, tokenId }: { season: string; tokenId: number }) {
+export function getNftCongratsPath({
+  season,
+  tokenId,
+  starterPack,
+  contractName
+}: {
+  season: string;
+  tokenId: number;
+  starterPack?: boolean;
+  contractName: string;
+}) {
+  return `seasons/${season}/${contractName}/${tokenId}/${starterPack ? 'starter-pack-' : ''}${'congrats.png'}`;
+}
+
+export function getShareImagePath({
+  season,
+  tokenId,
+  contractName
+}: {
+  season: string;
+  tokenId: number;
+  contractName: string;
+}) {
   return `seasons/${season}/${contractName}/${tokenId}/congrats.png`;
 }
 

@@ -1,7 +1,7 @@
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { parseEventLogs } from 'viem';
 
-import { builderNftChain, getBuilderContractAddress } from '../constants';
+import { builderNftChain, getBuilderContractAddress, getBuilderStarterPackContractAddress } from '../constants';
 
 import { convertBlockRange, type BlockRange } from './convertBlockRange';
 
@@ -47,6 +47,22 @@ export function getBuilderScoutedEvents({ fromBlock, toBlock }: BlockRange): Pro
     .getLogs({
       ...convertBlockRange({ fromBlock, toBlock }),
       address: getBuilderContractAddress(),
+      event: builderScoutedAbi
+    })
+    .then((logs) =>
+      parseEventLogs({
+        abi: [builderScoutedAbi],
+        logs,
+        eventName: 'BuilderScouted'
+      }).filter((ev) => !ignoreEvent(ev))
+    );
+}
+
+export function getBuilderStarterPackScoutedEvents({ fromBlock, toBlock }: BlockRange): Promise<BuilderScoutedEvent[]> {
+  return getPublicClient(builderNftChain.id)
+    .getLogs({
+      ...convertBlockRange({ fromBlock, toBlock }),
+      address: getBuilderStarterPackContractAddress(),
       event: builderScoutedAbi
     })
     .then((logs) =>
