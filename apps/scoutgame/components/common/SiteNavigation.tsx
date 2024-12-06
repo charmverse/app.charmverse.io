@@ -53,7 +53,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
   const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
-    path: '/quests'
+    path: '/scout'
   });
 
   const openAuthModal = isAuthenticated

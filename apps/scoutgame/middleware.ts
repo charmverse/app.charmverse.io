@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
   if (isLoggedIn && (path === '/login' || path === '/')) {
     // eslint-disable-next-line no-console
     console.log('Redirecting to home page', session);
-    return NextResponse.redirect(new URL('/quests', request.url));
+    return NextResponse.redirect(new URL('/scout', request.url));
   }
 
   return response;
