@@ -22,9 +22,10 @@ export type CarouselProps = {
   renderBullet?: (index: number, className: string) => string;
   slidesPerView?: number;
   boxProps?: Partial<BoxProps>;
+  mobileMinHeight?: string;
 } & Partial<SwiperProps>;
 
-export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: CarouselProps) {
+export function Carousel({ children, renderBullet, boxProps, mobileMinHeight, ...swiperProps }: CarouselProps) {
   const isDesktop = useMdScreen();
   // Use state and effect to skip pre-rendering
   const [isClientSide, setIsClientSide] = useState(false);
@@ -79,7 +80,7 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
             : undefined
         }
         {...swiperProps}
-        style={{ width: '100%', ...swiperProps.style }}
+        style={{ width: '100%', ...swiperProps.style, minHeight: isDesktop ? undefined : mobileMinHeight }}
       >
         {children.map((child, index) => (
           <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
@@ -89,6 +90,12 @@ export function Carousel({ children, renderBullet, boxProps, ...swiperProps }: C
         <>
           <NextArrow className={(nextButtonId as string).replace('.', '')} />
           <PrevArrow className={(prevButtonId as string).replace('.', '')} />
+        </>
+      )}
+      {!isDesktop && swiperProps.slidesPerView && children.length > swiperProps.slidesPerView && (
+        <>
+          <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
+          <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
         </>
       )}
     </Box>

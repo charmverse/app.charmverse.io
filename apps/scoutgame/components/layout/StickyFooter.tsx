@@ -5,7 +5,7 @@ import { SiteNavigation } from 'components/common/SiteNavigation';
 
 export function StickyFooter() {
   return (
-    <Box component='footer' position='sticky' bottom={0}>
+    <Box component='footer' position='sticky' zIndex={1} bottom={0}>
       <Hidden mdUp>
         <SiteNavigation />
       </Hidden>

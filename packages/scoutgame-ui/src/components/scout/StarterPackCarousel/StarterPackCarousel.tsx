@@ -1,8 +1,8 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 
-import { BuilderCard } from '../../../components/common/Card/BuilderCard/BuilderCard';
-import { Carousel } from '../../../components/common/Carousel/Carousel';
+import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
+import { Carousel } from '../../common/Carousel/Carousel';
 
 import 'swiper/css';
 import 'swiper/css/autoplay';
@@ -27,6 +27,7 @@ export function StarterPackCarousel({
           nextEl: '.swiper-starter-pack-button-next',
           prevEl: '.swiper-starter-pack-button-prev'
         }}
+        mobileMinHeight='550px'
       >
         {builders.map((builder) => (
           <Stack
