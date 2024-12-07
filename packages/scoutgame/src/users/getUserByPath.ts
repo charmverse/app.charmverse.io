@@ -1,5 +1,5 @@
 import type { BuilderStatus } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
+import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 
 import { currentSeason } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
@@ -31,7 +31,8 @@ export async function getUserByPath(path: string): Promise<
       displayName: true,
       builderNfts: {
         where: {
-          season: currentSeason
+          season: currentSeason,
+          nftType: BuilderNftType.default
         }
       },
       farcasterName: true,

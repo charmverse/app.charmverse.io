@@ -33,14 +33,14 @@ function Document() {
         competition. New Scouts will compete with each other to earn the most Scout Points during their first week
         playing the game. The Top 10 point earners will be awarded OP, from a weekly pool of 500 OP, as follows:
       </Typography>
-      <Table sx={{ '& th, & td': { px: 0 } }} size='small'>
+      <Table size='small'>
         <TableHead>
           <TableRow>
             <TableCell>Rank</TableCell>
             <TableCell align='right'>Reward</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody sx={{ '& td, & th': { border: 0 } }}>
+        <TableBody>
           <TableRow>
             <TableCell>1</TableCell>
             <TableCell align='right'>100 OP</TableCell>
