@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { PropsWithChildren } from '@packages/utils/react';
 
@@ -7,7 +8,7 @@ type Props = {
   mdDown?: boolean;
   mdUp?: boolean;
   display?: 'block' | 'inline' | 'inline-block' | 'flex' | 'grid' | 'table' | 'table-cell';
-};
+} & BoxProps;
 
 // TODO: just use class names?
 export function getSXProps({ display = 'block', mdDown, mdUp }: Props) {
@@ -22,6 +23,10 @@ export function getSXProps({ display = 'block', mdDown, mdUp }: Props) {
 }
 
 // replace a deprecated Hidden component
-export function Hidden({ children, mdDown, mdUp }: PropsWithChildren<Props>) {
-  return <Box sx={getSXProps({ mdDown, mdUp })}>{children}</Box>;
+export function Hidden({ children, mdDown, mdUp, ...restProps }: PropsWithChildren<Props>) {
+  return (
+    <Box sx={getSXProps({ mdDown, mdUp })} {...restProps}>
+      {children}
+    </Box>
+  );
 }

@@ -7,22 +7,30 @@ export function Stats({ friends }: { friends: SessionUser[] }) {
   const pointsEarned = friends.length * rewardPoints;
 
   return (
-    <Stack flexDirection='row' justifyContent='space-between' px={4} width='100%'>
+    <Stack flexDirection={{ xs: 'column', md: 'row' }} justifyContent='space-between' gap={{ xs: 0.5, md: 4 }}>
       <Box>
-        <Typography textAlign='center' variant='body2' mb={1} fontWeight={600}>
+        <Typography textAlign='center' variant='caption' mb={1} fontWeight={600}>
           FRIENDS JOINED
         </Typography>
-        <Box p={2} gap={1} bgcolor='primary.dark'>
+        <Stack px={2} py={0.5} gap={1} bgcolor='primary.dark' borderRadius='30px'>
           <Typography variant='h5' component='p' fontWeight={600} textAlign='center' color='secondary'>
             {friendsJoined}
           </Typography>
-        </Box>
+        </Stack>
       </Box>
       <Box>
-        <Typography textAlign='center' variant='body2' mb={1} fontWeight={600}>
+        <Typography textAlign='center' variant='caption' mb={1} fontWeight={600}>
           POINTS EARNED
         </Typography>
-        <Stack p={2} gap={0.5} bgcolor='primary.dark' flexDirection='row' justifyContent='center'>
+        <Stack
+          px={2}
+          py={0.5}
+          gap={0.5}
+          bgcolor='primary.dark'
+          flexDirection='row'
+          justifyContent='center'
+          borderRadius='30px'
+        >
           <Typography variant='h5' component='p' fontWeight={600} textAlign='center' color='secondary'>
             {pointsEarned}
           </Typography>

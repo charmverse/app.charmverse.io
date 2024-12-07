@@ -22,7 +22,7 @@
     "@packages/scoutgame": "^0.0.0",
     "@packages/scoutgame-ui": "^0.0.0",
     "@packages/utils": "^1.0.0",
-    "@twa-dev/sdk": "^7.10.1",
+    "@twa-dev/sdk": "^8.0.1",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.3.17",
     "next-safe-action": "~7.4.2",

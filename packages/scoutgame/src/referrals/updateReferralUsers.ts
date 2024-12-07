@@ -1,5 +1,6 @@
 import type { BuilderEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 
 import { rewardPoints } from '../constants';
 import { currentSeason, getCurrentWeek } from '../dates';
@@ -78,6 +79,12 @@ export async function updateReferralUsers(referralCode: string, refereeId: strin
         }
       },
       select: BasicUserInfoSelect
+    });
+
+    trackUserAction('referral_link_used', {
+      userId: refereeId,
+      referralCode,
+      referrerPath: referrer.path
     });
 
     return [referrer, referee];

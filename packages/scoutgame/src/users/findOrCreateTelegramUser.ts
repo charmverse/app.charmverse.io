@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { uuidFromNumber } from '@packages/utils/uuid';
-import type { WebAppInitData } from '@twa-dev/types/index';
+import type { WebAppInitData } from '@twa-dev/types';
 
 import { updateReferralUsers } from '../referrals/updateReferralUsers';
 
@@ -26,8 +25,8 @@ export async function findOrCreateTelegramUser(
   const startParam = telegramUser.start_param;
 
   if (user?.isNew && startParam?.startsWith('ref_')) {
-    const param = startParam.replace('ref_', '').trim();
-    const users = await updateReferralUsers(param, user.id).catch((error) => {
+    const referralCode = startParam.replace('ref_', '').trim();
+    const users = await updateReferralUsers(referralCode, user.id).catch((error) => {
       // There can be a case where the referrer is not found. Maybe someone will try to guess referral codes to get rewards.
       log.warn('Error creating referral event.', { error, startParam: telegramUser.start_param, referrerId: user.id });
       return null;
@@ -35,10 +34,6 @@ export async function findOrCreateTelegramUser(
 
     if (users) {
       const [, referee] = users;
-
-      trackUserAction('referral_link_used', {
-        userId: user.id
-      });
 
       return { ...referee, isNew: true };
     }

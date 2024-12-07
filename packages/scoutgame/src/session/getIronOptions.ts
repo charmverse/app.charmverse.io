@@ -12,7 +12,7 @@ export function getIronOptions({
     cookieName,
     password: authSecret || '',
     cookieOptions: {
-      sameSite: isLocalTunnel ? 'lax' : sameSite,
+      sameSite: isLocalTunnel ? 'none' : sameSite,
       // secure: true should be used in production (HTTPS) but can't be used in development (HTTP)
       secure: isLocalTunnel ? true : typeof baseUrl === 'string' && baseUrl.includes('https'),
       ...restOptions

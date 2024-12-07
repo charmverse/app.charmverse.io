@@ -11,6 +11,7 @@ export type MixPanelUserProfile = {
   'Agreed To TOS': boolean;
   'Enable Marketing': boolean;
   'Builder Status': BuilderStatus | null;
+  referrals: number;
 };
 
 export function updateMixpanelUserProfile(userId: string, profile: Partial<MixPanelUserProfile>) {

@@ -5,6 +5,7 @@ import { HomePage } from './po/HomePage.po';
 import { InfoPage } from './po/InfoPage.po';
 import { LoginPage } from './po/LoginPage.po';
 import { ProfilePage } from './po/ProfilePage.po';
+import { QuestsPage } from './po/QuestsPage.po';
 import { ScoutPage } from './po/ScoutPage.po';
 import { UserPage } from './po/UserPage.po';
 import { Utilities } from './po/Utilities.po';
@@ -20,6 +21,7 @@ type Fixtures = {
   userPage: UserPage;
   scoutPage: ScoutPage;
   claimPage: ClaimPage;
+  questsPage: QuestsPage;
 };
 
 export const test = base.extend<Fixtures>({
@@ -52,7 +54,8 @@ export const test = base.extend<Fixtures>({
   infoPage: ({ page }, use) => use(new InfoPage(page)),
   userPage: ({ page }, use) => use(new UserPage(page)),
   scoutPage: ({ page }, use) => use(new ScoutPage(page)),
-  claimPage: ({ page }, use) => use(new ClaimPage(page))
+  claimPage: ({ page }, use) => use(new ClaimPage(page)),
+  questsPage: ({ page }, use) => use(new QuestsPage(page))
 });
 
 export { chromium, expect } from '@playwright/test';

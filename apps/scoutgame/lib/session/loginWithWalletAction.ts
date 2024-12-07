@@ -5,11 +5,11 @@ import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { actionClient } from '@packages/scoutgame/actions/actionClient';
 import { getUserFromSession } from '@packages/scoutgame/session/getUserFromSession';
 import { type SessionUser } from '@packages/scoutgame/session/interfaces';
+import { findOrCreateWalletUser } from '@packages/scoutgame/users/findOrCreateWalletUser';
 import { authSecret } from '@root/config/constants';
 import { sealData } from 'iron-session';
 import { cookies } from 'next/headers';
 
-import { findOrCreateWalletUser } from 'lib/blockchain/findOrCreateWalletUser';
 import { loginWithWalletSchema } from 'lib/blockchain/schema';
 import { verifyWalletSignature } from 'lib/blockchain/verifyWallet';
 
