@@ -8,7 +8,7 @@ import { ScoutButton } from '../../ScoutButton/ScoutButton';
 import { BuilderCardNftDisplay } from './BuilderCardNftDisplay';
 import { BuilderCardStats } from './BuilderCardStats';
 
-type RequiredBuilderInfoFields = 'displayName' | 'builderStatus' | 'id' | 'path';
+type RequiredBuilderInfoFields = 'displayName' | 'builderStatus' | 'id' | 'path' | 'nftType';
 
 export function BuilderCard({
   builder,
@@ -51,7 +51,7 @@ export function BuilderCard({
       </BuilderCardNftDisplay>
       {typeof builder.price !== 'undefined' && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-          <ScoutButton builder={builder as BuilderInfo} />
+          <ScoutButton builder={builder} />
         </Stack>
       )}
     </Card>

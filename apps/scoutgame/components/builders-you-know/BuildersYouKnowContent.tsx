@@ -23,14 +23,6 @@ export function BuildersYouKnowContent({
 
       <BuildersGallery size='small' builders={builders} />
 
-      {/* <Grid2 container component={Paper} size={{ xs: 12 }} overflowY='scroll'>
-        {builders.map((b) => (
-          <Grid2 key={b.id} size={{ xs: 6 }}>
-            <BuilderCard builder={b} showPurchaseButton />
-          </Grid2>
-        ))}
-      </Grid2> */}
-
       <Grid2 size={{ xs: 12 }}>
         <Button
           LinkComponent={Link}
