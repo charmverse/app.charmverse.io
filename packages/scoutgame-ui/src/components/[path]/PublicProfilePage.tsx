@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { BuilderStatus } from '@charmverse/core/prisma-client';
+import { BuilderNftType, type BuilderStatus } from '@charmverse/core/prisma-client';
 import { Box, Stack, Paper } from '@mui/material';
-import type { BasicUserInfo, BuilderUserInfo } from '@packages/scoutgame/users/interfaces';
+import type { BasicUserInfo } from '@packages/scoutgame/users/interfaces';
 
 import { BackButton } from '../common/Button/BackButton';
 import { Hidden } from '../common/Hidden';
@@ -37,7 +37,12 @@ export function PublicProfilePage({ user, tab }: { user: UserProfile; tab: strin
         />
       </Box>
       {tab === 'builder' ? (
-        <PublicBuilderProfile builder={user as BuilderUserInfo} />
+        <PublicBuilderProfile
+          builder={{
+            ...user,
+            nftType: BuilderNftType.default
+          }}
+        />
       ) : (
         <PublicScoutProfile publicUser={user} />
       )}

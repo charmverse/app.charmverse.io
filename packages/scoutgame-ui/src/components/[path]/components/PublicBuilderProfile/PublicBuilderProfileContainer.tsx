@@ -19,10 +19,11 @@ import { PublicBuilderStats } from './PublicBuilderStats';
 
 export type BuilderProfileProps = {
   builder: BasicUserInfo & {
-    builderStatus: BuilderStatus;
+    builderStatus: BuilderStatus | null;
     price?: bigint;
     nftImageUrl?: string;
     congratsImageUrl?: string;
+    nftType: BuilderNftType;
   };
   builderActivities: BuilderActivity[];
 } & BuilderStats &
@@ -56,7 +57,6 @@ export function PublicBuilderProfileContainer({
   rank
 }: BuilderProfileProps) {
   const isDesktop = useMdScreen();
-
   return (
     <Box>
       <Stack
