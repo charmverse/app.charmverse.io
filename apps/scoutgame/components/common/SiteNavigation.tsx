@@ -103,7 +103,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Friends'
           href='/friends'
           value='friends'
-          icon={<FriendsIcon active={value === 'friends'} />}
+          icon={<FriendsIcon fill='#D8E1FF' />}
           LinkComponent={Link}
         />
       </StyledBottomNavigation>

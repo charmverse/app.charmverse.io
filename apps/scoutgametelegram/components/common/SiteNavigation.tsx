@@ -75,7 +75,7 @@ export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTel
         label='Friends'
         href='/friends'
         value='friends'
-        icon={<FriendsIcon active={value === 'friends'} />}
+        icon={<FriendsIcon fill={value === 'friends' ? '#fff' : '#000'} />}
         LinkComponent={Link}
       />
     </StyledBottomNavigation>

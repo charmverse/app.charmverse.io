@@ -1,7 +1,6 @@
 import { SvgIcon } from '@mui/material';
 
-export function FriendsIcon({ active }: { active: boolean }) {
-  const fill = active ? '#fff' : '#000';
+export function FriendsIcon({ fill }: { fill: string }) {
   return (
     <SvgIcon>
       <svg width='25' height='24' viewBox='0 0 25 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
