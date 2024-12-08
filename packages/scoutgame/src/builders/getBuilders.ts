@@ -130,6 +130,7 @@ export async function getBuilders({
     const builders = await prisma.builderNft.findMany({
       where: {
         season: currentSeason,
+        nftType: BuilderNftType.default,
         builder: {
           builderStatus: 'approved'
         }
