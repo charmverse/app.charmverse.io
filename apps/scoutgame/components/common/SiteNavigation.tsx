@@ -1,6 +1,7 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
 import { SignInModalMessage } from '@packages/scoutgame-ui/components/common/ScoutButton/SignInModalMessage';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
@@ -15,7 +16,6 @@ import { useGetClaimablePoints } from 'hooks/api/session';
 
 import { BuilderIcon } from './BuilderIcon';
 import { ClaimIcon } from './Icons/ClaimIcon';
-import { FriendsIcon } from './Icons/FriendsIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -103,7 +103,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Friends'
           href='/friends'
           value='friends'
-          icon={<FriendsIcon />}
+          icon={<FriendsIcon active={value === 'friends'} />}
           LinkComponent={Link}
         />
       </StyledBottomNavigation>
