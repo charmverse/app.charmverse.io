@@ -86,7 +86,7 @@ function WalletLoginButton() {
   function onClick() {
     if (!address) {
       // openConnectModal exists if wallet is already connected
-      openConnectModal!();
+      openConnectModal?.();
     }
     setIsConnecting(true);
   }

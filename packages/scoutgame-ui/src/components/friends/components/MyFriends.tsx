@@ -13,7 +13,7 @@ import type { SessionUser } from '@packages/scoutgame/session/interfaces';
 
 import { Avatar } from '../../common/Avatar';
 
-export function MyFriends({ friends }: { friends: SessionUser[] }) {
+export function MyFriends({ friends, title }: { friends: SessionUser[]; title?: string }) {
   const sorted = friends.sort((a, b) => b.currentBalance - a.currentBalance);
 
   if (friends.length === 0) {
@@ -33,7 +33,7 @@ export function MyFriends({ friends }: { friends: SessionUser[] }) {
         }}
       >
         <Typography variant='h5' textAlign='center'>
-          My Friends
+          {title}
         </Typography>
         <Typography textAlign='center'>No friends joined through your referral link</Typography>
       </Paper>
@@ -58,8 +58,9 @@ export function MyFriends({ friends }: { friends: SessionUser[] }) {
       }}
     >
       <Typography variant='h5' textAlign='center'>
-        My Friends
+        {title}
       </Typography>
+      <Typography textAlign='center'>See who's already playing!</Typography>
       <TableContainer component={Paper}>
         <Table aria-label='Leaderboard table' size='small' sx={{ px: { md: 6 } }} data-test='friends-table'>
           <TableHead>
