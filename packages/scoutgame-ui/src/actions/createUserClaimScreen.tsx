@@ -1,19 +1,15 @@
-import { S3Client, type PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
+import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
+import { getLastWeek } from '@packages/scoutgame/dates';
 import { getClaimablePointsWithSources } from '@packages/scoutgame/points/getClaimablePointsWithSources';
 import { baseUrl } from '@packages/utils/constants';
 import puppeteer from 'puppeteer';
-import React from 'react';
 
 import { PointsClaimBuilderScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimBuilderScreen';
 import { PointsClaimScoutScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimScoutScreen';
 
-const client = new S3Client(getS3ClientConfig());
-
-export async function createUserClaimScreen({ userId, week }: { userId: string; week: string }) {
+export async function createUserClaimScreen(userId: string) {
   const { renderToString } = await import('react-dom/server');
 
   const user = await prisma.scout.findUniqueOrThrow({
@@ -93,26 +89,18 @@ export async function createUserClaimScreen({ userId, week }: { userId: string; 
     await page.waitForNetworkIdle();
 
     const screenshot = await page.screenshot();
-    const bucket = process.env.S3_UPLOAD_BUCKET;
 
-    const params: PutObjectCommandInput = {
-      Bucket: bucket,
-      Key: `points-claim/${userId}/${week}.png`,
-      Body: screenshot,
-      ContentType: 'image/png'
-    };
-
-    const s3Upload = new Upload({
-      client,
-      params
+    await uploadFileToS3({
+      pathInS3: `points-claim/${userId}/${getLastWeek()}.png`,
+      bucket: process.env.S3_UPLOAD_BUCKET,
+      content: screenshot as Buffer,
+      contentType: 'image/png'
     });
 
-    await s3Upload.done();
-    log.info('generated claim creen', { claimedPoints, bucket, week, userId });
+    log.info('generated claim screen', { userId });
   } catch (e) {
-    log.error('error generating claim screen', { userId, week, claimedPoints, error: e });
+    log.error('error generating claim screen', { userId, error: e });
   } finally {
     await browser.close();
   }
-  return { week };
 }
