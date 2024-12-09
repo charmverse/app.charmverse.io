@@ -29,10 +29,8 @@ export function PointsTable({
             px: 2.5,
             py: 4,
             display: 'flex',
-            mt: 0,
             justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'background.dark'
+            alignItems: 'center'
           }}
         >
           <Typography variant='h6' textAlign='center'>

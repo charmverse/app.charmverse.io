@@ -14,3 +14,13 @@ export function useGetUserTrigger() {
 export function useUserWalletAddress(address?: string) {
   return useGETImmutable(address ? `/api/session/wallet` : null, { address });
 }
+
+export function useGetClaimablePoints() {
+  return useGETImmutable<{ points: number }>(
+    '/api/session/claimable-points',
+    {},
+    {
+      refreshInterval: 30000
+    }
+  );
+}
