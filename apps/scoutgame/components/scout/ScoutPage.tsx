@@ -1,6 +1,7 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import type { StarterPackBuilder } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
@@ -34,7 +35,8 @@ export function ScoutPage({
   buildersLayout,
   tab,
   starterpackBuilders,
-  remainingStarterCards
+  remainingStarterCards,
+  userId
 }: {
   scoutSort: string;
   builderSort: string;
@@ -43,8 +45,9 @@ export function ScoutPage({
   scoutTab: string;
   buildersLayout: string;
   tab: string;
-  starterpackBuilders: BuilderInfo[];
+  starterpackBuilders: StarterPackBuilder[];
   remainingStarterCards?: number;
+  userId?: string;
 }) {
   const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
     .filter(([, value]) => isTruthy(value))

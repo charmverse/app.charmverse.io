@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, Typography } from '@mui/material';
 import { getEditorialDescription } from '@packages/scoutgame/builderNfts/builderRegistration/starterPack/starterPackBuilders';
-import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
+import type { StarterPackBuilder } from '@packages/scoutgame/builders/getStarterPackBuilders';
 
 import { BuilderCard } from '../../common/Card/BuilderCard/BuilderCard';
 import { Carousel } from '../../common/Carousel/Carousel';
@@ -14,7 +14,7 @@ export function StarterPackCarousel({
   builders,
   remainingStarterCards
 }: {
-  builders: BuilderInfo[];
+  builders: StarterPackBuilder[];
   remainingStarterCards?: number;
 }) {
   return (
@@ -40,7 +40,7 @@ export function StarterPackCarousel({
             p={{ xs: 2, md: 4 }}
           >
             <Box>
-              <BuilderCard builder={builder} showPurchaseButton />
+              <BuilderCard builder={builder} showPurchaseButton markStarterCardPurchased={builder.purchased} />
             </Box>
             <Box display='flex' alignItems='center' flexWrap='wrap'>
               {/* <Typography>{builder.bio}</Typography> */}

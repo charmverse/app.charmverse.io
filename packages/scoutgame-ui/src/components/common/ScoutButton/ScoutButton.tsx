@@ -25,10 +25,10 @@ const NFTPurchaseDialog = dynamic(
 
 export function ScoutButton({
   builder,
-  disableStarterCardPoints = false
+  markStarterCardPurchased = false
 }: {
   builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus | null };
-  disableStarterCardPoints?: boolean;
+  markStarterCardPurchased?: boolean;
 }) {
   const theme = useTheme();
   const trackEvent = useTrackEvent();
@@ -61,16 +61,16 @@ export function ScoutButton({
   return (
     <div>
       <DynamicLoadingContext.Provider value={setDialogLoadingStatus}>
-        {builder.nftType === 'starter_pack' && disableStarterCardPoints ? (
+        {builder.nftType === 'starter_pack' && markStarterCardPurchased ? (
           <Button variant='outlined' fullWidth disabled>
-            Starter Card
+            Purchased
           </Button>
         ) : (
           <LoadingButton
             loading={dialogLoadingStatus}
             fullWidth
             onClick={handleClick}
-            disabled={builder.nftType === 'starter_pack' && disableStarterCardPoints}
+            disabled={builder.nftType === 'starter_pack' && markStarterCardPurchased}
             data-test={isLoading ? '' : 'scout-button'}
             variant='buy'
           >

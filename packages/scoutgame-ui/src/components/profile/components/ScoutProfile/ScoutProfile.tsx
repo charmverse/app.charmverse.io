@@ -35,7 +35,7 @@ export async function ScoutProfile({ userId }: { userId: string }) {
           Scouted Builders
         </Typography>
         {scoutedBuilders.length > 0 ? (
-          <BuildersGallery builders={scoutedBuilders} columns={3} size='small' disableStarterCardPoints />
+          <BuildersGallery builders={scoutedBuilders} columns={3} size='small' markStarterCardPurchased />
         ) : (
           <Paper sx={{ p: 2 }}>
             <Typography>You haven't scouted any Builders yet. Start exploring and discover talent!</Typography>
