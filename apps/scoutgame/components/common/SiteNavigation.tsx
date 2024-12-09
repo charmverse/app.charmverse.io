@@ -1,7 +1,7 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
+import { ClaimIcon } from '@packages/scoutgame-ui/components/common/Icons/ClaimIcon';
 import { SignInModalMessage } from '@packages/scoutgame-ui/components/common/ScoutButton/SignInModalMessage';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
@@ -16,7 +16,6 @@ import { SlUser } from 'react-icons/sl';
 import { useGetClaimablePoints } from 'hooks/api/session';
 
 import { BuilderIcon } from './BuilderIcon';
-import { ClaimIcon } from './Icons/ClaimIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
