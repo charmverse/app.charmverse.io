@@ -29,3 +29,5 @@ export type BuilderInfo = BasicUserInfo &
     congratsImageUrl: string | null;
     nftsSoldToScout?: number;
   };
+
+export type Last7DaysGems = { date: string; gemsCount: number }[];

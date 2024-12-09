@@ -4,8 +4,7 @@ import { currentSeason, getCurrentWeek, getLastWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
 
 import type { BuilderInfo } from './interfaces';
-
-export type Last7DaysGems = { date: string; gemsCount: number }[];
+import { normalizeLast7DaysGems } from './utils/normalizeLast7DaysGems';
 
 const userSelect = {
   ...BasicUserInfoSelect,
@@ -118,9 +117,7 @@ export async function getTodaysHotBuilders(): Promise<BuilderInfo[]> {
       nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
       builderStatus: builder.builderStatus!,
       rank: builder.userWeeklyStats[0]?.rank || -1,
-      last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
-        .map((gem) => gem.gemsCount)
-        .slice(-7),
+      last7DaysGems: normalizeLast7DaysGems(builder.builderCardActivities[0]),
       nftType: BuilderNftType.default
     };
   });

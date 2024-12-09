@@ -3,8 +3,8 @@ import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
 import { getCurrentWeek, currentSeason } from '../dates';
 import type { Season } from '../dates';
 
-import type { Last7DaysGems } from './getTodaysHotBuilders';
 import type { BuilderInfo } from './interfaces';
+import { normalizeLast7DaysGems } from './utils/normalizeLast7DaysGems';
 
 export async function getStarterPackBuilders({
   season = currentSeason,
@@ -70,9 +70,7 @@ export async function getStarterPackBuilders({
     points: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
     cards: builder.userSeasonStats[0]?.nftsSold || 0,
     builderPoints: builder.userSeasonStats[0]?.pointsEarnedAsBuilder || 0,
-    last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
-      .map((gem) => gem.gemsCount)
-      .slice(-7),
+    last7DaysGems: normalizeLast7DaysGems(builder.builderCardActivities[0]),
     nftsSold: builder.userSeasonStats[0]?.nftsSold || 0,
     builderStatus: 'approved',
     nftImageUrl: builder.builderNfts[0]?.imageUrl || '',

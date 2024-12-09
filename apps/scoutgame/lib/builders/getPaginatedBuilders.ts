@@ -1,6 +1,6 @@
 import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
-import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
+import { normalizeLast7DaysGems } from '@packages/scoutgame/builders/utils/normalizeLast7DaysGems';
 
 export type CompositeCursor = {
   userId: string;
@@ -107,9 +107,7 @@ export async function getPaginatedBuilders({
         scoutedBy: stat.user.builderNfts?.[0]?.nftSoldEvents?.length ?? 0,
         nftsSold: stat.user.userSeasonStats[0]?.nftsSold ?? 0,
         builderStatus: stat.user.builderStatus!,
-        last7DaysGems: ((stat.user.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
-          .map((gem) => gem.gemsCount)
-          .slice(-7)
+        last7DaysGems: normalizeLast7DaysGems(stat.user.builderCardActivities[0])
       }))
     );
   const userId = builders[builders.length - 1]?.id;

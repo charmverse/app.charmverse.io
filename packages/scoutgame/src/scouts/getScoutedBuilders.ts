@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { Last7DaysGems } from '../builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '../builders/interfaces';
+import { normalizeLast7DaysGems } from '../builders/utils/normalizeLast7DaysGems';
 import { currentSeason, getCurrentWeek } from '../dates';
 import { BasicUserInfoSelect } from '../users/queries';
 
@@ -102,9 +102,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           nftsSoldToScout: nftsSoldData.toScout,
           rank: builder.userWeeklyStats[0]?.rank ?? -1,
           price: nft.currentPrice ?? 0,
-          last7DaysGems: ((builder.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
-            .map((gem) => gem.gemsCount)
-            .slice(-7),
+          last7DaysGems: normalizeLast7DaysGems(builder.builderCardActivities[0]),
           nftType: nft.nftType || 'default',
           congratsImageUrl: nft.congratsImageUrl
         };
