@@ -60,10 +60,6 @@ export async function findOrCreateFarcasterUser({
     if (users) {
       const [, referee] = users;
 
-      trackUserAction('referral_link_used', {
-        userId: user.id
-      });
-
       return { ...referee, isNew: true };
     }
   }

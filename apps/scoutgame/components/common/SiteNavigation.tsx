@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
+import { ImGift as QuestsIcon } from 'react-icons/im';
 import { PiBinocularsLight } from 'react-icons/pi';
 import { SlUser } from 'react-icons/sl';
 
@@ -100,11 +101,12 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           />
         ) : null}
         <BottomNavigationAction
-          label='Friends'
-          href='/friends'
-          value='friends'
-          icon={<FriendsIcon fill='#D8E1FF' />}
+          label='Quests'
+          href='/quests'
+          value='quests'
+          icon={<QuestsIcon size='19px' />}
           LinkComponent={Link}
+          onClick={(e) => openAuthModal?.(e, 'quests')}
         />
       </StyledBottomNavigation>
       <SignInModalMessage
@@ -127,8 +129,8 @@ function getActiveButton(pathname: string) {
     return 'claim';
   } else if (pathname.startsWith('/builders')) {
     return 'builders';
-  } else if (pathname.startsWith('/friends')) {
-    return 'friends';
+  } else if (pathname.startsWith('/quests')) {
+    return 'quests';
   }
   return null;
 }

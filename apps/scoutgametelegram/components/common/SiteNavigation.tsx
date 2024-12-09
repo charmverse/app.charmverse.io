@@ -71,13 +71,6 @@ export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTel
         icon={<ClaimIcon active={value === 'claim'} />}
         LinkComponent={Link}
       />
-      <BottomNavigationAction
-        label='Friends'
-        href='/friends'
-        value='friends'
-        icon={<FriendsIcon fill={value === 'friends' ? '#fff' : '#000'} />}
-        LinkComponent={Link}
-      />
     </StyledBottomNavigation>
   );
 }
@@ -85,8 +78,6 @@ export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTel
 function getActiveButton(pathname: string) {
   if (pathname.startsWith('/quests')) {
     return 'quests';
-  } else if (pathname.startsWith('/friends')) {
-    return 'friends';
   } else if (pathname.startsWith('/scout') || pathname.startsWith('/u')) {
     return 'scout';
   } else if (pathname.startsWith('/claim')) {
