@@ -12,7 +12,7 @@ export async function claimDailyReward({
   userId: string;
   isBonus?: boolean;
   dayOfWeek: number;
-  week?: number;
+  week?: string;
 }) {
   if (dayOfWeek !== 7 && isBonus) {
     throw new Error('Bonus reward can only be claimed on the last day of the week');
