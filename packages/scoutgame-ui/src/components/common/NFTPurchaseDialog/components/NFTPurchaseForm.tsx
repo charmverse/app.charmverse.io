@@ -313,7 +313,10 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
   const [selectedQuantity, setSelectedQuantity] = useState<number | 'custom'>(1);
   const [customQuantity, setCustomQuantity] = useState(2);
 
-  const handleTokensToBuyChange = (value: number | 'custom') => {
+  const handleQuantityChange = (value: number | 'custom') => {
+    if (builder.nftType === 'starter_pack') {
+      throw new Error('Only one starter pack can be purchased at a time');
+    }
     if (value === 'custom') {
       setSelectedQuantity('custom');
       setTokensToBuy(customQuantity);
@@ -373,71 +376,75 @@ export function NFTPurchaseFormContent({ builder }: NFTPurchaseProps) {
           to learn more.
         </Alert>
       ) : null}
-      <Stack gap={1}>
-        <Typography color='secondary'>Select quantity</Typography>
-        <ToggleButtonGroup
-          value={selectedQuantity}
-          onChange={(_, newValue) => handleTokensToBuyChange(newValue)}
-          exclusive
-          fullWidth
-          aria-label='quantity selection'
-        >
-          {initialQuantities.map((q) => (
-            <ToggleButton sx={{ minWidth: 60, minHeight: 40 }} key={q} value={q} aria-label={q.toString()}>
-              {q}
+      {builder.nftType === 'default' && (
+        <Stack gap={1}>
+          <Typography color='secondary'>Select quantity</Typography>
+          <ToggleButtonGroup
+            value={selectedQuantity}
+            onChange={(_, newValue) => handleQuantityChange(newValue)}
+            exclusive
+            fullWidth
+            aria-label='quantity selection'
+          >
+            {initialQuantities.map((q) => (
+              <ToggleButton sx={{ minWidth: 60, minHeight: 40 }} key={q} value={q} aria-label={q.toString()}>
+                {q}
+              </ToggleButton>
+            ))}
+            <ToggleButton sx={{ fontSize: 14, textTransform: 'none' }} value='custom' aria-label='custom'>
+              Custom
             </ToggleButton>
-          ))}
-          <ToggleButton sx={{ fontSize: 14, textTransform: 'none' }} value='custom' aria-label='custom'>
-            Custom
-          </ToggleButton>
-        </ToggleButtonGroup>
-        {selectedQuantity === 'custom' && (
-          <Stack flexDirection='row' gap={2} mt={2}>
-            <IconButton
-              color='secondary'
-              onClick={() => {
-                const newQuantity = Math.max(1, customQuantity - 1);
-                setCustomQuantity(newQuantity);
-                setTokensToBuy(newQuantity);
-              }}
-            >
-              -
-            </IconButton>
-            <NumberInputField
-              fullWidth
-              color='secondary'
-              id='builderId'
-              type='number'
-              placeholder='Quantity'
-              value={customQuantity}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-                if (!Number.isNaN(value) && value > 0) {
-                  setCustomQuantity(value);
-                  setTokensToBuy(value);
-                }
-              }}
-              disableArrows
-              sx={{ '& input': { textAlign: 'center' } }}
-            />
-            <IconButton
-              color='secondary'
-              onClick={() => {
-                setCustomQuantity((prev) => prev + 1);
-                setTokensToBuy((prev) => prev + 1);
-              }}
-            >
-              +
-            </IconButton>
-          </Stack>
-        )}
-      </Stack>
+          </ToggleButtonGroup>
+          {selectedQuantity === 'custom' && (
+            <Stack flexDirection='row' gap={2} mt={2}>
+              <IconButton
+                color='secondary'
+                onClick={() => {
+                  const newQuantity = Math.max(1, customQuantity - 1);
+                  setCustomQuantity(newQuantity);
+                  setTokensToBuy(newQuantity);
+                }}
+              >
+                -
+              </IconButton>
+              <NumberInputField
+                fullWidth
+                color='secondary'
+                id='builderId'
+                type='number'
+                placeholder='Quantity'
+                value={customQuantity}
+                onChange={(e) => {
+                  const value = parseInt(e.target.value, 10);
+                  if (!Number.isNaN(value) && value > 0) {
+                    setCustomQuantity(value);
+                    setTokensToBuy(value);
+                  }
+                }}
+                disableArrows
+                sx={{ '& input': { textAlign: 'center' } }}
+              />
+              <IconButton
+                color='secondary'
+                onClick={() => {
+                  setCustomQuantity((prev) => prev + 1);
+                  setTokensToBuy((prev) => prev + 1);
+                }}
+              >
+                +
+              </IconButton>
+            </Stack>
+          )}
+        </Stack>
+      )}
       <Stack>
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={1}>
           <Typography color='secondary'>Total cost</Typography>
-          <Link href='/info#builder-nfts' target='_blank' title='Read how Builder cards are priced'>
-            <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
-          </Link>
+          {builder.nftType === 'default' && (
+            <Link href='/info#builder-nfts' target='_blank' title='Read how Builder cards are priced'>
+              <InfoIcon sx={{ color: 'secondary.main', fontSize: 16, opacity: 0.7 }} />
+            </Link>
+          )}
         </Stack>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Typography variant='caption' color='secondary' align='left' sx={{ width: '50%' }}>
