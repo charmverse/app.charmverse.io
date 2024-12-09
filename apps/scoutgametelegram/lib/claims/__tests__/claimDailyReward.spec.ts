@@ -66,19 +66,28 @@ describe('claimDailyReward', () => {
     expect(scout.userSeasonStats[0].pointsEarnedAsBuilder).toBe(1);
     expect(scout.userAllTimeStats[0].pointsEarnedAsBuilder).toBe(1);
   });
+});
 
+describe('claimDailyReward streak', () => {
   it('should claim daily reward streak', async () => {
     const builder = await mockBuilder();
     const userId = builder.id;
+    const week = getCurrentWeek();
 
-    await claimDailyReward({ userId, isBonus: true, dayOfWeek: 7 });
+    for (const dayOfWeek of [1, 2, 3, 4, 5, 6, 7]) {
+      await claimDailyReward({ userId, week, dayOfWeek });
+    }
+
+    // claim streak
+    await claimDailyReward({ userId, isBonus: true, week, dayOfWeek: 7 });
 
     const dailyClaimStreakEvent = await prisma.scoutDailyClaimStreakEvent.findFirstOrThrow({
       where: {
         userId,
-        week: getCurrentWeek()
+        week
       }
     });
+
     const pointsReceipt = await prisma.pointsReceipt.findFirstOrThrow({
       where: {
         recipientId: userId,
@@ -88,6 +97,7 @@ describe('claimDailyReward', () => {
         }
       }
     });
+
     const scout = await prisma.scout.findUniqueOrThrow({
       where: {
         id: userId
@@ -110,8 +120,15 @@ describe('claimDailyReward', () => {
     expect(dailyClaimStreakEvent).toBeDefined();
     expect(pointsReceipt).toBeDefined();
     expect(pointsReceipt.value).toBe(3);
-    expect(scout.currentBalance).toBe(3);
-    expect(scout.userSeasonStats[0].pointsEarnedAsBuilder).toBe(3);
-    expect(scout.userAllTimeStats[0].pointsEarnedAsBuilder).toBe(3);
+    expect(scout.currentBalance).toBe(10);
+    expect(scout.userSeasonStats[0].pointsEarnedAsBuilder).toBe(scout.currentBalance);
+    expect(scout.userAllTimeStats[0].pointsEarnedAsBuilder).toBe(scout.currentBalance);
+  });
+
+  it('should not allow claiming daily reward streak if not all days are claimed', async () => {
+    const builder = await mockBuilder();
+    const userId = builder.id;
+
+    await expect(claimDailyReward({ userId, isBonus: true, dayOfWeek: 7 })).rejects.toThrow();
   });
 });

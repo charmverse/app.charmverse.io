@@ -38,7 +38,7 @@ export async function getDailyClaims(userId: string): Promise<DailyClaim[]> {
       };
 
       // For the last day of the week, return 2 claims: one for the daily claim and one for the bonus claim
-      if (index === 6) {
+      if (index === 6 && dailyClaimEvents.length === 7) {
         return [dailyClaimInfo, { ...dailyClaimInfo, claimed: !!dailyClaimStreakEvent, isBonus: true }];
       }
 
