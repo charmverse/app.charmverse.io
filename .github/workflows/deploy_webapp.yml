@@ -116,12 +116,12 @@ jobs:
             test_command: 'npm run test:browser'
           - test_name: 'Serverless tests'
             test_command: |
-              npm run serverless:start
+              npm run serverless:start &
               sleep_loop_ct=0
-              until curl --output /dev/null --silent --head --fail http://localhost:3020 || [[ $sleep_loop_ct > 30 ]]; do
+              until curl --output /dev/null --silent --head http://localhost:3020 || [[ $sleep_loop_ct > 30 ]]; do
                 echo "serverless server not up in loop $sleep_loop_ct ... sleeping"
                 sleep_loop_ct=$((sleep_loop_ct + 1))
-                sleep 10
+                sleep 2
               done
               npm run test:serverless
 
