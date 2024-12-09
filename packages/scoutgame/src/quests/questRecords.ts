@@ -4,7 +4,7 @@ type QuestRecord = {
   link?: string;
 };
 
-export type QuestType = 'follow-x-account' | 'share-x-channel' | 'invite-friend';
+export type QuestType = 'follow-x-account' | 'share-x-telegram' | 'invite-friend';
 
 export type QuestInfo = {
   type: QuestType;
@@ -17,9 +17,9 @@ export const questsRecord: Record<QuestType, QuestRecord> = {
     label: 'Follow @scoutgamexyz',
     link: 'https://x.com/@scoutgamexyz'
   },
-  'share-x-channel': {
+  'share-x-telegram': {
     points: 50,
-    label: 'Share this channel',
+    label: 'Share our Telegram',
     link: `https://x.com/intent/tweet?text=${encodeURIComponent(
       "I'm playing @scoutgamexyz on Telegram! 🕹️ Come join me, play in the channel, and discover top builders while earning points and rewards. Let’s scout together! 👉 https://t.me/+J0dl4_uswBY2NTkx #PlayAndEarn"
     )}`
