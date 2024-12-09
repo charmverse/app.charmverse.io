@@ -16,6 +16,7 @@ export type NftPurchaseEvent = BaseEvent & {
   builderPath: string;
   paidWithPoints: boolean;
   season: string;
+  nftType: string;
 };
 
 type FrontendEvent = BaseEvent & {

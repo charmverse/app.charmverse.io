@@ -51,6 +51,7 @@ export async function recordNftMint(
       id: builderNftId
     },
     select: {
+      nftType: true,
       season: true,
       tokenId: true,
       builderId: true,
@@ -203,7 +204,8 @@ export async function recordNftMint(
       amount,
       paidWithPoints,
       builderPath: builderNft.builder.path!,
-      season: builderNft.season
+      season: builderNft.season,
+      nftType: builderNft.nftType
     });
   }
 
