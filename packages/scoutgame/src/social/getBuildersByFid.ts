@@ -1,9 +1,10 @@
 import type { BuilderNftType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Last7DaysGems } from '@packages/scoutgame/builders/getTodaysHotBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { getCurrentWeek } from '@packages/scoutgame/dates';
 import { uniqueValues } from '@packages/utils/array';
+
+import { normalizeLast7DaysGems } from '../builders/utils/normalizeLast7DaysGems';
 
 export async function getBuildersByFid({
   fids,
@@ -100,9 +101,7 @@ export async function getBuildersByFid({
         nftsSold: scout.userSeasonStats[0]?.nftsSold ?? 0,
         builderStatus: scout.builderStatus!,
         farcasterId: scout.farcasterId,
-        last7DaysGems: ((scout.builderCardActivities[0]?.last7Days as unknown as Last7DaysGems) || [])
-          .map((gem) => gem.gemsCount)
-          .slice(-7),
+        last7DaysGems: normalizeLast7DaysGems(scout.builderCardActivities[0]),
         contractAddress: scout.builderNfts[0]?.contractAddress || '',
         nftType: scout.builderNfts[0]?.nftType || 'default'
       }));

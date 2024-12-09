@@ -2,8 +2,6 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { DateTime } from 'luxon';
 
-export type Last7DaysGems = { date: string; gemsCount: number }[];
-
 export async function updateBuilderCardActivity(date: DateTime) {
   const builders = await prisma.scout.findMany({
     where: {
