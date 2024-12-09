@@ -121,7 +121,7 @@ jobs:
               until curl --output /dev/null --silent --head http://localhost:3020 || [[ $sleep_loop_ct > 30 ]]; do
                 echo "serverless server not up in loop $sleep_loop_ct ... sleeping"
                 sleep_loop_ct=$((sleep_loop_ct + 1))
-                sleep 2
+                sleep 10
               done
               npm run test:serverless
 
