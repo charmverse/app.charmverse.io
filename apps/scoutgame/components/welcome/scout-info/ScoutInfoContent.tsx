@@ -3,13 +3,9 @@
 import { Box, Button, Typography } from '@mui/material';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { BuilderCard } from '@packages/scoutgame-ui/components/common/Card/BuilderCard/BuilderCard';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Link from 'next/link';
-import React from 'react';
 
 export function ScoutInfoContent({ builder }: { builder: BuilderInfo }) {
-  const isMdScreen = useMdScreen();
-  const iconSize = isMdScreen ? 24 : 18;
   return (
     <>
       <Typography color='secondary' textAlign='center' width='100%' fontWeight={700} variant='h5'>

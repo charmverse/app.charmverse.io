@@ -1,11 +1,11 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
+import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { ClaimIcon } from './Icons/ClaimIcon';
-import { FriendsIcon } from './Icons/FriendsIcon';
 import { QuestsIcon } from './Icons/QuestsIcon';
 import { ScoutIcon } from './Icons/ScoutIcon';
 

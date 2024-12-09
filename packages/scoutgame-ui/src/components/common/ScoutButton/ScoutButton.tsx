@@ -22,7 +22,11 @@ const NFTPurchaseDialog = dynamic(
   }
 );
 
-export function ScoutButton({ builder }: { builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus } }) {
+export function ScoutButton({
+  builder
+}: {
+  builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus | null };
+}) {
   const trackEvent = useTrackEvent();
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
