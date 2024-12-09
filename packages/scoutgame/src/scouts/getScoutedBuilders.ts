@@ -103,7 +103,7 @@ export async function getScoutedBuilders({ scoutId }: { scoutId: string }): Prom
           rank: builder.userWeeklyStats[0]?.rank ?? -1,
           price: nft.currentPrice ?? 0,
           last7DaysGems: normalizeLast7DaysGems(builder.builderCardActivities[0]),
-          nftType: nft.nftType || 'default',
+          nftType: nft.nftType,
           congratsImageUrl: nft.congratsImageUrl
         };
 
