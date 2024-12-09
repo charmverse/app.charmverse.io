@@ -12,7 +12,13 @@ import { useAction } from 'next-safe-action/hooks';
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
+export function DailyClaimCard({
+  dailyClaim,
+  hasClaimedStreak
+}: {
+  dailyClaim: DailyClaim;
+  hasClaimedStreak: boolean;
+}) {
   const { refreshUser } = useUser();
   const { execute: claimDailyReward, isExecuting } = useAction(claimDailyRewardAction, {
     onSuccess: () => {
@@ -25,7 +31,7 @@ export function DailyClaimCard({ dailyClaim }: { dailyClaim: DailyClaim }) {
   const isClaimed = dailyClaim.claimed;
   const buttonLabel =
     isClaimToday && !isClaimed ? 'Claim' : dailyClaim.isBonus ? 'Bonus' : WEEKDAYS[dailyClaim.day - 1];
-  const canClaim = isClaimToday && !isClaimed && !isExecuting;
+  const canClaim = isClaimToday && !isClaimed && !isExecuting && (!dailyClaim.isBonus || hasClaimedStreak);
   const variant = isPastDay ? 'disabled' : isClaimToday ? 'secondary' : 'primary';
 
   return (

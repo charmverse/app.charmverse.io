@@ -7,11 +7,13 @@ import { sendPointsForDailyClaimStreak } from '@packages/scoutgame/points/builde
 export async function claimDailyReward({
   userId,
   isBonus,
-  dayOfWeek
+  dayOfWeek,
+  week = getCurrentWeek()
 }: {
   userId: string;
   isBonus?: boolean;
   dayOfWeek: number;
+  week?: string;
 }) {
   if (dayOfWeek !== 7 && isBonus) {
     throw new Error('Bonus reward can only be claimed on the last day of the week');
@@ -21,12 +23,23 @@ export async function claimDailyReward({
     const existingEvent = await prisma.scoutDailyClaimStreakEvent.findFirst({
       where: {
         userId,
-        week: getCurrentWeek()
+        week
       }
     });
 
     if (existingEvent) {
       throw new Error('Daily reward streak already claimed');
+    }
+
+    const existingEvents = await prisma.scoutDailyClaimEvent.findMany({
+      where: {
+        userId,
+        week
+      }
+    });
+
+    if (existingEvents.length < 7) {
+      throw new Error('You must claim all 7 days of the week to get the bonus reward');
     }
 
     await sendPointsForDailyClaimStreak({
@@ -40,7 +53,7 @@ export async function claimDailyReward({
     const existingEvent = await prisma.scoutDailyClaimEvent.findFirst({
       where: {
         userId,
-        week: getCurrentWeek(),
+        week,
         dayOfWeek
       }
     });
