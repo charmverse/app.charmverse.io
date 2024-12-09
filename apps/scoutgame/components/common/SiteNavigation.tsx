@@ -1,7 +1,7 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
+import { ClaimIcon } from '@packages/scoutgame-ui/components/common/Icons/ClaimIcon';
 import { SignInModalMessage } from '@packages/scoutgame-ui/components/common/ScoutButton/SignInModalMessage';
 import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
@@ -16,7 +16,6 @@ import { SlUser } from 'react-icons/sl';
 import { useGetClaimablePoints } from 'hooks/api/session';
 
 import { BuilderIcon } from './BuilderIcon';
-import { ClaimIcon } from './Icons/ClaimIcon';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
   shouldForwardProp: (prop) => prop !== 'topNav'
@@ -86,7 +85,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Claim'
           href='/claim'
           value='claim'
-          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
+          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} fill='currentColor' />}
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
         {user ? (

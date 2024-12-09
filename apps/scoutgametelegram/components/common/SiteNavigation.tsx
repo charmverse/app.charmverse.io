@@ -1,11 +1,12 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
+import { ClaimIcon } from '@packages/scoutgame-ui/components/common/Icons/ClaimIcon';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { ClaimIcon } from './Icons/ClaimIcon';
+import { useGetClaimablePoints } from 'hooks/api/session';
+
 import { QuestsIcon } from './Icons/QuestsIcon';
 import { ScoutIcon } from './Icons/ScoutIcon';
 
@@ -41,6 +42,7 @@ const StyledBottomNavigation = styled(BottomNavigation, {
 export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTelegram?: boolean }) {
   const pathname = usePathname();
   const value = getActiveButton(pathname);
+  const { data: claimablePoints } = useGetClaimablePoints();
 
   return (
     <StyledBottomNavigation
@@ -68,7 +70,7 @@ export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTel
         label='Claim'
         href='/claim'
         value='claim'
-        icon={<ClaimIcon active={value === 'claim'} />}
+        icon={<ClaimIcon fill='currentColor' animate={claimablePoints && claimablePoints.points > 0} />}
         LinkComponent={Link}
       />
     </StyledBottomNavigation>
