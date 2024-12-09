@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { getENSDetails, getENSName } from '@packages/blockchain/getENSName';
 import { getFarcasterUsersByAddresses } from '@packages/farcaster/getFarcasterUsersByAddresses';
-import { trackUserAction } from '@packages/mixpanel/trackUserAction';
 import { updateReferralUsers } from '@packages/scoutgame/referrals/updateReferralUsers';
 import { findOrCreateUser } from '@packages/scoutgame/users/findOrCreateUser';
 import type { FindOrCreateUserResult } from '@packages/scoutgame/users/findOrCreateUser';

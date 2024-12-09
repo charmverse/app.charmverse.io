@@ -6,20 +6,23 @@ import { updateReferralUsers } from '../referrals/updateReferralUsers';
 
 import { findOrCreateUser } from './findOrCreateUser';
 import type { FindOrCreateUserResult } from './findOrCreateUser';
+import { generateUserPath } from './generateUserPath';
 
 export async function findOrCreateTelegramUser(
   telegramUser: WebAppInitData['user'] & Pick<WebAppInitData, 'start_param'>
 ): Promise<FindOrCreateUserResult> {
-  if (!telegramUser?.id || !telegramUser?.username) {
+  if (!telegramUser?.id) {
     throw new Error('Missing telegram web app user data');
   }
+
+  const displayName = `${telegramUser.first_name}${telegramUser.last_name ? ` ${telegramUser.last_name}` : ''}`;
 
   const user = await findOrCreateUser({
     newUserId: uuidFromNumber(telegramUser.id),
     telegramId: telegramUser.id,
     avatar: telegramUser.photo_url,
-    displayName: `${telegramUser.first_name}${telegramUser.last_name ? ` ${telegramUser.last_name}` : ''}`,
-    path: telegramUser.username
+    displayName,
+    path: await generateUserPath(telegramUser.username || displayName)
   });
 
   const startParam = telegramUser.start_param;
