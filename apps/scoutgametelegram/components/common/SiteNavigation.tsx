@@ -70,7 +70,7 @@ export function SiteNavigation({ topNav, isTelegram }: { topNav?: boolean; isTel
         label='Claim'
         href='/claim'
         value='claim'
-        icon={<ClaimIcon fill='currentColor' animate={claimablePoints && claimablePoints.points > 0} />}
+        icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
         LinkComponent={Link}
       />
     </StyledBottomNavigation>

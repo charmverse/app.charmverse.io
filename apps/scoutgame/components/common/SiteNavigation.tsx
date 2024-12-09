@@ -85,7 +85,7 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           label='Claim'
           href='/claim'
           value='claim'
-          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} fill='currentColor' />}
+          icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
         {user ? (
