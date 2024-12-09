@@ -1,29 +1,26 @@
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, styled } from '@mui/material';
-import { FriendsIcon } from '@packages/scoutgame-ui/components/common/Icons/FriendsIcon';
+import { getPlatform } from '@packages/mixpanel/utils';
+import { BuilderIcon } from '@packages/scoutgame-ui/components/common/Icons/BuilderIcon';
+import { ClaimIcon } from '@packages/scoutgame-ui/components/common/Icons/ClaimIcon';
 import { SignInModalMessage } from '@packages/scoutgame-ui/components/common/ScoutButton/SignInModalMessage';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
+import { useGetClaimablePoints } from '@packages/scoutgame-ui/hooks/api/session';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import { ImGift as QuestsIcon } from 'react-icons/im';
-import { PiBinocularsLight } from 'react-icons/pi';
-import { SlUser } from 'react-icons/sl';
-
-import { useGetClaimablePoints } from 'hooks/api/session';
-
-import { BuilderIcon } from './BuilderIcon';
-import { ClaimIcon } from './Icons/ClaimIcon';
+import { PiBinocularsLight as ScoutIcon } from 'react-icons/pi';
 
 const StyledBottomNavigation = styled(BottomNavigation, {
-  shouldForwardProp: (prop) => prop !== 'topNav'
-})<{ topNav?: boolean }>(({ theme, topNav }) => ({
+  shouldForwardProp: (prop) => prop !== 'topNav' && prop !== 'isTelegram'
+})<{ topNav?: boolean; isTelegram?: boolean }>(({ theme, topNav, isTelegram }) => ({
   background: topNav
     ? 'transparent'
     : 'linear-gradient(88.35deg, #96CDFF 0%, #A06CD5 29.5%, #96CDFF 75.47%, #A06CD5 100%)',
+  height: isTelegram ? '71px' : undefined,
   '& > a': {
     color: topNav ? theme.palette.text.primary : theme.palette.common.black,
     gap: '2px',
@@ -37,6 +34,7 @@ const StyledBottomNavigation = styled(BottomNavigation, {
       backgroundColor: topNav ? theme.palette.primary.main : 'rgba(44, 0, 90, 0.25)'
     },
     '&.MuiButtonBase-root': {
+      paddingBottom: isTelegram ? '15px' : undefined,
       minWidth: '60px'
     },
     '& .MuiBottomNavigationAction-label': {
@@ -46,11 +44,11 @@ const StyledBottomNavigation = styled(BottomNavigation, {
 }));
 
 export function SiteNavigation({ topNav }: { topNav?: boolean }) {
+  const platform = getPlatform();
   const pathname = usePathname();
   const { user } = useUser();
   const isAuthenticated = Boolean(user);
   const value = getActiveButton(pathname);
-  const isDesktop = useMdScreen();
   const { data: claimablePoints } = useGetClaimablePoints();
   const [authPopup, setAuthPopup] = useState({
     open: false,
@@ -66,21 +64,29 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
 
   return (
     <>
-      <StyledBottomNavigation showLabels value={value} data-test='site-navigation' topNav={topNav}>
+      <StyledBottomNavigation
+        showLabels
+        value={value}
+        data-test='site-navigation'
+        topNav={topNav}
+        isTelegram={platform === 'telegram'}
+      >
         <BottomNavigationAction
           label='Scout'
           href='/scout'
           value='scout'
-          icon={<PiBinocularsLight size='24px' />}
+          icon={<ScoutIcon size='24px' />}
           LinkComponent={Link}
         />
-        <BottomNavigationAction
-          label='Builders'
-          href='/builders'
-          value='builders'
-          icon={<BuilderIcon />}
-          LinkComponent={Link}
-        />
+        {platform === 'webapp' && (
+          <BottomNavigationAction
+            label='Builders'
+            href='/builders'
+            value='builders'
+            icon={<BuilderIcon />}
+            LinkComponent={Link}
+          />
+        )}
         <BottomNavigationAction
           LinkComponent={Link}
           label='Claim'
@@ -89,17 +95,6 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           icon={<ClaimIcon animate={claimablePoints && claimablePoints.points > 0} />}
           onClick={(e) => openAuthModal?.(e, 'claim')}
         />
-        {user ? (
-          <BottomNavigationAction
-            LinkComponent={Link}
-            label='Profile'
-            // This makes sure the UI doesn't flicker from single column to double column for desktop screens
-            href={isDesktop ? '/profile?tab=scout-build' : '/profile'}
-            value='profile'
-            icon={<SlUser size='19px' style={{ margin: '2px 0 3px' }} />}
-            onClick={(e) => openAuthModal?.(e, 'profile')}
-          />
-        ) : null}
         <BottomNavigationAction
           label='Quests'
           href='/quests'
@@ -121,10 +116,6 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
 function getActiveButton(pathname: string) {
   if (pathname.startsWith('/scout') || pathname.startsWith('/u/')) {
     return 'scout';
-  } else if (pathname.startsWith('/profile')) {
-    return 'profile';
-  } else if (pathname.startsWith('/info')) {
-    return 'info';
   } else if (pathname.startsWith('/claim')) {
     return 'claim';
   } else if (pathname.startsWith('/builders')) {

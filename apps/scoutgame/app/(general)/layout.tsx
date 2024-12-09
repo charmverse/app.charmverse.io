@@ -1,8 +1,7 @@
 import { Box } from '@mui/material';
+import { Header } from '@packages/scoutgame-ui/components/common/Navigation/Header';
+import { StickyFooter } from '@packages/scoutgame-ui/components/common/Navigation/StickyFooter';
 import type { ReactNode } from 'react';
-
-import { Header } from 'components/common/Header/Header';
-import { StickyFooter } from 'components/layout/StickyFooter';
 
 export default async function Layout({
   children
