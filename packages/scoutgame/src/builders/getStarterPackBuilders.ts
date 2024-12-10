@@ -1,4 +1,6 @@
+import type { BuilderNft, NFTPurchaseEvent } from '@charmverse/core/prisma-client';
 import { BuilderNftType, prisma } from '@charmverse/core/prisma-client';
+import type { NftPurchaseEvent } from '@packages/mixpanel/interfaces';
 
 import { getCurrentWeek, currentSeason } from '../dates';
 import type { Season } from '../dates';
@@ -6,15 +8,19 @@ import type { Season } from '../dates';
 import type { BuilderInfo } from './interfaces';
 import { normalizeLast7DaysGems } from './utils/normalizeLast7DaysGems';
 
+export type StarterPackBuilder = BuilderInfo & { purchased: boolean };
+
 export async function getStarterPackBuilders({
   season = currentSeason,
   week = getCurrentWeek(),
-  limit
+  limit,
+  userId
 }: {
   season?: Season;
   week?: string;
   limit?: number;
-} = {}): Promise<BuilderInfo[]> {
+  userId?: string;
+} = {}): Promise<StarterPackBuilder[]> {
   const starterPackBuilders = await prisma.scout.findMany({
     where: {
       builderStatus: 'approved',
@@ -36,7 +42,19 @@ export async function getStarterPackBuilders({
         where: {
           season,
           nftType: BuilderNftType.starter_pack
-        }
+        },
+        include: userId
+          ? {
+              nftSoldEvents: {
+                where: {
+                  scoutId: userId
+                },
+                select: {
+                  id: true
+                }
+              }
+            }
+          : undefined
       },
       builderCardActivities: true,
       userSeasonStats: {
@@ -76,6 +94,7 @@ export async function getStarterPackBuilders({
     nftImageUrl: builder.builderNfts[0]?.imageUrl || '',
     nftType: BuilderNftType.starter_pack,
     farcasterId: builder.farcasterId,
-    congratsImageUrl: builder.builderNfts[0]?.congratsImageUrl || ''
+    congratsImageUrl: builder.builderNfts[0]?.congratsImageUrl || '',
+    purchased: !!(builder.builderNfts[0] as BuilderNft & { nftSoldEvents?: NftPurchaseEvent[] })?.nftSoldEvents?.length
   }));
 }
