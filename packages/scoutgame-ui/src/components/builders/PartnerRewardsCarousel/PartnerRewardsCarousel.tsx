@@ -57,6 +57,7 @@ export function PartnerRewardsCarousel() {
       <Carousel
         height={isDesktop ? 300 : 145}
         slidesPerView={1}
+        autoplay
         renderBullet={(index, className) =>
           `<img src="/images/crypto/${partnerInfos[index].logo}" class="${className}"/>`
         }

@@ -92,7 +92,7 @@ export function Carousel({
           width: '100%',
           ...swiperProps.style,
           minHeight: isDesktop ? undefined : mobileMinHeight,
-          zIndex: 'initial'
+          zIndex: '0'
         }}
       >
         {children.map((child, index) => (
