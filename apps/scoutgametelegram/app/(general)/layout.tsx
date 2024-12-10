@@ -13,7 +13,6 @@ export default function Layout({
       <Box
         sx={{
           minHeight: 'calc(100vh - 117.5px)',
-          overflow: 'auto',
           px: 1
         }}
         component='main'
