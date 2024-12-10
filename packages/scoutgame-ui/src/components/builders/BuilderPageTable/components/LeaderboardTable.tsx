@@ -4,14 +4,14 @@ import { Box, Stack, TableHead } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
+import type { LeaderBoardRow } from '@packages/scoutgame/builders/getLeaderboard';
 import type { ISOWeek } from '@packages/scoutgame/dates';
-import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
-import { getSXProps } from '@packages/scoutgame-ui/components/common/Hidden';
-import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
-import { ScoutButton } from '@packages/scoutgame-ui/components/common/ScoutButton/ScoutButton';
 import Link from 'next/link';
 
-import type { LeaderBoardRow } from 'lib/builders/getLeaderboard';
+import { Avatar } from '../../../common/Avatar';
+import { getSXProps } from '../../../common/Hidden';
+import { GemsIcon } from '../../../common/Icons';
+import { ScoutButton } from '../../../common/ScoutButton/ScoutButton';
 
 import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';

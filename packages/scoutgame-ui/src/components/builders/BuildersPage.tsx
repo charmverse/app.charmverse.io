@@ -1,9 +1,11 @@
+import 'server-only';
+
 import { Grid2 as Grid, Stack, Typography } from '@mui/material';
-import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
-import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
 import { Suspense } from 'react';
 
-import { LoadingTable } from 'components/common/Loading/LoadingTable';
+import { HeaderMessage } from '../common/Header/HeaderMessage';
+import { LoadingTable } from '../common/Loading/LoadingTable';
+import { TabsMenu, type TabItem } from '../common/Tabs/TabsMenu';
 
 import { BuilderPageInviteCard } from './BuilderInviteCard/BuilderInviteCard';
 import { BuilderPageTable } from './BuilderPageTable/BuilderPageTable';

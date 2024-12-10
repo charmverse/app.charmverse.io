@@ -1,6 +1,4 @@
-import { prisma } from '@charmverse/core/prisma-client';
-
-import { getLeaderboard } from 'lib/builders/getLeaderboard';
+import { getLeaderboard } from '@packages/scoutgame/builders/getLeaderboard';
 import { getTopScoutsByWeek } from 'lib/scouts/getTopScouts';
 import { getWeekStartEndFormatted, getDateFromISOWeek } from '@packages/scoutgame/dates';
 async function query() {

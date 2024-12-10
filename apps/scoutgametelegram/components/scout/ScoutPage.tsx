@@ -1,5 +1,5 @@
 import { Box, Typography } from '@mui/material';
-import { LoadingTable } from '@packages/scoutgame-ui/components/claim/components/common/LoadingTable';
+import { LoadingTable } from '@packages/scoutgame-ui/components/common/Loading/LoadingTable';
 import { InfoModal } from '@packages/scoutgame-ui/components/scout/InfoModal';
 import {
   scoutTabs,
