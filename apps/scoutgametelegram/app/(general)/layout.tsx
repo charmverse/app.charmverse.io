@@ -2,8 +2,6 @@ import { Box, Stack } from '@mui/material';
 import { Header } from '@packages/scoutgame-ui/components/common/Navigation/Header';
 import { StickyFooter } from '@packages/scoutgame-ui/components/common/Navigation/StickyFooter';
 
-import { GeneralBackgroundImage } from 'components/layout/GeneralBackgroundImage';
-
 export default function Layout({
   children
 }: Readonly<{
