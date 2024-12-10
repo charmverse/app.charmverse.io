@@ -70,7 +70,6 @@ export function ScoutButton({
             loading={dialogLoadingStatus}
             fullWidth
             onClick={handleClick}
-            disabled={builder.nftType === 'starter_pack' && markStarterCardPurchased}
             data-test={isLoading ? '' : 'scout-button'}
             variant='buy'
           >
