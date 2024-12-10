@@ -52,17 +52,21 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
 
 export function BuilderActivityGems({
   activity,
-  showEmpty = false
+  showEmpty = false,
+  size = 'medium'
 }: {
   activity: BuilderActivity;
   showEmpty?: boolean;
+  size?: 'small' | 'medium';
 }) {
   return (
     <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'github_event' ? (
         <>
-          <Typography component='span'>+{activity.gems}</Typography>
-          <GemsIcon />
+          <Typography component='span' variant={size === 'small' ? 'body2' : 'body1'}>
+            +{activity.gems}
+          </Typography>
+          <GemsIcon size={size === 'small' ? 16 : 20} />
         </>
       ) : showEmpty ? (
         '-'
