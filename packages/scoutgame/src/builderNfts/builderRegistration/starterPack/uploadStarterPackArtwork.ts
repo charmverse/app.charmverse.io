@@ -1,6 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
-import type { PutObjectCommandInput, S3ClientConfig } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
+import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 
 import { getBuilderActivities } from '../../../builders/getBuilderActivities';
 import { getBuilderNft } from '../../../builders/getBuilderNft';
@@ -14,22 +12,6 @@ import {
   generateNftStarterPackCongrats,
   updateNftStarterPackImage
 } from './generateStarterPackNftImage';
-
-function getS3ClientConfig() {
-  const config: Pick<S3ClientConfig, 'region' | 'credentials'> = {
-    region: process.env.S3_UPLOAD_REGION
-  };
-
-  if (process.env.S3_UPLOAD_KEY && process.env.S3_UPLOAD_SECRET) {
-    config.credentials = {
-      accessKeyId: process.env.S3_UPLOAD_KEY as string,
-      secretAccessKey: process.env.S3_UPLOAD_SECRET as string
-    };
-  }
-  return config;
-}
-
-const client = new S3Client(getS3ClientConfig());
 
 export async function uploadStarterPackArtwork({
   imageHostingBaseUrl,
@@ -64,20 +46,12 @@ export async function uploadStarterPackArtwork({
     contractName: getBuilderStarterPackContractAddress()
   });
 
-  const params: PutObjectCommandInput = {
-    ACL: 'public-read',
-    Bucket: process.env.SCOUTGAME_S3_BUCKET,
-    Key: `nft/${imagePath}`,
-    Body: imageBuffer,
-    ContentType: 'image/png'
-  };
-
-  const s3Upload = new Upload({
-    client,
-    params
+  await uploadFileToS3({
+    pathInS3: `nft/${imagePath}`,
+    bucket: process.env.SCOUTGAME_S3_BUCKET,
+    content: imageBuffer,
+    contentType: 'image/png'
   });
-
-  await s3Upload.done();
 
   return `${imageDomain}/${imagePath}`;
 }
@@ -116,20 +90,12 @@ export async function uploadStarterPackArtworkCongrats({
     contractName: getBuilderStarterPackContractAddress()
   });
 
-  const params: PutObjectCommandInput = {
-    ACL: 'public-read',
-    Bucket: process.env.SCOUTGAME_S3_BUCKET,
-    Key: `nft/${imagePath}`,
-    Body: imageBuffer,
-    ContentType: 'image/png'
-  };
-
-  const s3Upload = new Upload({
-    client,
-    params
+  await uploadFileToS3({
+    pathInS3: `nft/${imagePath}`,
+    bucket: process.env.SCOUTGAME_S3_BUCKET,
+    content: imageBuffer,
+    contentType: 'image/png'
   });
-
-  await s3Upload.done();
 
   return `${imageDomain}/${imagePath}`;
 }
