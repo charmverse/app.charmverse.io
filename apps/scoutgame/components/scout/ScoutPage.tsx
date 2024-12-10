@@ -59,7 +59,6 @@ export function ScoutPage({
       <HeaderMessage />
       <Grid
         container
-        spacing={1}
         height={{
           md: 'calc(100vh - 100px)',
           xs: 'calc(100vh - 160px)'
@@ -71,7 +70,7 @@ export function ScoutPage({
           sx={{
             height: '100%',
             overflowX: 'hidden',
-            p: 2,
+            p: 1,
             gap: 2
           }}
         >
@@ -151,7 +150,13 @@ export function ScoutPage({
         </Grid>
         <Grid
           size={4}
-          sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}
+          sx={{
+            height: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            display: { xs: 'none', md: 'block' },
+            px: 1
+          }}
         >
           <Box sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'background.default' }}>
             <TabsMenu value={scoutTab} tabs={scoutTabOptions} queryKey='scoutTab' />
