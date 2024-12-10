@@ -9,7 +9,7 @@ import puppeteer from 'puppeteer';
 import { PointsClaimBuilderScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimBuilderScreen';
 import { PointsClaimScoutScreen } from '../components/claim/components/PointsClaimScreen/PointsClaimModal/PointsClaimScoutScreen';
 
-export async function createUserClaimScreen(userId: string) {
+export async function createUserClaimScreen({ userId, week }: { userId: string; week: string }) {
   const { renderToString } = await import('react-dom/server');
 
   const user = await prisma.scout.findUniqueOrThrow({
@@ -91,7 +91,7 @@ export async function createUserClaimScreen(userId: string) {
     const screenshot = await page.screenshot();
 
     await uploadFileToS3({
-      pathInS3: `points-claim/${userId}/${getLastWeek()}.png`,
+      pathInS3: `points-claim/${userId}/${week}.png`,
       bucket: process.env.S3_UPLOAD_BUCKET,
       content: screenshot as Buffer,
       contentType: 'image/png'
