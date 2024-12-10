@@ -32,14 +32,19 @@ export async function getPaginatedBuilders({
         },
         week
       },
-      orderBy: {
-        rank: 'asc'
-      },
+      orderBy: [
+        {
+          rank: 'asc'
+        },
+        {
+          userId: 'asc'
+        }
+      ],
       skip: cursor ? 1 : 0,
       take: limit,
       cursor: cursor
         ? {
-            rank: cursor.rank,
+            rank: cursor.rank === -1 ? null : cursor.rank,
             userId_week: {
               userId: cursor.userId,
               week
