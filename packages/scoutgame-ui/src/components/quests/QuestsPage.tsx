@@ -19,32 +19,22 @@ export function QuestsPage({
   friends: SessionUser[];
 }) {
   return (
-    <Box
-      sx={{
-        backgroundImage: 'url(/images/backgrounds/star-bg.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        height: '100%'
-      }}
-    >
-      <Grid container spacing={1} data-test='quest-page' minHeight='100%'>
-        <Grid size={{ xs: 12, md: 8 }}>
-          <Box maxWidth='500px' margin='0 auto'>
-            <Box sx={{ px: 5 }}>
-              <DailyClaimGallery dailyClaims={dailyClaims} />
-            </Box>
-            <Box sx={{ px: 1, mb: 2 }}>
-              <QuestsList quests={quests} friends={friends} />
-            </Box>
+    <Grid container spacing={1} data-test='quest-page' minHeight='100%'>
+      <Grid size={{ xs: 12, md: 8 }}>
+        <Box maxWidth='500px' margin='0 auto'>
+          <Box sx={{ px: 5 }}>
+            <DailyClaimGallery dailyClaims={dailyClaims} />
           </Box>
-        </Grid>
-        <Grid size={{ xs: 0, md: 4 }} data-test='quest-sidebar'>
-          <Hidden mdDown height='100%' bgcolor='black.main' px={1}>
-            <FriendlyQuest friends={friends} title='Friendly Quest' />
-          </Hidden>
-        </Grid>
+          <Box sx={{ px: 1, mb: 2 }}>
+            <QuestsList quests={quests} friends={friends} />
+          </Box>
+        </Box>
       </Grid>
-    </Box>
+      <Grid size={{ xs: 0, md: 4 }} data-test='quest-sidebar'>
+        <Hidden mdDown height='100%' bgcolor='black.main' px={1} borderLeft='4px solid' borderColor='background.light'>
+          <FriendlyQuest friends={friends} title='Friendly Quest' />
+        </Hidden>
+      </Grid>
+    </Grid>
   );
 }

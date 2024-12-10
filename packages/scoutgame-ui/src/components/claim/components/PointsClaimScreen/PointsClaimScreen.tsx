@@ -60,7 +60,6 @@ export function PointsClaimScreen({
         padding: 4,
         borderRadius: 2,
         display: 'flex',
-        backgroundColor: 'background.dark',
         width: '100%',
         alignItems: 'center',
         justifyContent: 'center',

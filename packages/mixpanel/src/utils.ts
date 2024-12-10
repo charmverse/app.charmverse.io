@@ -45,7 +45,7 @@ export function getUTMParamsFromSearch(searchString: string): UTMParams | undefi
   };
 }
 
-const platform = env('SCOUTGAME_PLATFORM') || process.env.REACT_APP_SCOUTGAME_PLATFORM;
+const platform = env('SCOUTGAME_PLATFORM') || process.env.REACT_APP_SCOUTGAME_PLATFORM || 'webapp';
 
 function isPlatform(_platform: string = ''): _platform is ReferralPlatform {
   const availablePlatforms = Object.values(ReferralPlatform);
