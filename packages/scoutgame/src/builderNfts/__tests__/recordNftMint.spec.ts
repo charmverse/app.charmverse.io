@@ -94,6 +94,7 @@ describe('recordNftMint', () => {
       amount,
       builderPath: builder.path,
       paidWithPoints: true,
+      nftType: builderNft.nftType,
       season: builderNft.season
     });
 

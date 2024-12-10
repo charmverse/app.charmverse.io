@@ -2,6 +2,7 @@
 
 import type { BuilderStatus } from '@charmverse/core/prisma';
 import { LoadingButton } from '@mui/lab';
+import { Button, Typography, useTheme } from '@mui/material';
 import { convertCostToPoints } from '@packages/scoutgame/builderNfts/utils';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
@@ -23,10 +24,13 @@ const NFTPurchaseDialog = dynamic(
 );
 
 export function ScoutButton({
-  builder
+  builder,
+  disableStarterCardPoints = false
 }: {
   builder: NFTPurchaseProps['builder'] & { builderStatus: BuilderStatus | null };
+  disableStarterCardPoints?: boolean;
 }) {
+  const theme = useTheme();
   const trackEvent = useTrackEvent();
   const [isPurchasing, setIsPurchasing] = useState<boolean>(false);
   const [authPopup, setAuthPopup] = useState<boolean>(false);
@@ -57,23 +61,30 @@ export function ScoutButton({
   return (
     <div>
       <DynamicLoadingContext.Provider value={setDialogLoadingStatus}>
-        <LoadingButton
-          loading={dialogLoadingStatus}
-          fullWidth
-          onClick={handleClick}
-          // @ts-ignore
-          variant='buy'
-          data-test={isLoading ? '' : 'scout-button'}
-        >
-          {purchaseCostInPoints}
-          <Image
-            src='/images/profile/scout-game-blue-icon.svg'
-            alt='Scout game points'
-            width={21}
-            height={12}
-            style={{ marginLeft: 4, marginRight: 4 }}
-          />
-        </LoadingButton>
+        {builder.nftType === 'starter_pack' && disableStarterCardPoints ? (
+          <Button variant='outlined' fullWidth disabled>
+            Starter Card
+          </Button>
+        ) : (
+          <LoadingButton
+            loading={dialogLoadingStatus}
+            fullWidth
+            onClick={handleClick}
+            disabled={builder.nftType === 'starter_pack' && disableStarterCardPoints}
+            data-test={isLoading ? '' : 'scout-button'}
+            variant='buy'
+          >
+            {purchaseCostInPoints}
+            <Image
+              src='/images/profile/scout-game-blue-icon.svg'
+              alt='Scout game points'
+              width={21}
+              height={12}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          </LoadingButton>
+        )}
+
         {isPurchasing && (
           <NFTPurchaseDialog
             open
@@ -83,6 +94,7 @@ export function ScoutButton({
             builder={builder}
           />
         )}
+
         <SignInModalMessage open={authPopup} onClose={() => setAuthPopup(false)} path={`/u/${builder.path}`} />
       </DynamicLoadingContext.Provider>
     </div>

@@ -16,7 +16,8 @@ export function BuilderCard({
   hideDetails = false,
   showHotIcon = false,
   size = 'medium',
-  disableProfileUrl = false
+  disableProfileUrl = false,
+  disableStarterCardPoints = false
 }: {
   size?: 'x-small' | 'small' | 'medium' | 'large';
   builder: Omit<Partial<BuilderInfo>, RequiredBuilderInfoFields> & Pick<BuilderInfo, RequiredBuilderInfoFields>;
@@ -24,6 +25,7 @@ export function BuilderCard({
   showPurchaseButton?: boolean;
   showHotIcon?: boolean;
   disableProfileUrl?: boolean;
+  disableStarterCardPoints?: boolean;
 }) {
   return (
     <Card
@@ -51,7 +53,7 @@ export function BuilderCard({
       </BuilderCardNftDisplay>
       {typeof builder.price !== 'undefined' && showPurchaseButton && (
         <Stack px={{ xs: 1, md: 0 }} pt={{ xs: 1, md: 2 }} pb={{ xs: 1, md: 0 }}>
-          <ScoutButton builder={builder} />
+          <ScoutButton builder={builder} disableStarterCardPoints={disableStarterCardPoints} />
         </Stack>
       )}
     </Card>

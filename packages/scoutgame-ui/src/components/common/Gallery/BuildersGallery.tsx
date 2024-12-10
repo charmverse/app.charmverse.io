@@ -7,12 +7,14 @@ export function BuildersGallery({
   builders,
   columns = 6,
   showHotIcon = false,
-  size = 'medium'
+  size = 'medium',
+  disableStarterCardPoints = false
 }: {
   builders: BuilderInfo[];
   columns?: number;
   showHotIcon?: boolean;
   size?: 'small' | 'medium' | 'large';
+  disableStarterCardPoints?: boolean;
 }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -29,7 +31,13 @@ export function BuildersGallery({
                   X {builder.nftsSoldToScout ?? 0}
                 </Typography>
               )}
-              <BuilderCard builder={builder} showPurchaseButton showHotIcon={showHotIcon} size={size} />
+              <BuilderCard
+                builder={builder}
+                showPurchaseButton
+                showHotIcon={showHotIcon}
+                size={size}
+                disableStarterCardPoints={disableStarterCardPoints}
+              />
             </Box>
           </Grid>
         ))}
