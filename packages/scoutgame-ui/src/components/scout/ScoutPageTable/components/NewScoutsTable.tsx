@@ -43,16 +43,12 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
           }}
         >
           <CommonTableRow>
-            <TableCell align='center' sx={{ width: '20%' }}>
-              RANK
-            </TableCell>
-            <TableCell align='left' sx={{ width: '20%' }}>
-              SCOUT
-            </TableCell>
-            <TableCell align='center' sx={{ width: '15%', display: { xs: 'none', md: 'table-cell' } }}>
+            <TableCell align='center'>RANK</TableCell>
+            <TableCell align='left'>SCOUT</TableCell>
+            <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               SCOUTED
             </TableCell>
-            <TableCell align='center' sx={{ width: '15%', display: { xs: 'none', md: 'table-cell' } }}>
+            <TableCell align='center' sx={{ display: { xs: 'none', md: 'table-cell' } }}>
               CARDS HELD
             </TableCell>
             <TableCell align='right' sx={{ width: '60%' }}>
@@ -90,7 +86,7 @@ export function NewScoutsTable({ scouts }: { scouts: NewScout[] }) {
                   alignItems='center'
                   flexDirection='row'
                   gap={1}
-                  maxWidth={{ xs: '140px', md: 'initial' }}
+                  maxWidth={{ xs: '150px', md: '135px' }}
                 >
                   <Avatar src={scout.avatar} name={scout.displayName} size='small' />
                   <TableCellText noWrap>{scout.displayName}</TableCellText>

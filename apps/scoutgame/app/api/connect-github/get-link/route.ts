@@ -1,7 +1,6 @@
 import { getGithubOAuthCallbackUrl } from '@packages/github/oauth';
 import { getSession } from '@packages/scoutgame/session/getSession';
-import { authSecret } from '@root/config/constants';
-import { GITHUB_CLIENT_ID } from '@root/lib/github/constants';
+import { authSecret, GITHUB_CLIENT_ID } from '@packages/utils/constants';
 import { sealData } from 'iron-session';
 import type { NextRequest } from 'next/server';
 

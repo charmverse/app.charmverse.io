@@ -28,8 +28,7 @@ export async function BuilderRewardsTableContainer({ week }: { week: string | nu
           flexDirection: 'column',
           mt: 0,
           justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'background.dark'
+          alignItems: 'center'
         }}
       >
         <Typography>Time to scout some Builders!</Typography>

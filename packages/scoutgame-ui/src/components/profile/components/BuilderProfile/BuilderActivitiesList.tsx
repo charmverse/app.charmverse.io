@@ -10,16 +10,24 @@ import { LuBookMarked } from 'react-icons/lu';
 
 import { GemsIcon } from '../../../common/Icons';
 
-export function getActivityLabel(activity: BuilderActivity) {
+export function getActivityLabel(activity: BuilderActivity, shorten = false) {
   return activity.type === 'github_event'
     ? activity.contributionType === 'first_pr'
-      ? 'First contribution!'
+      ? shorten
+        ? 'First PR!'
+        : 'First contribution!'
       : activity.contributionType === 'regular_pr'
-        ? 'Contribution accepted!'
+        ? shorten
+          ? 'Regular PR!'
+          : 'Contribution accepted!'
         : activity.contributionType === 'third_pr_in_streak'
-          ? 'Contribution streak!'
+          ? shorten
+            ? 'PR Streak!'
+            : 'Contribution streak!'
           : activity.contributionType === 'daily_commit'
-            ? 'Daily commit!'
+            ? shorten
+              ? 'Commit!'
+              : 'Daily commit!'
             : null
     : activity.type === 'nft_purchase'
       ? 'Scouted by'
@@ -44,17 +52,21 @@ export function BuilderActivityDetail({ activity }: { activity: BuilderActivity 
 
 export function BuilderActivityGems({
   activity,
-  showEmpty = false
+  showEmpty = false,
+  size = 'medium'
 }: {
   activity: BuilderActivity;
   showEmpty?: boolean;
+  size?: 'small' | 'medium';
 }) {
   return (
     <Stack component='span' flexDirection='row' gap={0.5} alignItems='center'>
       {activity.type === 'github_event' ? (
         <>
-          <Typography component='span'>+{activity.gems}</Typography>
-          <GemsIcon />
+          <Typography component='span' variant={size === 'small' ? 'body2' : 'body1'}>
+            +{activity.gems}
+          </Typography>
+          <GemsIcon size={size === 'small' ? 16 : 20} />
         </>
       ) : showEmpty ? (
         '-'

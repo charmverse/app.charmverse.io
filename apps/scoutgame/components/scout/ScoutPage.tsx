@@ -1,6 +1,7 @@
 import AppsIcon from '@mui/icons-material/Apps';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import type { StarterPackBuilder } from '@packages/scoutgame/builders/getStarterPackBuilders';
 import type { BuilderInfo } from '@packages/scoutgame/builders/interfaces';
 import { HeaderMessage } from '@packages/scoutgame-ui/components/common/Header/HeaderMessage';
 import { TabsMenu, type TabItem } from '@packages/scoutgame-ui/components/common/Tabs/TabsMenu';
@@ -34,7 +35,8 @@ export function ScoutPage({
   buildersLayout,
   tab,
   starterpackBuilders,
-  remainingStarterCards
+  remainingStarterCards,
+  userId
 }: {
   scoutSort: string;
   builderSort: string;
@@ -43,8 +45,9 @@ export function ScoutPage({
   scoutTab: string;
   buildersLayout: string;
   tab: string;
-  starterpackBuilders: BuilderInfo[];
+  starterpackBuilders: StarterPackBuilder[];
   remainingStarterCards?: number;
+  userId?: string;
 }) {
   const urlString = Object.entries({ tab, scoutSort, builderSort, scoutOrder, builderOrder })
     .filter(([, value]) => isTruthy(value))
@@ -56,7 +59,6 @@ export function ScoutPage({
       <HeaderMessage />
       <Grid
         container
-        spacing={1}
         height={{
           md: 'calc(100vh - 100px)',
           xs: 'calc(100vh - 160px)'
@@ -68,7 +70,7 @@ export function ScoutPage({
           sx={{
             height: '100%',
             overflowX: 'hidden',
-            p: 2,
+            p: 1,
             gap: 2
           }}
         >
@@ -148,7 +150,13 @@ export function ScoutPage({
         </Grid>
         <Grid
           size={4}
-          sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}
+          sx={{
+            height: '100%',
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            display: { xs: 'none', md: 'block' },
+            px: 1
+          }}
         >
           <Box sx={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'background.default' }}>
             <TabsMenu value={scoutTab} tabs={scoutTabOptions} queryKey='scoutTab' />

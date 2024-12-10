@@ -8,13 +8,13 @@ export function BuildersGallery({
   columns = 6,
   showHotIcon = false,
   size = 'medium',
-  disableStarterCardPoints = false
+  markStarterCardPurchased = false
 }: {
   builders: BuilderInfo[];
   columns?: number;
   showHotIcon?: boolean;
   size?: 'small' | 'medium' | 'large';
-  disableStarterCardPoints?: boolean;
+  markStarterCardPurchased?: boolean;
 }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -36,7 +36,7 @@ export function BuildersGallery({
                 showPurchaseButton
                 showHotIcon={showHotIcon}
                 size={size}
-                disableStarterCardPoints={disableStarterCardPoints}
+                markStarterCardPurchased={markStarterCardPurchased}
               />
             </Box>
           </Grid>
