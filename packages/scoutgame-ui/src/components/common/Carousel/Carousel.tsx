@@ -88,7 +88,12 @@ export function Carousel({
             : undefined
         }
         {...swiperProps}
-        style={{ width: '100%', ...swiperProps.style, minHeight: isDesktop ? undefined : mobileMinHeight }}
+        style={{
+          width: '100%',
+          ...swiperProps.style,
+          minHeight: isDesktop ? undefined : mobileMinHeight,
+          zIndex: 'initial'
+        }}
       >
         {children.map((child, index) => (
           <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
