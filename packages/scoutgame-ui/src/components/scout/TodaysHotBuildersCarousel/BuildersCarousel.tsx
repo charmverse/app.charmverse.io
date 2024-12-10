@@ -79,6 +79,7 @@ export function BuildersCarousel({
       slidesPerView={slidesPerView}
       boxProps={{ width: { xs: '100%', md: '90%' }, margin: '0 auto' }}
       showMobileNavigationArrows
+      autoplay
     >
       {builderCards}
     </Carousel>

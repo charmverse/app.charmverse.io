@@ -31,6 +31,7 @@ export function Carousel({
   renderBullet,
   boxProps,
   mobileMinHeight,
+  autoplay,
   showMobileNavigationArrows,
   ...swiperProps
 }: CarouselProps) {
@@ -63,12 +64,12 @@ export function Carousel({
     >
       <Swiper
         autoplay={
-          swiperProps.autoplay
+          typeof autoplay === 'boolean'
             ? {
                 delay: 3000,
                 pauseOnMouseEnter: true
               }
-            : undefined
+            : autoplay || undefined
         }
         loop
         className='swiper'
