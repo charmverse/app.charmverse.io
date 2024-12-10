@@ -90,9 +90,9 @@ export function Carousel({
         {...swiperProps}
         style={{
           width: '100%',
-          ...swiperProps.style,
           minHeight: isDesktop ? undefined : mobileMinHeight,
-          zIndex: '0'
+          zIndex: 0,
+          ...swiperProps.style
         }}
       >
         {children.map((child, index) => (
@@ -110,8 +110,8 @@ export function Carousel({
         swiperProps.slidesPerView &&
         children.length > swiperProps.slidesPerView && (
           <>
-            <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
-            <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
+            <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ height: '100px' }} />
+            <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ height: '100px' }} />
           </>
         )}
     </Box>
