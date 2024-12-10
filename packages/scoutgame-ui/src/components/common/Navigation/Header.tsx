@@ -138,7 +138,7 @@ export function Header() {
                       onClose={handleCloseUserMenu}
                       onClick={handleCloseUserMenu}
                     >
-                      <MenuItem>
+                      <MenuItem data-test='user-profile-button'>
                         <Link href='/profile'>{user.displayName}</Link>
                       </MenuItem>
                       {platform === 'webapp' && (
