@@ -3,10 +3,12 @@
 import { log } from '@charmverse/core/log';
 import InfoIcon from '@mui/icons-material/Info';
 import { Box, Container, Menu, MenuItem, Toolbar, AppBar, Button, Typography, Stack, IconButton } from '@mui/material';
+import { getPlatform } from '@packages/mixpanel/utils';
 import { revalidatePathAction } from '@packages/scoutgame/actions/revalidatePathAction';
 import { logoutAction } from '@packages/scoutgame/session/logoutAction';
 import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
 import { Hidden } from '@packages/scoutgame-ui/components/common/Hidden';
+import { SiteNavigation } from '@packages/scoutgame-ui/components/common/Navigation/SiteNavigation';
 import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -15,10 +17,9 @@ import { useAction } from 'next-safe-action/hooks';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { SiteNavigation } from 'components/common/SiteNavigation';
-
 export function Header() {
   const router = useRouter();
+  const platform = getPlatform();
   const { user, refreshUser } = useUser();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -137,12 +138,14 @@ export function Header() {
                       onClose={handleCloseUserMenu}
                       onClick={handleCloseUserMenu}
                     >
-                      <MenuItem>
+                      <MenuItem data-test='user-profile-button'>
                         <Link href='/profile'>{user.displayName}</Link>
                       </MenuItem>
-                      <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
-                        Sign Out
-                      </MenuItem>
+                      {platform === 'webapp' && (
+                        <MenuItem onClick={() => logoutUser()} data-test='sign-out-button'>
+                          Sign Out
+                        </MenuItem>
+                      )}
                       {/* <InstallAppMenuItem>Install</InstallAppMenuItem> */}
                     </Menu>
                   </Box>
@@ -154,9 +157,11 @@ export function Header() {
                       <InfoIcon color='secondary' />
                     </IconButton>
                   </Link>
-                  <Button variant='gradient' href='/login' data-test='sign-in-button'>
-                    Sign in
-                  </Button>
+                  {platform === 'webapp' && (
+                    <Button variant='gradient' href='/login' data-test='sign-in-button'>
+                      Sign in
+                    </Button>
+                  )}
                 </>
               )}
             </Stack>

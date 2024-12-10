@@ -19,8 +19,13 @@ test.describe('Profile page', () => {
     await utils.loginAsUserId(builder.id);
 
     await page.goto('/scout');
-    const link = page.locator(`data-test=site-navigation >> [href*="/profile"]`).first();
-    await link.click();
+
+    const userPill = page.locator('data-test=user-menu-pill');
+    await expect(userPill).toBeVisible();
+    await userPill.click();
+    const profileButton = page.locator('data-test=user-profile-button');
+    await expect(profileButton).toBeVisible();
+    await profileButton.click();
 
     // Logged in user should be redirected
     await page.waitForURL('**/profile*');
