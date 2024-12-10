@@ -10,16 +10,24 @@ import { LuBookMarked } from 'react-icons/lu';
 
 import { GemsIcon } from '../../../common/Icons';
 
-export function getActivityLabel(activity: BuilderActivity) {
+export function getActivityLabel(activity: BuilderActivity, shorten = false) {
   return activity.type === 'github_event'
     ? activity.contributionType === 'first_pr'
-      ? 'First contribution!'
+      ? shorten
+        ? 'First PR!'
+        : 'First contribution!'
       : activity.contributionType === 'regular_pr'
-        ? 'Contribution accepted!'
+        ? shorten
+          ? 'Regular PR!'
+          : 'Contribution accepted!'
         : activity.contributionType === 'third_pr_in_streak'
-          ? 'Contribution streak!'
+          ? shorten
+            ? 'PR Streak!'
+            : 'Contribution streak!'
           : activity.contributionType === 'daily_commit'
-            ? 'Daily commit!'
+            ? shorten
+              ? 'Commit!'
+              : 'Daily commit!'
             : null
     : activity.type === 'nft_purchase'
       ? 'Scouted by'

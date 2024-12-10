@@ -26,7 +26,7 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
           xs: 'calc(100vh - 165px)'
         }}
       >
-        <Grid size={{ xs: 12, md: 7 }} sx={{ height: '100%', overflowX: 'hidden', px: 1, gap: 2 }}>
+        <Grid size={{ xs: 12, md: 8 }} sx={{ height: '100%', overflowX: 'hidden', px: 1, gap: 2 }}>
           <Stack
             height={{ xs: 180, md: 350 }}
             sx={{
@@ -59,7 +59,7 @@ export function BuildersPage({ week, tab }: { week: string; tab: string }) {
             </Suspense>
           </Stack>
         </Grid>
-        <Grid size={5} sx={{ pr: 1, height: '100%', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}>
+        <Grid size={4} sx={{ pr: 1, height: '100%', overflowX: 'hidden', display: { xs: 'none', md: 'block' } }}>
           <Stack sx={{ display: { xs: 'none', md: 'block' } }}>
             <BuilderPageInviteCard />
           </Stack>
