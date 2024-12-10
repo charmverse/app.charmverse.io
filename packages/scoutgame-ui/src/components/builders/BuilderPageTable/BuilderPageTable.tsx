@@ -1,9 +1,8 @@
 import 'server-only';
 
 import { getBuilderActivities } from '@packages/scoutgame/builders/getBuilderActivities';
+import { getLeaderboard } from '@packages/scoutgame/builders/getLeaderboard';
 import { safeAwaitSSRData } from '@packages/scoutgame/utils/async';
-
-import { getLeaderboard } from 'lib/builders/getLeaderboard';
 
 import { ActivityTable } from './components/ActivityTable';
 import { LeaderboardTable } from './components/LeaderboardTable';

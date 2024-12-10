@@ -1,10 +1,11 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { Carousel } from '@packages/scoutgame-ui/components/common/Carousel/Carousel';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
 import Image from 'next/image';
 import Link from 'next/link';
+
+import { useMdScreen } from '../../../hooks/useMediaScreens';
+import { Carousel } from '../../common/Carousel/Carousel';
 
 const partnerInfos = [
   { logo: 'talent.jpg', name: 'talent', infoPath: 'talent-protocol' },
@@ -56,6 +57,7 @@ export function PartnerRewardsCarousel() {
       <Carousel
         height={isDesktop ? 300 : 145}
         slidesPerView={1}
+        autoplay
         renderBullet={(index, className) =>
           `<img src="/images/crypto/${partnerInfos[index].logo}" class="${className}"/>`
         }

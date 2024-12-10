@@ -88,7 +88,12 @@ export function Carousel({
             : undefined
         }
         {...swiperProps}
-        style={{ width: '100%', ...swiperProps.style, minHeight: isDesktop ? undefined : mobileMinHeight }}
+        style={{
+          width: '100%',
+          minHeight: isDesktop ? undefined : mobileMinHeight,
+          zIndex: 0,
+          ...swiperProps.style
+        }}
       >
         {children.map((child, index) => (
           <SwiperSlide key={`${index.toString()}`}>{child}</SwiperSlide>
@@ -105,8 +110,8 @@ export function Carousel({
         swiperProps.slidesPerView &&
         children.length > swiperProps.slidesPerView && (
           <>
-            <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
-            <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ zIndex: 1, height: '100px' }} />
+            <NextArrow className={(nextButtonId as string).replace('.', '')} style={{ height: '100px' }} />
+            <PrevArrow className={(prevButtonId as string).replace('.', '')} style={{ height: '100px' }} />
           </>
         )}
     </Box>

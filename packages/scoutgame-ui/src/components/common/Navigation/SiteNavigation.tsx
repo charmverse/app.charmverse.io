@@ -78,15 +78,13 @@ export function SiteNavigation({ topNav }: { topNav?: boolean }) {
           icon={<ScoutIcon size='24px' />}
           LinkComponent={Link}
         />
-        {platform === 'webapp' && (
-          <BottomNavigationAction
-            label='Builders'
-            href='/builders'
-            value='builders'
-            icon={<BuilderIcon />}
-            LinkComponent={Link}
-          />
-        )}
+        <BottomNavigationAction
+          label='Builders'
+          href='/builders'
+          value='builders'
+          icon={<BuilderIcon />}
+          LinkComponent={Link}
+        />
         <BottomNavigationAction
           LinkComponent={Link}
           label='Claim'

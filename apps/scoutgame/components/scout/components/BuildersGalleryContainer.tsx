@@ -77,10 +77,10 @@ export function BuildersGalleryContainer({
   return (
     <>
       <BuildersGallery builders={builders} showHotIcon={showHotIcon} size={isDesktop ? 'large' : 'small'} columns={3} />
-      {nextCursor && <div ref={observerTarget} style={{ height: '20px', width: '100%' }} />}
+      {nextCursor && <div ref={observerTarget} style={{ height: '50px', width: '100%' }} />}
       {isLoading && (
         <Box my={2}>
-          <LoadingCards />
+          <LoadingCards count={3} />
         </Box>
       )}
       {error && <Alert severity='error'>{error}</Alert>}

@@ -5,19 +5,20 @@ import TableCell from '@mui/material/TableCell';
 import type { BonusPartner } from '@packages/scoutgame/bonus';
 import { bonusPartnersRecord } from '@packages/scoutgame/bonus';
 import type { BuilderActivity } from '@packages/scoutgame/builders/getBuilderActivities';
-import { Avatar } from '@packages/scoutgame-ui/components/common/Avatar';
-import { Hidden } from '@packages/scoutgame-ui/components/common/Hidden';
-import { GemsIcon } from '@packages/scoutgame-ui/components/common/Icons';
-import {
-  BuilderActivityGems,
-  getActivityLabel
-} from '@packages/scoutgame-ui/components/profile/components/BuilderProfile/BuilderActivitiesList';
-import { secondaryTextColorDarkMode } from '@packages/scoutgame-ui/theme/colors.ts';
 import { getRelativeTime } from '@packages/utils/dates';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BiLike } from 'react-icons/bi';
 import { LuBookMarked } from 'react-icons/lu';
+
+import { secondaryTextColorDarkMode } from '../../../../theme/colors';
+import { Avatar } from '../../../common/Avatar';
+import { Hidden } from '../../../common/Hidden';
+import { GemsIcon } from '../../../common/Icons';
+import {
+  BuilderActivityGems,
+  getActivityLabel
+} from '../../../profile/components/BuilderProfile/BuilderActivitiesList';
 
 import { CommonTableRow } from './CommonTableRow';
 import { TableCellText } from './TableCellText';

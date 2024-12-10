@@ -1,13 +1,13 @@
 'use client';
 
 import { Button, Divider, List, ListItem, ListItemText, Paper, Stack, Typography } from '@mui/material';
-import { JoinGithubButton } from '@packages/scoutgame-ui/components/common/JoinGithubButton';
-import { useMdScreen } from '@packages/scoutgame-ui/hooks/useMediaScreens';
-import { useUser } from '@packages/scoutgame-ui/providers/UserProvider';
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { Dialog } from 'components/common/Dialog';
+import { useMdScreen } from '../../../hooks/useMediaScreens';
+import { useUser } from '../../../providers/UserProvider';
+import { Dialog } from '../../common/Dialog';
+import { JoinGithubButton } from '../../common/JoinGithubButton';
 
 function InviteModal({ open, onClose, signedIn }: { open: boolean; onClose: () => void; signedIn: boolean }) {
   return (

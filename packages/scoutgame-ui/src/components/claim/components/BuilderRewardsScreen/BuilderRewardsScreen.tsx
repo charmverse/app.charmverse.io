@@ -1,6 +1,6 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { IconButton, Paper, Stack, Typography } from '@mui/material';
+import { IconButton, Stack, Typography } from '@mui/material';
 import {
   getLastWeek,
   currentSeason,
@@ -12,8 +12,8 @@ import {
 import Link from 'next/link';
 import { Suspense } from 'react';
 
+import { LoadingTable } from '../../../common/Loading/LoadingTable';
 import { TabsMenu } from '../../../common/Tabs/TabsMenu';
-import { LoadingTable } from '../common/LoadingTable';
 
 import { BuilderRewardsTableContainer } from './BuilderRewardsTableContainer';
 
