@@ -331,6 +331,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@jest/globals": "^29.7.0",
     "@next/eslint-plugin-next": "^14.2.15",
+    "@octokit/plugin-throttling": "^9.3.2",
     "@playwright/test": "^1.47.1",
     "@spruceid/siwe-parser": "^2.0.2",
     "@storybook/addon-essentials": "^8.4.6",

@@ -34,7 +34,6 @@
       "@packages/farcaster/*": ["./packages/farcaster/src/*"],
       "@packages/aws/*": ["./packages/aws/src/*"],
       "@packages/blockchain/*": ["./packages/blockchain/src/*"],
-      "@packages/scoutgame/*": ["./packages/scoutgame/src/*"],
       "@packages/testing/*": ["./packages/testing/src/*"],
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
