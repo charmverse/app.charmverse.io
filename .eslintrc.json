@@ -81,17 +81,11 @@
           "./@connect-shared",
           "./apps/cron/",
           "./apps/farcaster/",
-          "./apps/scoutgame/",
-          "./apps/scoutgametelegram/",
-          "./apps/scoutgamecron/",
           "./apps/sunnyawards/",
-          "./apps/waitlist/",
           "./apps/websockets/",
           "./apps/ceramic/",
           "./packages/charmeditor/",
           "./packages/github/",
-          "./packages/scoutgame/",
-          "./packages/scoutgame-ui/",
           "./packages/testing/",
           "./packages/utils/"
         ]
