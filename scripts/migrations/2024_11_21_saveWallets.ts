@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { getFarcasterUserById } from '@packages/farcaster/getFarcasterUserById';
 import { getOnchainEvents } from '@packages/scoutgame/builderNfts/getOnchainPurchaseEvents';

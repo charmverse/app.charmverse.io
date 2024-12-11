@@ -1,10 +1,11 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { currentSeason } from '@packages/scoutgame/dates';
 
 async function refreshBuildersNftSoldStat() {
   const builderNfts = await prisma.builderNft.findMany({
     orderBy: {
-      createdAt: 'desc',
+      createdAt: 'desc'
     },
     where: {
       nftSoldEvents: {

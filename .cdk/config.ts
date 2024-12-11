@@ -41,24 +41,6 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       sslCert: sunnyCert
     }
   },
-  scoutgame: {
-    prd: {
-      sslCert: scoutgameCert
-    }
-  },
-  scoutgamecron: {
-    prd: {
-      environmentTier: 'Worker'
-    },
-    stg: {
-      environmentTier: 'Worker'
-    }
-  },
-  waitlist: {
-    prd: {
-      sslCert: scoutgameCert
-    }
-  },
   webapp: {
     prd: {
       sslCert: charmverseCert,
@@ -69,11 +51,6 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
     prd: {
       sslCert: charmverseCert,
       instanceType: 't3.medium'
-    }
-  },
-  scoutgametelegram: {
-    prd: {
-      sslCert: scoutgameCert
     }
   }
 };
