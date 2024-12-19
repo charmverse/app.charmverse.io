@@ -1,6 +1,6 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma';
-import type { FormFieldValue } from '@root/lib/forms/interfaces';
 import * as constants from '@root/lib/projects/formField';
+import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { isTruthy } from '@root/lib/utils/types';
 
 type PropertiesMap = Record<string, FormFieldValue>;

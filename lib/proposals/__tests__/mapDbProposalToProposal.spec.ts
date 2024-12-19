@@ -6,7 +6,6 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 import { mapDbProposalToProposal } from '../mapDbProposalToProposal';
-import type { ProposalToMap } from '../mapDbProposalToProposal';
 
 describe('mapDbProposalToProposal', () => {
   it('Includes rubric reviews when share reviews is enabled', async () => {
@@ -94,9 +93,11 @@ describe('mapDbProposalToProposal', () => {
     });
 
     const mapped = mapDbProposalToProposal({
-      proposal: proposal as any as ProposalToMap,
+      proposal: proposal as any,
       workflow: null,
-      permissions: mockPermissions
+      permissionsByStep: {
+        draft: mockPermissions
+      }
     });
 
     // New form should be created since we are duplicating a proposal template

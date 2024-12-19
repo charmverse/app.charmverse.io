@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { createForm } from 'lib/forms/createForm';
+import { createForm } from '@root/lib/proposals/forms/createForm';
 import { v4 } from 'uuid';
 
 async function splitStructuredProposalForms() {

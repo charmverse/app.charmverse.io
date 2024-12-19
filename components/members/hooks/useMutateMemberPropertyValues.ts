@@ -1,4 +1,4 @@
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import charmClient from 'charmClient';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';

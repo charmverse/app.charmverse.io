@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { writeFileSync } from 'fs';
 import { stringify } from 'csv-stringify/sync';
-import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
+import type { FormFieldValue, LongTextValue } from '@root/lib/proposals/forms/interfaces';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from 'lib/utils/types';
 

@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import { getAllMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
 import { getSpaceMembers } from '@root/lib/members/getSpaceMembers';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 

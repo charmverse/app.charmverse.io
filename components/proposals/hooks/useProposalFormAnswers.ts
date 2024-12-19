@@ -1,11 +1,10 @@
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType, ProjectFieldValue, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { useCallback, useMemo, useEffect } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -19,17 +18,19 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   const formFields = useMemo(
     () =>
       answers &&
-      proposal?.form?.formFields?.map((formField) => {
-        const proposalFormFieldAnswer = answers.find(
-          (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-        );
-        return {
-          ...formField,
-          formFieldAnswerId: proposalFormFieldAnswer?.id,
-          value: proposalFormFieldAnswer?.value as FormFieldValue,
-          options: (formField.options ?? []) as SelectOptionType[]
-        };
-      }),
+      proposal?.form?.formFields
+        ?.filter((formField) => !formField.isHiddenByDependency)
+        .map((formField) => {
+          const proposalFormFieldAnswer = answers.find(
+            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+          );
+          return {
+            ...formField,
+            formFieldAnswerId: proposalFormFieldAnswer?.id,
+            value: proposalFormFieldAnswer?.value as FormFieldValue,
+            options: (formField.options ?? []) as SelectOptionType[]
+          };
+        }),
     [!!proposal?.form?.formFields, !!answers, proposal?.id]
   );
 

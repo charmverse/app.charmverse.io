@@ -1,13 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createForm } from '@root/lib/forms/createForm';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
-import { upsertProposalFormAnswers } from '@root/lib/forms/upsertProposalFormAnswers';
 import { v4 } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
+
+import { createForm } from '../createForm';
+import type { FormFieldInput } from '../interfaces';
+import { upsertProposalFormAnswers } from '../upsertProposalFormAnswers';
 
 describe('upsertFormAnswers', () => {
   let proposal: Awaited<ReturnType<typeof generateProposal>>;
@@ -40,7 +41,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -51,7 +53,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
@@ -109,7 +112,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -120,7 +124,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
@@ -166,7 +171,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -177,7 +183,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
@@ -240,7 +247,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -251,7 +259,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
@@ -294,7 +303,8 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 

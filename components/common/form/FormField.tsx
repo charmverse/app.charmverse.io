@@ -1,7 +1,7 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Edit, EditOff, MoreHoriz } from '@mui/icons-material';
+import { Edit, EditOff, MoreHoriz, Close as CloseIcon } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -19,13 +19,12 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -44,6 +43,7 @@ import {
   nonPrivateFieldTypes
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+import { FieldWrapper } from './fields/FieldWrapper';
 import { isWalletConfig } from './fields/utils';
 
 export const FormFieldContainer = styled(Stack, {
@@ -77,6 +77,7 @@ export interface FormFieldProps {
   onUpdateOption?: (option: SelectOptionType) => void;
   shouldFocus?: boolean;
   formFieldTypeFrequencyCount?: Record<FormFieldType, number>;
+  evaluations: { id: string; title: string }[];
 }
 
 function ExpandedFormField({
@@ -88,7 +89,8 @@ function ExpandedFormField({
   onDeleteOption,
   onUpdateOption,
   shouldFocus,
-  formFieldTypeFrequencyCount
+  formFieldTypeFrequencyCount,
+  evaluations
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
@@ -273,6 +275,71 @@ function ExpandedFormField({
           />
           <Typography>Private (Authors & Reviewers can view)</Typography>
         </Stack>
+      )}
+      <Divider
+        sx={{
+          my: 1
+        }}
+      />
+
+      {evaluations.length > 0 && (
+        <FieldWrapper label='Workflow step'>
+          <Select<number | null>
+            data-test='form-field-dependency-select'
+            displayEmpty
+            value={formField.dependsOnStepIndex}
+            onChange={(e, value) => {
+              updateFormField({
+                dependsOnStepIndex: e.target.value as number,
+                id: formField.id
+              });
+            }}
+            sx={{
+              width: 'fit-content'
+            }}
+            variant='outlined'
+            IconComponent={
+              formField.dependsOnStepIndex
+                ? // eslint-disable-next-line react/no-unstable-nested-components
+                  () => (
+                    <IconButton
+                      size='small'
+                      color='secondary'
+                      onClick={() => {
+                        updateFormField({
+                          dependsOnStepIndex: null,
+                          id: formField.id
+                        });
+                      }}
+                      sx={{ mr: 1 }}
+                    >
+                      <CloseIcon fontSize='small' />
+                    </IconButton>
+                  )
+                : undefined
+            }
+            renderValue={(value) => {
+              if (value === null) {
+                return (
+                  <Typography component='em' color='secondary'>
+                    Do not require a step
+                  </Typography>
+                );
+              }
+              return evaluations[value]?.title;
+            }}
+          >
+            {evaluations.map((evaluation, index) => {
+              return (
+                <MenuItem data-test={`form-field-dependency-option-${evaluation.id}`} key={evaluation.id} value={index}>
+                  <Stack flexDirection='row' gap={1} alignItems='center'>
+                    {index + 1}. {evaluation.title}
+                  </Stack>
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FieldWrapper>
       )}
     </>
   );

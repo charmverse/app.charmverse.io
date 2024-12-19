@@ -1,5 +1,5 @@
 import { uniq } from 'lodash';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
+import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertProposalFormAnswers';
 
 import { charmValue, getProposals, findProposalMatch } from './utils';
 import { getProjectsFromFile, applicationsFile, fieldIds } from './data';

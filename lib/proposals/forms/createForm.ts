@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { v4 } from 'uuid';
 
 export async function createForm(fields: FormFieldInput[]) {
@@ -28,6 +28,7 @@ export async function createForm(fields: FormFieldInput[]) {
           options: field.options,
           private: field.private,
           required: field.required,
+          dependsOnStepIndex: field.dependsOnStepIndex,
           fieldConfig: field.fieldConfig as any
         }
       });

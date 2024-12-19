@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { useEffect, useMemo, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';

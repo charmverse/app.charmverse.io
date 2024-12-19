@@ -1,4 +1,5 @@
 import { Box, Grid, Paper, Stack, Typography } from '@mui/material';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -9,7 +10,6 @@ import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { SocialInputs } from 'components/settings/profile/components/SocialInputs';
 import { TimezoneAutocomplete } from 'components/settings/profile/components/TimezoneAutocomplete';
 import UserDescription from 'components/settings/profile/components/UserDescription';
-import type { SelectOptionType } from 'lib/forms/interfaces';
 import type { Social } from 'lib/members/interfaces';
 
 export default {

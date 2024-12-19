@@ -1,6 +1,6 @@
 import { Button, Chip, MenuItem, TextField, Typography, Paper, Box } from '@mui/material';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { ReactNode } from 'react';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import { v4 } from 'uuid';

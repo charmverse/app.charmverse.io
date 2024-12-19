@@ -1,6 +1,6 @@
 import type { SxProps } from '@mui/material';
 import { Chip, Stack, Tooltip, Typography } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
 

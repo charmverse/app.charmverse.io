@@ -1,4 +1,4 @@
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import type { IPropertyOption } from 'lib/databases/board';
 

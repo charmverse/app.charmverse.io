@@ -13,7 +13,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import Avatar from 'components/common/Avatar';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';

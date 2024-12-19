@@ -1,5 +1,11 @@
 import type { SxProps } from '@mui/material';
 import { Box } from '@mui/material';
+import type {
+  UploadedFileInfo,
+  FormFieldValue,
+  FieldType,
+  OpProjectFieldValue
+} from '@root/lib/proposals/forms/interfaces';
 import { debounce } from 'lodash';
 import { forwardRef, useMemo } from 'react';
 import type { UseFormGetFieldState } from 'react-hook-form';
@@ -11,7 +17,6 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 import { AttachRewardButton } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/AttachRewardButton';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
-import type { UploadedFileInfo, FormFieldValue, FieldType, OpProjectFieldValue } from 'lib/forms/interfaces';
 
 import { OptimismProjectSelector } from '../../ProjectForm/components/Optimism/OptimismProjectSelector';
 import { InputSearchBlockchain } from '../InputSearchBlockchain';

@@ -1,5 +1,5 @@
 import { Box, FormLabel, Switch, Typography } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { FormControlLabel } from 'components/common/form/FormControlLabel';

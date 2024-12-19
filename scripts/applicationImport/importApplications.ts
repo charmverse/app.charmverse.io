@@ -1,9 +1,9 @@
 import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { FormField, prisma } from '@charmverse/core/prisma-client';
-import { SelectOptionType } from 'lib/forms/interfaces';
-import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
+import { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
+import type { FieldAnswerInput, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { readFileSync } from 'fs';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
+import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertProposalFormAnswers';
 import { ProposalEvaluationInput, createProposal } from 'lib/proposals/createProposal';
 import { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';

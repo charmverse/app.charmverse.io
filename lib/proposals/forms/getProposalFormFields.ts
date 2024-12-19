@@ -1,8 +1,16 @@
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { FormFieldInput, TypedFormField } from '@root/lib/proposals/forms/interfaces';
 
-export function getProposalFormFields(fields: FormFieldInput[] | null | undefined, canViewPrivateFields: boolean) {
+export function getProposalFormFields({
+  fields,
+  canViewPrivateFields,
+  currentEvaluationIndex
+}: {
+  fields: FormFieldInput[] | null | undefined;
+  canViewPrivateFields: boolean;
+  currentEvaluationIndex?: number;
+}): TypedFormField[] | null {
   if (!fields) {
     return null;
   }
@@ -34,6 +42,17 @@ export function getProposalFormFields(fields: FormFieldInput[] | null | undefine
       Object.assign(field, { fieldConfig });
     }
   });
-
-  return canViewPrivateFields ? fields : fields.filter((field) => !field.private);
+  const filtered = canViewPrivateFields ? fields : fields.filter((field) => !field.private);
+  return filtered.map((field) => {
+    //  logic whether a field should be hidden based on evaluationsUpToCurrent
+    const isHiddenByDependency = Boolean(
+      typeof currentEvaluationIndex === 'number' &&
+        typeof field.dependsOnStepIndex === 'number' &&
+        field.dependsOnStepIndex > currentEvaluationIndex
+    );
+    return {
+      ...field,
+      isHiddenByDependency
+    } as TypedFormField;
+  });
 }

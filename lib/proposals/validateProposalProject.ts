@@ -1,10 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma';
-import type { FormFieldInput, FormFieldValue } from '@root/lib/forms/interfaces';
 import { convertToProjectValues } from '@root/lib/projects/convertToProjectValues';
 import { createProjectYupSchema } from '@root/lib/projects/createProjectYupSchema';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
+import type { FormFieldInput, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 
 export function validateProposalProject({
   formFields,

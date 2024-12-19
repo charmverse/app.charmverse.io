@@ -18,13 +18,13 @@ import type {
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import type { UpdateableRewardFields } from '@root/lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';
+import type { TypedFormField } from './forms/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   RubricCriteriaTyped,
@@ -51,10 +51,6 @@ export type VoteSettings = Pick<
 > & {
   durationDays: number;
   options: string[];
-};
-
-export type TypedFormField = Omit<FormField, 'options'> & {
-  options: SelectOptionType[];
 };
 
 export type ProposalPendingReward = {

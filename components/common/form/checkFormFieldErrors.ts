@@ -1,6 +1,5 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
-
-import type { FormFieldInput } from 'lib/forms/interfaces';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 
 import { nonDuplicateFieldTypes } from './constants';
 

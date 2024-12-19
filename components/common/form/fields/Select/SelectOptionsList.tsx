@@ -12,7 +12,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 

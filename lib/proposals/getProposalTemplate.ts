@@ -1,5 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';
@@ -65,9 +66,13 @@ export async function getProposalTemplate({ pageId }: { pageId: string }): Promi
     }
   });
 
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
   return mapDbProposalToProposal({
     proposal,
-    permissions: mockPermissions,
+    permissionsByStep: {
+      [currentEvaluation?.id || 'draft']: mockPermissions
+    },
     workflow: null
   });
 }
