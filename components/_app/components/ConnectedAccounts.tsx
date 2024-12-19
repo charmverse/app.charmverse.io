@@ -137,27 +137,25 @@ function TelegramAccountConnect({
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 
   return (
-    <>
-      <ConnectedAccount
-        label='Telegram'
-        icon={<IdentityIcon type='Telegram' size='small' />}
-        required={isTelegramRequired}
-        disabled={!!connectedTelegramAccount || isConnectingToTelegram}
-        onClick={() => {
-          setIsOnboardingModalOpen(true);
-          connectTelegram();
-        }}
-      >
-        {!connectedTelegramAccount ? (
-          <Typography variant='subtitle1'>Connect with Telegram</Typography>
-        ) : (
-          <Typography variant='subtitle1'>
-            Connected as {(connectedTelegramAccount.account as unknown as Partial<TelegramAccount>)?.username}
-          </Typography>
-        )}
-      </ConnectedAccount>
+    <ConnectedAccount
+      label='Telegram'
+      icon={<IdentityIcon type='Telegram' size='small' />}
+      required={isTelegramRequired}
+      disabled={!!connectedTelegramAccount || isConnectingToTelegram}
+      onClick={() => {
+        setIsOnboardingModalOpen(true);
+        connectTelegram();
+      }}
+    >
+      {!connectedTelegramAccount ? (
+        <Typography variant='subtitle1'>Connect with Telegram</Typography>
+      ) : (
+        <Typography variant='subtitle1'>
+          Connected as {(connectedTelegramAccount.account as unknown as Partial<TelegramAccount>)?.username}
+        </Typography>
+      )}
       <TelegramLoginIframe />
-    </>
+    </ConnectedAccount>
   );
 }
 
