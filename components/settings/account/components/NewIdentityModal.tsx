@@ -23,7 +23,7 @@ import type { TelegramAccount } from 'lib/telegram/interfaces';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import IdentityProviderItem from './IdentityProviderItem';
-import { TELEGRAM_BOT_ID } from './TelegramLoginIframe';
+import { TELEGRAM_BOT_ID, TelegramLoginIframe } from './TelegramLoginIframe';
 
 const WarpcastLogin = dynamic(
   () => import('components/login/components/WarpcastLogin').then((module) => module.WarpcastLogin),
@@ -168,6 +168,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
                 }}
               >
                 Connect
+                <TelegramLoginIframe />
               </Button>
             </IdentityProviderItem>
           )}
