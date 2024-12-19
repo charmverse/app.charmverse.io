@@ -7,6 +7,7 @@ export function validateAnswers(
 ) {
   return formFields
     .filter((formField) => formField.type !== 'milestone' && formField.type !== 'label')
+    .filter((formField) => !formField)
     .every(
       (f) =>
         !f.required ||

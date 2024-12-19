@@ -18,7 +18,7 @@ describe('createForm', () => {
         private: false,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -30,7 +30,7 @@ describe('createForm', () => {
         private: true,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 

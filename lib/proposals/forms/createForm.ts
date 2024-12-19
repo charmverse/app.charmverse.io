@@ -28,7 +28,7 @@ export async function createForm(fields: FormFieldInput[]) {
           options: field.options,
           private: field.private,
           required: field.required,
-          dependsOnEvaluationId: field.dependsOnEvaluationId,
+          dependsOnStepIndex: field.dependsOnStepIndex,
           fieldConfig: field.fieldConfig as any
         }
       });

@@ -74,20 +74,16 @@ export function mapDbProposalToProposal({
     proposal.status === 'draft'
       ? permissionsByStep.draft
       : currentEvaluation && permissionsByStep[currentEvaluation.id];
-
   if (!permissions) {
     throw new Error('Could not find permissions for proposal');
   }
 
   // find past and current evaluations for hiding form fields
   const currentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id);
-  const evaluationsUpToCurrent = proposal.evaluations
-    .slice(0, currentEvaluationIndex + 1)
-    .map((evaluation) => evaluation.id);
   const formFields = getProposalFormFields({
     fields: form?.formFields as unknown as FormFieldInput[],
     canViewPrivateFields: !!permissions.view_private_fields,
-    evaluationsUpToCurrent
+    currentEvaluationIndex: proposal.status === 'draft' ? -1 : currentEvaluationIndex
   });
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
     ?.fieldConfig as ProjectAndMembersFieldConfig;

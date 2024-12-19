@@ -56,7 +56,7 @@ export type FieldType = MemberPropertyType | FormFieldType;
 
 export type FormFieldInput = Pick<
   FormField,
-  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'dependsOnEvaluationId' | 'fieldConfig'
+  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'dependsOnStepIndex' | 'fieldConfig'
 > & {
   options?: SelectOptionType[];
 };

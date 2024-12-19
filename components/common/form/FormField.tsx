@@ -284,22 +284,22 @@ function ExpandedFormField({
 
       {evaluations.length > 0 && (
         <FieldWrapper label='Workflow step'>
-          <Select<string | null>
+          <Select<number | null>
             data-test='form-field-dependency-select'
             displayEmpty
-            value={formField.dependsOnEvaluationId}
-            onChange={(e) =>
+            value={formField.dependsOnStepIndex}
+            onChange={(e, value) => {
               updateFormField({
-                dependsOnEvaluationId: e.target.value as string,
+                dependsOnStepIndex: e.target.value as number,
                 id: formField.id
-              })
-            }
+              });
+            }}
             sx={{
               width: 'fit-content'
             }}
             variant='outlined'
             IconComponent={
-              formField.dependsOnEvaluationId
+              formField.dependsOnStepIndex
                 ? // eslint-disable-next-line react/no-unstable-nested-components
                   () => (
                     <IconButton
@@ -307,7 +307,7 @@ function ExpandedFormField({
                       color='secondary'
                       onClick={() => {
                         updateFormField({
-                          dependsOnEvaluationId: null,
+                          dependsOnStepIndex: null,
                           id: formField.id
                         });
                       }}
@@ -319,23 +319,19 @@ function ExpandedFormField({
                 : undefined
             }
             renderValue={(value) => {
-              if (!value) {
+              if (value === null) {
                 return (
                   <Typography component='em' color='secondary'>
                     Do not require a step
                   </Typography>
                 );
               }
-              return evaluations.find((evaluation) => evaluation.id === value)?.title;
+              return evaluations[value]?.title;
             }}
           >
             {evaluations.map((evaluation, index) => {
               return (
-                <MenuItem
-                  data-test={`form-field-dependency-option-${evaluation.id}`}
-                  key={evaluation.id}
-                  value={evaluation.id}
-                >
+                <MenuItem data-test={`form-field-dependency-option-${evaluation.id}`} key={evaluation.id} value={index}>
                   <Stack flexDirection='row' gap={1} alignItems='center'>
                     {index + 1}. {evaluation.title}
                   </Stack>

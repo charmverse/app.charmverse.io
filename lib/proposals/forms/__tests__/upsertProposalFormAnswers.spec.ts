@@ -42,7 +42,7 @@ describe('upsertFormAnswers', () => {
         private: false,
         required: false,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -54,7 +54,7 @@ describe('upsertFormAnswers', () => {
         private: true,
         required: false,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 
@@ -113,7 +113,7 @@ describe('upsertFormAnswers', () => {
         private: false,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -125,7 +125,7 @@ describe('upsertFormAnswers', () => {
         private: true,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 
@@ -172,7 +172,7 @@ describe('upsertFormAnswers', () => {
         private: false,
         required: false,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -184,7 +184,7 @@ describe('upsertFormAnswers', () => {
         private: true,
         required: false,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 
@@ -248,7 +248,7 @@ describe('upsertFormAnswers', () => {
         private: false,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -260,7 +260,7 @@ describe('upsertFormAnswers', () => {
         private: true,
         required: true,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 
@@ -304,7 +304,7 @@ describe('upsertFormAnswers', () => {
         private: false,
         required: false,
         fieldConfig: {},
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ];
 

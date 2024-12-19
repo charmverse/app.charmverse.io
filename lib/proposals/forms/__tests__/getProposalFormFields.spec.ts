@@ -10,7 +10,7 @@ describe('getProposalFormFields', () => {
     const fields = getProposalFormFields({
       fields: [formField],
       canViewPrivateFields: true,
-      evaluationsUpToCurrent: []
+      currentEvaluationIndex: 0
     });
     expect(fields).toHaveLength(1);
   });
@@ -20,7 +20,7 @@ describe('getProposalFormFields', () => {
     const fields = getProposalFormFields({
       fields: [formField],
       canViewPrivateFields: false,
-      evaluationsUpToCurrent: []
+      currentEvaluationIndex: 0
     });
     expect(fields).toHaveLength(0);
   });
@@ -48,7 +48,7 @@ describe('getProposalFormFields', () => {
     const fields = getProposalFormFields({
       fields: [formField],
       canViewPrivateFields: false,
-      evaluationsUpToCurrent: []
+      currentEvaluationIndex: 0
     });
     expect(fields).toHaveLength(1);
     const fieldConfig = fields![0].fieldConfig as ProjectAndMembersFieldConfig;

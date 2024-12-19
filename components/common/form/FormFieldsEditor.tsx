@@ -133,7 +133,7 @@ export function ControlledFormFieldsEditor({
         required: true,
         id: fieldId,
         fieldConfig: null,
-        dependsOnEvaluationId: null
+        dependsOnStepIndex: null
       }
     ]);
 

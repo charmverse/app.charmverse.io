@@ -50,7 +50,9 @@ export function ProposalStickyFooter({
   const formFields =
     page.type === 'proposal_template'
       ? proposal.form?.formFields
-      : proposal.form?.formFields?.filter((field) => field.type === 'project_profile' || field.type === 'milestone');
+      : proposal.form?.formFields?.filter(
+          (field) => !field.isHiddenByDependency && (field.type === 'project_profile' || field.type === 'milestone')
+        );
   const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
 
   const errors = getProposalErrors({

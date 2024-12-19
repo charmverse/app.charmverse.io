@@ -78,7 +78,7 @@ export async function upsertProposalFormFields({
             private: field.private,
             required,
             fieldConfig: field.fieldConfig as Prisma.InputJsonValue,
-            dependsOnEvaluationId: field.dependsOnEvaluationId
+            dependsOnStepIndex: field.dependsOnStepIndex
           },
           update: {
             type: field.type,
@@ -89,7 +89,7 @@ export async function upsertProposalFormFields({
             private: field.private,
             required,
             fieldConfig: field.fieldConfig as Prisma.InputJsonValue,
-            dependsOnEvaluationId: field.dependsOnEvaluationId
+            dependsOnStepIndex: field.dependsOnStepIndex
           }
         });
       })

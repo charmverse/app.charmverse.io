@@ -41,7 +41,7 @@ export function FormFieldsEditor() {
     type: 'short_text',
     id: v4(),
     fieldConfig: null,
-    dependsOnEvaluationId: null
+    dependsOnStepIndex: null
   };
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([field.id]);
   const [formFields, setFormFields] = useState<FormFieldInput[]>([field]);

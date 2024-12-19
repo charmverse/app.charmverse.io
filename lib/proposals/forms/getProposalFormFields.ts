@@ -5,11 +5,11 @@ import type { FormFieldInput, TypedFormField } from '@root/lib/proposals/forms/i
 export function getProposalFormFields({
   fields,
   canViewPrivateFields,
-  evaluationsUpToCurrent
+  currentEvaluationIndex
 }: {
   fields: FormFieldInput[] | null | undefined;
   canViewPrivateFields: boolean;
-  evaluationsUpToCurrent: string[];
+  currentEvaluationIndex?: number;
 }): TypedFormField[] | null {
   if (!fields) {
     return null;
@@ -42,12 +42,13 @@ export function getProposalFormFields({
       Object.assign(field, { fieldConfig });
     }
   });
-
   const filtered = canViewPrivateFields ? fields : fields.filter((field) => !field.private);
   return filtered.map((field) => {
     //  logic whether a field should be hidden based on evaluationsUpToCurrent
     const isHiddenByDependency = Boolean(
-      typeof field.dependsOnEvaluationId === 'string' && !evaluationsUpToCurrent.includes(field.dependsOnEvaluationId)
+      typeof currentEvaluationIndex === 'number' &&
+        typeof field.dependsOnStepIndex === 'number' &&
+        field.dependsOnStepIndex > currentEvaluationIndex
     );
     return {
       ...field,

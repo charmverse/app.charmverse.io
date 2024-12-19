@@ -33,8 +33,7 @@ export async function getProposalFormAnswers({
 
   const accessibleFields = getProposalFormFields({
     fields: proposal.form?.formFields as unknown as FormFieldInput[],
-    canViewPrivateFields,
-    evaluationsUpToCurrent: []
+    canViewPrivateFields
   });
   const accessibleFieldIds = accessibleFields?.map((field) => field.id);
 
