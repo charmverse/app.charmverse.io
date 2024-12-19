@@ -10,36 +10,13 @@ export function loginWithTelegram(callback: (user: TelegramAccount) => void) {
   window.Telegram.Login.auth({ bot_id: TELEGRAM_BOT_ID, request_access: true }, callback);
 }
 
-export class TelegramLoginIframe extends React.Component<{
-  widgetVersion?: string;
-  children?: React.ReactNode;
-}> {
-  instance: HTMLDivElement | null = null;
-
-  componentDidMount() {
+export function TelegramLoginIframe() {
+  React.useEffect(() => {
     const script = document.createElement('script');
-    script.src = `https://telegram.org/js/telegram-widget.js?${this.props.widgetVersion || ''}`;
+    script.src = 'https://telegram.org/js/telegram-widget.js?22';
     script.async = true;
-    this.instance?.appendChild(script);
-  }
+    document.getElementById('telegram-login-container')?.appendChild(script);
+  }, []);
 
-  render() {
-    return (
-      <div
-        style={{
-          cursor: 'pointer',
-          opacity: 0,
-          pointerEvents: 'none',
-          position: 'absolute',
-          width: 0,
-          height: 0
-        }}
-        ref={(component) => {
-          this.instance = component;
-        }}
-      >
-        {this.props.children}
-      </div>
-    );
-  }
+  return <div id='telegram-login-container' />;
 }
