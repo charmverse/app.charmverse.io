@@ -1,14 +1,15 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
-  FormField,
   Page,
   Proposal,
   ProposalAuthor,
   ProposalEvaluationType,
   ProposalReviewer,
   ProposalRubricCriteria,
+  ProposalEvaluationPermission,
   ProposalRubricCriteriaAnswer,
-  DraftProposalRubricCriteriaAnswer
+  DraftProposalRubricCriteriaAnswer,
+  FormField
 } from '@charmverse/core/prisma';
 import {
   ProposalEvaluationResult,
@@ -21,68 +22,73 @@ import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
-import { getProposalFormFields } from '@root/lib/proposals/form/getProposalFormFields';
+import { getProposalFormFields } from '@root/lib/proposals/forms/getProposalFormFields';
+import type { FormFieldInput, TypedFormField } from '@root/lib/proposals/forms/interfaces';
 
-import { getProposalProjectFormAnswers } from './form/getProposalProjectFormAnswers';
-import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
+import { getProposalProjectFormAnswers } from './forms/getProposalProjectFormAnswers';
+import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric } from './interfaces';
 import { showRubricAnswersToAuthor } from './showRubricAnswersToAuthor';
 
-type FormFieldsIncludeType = {
+export type ProposalToMap = Proposal & {
+  authors: ProposalAuthor[];
+  evaluations: (ProposalEvaluation & {
+    appealReviewers: ProposalAppealReviewer[];
+    permissions: ProposalEvaluationPermission[];
+    reviews: ProposalEvaluationReview[];
+    appealReviews: ProposalEvaluationAppealReview[];
+    reviewers: ProposalReviewer[];
+    rubricAnswers: ProposalRubricCriteriaAnswer[];
+    rubricCriteria: ProposalRubricCriteria[];
+    draftRubricAnswers: DraftProposalRubricCriteriaAnswer[];
+  })[];
+  page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
+  rewards: { id: string }[];
   form: {
     id: string;
     formFields: FormField[] | null;
   } | null;
+  project?: ProjectWithMembers | null;
+} & {
+  issuedCredentials?: EASAttestationFromApi[];
 };
-
-export type ProposalToMap = Proposal &
-  FormFieldsIncludeType & {
-    authors: ProposalAuthor[];
-    evaluations: (ProposalEvaluation & {
-      appealReviewers: ProposalAppealReviewer[];
-      reviews: ProposalEvaluationReview[];
-      appealReviews: ProposalEvaluationAppealReview[];
-      reviewers: ProposalReviewer[];
-      rubricAnswers: ProposalRubricCriteriaAnswer[];
-      rubricCriteria: ProposalRubricCriteria[];
-      draftRubricAnswers: DraftProposalRubricCriteriaAnswer[];
-    })[];
-    page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
-    rewards: { id: string }[];
-    project?: ProjectWithMembers | null;
-  } & {
-    issuedCredentials?: EASAttestationFromApi[];
-  };
 
 export function mapDbProposalToProposal({
   proposal,
-  permissions,
   permissionsByStep,
-  proposalEvaluationReviews,
   workflow,
-  proposalEvaluationAppealReviews,
-  isPublicPage,
   userId
 }: {
   workflow: {
     evaluations: WorkflowEvaluationJson[];
   } | null;
-  isPublicPage?: boolean;
-  proposalEvaluationReviews?: ProposalEvaluationReview[];
-  proposalEvaluationAppealReviews?: ProposalEvaluationAppealReview[];
   proposal: ProposalToMap;
-  permissions: ProposalPermissionFlags;
-  permissionsByStep?: Record<string, ProposalPermissionFlags>;
+  permissionsByStep: Record<string, ProposalPermissionFlags>;
   userId?: string;
 }): ProposalWithUsersAndRubric {
   const { rewards, form, evaluations, fields, page, issuedCredentials, ...rest } = proposal;
+
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const formFields = getProposalFormFields(
-    form?.formFields as unknown as FormFieldInput[],
-    !!permissions.view_private_fields
-  );
+  const permissions =
+    proposal.status === 'draft'
+      ? permissionsByStep.draft
+      : currentEvaluation && permissionsByStep[currentEvaluation.id];
+
+  if (!permissions) {
+    throw new Error('Could not find permissions for proposal');
+  }
+
+  // find past and current evaluations for hiding form fields
+  const currentEvaluationIndex = proposal.evaluations.findIndex((e) => e.id === currentEvaluation?.id);
+  const evaluationsUpToCurrent = proposal.evaluations
+    .slice(0, currentEvaluationIndex + 1)
+    .map((evaluation) => evaluation.id);
+  const formFields = getProposalFormFields({
+    fields: form?.formFields as unknown as FormFieldInput[],
+    canViewPrivateFields: !!permissions.view_private_fields,
+    evaluationsUpToCurrent
+  });
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
     ?.fieldConfig as ProjectAndMembersFieldConfig;
   const project = proposal.project
@@ -95,11 +101,14 @@ export function mapDbProposalToProposal({
 
   const isAuthor = !!userId && proposal.authors.some((a) => a.userId === userId);
 
+  const isPublicPage =
+    proposal.status === 'published' && currentEvaluation?.permissions.some((p) => p.systemRole === 'public');
+
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const workflowEvaluation = workflow?.evaluations.find(
       (e) => e.title === evaluation.title && e.type === evaluation.type
     );
-    const appealReviews = proposalEvaluationAppealReviews?.filter((review) => review.evaluationId === evaluation.id);
+    const appealReviews = proposal.evaluations.flatMap((e) => e.appealReviews);
     const stepPermissions = permissionsByStep?.[evaluation.id];
 
     let rubricAnswers = evaluation.rubricAnswers;

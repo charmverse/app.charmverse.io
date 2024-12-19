@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 import { isTruthy } from 'lib/utils/types';
-import type { FormFieldValue } from 'lib/forms/interfaces';
+import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 
 // Import rows from a CSV that answer questions on a proposal template
 const templateId = '23630cb0-8a55-4bea-acf5-0f65579302e4';

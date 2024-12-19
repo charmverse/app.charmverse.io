@@ -56,7 +56,7 @@ export type FieldType = MemberPropertyType | FormFieldType;
 
 export type FormFieldInput = Pick<
   FormField,
-  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'fieldConfig'
+  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'dependsOnEvaluationId' | 'fieldConfig'
 > & {
   options?: SelectOptionType[];
 };
@@ -65,4 +65,10 @@ export type FieldAnswerInput = {
   id?: string;
   fieldId: string;
   value: FormFieldValue;
+};
+
+//  client side form field type
+export type TypedFormField = Omit<FormField, 'options'> & {
+  options: SelectOptionType[];
+  isHiddenByDependency?: boolean; // isHiddenByDependency if it is depending on a future evaluation
 };

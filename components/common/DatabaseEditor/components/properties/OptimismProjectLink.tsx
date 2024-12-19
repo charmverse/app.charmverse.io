@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Stack } from '@mui/material';
+import type { OpProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 
 import { StyledTypography } from 'components/common/CharmEditor/components/nestedPage/components/NestedPage';
 import Link from 'components/common/Link';
-import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 
 const Typography = styled(StyledTypography)`
   overflow: hidden;

@@ -67,7 +67,9 @@ export async function getProposalTemplate({ pageId }: { pageId: string }): Promi
 
   return mapDbProposalToProposal({
     proposal,
-    permissions: mockPermissions,
+    permissionsByStep: {
+      draft: mockPermissions
+    },
     workflow: null
   });
 }

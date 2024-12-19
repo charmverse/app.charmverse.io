@@ -1,8 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createForm } from '@root/lib/forms/createForm';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import { v4 } from 'uuid';
+
+import { createForm } from '../createForm';
+import type { FormFieldInput } from '../interfaces';
 
 describe('createForm', () => {
   it('should create form from fields and return valid id of the form', async () => {
@@ -16,7 +17,8 @@ describe('createForm', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnEvaluationId: null
       },
       {
         id: v4(),
@@ -27,7 +29,8 @@ describe('createForm', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnEvaluationId: null
       }
     ];
 

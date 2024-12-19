@@ -1,4 +1,4 @@
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType, FormFieldInput, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { capitalize } from '@root/lib/utils/strings';
 import { useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
@@ -10,7 +10,6 @@ import { formFieldTypes } from 'components/common/form/constants';
 import { FormFieldAnswers as CustomFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
-import type { FormFieldInput, FormFieldValue } from 'lib/forms/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 
 const options: SelectOptionType[] = [
@@ -41,7 +40,8 @@ export function FormFieldsEditor() {
     required: true,
     type: 'short_text',
     id: v4(),
-    fieldConfig: null
+    fieldConfig: null,
+    dependsOnEvaluationId: null
   };
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([field.id]);
   const [formFields, setFormFields] = useState<FormFieldInput[]>([field]);
@@ -50,6 +50,10 @@ export function FormFieldsEditor() {
     <GlobalContext>
       <ControlledFormFieldsEditor
         formFields={formFields}
+        evaluations={[
+          { id: '123', title: 'Evaluation 1' },
+          { id: '456', title: 'Evaluation 2' }
+        ]}
         setFormFields={setFormFields}
         collapsedFieldIds={collapsedFieldIds}
         toggleCollapse={(fieldId) => {

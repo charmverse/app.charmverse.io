@@ -1,13 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getProposalFormAnswers } from '@root/lib/proposals/forms/getProposalFormAnswers';
+import type { FieldAnswerInput } from '@root/lib/proposals/forms/interfaces';
+import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertProposalFormAnswers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FieldAnswerInput } from 'lib/forms/interfaces';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalFormAnswers } from 'lib/proposals/form/getProposalFormAnswers';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 

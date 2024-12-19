@@ -1,9 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { useCallback, useEffect } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
-
-import type { FormFieldValue } from 'lib/forms/interfaces';
 
 import type { FormFieldInput } from './formFieldSchema';
 import { getYupValidationSchema, getFormFieldMap } from './formFieldSchema';
