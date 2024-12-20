@@ -13,13 +13,13 @@ import { DocumentColumn, DocumentColumnLayout } from './components/DocumentColum
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
 import { RewardSidebar } from './components/Sidebar/RewardSidebar';
-import type { DocumentPageProps } from './DocumentPage';
+import type { DocumentPageProps, ProposalProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
 import { useReward } from './hooks/useReward';
 
-type DocumentPageWithSidebarsProps = DocumentPageProps & {
+type DocumentPageWithSidebarsProps = Omit<DocumentPageProps, keyof ProposalProps> & {
   readOnly?: boolean;
   insideModal?: boolean;
   refreshPage?: VoidFunction;

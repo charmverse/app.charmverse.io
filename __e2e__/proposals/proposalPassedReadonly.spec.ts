@@ -91,7 +91,8 @@ test.beforeAll(async () => {
         fieldConfig: {},
         options: [],
         index: 0,
-        private: false
+        private: false,
+        dependsOnStepIndex: null
       },
       {
         type: 'milestone',
@@ -102,7 +103,8 @@ test.beforeAll(async () => {
         required: false,
         id: uuid(),
         index: 0,
-        private: false
+        private: false,
+        dependsOnStepIndex: null
       }
     ]
   }).then(({ proposal }) => proposal.id);

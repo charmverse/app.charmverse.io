@@ -62,6 +62,8 @@ const RewardProperties = dynamic(
   () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
+export type ProposalProps = ReturnType<typeof useProposal> & ReturnType<typeof useProposalFormAnswers>;
+
 export type DocumentPageProps = {
   page: PageWithContent;
   savePage: (p: Partial<Page>) => void;
@@ -72,8 +74,7 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
-} & ReturnType<typeof useProposal> &
-  ReturnType<typeof useProposalFormAnswers>;
+} & ProposalProps;
 
 function DocumentPageComponent({
   insideModal = false,

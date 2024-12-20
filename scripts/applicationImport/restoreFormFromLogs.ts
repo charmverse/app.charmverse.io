@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { createProposal } from 'lib/proposals/createProposal';

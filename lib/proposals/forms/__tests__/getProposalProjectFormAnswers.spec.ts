@@ -34,7 +34,8 @@ const fieldsInput: FormFieldInput[] = [
           private: true
         }
       }
-    })
+    }),
+    dependsOnStepIndex: null
   }
 ];
 

@@ -20,6 +20,7 @@ export function getFormInput(input: Partial<FormFieldInput>): FormFieldInput {
     private: false,
     required: true,
     fieldConfig: {},
+    dependsOnStepIndex: null,
     ...input
   };
 }

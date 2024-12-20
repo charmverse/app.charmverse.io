@@ -23,7 +23,8 @@ describe('createDraftProposal', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: uuid(),
@@ -34,7 +35,8 @@ describe('createDraftProposal', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 

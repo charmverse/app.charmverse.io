@@ -151,7 +151,8 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
         private: false,
         required: true,
         id: uuid(),
-        fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true })
+        fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true }),
+        dependsOnStepIndex: null
       }
     ];
   }
