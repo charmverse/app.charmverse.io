@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { createForm } from '@root/lib/forms/createForm';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import { createForm } from '@root/lib/proposals/forms/createForm';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { v4 } from 'uuid';
 
 import { getProposalTemplate } from '../getProposalTemplate';
@@ -44,7 +44,8 @@ describe('getProposal', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
     const formId = await createForm(fieldsInput);

@@ -2,6 +2,7 @@ import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -12,13 +13,13 @@ import { DocumentColumn, DocumentColumnLayout } from './components/DocumentColum
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
 import { RewardSidebar } from './components/Sidebar/RewardSidebar';
-import type { DocumentPageProps } from './DocumentPage';
+import type { DocumentPageProps, ProposalProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
 import { useReward } from './hooks/useReward';
 
-type DocumentPageWithSidebarsProps = DocumentPageProps & {
+type DocumentPageWithSidebarsProps = Omit<DocumentPageProps, keyof ProposalProps> & {
   readOnly?: boolean;
   insideModal?: boolean;
   refreshPage?: VoidFunction;
@@ -35,6 +36,9 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
 
+  const proposalProps = useProposal({
+    proposalId
+  });
   const {
     proposal,
     refreshProposal,
@@ -43,8 +47,10 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     onChangeWorkflow,
     onChangeRewardSettings,
     onChangeSelectedCredentialTemplates
-  } = useProposal({
-    proposalId
+  } = proposalProps;
+
+  const proposalAnswersProps = useProposalFormAnswers({
+    proposal
   });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
@@ -115,6 +121,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       <DocumentColumn>
         <DocumentPage
           {...props}
+          {...proposalAnswersProps}
+          {...proposalProps}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={internalSidebarView}
@@ -160,6 +168,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
           onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+          refreshProposalFormAnswers={proposalAnswersProps.refreshProposalFormAnswers}
         />
       )}
       {(page.type === 'bounty' || page.type === 'bounty_template') && reward && (

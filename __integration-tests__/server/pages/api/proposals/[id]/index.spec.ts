@@ -1,12 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { createForm } from '@root/lib/proposals/forms/createForm';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import _isEqual from 'lodash/isEqual';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import { createForm } from 'lib/forms/createForm';
-import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -82,7 +82,8 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: null
+        fieldConfig: null,
+        dependsOnStepIndex: null
       }
     ];
     const formId = await createForm(fieldsInput);

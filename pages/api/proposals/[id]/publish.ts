@@ -1,12 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { FieldAnswerInput, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimismSepolia } from 'viem/chains';
 
 import { issueProposalPublishedQualifyingEvent } from 'lib/credentials/reputation/issueProposalPublishedQualifyingEvent';
-import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -107,6 +107,10 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   if (isProposalArchived) {
     throw new ActionNotPermittedError(`You cannot publish an archived proposal`);
   }
+  // dont expect values for any form fields that depend on an evaluation step
+  const formFields = (proposalPage.proposal.form?.formFields as unknown as FormFieldInput[]).filter(
+    (field) => typeof field.dependsOnStepIndex !== 'number'
+  );
   const errors = getProposalErrors({
     page: {
       title: proposalPage.title ?? '',
@@ -126,7 +130,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       fields: proposalPage.proposal.fields as ProposalFields,
       authors: proposalPage.proposal.authors.map((a) => a.userId),
       formAnswers: proposalPage.proposal.formAnswers as FieldAnswerInput[],
-      formFields: proposalPage.proposal.form?.formFields as unknown as FormFieldInput[]
+      formFields
     },
     isDraft: false,
     project: proposalPage.proposal.project,

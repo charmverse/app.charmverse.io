@@ -1,8 +1,8 @@
+import type { FieldType, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { isValidName } from 'ethers/lib/utils';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
-import type { FieldType, FormFieldValue } from 'lib/forms/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';

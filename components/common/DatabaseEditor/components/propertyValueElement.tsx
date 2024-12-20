@@ -3,6 +3,7 @@ import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/pri
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import type { OpProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
@@ -34,7 +35,6 @@ import {
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
-import type { OpProjectFieldValue } from 'lib/forms/interfaces';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalReviewerProperty } from 'lib/proposals/blocks/interfaces';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';

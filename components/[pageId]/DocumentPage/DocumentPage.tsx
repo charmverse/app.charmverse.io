@@ -22,7 +22,7 @@ import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/vi
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
+import type { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
@@ -53,7 +53,7 @@ import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
-import { useProposal } from './hooks/useProposal';
+import type { useProposal } from './hooks/useProposal';
 import { useReward } from './hooks/useReward';
 
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
@@ -62,6 +62,8 @@ const RewardProperties = dynamic(
   () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
+export type ProposalProps = ReturnType<typeof useProposal> & ReturnType<typeof useProposalFormAnswers>;
+
 export type DocumentPageProps = {
   page: PageWithContent;
   savePage: (p: Partial<Page>) => void;
@@ -72,7 +74,7 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
-};
+} & ProposalProps;
 
 function DocumentPageComponent({
   insideModal = false,
@@ -83,7 +85,23 @@ function DocumentPageComponent({
   sidebarView,
   setSidebarView,
   showCard,
-  showParentChip
+  showParentChip,
+  proposal,
+  refreshProposal,
+  onChangeEvaluation,
+  onChangeTemplate,
+  onChangeWorkflow,
+  onChangeRewardSettings,
+  onChangeSelectedCredentialTemplates,
+  refreshProposalFormAnswers,
+  projectForm,
+  control,
+  formFields,
+  getFieldState,
+  onSave,
+  applyProject,
+  applyProjectMembers,
+  isLoadingAnswers
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -99,33 +117,6 @@ function DocumentPageComponent({
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-
-  const {
-    proposal,
-    refreshProposal,
-    onChangeEvaluation,
-    onChangeTemplate,
-    onChangeWorkflow,
-    onChangeRewardSettings,
-    onChangeSelectedCredentialTemplates
-  } = useProposal({
-    proposalId
-  });
-
-  const {
-    control,
-    formFields,
-    getFieldState,
-    applyProject,
-    applyProjectMembers,
-    isLoadingAnswers,
-    projectForm,
-    onSave,
-    refreshProposalFormAnswers
-  } = useProposalFormAnswers({
-    proposal
-  });
-
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
@@ -403,6 +394,7 @@ function DocumentPageComponent({
                   onChangeEvaluation={onChangeEvaluation}
                   onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}
+                  refreshProposalFormAnswers={refreshProposalFormAnswers}
                   onChangeWorkflow={onChangeWorkflow}
                   onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
                 />
@@ -469,6 +461,7 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
+                      evaluations={proposal.evaluations}
                       expandFieldsByDefault={proposal.status === 'draft'}
                       formFields={proposal.form?.formFields ?? []}
                     />

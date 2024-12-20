@@ -1,7 +1,8 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
-import { FormFieldInput } from 'lib/forms/interfaces';
+import { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { createProposal } from 'lib/proposals/createProposal';
-import { upsertProposalFormFields } from 'lib/proposals/form/upsertProposalFormFields';
+import { upsertProposalFormFields } from '@root/lib/proposals/forms/upsertProposalFormFields';
 import { exportRoles } from 'lib/templates/exportRoles';
 import { importRoles } from 'lib/templates/importRoles';
 import { v4 as uuid } from 'uuid';

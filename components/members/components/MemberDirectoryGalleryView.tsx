@@ -2,7 +2,7 @@ import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { MouseEvent } from 'react';
 
 import Avatar from 'components/common/Avatar';

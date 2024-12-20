@@ -13,11 +13,6 @@ type PermissionsMap = Awaited<
   ReturnType<typeof permissionsApiClient.proposals.computeAllProposalEvaluationPermissions>
 >;
 
-type WorkflowEvaluationWithTimestamps = WorkflowEvaluationJson & {
-  createdAt: Date;
-  updatedAt: Date;
-};
-
 export async function getProposal({
   id,
   permissionsByStep,
@@ -27,7 +22,7 @@ export async function getProposal({
   permissionsByStep: PermissionsMap;
   userId?: string;
 }): Promise<ProposalWithUsersAndRubric> {
-  const proposal = await prisma.proposal.findUniqueOrThrow({
+  const { workflow, ...proposal } = await prisma.proposal.findUniqueOrThrow({
     where: {
       id
     },
@@ -75,55 +70,27 @@ export async function getProposal({
           paidTier: true,
           publicProposals: true
         }
+      },
+      workflow: {
+        select: {
+          evaluations: true
+        }
       }
     }
   });
 
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-
-  const currentPermissions =
-    proposal.status === 'draft'
-      ? permissionsByStep.draft
-      : currentEvaluation && permissionsByStep[currentEvaluation.id];
-
-  if (!currentPermissions) {
-    throw new Error('Could not find permissions for proposal');
-  }
-
-  const proposalEvaluationReviews = proposal.evaluations.map((e) => e.reviews).flat();
-  const proposalEvaluationAppealReviews = proposal.evaluations.map((e) => e.appealReviews).flat();
-
-  const [workflow, credentials] = await Promise.all([
-    proposal.workflowId
-      ? await prisma.proposalWorkflow.findFirst({
-          where: {
-            id: proposal.workflowId
-          },
-          select: {
-            evaluations: true
-          }
-        })
-      : Promise.resolve(null),
-    getProposalOrApplicationCredentials({ proposalId: id }).catch((error) => {
-      log.error('Error fetching proposal credentials', { error, proposalId: id });
-      return [];
-    })
-  ]);
-
-  const isPublicPage =
-    proposal.status === 'published' && currentEvaluation?.permissions.some((p) => p.systemRole === 'public');
+  const credentials = await getProposalOrApplicationCredentials({ proposalId: id }).catch((error) => {
+    log.error('Error fetching proposal credentials', { error, proposalId: id });
+    return [];
+  });
 
   return mapDbProposalToProposal({
-    proposalEvaluationReviews,
-    proposalEvaluationAppealReviews,
     workflow: workflow
       ? {
           evaluations: workflow.evaluations as any as WorkflowEvaluationJson[]
         }
       : null,
     proposal: { ...proposal, issuedCredentials: credentials },
-    permissions: currentPermissions,
-    isPublicPage,
     permissionsByStep,
     userId
   });

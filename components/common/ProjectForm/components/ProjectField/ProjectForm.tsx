@@ -2,12 +2,12 @@ import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
+import type { ProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 import type { KeyedMutator } from 'swr';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectFieldValue } from 'lib/forms/interfaces';
 import { defaultProjectMember } from 'lib/projects/constants';
 import { projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';

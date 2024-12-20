@@ -1,13 +1,12 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import debounce from 'lodash/debounce';
 import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
-import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
@@ -16,11 +15,13 @@ import { FormField } from './FormField';
 
 export function FormFieldsEditor({
   proposalId,
+  evaluations,
   expandFieldsByDefault,
   formFields: initialFormFields,
   readOnly
 }: {
   proposalId: string;
+  evaluations: { id: string; title: string }[];
   expandFieldsByDefault?: boolean;
   formFields: FormFieldInput[];
   readOnly?: boolean;
@@ -51,6 +52,7 @@ export function FormFieldsEditor({
       collapsedFieldIds={collapsedFieldIds}
       formFields={formFields}
       setFormFields={updateFormFields}
+      evaluations={evaluations}
       toggleCollapse={(fieldId) => {
         if (collapsedFieldIds.includes(fieldId)) {
           setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
@@ -68,12 +70,14 @@ export function ControlledFormFieldsEditor({
   setFormFields,
   collapsedFieldIds,
   toggleCollapse,
+  evaluations,
   readOnly
 }: {
   formFields: FormFieldInput[];
   setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
+  evaluations: { id: string; title: string }[];
   readOnly?: boolean;
 }) {
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
@@ -128,7 +132,8 @@ export function ControlledFormFieldsEditor({
         private: false,
         required: true,
         id: fieldId,
-        fieldConfig: null
+        fieldConfig: null,
+        dependsOnStepIndex: null
       }
     ]);
 
@@ -238,6 +243,7 @@ export function ControlledFormFieldsEditor({
             onUpdateOption(formField.id, option);
           }}
           forceFocus={lastInsertedIndexRef.current === formField.index}
+          evaluations={evaluations}
         />
       ))}
       {!readOnly && (

@@ -1,9 +1,9 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import type { RubricCriteriaTyped } from '@root/lib/proposals/rubric/interfaces';
 import { v4 as uuid } from 'uuid';
@@ -151,7 +151,8 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
         private: false,
         required: true,
         id: uuid(),
-        fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true })
+        fieldConfig: createDefaultProjectAndMembersFieldConfig({ allFieldsRequired: true }),
+        dependsOnStepIndex: null
       }
     ];
   }

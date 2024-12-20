@@ -7,13 +7,21 @@ import { getProposalFormFields } from '../getProposalFormFields';
 describe('getProposalFormFields', () => {
   it('Should not filter out private fields', () => {
     const formField = getFormInput({ private: true });
-    const fields = getProposalFormFields([formField], true);
+    const fields = getProposalFormFields({
+      fields: [formField],
+      canViewPrivateFields: true,
+      currentEvaluationIndex: 0
+    });
     expect(fields).toHaveLength(1);
   });
 
   it('Should filter out private fields', () => {
     const formField = getFormInput({ private: true });
-    const fields = getProposalFormFields([formField], false);
+    const fields = getProposalFormFields({
+      fields: [formField],
+      canViewPrivateFields: false,
+      currentEvaluationIndex: 0
+    });
     expect(fields).toHaveLength(0);
   });
 
@@ -37,7 +45,11 @@ describe('getProposalFormFields', () => {
         }
       })
     });
-    const fields = getProposalFormFields([formField], false);
+    const fields = getProposalFormFields({
+      fields: [formField],
+      canViewPrivateFields: false,
+      currentEvaluationIndex: 0
+    });
     expect(fields).toHaveLength(1);
     const fieldConfig = fields![0].fieldConfig as ProjectAndMembersFieldConfig;
     expect(fieldConfig.walletAddress.show).toBe(false);

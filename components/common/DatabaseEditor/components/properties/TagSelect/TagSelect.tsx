@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 

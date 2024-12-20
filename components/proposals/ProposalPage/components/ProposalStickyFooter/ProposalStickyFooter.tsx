@@ -1,5 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
+import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import type { Control } from 'react-hook-form';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 
@@ -9,7 +10,6 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ProposalToErrorCheck } from 'lib/proposals/getProposalErrors';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
@@ -50,7 +50,9 @@ export function ProposalStickyFooter({
   const formFields =
     page.type === 'proposal_template'
       ? proposal.form?.formFields
-      : proposal.form?.formFields?.filter((field) => field.type === 'project_profile' || field.type === 'milestone');
+      : proposal.form?.formFields?.filter(
+          (field) => !field.isHiddenByDependency && (field.type === 'project_profile' || field.type === 'milestone')
+        );
   const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
 
   const errors = getProposalErrors({

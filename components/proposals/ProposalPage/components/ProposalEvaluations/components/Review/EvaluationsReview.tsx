@@ -67,6 +67,7 @@ export type Props = {
   pageTitle?: string;
   expanded: boolean;
   refreshPage?: VoidFunction;
+  refreshProposalFormAnswers?: VoidFunction;
 };
 
 export function EvaluationsReview({
@@ -80,6 +81,7 @@ export function EvaluationsReview({
   onChangeRewardSettings,
   readOnlyCredentialTemplates,
   refreshProposal: _refreshProposal,
+  refreshProposalFormAnswers,
   expanded: expandedContainer,
   templateId,
   refreshPage
@@ -166,6 +168,8 @@ export function EvaluationsReview({
     await refreshIssuableCredentials();
     await _refreshProposal?.();
     await refreshPage?.();
+    // update proposal questions as some may appear after certain steps
+    await refreshProposalFormAnswers?.();
   }
 
   useEffect(() => {

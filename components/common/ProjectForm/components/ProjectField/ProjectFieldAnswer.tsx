@@ -1,5 +1,6 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
+import type { ProjectFieldValue, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { debounce } from 'lodash';
 import { useMemo } from 'react';
 import type { UseFormGetFieldState } from 'react-hook-form';
@@ -7,7 +8,6 @@ import type { UseFormGetFieldState } from 'react-hook-form';
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { useUser } from 'hooks/useUser';
-import type { ProjectFieldValue, FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';

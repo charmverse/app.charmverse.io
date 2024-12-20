@@ -1,5 +1,5 @@
 import { Box, Chip, ListItemText, MenuItem, Stack } from '@mui/material';
-import type { SelectOptionType } from '@root/lib/forms/interfaces';
+import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { HTMLAttributes } from 'react';
 
 import { SelectOptionEdit } from 'components/common/form/fields/Select/SelectOptionEdit';

@@ -6,11 +6,11 @@ import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import { createDraftProposal } from '../../../../lib/proposals/createDraftProposal';
 import { publishProposal } from '../../../../lib/proposals/publishProposal';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
+import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertProposalFormAnswers';
 
 import { appendFileSync } from 'fs';
 import { RateLimit } from 'async-sema';
-import type { FieldAnswerInput } from 'lib/forms/interfaces';
+import type { FieldAnswerInput } from '@root/lib/proposals/forms/interfaces';
 import { charmValues, charmValue, charmLinks } from './utils';
 import {
   spaceId,

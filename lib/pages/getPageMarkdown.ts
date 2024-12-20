@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from '@root/connectors/chains';
-import type { FormFieldValue, LongTextValue, ProjectFieldValue, SelectOptionType } from '@root/lib/forms/interfaces';
 import type {
   ProjectField,
   ProjectMemberField,
@@ -8,6 +7,12 @@ import type {
   FieldConfig
 } from '@root/lib/projects/formField';
 import { getFieldConfig, projectMemberFieldProperties, projectFieldProperties } from '@root/lib/projects/formField';
+import type {
+  FormFieldValue,
+  LongTextValue,
+  ProjectFieldValue,
+  SelectOptionType
+} from '@root/lib/proposals/forms/interfaces';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import { _ } from '@root/lib/prosemirror/builders';
 import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';

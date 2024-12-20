@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
@@ -23,7 +23,8 @@ describe('createDraftProposal', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: uuid(),
@@ -34,7 +35,8 @@ describe('createDraftProposal', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 

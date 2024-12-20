@@ -2,9 +2,9 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { FormField, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { createForm } from '@root/lib/forms/createForm';
-import type { FormFieldInput } from '@root/lib/forms/interfaces';
-import { upsertProposalFormFields } from '@root/lib/proposals/form/upsertProposalFormFields';
+import { createForm } from '@root/lib/proposals/forms/createForm';
+import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
+import { upsertProposalFormFields } from '@root/lib/proposals/forms/upsertProposalFormFields';
 import { v4 } from 'uuid';
 
 const numberFieldInput: FormFieldInput = {
@@ -16,7 +16,8 @@ const numberFieldInput: FormFieldInput = {
   options: [],
   private: true,
   required: true,
-  fieldConfig: {}
+  fieldConfig: {},
+  dependsOnStepIndex: null
 };
 
 describe('upsertProposalFormFields', () => {
@@ -45,7 +46,8 @@ describe('upsertProposalFormFields', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -56,7 +58,8 @@ describe('upsertProposalFormFields', () => {
         options: [],
         private: true,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
@@ -104,7 +107,8 @@ describe('upsertProposalFormFields', () => {
         options: [],
         private: false,
         required: true,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       },
       {
         id: v4(),
@@ -115,7 +119,8 @@ describe('upsertProposalFormFields', () => {
         options: [],
         private: true,
         required: false,
-        fieldConfig: {}
+        fieldConfig: {},
+        dependsOnStepIndex: null
       }
     ];
 
