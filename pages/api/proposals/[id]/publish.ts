@@ -108,7 +108,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     throw new ActionNotPermittedError(`You cannot publish an archived proposal`);
   }
   // dont expect values for any form fields that depend on an evaluation step
-  const formFields = (proposalPage.proposal.form?.formFields as unknown as FormFieldInput[]).filter(
+  const formFields = (proposalPage.proposal.form?.formFields as unknown as FormFieldInput[])?.filter(
     (field) => typeof field.dependsOnStepIndex !== 'number'
   );
   const errors = getProposalErrors({
