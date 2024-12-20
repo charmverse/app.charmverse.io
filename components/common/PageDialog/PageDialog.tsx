@@ -4,15 +4,16 @@ import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
 import charmClient from 'charmClient/charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
+import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
 import Dialog from 'components/common/DatabaseEditor/components/dialog';
+import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -36,13 +37,21 @@ function PageDialogBase(props: Props) {
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
-  const router = useRouter();
   const { space } = useCurrentSpace();
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
   const { page } = usePage({ pageIdOrPath: pageId });
+
+  const proposalProps = useProposal({
+    proposalId: page?.proposalId
+  });
+
+  const proposalAnswersProps = useProposalFormAnswers({
+    proposal: proposalProps.proposal
+  });
+
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const fullPageUrl = page?.path ? `/${page?.path}` : null;
 
@@ -179,6 +188,8 @@ function PageDialogBase(props: Props) {
           page={page}
           savePage={savePage}
           readOnly={readOnlyPage}
+          {...proposalProps}
+          {...proposalAnswersProps}
         />
       )}
     </Dialog>

@@ -14,6 +14,10 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
 
+  // form field visibility may change when evaluation steps are completed, so we need to recalculate the form fields
+  const visibleFormFields =
+    proposal?.form?.formFields?.filter((formField) => !formField.isHiddenByDependency).length || 0;
+
   // only calculate this once on load, since answers will become stale and override the formFIelds
   const formFields = useMemo(
     () =>
@@ -31,7 +35,7 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
             options: (formField.options ?? []) as SelectOptionType[]
           };
         }),
-    [!!proposal?.form?.formFields, !!answers, proposal?.id]
+    [!!proposal?.form?.formFields, visibleFormFields, !!answers, proposal?.id]
   );
 
   // get Answers form

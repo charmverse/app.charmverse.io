@@ -17,6 +17,7 @@ export type ProposalEvaluationsProps = {
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   onChangeSelectedCredentialTemplates: ProposalSettingsProps['onChangeSelectedCredentialTemplates'];
   refreshProposal?: VoidFunction;
+  refreshProposalFormAnswers?: VoidFunction;
   pagePath?: string;
   pageTitle?: string;
   templateId?: string | null;
@@ -38,6 +39,7 @@ export function ProposalEvaluations({
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
+  refreshProposalFormAnswers,
   onChangeSelectedCredentialTemplates,
   pagePath,
   pageTitle,
@@ -78,6 +80,7 @@ export function ProposalEvaluations({
         onChangeEvaluation={onChangeEvaluation}
         readOnlyCredentialTemplates={!isAdmin}
         onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+        refreshProposalFormAnswers={refreshProposalFormAnswers}
         refreshProposal={refreshProposal}
         refreshPage={refreshPage}
         onChangeRewardSettings={onChangeRewardSettings}
