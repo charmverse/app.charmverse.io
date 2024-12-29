@@ -275,7 +275,7 @@ describe('computeBountyPermissions', () => {
     });
   });
 
-  it('should return false for all bounty operations if the the user is not a member of the space', async () => {
+  it('should return false for all bounty operations if the user is not a member of the space', async () => {
     const { user, space } = await generateUserAndSpace({ isAdmin: true });
 
     const { user: externalUser } = await generateUserAndSpace({ isAdmin: true });
