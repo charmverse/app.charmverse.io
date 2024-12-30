@@ -38,6 +38,7 @@ async function query() {
             claimedAt: new Date(),
             value: 100,
             recipientId: builderId,
+            season: currentSeason,
             activities: {
               create: {
                 type: 'points',
