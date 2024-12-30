@@ -3,6 +3,7 @@ import { memo, useEffect, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
+import { useProposalFormFieldsEditor } from 'components/proposals/hooks/useProposalFormFieldsEditor';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -51,6 +52,11 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   const proposalAnswersProps = useProposalFormAnswers({
     proposal
+  });
+  const proposalFormFieldsProps = useProposalFormFieldsEditor({
+    proposalId,
+    formFields: proposal?.form?.formFields || undefined,
+    readOnly: props.readOnly ?? false
   });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
@@ -121,8 +127,9 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       <DocumentColumn>
         <DocumentPage
           {...props}
-          {...proposalAnswersProps}
           {...proposalProps}
+          proposalAnswersProps={proposalAnswersProps}
+          proposalFormFieldsProps={proposalFormFieldsProps}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={internalSidebarView}

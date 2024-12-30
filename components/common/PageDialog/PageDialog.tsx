@@ -14,6 +14,7 @@ import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal'
 import { Button } from 'components/common/Button';
 import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
+import { useProposalFormFieldsEditor } from 'components/proposals/hooks/useProposalFormFieldsEditor';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -50,6 +51,11 @@ function PageDialogBase(props: Props) {
 
   const proposalAnswersProps = useProposalFormAnswers({
     proposal: proposalProps.proposal
+  });
+  const proposalFormFieldsProps = useProposalFormFieldsEditor({
+    proposalId: page?.proposalId,
+    formFields: proposalProps.proposal?.form?.formFields || undefined,
+    readOnly: props.readOnly ?? false
   });
 
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
@@ -189,7 +195,8 @@ function PageDialogBase(props: Props) {
           savePage={savePage}
           readOnly={readOnlyPage}
           {...proposalProps}
-          {...proposalAnswersProps}
+          proposalAnswersProps={proposalAnswersProps}
+          proposalFormFieldsProps={proposalFormFieldsProps}
         />
       )}
     </Dialog>

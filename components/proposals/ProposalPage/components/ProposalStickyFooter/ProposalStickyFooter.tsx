@@ -1,6 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
-import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
+import type { FormFieldValue, FormFieldInput, TypedFormField } from '@root/lib/proposals/forms/interfaces';
 import type { Control } from 'react-hook-form';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 
@@ -18,11 +18,13 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 export function ProposalStickyFooter({
   proposal,
   formAnswersControl,
+  formFields: allFormFields,
   page,
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
   formAnswersControl: Control<Record<string, FormFieldValue>, any>;
+  formFields?: FormFieldInput[];
   page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
   isStructuredProposal: boolean;
 }) {
@@ -49,9 +51,11 @@ export function ProposalStickyFooter({
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const formFields =
     page.type === 'proposal_template'
-      ? proposal.form?.formFields
-      : proposal.form?.formFields?.filter(
-          (field) => !field.isHiddenByDependency && (field.type === 'project_profile' || field.type === 'milestone')
+      ? allFormFields
+      : allFormFields?.filter(
+          (field) =>
+            !(field as TypedFormField).isHiddenByDependency &&
+            (field.type === 'project_profile' || field.type === 'milestone')
         );
   const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
 

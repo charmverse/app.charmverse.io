@@ -13,57 +13,60 @@ import { Button } from '../Button';
 
 import { FormField } from './FormField';
 
-export function FormFieldsEditor({
-  proposalId,
-  evaluations,
-  expandFieldsByDefault,
-  formFields: initialFormFields,
-  readOnly
-}: {
-  proposalId: string;
-  evaluations: { id: string; title: string }[];
-  expandFieldsByDefault?: boolean;
+// export function FormFieldsEditor({
+//   proposalId,
+//   evaluations,
+//   expandFieldsByDefault,
+//   formFields: initialFormFields,
+//   readOnly
+// }: {
+//   proposalId: string;
+//   evaluations: { id: string; title: string }[];
+//   expandFieldsByDefault?: boolean;
+//   formFields: FormFieldInput[];
+//   readOnly?: boolean;
+// }) {
+//   const [formFields, setFormFields] = useState([...initialFormFields]);
+//   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(
+//     expandFieldsByDefault ? [] : formFields.map((field) => field.id)
+//   );
+//   const { trigger } = useUpdateProposalFormFields({ proposalId });
+//   const debouncedUpdate = useMemo(() => {
+//     return debounce(trigger, 200);
+//   }, [trigger]);
+
+//   async function updateFormFields(_formFields: FormFieldInput[]) {
+//     if (readOnly) {
+//       return;
+//     }
+//     setFormFields(_formFields);
+//     try {
+//       await debouncedUpdate({ formFields: _formFields });
+//     } catch (error) {
+//       // dont show error modal, the UI should show red borders now instead
+//     }
+//   }
+
+//   return (
+//     <ControlledFormFieldsEditor
+//       collapsedFieldIds={collapsedFieldIds}
+//       formFields={formFields}
+//       setFormFields={updateFormFields}
+//       evaluations={evaluations}
+//       toggleCollapse={toggleCollapse}
+//       readOnly={readOnly}
+//     />
+//   );
+// }
+
+export type ControlledFormFieldsEditorProps = {
   formFields: FormFieldInput[];
-  readOnly?: boolean;
-}) {
-  const [formFields, setFormFields] = useState([...initialFormFields]);
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(
-    expandFieldsByDefault ? [] : formFields.map((field) => field.id)
-  );
-  const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const debouncedUpdate = useMemo(() => {
-    return debounce(trigger, 200);
-  }, [trigger]);
-
-  async function updateFormFields(_formFields: FormFieldInput[]) {
-    if (readOnly) {
-      return;
-    }
-    setFormFields(_formFields);
-    try {
-      await debouncedUpdate({ formFields: _formFields });
-    } catch (error) {
-      // dont show error modal, the UI should show red borders now instead
-    }
-  }
-
-  return (
-    <ControlledFormFieldsEditor
-      collapsedFieldIds={collapsedFieldIds}
-      formFields={formFields}
-      setFormFields={updateFormFields}
-      evaluations={evaluations}
-      toggleCollapse={(fieldId) => {
-        if (collapsedFieldIds.includes(fieldId)) {
-          setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
-        } else {
-          setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
-        }
-      }}
-      readOnly={readOnly}
-    />
-  );
-}
+  setFormFields: (formFields: FormFieldInput[]) => void;
+  collapsedFieldIds: string[];
+  toggleCollapse: (fieldId: string) => void;
+  evaluations: { id: string; title: string }[];
+  readOnly: boolean;
+};
 
 export function ControlledFormFieldsEditor({
   formFields,
@@ -72,14 +75,7 @@ export function ControlledFormFieldsEditor({
   toggleCollapse,
   evaluations,
   readOnly
-}: {
-  formFields: FormFieldInput[];
-  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
-  collapsedFieldIds: string[];
-  toggleCollapse: (fieldId: string) => void;
-  evaluations: { id: string; title: string }[];
-  readOnly?: boolean;
-}) {
+}: ControlledFormFieldsEditorProps) {
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
   const lastInsertedIndexRef = useRef<number | undefined>(undefined);

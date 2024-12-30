@@ -284,10 +284,10 @@ function ExpandedFormField({
 
       {evaluations.length > 0 && (
         <FieldWrapper label='Workflow step'>
-          <Select<number | null>
+          <Select<number | ''>
             data-test='form-field-dependency-select'
             displayEmpty
-            value={formField.dependsOnStepIndex}
+            value={formField.dependsOnStepIndex || ''}
             onChange={(e, value) => {
               updateFormField({
                 dependsOnStepIndex: e.target.value as number,
@@ -319,7 +319,7 @@ function ExpandedFormField({
                 : undefined
             }
             renderValue={(value) => {
-              if (value === null) {
+              if (value === '') {
                 return (
                   <Typography component='em' color='secondary'>
                     Do not require a step
