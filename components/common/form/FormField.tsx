@@ -284,10 +284,10 @@ function ExpandedFormField({
 
       {evaluations.length > 0 && (
         <FieldWrapper label='Workflow step'>
-          <Select<number | ''>
+          <Select<number | null>
             data-test='form-field-dependency-select'
             displayEmpty
-            value={formField.dependsOnStepIndex || ''}
+            value={formField.dependsOnStepIndex ?? null}
             onChange={(e, value) => {
               updateFormField({
                 dependsOnStepIndex: e.target.value as number,
@@ -299,7 +299,7 @@ function ExpandedFormField({
             }}
             variant='outlined'
             IconComponent={
-              formField.dependsOnStepIndex
+              formField.dependsOnStepIndex !== null
                 ? // eslint-disable-next-line react/no-unstable-nested-components
                   () => (
                     <IconButton
@@ -319,7 +319,7 @@ function ExpandedFormField({
                 : undefined
             }
             renderValue={(value) => {
-              if (value === '') {
+              if (value === null) {
                 return (
                   <Typography component='em' color='secondary'>
                     Do not require a step
