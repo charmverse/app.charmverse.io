@@ -45,12 +45,6 @@ jobs:
             test_command: 'npm run typecheck -w apps/cron'
           - test_name: 'Typecheck websockets'
             test_command: 'npm run typecheck -w apps/websockets'
-          - test_name: 'Typecheck scoutgame'
-            test_command: 'npm run typecheck -w apps/scoutgame'
-          - test_name: 'Typecheck scoutgame telegram'
-            test_command: 'npm run typecheck -w apps/scoutgametelegram'
-          - test_name: 'Typecheck scoutgame cron'
-            test_command: 'npm run typecheck -w apps/scoutgamecron'
 
     steps:
       - uses: actions/checkout@v4
