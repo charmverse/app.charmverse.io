@@ -15,8 +15,10 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
 
   // form field visibility may change when evaluation steps are completed, so we need to recalculate the form fields
+  // Note that we count the number of hidden fields, not the number of visible fields since new fields are visible by default and that would
+  // cause the form to be recalculated every time a new field is added
   const visibleFormFields =
-    proposal?.form?.formFields?.filter((formField) => !formField.isHiddenByDependency).length || 0;
+    proposal?.form?.formFields?.filter((formField) => formField.isHiddenByDependency).length || 0;
 
   // only calculate this once on load, since answers will become stale and override the formFIelds
   const formFields = useMemo(
