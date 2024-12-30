@@ -176,7 +176,7 @@ export function toggleList(listType: NodeType, itemType?: NodeType, todo?: boole
       let liftFrom = selection.$to.pos;
 
       // I am not fully sure the best solution,
-      // but if we donot handle the the nodeSelection of itemType
+      // but if we donot handle the nodeSelection of itemType
       // an incorrect content error in thrown by liftFollowingList.
       if (selection instanceof NodeSelection && selection.node.type === listItem) {
         liftFrom = selection.$from.pos + selection.node.firstChild!.content.size;
@@ -492,7 +492,7 @@ export function outdentList(type: NodeType): Command {
       return false;
     }
     // if we're backspacing at the start of a list item, unindent it
-    // take the the range of nodes we might be lifting
+    // take the range of nodes we might be lifting
 
     // the predicate is for when you're backspacing a top level list item:
     // we don't want to go up past the doc node, otherwise the range
@@ -762,7 +762,7 @@ function joinToPreviousListItem(type?: NodeType): Command {
           );
           tr.replaceWith(nodeBeforePos, $from.pos + $cut.nodeAfter.nodeSize, list);
         } else {
-          // take the text content of the paragraph and insert after the paragraph up until before the the cut
+          // take the text content of the paragraph and insert after the paragraph up until before the cut
           tr = tr.step(
             new ReplaceAroundStep(
               $lastNode.pos,
