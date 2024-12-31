@@ -104,6 +104,7 @@ function ExpandedFormField({
   const { space } = useCurrentSpace();
 
   const formFieldType = formField.type;
+
   const filteredFormFieldTypes = useMemo(() => {
     if (!formFieldTypeFrequencyCount) {
       return formFieldTypes.filter((_formFieldType) => {
@@ -284,13 +285,14 @@ function ExpandedFormField({
 
       {evaluations.length > 0 && (
         <FieldWrapper label='Workflow step'>
-          <Select<number | null>
+          <Select<string | null>
             data-test='form-field-dependency-select'
             displayEmpty
-            value={formField.dependsOnStepIndex}
-            onChange={(e, value) => {
+            // use a string instead of number, MUI shows the number 0 as selected when the value is null for some reason
+            value={typeof formField.dependsOnStepIndex === 'number' ? `${formField.dependsOnStepIndex}` : null}
+            onChange={(e) => {
               updateFormField({
-                dependsOnStepIndex: e.target.value as number,
+                dependsOnStepIndex: parseInt(e.target.value!),
                 id: formField.id
               });
             }}
@@ -299,7 +301,7 @@ function ExpandedFormField({
             }}
             variant='outlined'
             IconComponent={
-              formField.dependsOnStepIndex
+              formField.dependsOnStepIndex !== null
                 ? // eslint-disable-next-line react/no-unstable-nested-components
                   () => (
                     <IconButton
@@ -326,12 +328,16 @@ function ExpandedFormField({
                   </Typography>
                 );
               }
-              return evaluations[value]?.title;
+              return evaluations[parseInt(value)]?.title;
             }}
           >
             {evaluations.map((evaluation, index) => {
               return (
-                <MenuItem data-test={`form-field-dependency-option-${evaluation.id}`} key={evaluation.id} value={index}>
+                <MenuItem
+                  data-test={`form-field-dependency-option-${evaluation.id}`}
+                  key={evaluation.id}
+                  value={`${index}`}
+                >
                   <Stack flexDirection='row' gap={1} alignItems='center'>
                     {index + 1}. {evaluation.title}
                   </Stack>

@@ -124,7 +124,7 @@ export function useCreateProposalRewards(proposalId: MaybeString) {
   return usePOST<undefined, ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}/rewards`);
 }
 
-export function useUpdateProposalFormFields({ proposalId }: { proposalId: string }) {
+export function useUpdateProposalFormFields({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
 }
 

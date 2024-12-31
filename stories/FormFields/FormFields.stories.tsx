@@ -49,6 +49,7 @@ export function FormFieldsEditor() {
   return (
     <GlobalContext>
       <ControlledFormFieldsEditor
+        readOnly={false}
         formFields={formFields}
         evaluations={[
           { id: '123', title: 'Evaluation 1' },

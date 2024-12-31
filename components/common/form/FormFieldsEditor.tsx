@@ -2,68 +2,23 @@ import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import type { SelectOptionType, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
-import debounce from 'lodash/debounce';
-import { useRef, useEffect, useState, useMemo } from 'react';
+import { useRef, useEffect } from 'react';
 import { v4 } from 'uuid';
 
-import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 
 import { FormField } from './FormField';
 
-export function FormFieldsEditor({
-  proposalId,
-  evaluations,
-  expandFieldsByDefault,
-  formFields: initialFormFields,
-  readOnly
-}: {
-  proposalId: string;
-  evaluations: { id: string; title: string }[];
-  expandFieldsByDefault?: boolean;
+export type ControlledFormFieldsEditorProps = {
   formFields: FormFieldInput[];
-  readOnly?: boolean;
-}) {
-  const [formFields, setFormFields] = useState([...initialFormFields]);
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(
-    expandFieldsByDefault ? [] : formFields.map((field) => field.id)
-  );
-  const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const debouncedUpdate = useMemo(() => {
-    return debounce(trigger, 200);
-  }, [trigger]);
-
-  async function updateFormFields(_formFields: FormFieldInput[]) {
-    if (readOnly) {
-      return;
-    }
-    setFormFields(_formFields);
-    try {
-      await debouncedUpdate({ formFields: _formFields });
-    } catch (error) {
-      // dont show error modal, the UI should show red borders now instead
-    }
-  }
-
-  return (
-    <ControlledFormFieldsEditor
-      collapsedFieldIds={collapsedFieldIds}
-      formFields={formFields}
-      setFormFields={updateFormFields}
-      evaluations={evaluations}
-      toggleCollapse={(fieldId) => {
-        if (collapsedFieldIds.includes(fieldId)) {
-          setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
-        } else {
-          setCollapsedFieldIds([...collapsedFieldIds, fieldId]);
-        }
-      }}
-      readOnly={readOnly}
-    />
-  );
-}
+  setFormFields: (formFields: FormFieldInput[]) => void;
+  collapsedFieldIds: string[];
+  toggleCollapse: (fieldId: string) => void;
+  evaluations: { id: string; title: string }[];
+  readOnly: boolean;
+};
 
 export function ControlledFormFieldsEditor({
   formFields,
@@ -72,14 +27,7 @@ export function ControlledFormFieldsEditor({
   toggleCollapse,
   evaluations,
   readOnly
-}: {
-  formFields: FormFieldInput[];
-  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
-  collapsedFieldIds: string[];
-  toggleCollapse: (fieldId: string) => void;
-  evaluations: { id: string; title: string }[];
-  readOnly?: boolean;
-}) {
+}: ControlledFormFieldsEditorProps) {
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
   const lastInsertedIndexRef = useRef<number | undefined>(undefined);

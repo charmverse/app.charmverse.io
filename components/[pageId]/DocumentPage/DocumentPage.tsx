@@ -20,9 +20,10 @@ import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/s
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/views';
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
-import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { useProposalFormAnswers } from 'components/proposals/hooks/useProposalFormAnswers';
+import type { useProposalFormFieldsEditor } from 'components/proposals/hooks/useProposalFormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
@@ -62,7 +63,10 @@ const RewardProperties = dynamic(
   () => import('components/[pageId]/DocumentPage/components/RewardProperties').then((r) => r.RewardProperties),
   { ssr: false }
 );
-export type ProposalProps = ReturnType<typeof useProposal> & ReturnType<typeof useProposalFormAnswers>;
+export type ProposalProps = ReturnType<typeof useProposal> & {
+  proposalAnswersProps: ReturnType<typeof useProposalFormAnswers>;
+  proposalFormFieldsProps: ReturnType<typeof useProposalFormFieldsEditor>;
+};
 
 export type DocumentPageProps = {
   page: PageWithContent;
@@ -93,15 +97,8 @@ function DocumentPageComponent({
   onChangeWorkflow,
   onChangeRewardSettings,
   onChangeSelectedCredentialTemplates,
-  refreshProposalFormAnswers,
-  projectForm,
-  control,
-  formFields,
-  getFieldState,
-  onSave,
-  applyProject,
-  applyProjectMembers,
-  isLoadingAnswers
+  proposalAnswersProps,
+  proposalFormFieldsProps
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -262,7 +259,7 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
   return (
     <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
-      <FormProvider {...projectForm}>
+      <FormProvider {...proposalAnswersProps.projectForm}>
         <Box
           ref={printRef}
           className={`document-print-container ${fontClassName} drag-area-container`}
@@ -394,7 +391,7 @@ function DocumentPageComponent({
                   onChangeEvaluation={onChangeEvaluation}
                   onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}
-                  refreshProposalFormAnswers={refreshProposalFormAnswers}
+                  refreshProposalFormAnswers={proposalAnswersProps.refreshProposalFormAnswers}
                   onChangeWorkflow={onChangeWorkflow}
                   onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
                 />
@@ -458,15 +455,13 @@ function DocumentPageComponent({
                 </CardPropertiesWrapper>
                 {proposal && proposal.formId ? (
                   page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
-                      proposalId={proposal.id}
+                    <ControlledFormFieldsEditor
+                      {...proposalFormFieldsProps}
                       evaluations={proposal.evaluations}
-                      expandFieldsByDefault={proposal.status === 'draft'}
-                      formFields={proposal.form?.formFields ?? []}
+                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                     />
                   ) : (
-                    <LoadingComponent isLoading={isLoadingAnswers}>
+                    <LoadingComponent isLoading={proposalAnswersProps.isLoadingAnswers}>
                       <FormFieldAnswers
                         milestoneProps={{
                           containerWidth,
@@ -494,7 +489,7 @@ function DocumentPageComponent({
                                 })
                               });
                             }
-                            refreshProposalFormAnswers();
+                            proposalAnswersProps.refreshProposalFormAnswers();
                           },
                           onDelete: (draftId: string) => {
                             onChangeRewardSettings({
@@ -504,12 +499,9 @@ function DocumentPageComponent({
                             });
                           }
                         }}
-                        control={control}
+                        {...proposalAnswersProps}
                         disabled={!proposal.permissions.edit}
                         enableComments={proposal.permissions.comment}
-                        formFields={formFields}
-                        getFieldState={getFieldState}
-                        onSave={onSave}
                         pageId={page.id}
                         isAuthor={proposalAuthors.includes(user?.id || '')}
                         threads={threads}
@@ -517,8 +509,6 @@ function DocumentPageComponent({
                         key={proposal?.status === 'draft' ? 'draft' : 'published'}
                         projectId={proposal.projectId}
                         proposalId={proposal.id}
-                        applyProject={applyProject}
-                        applyProjectMembers={applyProjectMembers}
                       />
                     </LoadingComponent>
                   )
@@ -571,7 +561,8 @@ function DocumentPageComponent({
           <ProposalStickyFooter
             page={page}
             proposal={proposal}
-            formAnswersControl={control}
+            formAnswersControl={proposalAnswersProps.control}
+            formFields={proposalFormFieldsProps.formFields}
             isStructuredProposal={isStructuredProposal}
           />
         )}
