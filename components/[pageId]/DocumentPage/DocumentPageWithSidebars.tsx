@@ -56,7 +56,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const proposalFormFieldsProps = useProposalFormFieldsEditor({
     proposalId,
     formFields: proposal?.form?.formFields || undefined,
-    readOnly: props.readOnly ?? false
+    readOnly: props.readOnly ?? false,
+    expandFieldsByDefault: proposal?.status === 'draft'
   });
 
   const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({

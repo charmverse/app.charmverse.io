@@ -456,8 +456,8 @@ function DocumentPageComponent({
                 {proposal && proposal.formId ? (
                   page.type === 'proposal_template' ? (
                     <ControlledFormFieldsEditor
-                      evaluations={proposal.evaluations}
                       {...proposalFormFieldsProps}
+                      evaluations={proposal.evaluations}
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                     />
                   ) : (

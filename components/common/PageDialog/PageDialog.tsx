@@ -55,7 +55,8 @@ function PageDialogBase(props: Props) {
   const proposalFormFieldsProps = useProposalFormFieldsEditor({
     proposalId: page?.proposalId,
     formFields: proposalProps.proposal?.form?.formFields || undefined,
-    readOnly: props.readOnly ?? false
+    readOnly: props.readOnly ?? false,
+    expandFieldsByDefault: proposalProps.proposal?.status === 'draft'
   });
 
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;

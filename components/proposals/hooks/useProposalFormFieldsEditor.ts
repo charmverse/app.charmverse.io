@@ -58,7 +58,7 @@ export function useProposalFormFieldsEditor({
         setCollapsedFieldIds(initialFormFields.map((field) => field.id));
       }
     }
-  }, [!!initialFormFields]);
+  }, [!!initialFormFields, expandFieldsByDefault]);
 
   return { readOnly, setFormFields: setFormFieldsQuietly, formFields, collapsedFieldIds, toggleCollapse };
 }
