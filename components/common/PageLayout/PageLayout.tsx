@@ -104,10 +104,11 @@ function PageLayout({ children }: PageLayoutProps) {
               {space?.domain !== 'ef' && space?.customDomain !== 'ethrangers.com' ? (
                 <AnnouncementBanner
                   actionLabel='Play'
-                  actionHref='https://scoutgame.xyz/login'
+                  actionHref='https://youtube.com/shorts/Xr9S_aJPIPs?si=1UTudvjtc-NF5Zvt'
                   bannerId='scout-game-banner'
                 >
-                  Scout Game, fantasy sports for onchain builders, now open for everyone
+                  Preseason 2 is live! All rankings and points reset. Scout cheaper, tradeable Builder Cards, complete
+                  quests, and rack up points.
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
