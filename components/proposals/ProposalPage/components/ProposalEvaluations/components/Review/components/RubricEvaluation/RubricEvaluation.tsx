@@ -27,12 +27,13 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
   const rubricCriteria = evaluation?.rubricCriteria;
   const myRubricAnswers = useMemo(
     () => evaluation?.rubricAnswers.filter((answer) => answer.userId === user?.id) || [],
-    [user?.id, !!evaluation?.rubricAnswers]
+    // watch the evaluation id in case more than one evaluation has answers
+    [user?.id, evaluation.id, !!evaluation?.rubricAnswers]
   );
   const myDraftRubricAnswers = useMemo(
     () => evaluation?.draftRubricAnswers.filter((answer) => answer.userId === user?.id),
     // watch the size of draft answers so they refresh when the user deletes them
-    [user?.id, !!evaluation?.draftRubricAnswers?.length]
+    [user?.id, evaluation.id, !!evaluation?.draftRubricAnswers?.length]
   );
 
   const isAuthor = proposal.authors.some((a) => a.userId === user?.id);
