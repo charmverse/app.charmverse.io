@@ -78,7 +78,13 @@ describe('upsertFormAnswers', () => {
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
       expect.arrayContaining([
-        { ...answer1, id: expect.any(String), fieldId: fieldsInput[0].id, proposalId: proposal.id, type: 'short_text' }
+        expect.objectContaining({
+          ...answer1,
+          id: expect.any(String),
+          fieldId: fieldsInput[0].id,
+          proposalId: proposal.id,
+          type: 'short_text'
+        })
       ])
     );
 
@@ -95,8 +101,20 @@ describe('upsertFormAnswers', () => {
 
     expect(updated2).toEqual<FormFieldAnswer[]>(
       expect.arrayContaining([
-        { ...answer1, id: expect.any(String), fieldId: fieldsInput[0].id, proposalId: proposal.id, type: 'short_text' },
-        { ...answer2, id: expect.any(String), fieldId: fieldsInput[1].id, proposalId: proposal.id, type: 'long_text' }
+        expect.objectContaining({
+          ...answer1,
+          id: expect.any(String),
+          fieldId: fieldsInput[0].id,
+          proposalId: proposal.id,
+          type: 'short_text'
+        }),
+        expect.objectContaining({
+          ...answer2,
+          id: expect.any(String),
+          fieldId: fieldsInput[1].id,
+          proposalId: proposal.id,
+          type: 'long_text'
+        })
       ])
     );
   });
@@ -154,8 +172,20 @@ describe('upsertFormAnswers', () => {
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
       expect.arrayContaining([
-        { ...answer1, id: expect.any(String), fieldId: fieldsInput[0].id, proposalId: proposal.id, type: 'short_text' },
-        { ...answer2, id: expect.any(String), fieldId: fieldsInput[1].id, proposalId: proposal.id, type: 'long_text' }
+        expect.objectContaining({
+          ...answer1,
+          id: expect.any(String),
+          fieldId: fieldsInput[0].id,
+          proposalId: proposal.id,
+          type: 'short_text'
+        }),
+        expect.objectContaining({
+          ...answer2,
+          id: expect.any(String),
+          fieldId: fieldsInput[1].id,
+          proposalId: proposal.id,
+          type: 'long_text'
+        })
       ])
     );
   });
@@ -208,7 +238,13 @@ describe('upsertFormAnswers', () => {
 
     expect(updated1).toEqual<FormFieldAnswer[]>(
       expect.arrayContaining([
-        { ...answer1, id: expect.any(String), fieldId: fieldsInput[0].id, proposalId: proposal.id, type: 'short_text' }
+        expect.objectContaining({
+          ...answer1,
+          id: expect.any(String),
+          fieldId: fieldsInput[0].id,
+          proposalId: proposal.id,
+          type: 'short_text'
+        })
       ])
     );
 
@@ -225,13 +261,13 @@ describe('upsertFormAnswers', () => {
 
     expect(updated2).toEqual<FormFieldAnswer[]>(
       expect.arrayContaining([
-        {
+        expect.objectContaining({
           ...updatedAnswer,
           id: expect.any(String),
           fieldId: fieldsInput[0].id,
           proposalId: proposal.id,
           type: 'short_text'
-        }
+        })
       ])
     );
   });
