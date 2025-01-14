@@ -7,7 +7,7 @@ esbuild
   .build({
     bundle: true,
     entryPoints: ['./src/cron.ts'],
-    // metafile: true, // uncomment to analyize build file contents
+    // metafile: true, // uncomment to analyze build file contents
     outdir: './dist',
     tsconfig: './tsconfig.json',
     // packages: 'external',

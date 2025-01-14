@@ -326,7 +326,7 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
             }
           });
 
-          log.info(`Loop checkout url was succesfully added in stripe metadata`, { spaceId, priceId, subscriptionId });
+          log.info(`Loop checkout url was successfully added in stripe metadata`, { spaceId, priceId, subscriptionId });
         }
 
         break;

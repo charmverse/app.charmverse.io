@@ -115,7 +115,7 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
       {!hasEnoughOptions && (
         <Grid item>
           <Alert severity='info'>
-            Please at at least {minimumOptions} non empty option{minimumOptions !== 1 ? 's' : ''}
+            Please at least {minimumOptions} non empty option{minimumOptions !== 1 ? 's' : ''}
           </Alert>
         </Grid>
       )}

@@ -8,7 +8,7 @@ esbuild
   .build({
     bundle: true,
     entryPoints: ['./src/ceramic-client.ts'],
-    // metafile: true, // uncomment to analyize build file contents
+    // metafile: true, // uncomment to analyze build file contents
     outdir: './dist',
     platform: 'node',
     sourcemap: true,
