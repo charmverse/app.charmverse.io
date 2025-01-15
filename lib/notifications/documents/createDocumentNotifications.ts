@@ -337,6 +337,14 @@ export async function createDocumentNotifications(webhookData: {
         : (webhookData.event.document?.authors.map(({ id }) => id) ?? []);
       const documentId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          domain: true
+        }
+      });
 
       const comment = webhookData.event.post
         ? await prisma.postComment.findFirstOrThrow({
@@ -480,6 +488,56 @@ export async function createDocumentNotifications(webhookData: {
           });
           ids.push(id);
           notificationSentUserIds.add(targetUserId);
+        }
+      }
+
+      const document = documentId
+        ? await prisma.page.findUniqueOrThrow({
+            where: {
+              id: documentId
+            },
+            select: {
+              type: true,
+              proposalId: true
+            }
+          })
+        : null;
+
+      if (documentId && space.domain === 'op-grants' && document?.type === 'proposal' && document?.proposalId) {
+        const spaceRoles = await prisma.spaceRole.findMany({
+          where: {
+            spaceId
+          },
+          select: {
+            userId: true
+          }
+        });
+
+        for (const spaceRole of spaceRoles) {
+          if (notificationSentUserIds.has(spaceRole.userId) || spaceRole.userId === commentAuthorId) {
+            continue;
+          }
+
+          const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+            resourceId: document?.proposalId,
+            userId: spaceRole.userId
+          });
+
+          if (proposalPermissions.evaluate || proposalPermissions.evaluate_appeal) {
+            const { id } = await saveDocumentNotification({
+              type: 'comment.created',
+              createdAt: webhookData.createdAt,
+              createdBy: commentAuthorId,
+              commentId,
+              pageId: documentId,
+              spaceId,
+              userId: spaceRole.userId,
+              content: comment.content
+            });
+
+            ids.push(id);
+            notificationSentUserIds.add(spaceRole.userId);
+          }
         }
       }
 
