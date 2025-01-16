@@ -1,6 +1,7 @@
 /* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/utils/types';
 import { getPermissionsClient } from '@root/lib/permissions/api';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
@@ -498,32 +499,39 @@ export async function createDocumentNotifications(webhookData: {
             },
             select: {
               type: true,
-              proposalId: true
+              proposalId: true,
+              proposal: {
+                select: {
+                  id: true,
+                  reviewers: {
+                    where: {
+                      userId: {
+                        not: null
+                      }
+                    },
+                    select: {
+                      userId: true
+                    }
+                  }
+                }
+              }
             }
           })
         : null;
 
-      if (documentId && space.domain === 'op-grants' && document?.type === 'proposal' && document?.proposalId) {
-        const spaceRoles = await prisma.spaceRole.findMany({
-          where: {
-            spaceId
-          },
-          select: {
-            userId: true
-          }
-        });
+      const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
+      const proposalReviewerUserIds = Array.from(
+        new Set(document?.proposal?.reviewers.map((reviewer) => reviewer.userId).filter(isTruthy) ?? [])
+      ).filter((userId) => userId !== commentAuthorId && !notificationSentUserIds.has(userId));
 
-        for (const spaceRole of spaceRoles) {
-          if (notificationSentUserIds.has(spaceRole.userId) || spaceRole.userId === commentAuthorId) {
-            continue;
-          }
-
+      if (documentId && proposalId && proposalReviewerUserIds.length) {
+        for (const userId of proposalReviewerUserIds) {
           const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
-            resourceId: document?.proposalId,
-            userId: spaceRole.userId
+            resourceId: proposalId,
+            userId
           });
 
-          if (proposalPermissions.evaluate || proposalPermissions.evaluate_appeal) {
+          if (proposalPermissions.evaluate || proposalPermissions.evaluate_appeal || proposalPermissions.view) {
             const { id } = await saveDocumentNotification({
               type: 'comment.created',
               createdAt: webhookData.createdAt,
@@ -531,12 +539,12 @@ export async function createDocumentNotifications(webhookData: {
               commentId,
               pageId: documentId,
               spaceId,
-              userId: spaceRole.userId,
+              userId,
               content: comment.content
             });
 
             ids.push(id);
-            notificationSentUserIds.add(spaceRole.userId);
+            notificationSentUserIds.add(userId);
           }
         }
       }
