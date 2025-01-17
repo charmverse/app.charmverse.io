@@ -1,6 +1,7 @@
 /* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/utils/types';
 import { getPermissionsClient } from '@root/lib/permissions/api';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
@@ -337,7 +338,6 @@ export async function createDocumentNotifications(webhookData: {
         : (webhookData.event.document?.authors.map(({ id }) => id) ?? []);
       const documentId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
-
       const comment = webhookData.event.post
         ? await prisma.postComment.findFirstOrThrow({
             where: {
@@ -480,6 +480,77 @@ export async function createDocumentNotifications(webhookData: {
           });
           ids.push(id);
           notificationSentUserIds.add(targetUserId);
+        }
+      }
+
+      const document = documentId
+        ? await prisma.page.findUniqueOrThrow({
+            where: {
+              id: documentId
+            },
+            select: {
+              type: true,
+              proposalId: true,
+              proposal: {
+                select: {
+                  id: true,
+                  ProposalAppealReviewer: {
+                    where: {
+                      userId: {
+                        not: null
+                      }
+                    },
+                    select: {
+                      userId: true
+                    }
+                  },
+                  reviewers: {
+                    where: {
+                      userId: {
+                        not: null
+                      }
+                    },
+                    select: {
+                      userId: true
+                    }
+                  }
+                }
+              }
+            }
+          })
+        : null;
+
+      const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
+      const proposalReviewerUserIds = Array.from(
+        new Set(
+          [...(document?.proposal?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
+            .map((reviewer) => reviewer.userId)
+            .filter(isTruthy) ?? []
+        )
+      ).filter((userId) => userId !== commentAuthorId && !notificationSentUserIds.has(userId));
+
+      if (documentId && proposalId && proposalReviewerUserIds.length) {
+        for (const userId of proposalReviewerUserIds) {
+          const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+            resourceId: proposalId,
+            userId
+          });
+
+          if (proposalPermissions.view) {
+            const { id } = await saveDocumentNotification({
+              type: 'comment.created',
+              createdAt: webhookData.createdAt,
+              createdBy: commentAuthorId,
+              commentId,
+              pageId: documentId,
+              spaceId,
+              userId,
+              content: comment.content
+            });
+
+            ids.push(id);
+            notificationSentUserIds.add(userId);
+          }
         }
       }
 
