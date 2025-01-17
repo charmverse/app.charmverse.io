@@ -338,15 +338,6 @@ export async function createDocumentNotifications(webhookData: {
         : (webhookData.event.document?.authors.map(({ id }) => id) ?? []);
       const documentId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
-      const space = await prisma.space.findUniqueOrThrow({
-        where: {
-          id: spaceId
-        },
-        select: {
-          domain: true
-        }
-      });
-
       const comment = webhookData.event.post
         ? await prisma.postComment.findFirstOrThrow({
             where: {
@@ -538,7 +529,7 @@ export async function createDocumentNotifications(webhookData: {
         )
       ).filter((userId) => userId !== commentAuthorId && !notificationSentUserIds.has(userId));
 
-      if (documentId && proposalId && space.domain === 'op-grants' && proposalReviewerUserIds.length) {
+      if (documentId && proposalId && proposalReviewerUserIds.length) {
         for (const userId of proposalReviewerUserIds) {
           const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
             resourceId: proposalId,
