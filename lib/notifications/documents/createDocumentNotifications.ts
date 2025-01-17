@@ -503,6 +503,16 @@ export async function createDocumentNotifications(webhookData: {
               proposal: {
                 select: {
                   id: true,
+                  ProposalAppealReviewer: {
+                    where: {
+                      userId: {
+                        not: null
+                      }
+                    },
+                    select: {
+                      userId: true
+                    }
+                  },
                   reviewers: {
                     where: {
                       userId: {
@@ -524,14 +534,14 @@ export async function createDocumentNotifications(webhookData: {
         new Set(document?.proposal?.reviewers.map((reviewer) => reviewer.userId).filter(isTruthy) ?? [])
       ).filter((userId) => userId !== commentAuthorId && !notificationSentUserIds.has(userId));
 
-      if (documentId && proposalId && proposalReviewerUserIds.length) {
+      if (documentId && proposalId && space.domain === 'op-grants' && proposalReviewerUserIds.length) {
         for (const userId of proposalReviewerUserIds) {
           const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
             resourceId: proposalId,
             userId
           });
 
-          if (proposalPermissions.evaluate || proposalPermissions.evaluate_appeal || proposalPermissions.view) {
+          if (proposalPermissions.view) {
             const { id } = await saveDocumentNotification({
               type: 'comment.created',
               createdAt: webhookData.createdAt,

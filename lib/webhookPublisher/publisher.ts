@@ -5,8 +5,6 @@ import { isTestEnv } from '@root/config/constants';
 import { addMessageToSQS } from '@root/lib/aws/SQS';
 import type { WebhookEvent, WebhookPayload } from '@root/lib/webhookPublisher/interfaces';
 
-import { createNotificationsFromEvent } from '../notifications/createNotificationsFromEvent';
-
 const SQS_QUEUE_NAME = process.env.SQS_WEBHOOK_PUBLISHER_QUEUE_NAME;
 
 // This function check subscription status by event name AND name space
