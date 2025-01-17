@@ -531,7 +531,11 @@ export async function createDocumentNotifications(webhookData: {
 
       const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
       const proposalReviewerUserIds = Array.from(
-        new Set(document?.proposal?.reviewers.map((reviewer) => reviewer.userId).filter(isTruthy) ?? [])
+        new Set(
+          [...(document?.proposal?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
+            .map((reviewer) => reviewer.userId)
+            .filter(isTruthy) ?? []
+        )
       ).filter((userId) => userId !== commentAuthorId && !notificationSentUserIds.has(userId));
 
       if (documentId && proposalId && space.domain === 'op-grants' && proposalReviewerUserIds.length) {
