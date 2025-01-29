@@ -149,7 +149,7 @@
     "@hookform/resolvers": "^2.8.8",
     "@koa/cors": "^5.0.0",
     "@koa/router": "^10.1.1",
-    "@lens-protocol/client": "^2.0.0-alpha.27",
+    "@lens-protocol/client": "^2.3.2",
     "@lens-protocol/metadata": "^1.2.0",
     "@lens-protocol/react-web": "^2.0.0-alpha.27",
     "@lens-protocol/wagmi": "^4.1.4",
@@ -305,7 +305,7 @@
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless": "^4.1.19",
     "sharp": "^0.33.5",
-    "siwe": "^2.1.4",
+    "siwe": "^3.0.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "stripe": "^12.14.0",
@@ -324,10 +324,10 @@
     "viem": "^2.21.26",
     "wagmi": "^2.12.17",
     "yup": "^1.4.0",
-    "zksync-web3": "^0.16.0"
+    "zksync-web3": "^0.17.1"
   },
   "devDependencies": {
-    "@depay/web3-mock": "^13.18.1",
+    "@depay/web3-mock": "^14.19.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@jest/globals": "^29.7.0",
     "@next/eslint-plugin-next": "^14.2.15",
