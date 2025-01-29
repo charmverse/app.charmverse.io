@@ -1,10 +1,9 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import { getENSName } from '@packages/blockchain/getENSName';
 import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
-import { uid } from '@root/lib/utils/strings';
+import { v4 as uuid } from 'uuid';
 
 import type { ProjectAndMembersPayload } from './interfaces';
 
@@ -37,7 +36,7 @@ async function getOrCreateUserByWallet(walletAddress: string) {
     data: {
       username: ens ?? shortWalletAddress(walletAddress.toLowerCase()),
       identityType: 'Wallet',
-      path: isUserPathAvailable ? userPath : uid(),
+      path: isUserPathAvailable ? userPath : uuid(),
       wallets: {
         create: {
           address: walletAddress.toLowerCase(),
@@ -82,7 +81,7 @@ async function getOrCreateUserByEmail(email: string) {
     data: {
       username: email,
       claimed: false,
-      path: stringUtils.uid(),
+      path: uuid(),
       identityType: 'VerifiedEmail',
       email,
       verifiedEmails: {
