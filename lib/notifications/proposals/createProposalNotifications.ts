@@ -283,12 +283,7 @@ export async function createProposalNotifications(webhookData: {
 
         const isAppealReviewer = proposalPermissions.evaluate_appeal;
 
-        // Only notify reviewers for hidden evaluations
-        if (
-          proposal.workflow?.privateEvaluations &&
-          !isAppealReviewer &&
-          privateEvaluationSteps.includes(currentEvaluation.type)
-        ) {
+        if (!isAppealReviewer) {
           continue;
         }
 
