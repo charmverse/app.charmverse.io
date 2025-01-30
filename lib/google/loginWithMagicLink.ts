@@ -1,11 +1,11 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import { firebaseApp } from '@root/lib/google/firebaseApp';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 import { getUserProfile } from '@root/lib/profile/getUser';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { sessionUserRelations } from '@root/lib/session/config';
+import { v4 as uuid } from 'uuid';
 
 import type { LoginWithGoogleRequest } from './loginWithGoogle';
 
@@ -85,7 +85,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
         username: verificationResult.email,
         identityType: 'VerifiedEmail',
         email: verificationResult.email,
-        path: stringUtils.uid(),
+        path: uuid(),
         verifiedEmails: {
           create: {
             email: verificationResult.email,
