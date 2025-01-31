@@ -56,7 +56,7 @@ provider:
 
 functions:
   # This function is purely for testing our implementation, it received a webhook call and logs it
-  # Returns a 200 HTTP response
+  # Returns a 200 HTTP response..
   webhookChecker:
     handler: serverless/handler.webhookChecker
     events:
