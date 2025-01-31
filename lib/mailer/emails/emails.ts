@@ -13,6 +13,7 @@ import { NotificationTemplate } from './templates/NotificationTemplate';
 import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
 import { emailSubject, PageInviteTemplate } from './templates/PageInviteTemplate';
+import { emailSubject as emailPlainSubject, PlainTemplate } from './templates/PlainTemplate';
 
 export async function getPendingNotificationEmail({
   notification,
@@ -76,6 +77,13 @@ export async function getPageInviteEmail(props: PageInviteEmailProps) {
 export async function getMagicLinkEmail(props: MagicLinkProps) {
   const html = await render(MagicLinkTemplate(props));
   const subject = emailVerificationSubject();
+
+  return { html, subject };
+}
+
+export async function getPlainEmail() {
+  const html = await render(PlainTemplate());
+  const subject = emailPlainSubject();
 
   return { html, subject };
 }
