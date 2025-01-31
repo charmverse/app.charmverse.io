@@ -1,6 +1,6 @@
 service: cvServerless
 
-frameworkVersion: '4'
+frameworkVersion: '4.1.19'
 
 # Create an optimized package for our functions
 package:
