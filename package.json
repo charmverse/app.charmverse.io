@@ -202,7 +202,7 @@
     "@typeform/api-client": "^2.3.1",
     "@uauth/js": "^2.4.0",
     "@vercel/og": "^0.6.3",
-    "@wagmi/connectors": "^5.1.10",
+    "@wagmi/connectors": "^5.7.5",
     "@wagmi/core": "^2.13.3",
     "@zoralabs/zdk": "^2.4.0",
     "apg-js": "^4.4.0",
