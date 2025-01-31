@@ -388,7 +388,7 @@
     "@types/turndown": "^5.0.2",
     "@types/uuid": "^9.0.4",
     "@typescript-eslint/parser": "^8.9.0",
-    "aws-cdk": "^2.151.0",
+    "aws-cdk": "^2.177.0",
     "chromatic": "^6.21.0",
     "concurrently": "^8.2.1",
     "cookie": "^0.7.1",
