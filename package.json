@@ -203,7 +203,7 @@
     "@uauth/js": "^2.4.0",
     "@vercel/og": "^0.6.3",
     "@wagmi/connectors": "^5.7.5",
-    "@wagmi/core": "^2.13.3",
+    "@wagmi/core": "^2.16.3",
     "@zoralabs/zdk": "^2.4.0",
     "apg-js": "^4.4.0",
     "async-sema": "^3.1.1",
@@ -321,7 +321,7 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.14.0",
     "uuid": "^8.3.2",
-    "viem": "^2.21.26",
+    "viem": "^2.22.17",
     "wagmi": "^2.12.17",
     "yup": "^1.4.0",
     "zksync-web3": "^0.17.1"
@@ -442,8 +442,7 @@
     "react-dom": "^18.3.1",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
-    "serverless": "^4.1.19",
-    "viem": "^2.21.26"
+    "serverless": "^4.1.19"
   },
   "msw": {
     "workerDirectory": "public"
