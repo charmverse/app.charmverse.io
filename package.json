@@ -442,7 +442,8 @@
     "react-dom": "^18.3.1",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
-    "serverless": "^4.1.19"
+    "serverless": "^4.1.19",
+    "viem": "^2.22.17"
   },
   "msw": {
     "workerDirectory": "public"
