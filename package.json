@@ -202,8 +202,8 @@
     "@typeform/api-client": "^2.3.1",
     "@uauth/js": "^2.4.0",
     "@vercel/og": "^0.6.3",
-    "@wagmi/connectors": "^5.1.10",
-    "@wagmi/core": "^2.13.3",
+    "@wagmi/connectors": "^5.7.5",
+    "@wagmi/core": "^2.16.3",
     "@zoralabs/zdk": "^2.4.0",
     "apg-js": "^4.4.0",
     "async-sema": "^3.1.1",
@@ -305,7 +305,7 @@
     "scroll-into-view-if-needed": "^2.2.29",
     "serverless": "^4.1.19",
     "sharp": "^0.33.5",
-    "siwe": "^2.1.4",
+    "siwe": "^3.0.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "stripe": "^12.14.0",
@@ -321,13 +321,13 @@
     "unique-names-generator": "^4.7.1",
     "usehooks-ts": "^2.14.0",
     "uuid": "^8.3.2",
-    "viem": "^2.21.26",
-    "wagmi": "^2.12.17",
+    "viem": "^2.22.17",
+    "wagmi": "^2.14.9",
     "yup": "^1.4.0",
-    "zksync-web3": "^0.16.0"
+    "zksync-web3": "^0.17.1"
   },
   "devDependencies": {
-    "@depay/web3-mock": "^13.18.1",
+    "@depay/web3-mock": "^14.19.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@jest/globals": "^29.7.0",
     "@next/eslint-plugin-next": "^14.2.15",
@@ -391,7 +391,7 @@
     "aws-cdk": "^2.177.0",
     "chromatic": "^6.21.0",
     "concurrently": "^8.2.1",
-    "cookie": "^0.7.1",
+    "cookie": "^1.0.2",
     "cross-env": "^7.0.3",
     "dependency-cruiser": "^13.1.5",
     "dotenv": "^16.3.1",
@@ -443,7 +443,7 @@
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
     "serverless": "^4.1.19",
-    "viem": "^2.21.26"
+    "viem": "^2.22.17"
   },
   "msw": {
     "workerDirectory": "public"
