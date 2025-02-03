@@ -270,11 +270,13 @@ function CardDetailProperties(props: Props) {
     [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
-  let boardProperties = board.fields.cardProperties || [];
+  let boardProperties = (board.fields.cardProperties || [])
+    // hide deleted properties unless they were deleted before the card was created
+    .filter((p) => !p.deletedAt || new Date(p.deletedAt) > new Date(card.createdAt));
 
   if (board.fields.sourceType === 'proposals') {
     // remove properties that belong to a different template
-    boardProperties = board.fields?.cardProperties.filter(
+    boardProperties = boardProperties.filter(
       (property) => !property.templateId || card.fields.properties[property.id] !== undefined
     );
   }

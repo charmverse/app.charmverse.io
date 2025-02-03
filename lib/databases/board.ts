@@ -72,6 +72,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   id: string;
   name: string;
   type: T;
+  deletedAt?: string; // ISODate. If set, the property will be visible based on when the page was created
   options: IPropertyOption[];
   description?: string;
   tooltip?: string;
