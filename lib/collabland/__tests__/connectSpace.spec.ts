@@ -13,7 +13,8 @@ import { addUserToSpace } from 'testing/utils/spaces';
 const collablandApiUrl = 'https://fakedomain.com';
 
 jest.mock('config/constants', () => ({
-  authSecret: 'testsecret1234567890'
+  authSecret: 'testsecret1234567890',
+  isTestEnv: true
 }));
 
 jest.mock('lib/collabland/config', () => ({
