@@ -78,6 +78,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
       disableEditPropertyOption={!isAdmin}
+      isTemplate={!proposalFromDb} // templates are not loaded into the proposalsmap
       boardType='proposals'
     />
   );

@@ -39,6 +39,7 @@ type Props = {
   disableEditPropertyOption?: boolean;
   boardType?: 'proposals' | 'rewards';
   showCard?: (cardId: string | null) => void;
+  isTemplate?: boolean; // whether or not to always hide deleted properties
 };
 
 function CardDetailProperties(props: Props) {
@@ -52,7 +53,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedBy,
     syncWithPageId,
     mutator = defaultMutator,
-    disableEditPropertyOption
+    disableEditPropertyOption,
+    isTemplate
   } = props;
 
   const [newTemplateId, setNewTemplateId] = useState('');
@@ -271,8 +273,8 @@ function CardDetailProperties(props: Props) {
   );
 
   let boardProperties = (board.fields.cardProperties || [])
-    // hide deleted properties unless they were deleted before the card was created
-    .filter((p) => !p.deletedAt || new Date(p.deletedAt) > new Date(card.createdAt));
+    // hide deleted properties unless they were deleted before the card was created and it's not a template
+    .filter((p) => !p.deletedAt || (!isTemplate && new Date(p.deletedAt) > new Date(card.createdAt)));
 
   if (board.fields.sourceType === 'proposals') {
     // remove properties that belong to a different template

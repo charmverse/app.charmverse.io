@@ -126,7 +126,14 @@ export function useRewardsBoard() {
         return;
       }
 
-      const updatedProperties = dbBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
+      const updatedProperties = dbBlock.fields.cardProperties.map((p) =>
+        p.id === propertyTemplateId
+          ? {
+              ...p,
+              deletedAt: new Date().toISOString()
+            }
+          : p
+      );
       const updatedBlock = {
         ...dbBlock,
         fields: { ...(dbBlock.fields as BoardFields), cardProperties: updatedProperties }

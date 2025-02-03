@@ -87,6 +87,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       mutator={mutator ?? undefined}
       disableEditPropertyOption={!isAdmin}
       boardType='rewards'
+      isTemplate={rewardPage?.type === 'bounty_template'}
     />
   );
 }
