@@ -67,6 +67,10 @@ export function CardDetailProperty({
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
   const propertyTooltip = property.name.length > 20 ? property.name : '';
+
+  // do not allow editing deleted properties (simpler UX)
+  readOnly = readOnly || !!property.deletedAt;
+
   return (
     <Stack
       ref={columnRef}
@@ -83,7 +87,7 @@ export function CardDetailProperty({
       className='octo-propertyrow'
     >
       {(readOnly || disableEditPropertyOption) && (
-        <PropertyLabel tooltip={propertyTooltip} readOnly>
+        <PropertyLabel tooltip={propertyTooltip} readOnly deleted={!!property.deletedAt}>
           {property.name}
         </PropertyLabel>
       )}

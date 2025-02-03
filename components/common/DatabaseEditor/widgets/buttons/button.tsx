@@ -13,6 +13,7 @@ type Props = {
   rightIcon?: boolean;
   disabled?: boolean;
   'data-test'?: string;
+  deleted?: boolean;
 };
 
 function Button({ size = 'small', ...props }: Props): JSX.Element {
@@ -31,6 +32,7 @@ function Button({ size = 'small', ...props }: Props): JSX.Element {
       title={props.title}
       onBlur={props.onBlur}
       disabled={props.disabled}
+      style={{ textDecoration: props.deleted ? 'line-through' : 'none' }}
     >
       {!props.rightIcon && props.icon}
       <span>{props.children}</span>

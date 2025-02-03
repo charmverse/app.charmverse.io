@@ -11,6 +11,7 @@ type PropertyLabelProps = {
   highlighted?: boolean;
   fullWidth?: boolean;
   tooltip?: string;
+  deleted?: boolean; // when showing deleted card properties
 };
 
 const Wrapper = styled(({ highlighted, fullWidth, ...props }: any) => <Box {...props} />)<{
@@ -31,18 +32,20 @@ export function PropertyLabel({
   fullWidth,
   tooltip,
   readOnly = true,
-  highlighted
+  highlighted,
+  deleted
 }: PropertyLabelProps) {
   if (readOnly) {
+    const deletedTooltip = deleted ? 'This property was deleted' : tooltip;
     return (
       <Wrapper
         className='octo-propertyname octo-propertyname--readonly'
         highlighted={highlighted}
         fullWidth={fullWidth}
       >
-        <Tooltip title={tooltip} disableInteractive>
+        <Tooltip title={tooltip || deletedTooltip} disableInteractive>
           <span>
-            <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>}>
+            <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>} deleted={deleted}>
               {children}
             </Button>
           </span>
