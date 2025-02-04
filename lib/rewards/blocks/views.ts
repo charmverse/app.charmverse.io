@@ -137,9 +137,9 @@ export function getProposalRewardsView({
   view.fields.visiblePropertyIds = (board.fields.cardProperties as { id: string }[])
     .map((p) => p.id)
     .filter((id: string) => {
-      if (rewardTypes.includes('custom') && id === REWARD_CUSTOM_VALUE) {
+      if (rewardTypes.includes('custom') && (id === REWARD_CUSTOM_VALUE || id === DUE_DATE_ID)) {
         return true;
-      } else if (rewardTypes.includes('token') && (id === REWARD_AMOUNT || id === REWARD_CHAIN)) {
+      } else if (rewardTypes.includes('token') && (id === REWARD_AMOUNT || id === REWARD_CHAIN || id === DUE_DATE_ID)) {
         return true;
       } else {
         return !id.startsWith('__');
@@ -148,12 +148,12 @@ export function getProposalRewardsView({
 
   view.fields.columnWidths = {
     ...view.fields.columnWidths,
-    [Constants.titleColumnId]: 300
+    [Constants.titleColumnId]: 250
   };
   // set larger than normal width for all custom properties
   view.fields.visiblePropertyIds.forEach((id) => {
     if (!view.fields.columnWidths[id]) {
-      view.fields.columnWidths[id] = 200;
+      view.fields.columnWidths[id] = 150;
     }
   });
   return view;
