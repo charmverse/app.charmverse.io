@@ -68,7 +68,6 @@ exports[`components/table/TableHeaders should match snapshot 1`] = `
       >
         <button
           class="Button size--small"
-          style="text-decoration: none;"
           type="button"
         >
           <span>

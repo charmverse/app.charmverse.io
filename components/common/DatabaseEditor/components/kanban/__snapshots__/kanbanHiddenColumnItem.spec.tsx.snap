@@ -22,7 +22,6 @@ exports[`src/components/kanban/kanbanHiddenColumnItem should match snapshot 1`] 
       </div>
       <button
         class="Button size--small"
-        style="text-decoration: none;"
         type="button"
       >
         <span>
@@ -56,7 +55,6 @@ exports[`src/components/kanban/kanbanHiddenColumnItem should match snapshot read
       </div>
       <button
         class="Button size--small"
-        style="text-decoration: none;"
         type="button"
       >
         <span>
