@@ -39,6 +39,7 @@ type Props = {
   disableEditPropertyOption?: boolean;
   boardType?: 'proposals' | 'rewards';
   showCard?: (cardId: string | null) => void;
+  isTemplate?: boolean; // whether or not to always hide deleted properties
 };
 
 function CardDetailProperties(props: Props) {
@@ -52,7 +53,8 @@ function CardDetailProperties(props: Props) {
     pageUpdatedBy,
     syncWithPageId,
     mutator = defaultMutator,
-    disableEditPropertyOption
+    disableEditPropertyOption,
+    isTemplate
   } = props;
 
   const [newTemplateId, setNewTemplateId] = useState('');
@@ -196,14 +198,10 @@ function CardDetailProperties(props: Props) {
         id: 'CardDetailProperty.confirm-delete-heading',
         defaultMessage: 'Confirm Delete Property'
       }),
-      subText: intl.formatMessage(
-        {
-          id: 'CardDetailProperty.confirm-delete-subtext',
-          defaultMessage:
-            'Are you sure you want to delete the property "{propertyName}"? Deleting it will delete the property from all cards in this board.'
-        },
-        { propertyName: propertyTemplate.name }
-      ),
+      subText:
+        board.id === '__defaultBoard' // __defaultBoard type  sis used to capture reward and proposal properties
+          ? `Are you sure you want to delete the property "${propertyTemplate.name}"?  Deleting it will not destroy data from previous submissions.`
+          : `Are you sure you want to delete the property "${propertyTemplate.name}"? Deleting it will delete the property from all cards in this board.`,
       confirmButtonText: intl.formatMessage({
         id: 'CardDetailProperty.delete-action-button',
         defaultMessage: 'Delete'
@@ -232,6 +230,14 @@ function CardDetailProperties(props: Props) {
 
     // open confirmation dialog property delete
     setShowConfirmationDialog(true);
+  }
+
+  // only used for proposal and reward boards at this time. we fully delete the properties of other boards
+  function restoreProperty(propertyTemplate: IPropertyTemplate) {
+    mutator.updateProperty(board, propertyTemplate.id, {
+      ...propertyTemplate,
+      deletedAt: undefined
+    });
   }
 
   function getDeleteDisabled(template: IPropertyTemplate) {
@@ -270,11 +276,13 @@ function CardDetailProperties(props: Props) {
     [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
-  let boardProperties = board.fields.cardProperties || [];
+  let boardProperties = (board.fields.cardProperties || [])
+    // hide deleted properties unless they were deleted before the card was created and it's not a template
+    .filter((p) => !p.deletedAt || (!isTemplate && new Date(p.deletedAt) > new Date(card.createdAt)));
 
   if (board.fields.sourceType === 'proposals') {
     // remove properties that belong to a different template
-    boardProperties = board.fields?.cardProperties.filter(
+    boardProperties = boardProperties.filter(
       (property) => !property.templateId || card.fields.properties[property.id] !== undefined
     );
   }
@@ -299,6 +307,7 @@ function CardDetailProperties(props: Props) {
             showCard={props.showCard}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+            onRestore={() => restoreProperty(propertyTemplate)}
             onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {
               onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate, relationData);
             }}
