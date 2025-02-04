@@ -495,22 +495,22 @@ export async function createDocumentNotifications(webhookData: {
               proposal: {
                 select: {
                   id: true,
-                  ProposalAppealReviewer: {
-                    where: {
-                      userId: {
-                        not: null
-                      }
-                    },
-                    select: {
-                      userId: true
-                    }
-                  },
                   evaluations: {
                     orderBy: {
                       index: 'asc'
                     },
                     include: {
                       reviewers: {
+                        where: {
+                          userId: {
+                            not: null
+                          }
+                        },
+                        select: {
+                          userId: true
+                        }
+                      },
+                      appealReviewers: {
                         where: {
                           userId: {
                             not: null
@@ -532,7 +532,7 @@ export async function createDocumentNotifications(webhookData: {
       const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
       const proposalReviewerUserIds = Array.from(
         new Set(
-          [...(currentEvaluation?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
+          [...(currentEvaluation?.reviewers ?? []), ...(currentEvaluation?.appealReviewers ?? [])]
             .map((reviewer) => reviewer.userId)
             .filter(isTruthy) ?? []
         )
