@@ -1,6 +1,8 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import type { FormFieldValue, FormFieldInput, TypedFormField } from '@root/lib/proposals/forms/interfaces';
+import { delay } from '@root/lib/utils/async';
+import { useState } from 'react';
 import type { Control } from 'react-hook-form';
 import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 
@@ -35,6 +37,7 @@ export function ProposalStickyFooter({
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
+  const [loadingSave, setLoadingSave] = useState(false);
 
   async function onClick() {
     try {
@@ -85,18 +88,36 @@ export function ProposalStickyFooter({
   }
   const disabledTooltip = errors.length > 0 ? errors.join('\n') : undefined;
 
+  const handleSave = async () => {
+    setLoadingSave(true);
+    await delay(1000);
+    setLoadingSave(false);
+  };
+
   return (
     <StickyFooterContainer>
       <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
-        <Button
-          disabledTooltip={disabledTooltip}
-          disabled={!!disabledTooltip}
-          data-test='publish-proposal-button'
-          loading={isMutating}
-          onClick={onClick}
-        >
-          Publish
-        </Button>
+        {proposal.status === 'draft' ? (
+          <Button
+            disabledTooltip={disabledTooltip}
+            disabled={!!disabledTooltip}
+            data-test='publish-proposal-button'
+            loading={isMutating}
+            onClick={onClick}
+          >
+            Publish
+          </Button>
+        ) : (
+          <Button
+            disabledTooltip={disabledTooltip}
+            disabled={loadingSave}
+            data-test='save-proposal-button'
+            loading={loadingSave}
+            onClick={handleSave}
+          >
+            Save
+          </Button>
+        )}
       </Box>
     </StickyFooterContainer>
   );

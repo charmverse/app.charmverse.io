@@ -557,7 +557,7 @@ function DocumentPageComponent({
             )}
           </PageEditorContainer>
         </Box>
-        {proposal?.status === 'draft' && (
+        {proposal?.status && (
           <ProposalStickyFooter
             page={page}
             proposal={proposal}
