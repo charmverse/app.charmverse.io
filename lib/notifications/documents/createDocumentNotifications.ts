@@ -1,4 +1,5 @@
 /* eslint-disable no-continue */
+import { getCurrentEvaluation } from '@charmverse/core/dist/cjs/proposals';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTruthy } from '@packages/utils/types';
@@ -504,14 +505,21 @@ export async function createDocumentNotifications(webhookData: {
                       userId: true
                     }
                   },
-                  reviewers: {
-                    where: {
-                      userId: {
-                        not: null
-                      }
+                  evaluations: {
+                    orderBy: {
+                      index: 'asc'
                     },
-                    select: {
-                      userId: true
+                    include: {
+                      reviewers: {
+                        where: {
+                          userId: {
+                            not: null
+                          }
+                        },
+                        select: {
+                          userId: true
+                        }
+                      }
                     }
                   }
                 }
@@ -520,10 +528,11 @@ export async function createDocumentNotifications(webhookData: {
           })
         : null;
 
+      const currentEvaluation = getCurrentEvaluation(document?.proposal?.evaluations ?? []);
       const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
       const proposalReviewerUserIds = Array.from(
         new Set(
-          [...(document?.proposal?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
+          [...(currentEvaluation?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
             .map((reviewer) => reviewer.userId)
             .filter(isTruthy) ?? []
         )
