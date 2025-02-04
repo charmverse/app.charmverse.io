@@ -65,7 +65,8 @@ async function exportSunnyProjectsToCsv() {
       Created: project.createdAt.toUTCString(),
       Name: project.name,
       Type: project.sunnyAwardsProjectType || '',
-      Creator: `https://warpcast.com/${creatorAccount.username}`,
+      'Creator Warpcast': creatorAccount ? `https://warpcast.com/${creatorAccount?.username}` : '',
+      'Creator Email': project.user.email || '',
       'Team members': project.projectMembers
         .map((member) => (member.user?.farcasterUser?.account as FarcasterProfile['body'])?.username)
         .join(', '),
@@ -90,7 +91,7 @@ async function exportSunnyProjectsToCsv() {
     columns: Object.keys(rows[0])
   });
 
-  writeFileSync(`./scripts/sunny/project-export.csv`, csvString);
+  writeFileSync(`./scripts/sunny/project-export.tsv`, csvString);
 }
 
 exportSunnyProjectsToCsv().catch(console.error);
