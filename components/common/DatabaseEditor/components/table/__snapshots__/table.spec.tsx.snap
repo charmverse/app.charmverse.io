@@ -257,6 +257,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -367,6 +368,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -564,6 +566,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -1059,6 +1062,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -1169,6 +1173,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -1366,6 +1371,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -1861,6 +1867,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -1971,6 +1978,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -2168,6 +2176,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -2663,6 +2672,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -2773,6 +2783,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -2970,6 +2981,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                   >
                     <button
                       class="Button size--small"
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -3412,6 +3424,7 @@ exports[`components/table/Table should match snapshot 1`] = `
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -3743,6 +3756,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
           >
             <button
               class="Button size--small"
+              style="text-decoration: none;"
               type="button"
             >
               <span>
@@ -3811,6 +3825,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
                 </div>
                 <button
                   class="Button size--small"
+                  style="text-decoration: none;"
                   type="button"
                 >
                   <span>

@@ -26,6 +26,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
       >
         <button
           class="Button size--small"
+          style="text-decoration: none;"
           title="0"
           type="button"
         >
@@ -117,6 +118,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot 1`] = `
       >
         <button
           class="Button size--small"
+          style="text-decoration: none;"
           title="0"
           type="button"
         >
@@ -209,6 +211,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot readonly
       >
         <button
           class="Button size--small"
+          style="text-decoration: none;"
           title="0"
           type="button"
         >

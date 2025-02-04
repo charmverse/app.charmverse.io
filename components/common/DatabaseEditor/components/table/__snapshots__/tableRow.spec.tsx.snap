@@ -92,6 +92,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>
@@ -203,6 +204,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>
@@ -381,6 +383,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>
@@ -468,6 +471,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>
@@ -579,6 +583,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>
@@ -739,6 +744,7 @@ exports[`components/table/TableRow should match snapshots with a nested row 1`] 
             >
               <button
                 class="Button size--small"
+                style="text-decoration: none;"
                 type="button"
               >
                 <span>

@@ -278,6 +278,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     class="KanbanCalculation"
                   >
                     <button
+                      style="text-decoration: none;"
                       title="2"
                       type="button"
                     >
@@ -511,6 +512,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         </span>
                       </div>
                       <button
+                        style="text-decoration: none;"
                         type="button"
                       >
                         <span>
@@ -1574,6 +1576,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     class="KanbanCalculation"
                   >
                     <button
+                      style="text-decoration: none;"
                       title="2"
                       type="button"
                     >
@@ -1807,6 +1810,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         </span>
                       </div>
                       <button
+                        style="text-decoration: none;"
                         type="button"
                       >
                         <span>
@@ -2419,6 +2423,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     style="flex-grow: 1;"
                   >
                     <button
+                      style="text-decoration: none;"
                       type="button"
                     >
                       <span>
@@ -2486,6 +2491,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           </span>
                         </div>
                         <button
+                          style="text-decoration: none;"
                           type="button"
                         >
                           <span>
@@ -2649,6 +2655,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                               style="text-decoration: none;"
                             >
                               <button
+                                style="text-decoration: none;"
                                 type="button"
                               >
                                 <span>
@@ -2770,6 +2777,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                               style="text-decoration: none;"
                             >
                               <button
+                                style="text-decoration: none;"
                                 type="button"
                               >
                                 <span>
