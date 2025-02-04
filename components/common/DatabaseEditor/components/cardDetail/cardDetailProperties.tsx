@@ -200,7 +200,7 @@ function CardDetailProperties(props: Props) {
       }),
       subText:
         board.id === '__defaultBoard' // __defaultBoard type  sis used to capture reward and proposal properties
-          ? `Are you sure you want to delete the property "${propertyTemplate.name}"? Deleting it will not destroy data from previous submissions.`
+          ? `Are you sure you want to delete the property "${propertyTemplate.name}"?  Deleting it will not destroy data from previous submissions.`
           : `Are you sure you want to delete the property "${propertyTemplate.name}"? Deleting it will delete the property from all cards in this board.`,
       confirmButtonText: intl.formatMessage({
         id: 'CardDetailProperty.delete-action-button',
@@ -230,6 +230,14 @@ function CardDetailProperties(props: Props) {
 
     // open confirmation dialog property delete
     setShowConfirmationDialog(true);
+  }
+
+  // only used for proposal and reward boards at this time. we fully delete the properties of other boards
+  function restoreProperty(propertyTemplate: IPropertyTemplate) {
+    mutator.updateProperty(board, propertyTemplate.id, {
+      ...propertyTemplate,
+      deletedAt: undefined
+    });
   }
 
   function getDeleteDisabled(template: IPropertyTemplate) {
@@ -299,6 +307,7 @@ function CardDetailProperties(props: Props) {
             showCard={props.showCard}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
+            onRestore={() => restoreProperty(propertyTemplate)}
             onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {
               onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate, relationData);
             }}

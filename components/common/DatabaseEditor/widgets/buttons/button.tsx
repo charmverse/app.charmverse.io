@@ -32,7 +32,7 @@ function Button({ size = 'small', ...props }: Props): JSX.Element {
       title={props.title}
       onBlur={props.onBlur}
       disabled={props.disabled}
-      style={{ textDecoration: props.deleted ? 'line-through' : 'none' }}
+      style={{ textDecoration: props.deleted ? 'line-through' : undefined }}
     >
       {!props.rightIcon && props.icon}
       <span>{props.children}</span>

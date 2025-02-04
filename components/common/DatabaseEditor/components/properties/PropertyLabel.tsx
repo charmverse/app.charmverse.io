@@ -36,14 +36,13 @@ export function PropertyLabel({
   deleted
 }: PropertyLabelProps) {
   if (readOnly) {
-    const deletedTooltip = deleted ? 'This property was deleted' : tooltip;
     return (
       <Wrapper
         className='octo-propertyname octo-propertyname--readonly'
         highlighted={highlighted}
         fullWidth={fullWidth}
       >
-        <Tooltip title={tooltip || deletedTooltip} disableInteractive>
+        <Tooltip title={tooltip} disableInteractive>
           <span>
             <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>} deleted={deleted}>
               {children}

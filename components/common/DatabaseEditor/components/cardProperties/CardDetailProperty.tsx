@@ -40,6 +40,7 @@ export function CardDetailProperty({
   board,
   card,
   onDelete,
+  onRestore,
   pageUpdatedBy,
   pageUpdatedAt,
   deleteDisabledMessage,
@@ -56,6 +57,7 @@ export function CardDetailProperty({
   board: Board;
   onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: VoidFunction;
+  onRestore: VoidFunction;
   pageUpdatedAt: string;
   pageUpdatedBy: string;
   deleteDisabledMessage?: string;
@@ -66,10 +68,11 @@ export function CardDetailProperty({
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
-  const propertyTooltip = property.name.length > 20 ? property.name : '';
-
-  // do not allow editing deleted properties (simpler UX)
-  readOnly = readOnly || !!property.deletedAt;
+  const propertyTooltip = property.deletedAt
+    ? 'This property was deleted'
+    : property.name.length > 20
+      ? property.name
+      : '';
 
   return (
     <Stack
@@ -105,7 +108,7 @@ export function CardDetailProperty({
             <DragIndicatorIcon className='icons' fontSize='small' color='secondary' />
             <Tooltip title={propertyTooltip} disableInteractive>
               <span>
-                <Button>{property.name}</Button>
+                <Button deleted={!!property.deletedAt}>{property.name}</Button>
               </span>
             </Tooltip>
           </PropertyNameContainer>
@@ -113,6 +116,10 @@ export function CardDetailProperty({
             <PropertyMenu
               board={board}
               onDelete={onDelete}
+              onRestore={() => {
+                onRestore();
+                changePropertyPopupState.close();
+              }}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
               onTypeAndNameChanged={(newType, newName, relationData) => {
