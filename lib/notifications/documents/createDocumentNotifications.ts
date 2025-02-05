@@ -1,6 +1,7 @@
 /* eslint-disable no-continue */
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { isTruthy } from '@packages/utils/types';
 import { getPermissionsClient } from '@root/lib/permissions/api';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
@@ -494,24 +495,31 @@ export async function createDocumentNotifications(webhookData: {
               proposal: {
                 select: {
                   id: true,
-                  ProposalAppealReviewer: {
-                    where: {
-                      userId: {
-                        not: null
-                      }
+                  evaluations: {
+                    orderBy: {
+                      index: 'asc'
                     },
-                    select: {
-                      userId: true
-                    }
-                  },
-                  reviewers: {
-                    where: {
-                      userId: {
-                        not: null
+                    include: {
+                      reviewers: {
+                        where: {
+                          userId: {
+                            not: null
+                          }
+                        },
+                        select: {
+                          userId: true
+                        }
+                      },
+                      appealReviewers: {
+                        where: {
+                          userId: {
+                            not: null
+                          }
+                        },
+                        select: {
+                          userId: true
+                        }
                       }
-                    },
-                    select: {
-                      userId: true
                     }
                   }
                 }
@@ -520,10 +528,11 @@ export async function createDocumentNotifications(webhookData: {
           })
         : null;
 
+      const currentEvaluation = getCurrentEvaluation(document?.proposal?.evaluations ?? []);
       const proposalId = document?.type === 'proposal' ? document?.proposal?.id : null;
       const proposalReviewerUserIds = Array.from(
         new Set(
-          [...(document?.proposal?.reviewers ?? []), ...(document?.proposal?.ProposalAppealReviewer ?? [])]
+          [...(currentEvaluation?.reviewers ?? []), ...(currentEvaluation?.appealReviewers ?? [])]
             .map((reviewer) => reviewer.userId)
             .filter(isTruthy) ?? []
         )
