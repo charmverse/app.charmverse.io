@@ -256,21 +256,18 @@ export function Comment({
                 <CommentVote permissions={permissions} votes={comment as GenericCommentWithVote} onVote={voteComment} />
               )}
               <Tooltip title={!permissions?.add_comment ? 'You do not have permissions to add a comment' : ''}>
-                <Typography
+                <Button
                   sx={{
-                    cursor: 'pointer'
+                    padding: '2px 6px'
                   }}
                   onClick={() => {
                     if (permissions?.add_comment) {
                       setShowCommentReply(true);
                     }
                   }}
-                  color='secondary'
-                  fontWeight='semibold'
-                  variant='subtitle1'
                 >
                   Reply
-                </Typography>
+                </Button>
               </Tooltip>
               {comment.lensCommentLink && (
                 <Link
