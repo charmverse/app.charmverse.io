@@ -1,5 +1,6 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import RestoreIcon from '@mui/icons-material/RestoreOutlined';
 import {
   ListItemIcon,
   ListItemText,
@@ -25,6 +26,7 @@ import { typeDisplayName } from './typeDisplayName';
 type Props = {
   onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: (id: string) => void;
+  onRestore: (id: string) => void;
   deleteDisabled?: boolean;
   property: IPropertyTemplate;
   board: Board;
@@ -84,12 +86,21 @@ const PropertyMenu = React.memo((props: Props) => {
         </Tooltip>
       </MenuItem>
       <Divider sx={{ my: '0 !important' }} />
-      <MenuItem onClick={() => props.onDelete(propertyId)}>
-        <ListItemIcon>
-          <DeleteOutlinedIcon fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>Delete property</ListItemText>
-      </MenuItem>
+      {props.property.deletedAt ? (
+        <MenuItem onClick={() => props.onRestore(propertyId)}>
+          <ListItemIcon>
+            <RestoreIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Undelete property</ListItemText>
+        </MenuItem>
+      ) : (
+        <MenuItem onClick={() => props.onDelete(propertyId)}>
+          <ListItemIcon>
+            <DeleteOutlinedIcon fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Delete property</ListItemText>
+        </MenuItem>
+      )}
       <Menu
         {...bindMenu(changePropertyTypePopupState)}
         anchorOrigin={{

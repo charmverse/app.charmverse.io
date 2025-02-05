@@ -175,7 +175,14 @@ export function ProposalBlocksProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const updatedProperties = proposalBoardBlock.fields.cardProperties.filter((p) => p.id !== propertyTemplateId);
+      const updatedProperties = proposalBoardBlock.fields.cardProperties.map((p) =>
+        p.id === propertyTemplateId
+          ? {
+              ...p,
+              deletedAt: new Date().toISOString()
+            }
+          : p
+      );
       const updatedBlock = { ...proposalBoardBlock, fields: { cardProperties: updatedProperties } };
       try {
         const res = await updateProposalBlocks([updatedBlock]);

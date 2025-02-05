@@ -80,6 +80,13 @@ export class ProposalsMutator extends Mutator {
     });
   }
 
+  // to enable undeleting properties
+  async updateProperty(board: Board, propertyId: string, updatedProperty: IPropertyTemplate) {
+    this.blocksContext.updateProperty({
+      ...updatedProperty
+    });
+  }
+
   async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {
     const proposalBoardBlock = this.blocksContext.proposalBoardBlock;
     const oldFields = proposalBoardBlock?.fields || {};

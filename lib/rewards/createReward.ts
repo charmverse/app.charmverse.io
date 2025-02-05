@@ -1,10 +1,13 @@
 import type { Page, PagePermission, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { BoardFields } from '@root/lib/databases/board';
 import { NotFoundError } from '@root/lib/middleware';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
+
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 
 import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
@@ -81,6 +84,24 @@ export async function createReward({
       defaultPagePermissionGroup: true
     }
   });
+
+  const rewardBoardBlock = await prisma.rewardBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: '__defaultBoard',
+        spaceId
+      }
+    }
+  });
+
+  // dont create properties that were deleted
+  if (rewardBoardBlock && (fields as unknown as RewardFields | undefined)?.properties) {
+    (rewardBoardBlock.fields as unknown as BoardFields).cardProperties.forEach((property) => {
+      if (property.deletedAt) {
+        delete (fields as unknown as RewardFields).properties![property.id];
+      }
+    });
+  }
 
   const rewardId = v4();
 

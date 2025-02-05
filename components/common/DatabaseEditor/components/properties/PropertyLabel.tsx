@@ -11,6 +11,7 @@ type PropertyLabelProps = {
   highlighted?: boolean;
   fullWidth?: boolean;
   tooltip?: string;
+  deleted?: boolean; // when showing deleted card properties
 };
 
 const Wrapper = styled(({ highlighted, fullWidth, ...props }: any) => <Box {...props} />)<{
@@ -31,7 +32,8 @@ export function PropertyLabel({
   fullWidth,
   tooltip,
   readOnly = true,
-  highlighted
+  highlighted,
+  deleted
 }: PropertyLabelProps) {
   if (readOnly) {
     return (
@@ -42,7 +44,7 @@ export function PropertyLabel({
       >
         <Tooltip title={tooltip} disableInteractive>
           <span>
-            <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>}>
+            <Button rightIcon icon={required && <Asterisk>&nbsp;*</Asterisk>} deleted={deleted}>
               {children}
             </Button>
           </span>

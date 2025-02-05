@@ -1,6 +1,7 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { BoardFields } from '@root/lib/databases/board';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
@@ -31,7 +32,7 @@ export type CreateDraftProposalInput = {
 
 export async function createDraftProposal(input: CreateDraftProposalInput) {
   // get source data
-  const [template, sourcePage, sourcePost] = await Promise.all([
+  const [template, sourcePage, sourcePost, proposalBoardBlock] = await Promise.all([
     input.templateId
       ? await prisma.page.findUniqueOrThrow({
           where: {
@@ -76,7 +77,15 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
             id: input.sourcePostId
           }
         })
-      : null
+      : null,
+    prisma.proposalBlock.findUnique({
+      where: {
+        id_spaceId: {
+          id: '__defaultBoard',
+          spaceId: input.spaceId
+        }
+      }
+    })
   ]);
 
   const workflow =
@@ -129,6 +138,15 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
     ...(templateFields || {}),
     pendingRewards: []
   };
+
+  // dont create properties that were deleted
+  if (proposalBoardBlock && fields.properties) {
+    (proposalBoardBlock.fields as unknown as BoardFields).cardProperties.forEach((property) => {
+      if (property.deletedAt) {
+        delete fields.properties![property.id];
+      }
+    });
+  }
 
   let formFields: FormFieldInput[] = [];
   if (input.pageType === 'proposal_template' && template?.proposal?.form) {
