@@ -80,11 +80,7 @@ export function ProposalsPage({ title }: { title: string }) {
     mutate: mutateNotifications
   } = useNotifications();
   const notifications = currentSpaceNotifications.filter((n) => {
-    return [
-      'application_comment.created',
-      'application_comment.replied',
-      'application_comment.mention.created'
-    ].includes(n.type);
+    return n.group === 'proposal' && n.type.includes('comment');
   });
   const viewId = (router.query.viewId || 'my-work') as 'all' | 'my-work' | 'reviewers' | 'my-comments';
   const onShowDescription = useCallback(() => {
