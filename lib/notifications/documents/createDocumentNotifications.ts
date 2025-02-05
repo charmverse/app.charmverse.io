@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
-import { getCurrentEvaluation } from '@charmverse/core/dist/cjs/proposals';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { isTruthy } from '@packages/utils/types';
 import { getPermissionsClient } from '@root/lib/permissions/api';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
