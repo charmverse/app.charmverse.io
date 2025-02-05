@@ -31,6 +31,8 @@ interface PageLayoutProps {
   children: ReactNode;
 }
 
+const whitelistedDomains = ['ef', 'ethrangers'];
+
 function PageLayout({ children }: PageLayoutProps) {
   const { user, isLoaded: isUserLoaded } = useUser();
   const { space, isLoading: isSpacesLoading } = useCurrentSpace();
@@ -101,7 +103,7 @@ function PageLayout({ children }: PageLayoutProps) {
             <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
-              {space?.domain !== 'ef' && space?.customDomain !== 'ethrangers.com' ? (
+              {!whitelistedDomains.includes(space?.domain || '') ? (
                 <AnnouncementBanner
                   actionLabel='Play'
                   actionHref='https://youtube.com/shorts/Xr9S_aJPIPs?si=1UTudvjtc-NF5Zvt'
