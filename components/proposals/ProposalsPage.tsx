@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import CommentIcon from '@mui/icons-material/Comment';
 import InboxIcon from '@mui/icons-material/Inbox';
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
@@ -9,7 +10,6 @@ import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
-import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -31,6 +31,8 @@ import {
   DatabaseStickyHeader,
   DatabaseTitle
 } from 'components/common/PageLayout/components/DatabasePageContent';
+import { NotificationsPopover } from 'components/common/PageLayout/components/Sidebar/components/NotificationsPopover';
+import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
@@ -72,7 +74,19 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
   const { router, updateURLQuery } = useCharmRouter();
-  const viewId = (router.query.viewId || 'my-work') as 'all' | 'my-work' | 'reviewers';
+  const {
+    currentSpaceNotifications,
+    isLoading: isLoadingNotifications,
+    mutate: mutateNotifications
+  } = useNotifications();
+  const notifications = currentSpaceNotifications.filter((n) => {
+    return [
+      'application_comment.created',
+      'application_comment.replied',
+      'application_comment.mention.created'
+    ].includes(n.type);
+  });
+  const viewId = (router.query.viewId || 'my-work') as 'all' | 'my-work' | 'reviewers' | 'my-comments';
   const onShowDescription = useCallback(() => {
     const oldBlocks = [activeBoard];
     const newBoard = createBoard({
@@ -257,6 +271,10 @@ export function ProposalsPage({ title }: { title: string }) {
                     id: 'all',
                     label: 'All'
                   },
+                  {
+                    id: 'my-comments',
+                    label: 'My Comments'
+                  },
                   ...(isAdmin
                     ? [
                         {
@@ -278,6 +296,8 @@ export function ProposalsPage({ title }: { title: string }) {
                           iconForViewType('table')
                         ) : view.id === 'my-work' ? (
                           <InboxIcon fontSize='small' />
+                        ) : view.id === 'my-comments' ? (
+                          <CommentIcon fontSize='small' />
                         ) : (
                           <PersonIcon fontSize='small' />
                         )
@@ -382,6 +402,13 @@ export function ProposalsPage({ title }: { title: string }) {
             </Stack>
           ) : viewId === 'my-work' ? (
             <UserProposalsTables />
+          ) : viewId === 'my-comments' ? (
+            <NotificationsPopover
+              notifications={notifications}
+              mutateNotifications={mutateNotifications}
+              isLoading={isLoadingNotifications}
+              close={() => {}}
+            />
           ) : isAdmin && viewId === 'reviewers' ? (
             <ProposalsReviewersTable />
           ) : null}
