@@ -415,6 +415,9 @@ export async function getUserProposals({
             evaluation.rubricAnswers.some((answer) => answer.userId === userId) ||
             evaluation.appealReviews.some((review) => review.reviewerId === userId)
         );
+        const hasReviewedRubricAnswers = proposal.evaluations.some((evaluation) =>
+          evaluation.rubricAnswers.some((answer) => answer.userId === userId)
+        );
 
         const userProposal = {
           id: proposal.id,
@@ -428,7 +431,7 @@ export async function getUserProposals({
                   dueDate: currentEvaluation.dueDate || null,
                   title: currentEvaluation.title,
                   result: currentEvaluation.result || null,
-                  rubricAnswers: isReviewer
+                  rubricAnswers: hasReviewedRubricAnswers
                     ? (currentEvaluation.rubricAnswers as { userId: string; response: RubricRangeAnswer }[])
                     : []
                 }
