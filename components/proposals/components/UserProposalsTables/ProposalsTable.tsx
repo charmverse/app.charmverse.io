@@ -130,6 +130,11 @@ export function ProposalsTable({
             {proposals.map((proposal) => {
               const result = proposal.currentEvaluation?.result;
               const statusLabel = result ? (result === 'pass' ? 'Passed' : 'Declined') : 'In progress';
+              const rubricAnswers = proposal.currentEvaluation?.rubricAnswers || [];
+              const averageAnswer = rubricAnswers.length
+                ? rubricAnswers.reduce((acc, answer) => acc + answer.response.score, 0) / rubricAnswers.length
+                : 0;
+
               return (
                 <StyledTableRow
                   key={proposal.id}
@@ -189,7 +194,9 @@ export function ProposalsTable({
                         justifyContent: 'center'
                       }}
                     >
-                      {proposal.userReviewResult === 'pass' ? (
+                      {proposal.currentEvaluation?.type === 'rubric' && averageAnswer > 0 ? (
+                        <Typography>{averageAnswer.toFixed(2)}</Typography>
+                      ) : proposal.userReviewResult === 'pass' ? (
                         <ApprovedIcon fontSize='small' color='success' />
                       ) : proposal.userReviewResult === 'fail' ? (
                         <RejectedIcon fontSize='small' color='error' />
