@@ -26,6 +26,7 @@ const esmModules = [
   'redux',
   '@hookform/resolvers',
   'uuid',
+  'nanoid',
   'data-uri-to-buffer',
   'fetch-blob',
   'lodash-es',
