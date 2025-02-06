@@ -428,7 +428,9 @@ export async function getUserProposals({
                   dueDate: currentEvaluation.dueDate || null,
                   title: currentEvaluation.title,
                   result: currentEvaluation.result || null,
-                  rubricAnswers: currentEvaluation.rubricAnswers as { userId: string; response: RubricRangeAnswer }[]
+                  rubricAnswers: isReviewer
+                    ? (currentEvaluation.rubricAnswers as { userId: string; response: RubricRangeAnswer }[])
+                    : []
                 }
               : undefined,
           updatedAt: proposal.page.updatedAt,
