@@ -10,12 +10,15 @@ import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/p
 
 import { permissionsApiClient } from '../permissions/api/client';
 
+import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricRangeAnswer } from './rubric/interfaces';
+
 type CurrentEvaluation = {
   id: string;
   type: ProposalEvaluationType;
   dueDate: Date | null;
   title: string;
   result: ProposalEvaluationResult | null;
+  rubricAnswers: Pick<ProposalRubricCriteriaAnswerWithTypedResponse, 'userId' | 'response'>[];
 };
 
 export type UserProposal = {
@@ -296,7 +299,8 @@ export async function getUserProposals({
           },
           rubricAnswers: {
             select: {
-              userId: true
+              userId: true,
+              response: true
             }
           },
           appealReviewers: {
@@ -411,6 +415,9 @@ export async function getUserProposals({
             evaluation.rubricAnswers.some((answer) => answer.userId === userId) ||
             evaluation.appealReviews.some((review) => review.reviewerId === userId)
         );
+        const hasReviewedRubricAnswers = proposal.evaluations.some((evaluation) =>
+          evaluation.rubricAnswers.some((answer) => answer.userId === userId)
+        );
 
         const userProposal = {
           id: proposal.id,
@@ -423,7 +430,10 @@ export async function getUserProposals({
                   type: currentEvaluation.type,
                   dueDate: currentEvaluation.dueDate || null,
                   title: currentEvaluation.title,
-                  result: currentEvaluation.result || null
+                  result: currentEvaluation.result || null,
+                  rubricAnswers: hasReviewedRubricAnswers
+                    ? (currentEvaluation.rubricAnswers as { userId: string; response: RubricRangeAnswer }[])
+                    : []
                 }
               : undefined,
           updatedAt: proposal.page.updatedAt,
