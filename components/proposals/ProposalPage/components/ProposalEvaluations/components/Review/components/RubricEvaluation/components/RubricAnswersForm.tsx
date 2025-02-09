@@ -188,7 +188,12 @@ export function RubricAnswersForm({
       return;
     }
     // HACK: we are not sure why rubricCriteriaId does not exist, seems to be an issue when two sets of rubric criteria exist
-    const filteredAnswers = values.answers.filter((answer) => !!answer.rubricCriteriaId);
+    const filteredAnswers = values.answers.filter(
+      (answer) =>
+        !!answer.rubricCriteriaId &&
+        // answers are optional - filter out ones with no score
+        typeof (answer.response as any)?.score === 'number'
+    );
     if (filteredAnswers.length !== values.answers.length) {
       log.warn('Some answers did not have a rubricCriteriaId, skipping them', {
         values,
