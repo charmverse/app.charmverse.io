@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type {
   DraftProposalRubricCriteriaAnswer,
   ProposalRubricCriteria,
@@ -186,8 +187,22 @@ export function RubricAnswersForm({
     if (!confirmed) {
       return;
     }
+    // HACK: we are not sure why rubricCriteriaId does not exist, seems to be an issue when two sets of rubric criteria exist
+    const filteredAnswers = values.answers.filter(
+      (answer) =>
+        !!answer.rubricCriteriaId &&
+        // answers are optional - filter out ones with no score
+        typeof (answer.response as any)?.score === 'number'
+    );
+    if (filteredAnswers.length !== values.answers.length) {
+      log.warn('Some answers did not have a rubricCriteriaId, skipping them', {
+        values,
+        filteredAnswers,
+        pageId: proposalId
+      });
+    }
     await upsertRubricCriteriaAnswer({
-      answers: values.answers as unknown as RubricAnswerData[],
+      answers: filteredAnswers as unknown as RubricAnswerData[],
       evaluationId
     });
     // if draft is showing, delete it now that we updated the answers
@@ -201,8 +216,13 @@ export function RubricAnswersForm({
   }
 
   async function submitDraftAnswers(values: FormInput) {
-    // answers are optional - filter out ones with no score
-    const filteredAnswers = values.answers.filter((answer) => typeof (answer.response as any)?.score === 'number');
+    // HACK: we are not sure why rubricCriteriaId does not exist, seems to be an issue when two sets of rubric criteria exist
+    const filteredAnswers = values.answers.filter((answer) => !!answer.rubricCriteriaId);
+    log.warn('Some draft answers did not have a rubricCriteriaId, skipping them', {
+      values,
+      filteredAnswers,
+      pageId: proposalId
+    });
     await upsertDraftRubricCriteriaAnswer({
       // @ts-ignore -  TODO: make answer types match
       answers: filteredAnswers,
