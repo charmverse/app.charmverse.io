@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type {
   DraftProposalRubricCriteriaAnswer,
   ProposalRubricCriteria,
@@ -188,6 +189,13 @@ export function RubricAnswersForm({
     }
     // HACK: we are not sure why rubricCriteriaId does not exist, seems to be an issue when two sets of rubric criteria exist
     const filteredAnswers = values.answers.filter((answer) => !!answer.rubricCriteriaId);
+    if (filteredAnswers.length !== values.answers.length) {
+      log.warn('Some answers did not have a rubricCriteriaId, skipping them', {
+        values,
+        filteredAnswers,
+        pageId: proposalId
+      });
+    }
     await upsertRubricCriteriaAnswer({
       answers: filteredAnswers as unknown as RubricAnswerData[],
       evaluationId
@@ -205,6 +213,11 @@ export function RubricAnswersForm({
   async function submitDraftAnswers(values: FormInput) {
     // HACK: we are not sure why rubricCriteriaId does not exist, seems to be an issue when two sets of rubric criteria exist
     const filteredAnswers = values.answers.filter((answer) => !!answer.rubricCriteriaId);
+    log.warn('Some draft answers did not have a rubricCriteriaId, skipping them', {
+      values,
+      filteredAnswers,
+      pageId: proposalId
+    });
     await upsertDraftRubricCriteriaAnswer({
       // @ts-ignore -  TODO: make answer types match
       answers: filteredAnswers,
