@@ -294,7 +294,7 @@ export function RubricAnswersForm({
   }, [answers, draftAnswers]);
 
   // persist form values to sessionStorage
-  usePersistentFormValues(`proposalId-answers-${proposalId}`, 'answers', { watch, setValue });
+  usePersistentFormValues(`proposalId-answers-${proposalId}-${evaluationId}`, 'answers', { watch, setValue });
 
   return (
     <form>
