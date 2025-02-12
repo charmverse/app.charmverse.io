@@ -336,6 +336,7 @@ function TableHeader(props: Props): JSX.Element {
             component='span'
             variant='subtitle1'
             sx={{
+              textDecoration: template.deletedAt ? 'line-through' : undefined,
               textOverflow: 'ellipsis',
               overflow: 'hidden',
               whiteSpace: 'nowrap'
