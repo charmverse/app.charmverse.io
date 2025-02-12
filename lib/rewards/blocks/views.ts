@@ -133,9 +133,11 @@ export function getProposalRewardsView({
 }) {
   const view = getDefaultView({ spaceId });
 
+  const blockCreated = new Date(board.createdAt).toISOString();
+
   // all custom properties are visible by default
   view.fields.visiblePropertyIds = (board.fields.cardProperties as { id: string; deletedAt?: string }[])
-    .filter((p) => !p.deletedAt)
+    .filter((p) => !p.deletedAt || p.deletedAt > blockCreated)
     .map((p) => p.id)
     .filter((id: string) => {
       if (rewardTypes.includes('custom') && (id === REWARD_CUSTOM_VALUE || id === DUE_DATE_ID)) {
