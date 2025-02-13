@@ -84,6 +84,8 @@ export async function saveProposalNotification({
           id: notificationId,
           createdAt,
           createdBy,
+          // mark as seen if you already saw it
+          seenAt: createdBy === userId ? new Date() : undefined,
           spaceId,
           userId
         }
