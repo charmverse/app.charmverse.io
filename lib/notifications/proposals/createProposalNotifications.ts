@@ -89,9 +89,9 @@ export async function createProposalNotifications(webhookData: {
 
       for (const spaceRole of spaceRoles) {
         // The user who triggered the event should not receive a notification
-        if (spaceRole.userId === userId) {
-          continue;
-        }
+        // if (spaceRole.userId === userId) {
+        //   continue;
+        // }
         const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
           resourceId: proposalId,
           userId: spaceRole.userId
