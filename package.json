@@ -13,8 +13,6 @@
     "script": "npx dotenv -e .env.local -- npx tsx",
     "testgen": "python scripts/testgen/make_tests.py",
     "getcontext": "npx tsx scripts/prompts/traverseAndTokenise.ts",
-    "ceramic": "npm start -w apps/ceramic",
-    "ceramic:build": "npm run build -w apps/ceramic",
     "build": "npm run webapp:build",
     "webapp:build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build",
     "webapp:build:analyze": "cross-env ANALYZE=true next build --experimental-debug-memory-usage",
