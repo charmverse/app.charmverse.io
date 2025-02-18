@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { issueOffchainProposalCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { getVotesByState } from '@root/lib/votes/getVotesByState';
 import { VOTE_STATUS } from '@root/lib/votes/interfaces';
 import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
@@ -92,13 +91,6 @@ const updateVoteStatus = async () => {
       return Promise.resolve();
     })
   ]);
-
-  for (const passedEval of passedEvaluations) {
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_approved',
-      proposalId: passedEval.proposalId
-    });
-  }
 
   return votesPassedDeadline.length;
 };

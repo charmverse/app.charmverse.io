@@ -2,12 +2,10 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { type EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import type { UserProfile } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { isTruthy } from 'lib/utils/types';
 
 const handler = apiHandler();
 
@@ -192,16 +190,6 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       submission: true,
       submissionNodes: true,
       message: true,
-      issuedCredentials: {
-        where: {
-          ceramicRecord: {
-            not: undefined
-          }
-        },
-        select: {
-          ceramicRecord: true
-        }
-      },
       bounty: {
         select: {
           approveSubmitters: true
@@ -239,24 +227,7 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
                 }
               }
             : undefined,
-          credentials: submission.issuedCredentials
-            .map((credential) => {
-              return credential.ceramicRecord as EASAttestationFromApi;
-            })
-            .filter(isTruthy)
-            .map((ceramicRecord) => {
-              return {
-                id: ceramicRecord.id,
-                source: ceramicRecord.type as 'onchain' | 'charmverse',
-                chainId: ceramicRecord.chainId,
-                content: ceramicRecord.content,
-                attester: ceramicRecord.attester,
-                recipient: ceramicRecord.recipient,
-                schemaId: ceramicRecord.schemaId,
-                createdAt: new Date(ceramicRecord.timeCreated).toISOString(),
-                verificationUrl: ceramicRecord.verificationUrl
-              };
-            })
+          credentials: []
         };
       })
     )

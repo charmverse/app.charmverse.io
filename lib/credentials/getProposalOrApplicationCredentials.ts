@@ -5,7 +5,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { EasSchemaChain } from './connectors';
 import { getOnchainCredentialsById, type EASAttestationFromApi } from './external/getOnchainCredentials';
-import { getCharmverseOffchainCredentialsByIds, getParsedCredential } from './queriesAndMutations';
 
 export async function getProposalOrApplicationCredentials({
   proposalId,
@@ -35,24 +34,12 @@ export async function getProposalOrApplicationCredentials({
         (acc, val) => {
           if (val.onchainAttestationId) {
             acc.onchain.push(val);
-          } else if (val.ceramicId) {
-            acc.offchain.push(val);
           }
           return acc;
         },
-        { offchain: [], onchain: [] } as { offchain: IssuedCredential[]; onchain: IssuedCredential[] }
+        { onchain: [] } as { onchain: IssuedCredential[] }
       )
     );
-
-  const offchainData = await getCharmverseOffchainCredentialsByIds({
-    ceramicIds: issuedCredentials.offchain.map((offchain) => offchain.ceramicId as string)
-  }).catch((err) => {
-    log.error('Error fetching offchain credentials', err);
-
-    return issuedCredentials.offchain
-      .map((offchain) => (offchain.ceramicRecord ? getParsedCredential(offchain.ceramicRecord as any) : null))
-      .filter(Boolean) as EASAttestationFromApi[];
-  });
 
   const onChainData = await getOnchainCredentialsById({
     attestations: issuedCredentials.onchain.map((c) => ({
@@ -61,5 +48,5 @@ export async function getProposalOrApplicationCredentials({
     }))
   });
 
-  return [...onChainData, ...offchainData];
+  return [...onChainData];
 }
