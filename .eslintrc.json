@@ -83,7 +83,6 @@
           "./apps/farcaster/",
           "./apps/sunnyawards/",
           "./apps/websockets/",
-          "./apps/ceramic/",
           "./packages/charmeditor/",
           "./packages/github/",
           "./packages/testing/",
