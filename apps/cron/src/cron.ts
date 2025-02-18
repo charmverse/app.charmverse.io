@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import { createOffchainCredentialsForExternalProjects } from '@root/lib/credentials/createOffchainCredentialsForExternalProjects';
 import { relay } from '@root/lib/websockets/relay';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
@@ -70,9 +69,6 @@ cron.schedule('0 1 * * *', updateMixpanelProfilesTask);
 
 // Sync summon space roles every day at midnight
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
-
-// Create external eas credentials for Gitcoin and Questbook every day at midnight
-cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 // Refresh docusign credentials every 6 hours
 cron.schedule('0 */6 * * *', refreshDocusignOAuthTask);

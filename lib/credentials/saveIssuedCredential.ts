@@ -22,19 +22,17 @@ export type IdenticalCredentialProps = {
 
 type IssuedCredentialToSave = {
   credentialProps: IdenticalCredentialProps;
-  offchainData?: NonNullableValues<Pick<IssuedCredential, 'ceramicId' | 'ceramicRecord'>>;
-  onChainData?: NonNullableValues<Pick<IssuedCredential, 'onchainChainId' | 'onchainAttestationId'>>;
+  onChainData: NonNullableValues<Pick<IssuedCredential, 'onchainChainId' | 'onchainAttestationId'>>;
 };
 
 export async function saveIssuedCredential({
   credentialProps: { credentialEvent, credentialTemplateId, schemaId, userId, proposalId, rewardApplicationId },
-  offchainData,
   onChainData
 }: IssuedCredentialToSave): Promise<IssuedCredential> {
   if ((!proposalId && !rewardApplicationId) || (proposalId && rewardApplicationId)) {
     throw new InvalidInputError('Either proposalId or rewardApplicationId must be provided');
   }
-  if (!offchainData && !onChainData) {
+  if (!onChainData) {
     throw new InvalidInputError('Either offchainData or onChainData must be provided');
   }
 
@@ -56,9 +54,7 @@ export async function saveIssuedCredential({
       where: { id: existingCredential.id },
       data: {
         onchainChainId: onChainData?.onchainChainId,
-        onchainAttestationId: onChainData?.onchainAttestationId,
-        ceramicId: offchainData?.ceramicId,
-        ceramicRecord: offchainData?.ceramicRecord
+        onchainAttestationId: onChainData?.onchainAttestationId
       }
     });
   } else {
@@ -70,8 +66,6 @@ export async function saveIssuedCredential({
         schemaId,
         onchainChainId: onChainData?.onchainChainId,
         onchainAttestationId: onChainData?.onchainAttestationId,
-        ceramicId: offchainData?.ceramicId,
-        ceramicRecord: offchainData?.ceramicRecord,
         proposal: proposalId ? { connect: { id: proposalId } } : undefined,
         rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
       }

@@ -673,49 +673,4 @@ describe('generateCredentialInputsForProposal', () => {
 
     expect(resultAfterIssuedCredentialSaved).toHaveLength(0);
   });
-
-  it('should return credentials that were only issued offchain but not yet onchain', async () => {
-    const userWallet = randomETHWalletAddress().toLowerCase();
-    const generated = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
-    const user = generated.user;
-
-    const space = await prisma.space.update({
-      where: {
-        id: generated.space.id
-      },
-      data: {
-        useOnchainCredentials: true
-      }
-    });
-
-    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
-      spaceId: space.id,
-      credentialEvents: ['proposal_approved'],
-      schemaType: 'reward'
-    });
-
-    const proposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: user.id,
-      authors: [user.id],
-      proposalStatus: 'published',
-      selectedCredentialTemplateIds: [credentialTemplate.id],
-      evaluationInputs: [{ evaluationType: 'feedback', result: 'pass', permissions: [], reviewers: [] }]
-    });
-
-    const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
-    expect(result.length).toBe(1);
-
-    // Simulate having issued this credential already
-    await testUtilsCredentials.generateIssuedOffchainCredential({
-      credentialEvent: 'proposal_approved',
-      credentialTemplateId: credentialTemplate.id,
-      proposalId: proposal.id,
-      userId: user.id
-    });
-
-    const resultAfterIssuedCredentialSaved = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
-
-    expect(resultAfterIssuedCredentialSaved).toHaveLength(1);
-  });
 });

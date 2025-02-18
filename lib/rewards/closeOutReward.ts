@@ -1,5 +1,4 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { issueOffchainRewardCredentialsIfNecessary } from '@root/lib/credentials/issueOffchainRewardCredentialsIfNecessary';
 
 import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
@@ -49,11 +48,6 @@ export async function closeOutReward(rewardId: string): Promise<RewardWithUsers>
       rewardId
     });
   }
-
-  await issueOffchainRewardCredentialsIfNecessary({
-    event: 'reward_submission_approved',
-    rewardId
-  });
 
   return getRewardOrThrow({ rewardId });
 }

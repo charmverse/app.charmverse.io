@@ -425,40 +425,4 @@ describe('findSpaceIssuableRewardCredentials', () => {
 
     expect(resultAfterIssuedCredentialSaved).toHaveLength(0);
   });
-
-  it('should return credentials that were only issued offchain but not yet onchain', async () => {
-    const userWallet = randomETHWalletAddress().toLowerCase();
-    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
-
-    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
-      spaceId: space.id,
-      credentialEvents: ['reward_submission_approved'],
-      schemaType: 'reward'
-    });
-
-    const reward = await generateBountyWithSingleApplication({
-      bountyCap: null,
-      applicationStatus: 'complete',
-      spaceId: space.id,
-      userId: user.id,
-      selectedCredentialTemplateIds: [credentialTemplate.id]
-    });
-
-    const rewardApplication = reward.applications[0];
-
-    const result = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
-    expect(result.length).toBe(1);
-
-    // Simulate having issued this credential already
-    await testUtilsCredentials.generateIssuedOffchainCredential({
-      credentialEvent: 'reward_submission_approved',
-      credentialTemplateId: credentialTemplate.id,
-      rewardApplicationId: rewardApplication.id,
-      userId: user.id
-    });
-
-    const resultAfterIssuedCredentialSaved = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
-
-    expect(resultAfterIssuedCredentialSaved.length).toBe(1);
-  });
 });

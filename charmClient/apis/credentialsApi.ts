@@ -1,6 +1,5 @@
 import * as http from '@root/adapters/http';
 
-import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
@@ -9,7 +8,7 @@ import type { CreateCredentialTemplateInput, CredentialTemplateUpdate } from 'li
 
 export class CredentialsApi {
   // TODO Test endpoint for generating a credential - remove later
-  attest(data: CharmVerseCredentialInput): Promise<EASAttestationFromApi> {
+  attest(data: any): Promise<EASAttestationFromApi> {
     return http.POST(`/api/credentials`, data);
   }
 
