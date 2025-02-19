@@ -1,7 +1,7 @@
 'use client';
 
-import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import { Box, Link, Stack, Typography } from '@mui/material';
+import { useTrackEvent } from '@packages/connect-shared/hooks/useTrackEvent';
 import Image from 'next/image';
 
 export function Footer() {

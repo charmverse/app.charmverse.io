@@ -1,6 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createProjectMetadataAttestation } from '@connect-shared/lib/attestations/agoraApi';
+import { createProjectMetadataAttestation } from '@packages/connect-shared/lib/attestations/agoraApi';
 import { getAttestation } from '@root/lib/credentials/getAttestation';
 import { decodeOptimismProjectAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';

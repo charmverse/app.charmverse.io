@@ -1,5 +1,5 @@
-import { AppProviders } from '@connect-shared/components/layout/AppProviders';
 import Box from '@mui/material/Box';
+import { AppProviders } from '@packages/connect-shared/components/layout/AppProviders';
 import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
 

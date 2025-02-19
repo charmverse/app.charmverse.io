@@ -1,10 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
 import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack, Button, Divider, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
+import { FormErrors } from '@packages/connect-shared/components/common/FormErrors';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState } from 'react';

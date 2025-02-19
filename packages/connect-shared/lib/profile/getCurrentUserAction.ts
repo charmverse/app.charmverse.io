@@ -2,7 +2,7 @@
 
 import type { FarcasterUser, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { authActionClient } from '@connect-shared/lib/actions/actionClient';
+import { authActionClient } from '@packages/connect-shared/lib/actions/actionClient';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
 export type LoggedInUser = User & {

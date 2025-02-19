@@ -1,6 +1,6 @@
 import { DataNotFoundError, SystemError, UnknownError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { SessionData } from '@connect-shared/lib/session/config';
+import type { SessionData } from '@packages/connect-shared/lib/session/config';
 import { isSystemError } from '@root/lib/middleware/isSystemError';
 import type { IronSession } from 'iron-session';
 import { headers } from 'next/headers';

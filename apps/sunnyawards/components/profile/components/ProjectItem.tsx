@@ -1,5 +1,3 @@
-import { Avatar } from '@connect-shared/components/common/Avatar';
-import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import AvatarGroup from '@mui/material/AvatarGroup';
 import Box from '@mui/material/Box';
@@ -7,6 +5,8 @@ import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
+import { Avatar } from '@packages/connect-shared/components/common/Avatar';
+import { CardMotion } from '@packages/connect-shared/components/common/Motions/CardMotion';
 import Link from 'next/link';
 
 import type { ProjectsWithMembers } from 'lib/projects/getRecentProjectsWithMembers';

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { getIronOptions } from '@connect-shared/lib/session/config';
+import { getIronOptions } from '@packages/connect-shared/lib/session/config';
 import { cookieName } from '@root/config/constants';
 import { randomIntFromInterval } from '@root/lib/utils/random';
 import { sealData } from 'iron-session';

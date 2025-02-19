@@ -1,13 +1,13 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { Avatar } from '@connect-shared/components/common/Avatar';
-import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { Box, Container, IconButton, Menu, MenuItem, Toolbar, AppBar, Link as MuiLink } from '@mui/material';
+import { Avatar } from '@packages/connect-shared/components/common/Avatar';
+import { useTrackEvent } from '@packages/connect-shared/hooks/useTrackEvent';
+import { revalidatePathAction } from '@packages/connect-shared/lib/actions/revalidatePathAction';
+import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
+import { logoutAction } from '@packages/connect-shared/lib/session/logoutAction';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';

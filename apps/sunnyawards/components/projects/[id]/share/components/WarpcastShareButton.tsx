@@ -1,8 +1,8 @@
 'use client';
 
-import { useTrackEvent } from '@connect-shared/hooks/useTrackEvent';
 import styled from '@emotion/styled';
 import { Button, SvgIcon } from '@mui/material';
+import { useTrackEvent } from '@packages/connect-shared/hooks/useTrackEvent';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 

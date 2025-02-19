@@ -1,10 +1,10 @@
-import { Avatar } from '@connect-shared/components/common/Avatar';
-import type { AvatarSize } from '@connect-shared/components/common/Avatar';
-import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { DeleteOutline } from '@mui/icons-material';
 import { Box, Card, CardActionArea, CardContent, IconButton, Stack, Typography } from '@mui/material';
+import { Avatar } from '@packages/connect-shared/components/common/Avatar';
+import type { AvatarSize } from '@packages/connect-shared/components/common/Avatar';
+import { CardMotion } from '@packages/connect-shared/components/common/Motions/CardMotion';
+import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
 import Link from 'next/link';
 
 export function getFarcasterCardDisplayDetails(user: LoggedInUser) {

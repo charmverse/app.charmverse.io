@@ -1,5 +1,5 @@
-import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { getCurrentUser } from '@packages/connect-shared/lib/profile/getCurrentUser';
+import { getSession } from '@packages/connect-shared/lib/session/getSession';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 

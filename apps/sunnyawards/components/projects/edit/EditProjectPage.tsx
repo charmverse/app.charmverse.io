@@ -1,10 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
+import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
+import type { ConnectProjectDetails } from '@packages/connect-shared/lib/projects/findProject';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';

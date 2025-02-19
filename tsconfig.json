@@ -27,7 +27,6 @@
     "incremental": true,
     "isolatedModules": true,
     "paths": {
-      "@connect-shared/*": ["./@connect-shared/*"],
       "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
       "@packages/utils/*": ["./packages/utils/src/*"],
       "@packages/github/*": ["./packages/github/src/*"],

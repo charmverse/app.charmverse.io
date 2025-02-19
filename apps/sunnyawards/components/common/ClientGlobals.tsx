@@ -1,6 +1,6 @@
 'use client';
 
-import { usePageView } from '@connect-shared/hooks/usePageView';
+import { usePageView } from '@packages/connect-shared/hooks/usePageView';
 import { useDatadogLogger } from '@root/hooks/useDatadogLogger';
 
 import { useDarkTheme } from 'hooks/useDarkTheme';

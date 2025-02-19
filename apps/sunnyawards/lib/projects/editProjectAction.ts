@@ -1,9 +1,9 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { authActionClient } from '@connect-shared/lib/actions/actionClient';
-import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
-import { storeUpdatedProjectMetadataAttestation } from '@connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
+import { authActionClient } from '@packages/connect-shared/lib/actions/actionClient';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@packages/connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
+import { storeUpdatedProjectMetadataAttestation } from '@packages/connect-shared/lib/attestations/storeUpdatedProjectMetadataAttestation';
 import { charmverseProjectDataChainId, disableCredentialAutopublish } from '@root/lib/credentials/constants';
 import { storeCharmverseProjectMetadata } from '@root/lib/credentials/reputation/storeCharmverseProjectMetadata';
 import { generateOgImage } from '@root/lib/projects/generateOgImage';

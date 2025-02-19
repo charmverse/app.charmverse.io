@@ -1,6 +1,6 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { findProject } from '@connect-shared/lib/projects/findProject';
+import { findProject } from '@packages/connect-shared/lib/projects/findProject';
 import { awsS3Bucket } from '@root/config/constants';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
 import { mapProjectToGitcoin } from '@root/lib/credentials/mapProjectToGitcoin';

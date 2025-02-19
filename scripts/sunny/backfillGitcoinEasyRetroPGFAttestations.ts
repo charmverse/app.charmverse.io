@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { gitcoinProjectAttestationChainId } from '@connect-shared/lib/attestations/constants';
-import { storeProjectMetadataAndPublishGitcoinAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
+import { gitcoinProjectAttestationChainId } from '@packages/connect-shared/lib/attestations/constants';
+import { storeProjectMetadataAndPublishGitcoinAttestation } from '@packages/connect-shared/lib/attestations/storeProjectMetadataAndPublishToGitcoin';
 import { optimism } from 'viem/chains';
 
 /**

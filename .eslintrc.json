@@ -78,7 +78,6 @@
         "packageDir": [
           "./",
           "../..",
-          "./@connect-shared",
           "./apps/cron/",
           "./apps/farcaster/",
           "./apps/sunnyawards/",
@@ -86,7 +85,8 @@
           "./packages/charmeditor/",
           "./packages/github/",
           "./packages/testing/",
-          "./packages/utils/"
+          "./packages/utils/",
+          "./packages/connect-shared/"
         ]
       }
     ],

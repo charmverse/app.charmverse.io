@@ -1,5 +1,5 @@
-import { Avatar } from '@connect-shared/components/common/Avatar';
 import Box from '@mui/material/Box';
+import { Avatar } from '@packages/connect-shared/components/common/Avatar';
 
 const height = '130px';
 

@@ -6,8 +6,7 @@
   ],
   "workspaces": [
     "apps/*",
-    "packages/*",
-    "@connect-shared"
+    "packages/*"
   ],
   "scripts": {
     "script": "npx dotenv -e .env.local -- npx tsx",

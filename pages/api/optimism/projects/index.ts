@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { storeProjectMetadataAndPublishOptimismAttestation } from '@connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
+import { storeProjectMetadataAndPublishOptimismAttestation } from '@packages/connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
 import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

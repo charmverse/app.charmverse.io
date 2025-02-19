@@ -1,10 +1,10 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import { revalidatePathAction } from '@connect-shared/lib/actions/revalidatePathAction';
-import { logoutAction } from '@connect-shared/lib/session/logoutAction';
 import { Button, Typography } from '@mui/material';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
+import { revalidatePathAction } from '@packages/connect-shared/lib/actions/revalidatePathAction';
+import { logoutAction } from '@packages/connect-shared/lib/session/logoutAction';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 

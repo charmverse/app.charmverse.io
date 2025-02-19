@@ -1,5 +1,5 @@
 {
-  "name": "connect-shared",
+  "name": "@packages/connect-shared",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

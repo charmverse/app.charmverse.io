@@ -1,5 +1,5 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Typography } from '@mui/material';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
 
 export default async function Home() {
   return (

@@ -1,6 +1,6 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import MuiLink from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
 import Image from 'next/image';
 
 import { WalletLogin } from 'components/common/WalletLogin/WalletLogin';

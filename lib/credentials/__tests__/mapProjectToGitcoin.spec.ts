@@ -1,4 +1,4 @@
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
+import type { ConnectProjectDetails } from '@packages/connect-shared/lib/projects/findProject';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { GitcoinEasyRetroPGFProject } from '../mapProjectToGitcoin';

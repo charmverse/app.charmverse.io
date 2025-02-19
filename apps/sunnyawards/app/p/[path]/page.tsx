@@ -1,4 +1,4 @@
-import { findProject } from '@connect-shared/lib/projects/findProject';
+import { findProject } from '@packages/connect-shared/lib/projects/findProject';
 import { notFound } from 'next/navigation';
 
 import { ProjectDetailsPage } from 'components/projects/[id]/ProjectDetailsPage';

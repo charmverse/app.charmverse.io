@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
-import type { ConnectProjectDetails } from '@connect-shared/lib/projects/findProject';
-import { getSession } from '@connect-shared/lib/session/getSession';
 import { Divider, Stack, Typography } from '@mui/material';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
+import type { ConnectProjectDetails } from '@packages/connect-shared/lib/projects/findProject';
+import { getSession } from '@packages/connect-shared/lib/session/getSession';
 
 import { FarcasterCard } from 'components/common/FarcasterCard';
 

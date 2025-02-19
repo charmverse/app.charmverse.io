@@ -1,5 +1,5 @@
 'use client';
 
-import { Template } from '@connect-shared/components/layout/Template';
+import { Template } from '@packages/connect-shared/components/layout/Template';
 
 export default Template;

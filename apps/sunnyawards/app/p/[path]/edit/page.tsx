@@ -1,6 +1,6 @@
-import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
-import { findProject } from '@connect-shared/lib/projects/findProject';
-import { getSession } from '@connect-shared/lib/session/getSession';
+import { getCurrentUser } from '@packages/connect-shared/lib/profile/getCurrentUser';
+import { findProject } from '@packages/connect-shared/lib/projects/findProject';
+import { getSession } from '@packages/connect-shared/lib/session/getSession';
 import { notFound, redirect } from 'next/navigation';
 
 import { EditProjectPage } from 'components/projects/edit/EditProjectPage';

@@ -1,6 +1,6 @@
 'use server';
 
-import { authActionClient } from '@connect-shared/lib/actions/actionClient';
+import { authActionClient } from '@packages/connect-shared/lib/actions/actionClient';
 import * as yup from 'yup';
 
 import { softDeleteAndRevokeSunnyAwardsProject } from './softDeleteAndRevokeSunnyAwardsProject';
