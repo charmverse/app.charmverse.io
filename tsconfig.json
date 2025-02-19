@@ -32,6 +32,7 @@
       "@packages/github/*": ["./packages/github/src/*"],
       "@packages/farcaster/*": ["./packages/farcaster/src/*"],
       "@packages/aws/*": ["./packages/aws/src/*"],
+      "@packages/connect-shared/*": ["./packages/connect-shared/src/*"],
       "@packages/blockchain/*": ["./packages/blockchain/src/*"],
       "@packages/testing/*": ["./packages/testing/src/*"],
       "@root/abis/*": ["./abis/*"],
