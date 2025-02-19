@@ -44,6 +44,7 @@ export function ProposalRewards() {
               pendingRewards={pendingRewards}
               reviewers={[]}
               assignedSubmitters={[]}
+              proposalCreatedAt={new Date()}
               variant='solid_button'
               isProposalTemplate={true}
               rewardIds={[]}

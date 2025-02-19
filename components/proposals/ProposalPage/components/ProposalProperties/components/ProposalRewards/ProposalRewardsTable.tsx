@@ -15,6 +15,7 @@ import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -42,6 +43,7 @@ export type ProposalRewardsTableProps = {
   requiredTemplateId?: string | null;
   variant?: 'solid_button' | 'card_property'; // solid_button is used for form proposals
   isProposalTemplate?: boolean;
+  proposalCreatedAt: Date;
 };
 
 export function ProposalRewardsTable({
@@ -55,8 +57,10 @@ export function ProposalRewardsTable({
   assignedSubmitters,
   requiredTemplateId,
   variant,
-  isProposalTemplate
+  isProposalTemplate,
+  proposalCreatedAt
 }: ProposalRewardsTableProps) {
+  const { currentPageId } = useCurrentPage();
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
   const { rewards: allRewards, isLoading: isLoadingRewards } = useRewards();
@@ -158,7 +162,10 @@ export function ProposalRewardsTable({
                     boardType='rewards'
                     hideCalculations
                     setSelectedPropertyId={() => {}}
-                    board={boardBlock!}
+                    board={{
+                      ...boardBlock!,
+                      createdAt: proposalCreatedAt.getTime()
+                    }}
                     activeView={tableView}
                     cards={cards}
                     views={[]}
