@@ -42,6 +42,7 @@ export type ProposalRewardsTableProps = {
   requiredTemplateId?: string | null;
   variant?: 'solid_button' | 'card_property'; // solid_button is used for form proposals
   isProposalTemplate?: boolean;
+  proposalCreatedAt: Date;
 };
 
 export function ProposalRewardsTable({
@@ -55,13 +56,13 @@ export function ProposalRewardsTable({
   assignedSubmitters,
   requiredTemplateId,
   variant,
-  isProposalTemplate
+  isProposalTemplate,
+  proposalCreatedAt
 }: ProposalRewardsTableProps) {
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
   const { rewards: allRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
-  const { navigateToSpacePath } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
   const {
     createNewReward,
@@ -88,6 +89,14 @@ export function ProposalRewardsTable({
   });
   const { showPage } = usePageDialog();
 
+  // the date of the proposal is important for the board view to hide properties that were deleted before the proposal was created
+  const boardWithProposalCreatedAt = useMemo(() => {
+    return {
+      ...boardBlock!,
+      createdAt: proposalCreatedAt.getTime()
+    };
+  }, [boardBlock, proposalCreatedAt]);
+
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
       if (page.reward.rewardType) {
@@ -96,12 +105,12 @@ export function ProposalRewardsTable({
       return acc;
     }, new Set());
     return getProposalRewardsView({
-      board: boardBlock,
+      board: boardWithProposalCreatedAt,
       spaceId: space?.id,
       rewardTypes: [...rewardTypesUsed],
       includeStatus: rewardIds.length > 0
     });
-  }, [space?.id, boardBlock, pendingRewards, rewardIds.length]);
+  }, [space?.id, pendingRewards, boardWithProposalCreatedAt, rewardIds.length]);
 
   const publishedRewards = useMemo(
     () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
@@ -158,7 +167,7 @@ export function ProposalRewardsTable({
                     boardType='rewards'
                     hideCalculations
                     setSelectedPropertyId={() => {}}
-                    board={boardBlock!}
+                    board={boardWithProposalCreatedAt}
                     activeView={tableView}
                     cards={cards}
                     views={[]}

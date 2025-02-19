@@ -465,6 +465,7 @@ function DocumentPageComponent({
                       <FormFieldAnswers
                         milestoneProps={{
                           containerWidth,
+                          proposalCreatedAt: new Date(page.createdAt),
                           pendingRewards: proposal.fields?.pendingRewards || [],
                           requiredTemplateId: proposal.fields?.rewardsTemplateId,
                           reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
