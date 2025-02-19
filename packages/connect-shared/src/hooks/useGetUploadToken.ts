@@ -1,4 +1,4 @@
-import { useGETtrigger } from '../../charmClient/hooks/helpers';
+import { useGETtrigger } from './helpers';
 
 export function useGetUploadToken() {
   return useGETtrigger<

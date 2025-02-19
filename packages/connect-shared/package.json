@@ -7,9 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "exports": {
+    "./components/*": "./src/components/*.tsx",
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@packages/utils": "^1.0.0"
+    "@mui/material-nextjs": "^6.4.3",
+    "@packages/utils": "^1.0.0",
+    "framer-motion": "^12.4.5",
+    "next-safe-action": "^7.10.4"
   }
 }

@@ -17,6 +17,7 @@
     "@mui/material-nextjs": "^6.1.0",
     "@packages/aws": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
+    "@packages/connect-shared": "^0.0.0",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.5.4",
     "next-safe-action": "~7.4.2",
