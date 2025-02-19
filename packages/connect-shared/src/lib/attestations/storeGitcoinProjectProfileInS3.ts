@@ -3,10 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { awsS3Bucket } from '@root/config/constants';
 import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getAttestationS3Path } from '@root/lib/credentials/getAttestationS3Path';
 import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
 import { replaceS3Domain } from '@root/lib/utils/url';
 
-import { getAttestationS3Path } from '../../../lib/credentials/getAttestationS3Path';
 import { findProject } from '../projects/findProject';
 
 type GitcoinUserProfile = {
