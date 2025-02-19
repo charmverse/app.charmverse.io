@@ -4,10 +4,6 @@
     "outDir": "dist",
     "rootDir": "src",
     // composite is useful for referenced packages. see https://www.typescriptlang.org/docs/handbook/project-references.html#composite
-    "composite": true,
-    "paths": {
-      "@root/config/*": ["../../config/*"],
-      "@root/lib/*": ["../../lib/*"]
-    }
+    "composite": true
   }
 }
