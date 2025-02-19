@@ -15,7 +15,6 @@ import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -60,12 +59,10 @@ export function ProposalRewardsTable({
   isProposalTemplate,
   proposalCreatedAt
 }: ProposalRewardsTableProps) {
-  const { currentPageId } = useCurrentPage();
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
   const { rewards: allRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
-  const { navigateToSpacePath } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
   const {
     createNewReward,
@@ -92,6 +89,14 @@ export function ProposalRewardsTable({
   });
   const { showPage } = usePageDialog();
 
+  // the date of the proposal is important for the board view to hide properties that were deleted before the proposal was created
+  const boardWithProposalCreatedAt = useMemo(() => {
+    return {
+      ...boardBlock!,
+      createdAt: proposalCreatedAt.getTime()
+    };
+  }, [boardBlock, proposalCreatedAt]);
+
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
       if (page.reward.rewardType) {
@@ -100,12 +105,12 @@ export function ProposalRewardsTable({
       return acc;
     }, new Set());
     return getProposalRewardsView({
-      board: boardBlock,
+      board: boardWithProposalCreatedAt,
       spaceId: space?.id,
       rewardTypes: [...rewardTypesUsed],
       includeStatus: rewardIds.length > 0
     });
-  }, [space?.id, boardBlock, pendingRewards, rewardIds.length]);
+  }, [space?.id, pendingRewards, boardWithProposalCreatedAt, rewardIds.length]);
 
   const publishedRewards = useMemo(
     () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
@@ -162,10 +167,7 @@ export function ProposalRewardsTable({
                     boardType='rewards'
                     hideCalculations
                     setSelectedPropertyId={() => {}}
-                    board={{
-                      ...boardBlock!,
-                      createdAt: proposalCreatedAt.getTime()
-                    }}
+                    board={boardWithProposalCreatedAt}
                     activeView={tableView}
                     cards={cards}
                     views={[]}
