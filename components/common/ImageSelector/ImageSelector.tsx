@@ -1,10 +1,10 @@
 import { Box, Button, TextField } from '@mui/material';
+import { ResizeType } from '@packages/utils/constants';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { ResizeType } from 'lib/file/constants';
 
 import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
 

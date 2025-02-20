@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, IconButton } from '@mui/material';
+import { ResizeType } from '@packages/utils/constants';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -12,7 +13,6 @@ import { AvatarEditMenu } from 'components/settings/space/components/AvatarEditM
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
-import { ResizeType } from 'lib/file/constants';
 import type { UserAvatar } from 'lib/users/interfaces';
 
 import { ProgressOverlay } from './ProgressOverlay';

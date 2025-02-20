@@ -1,18 +1,18 @@
 import { Writable } from 'stream';
 
+import type { ResizeType } from '@packages/utils/constants';
+import {
+  DEFAULT_MAX_FILE_SIZE_MB,
+  FORM_DATA_FILE_PART_NAME,
+  FORM_DATA_IMAGE_RESIZE_TYPE,
+  IMAGE_MAX_WIDTH
+} from '@packages/utils/constants';
 import formidable from 'formidable';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import sharp from 'sharp';
 
 import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
-import type { ResizeType } from 'lib/file/constants';
-import {
-  DEFAULT_MAX_FILE_SIZE_MB,
-  FORM_DATA_FILE_PART_NAME,
-  FORM_DATA_IMAGE_RESIZE_TYPE,
-  IMAGE_MAX_WIDTH
-} from 'lib/file/constants';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

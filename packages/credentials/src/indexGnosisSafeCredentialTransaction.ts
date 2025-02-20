@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { AttestationType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uniqueValues } from '@packages/utils/array';
 import { getSafeApiClient } from '@root/lib/gnosis/safe/getSafeApiClient';
-import { uniqueValues } from '@root/lib/utils/array';
 
 import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';

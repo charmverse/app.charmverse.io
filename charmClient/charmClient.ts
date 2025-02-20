@@ -10,6 +10,7 @@ import type {
   UserDetails
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from '@packages/connectors/chains';
+import { encodeFilename } from '@packages/utils/encodeFilename';
 import * as http from '@root/adapters/http';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
@@ -28,7 +29,6 @@ import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 

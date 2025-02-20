@@ -23,6 +23,7 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uniqueValues } from '@packages/utils/array';
 import { uid } from '@packages/utils/strings';
 import type { DataSourceType } from '@root/lib/databases/board';
 import type { IViewType } from '@root/lib/databases/boardView';
@@ -39,7 +40,6 @@ import { emptyDocument } from '@root/lib/prosemirror/constants';
 import { getRewardOrThrow } from '@root/lib/rewards/getReward';
 import type { RewardWithUsers } from '@root/lib/rewards/interfaces';
 import { sessionUserRelations } from '@root/lib/session/config';
-import { uniqueValues } from '@root/lib/utils/array';
 import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { typedKeys } from '@root/lib/utils/objects';

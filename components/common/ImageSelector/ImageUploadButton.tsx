@@ -1,9 +1,9 @@
 import type { ButtonProps } from '@mui/material';
 import { Stack, Typography } from '@mui/material';
+import type { ResizeType } from '@packages/utils/constants';
 
 import type { UploadedFileCallback } from 'hooks/useS3UploadInput';
 import { useS3UploadInput } from 'hooks/useS3UploadInput';
-import type { ResizeType } from 'lib/file/constants';
 
 import { Button } from '../Button';
 

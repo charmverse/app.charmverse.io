@@ -1,4 +1,5 @@
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
+import { uniqueValues } from '@packages/utils/array';
 import request from 'supertest';
 
 import type {
@@ -13,7 +14,6 @@ import type {
 } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { uniqueValues } from 'lib/utils/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
