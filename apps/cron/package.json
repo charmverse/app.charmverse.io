@@ -11,6 +11,8 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@packages/connectors": "^0.0.0",
+    "@packages/credentials": "^0.0.0",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
