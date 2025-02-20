@@ -3,13 +3,13 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { getEasConnector } from '@packages/credentials/connectors';
+import { credentialEventLabels } from '@packages/credentials/constants';
+import { attestationSchemaIds } from '@packages/credentials/schemas';
 import { optimism } from 'viem/chains';
 
 import Link from 'components/common/Link';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { getEasConnector } from 'lib/credentials/connectors';
-import { credentialEventLabels } from 'lib/credentials/constants';
-import { attestationSchemaIds } from 'lib/credentials/schemas';
 
 export type ProposalCredentialToPreview = Pick<CredentialTemplate, 'name' | 'description' | 'organization'>;
 

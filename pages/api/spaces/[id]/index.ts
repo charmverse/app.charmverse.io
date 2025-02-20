@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +10,6 @@ import { SpaceNotFoundError } from 'lib/public-api';
 import { withSessionRoute } from 'lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
 import { deleteProSubscription } from 'lib/subscription/deleteProSubscription';
-import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

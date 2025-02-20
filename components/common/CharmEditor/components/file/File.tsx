@@ -1,10 +1,10 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { Box, Typography } from '@mui/material';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { UploadedFileInfo } from '@root/lib/proposals/forms/interfaces';
 
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import { BlockNodeContainer } from '../common/BlockNodeContainer';
 import { EmptyEmbed } from '../common/EmptyEmbed';

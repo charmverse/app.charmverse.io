@@ -1,8 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { getProposalOrApplicationCredentials } from '@packages/credentials/getProposalOrApplicationCredentials';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getProposalOrApplicationCredentials } from 'lib/credentials/getProposalOrApplicationCredentials';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PagesRequest } from '@charmverse/core/pages';
 import type { Prisma, PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +12,6 @@ import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

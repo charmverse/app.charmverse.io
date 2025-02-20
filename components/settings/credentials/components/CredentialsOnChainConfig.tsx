@@ -1,11 +1,11 @@
 import type { Space } from '@charmverse/core/prisma';
 import { Box, FormControlLabel, Grid, Stack, Switch, TextField } from '@mui/material';
+import { easSchemaChains, easSchemaMainnetChains } from '@packages/credentials/connectors';
 import { isAddress } from 'viem';
 
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { Typography } from 'components/common/Typography';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import { easSchemaChains, easSchemaMainnetChains } from 'lib/credentials/connectors';
 
 export type UpdateableCredentialProps = Pick<
   Space,

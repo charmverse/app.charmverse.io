@@ -1,5 +1,6 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,7 +13,6 @@ import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { checkUserBlacklistStatus } from 'lib/users/checkUserBlacklistStatus';
-import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

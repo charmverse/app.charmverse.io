@@ -1,12 +1,12 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
-
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
+import type { EASAttestationWithFavorite } from '@packages/credentials/external/getOnchainCredentials';
 import type {
   FindIssuableRewardCredentialsInput,
   IssuableRewardApplicationCredentialContent
-} from 'lib/credentials/findIssuableRewardCredentials';
-import type { UserCredentialsRequest } from 'lib/credentials/getAllUserCredentials';
+} from '@packages/credentials/findIssuableRewardCredentials';
+import type { UserCredentialsRequest } from '@packages/credentials/getAllUserCredentials';
+
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
 import { useDELETE, useGET, usePOST, usePUT } from './helpers';

@@ -1,11 +1,11 @@
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
+import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
+import type { IssuableProposalCredentialContent } from '@packages/credentials/findIssuableProposalCredentials';
 import type { FieldAnswerInput, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import type { GetProposalsReviewersResponse } from '@root/lib/proposals/getProposalsReviewers';
 import type { GetUserProposalsResponse } from '@root/lib/proposals/getUserProposals';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
-import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,

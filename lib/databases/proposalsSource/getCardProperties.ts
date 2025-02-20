@@ -10,13 +10,13 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from 'lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+} from '@packages/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from '@packages/credentials/findIssuableProposalCredentials';
+
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';

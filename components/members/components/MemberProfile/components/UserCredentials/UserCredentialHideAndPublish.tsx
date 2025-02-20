@@ -4,11 +4,11 @@ import PublishIcon from '@mui/icons-material/Publish';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import { IconButton, Stack, Tooltip } from '@mui/material';
+import type { EASAttestationWithFavorite } from '@packages/credentials/external/getOnchainCredentials';
 
 import Link from 'components/common/Link';
 import PopperPopup from 'components/common/PopperPopup';
 import { Typography } from 'components/common/Typography';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 export function UserCredentialHideAndPublish({
   credential,

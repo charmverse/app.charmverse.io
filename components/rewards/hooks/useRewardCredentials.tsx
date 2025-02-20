@@ -1,6 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
+import type { EasSchemaChain } from '@packages/credentials/connectors';
+import type {
+  IssuableRewardApplicationCredentialContent,
+  PartialIssuableRewardApplicationCredentialContent
+} from '@packages/credentials/findIssuableRewardCredentials';
 import { useCallback } from 'react';
 
 import charmClient from 'charmClient';
@@ -8,11 +13,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
-import type { EasSchemaChain } from 'lib/credentials/connectors';
-import type {
-  IssuableRewardApplicationCredentialContent,
-  PartialIssuableRewardApplicationCredentialContent
-} from 'lib/credentials/findIssuableRewardCredentials';
 
 export function useRewardCredentials() {
   const { space } = useCurrentSpace();
@@ -46,9 +46,9 @@ export function useRewardCredentials() {
         throw new InvalidInputError('Your wallet cannot issue credentials for this space');
       }
       // lazy load credentials to avoid loading eas sdk everywhere
-      const { rewardCredentialSchemaId } = await import('lib/credentials/schemas/reward');
+      const { rewardCredentialSchemaId } = await import('@packages/credentials/schemas/reward');
       const { multiAttestOnchain, populateOnChainAttestationTransaction } = await import(
-        'lib/credentials/multiAttestOnchain'
+        '@packages/credentials/multiAttestOnchain'
       );
 
       if (gnosisSafeForCredentials) {

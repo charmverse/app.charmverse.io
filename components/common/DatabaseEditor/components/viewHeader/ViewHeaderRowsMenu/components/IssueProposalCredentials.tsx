@@ -2,6 +2,7 @@ import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Box, ListItemText, Tooltip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import type { IssuableProposalCredentialContent } from '@packages/credentials/findIssuableProposalCredentials';
 import { conditionalPlural } from '@packages/utils/strings';
 import { useState } from 'react';
 
@@ -14,7 +15,6 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { useSwitchChain } from 'hooks/wagmi';
-import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 
 export function IssueProposalCredentials({
   selectedPageIds,

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -17,7 +18,6 @@ import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { UndesirableOperationError } from 'lib/utils/errors';
-import { replaceS3Domain } from 'lib/utils/url';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

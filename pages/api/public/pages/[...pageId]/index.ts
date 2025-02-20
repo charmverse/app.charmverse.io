@@ -1,6 +1,7 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isUUID } from '@packages/utils/strings';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -16,7 +17,6 @@ import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isTruthy } from 'lib/utils/types';
-import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

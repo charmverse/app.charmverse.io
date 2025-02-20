@@ -1,7 +1,7 @@
+import { saveGnosisSafeTransactionToIndex } from '@packages/credentials/indexGnosisSafeCredentialTransaction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { saveGnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

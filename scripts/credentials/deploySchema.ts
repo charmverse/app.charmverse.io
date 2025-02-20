@@ -1,9 +1,9 @@
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
 import { optimismSepolia } from 'viem/chains';
-import { EasSchemaChain, easConnectors } from 'lib/credentials/connectors';
-import { getEasInstance } from 'lib/credentials/getEasInstance';
-import { NULL_ADDRESS } from 'lib/credentials/constants';
+import { EasSchemaChain, easConnectors } from '@packages/credentials/connectors';
+import { getEasInstance } from '@packages/credentials/getEasInstance';
+import { NULL_ADDRESS } from '@packages/credentials/constants';
 
 import { Wallet, providers } from 'ethers';
 import { http } from 'viem';

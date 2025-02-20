@@ -1,7 +1,7 @@
+import { indexOnchainRewardCredentials } from '@packages/credentials/indexOnChainRewardCredential';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { indexOnchainRewardCredentials } from 'lib/credentials/indexOnChainRewardCredential';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

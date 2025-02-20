@@ -6,6 +6,16 @@ import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import type {
+  EASAttestationFromApi,
+  EASAttestationWithFavorite
+} from '@packages/credentials/external/getOnchainCredentials';
+import { trackedCharmverseSchemas, trackedSchemas } from '@packages/credentials/external/schemas';
+import { charmverseCredentialSchemas } from '@packages/credentials/schemas';
+import { externalCredentialSchemaId } from '@packages/credentials/schemas/external';
+import { type CredentialDataInput } from '@packages/credentials/schemas/interfaces';
+import { proposalCredentialSchemaId } from '@packages/credentials/schemas/proposal';
+import { rewardCredentialSchemaId } from '@packages/credentials/schemas/reward';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import Image from 'next/image';
 
@@ -14,13 +24,6 @@ import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { EASAttestationFromApi, EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
-import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
-import { charmverseCredentialSchemas } from 'lib/credentials/schemas';
-import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
-import { type CredentialDataInput } from 'lib/credentials/schemas/interfaces';
-import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
-import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 
 export type UserCredentialRowProps = {
   credential: EASAttestationFromApi & Partial<Pick<EASAttestationWithFavorite, 'favoriteCredentialId' | 'index'>>;

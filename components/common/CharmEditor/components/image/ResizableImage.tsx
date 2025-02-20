@@ -4,6 +4,7 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 
@@ -12,7 +13,6 @@ import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { replaceS3Domain } from 'lib/utils/url';
 
 import { enableDragAndDrop } from '../../utils';
 import { getFileBinary } from '../@bangle.dev/base-components/image';

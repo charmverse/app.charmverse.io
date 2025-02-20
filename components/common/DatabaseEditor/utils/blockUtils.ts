@@ -1,5 +1,6 @@
+import { replaceS3Domain } from '@packages/utils/url';
+
 import type { UIBlockWithDetails, BlockWithDetails } from 'lib/databases/block';
-import { replaceS3Domain } from 'lib/utils/url';
 import type { ServerBlockFields } from 'pages/api/blocks';
 
 import { OctoUtils } from '../octoUtils';

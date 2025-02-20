@@ -1,10 +1,9 @@
+import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
+import type { GnosisSafeTransactionToIndex } from '@packages/credentials/indexGnosisSafeCredentialTransaction';
+import type { ProposalCredentialsToIndex } from '@packages/credentials/indexOnChainProposalCredential';
+import type { RewardCredentialsToIndex } from '@packages/credentials/indexOnChainRewardCredential';
+import type { CreateCredentialTemplateInput, CredentialTemplateUpdate } from '@packages/credentials/templates';
 import * as http from '@root/adapters/http';
-
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
-import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
-import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
-import type { RewardCredentialsToIndex } from 'lib/credentials/indexOnChainRewardCredential';
-import type { CreateCredentialTemplateInput, CredentialTemplateUpdate } from 'lib/credentials/templates';
 
 export class CredentialsApi {
   // TODO Test endpoint for generating a credential - remove later

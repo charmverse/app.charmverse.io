@@ -2,6 +2,10 @@ import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import type { EasSchemaChain } from '@packages/credentials/connectors';
+import type { IssuableRewardApplicationCredentialContent } from '@packages/credentials/findIssuableRewardCredentials';
+import { getOnChainSchemaUrl } from '@packages/credentials/getOnChainSchemaUrl';
+import { rewardCredentialSchemaId } from '@packages/credentials/schemas/reward';
 import { conditionalPlural } from '@packages/utils/strings';
 import { useMemo, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
@@ -17,10 +21,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
-import type { EasSchemaChain } from 'lib/credentials/connectors';
-import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
-import { getOnChainSchemaUrl } from 'lib/credentials/getOnChainSchemaUrl';
-import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 
 import { PropertyMenu } from './PropertyMenu';
 

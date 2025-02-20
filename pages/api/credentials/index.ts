@@ -1,7 +1,7 @@
+import { getAllUserCredentials } from '@packages/credentials/getAllUserCredentials';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { getAllUserCredentials } from 'lib/credentials/getAllUserCredentials';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
