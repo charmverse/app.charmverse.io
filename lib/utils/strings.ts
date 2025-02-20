@@ -53,27 +53,6 @@ export function isLocalhostUrl(text: string) {
   return /^https?:\/\/(localhost|0|10|127|192(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}|\[::1?\])/gi.test(text);
 }
 
-// generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
-export function stringToColor(name: string, saturation = 50, lightness = 60) {
-  if (name === '') {
-    // return 'var(--background-dark)';
-    return 'transparent';
-  }
-  return `hsl(${stringToHue(name)}, ${saturation}%, ${lightness}%)`;
-}
-
-export function stringToHue(name: string) {
-  const cleanName = name.replace('0x', ''); // ignore the universal prefix of addresses
-  let hash = 0;
-  for (let i = 0; i < cleanName.length; i++) {
-    // eslint-disable-next-line
-    hash = cleanName.charCodeAt(i) + ((hash << 5) - hash);
-  }
-
-  const h = hash % 360;
-  return h;
-}
-
 // A future update can use https://www.npmjs.com/package/friendly-url
 // Info for japanese title characters: https://gist.github.com/ryanmcgrath/982242
 export function stringToValidPath({
@@ -180,10 +159,6 @@ export function conditionalPlural({ word = '', count = 1, plural }: ConditionalP
     return plural ?? `${word}s`;
   }
   return word;
-}
-
-export function lowerCaseEqual(firstString?: string | null, secondString?: string | null): boolean {
-  return firstString?.toLowerCase() === secondString?.toLowerCase();
 }
 
 // ref: https://stackoverflow.com/questions/6300183/sanitize-string-of-regex-characters-before-regexp-build

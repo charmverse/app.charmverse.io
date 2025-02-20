@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
 import type { SxProps, Theme } from '@mui/material';
 import MuiAvatar from '@mui/material/Avatar';
+import { stringToColor } from '@packages/utils/strings';
 import { replaceS3Domain } from '@packages/utils/url';
-import { stringToColor } from '@root/lib/utils/strings';
 import React from 'react';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';

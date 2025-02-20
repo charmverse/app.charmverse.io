@@ -55,9 +55,6 @@ export const webhookEndpoint = 'api/v1/webhooks/addToDatabase';
 
 export const appSubdomain = 'app';
 
-// In CI, we want to have a private key for signing, but we don't need a fixed one. We also want to have errors if we are not in CI environment and CREDENTIAL_WALLET_KEY is not set
-export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY;
-
 // Github
 export const githubPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY as string;
 export const githubAppId = Number(process.env.GITHUB_APP_ID);

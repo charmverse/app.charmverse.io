@@ -1,4 +1,4 @@
-import { baseUrl } from '@root/config/constants';
+import { baseUrl } from '@packages/utils/constants';
 
 export function ProjectShareItem({ project }: { project: { name?: string | null; sunnyAwardsNumber: number | null } }) {
   const projectName = project.name?.substring(0, 30) || 'Untitled';

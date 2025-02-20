@@ -1,5 +1,4 @@
 import env from '@beam-australia/react-env';
-// import { isTestEnv } from '@root/config/constants';
 import { coinbaseWallet, walletConnect, injected, mock } from '@wagmi/connectors';
 import type { Address, Chain, Transport } from 'viem';
 import { custom, http } from 'viem';

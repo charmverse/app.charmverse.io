@@ -1,5 +1,5 @@
 import { getChainById } from '@packages/connectors/chains';
-import { credentialsWalletPrivateKey } from '@root/config/constants';
+import { credentialsWalletPrivateKey } from '@packages/utils/constants';
 import type { Signer } from 'ethers';
 import { Wallet, providers } from 'ethers';
 

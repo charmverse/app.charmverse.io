@@ -69,6 +69,10 @@ export function stringToHue(name: string) {
   return h;
 }
 
+export function lowerCaseEqual(firstString?: string | null, secondString?: string | null): boolean {
+  return firstString?.toLowerCase() === secondString?.toLowerCase();
+}
+
 /**
  * Create by default a cuid with length 10
  */

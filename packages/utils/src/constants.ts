@@ -15,3 +15,6 @@ export const cookieName = process.env.AUTH_COOKIE || 'scoutgame-session';
 export const GITHUB_CLIENT_ID = env('GITHUB_CLIENT_ID') ?? process.env.REACT_APP_GITHUB_CLIENT_ID;
 
 export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
+
+// In CI, we want to have a private key for signing, but we don't need a fixed one. We also want to have errors if we are not in CI environment and CREDENTIAL_WALLET_KEY is not set
+export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY;

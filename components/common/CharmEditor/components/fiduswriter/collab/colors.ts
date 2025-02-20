@@ -1,4 +1,4 @@
-import { stringToHue } from 'lib/utils/strings';
+import { stringToHue } from '@packages/utils/strings';
 
 import { noSpaceTmp } from '../common/basic';
 

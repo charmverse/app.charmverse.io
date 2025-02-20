@@ -1,6 +1,6 @@
+import { stringToColor } from '@packages/utils/strings';
 import { replaceS3Domain } from '@packages/utils/url';
 import { Img } from '@react-email/img';
-import { stringToColor } from '@root/lib/utils/strings';
 
 import Text from './Text';
 

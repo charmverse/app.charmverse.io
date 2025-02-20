@@ -1,5 +1,4 @@
 import { getChainById } from '@packages/connectors/chains';
-import { credentialsWalletPrivateKey } from '@root/config/constants';
 import { createWalletClient, http, publicActions } from 'viem';
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts';
 import { optimismSepolia } from 'viem/chains';
