@@ -82,11 +82,16 @@
           "./apps/farcaster/",
           "./apps/sunnyawards/",
           "./apps/websockets/",
+          "./packages/aws/",
           "./packages/charmeditor/",
+          "./packages/connect-shared/",
+          "./packages/connectors/",
+          "./packages/credentials/",
+          "./packages/farcaster/",
           "./packages/github/",
+          "./packages/nextjs/",
           "./packages/testing/",
-          "./packages/utils/",
-          "./packages/connect-shared/"
+          "./packages/utils/"
         ]
       }
     ],

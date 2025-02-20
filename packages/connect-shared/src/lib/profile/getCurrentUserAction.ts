@@ -2,8 +2,8 @@
 
 import type { FarcasterUser, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { authActionClient } from '@packages/connect-shared/lib/actions/actionClient';
-import { replaceS3Domain } from '@root/lib/utils/url';
+import { authActionClient } from '@packages/nextjs/actions/actionClient';
+import { replaceS3Domain } from '@packages/utils/url';
 
 export type LoggedInUser = User & {
   farcasterUser?: FarcasterUser | null;

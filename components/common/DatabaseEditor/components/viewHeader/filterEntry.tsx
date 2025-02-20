@@ -15,7 +15,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { getChainList, getChainById } from '@root/connectors/chains';
+import { getChainList, getChainById } from '@packages/connectors/chains';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';

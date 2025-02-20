@@ -12,6 +12,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { fancyTrim } from '@packages/utils/strings';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
 import type { MouseEvent } from 'react';
@@ -31,7 +32,6 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
-import { fancyTrim } from 'lib/utils/strings';
 
 import { PageIcon } from '../../PageIcon';
 

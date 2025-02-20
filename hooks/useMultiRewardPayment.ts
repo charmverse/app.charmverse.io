@@ -1,6 +1,6 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import { Interface } from '@ethersproject/abi';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { ethers } from 'ethers';
 import { useCallback } from 'react';

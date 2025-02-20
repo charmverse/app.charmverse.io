@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { wagmiConfig } from '@root/connectors/config';
+import { wagmiConfig } from '@packages/connectors/config';
 import { getBytecode, readContracts, readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import { erc20Abi, isAddress, parseAbi } from 'viem';

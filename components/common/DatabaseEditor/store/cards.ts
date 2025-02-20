@@ -1,6 +1,6 @@
+import { getChainList } from '@packages/connectors/chains';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { getChainList } from '@root/connectors/chains';
 
 import type { Board } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';

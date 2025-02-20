@@ -1,8 +1,8 @@
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
-import { CryptoCurrencies, getChainById } from '@root/connectors/chains';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/connectors/chains';
+import { CryptoCurrencies, getChainById } from '@packages/connectors/chains';
 import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 

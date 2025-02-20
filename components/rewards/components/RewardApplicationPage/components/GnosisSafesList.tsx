@@ -1,7 +1,7 @@
 import type { SystemError } from '@charmverse/core/errors';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { MenuItem } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 
 import charmClient from 'charmClient';
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';

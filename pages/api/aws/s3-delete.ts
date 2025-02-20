@@ -1,7 +1,7 @@
 // based on example from https://github.com/ryanto/next-s3-upload/issues/13
 import type { DeleteObjectCommandInput } from '@aws-sdk/client-s3';
 import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { awsS3Bucket } from '@root/config/constants';
+import { awsS3Bucket } from '@packages/utils/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

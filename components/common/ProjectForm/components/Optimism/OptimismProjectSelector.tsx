@@ -1,4 +1,5 @@
 import { ListItemText, MenuItem, Select, Typography } from '@mui/material';
+import { fancyTrim } from '@packages/utils/strings';
 import type { OpProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 import { useState } from 'react';
 
@@ -8,7 +9,6 @@ import type { ControlFieldProps, FieldProps } from 'components/common/form/inter
 import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { useUser } from 'hooks/useUser';
 import type { FormValues } from 'lib/optimism/projectSchema';
-import { fancyTrim } from 'lib/utils/strings';
 
 import { OptimismProjectDisplay } from './OptimismProjectDisplay';
 import { OptimismProjectForm } from './OptimismProjectForm';

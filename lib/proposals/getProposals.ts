@@ -14,8 +14,8 @@ import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,
   ProposalWithJoinedData
-} from '@root/lib/credentials/findIssuableProposalCredentials';
-import { generateCredentialInputsForProposal } from '@root/lib/credentials/findIssuableProposalCredentials';
+} from '@packages/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from '@packages/credentials/findIssuableProposalCredentials';
 import { sortBy } from 'lodash-es';
 
 import { permissionsApiClient } from 'lib/permissions/api/client';

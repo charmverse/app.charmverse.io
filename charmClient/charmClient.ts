@@ -9,8 +9,8 @@ import type {
   User,
   UserDetails
 } from '@charmverse/core/prisma';
+import type { FiatCurrency, IPairQuote } from '@packages/connectors/chains';
 import * as http from '@root/adapters/http';
-import type { FiatCurrency, IPairQuote } from '@root/connectors/chains';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 

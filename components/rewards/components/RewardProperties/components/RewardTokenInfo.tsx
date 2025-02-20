@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
 import { TokenLogo } from 'components/common/Icons/TokenLogo';

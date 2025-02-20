@@ -1,3 +1,4 @@
+import { saveSession } from '@packages/nextjs/session/saveSession';
 import { trackOpSpaceSuccessfulSigninEvent } from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -7,7 +8,6 @@ import { connectAccountWithGoogleCode } from 'lib/google/connectGoogleAccountWit
 import { loginWithGoogleCode } from 'lib/google/loginWithGoogleCode';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
-import { saveSession } from 'lib/middleware/saveSession';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

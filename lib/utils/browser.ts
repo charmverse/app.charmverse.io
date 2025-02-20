@@ -1,3 +1,4 @@
+import { addQueryToUrl } from '@packages/utils/url';
 import { baseUrl, isDevEnv } from '@root/config/constants';
 
 import { getAppApexDomain } from './domains/getAppApexDomain';
@@ -5,7 +6,6 @@ import { getCustomDomainFromHost } from './domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from './domains/getSpaceDomainFromHost';
 import { isLocalhostAlias } from './domains/isLocalhostAlias';
 import { getAppOriginURL } from './getAppOriginURL';
-import { addQueryToUrl } from './url';
 
 // using deprectead feature, navigator.userAgent doesnt exist yet in FF - https://developer.mozilla.org/en-US/docs/Web/API/Navigator/platform
 export function isMac() {

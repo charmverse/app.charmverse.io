@@ -6,7 +6,6 @@
     "paths": {
       "@root/abis/*": ["./abis/*"],
       "@root/adapters/*": ["./adapters/*"],
-      "@root/connectors/*": ["./connectors/*"],
       "@root/config/*": ["./config/*"],
       "@root/lib/*": ["./lib/*"],
       "@charmverse/core/prisma": ["node_modules/@charmverse/core/dist/esm/prisma"],

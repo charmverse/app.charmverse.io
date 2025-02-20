@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { getChainById } from '@packages/connectors/chains';
 import ERC721_ABI from '@root/abis/ERC721.json';
 import { GET } from '@root/adapters/http';
-import { getChainById } from '@root/connectors/chains';
 import type { NFTData } from '@root/lib/blockchain/getNFTs';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { lowerCaseEqual } from '@root/lib/utils/strings';

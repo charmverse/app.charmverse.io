@@ -1,4 +1,4 @@
-import { getChainShortname } from '@root/connectors/chains';
+import { getChainShortname } from '@packages/connectors/chains';
 
 export function getGnosisTransactionQueueUrl(address: string, chainId: number) {
   // Safe still has 'matic' in their urls instead of pol

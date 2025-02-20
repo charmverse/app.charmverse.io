@@ -13,6 +13,7 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 
 import Avatar from 'components/common/Avatar';
@@ -23,7 +24,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { Member, Social } from 'lib/members/interfaces';
 
 import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';

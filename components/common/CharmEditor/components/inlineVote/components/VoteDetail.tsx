@@ -17,7 +17,7 @@ import {
   Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import millify from 'millify';

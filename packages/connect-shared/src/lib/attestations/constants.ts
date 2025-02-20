@@ -1,4 +1,4 @@
-import { isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@root/config/constants';
+import { isDevEnv, isProdEnv, isStagingEnv, isTestEnv } from '@packages/utils/constants';
 import { optimism, optimismSepolia } from 'viem/chains';
 
 export const gitcoinProjectAttestationChainId =

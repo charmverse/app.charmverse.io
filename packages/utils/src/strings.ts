@@ -14,6 +14,14 @@ export function capitalize(input?: string): string {
   return `${trimmed[0].toUpperCase()}${trimmed.slice(1)}`;
 }
 
+export function fancyTrim(_text: string = '', maxLength: number = 40) {
+  const text = _text || '';
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength - 3)}...`;
+}
+
 export function fancyTrimWords(_text: string = '', maxWords: number = 40) {
   const text = _text || '';
   const words = text.split(' ');

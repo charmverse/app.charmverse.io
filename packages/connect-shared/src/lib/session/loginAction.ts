@@ -1,7 +1,7 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { loginWithFarcaster } from '@root/lib/farcaster/loginWithFarcaster';
+import { loginWithFarcaster } from '@packages/farcaster/loginWithFarcaster';
 import * as yup from 'yup';
 
 import { actionClient } from '../actions/actionClient';

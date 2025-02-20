@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { Tooltip, Typography } from '@mui/material';
-import { wagmiConfig } from '@root/connectors/config';
+import { wagmiConfig } from '@packages/connectors/config';
 import { switchChain } from '@wagmi/core';
 import { type FrameButtonMint } from 'frames.js';
 import type { ReactNode } from 'react';

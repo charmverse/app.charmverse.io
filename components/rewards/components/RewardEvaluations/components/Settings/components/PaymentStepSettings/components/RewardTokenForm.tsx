@@ -1,7 +1,7 @@
 import type { PaymentMethod } from '@charmverse/core/prisma-client';
 import { Box, Stack, TextField } from '@mui/material';
-import type { CryptoCurrency } from '@root/connectors/chains';
-import { getChainById } from '@root/connectors/chains';
+import type { CryptoCurrency } from '@packages/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 

@@ -2,7 +2,7 @@ import { DeleteObjectsCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/c
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
-import { awsS3Bucket } from '@root/config/constants';
+import { awsS3Bucket } from '@packages/utils/constants';
 
 import { getS3ClientConfig } from './getS3ClientConfig';
 import { listS3BucketContents } from './listS3Assets';

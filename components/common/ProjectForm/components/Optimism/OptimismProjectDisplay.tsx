@@ -1,6 +1,6 @@
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Divider, Stack, Typography } from '@mui/material';
-import { replaceUrl } from '@root/lib/utils/url';
+import { replaceUrl } from '@packages/utils/url';
 import { useState } from 'react';
 
 import { useEditOptimismProject, useGetOpProjects } from 'charmClient/hooks/optimism';

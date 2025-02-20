@@ -1,4 +1,4 @@
-import { getIronOptions as getIronOptionsRoot } from '@root/lib/session/getIronOptions';
+import { getIronOptions as getIronOptionsRoot } from '@packages/nextjs/session/getIronOptions';
 
 export type SessionData = {
   user?: { id: string };

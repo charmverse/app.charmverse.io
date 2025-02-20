@@ -1,8 +1,8 @@
 import type { BoxProps, SxProps, Theme } from '@mui/material';
 import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } from '@mui/material/';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
-import type { IChainDetails } from '@root/connectors/chains';
-import { getChainList, getChainById } from '@root/connectors/chains';
+import type { IChainDetails } from '@packages/connectors/chains';
+import { getChainList, getChainById } from '@packages/connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';

@@ -4,7 +4,8 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { type TypographyProps } from '@mui/material/Typography';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
+import { fancyTrim } from '@packages/utils/strings';
 import millify from 'millify';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
@@ -12,7 +13,6 @@ import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { TokenBadge } from 'components/common/TokenBadge';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { fancyTrim } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
 export interface IRewardBadgeProps {

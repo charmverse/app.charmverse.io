@@ -4,11 +4,11 @@ import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box, Divider, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import { fancyTrim } from '@packages/utils/strings';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { fancyTrim } from 'lib/utils/strings';
 
 import LoadingComponent from '../LoadingComponent';
 

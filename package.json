@@ -165,6 +165,7 @@
     "@octokit/auth-app": "^6.1.1",
     "@octokit/auth-oauth-app": "^8.1.0",
     "@octokit/rest": "^21.0.2",
+    "@packages/nextjs": "^0.0.0",
     "@popperjs/core": "^2.11.8",
     "@react-dnd/shallowequal": "^4.0.0",
     "@react-email/column": "^0.0.12",

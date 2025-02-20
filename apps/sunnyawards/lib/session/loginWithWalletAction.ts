@@ -1,7 +1,7 @@
 'use server';
 
 import { InvalidInputError } from '@charmverse/core/errors';
-import { actionClient } from '@packages/connect-shared/lib/actions/actionClient';
+import { actionClient } from '@packages/nextjs/actions/actionClient';
 import { isValidEoaOrGnosisWalletSignature } from '@root/lib/blockchain/signAndVerify';
 import { getDomain } from '@root/lib/utils/strings';
 

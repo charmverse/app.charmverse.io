@@ -1,7 +1,7 @@
 import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { useMemo, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 

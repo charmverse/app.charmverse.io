@@ -1,8 +1,8 @@
 import { Box } from '@mui/material';
+import { fancyTrim } from '@packages/utils/strings';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
-import { fancyTrim } from 'lib/utils/strings';
 
 const maxTitleLength = 35;
 type TemplateOption = {

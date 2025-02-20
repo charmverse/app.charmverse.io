@@ -1,7 +1,7 @@
 import type { Application } from '@charmverse/core/prisma-client';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { Tooltip } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { useMemo, useState } from 'react';
 
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';

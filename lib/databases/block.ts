@@ -1,6 +1,6 @@
 import type { Page, PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { OptionalFalseyFields } from '@root/lib/utils/objects';
-import { replaceS3Domain } from '@root/lib/utils/url';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 

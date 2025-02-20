@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { revokeAgoraProjectAttestation } from '@packages/connect-shared/lib/attestations/agoraApi';
-import type { EasSchemaChain } from '@root/lib/credentials/connectors';
-import { revokeAttestation } from '@root/lib/credentials/revokeAttestation';
+import type { EasSchemaChain } from '@packages/credentials/connectors';
+import { revokeAttestation } from '@packages/credentials/revokeAttestation';
 
 export async function softDeleteAndRevokeSunnyAwardsProject({ projectId }: { projectId: string }) {
   if (!stringUtils.isUUID(projectId)) {

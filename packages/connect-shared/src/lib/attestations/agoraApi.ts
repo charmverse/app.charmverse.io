@@ -2,11 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DELETE, POST } from '@root/adapters/http';
-import { EasSchemaChain } from '@root/lib/credentials/connectors';
-import { getAttestation } from '@root/lib/credentials/getAttestation';
-import { mapProjectToOptimism } from '@root/lib/credentials/mapProjectToOptimism';
-import { decodeOptimismProjectSnapshotAttestation } from '@root/lib/credentials/schemas/optimismProjectUtils';
+import { getAttestation } from '@packages/credentials/getAttestation';
+import { mapProjectToOptimism } from '@packages/credentials/mapProjectToOptimism';
+import { decodeOptimismProjectSnapshotAttestation } from '@packages/credentials/schemas/optimismProjectUtils';
+import { DELETE, POST } from '@packages/utils/http';
 import { optimism } from 'viem/chains';
 
 export const AGORA_API_KEY = process.env.AGORA_API_KEY as string;

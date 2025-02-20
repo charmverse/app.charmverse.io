@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { wagmiConfig } from '@root/connectors/config';
+import { wagmiConfig } from '@packages/connectors/config';
 import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

@@ -30,7 +30,6 @@
       "@root/abis/*": ["../../abis/*"],
       "@root/adapters/*": ["../../adapters/*"],
       "@root/config/*": ["../../config/*"],
-      "@root/connectors/*": ["../../connectors/*"],
       "@root/hooks/*": ["../../hooks/*"],
       "@root/lib/*": ["../../lib/*"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],

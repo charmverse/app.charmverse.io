@@ -1,6 +1,6 @@
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { builderDaoChains, daoChains, hatsProtocolChains, getChainList } from '@root/connectors/chains';
+import { builderDaoChains, daoChains, hatsProtocolChains, getChainList } from '@packages/connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';

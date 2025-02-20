@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
 import type { PublicClient } from 'viem';
 import { createPublicClient, http } from 'viem';

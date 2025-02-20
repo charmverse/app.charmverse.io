@@ -1,7 +1,7 @@
 import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Box, ListItemText, Tooltip } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';

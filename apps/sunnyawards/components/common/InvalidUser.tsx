@@ -3,8 +3,8 @@
 import { log } from '@charmverse/core/log';
 import { Button, Typography } from '@mui/material';
 import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
-import { revalidatePathAction } from '@packages/connect-shared/lib/actions/revalidatePathAction';
-import { logoutAction } from '@packages/connect-shared/lib/session/logoutAction';
+import { revalidatePathAction } from '@packages/nextjs/actions/revalidatePathAction';
+import { logoutAction } from '@packages/nextjs/session/logoutAction';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 

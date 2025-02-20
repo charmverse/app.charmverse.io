@@ -13,3 +13,5 @@ export const authSecret = process.env.AUTH_SECRET as string | undefined;
 export const cookieName = process.env.AUTH_COOKIE || 'scoutgame-session';
 
 export const GITHUB_CLIENT_ID = env('GITHUB_CLIENT_ID') ?? process.env.REACT_APP_GITHUB_CLIENT_ID;
+
+export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;

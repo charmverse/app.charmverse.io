@@ -1,4 +1,4 @@
-import { getChainList } from '@root/connectors/chains';
+import { getChainList } from '@packages/connectors/chains';
 import { useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';

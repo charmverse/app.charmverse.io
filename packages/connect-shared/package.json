@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@mui/material-nextjs": "^6.4.3",
+    "@packages/credentials": "^0.0.0",
+    "@packages/farcaster": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "framer-motion": "^12.4.5",
     "next-safe-action": "^7.10.4"

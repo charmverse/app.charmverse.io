@@ -1,7 +1,7 @@
 'use server';
 
 import type { ProductUpdatesFarcasterFrame, Project } from '@charmverse/core/prisma-client';
-import { actionClient } from '@packages/connect-shared/lib/actions/actionClient';
+import { actionClient } from '@packages/nextjs/actions/actionClient';
 
 import { createProductUpdate } from './createProductUpdate';
 import { schema } from './schema';

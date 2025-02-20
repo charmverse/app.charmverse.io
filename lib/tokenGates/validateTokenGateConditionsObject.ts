@@ -1,4 +1,4 @@
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 

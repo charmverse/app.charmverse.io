@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
 import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
-import type { OptimismProject } from '@root/lib/credentials/mapProjectToOptimism';
+import type { OptimismProject } from '@packages/credentials/mapProjectToOptimism';
 import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
 import { concatenateStringValues } from '@root/lib/utils/strings';
 import { useRouter } from 'next/navigation';

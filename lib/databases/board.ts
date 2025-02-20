@@ -1,7 +1,7 @@
+import { replaceS3Domain } from '@packages/utils/url';
 import type { UIBlockWithDetails } from '@root/lib/databases/block';
 import { createBlock } from '@root/lib/databases/block';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
-import { replaceS3Domain } from '@root/lib/utils/url';
 import { v4 } from 'uuid';
 
 import type { Card } from './card';

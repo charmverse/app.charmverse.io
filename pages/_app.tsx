@@ -6,8 +6,8 @@ import { development, LensProvider, production } from '@lens-protocol/react-web'
 import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import { wagmiConfig } from '@packages/connectors/config';
 import { isDevEnv, isProdEnv } from '@root/config/constants';
-import { wagmiConfig } from '@root/connectors/config';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';

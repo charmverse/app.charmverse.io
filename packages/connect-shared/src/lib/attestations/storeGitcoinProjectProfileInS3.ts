@@ -1,11 +1,11 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { awsS3Bucket } from '@root/config/constants';
-import { uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
-import { getAttestationS3Path } from '@root/lib/credentials/getAttestationS3Path';
-import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
-import { replaceS3Domain } from '@root/lib/utils/url';
+import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
+import { getAttestationS3Path } from '@packages/credentials/getAttestationS3Path';
+import { gitcoinProjectCredentialSchemaId } from '@packages/credentials/schemas/gitcoinProjectSchema';
+import { awsS3Bucket } from '@packages/utils/constants';
+import { replaceS3Domain } from '@packages/utils/url';
 
 import { findProject } from '../projects/findProject';
 

@@ -2,6 +2,7 @@ import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { MouseEvent } from 'react';
 
@@ -14,7 +15,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { Member, Social } from 'lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';

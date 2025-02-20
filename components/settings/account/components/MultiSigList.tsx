@@ -16,7 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
-import { getChainById, getChainShortname } from '@root/connectors/chains';
+import { getChainById, getChainShortname } from '@packages/connectors/chains';
 import { useCallback, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';

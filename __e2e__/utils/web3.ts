@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 
+import { getChainById } from '@packages/connectors/chains';
 import type { Page as BrowserPage } from '@playwright/test';
-import { getChainById } from '@root/connectors/chains';
 import { SiweMessage } from 'siwe';
 import { createWalletClient, getAddress, http } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';

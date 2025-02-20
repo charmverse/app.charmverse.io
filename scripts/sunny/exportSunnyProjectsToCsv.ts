@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import { stringify } from 'csv-stringify/sync';
 import { optimism } from 'viem/chains';
 import { writeFileSync } from 'node:fs';

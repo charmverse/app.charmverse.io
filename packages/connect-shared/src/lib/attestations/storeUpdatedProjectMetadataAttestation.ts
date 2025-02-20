@@ -1,7 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 
 import { createProjectViaAgora, storeProjectMetadataViaAgora } from './agoraApi';
 

@@ -1,5 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { DateTime } from 'luxon';
 
 import type { UIBlockWithDetails } from 'lib/databases/block';

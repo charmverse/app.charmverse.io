@@ -1,8 +1,8 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { FarcasterProfileInfo } from '@root/lib/farcaster/loginWithFarcaster';
-import { replaceS3Domain } from '@root/lib/utils/url';
 
 export type ConnectProjectMember = {
   farcasterId: number;

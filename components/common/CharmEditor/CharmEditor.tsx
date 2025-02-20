@@ -3,7 +3,7 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency } from '@root/connectors/chains';
+import type { CryptoCurrency, FiatCurrency } from '@packages/connectors/chains';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';

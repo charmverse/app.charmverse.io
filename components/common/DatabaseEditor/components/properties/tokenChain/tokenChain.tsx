@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import { isAddress } from 'viem';
 
 import { usePaymentMethods } from 'hooks/usePaymentMethods';

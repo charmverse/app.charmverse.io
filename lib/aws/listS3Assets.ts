@@ -1,5 +1,5 @@
 import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
-import { awsS3Bucket } from '@root/config/constants';
+import { awsS3Bucket } from '@packages/utils/constants';
 
 import { getS3ClientConfig } from './getS3ClientConfig';
 

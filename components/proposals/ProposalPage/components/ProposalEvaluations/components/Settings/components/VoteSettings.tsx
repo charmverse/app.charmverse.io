@@ -16,7 +16,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 

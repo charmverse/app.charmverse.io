@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/connectors/chains';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';

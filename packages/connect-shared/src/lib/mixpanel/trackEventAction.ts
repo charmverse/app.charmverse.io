@@ -1,9 +1,8 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
+import { actionClient } from '@packages/nextjs/actions/actionClient';
 import { v4 as uuid } from 'uuid';
-
-import { actionClient } from '../actions/actionClient';
 
 import { eventSchema } from './trackEventActionSchema';
 import { trackMixpanelEvent } from './trackMixpanelEvent';

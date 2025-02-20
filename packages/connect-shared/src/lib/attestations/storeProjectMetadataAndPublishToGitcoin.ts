@@ -3,10 +3,10 @@ import { log } from '@charmverse/core/log';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { resolveENSName } from '@packages/blockchain/getENSName';
-import { attestOnchain } from '@root/lib/credentials/attestOnchain';
-import { gitcoinProjectCredentialSchemaId } from '@root/lib/credentials/schemas/gitcoinProjectSchema';
-import { storeProjectInS3 } from '@root/lib/credentials/storeProjectInS3';
-import { getFarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import { attestOnchain } from '@packages/credentials/attestOnchain';
+import { gitcoinProjectCredentialSchemaId } from '@packages/credentials/schemas/gitcoinProjectSchema';
+import { storeProjectInS3 } from '@packages/credentials/storeProjectInS3';
+import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import { isAddress } from 'viem';
 
 import { gitcoinProjectAttestationChainId } from './constants';
