@@ -5,7 +5,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { getEasConnector } from '@packages/credentials/connectors';
 import { credentialEventLabels } from '@packages/credentials/constants';
-import { attestationSchemaIds } from '@packages/credentials/schemas';
+import { attestationSchemaIds } from '@packages/credentials/schemas/index';
 import { optimism } from 'viem/chains';
 
 import Link from 'components/common/Link';

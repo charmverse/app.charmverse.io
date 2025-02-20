@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import { attestationSchemaIds } from '@packages/credentials/schemas';
+import { attestationSchemaIds } from '@packages/credentials/schemas/index';
 import { useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';

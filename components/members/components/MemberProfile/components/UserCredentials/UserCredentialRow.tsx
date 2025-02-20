@@ -11,8 +11,8 @@ import type {
   EASAttestationWithFavorite
 } from '@packages/credentials/external/getOnchainCredentials';
 import { trackedCharmverseSchemas, trackedSchemas } from '@packages/credentials/external/schemas';
-import { charmverseCredentialSchemas } from '@packages/credentials/schemas';
 import { externalCredentialSchemaId } from '@packages/credentials/schemas/external';
+import { charmverseCredentialSchemas } from '@packages/credentials/schemas/index';
 import { type CredentialDataInput } from '@packages/credentials/schemas/interfaces';
 import { proposalCredentialSchemaId } from '@packages/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from '@packages/credentials/schemas/reward';
