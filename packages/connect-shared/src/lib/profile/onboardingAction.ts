@@ -1,8 +1,7 @@
 'use server';
 
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { authActionClient } from '../actions/actionClient';
+import { authActionClient } from '@packages/nextjs/actions/actionClient';
 
 import { schema } from './form';
 
