@@ -1,5 +1,5 @@
+import { capitalize } from '@packages/utils/strings';
 import type { SelectOptionType, FormFieldInput, FormFieldValue } from '@root/lib/proposals/forms/interfaces';
-import { capitalize } from '@root/lib/utils/strings';
 import { useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';

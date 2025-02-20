@@ -1,4 +1,5 @@
 import { InvalidInputError, MissingDataError } from '@charmverse/core/errors';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import type SafeApiKit from '@safe-global/api-kit';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { useCallback, useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import { getAddress } from 'viem';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { isSupportedSafeApiChain } from 'lib/gnosis/safe/isSupportedSafeApiChain';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { useCreateSafes } from './useCreateSafes';
 import { useWeb3Account } from './useWeb3Account';

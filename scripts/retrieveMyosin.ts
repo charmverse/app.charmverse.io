@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 import { checkDiscordGate } from '@root/lib/discord/collabland/checkDiscordGate';
 import { getDiscordUserState } from '@root/lib/collabland/collablandClient';
 import { uniq } from 'lodash';

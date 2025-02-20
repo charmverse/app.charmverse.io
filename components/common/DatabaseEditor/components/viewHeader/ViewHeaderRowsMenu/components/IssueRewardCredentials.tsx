@@ -2,6 +2,7 @@ import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import { conditionalPlural } from '@packages/utils/strings';
 import { useMemo, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 
@@ -20,7 +21,6 @@ import type { EasSchemaChain } from 'lib/credentials/connectors';
 import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
 import { getOnChainSchemaUrl } from 'lib/credentials/getOnChainSchemaUrl';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
-import { conditionalPlural } from 'lib/utils/strings';
 
 import { PropertyMenu } from './PropertyMenu';
 

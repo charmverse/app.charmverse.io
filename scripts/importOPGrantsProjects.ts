@@ -1,6 +1,6 @@
 import { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utils/strings';
+import { uid } from '@packages/utils/strings';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';

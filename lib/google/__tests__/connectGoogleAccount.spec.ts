@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { getUserProfile } from '@root/lib/profile/getUser';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { connectGoogleAccount } from '../connectGoogleAccount';

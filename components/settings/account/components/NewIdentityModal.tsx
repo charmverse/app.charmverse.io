@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 
@@ -20,7 +21,6 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import IdentityProviderItem from './IdentityProviderItem';
 import { TELEGRAM_BOT_ID, TelegramLoginIframe } from './TelegramLoginIframe';

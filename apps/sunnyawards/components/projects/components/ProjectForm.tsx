@@ -6,7 +6,7 @@ import { ImageField } from '@packages/connect-shared/components/common/ImageFiel
 import { LoadingComponent } from '@packages/connect-shared/components/common/Loading/LoadingComponent';
 import { MultiTextInputField } from '@packages/connect-shared/components/common/MultiTextInputField';
 import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';

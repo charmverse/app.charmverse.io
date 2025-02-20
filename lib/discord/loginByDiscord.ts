@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { getUserS3FilePath, uploadUrlToS3 } from '@root/lib/aws/uploadToS3Server';
 import { getDiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from '@root/lib/discord/getDiscordCallbackUrl';
@@ -10,7 +11,6 @@ import type { OauthFlowType } from '@root/lib/oauth/interfaces';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { postUserCreate } from '@root/lib/users/postUserCreate';
 import { DisabledAccountError } from '@root/lib/utils/errors';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';

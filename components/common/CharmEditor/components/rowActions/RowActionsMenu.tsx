@@ -9,6 +9,7 @@ import {
 import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
+import { slugify } from '@packages/utils/strings';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
@@ -24,7 +25,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { isMac } from 'lib/utils/browser';
-import { slugify } from 'lib/utils/strings';
 
 import { getHeadingLink } from '../heading';
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';

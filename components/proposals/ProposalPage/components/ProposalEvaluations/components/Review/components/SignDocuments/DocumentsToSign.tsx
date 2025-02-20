@@ -2,6 +2,7 @@ import type { DocumentSigner } from '@charmverse/core/prisma';
 import { Check as CheckIcon } from '@mui/icons-material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
@@ -12,7 +13,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import { getFormattedDateTime } from 'lib/utils/dates';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSigner; envelopeId: string }) {
   const { user } = useUser();

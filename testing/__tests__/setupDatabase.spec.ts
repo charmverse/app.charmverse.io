@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { InvalidInputError } from '@root/lib/utils/errors';
-import { uid } from '@root/lib/utils/strings';
 
 import { generateRole, generateUserAndSpace } from '../setupDatabase';
 

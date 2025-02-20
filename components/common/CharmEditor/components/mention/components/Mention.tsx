@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
+import { isUUID } from '@packages/utils/strings';
 import type { ReactNode } from 'react';
 
 import Link from 'components/common/Link';
@@ -8,7 +9,6 @@ import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfil
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
-import { isUUID } from 'lib/utils/strings';
 
 import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import type { NodeViewProps } from '../../@bangle.dev/core/node-view';

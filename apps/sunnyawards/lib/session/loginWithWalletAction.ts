@@ -3,7 +3,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { actionClient } from '@packages/nextjs/actions/actionClient';
 import { isValidEoaOrGnosisWalletSignature } from '@root/lib/blockchain/signAndVerify';
-import { getDomain } from '@root/lib/utils/strings';
 
 import { authSchema } from '../blockchain/config';
 
@@ -34,3 +33,18 @@ export const loginWithWalletAction = actionClient
 
     return { success: true, userId: loggedInUser.id };
   });
+
+// example: https://google.com/search?q=3531422 -> https://google.com
+function getDomain(url: string, includeProtocol?: boolean) {
+  if (!url.includes('http')) {
+    // invalid url, oh well
+    return url;
+  }
+  const pathArray = url.split('/');
+  const protocol = pathArray[0];
+  const host = pathArray[2];
+  if (includeProtocol) {
+    return `${protocol}//${host}`;
+  }
+  return host;
+}

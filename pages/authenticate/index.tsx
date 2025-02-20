@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import { isValidEmail } from '@packages/utils/strings';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -15,7 +16,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
-import { isValidEmail } from 'lib/utils/strings';
 
 export default function Authenticate() {
   const [loginError, setLoginError] = useState(false);

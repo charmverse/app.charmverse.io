@@ -4,7 +4,7 @@ import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import PreviewIcon from '@mui/icons-material/Preview';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 import { FcGoogle } from 'react-icons/fc';
 import { RiFolder2Line } from 'react-icons/ri';
 

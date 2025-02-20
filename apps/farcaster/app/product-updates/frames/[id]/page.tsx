@@ -1,7 +1,7 @@
 'use server';
 
+import { isUUID } from '@packages/utils/strings';
 import { baseUrl } from '@root/config/constants';
-import { isUUID } from '@root/lib/utils/strings';
 
 import { getProductUpdatesFrame } from 'lib/productUpdates/getProductUpdatesFrame';
 

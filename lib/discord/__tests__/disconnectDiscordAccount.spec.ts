@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { InvalidInputError } from '@root/lib/utils/errors';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { disconnectDiscordAccount } from '../disconnectDiscordAccount';

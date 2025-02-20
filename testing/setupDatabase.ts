@@ -23,6 +23,7 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import type { DataSourceType } from '@root/lib/databases/board';
 import type { IViewType } from '@root/lib/databases/boardView';
 import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updateBoardProperties';
@@ -42,7 +43,6 @@ import { uniqueValues } from '@root/lib/utils/array';
 import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { typedKeys } from '@root/lib/utils/objects';
-import { uid } from '@root/lib/utils/strings';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';

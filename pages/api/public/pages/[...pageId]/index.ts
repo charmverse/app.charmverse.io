@@ -1,5 +1,6 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isUUID } from '@packages/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,7 +15,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isUUID } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 import { replaceS3Domain } from 'lib/utils/url';
 

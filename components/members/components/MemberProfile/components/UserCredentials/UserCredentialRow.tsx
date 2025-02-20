@@ -6,6 +6,7 @@ import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
@@ -20,7 +21,6 @@ import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { type CredentialDataInput } from 'lib/credentials/schemas/interfaces';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 export type UserCredentialRowProps = {
   credential: EASAttestationFromApi & Partial<Pick<EASAttestationWithFavorite, 'favoriteCredentialId' | 'index'>>;

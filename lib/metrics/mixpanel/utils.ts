@@ -1,4 +1,4 @@
-import { capitalize, isUUID } from '@root/lib/utils/strings';
+import { capitalize, isUUID } from '@packages/utils/strings';
 
 import type { MixpanelTrackBase } from './interfaces';
 

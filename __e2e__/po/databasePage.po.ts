@@ -1,8 +1,8 @@
+import { slugify } from '@packages/utils/strings';
 import { selectors } from '@playwright/test';
 
 import type { PropertyType } from 'lib/databases/board';
 import type { FilterCondition } from 'lib/databases/filterClause';
-import { slugify } from 'lib/utils/strings';
 
 import { GlobalPage } from './global.po';
 

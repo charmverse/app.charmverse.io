@@ -9,7 +9,7 @@
 // import { redisClient } from '@root/adapters/redis/redisClient';
 // import { baseUrl } from '@root/config/constants';
 // import { InvalidStateError } from '@root/lib/middleware';
-// import { prettyPrint } from '@root/lib/utils/strings';
+// import { prettyPrint } from '@packages/utils/strings';
 
 // import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 // import type { RequiredDocusignCredentials } from './constants';

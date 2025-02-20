@@ -4,6 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, FormControlLabel, FormGroup, Grid, InputLabel, Stack, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { isUrl } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -15,7 +16,6 @@ import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
-import { isUrl } from 'lib/utils/strings';
 
 import Legend from '../components/Legend';
 import { UpgradeChip } from '../subscription/UpgradeWrapper';

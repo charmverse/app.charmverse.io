@@ -1,12 +1,12 @@
 import type { User, UserDetails } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isUUID } from '@packages/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
-import { isUUID } from 'lib/utils/strings';
 
 export type PublicUser = Pick<User, 'id' | 'username' | 'avatar' | 'path'> & {
   profile: UserDetails | null;

@@ -1,7 +1,7 @@
 import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 
 import charmClient from 'charmClient';
 import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';

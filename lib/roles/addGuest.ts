@@ -1,10 +1,10 @@
 import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isUUID, isValidEmail, uid } from '@packages/utils/strings';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { postUserCreate } from '@root/lib/users/postUserCreate';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@root/lib/utils/errors';
-import { isUUID, isValidEmail, uid } from '@root/lib/utils/strings';
 
 type GuestToAdd = {
   userIdOrEmail: string;

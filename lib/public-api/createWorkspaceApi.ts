@@ -1,5 +1,6 @@
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { baseUrl } from '@root/config/constants';
 import { upsertSpaceRolesFromDiscord } from '@root/lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { upsertUserRolesFromDiscord } from '@root/lib/discord/collabland/upsertUserRolesFromDiscord';
@@ -15,7 +16,6 @@ import { createOrGetUserFromWallet } from '@root/lib/users/createUser';
 import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { InvalidInputError } from '@root/lib/utils/errors';
 import { isValidUrl } from '@root/lib/utils/isValidUrl';
-import { uid } from '@root/lib/utils/strings';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@root/lib/webhookPublisher/publishEvent';
 

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { BoardFields } from 'lib/databases/board';
 import { BoardView } from 'lib/databases/boardView';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 
 async function displayBoardProperties({ pagePath, spaceDomain }: { spaceDomain: string; pagePath: string }) {
   const page = await prisma.page.findFirstOrThrow({

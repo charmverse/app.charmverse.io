@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getENSName } from '@packages/blockchain/getENSName';
+import { uid } from '@packages/utils/strings';
 import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { logSignupViaWallet } from '@root/lib/metrics/postToDiscord';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { getUserProfile } from '../profile/getUser';

@@ -4,10 +4,10 @@ import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { ApiError, InvalidApiKeyError } from '@root/lib/middleware/errors';
 import { getVerifiedSuperApiToken } from '@root/lib/middleware/requireSuperApiKey';
 import { getPermissionsClient } from '@root/lib/permissions/api';
-import { uid } from '@root/lib/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

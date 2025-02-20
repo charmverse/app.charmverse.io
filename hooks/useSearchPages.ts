@@ -1,8 +1,8 @@
 import type { PageType } from '@charmverse/core/prisma';
+import { stringSimilarity } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 
 import { useGetSearchPages } from 'charmClient/hooks/pages';
-import { stringSimilarity } from 'lib/utils/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useDebouncedValue } from './useDebouncedValue';

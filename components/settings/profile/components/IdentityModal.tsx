@@ -3,6 +3,7 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { Box, Chip, MenuItem, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
@@ -29,7 +30,6 @@ import type { TelegramAccount } from 'lib/telegram/interfaces';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { randomName } from 'lib/utils/randomName';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { useUserDetails } from '../hooks/useUserDetails';
 

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prettyPrint } from '@root/lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import Papa from 'papaparse';

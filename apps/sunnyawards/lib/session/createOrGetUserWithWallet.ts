@@ -2,12 +2,12 @@ import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getENSName } from '@packages/blockchain/getENSName';
+import { uid } from '@packages/utils/strings';
 import { logSignupViaWallet } from '@root/lib/metrics/postToDiscord';
 import { isProfilePathAvailable } from '@root/lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from '@root/lib/session/config';
 import { prepopulateUserProfile } from '@root/lib/users/prepopulateUserProfile';
 import { shortWalletAddress } from '@root/lib/utils/blockchain';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { getUserWalletProfile } from './getUserWalletProfile';

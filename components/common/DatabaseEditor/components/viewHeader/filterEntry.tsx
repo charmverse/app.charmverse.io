@@ -16,6 +16,7 @@ import {
   Typography
 } from '@mui/material';
 import { getChainList, getChainById } from '@packages/connectors/chains';
+import { slugify } from '@packages/utils/strings';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -37,7 +38,6 @@ import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/pr
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { slugify } from 'lib/utils/strings';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';

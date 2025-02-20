@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { getWagmiConfig } from '@packages/connectors/config';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { watchAccount } from '@wagmi/core';
 import type { Signer } from 'ethers';
@@ -21,7 +22,6 @@ import type {
 } from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utils/errors';
 import { MissingWeb3AccountError } from 'lib/utils/errors';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

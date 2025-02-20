@@ -1,9 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';
 import { DuplicateDataError, InvalidInputError } from '@root/lib/utils/errors';
 import { typedKeys } from '@root/lib/utils/objects';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import { capitalize } from '@packages/utils/strings';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import { capitalize } from 'lib/utils/strings';
 import { colors } from 'theme/colors';
 
 import { GroupLabel } from '../PopoverMenu';
