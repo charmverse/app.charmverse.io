@@ -428,20 +428,6 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Deploy websockets to Beanstalk
-        if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: prd-charmverse-websockets
-          environment_name: prd-charmverse-websockets
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_websockets.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github
-
   discord-alert:
     name: Notify Discord of failure
     runs-on: ubuntu-latest
