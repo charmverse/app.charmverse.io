@@ -13,6 +13,7 @@
   "dependencies": {
     "@packages/connectors": "^0.0.0",
     "@packages/credentials": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {

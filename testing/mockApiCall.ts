@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma-client';
-import { getIronOptions } from '@root/lib/session/getIronOptions';
+import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
 import { serialize } from 'cookie';
 import { sealData } from 'iron-session';
 import request from 'supertest';
