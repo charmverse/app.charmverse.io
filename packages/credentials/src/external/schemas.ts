@@ -1,6 +1,6 @@
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import type { EasSchemaChain } from '../../../packages/credentials/src/connectors';
+import type { EasSchemaChain } from '../connectors';
 import { proposalCredentialSchemaId } from '../schemas/proposal';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 

@@ -1,5 +1,5 @@
-import type { ProjectDetails } from '../../../packages/credentials/src/mapProjectToOptimism';
-import { mapProjectToOptimism } from '../../../packages/credentials/src/mapProjectToOptimism';
+import type { ProjectDetails } from '../mapProjectToOptimism';
+import { mapProjectToOptimism } from '../mapProjectToOptimism';
 
 describe('mapProjectToOptimism', () => {
   it('should map the project details correctly', () => {
