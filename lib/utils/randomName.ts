@@ -1,7 +1,6 @@
+import { capitalize } from '@packages/utils/strings';
 import type { Config } from 'unique-names-generator';
 import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
-
-import { capitalize } from './strings';
 
 const CRYPTO_WORD_LIST = [
   'airdrop',
