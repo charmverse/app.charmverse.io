@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { v4 as uuid } from 'uuid';
 
 import { getUserS3FilePath, uploadUrlToS3 } from '../aws/uploadToS3Server';
 import { DisabledAccountError } from '../utils/errors';
-import { uid } from '../utils/strings';
 
 export async function createOrUpdateFarcasterUser({
   bio,

@@ -1,8 +1,7 @@
 import env from '@beam-australia/react-env';
-import { coinbaseWallet, walletConnect, injected, mock } from '@wagmi/connectors';
+import { coinbaseWallet, walletConnect, injected } from '@wagmi/connectors';
 import type { Address, Chain, Transport } from 'viem';
-import { custom, http } from 'viem';
-import { mainnet } from 'viem/chains';
+import { http } from 'viem';
 import { createConfig } from 'wagmi';
 
 import { getChainList } from './chains';

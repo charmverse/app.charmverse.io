@@ -8,7 +8,6 @@ import TextField from '@mui/material/TextField';
 import { attestationSchemaIds } from '@packages/credentials/schemas';
 import { useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
-import { optimism } from 'viem/chains';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';

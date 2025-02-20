@@ -3,7 +3,7 @@ import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-
 import { optimismSepolia } from 'viem/chains';
 import { EasSchemaChain, easConnectors } from '@packages/credentials/connectors';
 import { getEasInstance } from '@packages/credentials/getEasInstance';
-import { NULL_ADDRESS } from '@packages/credentials/constants';
+import { zeroAddress } from 'viem';
 
 import { Wallet, providers } from 'ethers';
 import { http } from 'viem';
@@ -23,7 +23,7 @@ if (!privateKey) {
 const RESOLVER_ADDRESS = '0x3354B452e319E03de8eC4047cB56209304DFA645';
 const RECIPIENT_ADDRESS = '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2';
 
-async function deploy(chain: Chain, schema: string, resolverAddress: string = NULL_ADDRESS) {
+async function deploy(chain: Chain, schema: string, resolverAddress: string = zeroAddress) {
   // get registry contract
   const schemaRegistry = new SchemaRegistry(easConnectors[chain.id as EasSchemaChain].schemaRegistryContract);
   // connect wallet
@@ -61,7 +61,7 @@ async function attest({
   schema,
   data,
   refUID,
-  resolverAddress = NULL_ADDRESS,
+  resolverAddress = zeroAddress,
   recipient = RECIPIENT_ADDRESS
 }: {
   chain: Chain;

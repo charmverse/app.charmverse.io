@@ -1,6 +1,6 @@
+import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
 import request from 'supertest';
 
-import { getIronOptions } from 'lib/session/getIronOptions';
 import { baseUrl } from 'testing/mockApiCall';
 
 // These API calls should succeed without needed a user account
