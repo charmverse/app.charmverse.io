@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import type { AutocompleteRenderGetTagProps } from '@mui/material';
 import { IconButton, Box, Stack, TextField } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useCallback, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';

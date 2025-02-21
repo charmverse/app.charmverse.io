@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { randomBoardColor } from '@root/lib/databases/constants';
 import type { PageProperty } from '@root/lib/public-api';
 import uniqBy from 'lodash/uniqBy';

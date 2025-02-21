@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { ReactNode } from 'react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 

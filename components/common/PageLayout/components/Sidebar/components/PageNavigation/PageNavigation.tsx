@@ -1,7 +1,7 @@
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 

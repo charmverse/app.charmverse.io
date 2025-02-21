@@ -3,7 +3,7 @@ import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
 import { CryptoCurrencies, getChainById } from '@packages/blockchain/connectors/chains';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 

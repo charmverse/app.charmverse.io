@@ -1,6 +1,6 @@
 import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { v4 } from 'uuid';
 
 import type { CardFields } from '../card';

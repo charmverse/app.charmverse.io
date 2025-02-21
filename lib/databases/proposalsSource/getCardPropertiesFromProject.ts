@@ -1,5 +1,5 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import * as constants from '@root/lib/projects/formField';
 import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 

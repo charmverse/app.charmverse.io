@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import { validateAnswers } from '@root/lib/proposals/forms/validateAnswers';
 

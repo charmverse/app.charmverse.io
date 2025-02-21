@@ -2,8 +2,8 @@ import type { SystemError } from '@charmverse/core/errors';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { MenuItem } from '@mui/material';
 import { getChainById } from '@packages/blockchain/connectors/chains';
-import { isTruthy } from '@packages/lib/utils/types';
 import { shortenHex } from '@packages/utils/blockchain';
+import { isTruthy } from '@packages/utils/types';
 
 import charmClient from 'charmClient';
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';

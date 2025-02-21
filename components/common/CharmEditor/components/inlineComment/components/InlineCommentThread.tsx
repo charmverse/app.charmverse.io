@@ -1,7 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
 

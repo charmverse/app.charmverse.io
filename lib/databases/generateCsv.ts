@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { baseUrl } from '@root/config/constants';
 import { CardFilter } from '@root/lib/databases/cardFilter';
 import type { FilterGroup } from '@root/lib/databases/filterGroup';

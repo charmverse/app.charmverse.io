@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { IPropertyTemplate, PropertyType } from '@root/lib/databases/board';
 import type { Typeform } from '@typeform/api-client';
 import { v4 } from 'uuid';

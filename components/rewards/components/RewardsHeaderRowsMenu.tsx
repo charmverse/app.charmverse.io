@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { DateTime } from 'luxon';
 import { useState } from 'react';
 

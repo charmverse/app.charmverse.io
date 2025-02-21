@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
 import { DataNotFoundError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { Board, BoardFields } from 'lib/databases/board';

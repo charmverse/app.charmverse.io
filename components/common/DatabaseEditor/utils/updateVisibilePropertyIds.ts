@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { Constants } from 'lib/databases/constants';

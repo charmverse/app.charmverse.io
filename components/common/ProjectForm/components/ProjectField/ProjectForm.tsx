@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { ProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 import type { KeyedMutator } from 'swr';
 

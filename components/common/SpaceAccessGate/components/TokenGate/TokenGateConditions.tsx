@@ -3,7 +3,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
 

@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { Node } from 'prosemirror-model';
 import type { EditorView } from 'prosemirror-view';
 

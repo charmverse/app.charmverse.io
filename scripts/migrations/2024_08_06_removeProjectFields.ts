@@ -2,7 +2,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as fs from 'fs';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 /**
  * Create a back up of projects and also clean up some fields

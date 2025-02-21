@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { TextField } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo, useState } from 'react';
 
 import type { PageListItem } from 'components/common/PagesList';

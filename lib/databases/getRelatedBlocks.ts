@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { applyPageToBlock } from '@root/lib/databases/block';
 
 import type { BlockWithDetails } from './block';

@@ -7,7 +7,7 @@ import { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 
 const ProposalPropertyRubricPropertyRecord: Record<string, RubricEvaluationProperty> = {

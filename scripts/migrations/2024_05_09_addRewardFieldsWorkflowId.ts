@@ -1,7 +1,7 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { getRewardWorkflows, RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 export function inferRewardWorkflowOld(
   workflows: RewardWorkflow[],

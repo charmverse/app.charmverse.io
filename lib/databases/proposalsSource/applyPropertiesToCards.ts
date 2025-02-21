@@ -1,5 +1,5 @@
 import type { SmallProposalPermissionFlags } from '@charmverse/core/permissions';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 import type { BlockWithDetails } from '../block';
 import type { IPropertyTemplate } from '../board';

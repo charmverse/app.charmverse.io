@@ -3,7 +3,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { DeleteOutline } from '@mui/icons-material';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Card, CircularProgress, IconButton, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import Image from 'next/image';
 import { useState } from 'react';
 import type { Control, FieldArrayPath } from 'react-hook-form';

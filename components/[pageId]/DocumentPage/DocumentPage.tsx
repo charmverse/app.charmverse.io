@@ -1,7 +1,7 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';

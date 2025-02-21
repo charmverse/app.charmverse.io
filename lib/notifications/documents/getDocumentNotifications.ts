@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 
 import type { DocumentNotification } from '../interfaces';

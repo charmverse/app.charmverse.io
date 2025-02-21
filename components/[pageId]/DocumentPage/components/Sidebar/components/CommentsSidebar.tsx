@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';

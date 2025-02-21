@@ -1,6 +1,6 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
 import type { UIBlockWithDetails } from 'lib/databases/block';

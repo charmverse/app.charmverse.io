@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { isTruthy } from '@packages/lib/utils/types';
 import { count } from '@packages/metrics';
+import { isTruthy } from '@packages/utils/types';
 import { sendNotificationEmail } from '@root/lib/notifications/mailer/sendNotificationEmail';
 import { saveProposalNotification } from '@root/lib/notifications/saveNotification';
 

@@ -1,7 +1,7 @@
 import type { BountyStatus, Prisma } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useState } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { isPdfEmbedLink } from '@root/lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,

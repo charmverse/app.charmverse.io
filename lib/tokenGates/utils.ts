@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { AccessControlCondition } from '@root/lib/tokenGates/interfaces';
 
 type GateType = 'Wallet' | 'Collectibles' | 'Tokens' | 'Community' | 'Credential';

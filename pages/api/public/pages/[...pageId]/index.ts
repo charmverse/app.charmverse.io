@@ -1,8 +1,8 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
 import { NotFoundError } from '@packages/nextjs/errors';
 import { isUUID } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

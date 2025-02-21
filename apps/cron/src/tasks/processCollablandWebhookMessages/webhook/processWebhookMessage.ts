@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { assignRolesCollabland } from '@root/lib/collabland/assignRolesCollabland';
 import { disconnectSpace } from '@root/lib/collabland/disconnectSpace';
 import { getSpacesFromDiscord } from '@root/lib/discord/getSpaceFromDiscord';

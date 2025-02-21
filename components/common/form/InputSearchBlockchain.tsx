@@ -3,7 +3,7 @@ import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } fr
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
 import type { IChainDetails } from '@packages/blockchain/connectors/chains';
 import { getChainList, getChainById } from '@packages/blockchain/connectors/chains';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useEffect, useState, useMemo } from 'react';
 
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type ISafe from '@safe-global/safe-core-sdk';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';

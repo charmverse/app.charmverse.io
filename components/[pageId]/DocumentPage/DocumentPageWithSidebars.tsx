@@ -1,4 +1,4 @@
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 

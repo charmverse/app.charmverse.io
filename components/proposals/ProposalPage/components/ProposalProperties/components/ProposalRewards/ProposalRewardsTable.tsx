@@ -1,7 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
 import { Box, ListItemIcon, ListItemText, MenuItem, Stack } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';

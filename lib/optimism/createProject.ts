@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { OptionalPrismaTransaction, Prisma, Project, ProjectSource } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { resolveENSName } from '@packages/blockchain/getENSName';
-import { isTruthy } from '@packages/lib/utils/types';
 import { stringToValidPath, uid } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { ensureFarcasterUserExists } from '@root/lib/farcaster/ensureFarcasterUserExists';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 

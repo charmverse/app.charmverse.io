@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { isTruthy } from '@packages/lib/utils/types';
 import { isUUID } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import { sortCards } from 'components/common/DatabaseEditor/store/cards';

@@ -1,7 +1,7 @@
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';

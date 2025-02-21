@@ -1,5 +1,5 @@
-import { isTruthy } from '@packages/lib/utils/types';
 import { InvalidInputError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys, requireSuperApiKey } from 'lib/middleware';

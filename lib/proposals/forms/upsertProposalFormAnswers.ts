@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import type { FieldAnswerInput } from '@root/lib/proposals/forms/interfaces';
 import { validateAnswers } from '@root/lib/proposals/forms/validateAnswers';
 import { v4 } from 'uuid';

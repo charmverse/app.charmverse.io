@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
 import { WrongStateError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import type { UIBlockWithDetails } from '@root/lib/databases/block';
 import { blockToPrisma, prismaToBlock, prismaToUIBlock } from '@root/lib/databases/block';
 import { createBoard } from '@root/lib/databases/board';

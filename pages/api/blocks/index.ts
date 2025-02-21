@@ -2,9 +2,9 @@ import { log } from '@charmverse/core/log';
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/lib/utils/types';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UnauthorisedActionError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
