@@ -1,5 +1,5 @@
 import type { AuthClientError } from '@farcaster/auth-kit';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 

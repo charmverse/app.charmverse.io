@@ -6,6 +6,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import { shortenHex } from '@packages/utils/blockchain';
 import ERC20ABI from 'abis/ERC20.json';
 import { ethers } from 'ethers';
 import type { MouseEvent } from 'react';
@@ -23,7 +24,6 @@ import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { shortenHex } from 'lib/utils/blockchain';
 
 import { GnosisSafesList } from './GnosisSafesList';
 

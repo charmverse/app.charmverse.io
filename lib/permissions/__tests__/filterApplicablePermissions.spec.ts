@@ -1,6 +1,5 @@
 import type { Role, Space, User } from '@charmverse/core/prisma';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import type { AbstractPermission } from '../filterApplicablePermissions';
 import { filterApplicablePermissions } from '../filterApplicablePermissions';

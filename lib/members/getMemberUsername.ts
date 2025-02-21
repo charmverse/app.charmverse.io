@@ -1,7 +1,7 @@
 import type { IdentityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { shortenHex } from '@packages/utils/blockchain';
 import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
-import { shortenHex } from '@root/lib/utils/blockchain';
 
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 

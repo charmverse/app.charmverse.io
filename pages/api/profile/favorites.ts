@@ -1,13 +1,13 @@
 import type { FavoritePage } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { sessionUserRelations } from '@packages/profile/constants';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { updateFavoritePages } from '@packages/users/updateFavoritePages';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { updateFavoritePages } from 'lib/users/updateFavoritePages';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,5 +1,5 @@
-import { createMockPage } from 'testing/mocks/page';
-import { createMockProposal } from 'testing/mocks/proposal';
+import { createMockPage } from '@packages/testing/mocks/page';
+import { createMockProposal } from '@packages/testing/mocks/proposal';
 
 import { getProposalErrors } from '../getProposalErrors';
 import type { ProposalFields } from '../interfaces';

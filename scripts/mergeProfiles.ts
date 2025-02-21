@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { syncProposalPermissionsWithWorkflowPermissions } from '@root/lib/proposals/workflows/syncProposalPermissionsWithWorkflowPermissions';
 import { prettyPrint } from '@packages/utils/strings';
-import { mergeProfiles } from 'lib/users/mergeProfiles';
+import { mergeProfiles } from '@packages/users/mergeProfiles';
 import { DateTime } from 'luxon';
 
 const currentSeasonStartDate = DateTime.fromObject({ year: 2024, month: 9, day: 30 }, { zone: 'utc' }); // Actual launch: 2024-W40

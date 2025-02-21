@@ -1,9 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/utils/errors';
 import { verifyDiscordGateForSpace } from '@root/lib/discord/collabland/verifyDiscordGateForSpace';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 import { createAndAssignRoles } from '@root/lib/roles/createAndAssignRoles';
-import { InvalidInputError, UnauthorisedActionError } from '@root/lib/utils/errors';
 
 type Props = {
   spaceId: string;

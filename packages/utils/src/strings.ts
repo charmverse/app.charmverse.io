@@ -56,6 +56,14 @@ export function isUrl(text: string) {
   }
 }
 
+export const getFilenameWithExtension = (path: string, fallbackExtension = 'jpg'): string => {
+  const pathParts = path.split('/');
+  const rawName = pathParts.pop() || '';
+  const [name, extension] = rawName.split('.');
+
+  return `${pathParts.join('/')}/${name}.${extension?.toLowerCase() || fallbackExtension}`;
+};
+
 // ref: https://stackoverflow.com/questions/6300183/sanitize-string-of-regex-characters-before-regexp-build
 export function sanitizeForRegex(string: string) {
   return string.replace(/[#-.]|[[-^]|[?|{}]/g, '\\$&');

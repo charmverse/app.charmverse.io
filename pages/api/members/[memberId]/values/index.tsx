@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -5,7 +6,6 @@ import { getSpacesPropertyValues } from 'lib/members/getSpacesPropertyValues';
 import type { MemberPropertyValuesBySpace } from 'lib/members/interfaces';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

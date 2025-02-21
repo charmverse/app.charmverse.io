@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 import { v4 as uuid } from 'uuid';
-
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateBoard } from 'testing/setupDatabase';
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 import type { DatabaseBlocksCount } from '../countDatabaseBlockContentAndProps';
 import { countDatabaseBlockContentAndProps } from '../countDatabaseBlockContentAndProps';

@@ -1,4 +1,6 @@
 import { Box, Paper } from '@mui/material';
+import { createMockPage } from '@packages/testing/mocks/page';
+import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
 import { useRef, useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
@@ -10,8 +12,6 @@ import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
-import { createMockPage } from 'testing/mocks/page';
-import { createMockProposal } from 'testing/mocks/proposal';
 
 import { members } from '../lib/mockData';
 

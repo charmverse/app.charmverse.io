@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import type { SystemError } from '@packages/utils/errors';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -15,7 +16,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import type { SystemError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 
 export const schema = yup.object({

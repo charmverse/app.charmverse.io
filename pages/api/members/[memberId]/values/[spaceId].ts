@@ -1,3 +1,5 @@
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,8 +8,6 @@ import type { PropertyValue, UpdateMemberPropertyValuePayload } from 'lib/member
 import { updateMemberPropertyValues } from 'lib/members/updateMemberPropertyValues';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

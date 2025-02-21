@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import type { PageMeta } from '@charmverse/core/pages';
+import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -7,7 +8,6 @@ import { createIntl } from 'react-intl';
 import { v4 } from 'uuid';
 
 import type { IPropertyOption } from 'lib/databases/board';
-import { pageStubToCreate } from 'testing/generatePageStub';
 
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';

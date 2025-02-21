@@ -1,7 +1,6 @@
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 
 import { getSpacesOfUser } from '../getSpacesOfUser';
 

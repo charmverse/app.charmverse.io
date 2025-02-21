@@ -2,16 +2,16 @@ import { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from '@packages/utils/strings';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
-import { createOrGetUserFromWallet } from 'lib/users/createUser';
+import { createOrGetUserFromWallet } from '@packages/users/createUser';
 import { getProjectsImportData } from 'scripts/optimism/getRound3Projects';
 import { DateTime } from 'luxon';
 import { isTruthy } from 'lib/utils/types';
-import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
+import { getFilenameWithExtension } from '@packages/utils/strings';
 
 /*****
  * NOTE: This script creates new users and spaces for Optimism grants proposal projects.

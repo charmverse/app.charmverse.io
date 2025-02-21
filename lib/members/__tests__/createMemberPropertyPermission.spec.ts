@@ -1,8 +1,7 @@
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateMemberProperty } from '@packages/testing/utils/members';
+import { InvalidInputError } from '@packages/utils/errors';
 import { createMemberPropertyPermission } from '@root/lib/members/createMemberPropertyPermission';
-import { InvalidInputError } from '@root/lib/utils/errors';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateMemberProperty } from 'testing/utils/members';
 
 describe('createMemberPropertyPermission', () => {
   it('should create member property permission', async () => {

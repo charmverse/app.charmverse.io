@@ -1,8 +1,7 @@
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePageWithComment } from '@packages/testing/utils/pages';
 import { PageCommentNotFoundError } from '@root/lib/pages/comments/errors';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePageWithComment } from 'testing/utils/pages';
 
 import { getPageComment } from '../getPageComment';
 

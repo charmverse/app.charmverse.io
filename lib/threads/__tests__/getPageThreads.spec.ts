@@ -1,8 +1,7 @@
 import { testUtilsUser } from '@charmverse/core/test';
+import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { createRole } from '@packages/testing/utils/roles';
 import { assignRole } from '@root/lib/roles';
-
-import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
-import { createRole } from 'testing/utils/roles';
 
 import { createThread } from '../createThread';
 import { getPageThreads } from '../getPageThreads';

@@ -1,6 +1,6 @@
 import { Prisma, VoteType, prisma } from '@charmverse/core/prisma-client';
+import { DuplicateDataError } from '@packages/utils/errors';
 import { PageNotFoundError } from '@root/lib/pages/server';
-import { DuplicateDataError } from '@root/lib/utils/errors';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { publishVoteEvent } from '@root/lib/webhookPublisher/publishEvent';
 

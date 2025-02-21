@@ -1,11 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError } from '@root/lib/utils/errors';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateRole, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { InvalidInputError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { addSpaceOperations } from '../addSpaceOperations';
 import { computeGroupSpacePermissions } from '../computeGroupSpacePermissions';

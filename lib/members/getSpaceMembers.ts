@@ -1,6 +1,7 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { DiscordAccount } from '@root/lib/discord/client/getDiscordAccount';
 import {
@@ -11,7 +12,6 @@ import { getMemberSearchValue } from '@root/lib/members/getMemberSearchValue';
 import { getSpaceMemberSearchParams } from '@root/lib/members/getSpaceMemberSearchParams';
 import type { Member } from '@root/lib/members/interfaces';
 import { getPropertiesWithValues } from '@root/lib/members/utils';
-import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
 
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 

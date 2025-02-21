@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { setForumCategoryNotification } from '../setForumCategoryNotification';
 

@@ -3,11 +3,11 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import RedditIcon from '@mui/icons-material/Reddit';
 import { Chip, Divider, Stack, SvgIcon, Typography } from '@mui/material';
+import type { EnsProfile } from '@packages/profile/getEnsProfile';
 import type { ReactNode } from 'react';
 import { FaXTwitter } from 'react-icons/fa6';
 
 import Avatar from 'components/common/Avatar';
-import type { EnsProfile } from 'lib/profile/getEnsProfile';
 import DiscordIcon from 'public/images/logos/discord_logo.svg';
 
 import { ProfileWidget } from './ProfileWidget';

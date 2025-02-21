@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';
-import { InvalidStateError } from '@root/lib/middleware';
-import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 
 export type RemoveMemberInput = {
   userId: string;

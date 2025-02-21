@@ -2,9 +2,9 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
 import { authSecret } from '@root/config/constants';
-import { ActionNotPermittedError } from '@root/lib/middleware';
 import type { SessionData } from '@root/lib/session/config';
 import type { SealedUserId } from '@root/lib/websockets/interfaces';
 import { getIronSession, unsealData } from 'iron-session';

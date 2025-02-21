@@ -1,10 +1,9 @@
 import { testUtilsPages } from '@charmverse/core/test';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { updateUserProfile } from '@packages/users/updateUserProfile';
 import { saveDocumentNotification } from '@root/lib/notifications/saveNotification';
 import { builders } from '@root/lib/prosemirror/builders';
-import { updateUserProfile } from '@root/lib/users/updateUserProfile';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 afterEach(() => {
   jest.resetModules();

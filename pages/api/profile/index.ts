@@ -1,7 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { getUserProfile } from '@root/lib/profile/getUser';
+import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
+import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
+import type { SignupCookieType } from '@packages/metrics/userAcquisition/interfaces';
+import { signupCookieNames } from '@packages/metrics/userAcquisition/interfaces';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { getUserProfile } from '@packages/profile/getUser';
+import { createOrGetUserFromWallet } from '@packages/users/createUser';
+import { updateUserProfile } from '@packages/users/updateUserProfile';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,16 +19,10 @@ import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify'
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
-import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
-import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
-import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createOrGetUserFromWallet } from 'lib/users/createUser';
-import { updateUserProfile } from 'lib/users/updateUserProfile';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

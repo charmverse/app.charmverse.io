@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@root/lib/metrics';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { count } from '@packages/metrics';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch } from '@root/lib/middleware';
 import { requireApiKey } from '@root/lib/middleware/requireApiKey';
 import type { NextApiRequestWithApiPageKey } from '@root/lib/middleware/requireApiPageKey';

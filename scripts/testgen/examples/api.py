@@ -6,8 +6,8 @@ import request from 'supertest';
 
 import type { ApplicationWithTransactions, Reward } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBounty } from '@packages/testing/setupDatabase';
 
 describe('PUT /api/reward-applications/work - work on a reward', () => {
   let space: Space;

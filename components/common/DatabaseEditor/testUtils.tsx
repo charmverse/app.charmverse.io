@@ -1,4 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -10,7 +11,6 @@ import { v4 } from 'uuid';
 
 import { PagesContext } from 'hooks/usePages';
 import type { UIBlockWithDetails } from 'lib/databases/block';
-import { pageStubToCreate } from 'testing/generatePageStub';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 export const wrapIntl = (children?: React.ReactNode): JSX.Element => (

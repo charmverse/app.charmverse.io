@@ -1,5 +1,5 @@
+import { randomIntFromInterval } from '@packages/utils/random';
 import { askChatGPT } from '@root/lib/chatGPT/askChatgpt';
-import { randomIntFromInterval } from '@root/lib/utils/random';
 
 import {
   getPullRequestFileChanges,

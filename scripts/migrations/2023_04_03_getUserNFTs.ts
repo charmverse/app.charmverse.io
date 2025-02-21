@@ -1,4 +1,4 @@
-import { getUserNFTs } from 'lib/profile/getUserNFTs';
+import { getUserNFTs } from '@packages/profile/getUserNFTs';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uniq } from 'lodash';
 

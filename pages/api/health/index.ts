@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
+import { gauge, count } from '@packages/metrics';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { gauge, count } from 'lib/metrics';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json({ health: 'ok' });

@@ -1,10 +1,9 @@
 import type { PostCategoryPermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { MissingDataError } from '@root/lib/utils/errors';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { MissingDataError } from '@packages/utils/errors';
 import { v4 as uuid } from 'uuid';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 import { AvailableSpacePermissions } from '../availableSpacePermissions';
 import { saveRoleAndSpacePermissions } from '../saveRoleAndSpacePermissions';

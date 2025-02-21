@@ -1,6 +1,7 @@
 import type { BoxProps } from '@mui/material';
 import { Avatar as AvatarIcon, Box, Typography } from '@mui/material';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 
@@ -8,7 +9,6 @@ import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useMembers } from 'hooks/useMembers';
-import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 /**
  * @avatarIcon Pass this to override the user avatar with a custom icon

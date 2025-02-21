@@ -1,10 +1,10 @@
 import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 describe('GET /api/permissions/forum/list-post-category-permissions - List available category permissions', () => {
   it('should return list of post category permissions for a space member, responding 200', async () => {

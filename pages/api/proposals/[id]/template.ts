@@ -1,4 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { AdministratorOnlyError } from '@packages/users/errors';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,8 +9,6 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyProposalTemplate } from 'lib/proposals/applyProposalTemplate';
 import type { ApplyTemplateRequest } from 'lib/proposals/applyProposalTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
-import { AdministratorOnlyError } from 'lib/users/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

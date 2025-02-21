@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { getUserProfile } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { getUserProfile } from '@packages/profile/getUser';
+import { updateUsedIdentity } from '@packages/users/updateUsedIdentity';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
 
 const handler = nc({
   onError,

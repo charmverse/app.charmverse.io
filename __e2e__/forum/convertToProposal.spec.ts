@@ -1,11 +1,11 @@
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import { test as base, expect } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { v4 } from 'uuid';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { createUserAndSpace, generateSpaceRole, createUser } from '../utils/mocks';
 import { login } from '../utils/session';

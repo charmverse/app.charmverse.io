@@ -1,5 +1,6 @@
 import { Writable } from 'stream';
 
+import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import type { ResizeType } from '@packages/utils/constants';
 import {
   DEFAULT_MAX_FILE_SIZE_MB,
@@ -12,7 +13,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import sharp from 'sharp';
 
-import { getUserS3FilePath, uploadFileToS3 } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

@@ -1,8 +1,8 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import { addProjectMember } from 'lib/projects/addProjectMember';

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import type { PageProperty } from '../interfaces';
 import { PageFromBlock } from '../pageFromBlock.class';

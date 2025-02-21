@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { v4 as uuid } from 'uuid';
-
-import { generateSchema } from 'testing/publicApi/schemas';
 
 import { mapPersonFromApiToSystem } from '../mapPersonFromApiToSystem';
 

@@ -1,6 +1,7 @@
 import type { Role } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Alert, Box, InputLabel, Paper, Stack, TextField, Typography } from '@mui/material';
+import type { ISystemError } from '@packages/utils/errors';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -8,7 +9,6 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { useMembers } from 'hooks/useMembers';
-import type { ISystemError } from 'lib/utils/errors';
 
 export const schema = yup.object({
   name: yup.string().required('Please provide a valid role name')

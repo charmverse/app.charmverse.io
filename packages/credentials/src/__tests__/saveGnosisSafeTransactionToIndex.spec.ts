@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { v4 as uuid } from 'uuid';
 import { mainnet } from 'viem/chains';
 

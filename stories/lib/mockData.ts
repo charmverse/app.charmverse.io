@@ -1,11 +1,10 @@
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { createMemberProperty, createMemberPropertyValue } from '@packages/testing/mocks/memberProperty';
+import { createMockSpace } from '@packages/testing/mocks/space';
+import { createMockSpaceMember } from '@packages/testing/mocks/spaceMember';
+import { createMockUser } from '@packages/testing/mocks/user';
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '@root/lib/members/interfaces';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { ProposalTemplateMeta } from '@root/lib/proposals/getProposalTemplates';
-
-import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
-import { createMockSpace } from 'testing/mocks/space';
-import { createMockSpaceMember } from 'testing/mocks/spaceMember';
-import { createMockUser } from 'testing/mocks/user';
 
 import type { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 

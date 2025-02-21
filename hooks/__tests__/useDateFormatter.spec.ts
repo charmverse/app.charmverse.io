@@ -1,8 +1,8 @@
+import { normalizeWhitespace } from '@packages/testing/normalizeWhitespace';
 import { renderHook } from '@testing-library/react';
 
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useUserPreferences } from 'hooks/useUserPreferences';
-import { normalizeWhitespace } from 'testing/normalizeWhitespace';
 
 jest.mock('hooks/useUserPreferences', () => ({
   useUserPreferences: jest.fn()

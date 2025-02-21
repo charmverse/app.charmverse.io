@@ -1,12 +1,12 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { UpdateProfileItemRequest } from 'charmClient/apis/profileApi';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

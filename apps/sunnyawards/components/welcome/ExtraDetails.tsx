@@ -14,12 +14,11 @@ import {
   TextField
 } from '@mui/material';
 import { onboardingAction } from '@packages/connect-shared/lib/profile/onboardingAction';
+import type { FormValues } from '@packages/profile/form';
+import { schema } from '@packages/profile/form';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
-
-import type { FormValues } from 'lib/profile/form';
-import { schema } from 'lib/profile/form';
 
 const defaultValues = { email: '', terms: false, notify: true } as const;
 

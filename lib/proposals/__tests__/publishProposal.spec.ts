@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { voteSettings } from '@root/lib/proposals/createDefaultProposal';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { publishProposal } from '../publishProposal';
 

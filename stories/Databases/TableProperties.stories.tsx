@@ -1,4 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import { createMockBoard, createMockCard } from '@packages/testing/mocks/block';
+import { createMockPage } from '@packages/testing/mocks/page';
+import { generateSchemasForAllSupportedFieldTypes } from '@packages/testing/publicApi/schemas';
 import { http, HttpResponse } from 'msw';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
@@ -9,9 +12,6 @@ import type { RootState } from 'components/common/DatabaseEditor/store';
 import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { createTableView } from 'lib/databases/tableView';
-import { createMockBoard, createMockCard } from 'testing/mocks/block';
-import { createMockPage } from 'testing/mocks/page';
-import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 
 export default {
   title: 'Databases/Composites',

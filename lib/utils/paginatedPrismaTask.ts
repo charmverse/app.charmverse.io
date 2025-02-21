@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from './errors';
+import { InvalidInputError } from '../../packages/utils/src/errors';
 
 type PrismaModel = Extract<
   Uncapitalize<Prisma.ModelName>,

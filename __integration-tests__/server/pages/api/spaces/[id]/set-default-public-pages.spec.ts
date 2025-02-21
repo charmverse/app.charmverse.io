@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly created root pages in a space should be public by default', () => {
   it('should update the space default if user is admin, and return the space, responding with 200', async () => {

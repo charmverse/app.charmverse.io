@@ -1,7 +1,7 @@
 import type { PermissionCompute } from '@charmverse/core/permissions';
 import type { BountyPermission, BountyPermissionLevel } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 
 import { AvailableBountyPermissions } from './availableBountyPermissions';
 import { computeBountyPermissionsPublic } from './computeBountyPermissions.public';

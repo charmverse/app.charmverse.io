@@ -1,10 +1,9 @@
 import type { Role, Space, User, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import request from 'supertest';
-
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 
 // User 1 is admin
 let user1: User;

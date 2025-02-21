@@ -1,4 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { AdministratorOnlyError } from '@packages/users/errors';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,9 +11,6 @@ import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { withSessionRoute } from 'lib/session/withSession';
-import { AdministratorOnlyError } from 'lib/users/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

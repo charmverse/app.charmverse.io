@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserCookie: string;

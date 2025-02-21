@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from '@root/lib/utils/errors';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 import { castVote as castVoteService } from '@root/lib/votes/castVote';
 
 export async function castProposalVote({

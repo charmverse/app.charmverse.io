@@ -1,5 +1,5 @@
-import type { ISystemErrorInput } from '@root/lib/utils/errors';
-import { SystemError } from '@root/lib/utils/errors';
+import type { ISystemErrorInput } from '@packages/utils/errors';
+import { SystemError } from '@packages/utils/errors';
 
 import type { PageProperty } from './interfaces';
 

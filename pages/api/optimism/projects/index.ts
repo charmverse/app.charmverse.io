@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { storeProjectMetadataAndPublishOptimismAttestation } from '@packages/connect-shared/lib/attestations/storeProjectMetadataAndPublishOptimismAttestation';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,7 +11,6 @@ import type { OptimismProjectAttestationContent } from 'lib/optimism/getOpProjec
 import { getOpProjectsByFarcasterId } from 'lib/optimism/getOpProjectsByFarcasterId';
 import { generateOgImage } from 'lib/projects/generateOgImage';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

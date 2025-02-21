@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { upsertKycCredentials } from '../upsertKycCredentials';
 

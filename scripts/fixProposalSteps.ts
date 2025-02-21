@@ -1,6 +1,6 @@
 import { ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError } from 'lib/utils/errors';
+import { DataNotFoundError } from '@packages/utils/errors';
 
 export async function updateProposalSteps({ spaceDomain }: { spaceDomain: string }) {
   const templates = await prisma.page.findMany({

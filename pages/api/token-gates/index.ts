@@ -1,16 +1,16 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { updateTokenGateDetails } from 'lib/blockchain/updateTokenGateDetails';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { processTokenGateConditions } from 'lib/tokenGates/processTokenGateConditions';
-import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

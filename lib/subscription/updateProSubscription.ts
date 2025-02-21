@@ -1,4 +1,4 @@
-import { InvalidStateError } from '@root/lib/middleware';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type Stripe from 'stripe';
 
 import type { SubscriptionStatusType } from './constants';

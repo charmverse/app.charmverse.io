@@ -1,8 +1,7 @@
 import type { CharmWallet } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 import { rewardCharmsForProposal } from '@root/lib/charms/triggers/rewardCharmsForProposal';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('rewardCharmsFormProposal', () => {
   it('should reward user for creating first proposal (only once)', async () => {

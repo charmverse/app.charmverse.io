@@ -2,9 +2,9 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { DataNotFoundError } from 'lib/utils/errors';
-import { boardWithCardsArgs } from 'testing/generateBoardStub';
-import { pageStubToCreate } from 'testing/generatePageStub';
+import { DataNotFoundError } from '@packages/utils/errors';
+import { boardWithCardsArgs } from '@packages/testing/generateBoardStub';
+import { pageStubToCreate } from '@packages/testing/generatePageStub';
 
 type PageSeedInput = {
   page: Prisma.PageCreateManyInput;

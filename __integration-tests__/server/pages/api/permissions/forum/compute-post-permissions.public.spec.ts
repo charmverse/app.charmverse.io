@@ -1,11 +1,11 @@
 import type { PostCategoryPermission, Space, User } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
 
 import { publicPermissionsClient } from 'lib/permissions/api/freeClient';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;

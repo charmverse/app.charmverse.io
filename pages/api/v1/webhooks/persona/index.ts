@@ -3,11 +3,11 @@ import { Buffer } from 'node:buffer';
 import { InsecureOperationError, DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import type { PersonaEventData } from 'lib/kyc/persona/interfaces';
 import { checkSignature } from 'lib/kyc/persona/webhook/checkSignature';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { relay } from 'lib/websockets/relay';
 

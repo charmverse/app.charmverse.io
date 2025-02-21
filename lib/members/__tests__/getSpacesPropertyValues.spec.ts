@@ -1,11 +1,10 @@
 import type { MemberProperty, Space } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generateMemberProperty } from '@packages/testing/utils/members';
+import { addUserToSpace, generateSpaceForUser } from '@packages/testing/utils/spaces';
 import { getSpacesPropertyValues } from '@root/lib/members/getSpacesPropertyValues';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateMemberProperty } from 'testing/utils/members';
-import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 
 let user1: LoggedInUser;
 let user2: LoggedInUser;

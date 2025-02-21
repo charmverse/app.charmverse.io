@@ -1,7 +1,6 @@
-import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
-
-import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
+import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateForumPost } from '@packages/testing/utils/forums';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 
 import { canView, canCreate } from '../permissions';
 

@@ -1,10 +1,9 @@
 import type { Block, BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsBounties, testUtilsForum, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { emptyDocument } from '@root/lib/prosemirror/constants';
-
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateBoard } from 'testing/setupDatabase';
 
 import type { OverallBlocksCount } from '../countAllSpaceBlocks';
 import { countSpaceBlocks, countSpaceBlocksAndSave } from '../countAllSpaceBlocks';

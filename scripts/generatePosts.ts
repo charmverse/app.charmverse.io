@@ -1,8 +1,8 @@
-import { generateForumPosts } from 'testing/forums';
+import { generateForumPosts } from '@packages/testing/forums';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import { validate } from 'uuid';
-import { stubPostContent, stubPostContentText } from 'testing/forums.stub';
+import { stubPostContent, stubPostContentText } from '@packages/testing/forums.stub';
 
 async function listCategories({ spaceDomain }: { spaceDomain: string }) {
   return prisma.postCategory

@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { v4 as uuid } from 'uuid';
 
 import checkbox from 'components/common/DatabaseEditor/widgets/checkbox';
-import { generateSchema } from 'testing/publicApi/schemas';
 
 import type { ProposalBlocksCount } from '../countProposalBlocks';
 import { countProposalBlocks } from '../countProposalBlocks';

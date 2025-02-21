@@ -1,7 +1,7 @@
 import type { Application, ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { WrongStateError } from '@packages/utils/errors';
 import { verifyOrRejectApplications } from '@root/lib/rewards/verifyOrRejectApplications';
-import { WrongStateError } from '@root/lib/utils/errors';
 
 import { rollupRewardStatus } from './rollupRewardStatus';
 

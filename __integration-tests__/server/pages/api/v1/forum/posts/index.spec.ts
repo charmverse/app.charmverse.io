@@ -1,10 +1,9 @@
+import { generateForumPosts } from '@packages/testing/forums';
+import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
-
-import { generateForumPosts } from 'testing/forums';
-import { generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 describe('GET /api/v1/forum/posts', () => {
   it('should respond 401 when api token is missing or invalid', async () => {

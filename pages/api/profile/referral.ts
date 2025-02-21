@@ -1,9 +1,9 @@
+import { getReferralCode } from '@packages/users/getReferralCode';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getReferralCode } from 'lib/users/getReferralCode';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

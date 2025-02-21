@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostWithComment, generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
 
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
 import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostWithComment, generatePostCategory } from 'testing/utils/forums';
 
 let space: Space;
 let user: User;

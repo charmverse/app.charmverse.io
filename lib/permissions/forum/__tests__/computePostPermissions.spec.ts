@@ -4,8 +4,8 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { PostOperation } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/utils/errors';
 import { PostNotFoundError } from '@root/lib/forums/posts/errors';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';

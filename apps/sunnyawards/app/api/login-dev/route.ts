@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { getIronOptions } from '@packages/connect-shared/lib/session/config';
+import { randomIntFromInterval } from '@packages/utils/random';
 import { cookieName } from '@root/config/constants';
-import { randomIntFromInterval } from '@root/lib/utils/random';
 import { sealData } from 'iron-session';
 
 const isTestEnv = process.env.REACT_APP_APP_ENV === 'test';

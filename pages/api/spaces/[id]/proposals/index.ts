@@ -1,4 +1,5 @@
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +10,6 @@ import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import { getProposals } from 'lib/proposals/getProposals';
 import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,8 +1,7 @@
+import { createPage } from '@packages/testing/setupDatabase';
+import { generateProposalWorkflowWithEvaluations } from '@packages/testing/utils/proposals';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { expect, test as base } from '__e2e__/utils/test';
-
-import { createPage } from 'testing/setupDatabase';
-import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
 
 import { DocumentPage } from '../po/document.po';
 import { generateUser, generateUserAndSpace } from '../utils/mocks';

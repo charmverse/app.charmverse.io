@@ -3,13 +3,13 @@
 // see this issue for more: https://github.com/ryanto/next-s3-upload/issues/15
 
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
+import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
+import { getUserS3FilePath } from '@packages/aws/uploadToS3Server';
 import { awsS3Bucket } from '@packages/utils/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { getS3ClientConfig } from 'lib/aws/getS3ClientConfig';
-import { getUserS3FilePath } from 'lib/aws/uploadToS3Server';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

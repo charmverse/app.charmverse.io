@@ -1,6 +1,6 @@
 import type { Vote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError, UndesirableOperationError } from '@root/lib/utils/errors';
+import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 
 import type { UpdateVoteDTO } from './interfaces';
 import { VOTE_STATUS } from './interfaces';

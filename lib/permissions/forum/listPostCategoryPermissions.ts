@@ -1,9 +1,9 @@
 import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';
 import { PostCategoryNotFoundError } from '@root/lib/forums/categories/errors';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
-import { InvalidInputError } from '@root/lib/utils/errors';
 
 import type { PermissionCompute } from '../interfaces';
 

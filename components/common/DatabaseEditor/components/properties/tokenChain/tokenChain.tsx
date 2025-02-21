@@ -1,10 +1,10 @@
 import { Chip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import { shortWalletAddress } from '@packages/utils/blockchain';
 import { isAddress } from 'viem';
 
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { shortWalletAddress } from 'lib/utils/blockchain';
 
 type Props = {
   chainId: string; // values are strings in focalboard

@@ -1,10 +1,9 @@
 import type { Post, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace, createVote } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { InsecureOperationError } from '@packages/utils/errors';
 import { builders } from '@root/lib/prosemirror/builders';
-import { InsecureOperationError } from '@root/lib/utils/errors';
-
-import { generateUserAndSpace, createVote } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
 

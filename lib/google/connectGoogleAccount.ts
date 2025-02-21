@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getUserProfile } from '@packages/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { softDeleteUserWithoutConnectableIdentities } from '@packages/users/softDeleteUserWithoutConnectableIdentities';
+import { updateUsedIdentity } from '@packages/users/updateUsedIdentity';
+import { InvalidInputError, MissingDataError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { LoginWithGoogleRequest } from '@root/lib/google/loginWithGoogle';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
-import { getUserProfile } from '@root/lib/profile/getUser';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { softDeleteUserWithoutConnectableIdentities } from '@root/lib/users/softDeleteUserWithoutConnectableIdentities';
-import { updateUsedIdentity } from '@root/lib/users/updateUsedIdentity';
-import { InvalidInputError, MissingDataError, UnauthorisedActionError } from '@root/lib/utils/errors';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 

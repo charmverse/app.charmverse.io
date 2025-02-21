@@ -10,7 +10,7 @@
 // import { baseUrl } from '@root/config/constants';
 // import { createApplication } from 'lib/applications/actions';
 // import { createBounty } from 'lib/bounties';
-// import { generateSpaceUser } from 'testing/setupDatabase';
+// import { generateSpaceUser } from '@packages/testing/setupDatabase';
 
 // type Fixtures = {
 //   bountyBoardPage: BountyBoardPage;

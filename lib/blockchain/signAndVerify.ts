@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { SiweMessage } from 'siwe';
 import { hashMessage, parseAbi } from 'viem';
 
-import { InvalidInputError } from '../utils/errors';
+import { InvalidInputError } from '../../packages/utils/src/errors';
 
 import { getPublicClient } from './publicClient';
 

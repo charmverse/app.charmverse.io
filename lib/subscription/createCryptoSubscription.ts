@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { NotFoundError } from '@packages/nextjs/errors';
 import { getLoopProducts } from '@root/lib/loop/loop';
-import { NotFoundError } from '@root/lib/middleware';
 
 import { communityProduct, loopCheckoutUrl } from './constants';
 import { getCouponDetails } from './getCouponDetails';

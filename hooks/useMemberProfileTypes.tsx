@@ -1,9 +1,9 @@
+import type { MemberProfileJson } from '@packages/profile/memberProfiles';
+import { memberProfileLabels, memberProfileNames } from '@packages/profile/memberProfiles';
 import { sortArrayByObjectProperty } from '@packages/utils/array';
 import { useMemo } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { MemberProfileJson } from 'lib/profile/memberProfiles';
-import { memberProfileLabels, memberProfileNames } from 'lib/profile/memberProfiles';
 
 export const useMemberProfileTypes = () => {
   const { space, isLoading } = useCurrentSpace();

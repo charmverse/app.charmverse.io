@@ -1,12 +1,11 @@
 import { readFileSync } from 'fs';
 
 import { getChainById } from '@packages/connectors/chains';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import type { Page as BrowserPage } from '@playwright/test';
 import { SiweMessage } from 'siwe';
 import { createWalletClient, getAddress, http } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
-
-import { baseUrl } from 'testing/mockApiCall';
 
 type MockOptions = {
   blockchain: 'ethereum';

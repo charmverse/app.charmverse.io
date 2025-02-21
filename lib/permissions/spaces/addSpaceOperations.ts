@@ -1,8 +1,8 @@
 import { SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { uniqueValues } from '@packages/utils/array';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
-import { InsecureOperationError, InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
+import { InsecureOperationError, InvalidInputError, MissingDataError } from '@packages/utils/errors';
 
 import { AssignableToRolesOnlyError, InvalidPermissionGranteeError } from '../errors';
 import type { AssignablePermissionGroups } from '../interfaces';

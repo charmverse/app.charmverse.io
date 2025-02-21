@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@root/lib/metrics';
+import { count } from '@packages/metrics';
 
 import updateVoteStatus from './updateVoteStatus';
 

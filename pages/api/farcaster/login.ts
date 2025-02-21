@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import { trackOpSpaceSuccessfulSigninEvent } from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoginWithFarcasterParams } from '@packages/connect-shared/lib/session/loginWithFarcaster';
+import { loginWithFarcaster } from '@packages/connect-shared/lib/session/loginWithFarcaster';
+import { trackOpSpaceSuccessfulSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
+import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { LoginWithFarcasterParams } from 'lib/farcaster/loginWithFarcaster';
-import { loginWithFarcaster } from 'lib/farcaster/loginWithFarcaster';
-import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { sessionUserRelations } from '@packages/profile/constants';
+import { InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
-import { sessionUserRelations } from '@root/lib/session/config';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
 import { disconnectVerifiedEmail } from '../disconnectVerifiedEmail';

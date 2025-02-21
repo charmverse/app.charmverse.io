@@ -2,10 +2,9 @@ import type { User } from '@charmverse/core/prisma';
 import type { Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { baseUrl } from '@root/config/constants';
 import { expect, test } from '__e2e__/testWithFixtures';
-
-import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';
 

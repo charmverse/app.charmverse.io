@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import request from 'supertest';
 
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import request from 'supertest';
 
 describe('POST /api/notion/import - Import from Notion', () => {
   it('should validate request params for space admin and respond 200', async () => {

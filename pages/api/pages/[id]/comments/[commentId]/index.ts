@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageComment } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +12,6 @@ import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
 import { isSpaceAdmin } from 'lib/permissions/isSpaceAdmin';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

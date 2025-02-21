@@ -1,4 +1,4 @@
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

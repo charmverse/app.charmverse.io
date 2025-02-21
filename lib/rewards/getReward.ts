@@ -1,6 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError } from '@root/lib/utils/errors';
+import { DataNotFoundError } from '@packages/utils/errors';
 
 import type { RewardWithUsers } from './interfaces';
 import { mapDbRewardToReward } from './mapDbRewardToReward';

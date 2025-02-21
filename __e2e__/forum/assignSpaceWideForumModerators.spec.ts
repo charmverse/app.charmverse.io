@@ -1,10 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { expect, test as base } from '@playwright/test';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { ForumPostPage } from '../po/forumPost.po';

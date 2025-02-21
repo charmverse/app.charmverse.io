@@ -1,8 +1,7 @@
 import type { Space, Role, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { InvalidInputError } from '@root/lib/utils/errors';
-
-import { generateBounty } from 'testing/setupDatabase';
+import { generateBounty } from '@packages/testing/setupDatabase';
+import { InvalidInputError } from '@packages/utils/errors';
 
 import { setRewardUsers } from '../setRewardUsers';
 

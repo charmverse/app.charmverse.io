@@ -1,11 +1,10 @@
 import { InvalidInputError, SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { ApiPageKey } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidApiKeyError } from '@packages/nextjs/errors';
 import { getPermissionsClient } from '@root/lib/permissions/api';
 import type { NextApiRequest } from 'next';
 import type { NextHandler } from 'next-connect';
-
-import { InvalidApiKeyError } from './errors';
 
 export type InjectedPageApiKey = ApiPageKey & { page: { spaceId: string } };
 

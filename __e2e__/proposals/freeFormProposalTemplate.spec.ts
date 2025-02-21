@@ -11,11 +11,10 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { generateProposalWorkflowWithEvaluations } from '@packages/testing/utils/proposals';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { sleep } from 'zksync-web3/build/src/utils';
-
-import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
 
 test.describe.serial('Create and use Proposal Template', async () => {
   let space: Space;

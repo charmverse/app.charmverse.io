@@ -1,4 +1,6 @@
 import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
+import { matchWalletAddress, shortWalletAddress } from '@packages/utils/blockchain';
+import { randomName } from '@packages/utils/randomName';
 import { useMemo } from 'react';
 
 import type { IdentityIconSize } from 'components/settings/profile/components/IdentityIcon';
@@ -7,8 +9,6 @@ import type { IntegrationModel } from 'components/settings/profile/components/Id
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
-import { randomName } from 'lib/utils/randomName';
 
 import { useLensProfile } from './useLensProfile';
 

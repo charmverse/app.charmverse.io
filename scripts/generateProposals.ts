@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { getSpace } from 'lib/spaces/getSpace';
-import { randomIntFromInterval } from 'lib/utils/random';
+import { randomIntFromInterval } from '@packages/utils/random';
 
 const minRubricScore = 0;
 const maxRubricScore = 20;

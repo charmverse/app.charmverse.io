@@ -1,11 +1,10 @@
 import type { Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateUserAndSpaceKyc } from '@packages/testing/utils/kyc';
 import { baseUrl } from '@root/config/constants';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
-
-import { generateUserAndSpaceKyc } from 'testing/utils/kyc';
 
 test.describe.serial('Review reward applications', () => {
   let space: Space;

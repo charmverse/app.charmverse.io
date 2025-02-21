@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-
-import { generateBounty, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { AvailableBountyPermissions } from '../availableBountyPermissions';
 import { computeBountyPermissionsPublic } from '../computeBountyPermissions.public';

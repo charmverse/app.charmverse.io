@@ -1,5 +1,6 @@
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateBountyApplication, generateBountyWithSingleApplication } from '@packages/testing/setupDatabase';
 import type { E2EFixtures } from '__e2e__/testWithFixtures';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
@@ -13,7 +14,6 @@ import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
-import { generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 async function setupTestData() {
   const { space, user: admin } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });

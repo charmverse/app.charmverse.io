@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { parse } from 'csv-parse/sync';
 import { addCharms } from 'lib/charms/addCharms';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';

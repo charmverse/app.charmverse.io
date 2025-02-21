@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { AbstractWebsocketBroadcaster } from '@root/lib/websockets/interfaces';
 
 import { trashOrDeletePage } from './trashOrDeletePage';

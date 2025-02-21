@@ -1,17 +1,16 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
+import { trackOpSpaceClickSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
+import { sessionUserRelations } from '@packages/profile/constants';
+import { getUserProfile } from '@packages/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { postUserCreate } from '@packages/users/postUserCreate';
+import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import type { GoogleLoginOauthParams } from '@root/lib/google/authorization/authClient';
-import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from '@root/lib/metrics/mixpanel/updateTrackUserProfile';
-import { getUserProfile } from '@root/lib/profile/getUser';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { sessionUserRelations } from '@root/lib/session/config';
-import { postUserCreate } from '@root/lib/users/postUserCreate';
-import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@root/lib/utils/errors';
-
-import { trackOpSpaceClickSigninEvent } from '../metrics/mixpanel/trackOpSpaceSigninEvent';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 

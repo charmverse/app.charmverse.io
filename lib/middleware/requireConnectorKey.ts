@@ -1,4 +1,4 @@
-import { ActionNotPermittedError } from '@root/lib/middleware/errors';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
-import { DataNotFoundError, SystemError } from '@root/lib/utils/errors';
+import { UnknownError } from '@packages/nextjs/errors';
+import { DataNotFoundError, SystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { UnknownError } from './errors';
 import { isSystemError } from './isSystemError';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';
 

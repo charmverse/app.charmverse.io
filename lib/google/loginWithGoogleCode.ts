@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
+import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { InvalidInputError } from '@packages/utils/errors';
 import { googleOAuthClientIdSensitive } from '@root/config/constants';
 import { getClient } from '@root/lib/google/authorization/authClient';
 import { loginWithGoogle } from '@root/lib/google/loginWithGoogle';
-import type { SignupAnalytics } from '@root/lib/metrics/mixpanel/interfaces/UserEvent';
 import { getCallbackDomain } from '@root/lib/oauth/getCallbackDomain';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { InvalidInputError } from '@root/lib/utils/errors';
 
 export type LoginWithGoogleRequest = {
   code: string;

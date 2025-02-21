@@ -1,6 +1,7 @@
+import { renderWithTheme } from '@packages/testing/customRender';
+import { mockCurrentSpaceContext } from '@packages/testing/mocks/useCurrentSpace';
+
 import Link from 'components/common/Link';
-import { renderWithTheme } from 'testing/customRender';
-import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 jest.mock('hooks/useCurrentSpace', () => ({
   useCurrentSpace: jest.fn(() => mockCurrentSpaceContext())

@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { sessionUserRelations } from 'lib/session/config';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
+import { sessionUserRelations } from '@packages/profile/constants';
+import { countConnectableIdentities } from '@packages/users/countConnectableIdentities';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import { isAddress } from 'viem';
 
 /**

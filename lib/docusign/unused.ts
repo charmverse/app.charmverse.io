@@ -8,7 +8,7 @@
 // import { GET, POST } from '@root/adapters/http';
 // import { redisClient } from '@root/adapters/redis/redisClient';
 // import { baseUrl } from '@root/config/constants';
-// import { InvalidStateError } from '@root/lib/middleware';
+// import { InvalidStateError } from '@packages/nextjs/errors';
 // import { prettyPrint } from '@packages/utils/strings';
 
 // import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';

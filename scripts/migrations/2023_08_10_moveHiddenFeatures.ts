@@ -1,6 +1,6 @@
 import { Feature, prisma } from '@charmverse/core/prisma-client';
 import { STATIC_PAGES } from 'lib/features/constants';
-import { memberProfileNames } from 'lib/profile/memberProfiles';
+import { memberProfileNames } from '@packages/profile/memberProfiles';
 
 async function moveHiddenFeatures() {
   const spaces = await prisma.space.findMany({

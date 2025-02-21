@@ -1,8 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
-import { InsecureOperationError, InvalidInputError, MissingDataError } from '@root/lib/utils/errors';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { InsecureOperationError, InvalidInputError, MissingDataError } from '@packages/utils/errors';
 
 import { AssignableToRolesOnlyError, InvalidPermissionGranteeError } from '../../errors';
 import { addSpaceOperations } from '../addSpaceOperations';

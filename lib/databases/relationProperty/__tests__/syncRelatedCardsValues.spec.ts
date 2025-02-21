@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
 import { syncRelatedCardsValues } from '@root/lib/databases/relationProperty/syncRelatedCardsValues';
 import { syncRelationProperty } from '@root/lib/databases/relationProperty/syncRelationProperty';
 import { v4 } from 'uuid';
-
-import { generateBoard } from 'testing/setupDatabase';
 
 describe('syncRelatedCardsValues', () => {
   it('should sync related cards values', async () => {

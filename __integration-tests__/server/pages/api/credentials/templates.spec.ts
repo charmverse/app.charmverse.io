@@ -6,11 +6,10 @@ import type {
   CreateCredentialTemplateInput,
   CredentialTemplateUpdateableFields
 } from '@packages/credentials/templates';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser } from 'testing/setupDatabase';
 
 let nonAdminUser: User;
 let nonAdminUserCookie: string;

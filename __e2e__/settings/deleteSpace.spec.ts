@@ -1,7 +1,6 @@
+import { generateSpaceForUser } from '@packages/testing/utils/spaces';
 import { test as base } from '@playwright/test';
 import { v4 } from 'uuid';
-
-import { generateSpaceForUser } from 'testing/utils/spaces';
 
 import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';

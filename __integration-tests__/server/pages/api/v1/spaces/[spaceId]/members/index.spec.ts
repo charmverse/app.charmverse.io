@@ -1,15 +1,15 @@
 import type { AddressInfo } from 'node:net';
 
 import { prisma, type Space, type SuperApiToken, type User } from '@charmverse/core/prisma-client';
+import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { createServer } from '__e2e__/utils/mockServer';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { getSummonRoleLabel } from 'lib/summon/getSummonRoleLabel';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let superApiKey: SuperApiToken;
 let space: Space;

@@ -1,7 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostWithComment } from 'testing/utils/forums';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostWithComment } from '@packages/testing/utils/forums';
 
 import { deletePostComment } from '../deletePostComment';
 

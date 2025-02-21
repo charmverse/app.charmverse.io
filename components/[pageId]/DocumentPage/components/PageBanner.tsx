@@ -1,10 +1,10 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { ListItemButton, Typography, Box } from '@mui/material';
+import { randomIntFromInterval } from '@packages/utils/random';
 import { memo } from 'react';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
-import { randomIntFromInterval } from 'lib/utils/random';
 
 const StyledPageBanner = styled(({ focalBoard, ...props }: any) => <div {...props} />)<{ focalBoard?: boolean }>`
   display: flex;

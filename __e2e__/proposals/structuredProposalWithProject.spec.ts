@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
@@ -11,7 +12,6 @@ import { createProject } from 'lib/projects/createProject';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 let space: Space;
 let spaceAdmin: User;

@@ -1,8 +1,8 @@
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/pages/{id}/duplicate - Duplicate a page', () => {
   it('should allow a user to duplicate the page if they have access to create pages', async () => {

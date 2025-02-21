@@ -89,9 +89,12 @@
           "./packages/credentials/",
           "./packages/farcaster/",
           "./packages/github/",
+          "./packages/metrics/",
           "./packages/nextjs/",
           "./packages/testing/",
-          "./packages/utils/"
+          "./packages/users/",
+          "./packages/utils/",
+          "./packages/profile/"
         ]
       }
     ],

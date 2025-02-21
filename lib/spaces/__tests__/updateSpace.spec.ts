@@ -1,12 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { DuplicateDataError, InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';
-import { DuplicateDataError, InvalidInputError } from '@root/lib/utils/errors';
 import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { UpdateableSpaceFields } from '../updateSpace';
 import { updateSpace } from '../updateSpace';
@@ -36,7 +35,7 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  jest.unmock('lib/metrics/mixpanel/updateTrackGroupProfile');
+  jest.unmock('@packages/metrics/mixpanel/updateTrackGroupProfile');
   jest.resetModules();
 });
 
@@ -253,7 +252,7 @@ describe('updateSpace', () => {
 
     mockedMixpanelFn = jest.fn();
 
-    jest.mock('lib/metrics/mixpanel/updateTrackGroupProfile', () => ({
+    jest.mock('@packages/metrics/mixpanel/updateTrackGroupProfile', () => ({
       updateTrackGroupProfile: mockedMixpanelFn
     }));
 

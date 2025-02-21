@@ -1,9 +1,8 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl } from 'testing/mockApiCall';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;

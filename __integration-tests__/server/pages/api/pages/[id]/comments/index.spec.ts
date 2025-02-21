@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { createPage, generatePageComment } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, generatePageComment } from 'testing/setupDatabase';
 
 describe('GET /api/pages/[id]/comments - fetch comments of a page', () => {
   it('should allow a user with access to the space to fetch comments with status code 200', async () => {

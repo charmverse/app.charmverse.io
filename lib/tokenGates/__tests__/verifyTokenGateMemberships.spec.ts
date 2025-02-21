@@ -1,11 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { clearTokenGateData, deleteTokenGate, generateTokenGate } from '@packages/testing/utils/tokenGates';
 import { applyTokenGates } from '@root/lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMemberships } from '@root/lib/tokenGates/verifyTokenGateMemberships';
 import { walletAddress } from 'stories/lib/mockTokenGataData';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
   return prisma.spaceRole.findUnique({

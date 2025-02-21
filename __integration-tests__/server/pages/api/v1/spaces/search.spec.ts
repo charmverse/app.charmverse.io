@@ -1,11 +1,10 @@
 import type { Space, SuperApiToken } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import request from 'supertest';
-
-import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let superApiToken: SuperApiToken;
 let space: Space;

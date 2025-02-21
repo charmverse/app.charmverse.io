@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { generatePageToCreateStub } from '@packages/testing/generateStubs';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { generatePageToCreateStub } from 'testing/generateStubs';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/pages - create page', () => {
   it('should create a root-level page if the non-admin user has the permission and return it, responding with 201', async () => {

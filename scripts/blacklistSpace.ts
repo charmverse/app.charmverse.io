@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { blacklistUser } from 'lib/users/blacklistUser';
+import { blacklistUser } from '@packages/users/blacklistUser';
 
 /**
  * Use this script to retrieve and blacklist a space

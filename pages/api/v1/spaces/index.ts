@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireKeys, requireSuperApiKey } from 'lib/middleware';
@@ -6,7 +7,6 @@ import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { spaceTemplateApiNames } from 'lib/spaces/config';
-import { InvalidInputError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 
 const handler = defaultHandler();

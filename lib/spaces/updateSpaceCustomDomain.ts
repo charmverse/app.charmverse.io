@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
+import { isUniqueConstraintError } from '@packages/utils/errors/prisma';
 import { updateAllowedPlaybackDomains } from '@root/lib/mux/updateAllowedPlaybackDomains';
 import { isValidDomainName } from '@root/lib/utils/domains/isValidDomainName';
-import { InvalidInputError } from '@root/lib/utils/errors';
-import { isUniqueConstraintError } from '@root/lib/utils/errors/prisma';
 
 export type UpdateCustomDomainInput = {
   customDomain: string | null;

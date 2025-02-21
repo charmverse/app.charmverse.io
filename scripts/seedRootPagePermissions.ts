@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { Prisma } from '@charmverse/core/prisma';
-import { DataNotFoundError } from 'lib/utils/errors';
-import { pageStubToCreate } from 'testing/generatePageStub';
+import { DataNotFoundError } from '@packages/utils/errors';
+import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import { v4 } from 'uuid';
 
 /**

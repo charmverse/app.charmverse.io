@@ -7,7 +7,7 @@ import {
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import { MissingDataError } from '../utils/errors';
+import { MissingDataError } from '../../packages/utils/src/errors';
 
 export async function requireWalletSignature(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const domain = req.headers.host as string;

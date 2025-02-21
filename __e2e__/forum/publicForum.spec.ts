@@ -1,10 +1,10 @@
 import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import { expect, test as base } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { createUserAndSpace } from '../utils/mocks';

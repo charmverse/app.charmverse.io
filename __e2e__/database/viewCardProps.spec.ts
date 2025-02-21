@@ -2,13 +2,13 @@ import type { User } from '@charmverse/core/prisma';
 import type { PageComment, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateSchemasForAllSupportedFieldTypes } from '@packages/testing/publicApi/schemas';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { baseUrl } from '@root/config/constants';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
-import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
-import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';
 

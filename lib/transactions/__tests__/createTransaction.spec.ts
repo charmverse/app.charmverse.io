@@ -1,12 +1,11 @@
 import type { Application, Bounty, Space, User } from '@charmverse/core/prisma';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateBounty, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { refreshPaymentStatus } from '@root/lib/rewards/refreshPaymentStatus';
 import { work } from '@root/lib/rewards/work';
 import { createTransaction } from '@root/lib/transactions/createTransaction';
-import { DataNotFoundError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 jest.mock('lib/rewards/refreshPaymentStatus', () => ({
   refreshPaymentStatus: jest.fn()

@@ -10,14 +10,14 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 type ProposalWithDetails = Proposal & {
   page: Page;

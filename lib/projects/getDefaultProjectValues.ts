@@ -1,5 +1,5 @@
+import type { LoggedInUser } from '@packages/profile/getUser';
 import type { Member } from '@root/lib/members/interfaces';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import { createDefaultProject, defaultProjectMember } from './constants';
 import type { ProjectAndMembersPayload } from './interfaces';

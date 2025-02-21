@@ -1,18 +1,18 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
+import { checkUserBlacklistStatus } from '@packages/users/checkUserBlacklistStatus';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
-import { checkUserBlacklistStatus } from 'lib/users/checkUserBlacklistStatus';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

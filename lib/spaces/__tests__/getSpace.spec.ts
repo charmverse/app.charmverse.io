@@ -1,6 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { getSpace } from '../getSpace';
 

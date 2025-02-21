@@ -1,4 +1,4 @@
-import { SystemError } from '@root/lib/utils/errors';
+import { SystemError } from '@packages/utils/errors';
 
 export class ProposalNotFoundError extends SystemError {
   constructor(proposalid: string) {

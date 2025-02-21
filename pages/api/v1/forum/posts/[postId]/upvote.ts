@@ -1,5 +1,6 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getForumPost } from 'lib/forums/posts/getForumPost';
@@ -8,7 +9,6 @@ import { requireKeys } from 'lib/middleware';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 import { getPublicForumPost } from '../index';
 import type { PublicApiForumPost } from '../index';

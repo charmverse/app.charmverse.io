@@ -1,11 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { CharmWallet } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { getTransaction } from '@root/lib/charms/getTransaction';
 import { getUserOrSpaceWallet } from '@root/lib/charms/getUserOrSpaceWallet';
 import { transferCharms } from '@root/lib/charms/transferCharms';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('transferCharms', () => {
   it('sends charms from user to space', async () => {

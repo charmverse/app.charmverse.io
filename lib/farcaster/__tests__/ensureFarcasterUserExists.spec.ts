@@ -1,11 +1,10 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { isProfilePathAvailable } from '@packages/profile/isProfilePathAvailable';
+import { shortWalletAddress } from '@packages/utils/blockchain';
+import { randomIntFromInterval } from '@packages/utils/random';
 import { uid } from '@packages/utils/strings';
-import { shortWalletAddress } from '@root/lib/utils/blockchain';
-import { randomIntFromInterval } from '@root/lib/utils/random';
-
-import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 
 import type { TypedFarcasterUser } from '../ensureFarcasterUserExists';
 import { ensureFarcasterUserExists } from '../ensureFarcasterUserExists';
@@ -13,7 +12,7 @@ import { getFarcasterUsers } from '../getFarcasterUsers';
 
 jest.mock('../getFarcasterUsers');
 jest.mock('@packages/utils/strings');
-jest.mock('lib/utils/blockchain');
+jest.mock('@packages/utils/blockchain');
 jest.mock('lib/profile/isProfilePathAvailable');
 
 describe('ensureFarcasterUserExists', () => {

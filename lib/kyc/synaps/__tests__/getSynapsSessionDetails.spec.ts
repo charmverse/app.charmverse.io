@@ -1,7 +1,6 @@
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateSynapsCredential, generateSynapsUserKyc } from '@packages/testing/utils/kyc';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateSynapsCredential, generateSynapsUserKyc } from 'testing/utils/kyc';
 
 import { getSynapsSessionDetails } from '../getSynapsSessionDetails';
 

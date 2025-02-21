@@ -3,9 +3,9 @@ import crypto from 'crypto';
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { count } from '@packages/metrics';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
-import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
 import { type WebhookPayload } from 'lib/webhookPublisher/interfaces';

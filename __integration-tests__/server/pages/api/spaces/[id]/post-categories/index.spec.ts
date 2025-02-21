@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { PostCategory, PostCategoryPermission, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { CreatePostCategoryInput } from 'lib/forums/categories/createPostCategory';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let firstSpace: Space;
 let firstSpaceAdminUser: User;

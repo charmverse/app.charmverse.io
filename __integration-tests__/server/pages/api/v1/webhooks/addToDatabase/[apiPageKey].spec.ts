@@ -1,5 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
@@ -7,8 +9,6 @@ import type { CardPage } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import type { TypeformResponse } from 'lib/typeform/interfaces';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;

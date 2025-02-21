@@ -1,6 +1,7 @@
 import { prisma, type Application } from '@charmverse/core/prisma-client';
 import { findSpaceIssuableRewardCredentials } from '@packages/credentials/findIssuableRewardCredentials';
 import { getProposalOrApplicationCredentials } from '@packages/credentials/getProposalOrApplicationCredentials';
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +12,6 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 import { work } from 'lib/rewards/work';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

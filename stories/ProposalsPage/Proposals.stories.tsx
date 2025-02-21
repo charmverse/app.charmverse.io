@@ -1,4 +1,6 @@
 import { Box } from '@mui/material';
+import { createMockPage } from '@packages/testing/mocks/page';
+import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
@@ -7,8 +9,6 @@ import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/Docum
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
-import { createMockPage } from 'testing/mocks/page';
-import { createMockProposal } from 'testing/mocks/proposal';
 
 import { members, userProfile } from '../lib/mockData';
 

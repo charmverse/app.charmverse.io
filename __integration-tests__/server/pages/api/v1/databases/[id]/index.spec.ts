@@ -1,11 +1,11 @@
 import type { SpaceApiToken, User, Space } from '@charmverse/core/prisma';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { DatabasePage } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;

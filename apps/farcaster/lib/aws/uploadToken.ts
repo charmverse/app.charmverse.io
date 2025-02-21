@@ -1,8 +1,8 @@
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
 import { MissingDataError } from '@charmverse/core/errors';
-import { awsS3Bucket as bucket } from '@root/config/constants';
-import { getS3ClientConfig } from '@root/lib/aws/getS3ClientConfig';
-import { getFarcasterAppFilePath } from '@root/lib/aws/uploadToS3Server';
+import { getS3ClientConfig } from '@packages/aws/getS3ClientConfig';
+import { getFarcasterAppFilePath } from '@packages/aws/uploadToS3Server';
+import { awsS3Bucket as bucket } from '@packages/utils/constants';
 import { v4 as uuid } from 'uuid';
 
 const missingKeys: string[] = [];

@@ -1,5 +1,6 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { createOrGetUserFromWallet } from '@packages/users/createUser';
 import { isTestEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -10,7 +11,6 @@ import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
-import { createOrGetUserFromWallet } from 'lib/users/createUser';
 
 const handler = defaultHandler();
 

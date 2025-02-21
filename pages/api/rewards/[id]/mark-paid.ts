@@ -1,3 +1,4 @@
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import { markRewardAsPaid } from 'lib/rewards/markRewardAsPaid';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

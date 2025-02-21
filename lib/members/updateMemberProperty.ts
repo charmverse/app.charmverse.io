@@ -1,8 +1,8 @@
 import type { MemberProperty, PrismaPromise } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { NotFoundError } from '@root/lib/middleware';
-import { UserIsNotSpaceMemberError } from '@root/lib/users/errors';
-import { InvalidInputError } from '@root/lib/utils/errors';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { UserIsNotSpaceMemberError } from '@packages/users/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 
 type NewSelectOptionType = {
   id?: string;

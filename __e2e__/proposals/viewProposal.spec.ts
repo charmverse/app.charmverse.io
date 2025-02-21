@@ -1,12 +1,11 @@
 import type { Page, Proposal, Role, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
-
-import { baseUrl } from 'testing/mockApiCall';
 
 import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 

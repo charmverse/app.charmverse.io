@@ -1,18 +1,18 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { shortenHex } from '@packages/utils/blockchain';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
-import { shortenHex } from 'lib/utils/blockchain';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

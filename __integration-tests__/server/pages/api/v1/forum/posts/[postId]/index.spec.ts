@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateForumPosts } from '@packages/testing/forums';
+import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { generateForumPosts } from 'testing/forums';
-import { generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('GET /api/v1/forum/posts/[postId]', () => {
   it('should respond 200 with a forum post', async () => {

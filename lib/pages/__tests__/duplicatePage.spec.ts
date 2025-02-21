@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createPage, generateRole, generateBounty, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 as uid } from 'uuid';
-
-import { createPage, generateRole, generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { duplicatePage } from '../duplicatePage';
 

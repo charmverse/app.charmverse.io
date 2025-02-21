@@ -1,9 +1,9 @@
+import { completeOnboarding } from '@packages/users/completeOnboarding';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { completeOnboarding } from 'lib/users/completeOnboarding';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { PageEventMap } from '@packages/metrics/mixpanel/interfaces/PageEvent';
+import type { EventInput } from '@packages/metrics/recordDatabaseEvent';
+import { loginAnonymousUser } from '@packages/testing/mockApiCall';
 import { baseUrl } from '@root/config/constants';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
-
-import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-import type { EventInput } from 'lib/metrics/recordDatabaseEvent';
-import { loginAnonymousUser } from 'testing/mockApiCall';
 
 describe('POST /api/events - Analytics endpoint', () => {
   it('should create a user space action', async () => {

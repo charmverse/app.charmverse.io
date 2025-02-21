@@ -1,9 +1,8 @@
 import type { UserSpaceAction } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-
-import { createPage, createPost, generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
+import { createPage, createPost, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 
 import { getDefaultPageForSpace } from '../getDefaultPageForSpace';
 

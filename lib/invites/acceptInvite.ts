@@ -1,12 +1,11 @@
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { logInviteAccepted } from '@root/lib/metrics/postToDiscord';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
+import { updateTrackOpUserProfile } from '@packages/metrics/mixpanel/updateTrackOpUserProfile';
+import { logInviteAccepted } from '@packages/metrics/postToDiscord';
+import { getUserProfile } from '@packages/profile/getUser';
 import { joinSpace } from '@root/lib/spaces/joinSpace';
-
-import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
-import { updateTrackOpUserProfile } from '../metrics/mixpanel/updateTrackOpUserProfile';
-import { getUserProfile } from '../profile/getUser';
 
 import { validateInviteLink } from './validateInviteLink';
 

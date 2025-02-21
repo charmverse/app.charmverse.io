@@ -1,14 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { createRole } from '@packages/testing/utils/roles';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { generateUser } from '@packages/testing/utils/users';
 import { assignRole } from '@root/lib/roles';
 import { getProposalEntity, getSpaceEntity, getUserEntity } from '@root/lib/webhookPublisher/entities';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { createRole } from 'testing/utils/roles';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
 
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 

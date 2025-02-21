@@ -1,4 +1,4 @@
-import { trackUserActionSimple } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { trackUserActionSimple } from '@packages/metrics/mixpanel/trackUserAction';
 
 import type { EventType } from './trackEventActionSchema';
 

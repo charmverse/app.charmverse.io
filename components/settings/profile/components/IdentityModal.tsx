@@ -3,6 +3,9 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { Box, Chip, MenuItem, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import { countConnectableIdentities } from '@packages/users/countConnectableIdentities';
+import { shortWalletAddress } from '@packages/utils/blockchain';
+import { randomName } from '@packages/utils/randomName';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent, ReactNode } from 'react';
@@ -27,9 +30,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { shortWalletAddress } from 'lib/utils/blockchain';
-import { randomName } from 'lib/utils/randomName';
 
 import { useUserDetails } from '../hooks/useUserDetails';
 

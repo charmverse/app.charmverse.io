@@ -6,14 +6,14 @@ import {
   getCredentialTemplates,
   updateCredentialTemplate
 } from '@packages/credentials/templates';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { AdministratorOnlyError } from '@packages/users/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
-import { AdministratorOnlyError } from 'lib/users/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

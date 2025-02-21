@@ -1,10 +1,10 @@
+import { createMockPage } from '@packages/testing/mocks/page';
 import { renderHook } from '@testing-library/react';
 import { v4 as uuid } from 'uuid';
 
 import { usePages } from 'hooks/usePages';
 import { useRootPages } from 'hooks/useRootPages';
 import type { PagesMap } from 'lib/pages';
-import { createMockPage } from 'testing/mocks/page';
 
 jest.mock('hooks/usePages', () => ({
   usePages: jest.fn()

@@ -1,4 +1,5 @@
 import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
+import { mockCurrentSpaceContext } from '@packages/testing/mocks/useCurrentSpace';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
 import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';
@@ -8,7 +9,6 @@ import { useGetProposalDetails } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 import PaidShareToWeb from '../PaidShareToWeb';
 

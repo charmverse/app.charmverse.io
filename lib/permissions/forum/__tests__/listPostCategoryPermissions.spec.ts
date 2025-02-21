@@ -1,10 +1,9 @@
 import type { Role, Space, User } from '@charmverse/core/prisma';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { InvalidInputError } from '@packages/utils/errors';
 import { PostCategoryNotFoundError } from '@root/lib/forums/categories/errors';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 import { listPostCategoryPermissions } from '../listPostCategoryPermissions';
 import { upsertPostCategoryPermission } from '../upsertPostCategoryPermission';

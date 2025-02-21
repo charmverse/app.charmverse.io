@@ -1,10 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { DataNotFoundError } from '@root/lib/utils/errors';
+import { generateBounty, generateBountyWithSingleApplication } from '@packages/testing/setupDatabase';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { v4 as uuid } from 'uuid';
-
-import { generateBounty, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { getReward, getRewardOrThrow } from '../getReward';
 import type { Reward, RewardWithUsers } from '../interfaces';

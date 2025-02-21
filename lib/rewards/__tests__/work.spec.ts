@@ -1,9 +1,8 @@
 import type { Application } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from '@root/lib/utils/errors';
-
-import { generateBounty, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBounty, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from '@packages/utils/errors';
 
 import type { WorkUpsertData } from '../work';
 import { work } from '../work';

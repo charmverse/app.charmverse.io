@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserS3FilePath, uploadFileToS3 } from '@root/lib/aws/uploadToS3Server';
+import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import sharp from 'sharp';
 import { v4 } from 'uuid';
 

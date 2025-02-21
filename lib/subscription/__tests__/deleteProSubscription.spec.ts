@@ -1,10 +1,9 @@
 import { testUtilsUser } from '@charmverse/core/test';
-import { NotFoundError } from '@root/lib/middleware';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { getSpaceAndSubscription } from '@packages/testing/getSpaceSubscription';
+import { stripeMock } from '@packages/testing/stripeMock';
+import { addSpaceSubscription } from '@packages/testing/utils/spaces';
 import { v4 } from 'uuid';
-
-import { getSpaceAndSubscription } from 'testing/getSpaceSubscription';
-import { stripeMock } from 'testing/stripeMock';
-import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { deleteProSubscription } from '../deleteProSubscription';
 import { stripeClient } from '../stripe';

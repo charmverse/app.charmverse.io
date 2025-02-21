@@ -1,4 +1,4 @@
-import type { SystemError } from '@root/lib/utils/errors';
+import type { SystemError } from '@packages/utils/errors';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 

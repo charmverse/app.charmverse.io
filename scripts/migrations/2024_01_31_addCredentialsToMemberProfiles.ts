@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { MemberProfileJson } from 'lib/profile/memberProfiles';
+import { MemberProfileJson } from '@packages/profile/memberProfiles';
 
 async function addCredentialsToMemberProfiles() {
   const spaces = await prisma.space.findMany({

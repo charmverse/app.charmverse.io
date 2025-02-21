@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import {
   batchUpdateSpaceProfiles,
   type SpaceWithMixpanelProfile
-} from '@root/lib/metrics/mixpanel/batchUpdateSpaceProfiles';
-import { getTrackGroupProfile } from '@root/lib/metrics/mixpanel/updateTrackGroupProfile';
+} from '@packages/metrics/mixpanel/batchUpdateSpaceProfiles';
+import { getTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceBlockCount } from '@root/lib/spaces/getSpaceBlockCount';
 
 const perBatch = 1000;

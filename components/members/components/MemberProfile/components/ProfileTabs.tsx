@@ -1,5 +1,5 @@
 import { Stack } from '@mui/material';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import { useMemo, useState } from 'react';
 
 import type { TabConfig } from 'components/common/MultiTabs';

@@ -1,12 +1,12 @@
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
+import type { OpEventInput } from '@packages/metrics/recordDatabaseEvent';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
-import type { OpEventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

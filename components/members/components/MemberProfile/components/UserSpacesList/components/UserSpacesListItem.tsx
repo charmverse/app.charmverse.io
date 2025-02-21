@@ -11,6 +11,12 @@ import CheckIcon from '@mui/icons-material/VerifiedUser';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { Collapse, IconButton, Stack, Tab, Tabs, Tooltip, Typography, Box } from '@mui/material';
+import type {
+  ProfileProposalEvent,
+  ProfileVoteEvent,
+  ProfileBountyEvent,
+  CommunityDetails
+} from '@packages/profile/interfaces';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -20,12 +26,6 @@ import Link from 'components/common/Link';
 import { MemberProperties } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberProperties';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import type { PropertyValueWithDetails } from 'lib/members/interfaces';
-import type {
-  ProfileProposalEvent,
-  ProfileVoteEvent,
-  ProfileBountyEvent,
-  CommunityDetails
-} from 'lib/profile/interfaces';
 import { isTouchScreen } from 'lib/utils/browser';
 
 const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`

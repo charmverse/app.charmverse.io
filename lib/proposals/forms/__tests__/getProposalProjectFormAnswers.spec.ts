@@ -1,14 +1,13 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { getProjectProfileFieldConfig } from '@packages/testing/mocks/form';
 import { createDefaultProject, defaultProjectMember } from '@root/lib/projects/constants';
 import { createProject } from '@root/lib/projects/createProject';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { v4 } from 'uuid';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getProposalProjectFormAnswers } from '../getProposalProjectFormAnswers';
 

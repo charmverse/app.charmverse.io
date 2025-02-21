@@ -2,14 +2,14 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { PagePermission, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { generatePageToCreateStub } from '@packages/testing/generateStubs';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
 import { isTruthy } from 'lib/utils/types';
-import { generatePageToCreateStub } from 'testing/generateStubs';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let user: LoggedInUser;
 let space: Space;

@@ -1,9 +1,8 @@
 import { prisma, type Bounty, type Role, type Space, type User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { InvalidInputError, PositiveNumbersOnlyError } from '@root/lib/utils/errors';
+import { generateBounty } from '@packages/testing/setupDatabase';
+import { InvalidInputError, PositiveNumbersOnlyError } from '@packages/utils/errors';
 import { v4 as uuid } from 'uuid';
-
-import { generateBounty } from 'testing/setupDatabase';
 
 import type { UpdateableRewardFields } from '../updateRewardSettings';
 import { updateRewardSettings } from '../updateRewardSettings';

@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { createBlock, createPage } from '@packages/testing/setupDatabase';
 import { DateTime } from 'luxon';
 import { v4 } from 'uuid';
-
-import { createBlock, createPage } from 'testing/setupDatabase';
 
 import { deleteArchivedPages } from '../deleteArchivedPages';
 

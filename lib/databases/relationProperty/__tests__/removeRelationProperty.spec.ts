@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import type { IPropertyTemplate } from '@root/lib/databases/board';
 import { removeRelationProperty } from '@root/lib/databases/relationProperty/removeRelationProperty';
 import { syncRelationProperty } from '@root/lib/databases/relationProperty/syncRelationProperty';
 import { v4 } from 'uuid';
-
-import { generateBoard } from 'testing/setupDatabase';
 
 describe('removeRelationProperty', () => {
   it('should disconnect relation property on connected board', async () => {

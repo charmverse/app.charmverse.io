@@ -3,20 +3,20 @@ import { prisma } from '@charmverse/core/prisma-client';
 import {
   trackOpSpaceClickSigninEvent,
   trackOpSpaceSuccessfulSigninEvent
-} from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+} from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { sessionUserRelations } from '@packages/profile/constants';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { DisabledAccountError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
-import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DisabledAccountError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

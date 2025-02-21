@@ -1,8 +1,8 @@
+import type { UserPreferences } from '@packages/users/interfaces';
 import { useCallback, useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { useUser } from 'hooks/useUser';
-import type { UserPreferences } from 'lib/users/interfaces';
 
 export function useUserPreferences() {
   const { user, updateUser } = useUser();

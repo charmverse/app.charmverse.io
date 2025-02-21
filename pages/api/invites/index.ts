@@ -1,11 +1,11 @@
 import type { InviteLink } from '@charmverse/core/prisma';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createInviteLink } from 'lib/invites/createInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import { getSpaceInviteLinks } from 'lib/invites/getSpaceInviteLinks';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

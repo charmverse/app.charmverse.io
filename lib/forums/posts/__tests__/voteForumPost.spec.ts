@@ -1,7 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostCategory, generateForumPost } from '@packages/testing/utils/forums';
 
 import { createForumPost } from '../createForumPost';
 import { getPostVote } from '../getPostVote';

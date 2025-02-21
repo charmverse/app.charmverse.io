@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { createVote, generateBoard } from '@packages/testing/setupDatabase';
 import { expect } from '@playwright/test';
 import { baseUrl } from '@root/config/constants';
-
-import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { DatabasePage } from './po/databasePage.po';
 import { test } from './testWithFixtures';

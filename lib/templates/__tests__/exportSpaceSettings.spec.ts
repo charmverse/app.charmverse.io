@@ -12,9 +12,8 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers } from '@charmverse/core/test';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 as uuid } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { SpaceSettingsExport } from '../exportSpaceSettings';
 import { exportSpaceSettings } from '../exportSpaceSettings';

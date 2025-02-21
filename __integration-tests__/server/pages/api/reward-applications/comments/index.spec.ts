@@ -1,11 +1,11 @@
 import type { Application, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBounty } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { Reward } from 'lib/rewards/interfaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
 
 describe('POST /api/reward-applications/comments - create comment on an application', () => {
   let space: Space;

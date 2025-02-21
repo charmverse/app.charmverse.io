@@ -1,9 +1,8 @@
 import type { UserWallet } from '@charmverse/core/prisma';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { getAddress } from 'viem';
 
-import { randomETHWalletAddress } from 'testing/generateStubs';
-
-import { matchWalletAddress, shortenHex, shortWalletAddress } from '../blockchain';
+import { matchWalletAddress, shortenHex, shortWalletAddress } from '../../../packages/utils/src/blockchain';
 
 describe('shortWalletAddress()', () => {
   it('should shorten valid wallet addresses', () => {

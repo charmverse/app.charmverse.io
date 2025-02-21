@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
+import { trackOpSpaceSuccessfulSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
+import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import { isTestEnv } from '@root/config/constants';
-import { trackOpSpaceSuccessfulSigninEvent } from '@root/lib/metrics/mixpanel/trackOpSpaceSigninEvent';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { InvalidStateError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

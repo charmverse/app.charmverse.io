@@ -1,12 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { addUserGoogleAccount, generateUser } from '@packages/testing/utils/users';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import { searchUserProfile } from '@root/lib/public-api/searchUserProfile';
-import { DataNotFoundError, InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { addUserGoogleAccount, generateUser } from 'testing/utils/users';
 
 let user: User;
 let user1Wallet: string;

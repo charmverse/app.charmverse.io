@@ -1,4 +1,4 @@
-import { MockDataProvider, render } from 'testing/customRender';
+import { MockDataProvider, render } from '@packages/testing/customRender';
 
 import { CommentForm } from '../CommentForm';
 

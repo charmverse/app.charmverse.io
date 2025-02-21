@@ -2,9 +2,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let spaceOneUser: User;
 let spaceOne: Space;

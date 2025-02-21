@@ -2,10 +2,9 @@ import type { Page, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsMembers } from '@charmverse/core/test';
+import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-
-import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 test.describe('Duplicate a proposal template', async () => {
   let space: Space;

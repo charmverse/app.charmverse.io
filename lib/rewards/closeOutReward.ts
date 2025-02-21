@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-
-import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
 
 import { submissionIsComplete } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';

@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { stripeMock } from '@packages/testing/stripeMock';
 import { v4 } from 'uuid';
-
-import { stripeMock } from 'testing/stripeMock';
 
 import { stripeClient } from '../stripe';
 import { validateDiscountCode } from '../validateDiscountCode';

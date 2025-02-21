@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById } from '@packages/connectors/chains';
+import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from '@packages/utils/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import { DateTime } from 'luxon';
@@ -31,7 +32,6 @@ import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
-import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utils/errors';
 
 import ConnectSnapshot from './ConnectSnapshot';
 import { InputVotingStrategies } from './InputVotingStrategies';

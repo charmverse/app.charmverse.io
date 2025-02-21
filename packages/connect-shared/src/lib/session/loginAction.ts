@@ -1,9 +1,10 @@
 'use server';
 
 import { log } from '@charmverse/core/log';
-import { loginWithFarcaster } from '@packages/farcaster/loginWithFarcaster';
 import { actionClient } from '@packages/nextjs/actions/actionClient';
 import * as yup from 'yup';
+
+import { loginWithFarcaster } from './loginWithFarcaster';
 
 export const loginWithFarcasterAction = actionClient
   .metadata({ actionName: 'login' })

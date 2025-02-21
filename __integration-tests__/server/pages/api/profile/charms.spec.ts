@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import { addCharms } from 'lib/charms/addCharms';
 import type { TransactionResult } from 'lib/charms/addTransaction';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
 let user: User;

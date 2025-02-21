@@ -1,14 +1,14 @@
 import type { Space, SuperApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { addUserGoogleAccount, addUserWallet } from '@packages/testing/utils/users';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { baseUrl } from 'testing/mockApiCall';
-import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { addUserGoogleAccount, addUserWallet } from 'testing/utils/users';
 
 describe('GET /api/v1/users/search', () => {
   let user: User;

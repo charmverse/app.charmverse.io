@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { generateProposalSourceDb } from '@packages/testing/utils/proposals';
 import { createMissingCards } from '@root/lib/databases/proposalsSource/createMissingCards';
 import { v4 } from 'uuid';
-
-import { generateBoard } from 'testing/setupDatabase';
-import { generateProposalSourceDb } from 'testing/utils/proposals';
 
 import type { IPropertyOption, IPropertyTemplate } from '../board';
 import type { BoardViewFields } from '../boardView';

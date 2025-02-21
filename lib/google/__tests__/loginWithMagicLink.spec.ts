@@ -1,10 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 as uuid } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { DecodedIdToken } from '../firebaseApp';
 import type { MagicLinkLoginRequest } from '../loginWithMagicLink';

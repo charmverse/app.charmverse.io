@@ -1,11 +1,11 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBounty } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
 
 describe('POST /api/rewards/:id/close - close a reward', () => {
   let admin: User;

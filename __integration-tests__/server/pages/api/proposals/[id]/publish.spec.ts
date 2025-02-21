@@ -1,12 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
 import request from 'supertest';
 import { v4 } from 'uuid';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 let author: User;
 let reviewer: User;

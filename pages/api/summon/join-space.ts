@@ -1,17 +1,17 @@
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
+import { logWorkspaceJoinedViaTokenGate } from '@packages/metrics/postToDiscord';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { verifyMembership } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 

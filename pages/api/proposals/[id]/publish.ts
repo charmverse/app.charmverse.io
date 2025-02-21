@@ -2,20 +2,20 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { issueProposalPublishedQualifyingEvent } from '@packages/credentials/reputation/issueProposalPublishedQualifyingEvent';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { FieldAnswerInput, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimismSepolia } from 'viem/chains';
 
-import { trackOpUserAction } from 'lib/metrics/mixpanel/trackOpUserAction';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { publishProposal } from 'lib/proposals/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 

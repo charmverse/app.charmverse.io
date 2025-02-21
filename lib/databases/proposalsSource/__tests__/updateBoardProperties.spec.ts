@@ -2,13 +2,12 @@ import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma-cli
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateProposal } from '@packages/testing/utils/proposals';
 import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
-import { InvalidStateError } from '@root/lib/middleware';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { v4 as uuid } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposal } from 'testing/utils/proposals';
 
 import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
 import { updateBoardProperties } from '../updateBoardProperties';

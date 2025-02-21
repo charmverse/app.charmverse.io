@@ -1,5 +1,5 @@
 import type { Bounty, BountyPermission } from '@charmverse/core/prisma-client';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 
 import { AvailableBountyPermissions } from './availableBountyPermissions';
 import type { BountyPermissionFlags } from './interfaces';

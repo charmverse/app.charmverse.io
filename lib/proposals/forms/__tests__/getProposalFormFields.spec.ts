@@ -1,6 +1,5 @@
+import { getFormInput, getProjectProfileFieldConfig } from '@packages/testing/mocks/form';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
-
-import { getFormInput, getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getProposalFormFields } from '../getProposalFormFields';
 

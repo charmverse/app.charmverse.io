@@ -1,8 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { InvalidCustomPropertyValueError } from '@root/lib/public-api/errors';
 import { v4 as uuid } from 'uuid';
-
-import { generateSchema } from 'testing/publicApi/schemas';
 
 import { mapMultiSelectFromApiToSystem } from '../mapMultiSelectFromApiToSystem';
 

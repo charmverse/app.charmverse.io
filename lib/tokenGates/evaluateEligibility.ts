@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError } from '@root/lib/utils/errors';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { isTruthy } from '@root/lib/utils/types';
 import { validate } from 'uuid';
 

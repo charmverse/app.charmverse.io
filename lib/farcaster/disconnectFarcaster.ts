@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserProfile } from '@root/lib/profile/getUser';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { InvalidInputError } from '@root/lib/utils/errors';
+import { getUserProfile } from '@packages/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { InvalidInputError } from '@packages/utils/errors';
 
 export async function disconnectFarcaster({ userId }: { userId: string }): Promise<LoggedInUser> {
   const farcasterUser = await prisma.farcasterUser.findUnique({

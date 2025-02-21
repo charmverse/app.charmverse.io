@@ -1,12 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsCredentials } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import {
+  generateBounty,
+  generateBountyApplication,
+  generateBountyWithSingleApplication
+} from '@packages/testing/setupDatabase';
+import { randomETHWallet } from '@packages/utils/blockchain';
+import { pseudoRandomHexString } from '@packages/utils/random';
 import { getSubmissionPagePermalink } from '@root/lib/pages/getPagePermalink';
-import { randomETHWallet } from '@root/lib/utils/blockchain';
-import { pseudoRandomHexString } from '@root/lib/utils/random';
 import { v4 as uuid } from 'uuid';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { rewardSubmissionApprovedVerb } from '../constants';
 import type { IssuableRewardApplicationCredentialContent } from '../findIssuableRewardCredentials';

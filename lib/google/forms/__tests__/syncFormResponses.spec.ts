@@ -1,10 +1,9 @@
 import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type * as googlForms from '@googleapis/forms';
+import { boardWithCardsArgs } from '@packages/testing/generateBoardStub';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import type { BoardViewFields } from '@root/lib/databases/boardView';
-
-import { boardWithCardsArgs } from 'testing/generateBoardStub';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { syncFormResponses } from '../syncFormResponses';
 

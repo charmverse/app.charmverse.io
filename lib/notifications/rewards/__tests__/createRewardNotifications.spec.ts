@@ -1,7 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { createUserWithWallet, generateUserAndSpace, generateBounty } from '@packages/testing/setupDatabase';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { generateUser } from '@packages/testing/utils/users';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { reviewApplication } from '@root/lib/rewards/reviewApplication';
 import { work } from '@root/lib/rewards/work';
-import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import {
   getApplicationEntity,
   getRewardEntity,
@@ -9,10 +12,6 @@ import {
   getUserEntity
 } from '@root/lib/webhookPublisher/entities';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
-
-import { createUserWithWallet, generateUserAndSpace, generateBounty } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
 
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createRewardNotifications } from '../createRewardNotifications';

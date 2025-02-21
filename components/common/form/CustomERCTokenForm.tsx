@@ -5,6 +5,7 @@ import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
+import type { ISystemError } from '@packages/utils/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -18,7 +19,6 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { ISystemError } from 'lib/utils/errors';
 
 export type FormMode = 'create' | 'update';
 

@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackPageProfile } from '@packages/metrics/mixpanel/updateTrackPageProfile';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { prismaToBlock, prismaToUIBlock } from 'lib/databases/block';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import { duplicatePage } from 'lib/pages/duplicatePage';

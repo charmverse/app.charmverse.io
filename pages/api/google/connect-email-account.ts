@@ -1,5 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { sessionUserRelations } from '@packages/profile/constants';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { countConnectableIdentities } from '@packages/users/countConnectableIdentities';
+import { softDeleteUserWithoutConnectableIdentities } from '@packages/users/softDeleteUserWithoutConnectableIdentities';
+import { updateUsedIdentity } from '@packages/users/updateUsedIdentity';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,12 +12,7 @@ import { firebaseApp } from 'lib/google/firebaseApp';
 import type { LoginWithGoogleRequest } from 'lib/google/loginWithGoogle';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { softDeleteUserWithoutConnectableIdentities } from 'lib/users/softDeleteUserWithoutConnectableIdentities';
-import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

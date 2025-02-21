@@ -10,10 +10,11 @@ import type {
   UserDetails
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from '@packages/connectors/chains';
+import type { AggregatedProfileData } from '@packages/profile/getAggregatedData';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import { encodeFilename } from '@packages/utils/encodeFilename';
 import * as http from '@root/adapters/http';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
@@ -26,7 +27,6 @@ import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { AggregatedProfileData } from 'lib/profile';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';

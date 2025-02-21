@@ -1,8 +1,7 @@
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import { expect, test as base } from '@playwright/test';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';

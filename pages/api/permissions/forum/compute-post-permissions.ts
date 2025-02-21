@@ -1,5 +1,6 @@
 import type { PermissionCompute, PostPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -8,7 +9,6 @@ import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

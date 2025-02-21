@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { MixpanelEventName } from '@packages/metrics/mixpanel/interfaces';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { requireKeys } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';

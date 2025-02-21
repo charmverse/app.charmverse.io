@@ -1,8 +1,7 @@
 import type { PostComment, Space, User } from '@charmverse/core/prisma';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generateForumPost } from '@packages/testing/utils/forums';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
 
 import { createPostComment } from '../createPostComment';
 import type { CreatePostCommentInput } from '../interface';

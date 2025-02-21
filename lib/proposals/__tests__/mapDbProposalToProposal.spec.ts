@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-
-import { mockPermissions } from 'testing/mocks/proposal';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateProposalWorkflow } from 'testing/utils/proposals';
+import { mockPermissions } from '@packages/testing/mocks/proposal';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
 
 import { mapDbProposalToProposal } from '../mapDbProposalToProposal';
 

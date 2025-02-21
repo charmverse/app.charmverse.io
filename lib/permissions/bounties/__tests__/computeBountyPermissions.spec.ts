@@ -2,14 +2,13 @@ import { BountyOperation } from '@charmverse/core/prisma';
 import type { Prisma, BountyPermissionLevel, BountyPermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers } from '@charmverse/core/test';
+import type { BountyPermissions } from '@packages/testing/setupDatabase';
+import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@packages/utils/errors';
 import { assignRole } from '@root/lib/roles';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@root/lib/utils/errors';
 import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
-
-import type { BountyPermissions } from 'testing/setupDatabase';
-import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { TargetPermissionGroup, Resource } from '../../interfaces';
 import { computeBountyPermissions } from '../computeBountyPermissions';

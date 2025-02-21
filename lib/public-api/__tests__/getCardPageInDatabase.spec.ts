@@ -2,12 +2,11 @@
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { createPage } from '@root/lib/pages/server/createPage';
 import { v4 } from 'uuid';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { createDatabase } from '../createDatabase';
 import { createDatabaseCardPage } from '../createDatabaseCardPage';

@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generatePostCategory, generateForumPost } from '@packages/testing/utils/forums';
 import { expect, test as base } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { generateUserAndSpace, generateUser, grantForumModeratorAccess } from '__e2e__/utils/mocks';
-
-import { generatePostCategory, generateForumPost } from 'testing/utils/forums';
 
 import { login } from '../utils/session';
 

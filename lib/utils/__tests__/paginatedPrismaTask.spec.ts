@@ -4,8 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { arrayUtils } from '@charmverse/core/utilities';
 
+import { randomIntFromInterval } from '../../../packages/utils/src/random';
 import { paginatedPrismaTask } from '../paginatedPrismaTask';
-import { randomIntFromInterval } from '../random';
 
 describe('paginatedPrismaTask', () => {
   it('should perform a task and return results', async () => {

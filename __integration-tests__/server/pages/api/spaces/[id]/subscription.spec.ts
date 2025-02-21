@@ -1,11 +1,10 @@
 /* eslint-disable camelcase */
 
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { addSpaceSubscription } from '@packages/testing/utils/spaces';
+import { generateUser } from '@packages/testing/utils/users';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { addSpaceSubscription } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
 
 describe('GET /api/spaces/[id]/subscription - Get subscription for a space', () => {
   it('should throw error if the user is not member of the space and return 401', async () => {

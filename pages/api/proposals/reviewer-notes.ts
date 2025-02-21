@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import { ActionNotPermittedError, requireUser, onError, onNoMatch } from 'lib/mi
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getOrCreateReviewerNotes } from 'lib/proposals/getOrCreateReviewerNotes';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

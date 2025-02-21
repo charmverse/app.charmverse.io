@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
+import { createUserWithWallet } from '@packages/testing/setupDatabase';
+import { addUserToSpace, generateSpaceForUser } from '@packages/testing/utils/spaces';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { v4 } from 'uuid';
-
-import { createUserWithWallet } from 'testing/setupDatabase';
-import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 
 import { createMemberProperty } from '../createMemberProperty';
 import { getSpaceMembers } from '../getSpaceMembers';

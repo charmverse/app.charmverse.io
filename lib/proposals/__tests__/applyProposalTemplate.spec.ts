@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-
-import { generateProposalV2 } from 'testing/utils/proposals';
+import { generateProposalV2 } from '@packages/testing/utils/proposals';
 
 import { applyProposalTemplate } from '../applyProposalTemplate';
 

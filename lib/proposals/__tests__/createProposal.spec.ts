@@ -2,11 +2,10 @@ import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsPages } from '@charmverse/core/test';
+import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateForumPost } from '@packages/testing/utils/forums';
+import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
 import { v4 as uuid } from 'uuid';
-
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
-import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 import type { ProposalEvaluationInput } from '../createProposal';
 import { createProposal } from '../createProposal';

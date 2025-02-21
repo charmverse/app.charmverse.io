@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { DateTime } from 'luxon';
-
-import { generateSchema } from 'testing/publicApi/schemas';
 
 import { mapDateFromApiToSystem } from '../mapDateFromApiToSystem';
 

@@ -1,10 +1,10 @@
 import type { FiatCurrency } from '@packages/connectors/chains';
+import { DataNotFoundError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { pricingGetter } from 'lib/crypto-price/getters';
 import { onError, onNoMatch } from 'lib/middleware';
-import { DataNotFoundError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

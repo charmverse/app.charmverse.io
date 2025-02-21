@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Comment, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { CommentCreate } from 'lib/comments';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let nonAdminUser: User;
 let nonAdminUserSpace: Space;

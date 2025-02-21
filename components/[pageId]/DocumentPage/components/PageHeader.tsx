@@ -10,6 +10,7 @@ import { ListItemButton, Menu } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
+import { randomIntFromInterval } from '@packages/utils/random';
 import { memo, useCallback, useState } from 'react';
 
 import { PageParentChip } from 'components/[pageId]/DocumentPage/components/PageParentChip';
@@ -17,7 +18,6 @@ import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import { BlockIcons } from 'components/common/DatabaseEditor/blockIcons';
 import { randomEmojiList } from 'components/common/DatabaseEditor/emojiList';
 import EmojiIcon from 'components/common/Emoji';
-import { randomIntFromInterval } from 'lib/utils/random';
 
 import { GithubIssueChip } from './GithubIssueChip';
 import { randomBannerImage } from './PageBanner';

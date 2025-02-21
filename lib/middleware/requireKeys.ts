@@ -1,10 +1,9 @@
 import { stringUtils } from '@charmverse/core/utilities';
-import type { ISystemError } from '@root/lib/utils/errors';
+import { ApiError } from '@packages/nextjs/errors';
+import type { ISystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 import { isAddress } from 'viem';
-
-import { ApiError } from './errors';
 
 type TypeofReturnType = 'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function';
 type CustomValueType = 'uuid' | 'truthy' | 'wallet';
