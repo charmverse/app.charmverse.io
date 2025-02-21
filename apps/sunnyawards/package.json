@@ -18,7 +18,6 @@
     "@packages/aws": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
     "@packages/connect-shared": "^0.0.0",
-    "@packages/connectors": "^0.0.0",
     "@packages/nextjs": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@typeschema/yup": "^0.13.3",

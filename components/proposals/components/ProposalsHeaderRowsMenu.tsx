@@ -1,5 +1,5 @@
 import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import charmClient from 'charmClient';

@@ -1,6 +1,6 @@
 import type { ProjectMember } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';

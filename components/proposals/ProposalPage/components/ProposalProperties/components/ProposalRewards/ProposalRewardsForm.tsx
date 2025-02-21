@@ -1,7 +1,7 @@
 import { ProposalSystemRole } from '@charmverse/core/prisma';
 import { type BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import { useCallback, useState } from 'react';

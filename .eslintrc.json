@@ -85,7 +85,6 @@
           "./packages/aws/",
           "./packages/charmeditor/",
           "./packages/connect-shared/",
-          "./packages/connectors/",
           "./packages/credentials/",
           "./packages/farcaster/",
           "./packages/github/",

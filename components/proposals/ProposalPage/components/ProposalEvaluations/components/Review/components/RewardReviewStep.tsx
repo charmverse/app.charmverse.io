@@ -1,5 +1,5 @@
 import { Box, Card, FormLabel, Stack, Switch, Tooltip, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';

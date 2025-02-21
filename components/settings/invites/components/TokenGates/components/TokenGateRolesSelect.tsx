@@ -3,7 +3,7 @@ import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
 import { Box, Chip, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import Tooltip from '@mui/material/Tooltip';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';

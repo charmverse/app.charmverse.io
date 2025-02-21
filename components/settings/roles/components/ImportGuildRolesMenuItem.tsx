@@ -1,6 +1,6 @@
 import type { Guild } from '@guildxyz/types';
 import { Box, MenuItem, Typography } from '@mui/material';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
