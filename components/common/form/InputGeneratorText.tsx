@@ -5,10 +5,10 @@ import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import { isTruthy } from 'lib/utils/types';
 
 interface Props {
   onChange: (choices: string[]) => void;

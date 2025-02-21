@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import { playbackRestrictionId } from './config';
 import { mux } from './muxClient';

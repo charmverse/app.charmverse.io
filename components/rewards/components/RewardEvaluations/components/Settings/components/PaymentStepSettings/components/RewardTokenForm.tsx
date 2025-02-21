@@ -2,6 +2,7 @@ import type { PaymentMethod } from '@charmverse/core/prisma-client';
 import { Box, Stack, TextField } from '@mui/material';
 import type { CryptoCurrency } from '@packages/connectors/chains';
 import { getChainById } from '@packages/connectors/chains';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
@@ -9,7 +10,6 @@ import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockch
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { isTruthy } from 'lib/utils/types';
 
 export type FormInput = {
   chainId?: number | null;

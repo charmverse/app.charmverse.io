@@ -1,5 +1,6 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { NotFoundError } from '@packages/nextjs/errors';
 import { isUUID } from '@packages/utils/strings';
 import { replaceS3Domain } from '@packages/utils/url';
@@ -16,7 +17,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isTruthy } from 'lib/utils/types';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

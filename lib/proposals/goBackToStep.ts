@@ -1,8 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { getDraftStep } from '@root/lib/proposals/getCurrentStep';
-import { isTruthy } from '@root/lib/utils/types';
 import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
 import { relay } from '@root/lib/websockets/relay';
 

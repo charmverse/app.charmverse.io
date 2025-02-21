@@ -6,8 +6,8 @@ import type {
   ListBlockChildrenParameters,
   PageObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { IPropertyTemplate } from '@root/lib/databases/board';
-import { isTruthy } from '@root/lib/utils/types';
 import { relay } from '@root/lib/websockets/relay';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';

@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -22,7 +23,6 @@ import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { highlightDomElement, setUrlWithoutRerender } from 'lib/utils/browser';
-import { isTruthy } from 'lib/utils/types';
 
 const Center = styled.div`
   text-align: center;

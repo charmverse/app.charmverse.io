@@ -6,7 +6,7 @@ import type {
   UserTokenGate
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import type { TokenGateWithRoles } from './interfaces';
 import { validateTokenGate } from './validateTokenGate';

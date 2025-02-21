@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { isTruthy } from '@packages/lib/utils/types';
 import { assignRolesCollabland } from '@root/lib/collabland/assignRolesCollabland';
 import { disconnectSpace } from '@root/lib/collabland/disconnectSpace';
 import { getSpacesFromDiscord } from '@root/lib/discord/getSpaceFromDiscord';
@@ -6,7 +7,6 @@ import { removeSpaceMemberDiscord } from '@root/lib/discord/removeSpaceMemberDis
 import { unassignRolesDiscord } from '@root/lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from '@root/lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from '@root/lib/middleware/verifyApiKeyForSpace';
-import { isTruthy } from '@root/lib/utils/types';
 
 import type {
   MemberUpdateWebhookMessageData,

@@ -1,6 +1,7 @@
 /* eslint-disable max-lines */
 import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
+import { isTruthy } from '@packages/lib/utils/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useCallback, useState } from 'react';
 import type { IntlShape } from 'react-intl';
@@ -13,7 +14,6 @@ import { proposalPropertyTypesList } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { isTruthy } from 'lib/utils/types';
 
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';

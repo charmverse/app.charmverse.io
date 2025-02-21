@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import type { CustomNotification } from './interfaces';
 import { notificationMetadataSelectStatement, queryCondition, type QueryCondition } from './utils';

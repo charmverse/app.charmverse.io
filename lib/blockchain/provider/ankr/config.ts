@@ -1,4 +1,4 @@
-import { typedKeys } from '@root/lib/utils/objects';
+import { typedKeys } from '@packages/utils/types';
 
 // Find supported chains:  https://www.ankr.com/docs/advanced-api/overview/#chains-supported
 export const ankrAdvancedApis = {

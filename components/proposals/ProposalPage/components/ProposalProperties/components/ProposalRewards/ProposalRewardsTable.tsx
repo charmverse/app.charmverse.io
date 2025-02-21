@@ -1,6 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
 import { Box, ListItemIcon, ListItemText, MenuItem, Stack } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo } from 'react';
 
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
@@ -23,7 +24,6 @@ import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 

@@ -3,13 +3,13 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import type { AutocompleteRenderGetTagProps } from '@mui/material';
 import { IconButton, Box, Stack, TextField } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useCallback, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 

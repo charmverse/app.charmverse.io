@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { ProjectFieldValue } from '@root/lib/proposals/forms/interfaces';
 import type { KeyedMutator } from 'swr';
 
@@ -12,7 +13,6 @@ import { defaultProjectMember } from 'lib/projects/constants';
 import { projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { FieldAnswers } from '../FieldAnswers';
 

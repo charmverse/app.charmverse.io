@@ -1,5 +1,6 @@
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
 import {
@@ -11,7 +12,6 @@ import {
 import { applyDiscordGate } from '@root/lib/discord/collabland/applyDiscordGate';
 import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
 import { updateUserTokenGates } from '@root/lib/tokenGates/updateUserTokenGates';
-import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
 import type { TokenGateJoinType } from './interfaces';

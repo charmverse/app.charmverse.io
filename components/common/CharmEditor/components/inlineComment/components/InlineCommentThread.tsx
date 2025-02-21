@@ -1,6 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
 
@@ -8,7 +9,6 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import { isTruthy } from 'lib/utils/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PageThread from '../../thread/PageThread';

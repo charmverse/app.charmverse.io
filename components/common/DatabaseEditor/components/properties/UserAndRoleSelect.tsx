@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { ReactNode } from 'react';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
@@ -9,7 +10,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
-import { isTruthy } from 'lib/utils/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import type { PropertyValueDisplayType } from '../../interfaces';

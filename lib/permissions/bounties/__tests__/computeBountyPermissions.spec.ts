@@ -6,8 +6,8 @@ import type { BountyPermissions } from '@packages/testing/setupDatabase';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@packages/utils/errors';
+import { typedKeys } from '@packages/utils/types';
 import { assignRole } from '@root/lib/roles';
-import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
 
 import type { TargetPermissionGroup, Resource } from '../../interfaces';

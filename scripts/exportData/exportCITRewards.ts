@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { writeFileSync } from 'fs';
 import { stringify } from 'csv-stringify/sync';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 const FILE_OUTPUT_PATH = './cit-web3-rewards.csv';
 

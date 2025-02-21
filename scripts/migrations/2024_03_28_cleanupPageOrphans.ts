@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { uniq } from 'lodash';
 
 import { appendFileSync, readFileSync } from 'fs';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 const FILE_PATH = './orphans.txt';
 
 const userId = '4e1d4522-6437-4393-8ed1-9c56e53235f4';

@@ -1,5 +1,6 @@
 import type { Guild } from '@guildxyz/types';
 import { Box, MenuItem, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -10,7 +11,6 @@ import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { guild, user as guildUser } from 'lib/guild-xyz/client';
-import { isTruthy } from 'lib/utils/types';
 import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
 
 import GuildsAutocomplete from './GuildsAutocomplete';

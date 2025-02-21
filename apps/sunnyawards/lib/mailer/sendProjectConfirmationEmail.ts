@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse } from '@farcaster/auth-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { render } from '@react-email/render';
 import * as mailer from '@root/lib/mailer';
-import { isTruthy } from '@root/lib/utils/types';
 
 import { ProjectConfirmation } from './templates/ProjectConfirmation';
 

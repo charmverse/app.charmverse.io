@@ -1,3 +1,4 @@
+import { isTruthy } from '@packages/lib/utils/types';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
@@ -8,7 +9,6 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
-import { isTruthy } from 'lib/utils/types';
 
 import { DocumentColumn, DocumentColumnLayout } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';

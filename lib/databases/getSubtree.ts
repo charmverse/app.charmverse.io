@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { DataNotFoundError } from '@packages/utils/errors';
 
 import type { BlockWithDetails } from 'lib/databases/block';
@@ -9,7 +10,6 @@ import { filterLockedDatabaseCards } from 'lib/databases/filterLockedDatabaseCar
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { getBlocksAndRefresh } from 'lib/databases/proposalsSource/getBlocks';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { isTruthy } from 'lib/utils/types';
 
 export async function getSubtree({ pageId, userId }: { pageId: string; userId?: string }) {
   const page = await prisma.page.findFirstOrThrow({

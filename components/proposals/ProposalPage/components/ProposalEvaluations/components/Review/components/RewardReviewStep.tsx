@@ -1,4 +1,5 @@
 import { Box, Card, FormLabel, Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
@@ -11,7 +12,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
-import { isTruthy } from 'lib/utils/types';
 
 export type Props = {
   disabledPublishTooltip: string | null;

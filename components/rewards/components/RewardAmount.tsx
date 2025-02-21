@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { getChainById } from '@packages/connectors/chains';
+import { isTruthy } from '@packages/lib/utils/types';
 import { fancyTrim } from '@packages/utils/strings';
 import millify from 'millify';
 
@@ -13,7 +14,6 @@ import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { TokenBadge } from 'components/common/TokenBadge';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { isTruthy } from 'lib/utils/types';
 
 export interface IRewardBadgeProps {
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'status'>>;

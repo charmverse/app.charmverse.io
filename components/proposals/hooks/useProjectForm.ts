@@ -1,5 +1,6 @@
 import type { ProjectMember } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useCallback, useEffect, useRef } from 'react';
 import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
@@ -10,7 +11,6 @@ import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 export function useProjectForm(options: { fieldConfig?: ProjectAndMembersFieldConfig }) {
   const { fieldConfig } = options;

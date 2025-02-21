@@ -1,3 +1,4 @@
+import { isTruthy } from '@packages/lib/utils/types';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -7,7 +8,6 @@ import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { spaceTemplateApiNames } from 'lib/spaces/config';
-import { isTruthy } from 'lib/utils/types';
 
 const handler = defaultHandler();
 

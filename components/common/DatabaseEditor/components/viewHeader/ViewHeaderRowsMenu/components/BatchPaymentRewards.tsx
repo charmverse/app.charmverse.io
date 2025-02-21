@@ -2,6 +2,7 @@ import type { Application } from '@charmverse/core/prisma-client';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { Tooltip } from '@mui/material';
 import { getChainById } from '@packages/connectors/chains';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo, useState } from 'react';
 
 import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
@@ -13,7 +14,6 @@ import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { PropertyMenu } from './PropertyMenu';
 

@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import { TextField } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo, useState } from 'react';
 
 import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
-import { isTruthy } from 'lib/utils/types';
 
 import { allowedSourceDatabasePageTypes } from '../useSourceOptions';
 

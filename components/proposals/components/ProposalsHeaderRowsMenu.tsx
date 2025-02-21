@@ -1,4 +1,5 @@
 import type { ProposalEvaluationResult, ProposalSystemRole } from '@charmverse/core/prisma';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
@@ -10,7 +11,6 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from '../hooks/useProposals';

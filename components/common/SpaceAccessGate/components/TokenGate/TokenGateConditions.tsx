@@ -3,6 +3,7 @@ import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import { isTruthy } from '@packages/lib/utils/types';
 import { Fragment } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -10,7 +11,6 @@ import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import type { Operator } from 'lib/tokenGates/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 const StyledOperator = styled(Box)`
   &:after,

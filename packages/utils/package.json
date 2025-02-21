@@ -10,6 +10,7 @@
     "./blockchain": "./src/blockchain.ts",
     "./browser": "./src/browser.ts",
     "./constants": "./src/constants.ts",
+    "./dataEncryption": "./src/dataEncryption.ts",
     "./dates": "./src/dates.ts",
     "./encodeFilename": "./src/encodeFilename.ts",
     "./env": "./src/env.ts",

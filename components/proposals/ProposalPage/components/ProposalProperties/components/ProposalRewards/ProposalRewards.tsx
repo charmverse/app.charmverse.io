@@ -2,6 +2,7 @@ import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import Link from 'components/common/Link';
@@ -13,7 +14,6 @@ import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 

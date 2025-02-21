@@ -1,5 +1,5 @@
 import { getSession } from '@packages/connect-shared/lib/session/getSession';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 

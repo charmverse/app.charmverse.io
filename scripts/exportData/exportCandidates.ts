@@ -5,7 +5,7 @@ import { writeFileSync } from 'fs';
 import { stringify } from 'csv-stringify/sync';
 import type { FormFieldValue, LongTextValue } from '@root/lib/proposals/forms/interfaces';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 const userIds: string[] = [];
 

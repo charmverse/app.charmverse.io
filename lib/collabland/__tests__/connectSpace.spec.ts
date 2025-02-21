@@ -4,8 +4,8 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { createDiscordUser } from '@packages/testing/utils/discord';
 import { createRole } from '@packages/testing/utils/roles';
 import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { encryptData } from '@packages/utils/dataEncryption';
 import { connectSpace } from '@root/lib/collabland/connectSpace';
-import { encryptData } from '@root/lib/utils/dataEncryption';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 

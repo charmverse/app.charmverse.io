@@ -17,7 +17,7 @@ import { updateViews } from '@root/lib/databases/proposalsSource/updateViews';
 import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
 import type { PopulatedEvaluation, ProposalFields } from '@root/lib/proposals/interfaces';
 import { getDefaultPermissions } from '@root/lib/proposals/workflows/defaultEvaluation';
-import { sortBy } from '@root/lib/utils/objects';
+import { sortBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';

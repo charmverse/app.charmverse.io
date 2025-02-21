@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 // ref: https://wagmi.sh/core/chains
 import { uniqueValues } from '@packages/utils/array';
-import { isDevEnv } from '@root/config/constants';
+import { isDevEnv } from '@packages/utils/constants';
 import { defineChain } from 'viem';
 import type { Chain } from 'viem/chains';
 import {

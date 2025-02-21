@@ -1,6 +1,7 @@
 import type { BountyStatus, Prisma } from '@charmverse/core/prisma-client';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useState } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -10,7 +11,6 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { getAbsolutePath } from 'lib/utils/browser';
-import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';

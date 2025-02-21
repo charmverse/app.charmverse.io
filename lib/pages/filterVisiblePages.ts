@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 
 import { findParentOfType } from './findParentOfType';
 

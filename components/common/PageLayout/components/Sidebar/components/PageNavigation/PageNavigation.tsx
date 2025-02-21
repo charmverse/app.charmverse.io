@@ -1,6 +1,7 @@
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
 
@@ -18,7 +19,6 @@ import type { NewPageInput } from 'lib/pages/addPage';
 import { addPageAndRedirect } from 'lib/pages/addPage';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import type { PageMeta } from 'lib/pages/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { NavIconHoverCollapse, NavIconHoverExpand } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';

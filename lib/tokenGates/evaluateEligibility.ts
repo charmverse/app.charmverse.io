@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { DataNotFoundError } from '@packages/utils/errors';
-import { isTruthy } from '@root/lib/utils/types';
 import { validate } from 'uuid';
 
 import type { TokenGate } from './interfaces';

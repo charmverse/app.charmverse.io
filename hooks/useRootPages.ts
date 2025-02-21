@@ -1,7 +1,6 @@
 import { pageTree } from '@charmverse/core/pages/utilities';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo } from 'react';
-
-import { isTruthy } from 'lib/utils/types';
 
 import { usePages } from './usePages';
 

@@ -1,9 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { decryptData } from '@packages/utils/dataEncryption';
 import { updateMemberRolesFromDiscord } from '@root/lib/discord/collabland/updateMemberRolesFromDiscord';
 import { upsertSpaceRolesFromDiscord } from '@root/lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { mapSpace } from '@root/lib/public-api/createWorkspaceApi';
-import { decryptData } from '@root/lib/utils/dataEncryption';
 
 import { createAndAssignCollablandRoles } from './assignRolesCollabland';
 import { getDiscordUserState } from './collablandClient';

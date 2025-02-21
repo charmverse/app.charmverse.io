@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { DuplicateDataError, InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
+import { typedKeys } from '@packages/utils/types';
 import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';
-import { typedKeys } from '@root/lib/utils/objects';
 import { v4 } from 'uuid';
 
 import type { UpdateableSpaceFields } from '../updateSpace';

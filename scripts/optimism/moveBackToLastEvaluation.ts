@@ -2,7 +2,7 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { ProposalFields } from '@root/lib/proposals/interfaces';
 import { PageContent } from '@root/lib/prosemirror/interfaces';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 import { v4 } from 'uuid';
 
 export async function moveBackToLastEvaluation() {

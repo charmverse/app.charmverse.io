@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -27,7 +28,6 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
-import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';

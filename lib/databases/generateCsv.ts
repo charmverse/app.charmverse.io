@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { baseUrl } from '@root/config/constants';
 import { CardFilter } from '@root/lib/databases/cardFilter';
 import type { FilterGroup } from '@root/lib/databases/filterGroup';
@@ -7,7 +8,6 @@ import { getRelatedBlocks } from '@root/lib/databases/getRelatedBlocks';
 import { getBlocks as getBlocksForProposalSource } from '@root/lib/databases/proposalsSource/getBlocks';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { formatDate, formatDateTime } from '@root/lib/utils/dates';
-import { isTruthy } from '@root/lib/utils/types';
 import { stringify } from 'csv-stringify/sync';
 import { sortBy } from 'lodash-es';
 

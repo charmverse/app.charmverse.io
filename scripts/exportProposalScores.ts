@@ -8,7 +8,7 @@ import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggrega
 import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { writeToSameFolder } from 'lib/utils/file';
 import { isNumber } from 'lib/utils/numbers';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 import { groupBy } from 'lodash';
 
 type ExportedProposal = {

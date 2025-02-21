@@ -1,6 +1,7 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -37,7 +38,6 @@ import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';

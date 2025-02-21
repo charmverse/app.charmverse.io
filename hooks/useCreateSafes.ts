@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
+import { isTruthy } from '@packages/lib/utils/types';
 import type ISafe from '@safe-global/safe-core-sdk';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { isTruthy } from 'lib/utils/types';
 
 export function useCreateSafes(safeAddresses: string[]) {
   const [safes, setSafes] = useState<ISafe[]>([]);

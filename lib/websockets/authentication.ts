@@ -4,7 +4,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
-import { authSecret } from '@root/config/constants';
+import { authSecret } from '@packages/utils/constants';
 import type { SessionData } from '@root/lib/session/config';
 import type { SealedUserId } from '@root/lib/websockets/interfaces';
 import { getIronSession, unsealData } from 'iron-session';

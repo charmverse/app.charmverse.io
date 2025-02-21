@@ -1,4 +1,4 @@
-import { typedKeys } from '@root/lib/utils/objects';
+import { typedKeys } from '@packages/utils/types';
 
 import type { SignupCookieType } from '../userAcquisition/interfaces';
 

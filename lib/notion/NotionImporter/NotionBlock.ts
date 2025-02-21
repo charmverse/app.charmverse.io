@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import { isTruthy } from '@packages/lib/utils/types';
 import { isPdfEmbedLink } from '@root/lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,
@@ -13,7 +14,6 @@ import type {
   TextMark
 } from '@root/lib/prosemirror/interfaces';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from '@root/lib/prosemirror/plugins/image/constants';
-import { isTruthy } from '@root/lib/utils/types';
 
 import {
   MIN_EMBED_WIDTH,

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 
-import { authSecret } from '@root/config/constants';
+import { authSecret } from '@packages/utils/constants';
 
 function getKey() {
   if (!authSecret) {

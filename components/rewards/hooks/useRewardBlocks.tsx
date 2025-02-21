@@ -1,3 +1,4 @@
+import { isTruthy } from '@packages/lib/utils/types';
 import * as http from '@root/adapters/http';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useMemo } from 'react';
@@ -14,7 +15,6 @@ import type {
   RewardBlockWithTypedFields,
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import { useRewardsBoard } from './useRewardsBoard';
 

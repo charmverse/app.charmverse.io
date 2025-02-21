@@ -1,3 +1,4 @@
+import { isTruthy } from '@packages/lib/utils/types';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
@@ -5,7 +6,6 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import { useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 export type DisplayedPage =
   | 'tokens'

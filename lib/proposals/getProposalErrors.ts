@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import { validateAnswers } from '@root/lib/proposals/forms/validateAnswers';
-import { isTruthy } from '@root/lib/utils/types';
 
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 

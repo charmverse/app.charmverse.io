@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import Papa from 'papaparse';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { FormFieldValue } from '@root/lib/proposals/forms/interfaces';
 
 // Import rows from a CSV that answer questions on a proposal template

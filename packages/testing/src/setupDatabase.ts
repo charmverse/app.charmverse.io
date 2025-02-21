@@ -30,6 +30,7 @@ import { uniqueValues } from '@packages/utils/array';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
+import { typedKeys } from '@packages/utils/types';
 import type { DataSourceType } from '@root/lib/databases/board';
 import type { IViewType } from '@root/lib/databases/boardView';
 import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updateBoardProperties';
@@ -42,7 +43,6 @@ import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces'
 import { emptyDocument } from '@root/lib/prosemirror/constants';
 import { getRewardOrThrow } from '@root/lib/rewards/getReward';
 import type { RewardWithUsers } from '@root/lib/rewards/interfaces';
-import { typedKeys } from '@root/lib/utils/objects';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';

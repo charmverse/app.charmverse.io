@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import AddIcon from '@mui/icons-material/Add';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
@@ -13,7 +14,6 @@ import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { isTruthy } from 'lib/utils/types';
 
 import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';

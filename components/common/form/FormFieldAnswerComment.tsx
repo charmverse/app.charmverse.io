@@ -1,6 +1,7 @@
 import { MessageOutlined } from '@mui/icons-material';
 import AddCommentOutlinedIcon from '@mui/icons-material/AddCommentOutlined';
 import { Box, Stack, Tooltip, Typography } from '@mui/material';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useState } from 'react';
 
 import { useCreateThread } from 'charmClient/hooks/comments';
@@ -10,7 +11,6 @@ import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSi
 import { useThreads } from 'hooks/useThreads';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { highlightDomElement } from 'lib/utils/browser';
-import { isTruthy } from 'lib/utils/types';
 
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';

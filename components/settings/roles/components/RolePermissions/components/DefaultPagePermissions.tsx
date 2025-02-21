@@ -1,6 +1,7 @@
 import type { PagePermissionLevel } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, FormControlLabel, Menu, MenuItem, Switch, Typography } from '@mui/material';
+import { typedKeys } from '@packages/utils/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -15,7 +16,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
 import { pagePermissionLevels } from 'lib/permissions/pages/labels';
-import { typedKeys } from 'lib/utils/objects';
 
 type PagePermissionLevelWithoutCustomAndProposalEditor =
   | Exclude<PagePermissionLevel, 'custom' | 'proposal_editor'>

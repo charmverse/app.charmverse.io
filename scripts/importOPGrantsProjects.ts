@@ -10,7 +10,7 @@ import { stringify } from 'csv-stringify/sync';
 import { createOrGetUserFromWallet } from '@packages/users/createUser';
 import { getProjectsImportData } from 'scripts/optimism/getRound3Projects';
 import { DateTime } from 'luxon';
-import { isTruthy } from 'lib/utils/types';
+import { isTruthy } from '@packages/lib/utils/types';
 import { getFilenameWithExtension } from '@packages/utils/strings';
 
 /*****

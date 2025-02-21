@@ -1,12 +1,12 @@
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
+import { isTruthy } from '@packages/lib/utils/types';
 import { blockToPrisma } from '@root/lib/databases/block';
 import type { PrismaBlockSortOf } from '@root/lib/databases/block';
 import type { IPropertyOption, IPropertyTemplate } from '@root/lib/databases/board';
 import { createCard } from '@root/lib/databases/card';
 import { getPagePath } from '@root/lib/pages';
-import { isTruthy } from '@root/lib/utils/types';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;

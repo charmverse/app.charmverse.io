@@ -1,9 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
+import { isTruthy } from '@packages/lib/utils/types';
 import type { FieldAnswerInput } from '@root/lib/proposals/forms/interfaces';
 import { validateAnswers } from '@root/lib/proposals/forms/validateAnswers';
-import { isTruthy } from '@root/lib/utils/types';
 import { v4 } from 'uuid';
 
 export type RubricAnswerUpsert = {

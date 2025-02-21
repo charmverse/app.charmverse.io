@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/lib/utils/types';
 import { count } from '@packages/metrics';
 import { sendNotificationEmail } from '@root/lib/notifications/mailer/sendNotificationEmail';
 import { saveProposalNotification } from '@root/lib/notifications/saveNotification';
-import { isTruthy } from '@root/lib/utils/types';
 
 export async function sendDraftProposalNotificationTask() {
   const draftProposals = await prisma.proposal.findMany({

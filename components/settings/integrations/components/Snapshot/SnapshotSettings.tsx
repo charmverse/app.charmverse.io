@@ -2,6 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Stack, TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
+import { isTruthy } from '@packages/lib/utils/types';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -13,7 +14,6 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { isTruthy } from 'lib/utils/types';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
