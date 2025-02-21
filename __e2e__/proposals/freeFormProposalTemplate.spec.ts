@@ -11,7 +11,7 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
-import { generateProposalWorkflowWithEvaluations } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflowWithEvaluations } from '@root/lib/testing/proposals';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { sleep } from 'zksync-web3/build/src/utils';

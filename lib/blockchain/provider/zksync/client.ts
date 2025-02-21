@@ -3,11 +3,12 @@ import { getChainById } from '@packages/connectors/chains';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import ERC721_ABI from '@root/abis/ERC721.json';
 import { GET } from '@root/adapters/http';
-import type { NFTData } from '@root/lib/blockchain/getNFTs';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { RateLimit } from 'async-sema';
 import { zkSync, zksyncSepoliaTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
+
+import type { NFTData } from '../../getNFTs';
+import { getPublicClient } from '../../publicClient';
 
 import { supportedNetworks, type SupportedChainId } from './config';
 

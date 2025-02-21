@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-mixed-operators */
 /* eslint-disable eqeqeq */
 
-import { isTruthy } from './types';
+import { isTruthy } from '@packages/utils/types';
 
 // source: https://stackoverflow.com/questions/1685680/how-to-avoid-scientific-notation-for-large-numbers-in-javascript
 

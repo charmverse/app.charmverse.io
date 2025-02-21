@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflow } from '@root/lib/testing/proposals';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 

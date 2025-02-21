@@ -2,9 +2,9 @@ import type { FormField, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposalSourceDb } from '@packages/testing/utils/proposals';
 import { prismaToBlock } from '@root/lib/databases/block';
 import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
+import { generateProposalSourceDb } from '@root/lib/testing/proposals';
 
 import { applyPropertiesToCard } from '../applyPropertiesToCards';
 import { createMissingCards } from '../createMissingCards';

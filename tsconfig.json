@@ -46,7 +46,6 @@
       "@root/adapters/*": ["./adapters/*"],
       "@root/config/*": ["./config/*"],
       "@root/lib/*": ["./lib/*"],
-      "@root/testing/*": ["./testing/*"],
       "config/*": ["./config/*"],
       "scripts/*": ["./scripts/*"],
       "lib/*": ["./lib/*"],

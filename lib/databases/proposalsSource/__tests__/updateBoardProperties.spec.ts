@@ -4,9 +4,9 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposal } from '@packages/testing/utils/proposals';
 import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
+import { generateProposal } from '@root/lib/testing/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';

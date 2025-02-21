@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflow } from '@root/lib/testing/proposals';
 import request from 'supertest';
 import { v4 } from 'uuid';
 

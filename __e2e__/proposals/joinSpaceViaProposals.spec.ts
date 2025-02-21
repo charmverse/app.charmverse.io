@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { baseUrl } from '@packages/testing/mockApiCall';
-import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflow } from '@root/lib/testing/proposals';
 import { expect } from '__e2e__/testWithFixtures';
 import { test } from '__e2e__/utils/test';
 

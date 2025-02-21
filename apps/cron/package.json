@@ -13,11 +13,12 @@
   "dependencies": {
     "@packages/connectors": "^0.0.0",
     "@packages/credentials": "^0.0.0",
-    "@packages/nextjs": "^0.0.0",
+    "@packages/metrics": "^0.0.0",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@octokit/openapi-webhooks-types": "^8.3.0",
+    "@packages/testing": "^1.0.0",
     "@types/node-cron": "^3.0.11"
   }
 }

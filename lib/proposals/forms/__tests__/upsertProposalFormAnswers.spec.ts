@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposal } from '@packages/testing/utils/proposals';
+import { generateProposal } from '@root/lib/testing/proposals';
 import { v4 } from 'uuid';
 
 import { createForm } from '../createForm';

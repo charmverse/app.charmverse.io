@@ -1,6 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma-client';
-import type { OptionalNullable } from '@packages/lib/utils/types';
+import type { OptionalNullable } from '@packages/utils/types';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
 import { v4 as uuid } from 'uuid';
 

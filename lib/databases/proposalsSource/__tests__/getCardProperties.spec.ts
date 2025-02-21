@@ -2,13 +2,13 @@ import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateBoard, generateProposal, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposalSourceDb } from '@packages/testing/utils/proposals';
 import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { generateUser } from '@packages/testing/utils/users';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { prismaToBlock } from '@root/lib/databases/block';
 import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
+import { generateProposalSourceDb } from '@root/lib/testing/proposals';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';

@@ -1,6 +1,7 @@
 import { lowerCaseEqual } from '@packages/utils/strings';
 import ERC721_ABI from '@root/abis/ERC721.json';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
+
+import { getPublicClient } from '../../publicClient';
 
 import type { SupportedChainId } from './config';
 

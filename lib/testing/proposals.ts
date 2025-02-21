@@ -22,7 +22,7 @@ import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
-import { generateBoard } from '../setupDatabase';
+import { generateBoard } from '../../packages/testing/src/setupDatabase';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];

@@ -1,6 +1,6 @@
 /* eslint-disable no-use-before-define */
 import { log as _log } from '@charmverse/core/log';
-import { isDevEnv } from '@root/config/constants';
+import { isDevEnv } from '@packages/utils/constants';
 import type { DOMOutputSpec, Node } from 'prosemirror-model';
 import type { Transaction } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';

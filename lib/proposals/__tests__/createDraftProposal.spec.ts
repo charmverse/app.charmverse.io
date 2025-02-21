@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
 import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
+import { generateProposalWorkflow } from '@root/lib/testing/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { createDraftProposal } from '../createDraftProposal';

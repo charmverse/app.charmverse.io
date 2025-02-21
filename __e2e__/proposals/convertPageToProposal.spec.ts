@@ -1,5 +1,5 @@
 import { createPage } from '@packages/testing/setupDatabase';
-import { generateProposalWorkflowWithEvaluations } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflowWithEvaluations } from '@root/lib/testing/proposals';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { expect, test as base } from '__e2e__/utils/test';
 

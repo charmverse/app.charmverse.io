@@ -4,13 +4,13 @@ import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types'
 import { log } from '@charmverse/core/log';
 import ERC721_ABI from '@root/abis/ERC721.json';
 import { GET } from '@root/adapters/http';
-import { getNFTUrl } from '@root/lib/blockchain/utils';
 import { isMantleChain } from '@root/lib/gnosis/mantleClient';
 import { paginatedCall } from '@root/lib/utils/async';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
 import type { NFTData } from '../../getNFTs';
+import { getNFTUrl } from '../../utils';
 
 import type { SupportedChainId } from './config';
 import { advancedAPIEndpoint, ankrAdvancedApis, supportedChainIds } from './config';

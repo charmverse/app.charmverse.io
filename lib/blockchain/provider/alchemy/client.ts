@@ -1,6 +1,6 @@
 import env from '@beam-australia/react-env';
 import { getChainById } from '@packages/connectors/chains';
-import { isTruthy } from '@packages/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 import { GET } from '@root/adapters/http';
 import { paginatedCall } from '@root/lib/utils/async';
 

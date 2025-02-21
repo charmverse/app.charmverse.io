@@ -1,4 +1,4 @@
-import { isDevEnv } from '@root/config/constants';
+import { isDevEnv } from '@packages/utils/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

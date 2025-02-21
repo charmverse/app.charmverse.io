@@ -4,7 +4,7 @@ import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsPages } from '@charmverse/core/test';
 import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateForumPost } from '@packages/testing/utils/forums';
-import { generateProposalWorkflow } from '@packages/testing/utils/proposals';
+import { generateProposalWorkflow } from '@root/lib/testing/proposals';
 import { v4 as uuid } from 'uuid';
 
 import type { ProposalEvaluationInput } from '../createProposal';
