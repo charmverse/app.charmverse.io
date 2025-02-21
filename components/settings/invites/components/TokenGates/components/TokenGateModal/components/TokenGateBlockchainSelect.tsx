@@ -1,7 +1,7 @@
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
-import { getChainById, getChainList } from '@packages/connectors/chains';
-import type { IChainDetails } from '@packages/connectors/chains';
+import { getChainById, getChainList } from '@packages/blockchain/connectors/chains';
+import type { IChainDetails } from '@packages/blockchain/connectors/chains';
 import { forwardRef } from 'react';
 import type { Ref, ReactNode } from 'react';
 

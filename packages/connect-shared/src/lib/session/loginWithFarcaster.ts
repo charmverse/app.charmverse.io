@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
 import { createAppClient, verifySignInMessage, viemConnector } from '@farcaster/auth-client';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { createOrUpdateFarcasterUser } from '@packages/farcaster/createOrUpdateFarcasterUser';
 import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
 import { trackOpSpaceClickSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';

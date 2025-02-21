@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from '@packages/utils/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';

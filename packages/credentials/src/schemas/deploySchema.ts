@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { zeroAddress } from 'viem';
 import { optimism, optimismSepolia } from 'viem/chains';
 

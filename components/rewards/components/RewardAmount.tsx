@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { type TypographyProps } from '@mui/material/Typography';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { isTruthy } from '@packages/lib/utils/types';
 import { fancyTrim } from '@packages/utils/strings';
 import millify from 'millify';

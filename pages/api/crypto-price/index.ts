@@ -1,4 +1,4 @@
-import type { FiatCurrency } from '@packages/connectors/chains';
+import type { FiatCurrency } from '@packages/blockchain/connectors/chains';
 import { DataNotFoundError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';

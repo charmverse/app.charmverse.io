@@ -1,4 +1,4 @@
-import { wagmiConfig } from '@packages/connectors/config';
+import { wagmiConfig } from '@packages/blockchain/connectors/config';
 import type { GetEnsAddressReturnType } from '@wagmi/core';
 import { getEnsAddress } from '@wagmi/core';
 import { isValidName } from 'ethers/lib/utils';

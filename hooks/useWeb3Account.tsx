@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
-import { getWagmiConfig } from '@packages/connectors/config';
+import { getWagmiConfig } from '@packages/blockchain/connectors/config';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { SystemError } from '@packages/utils/errors';
 import { MissingWeb3AccountError } from '@packages/utils/errors';

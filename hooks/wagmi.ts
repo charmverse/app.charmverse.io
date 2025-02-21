@@ -1,4 +1,4 @@
-import { getWagmiConfig } from '@packages/connectors/config';
+import { getWagmiConfig } from '@packages/blockchain/connectors/config';
 import {
   useAccount as useAccountWagmi,
   useConnect as useConnectWagmi,

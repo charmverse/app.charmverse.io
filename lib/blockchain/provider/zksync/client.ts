@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import ERC721_ABI from '@root/abis/ERC721.json';
 import { GET } from '@root/adapters/http';

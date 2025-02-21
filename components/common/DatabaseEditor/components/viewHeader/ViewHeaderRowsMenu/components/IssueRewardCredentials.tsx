@@ -1,7 +1,7 @@
 import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import type { EasSchemaChain } from '@packages/credentials/connectors';
 import type { IssuableRewardApplicationCredentialContent } from '@packages/credentials/findIssuableRewardCredentials';
 import { getOnChainSchemaUrl } from '@packages/credentials/getOnChainSchemaUrl';

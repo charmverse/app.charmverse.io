@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
 import { RateLimit } from 'async-sema';

@@ -1,4 +1,4 @@
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/connectors/chains';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
 import fetch from '@root/adapters/http/fetch';
 
 const CoinMarketCapCryptoMapping: Record<CryptoCurrency | string, number> = {

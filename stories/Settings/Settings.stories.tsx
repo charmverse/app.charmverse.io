@@ -1,7 +1,7 @@
 import { development, LensProvider } from '@lens-protocol/react-web';
 import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Box, Paper } from '@mui/material';
-import { wagmiConfig } from '@packages/connectors/config';
+import { wagmiConfig } from '@packages/blockchain/connectors/config';
 import { http, HttpResponse } from 'msw';
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';

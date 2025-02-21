@@ -1,4 +1,4 @@
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 

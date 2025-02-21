@@ -15,7 +15,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { getChainList, getChainById } from '@packages/connectors/chains';
+import { getChainList, getChainById } from '@packages/blockchain/connectors/chains';
 import { slugify } from '@packages/utils/strings';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';

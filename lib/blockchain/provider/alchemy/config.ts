@@ -1,4 +1,4 @@
-import { getChainList } from '@packages/connectors/chains';
+import { getChainList } from '@packages/blockchain/connectors/chains';
 
 const chainList = getChainList({ enableTestnets: true });
 

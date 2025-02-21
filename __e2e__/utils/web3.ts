@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { baseUrl } from '@packages/testing/mockApiCall';
 import type { Page as BrowserPage } from '@playwright/test';
 import { SiweMessage } from 'siwe';

@@ -1,4 +1,4 @@
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { getGuildDetails } from '@root/lib/guild-xyz/getGuild';
 import { getHypersubDetails } from '@root/lib/tokenGates/hypersub/getHypersubDetails';
 import type { AccessControlCondition, TokenGate } from '@root/lib/tokenGates/interfaces';

@@ -16,7 +16,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { isTruthy } from '@packages/lib/utils/types';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';

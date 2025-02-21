@@ -1,5 +1,5 @@
 import type { Transaction } from '@charmverse/core/prisma';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import useSWR from 'swr';
 
 import { getMantleSafeTransaction } from 'lib/gnosis/mantleClient';

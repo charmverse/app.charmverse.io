@@ -1,5 +1,5 @@
 import { DelegateV2 } from '@delegatexyz/sdk';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { http } from 'viem';
 
 // Delegate.xyz is a service that allows users to delegate power to another wallet address. https://delegate.xyz/

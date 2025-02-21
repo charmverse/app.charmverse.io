@@ -9,7 +9,7 @@ import type {
   User,
   UserDetails
 } from '@charmverse/core/prisma';
-import type { FiatCurrency, IPairQuote } from '@packages/connectors/chains';
+import type { FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
 import type { AggregatedProfileData } from '@packages/profile/getAggregatedData';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { encodeFilename } from '@packages/utils/encodeFilename';

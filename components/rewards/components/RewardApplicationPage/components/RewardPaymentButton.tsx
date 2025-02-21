@@ -5,7 +5,7 @@ import { Contract } from '@ethersproject/contracts';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { shortenHex } from '@packages/utils/blockchain';
 import ERC20ABI from 'abis/ERC20.json';
 import { ethers } from 'ethers';

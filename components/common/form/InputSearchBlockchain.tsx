@@ -1,8 +1,8 @@
 import type { BoxProps, SxProps, Theme } from '@mui/material';
 import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } from '@mui/material/';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
-import type { IChainDetails } from '@packages/connectors/chains';
-import { getChainList, getChainById } from '@packages/connectors/chains';
+import type { IChainDetails } from '@packages/blockchain/connectors/chains';
+import { getChainList, getChainById } from '@packages/blockchain/connectors/chains';
 import { isTruthy } from '@packages/lib/utils/types';
 import { useEffect, useState, useMemo } from 'react';
 

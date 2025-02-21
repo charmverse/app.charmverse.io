@@ -1,5 +1,5 @@
 import { Chip } from '@mui/material';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { shortWalletAddress } from '@packages/utils/blockchain';
 import { isAddress } from 'viem';
 

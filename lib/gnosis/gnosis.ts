@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { getChainById, getChainList } from '@packages/connectors/chains';
+import { getChainById, getChainList } from '@packages/blockchain/connectors/chains';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import { RateLimit } from 'async-sema';
 import uniqBy from 'lodash/uniqBy';

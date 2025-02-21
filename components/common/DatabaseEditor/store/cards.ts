@@ -1,4 +1,4 @@
-import { getChainList } from '@packages/connectors/chains';
+import { getChainList } from '@packages/blockchain/connectors/chains';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 

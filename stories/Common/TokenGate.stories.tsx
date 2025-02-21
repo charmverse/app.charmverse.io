@@ -1,6 +1,6 @@
 import Card from '@mui/material/Card';
 import Paper from '@mui/material/Paper';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { http, HttpResponse } from 'msw';
 import { mockTokenGateResult, mockTokenGates } from 'stories/lib/mockTokenGataData';

@@ -33,7 +33,6 @@
       "@packages/farcaster/*": ["./packages/farcaster/src/*"],
       "@packages/aws/*": ["./packages/aws/src/*"],
       "@packages/connect-shared/*": ["./packages/connect-shared/src/*"],
-      "@packages/connectors/*": ["./packages/connectors/src/*"],
       "@packages/blockchain/*": ["./packages/blockchain/src/*"],
       "@packages/credentials/*": ["./packages/credentials/src/*"],
       "@packages/metrics/*": ["./packages/metrics/src/*"],

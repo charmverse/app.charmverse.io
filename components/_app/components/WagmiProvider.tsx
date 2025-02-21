@@ -1,4 +1,4 @@
-import { getWagmiConfig, wagmiConfig } from '@packages/connectors/config';
+import { getWagmiConfig, wagmiConfig } from '@packages/blockchain/connectors/config';
 import { isDevEnv, isTestEnv } from '@root/config/constants';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';

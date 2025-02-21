@@ -1,7 +1,7 @@
 import type { Application } from '@charmverse/core/prisma-client';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { Tooltip } from '@mui/material';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { isTruthy } from '@packages/lib/utils/types';
 import { useMemo, useState } from 'react';
 

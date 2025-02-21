@@ -1,4 +1,4 @@
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 
 import { getEthersProvider } from '../../../lib/blockchain/getEthersProvider';
 

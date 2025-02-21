@@ -1,5 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { getChainById } from '@packages/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { isTruthy } from '@packages/lib/utils/types';
 import { DateTime } from 'luxon';
 
