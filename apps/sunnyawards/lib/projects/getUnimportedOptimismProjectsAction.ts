@@ -3,9 +3,9 @@
 import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { arrayUtils } from '@charmverse/core/utilities';
-import { authActionClient } from '@connect-shared/lib/actions/actionClient';
-import type { ConnectProjectMember } from '@connect-shared/lib/projects/findProject';
-import type { FarcasterProfile } from '@root/lib/farcaster/getFarcasterProfile';
+import type { ConnectProjectMember } from '@packages/connect-shared/lib/projects/findProject';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import { authActionClient } from '@packages/nextjs/actions/actionClient';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 
 export type OptimismProjectWithMembers = OptimismProjectAttestation & {

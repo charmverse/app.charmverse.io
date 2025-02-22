@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateCharmWallet } from '@root/lib/charms/generateCharmWallet';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('generateCharmWallet', () => {
   it('should generate random wallet address and save it as charm wallet for user', async () => {

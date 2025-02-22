@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { lowerCaseEqual } from '@root/lib/utils/strings';
+import { lowerCaseEqual } from '@packages/utils/strings';
 
 export async function syncProposalPermissionsWithWorkflowPermissions({
   proposalId,

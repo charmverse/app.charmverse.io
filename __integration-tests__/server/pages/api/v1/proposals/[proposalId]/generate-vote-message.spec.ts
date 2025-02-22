@@ -3,15 +3,14 @@ import type { AddressInfo } from 'node:net';
 import type { Space, User } from '@charmverse/core/prisma';
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateSpaceApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { createServer } from '__e2e__/utils/mockServer';
 import request from 'supertest';
 import { v4 } from 'uuid';
 import { getAddress } from 'viem';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateSpaceApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let proposalAuthor: User;
 let space: Space;

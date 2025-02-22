@@ -1,14 +1,14 @@
 import type { Block, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { Card } from 'lib/databases/card';
 import type { ServerBlockFields } from 'pages/api/blocks';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('POST /api/blocks', () => {
   let adminUser: User;

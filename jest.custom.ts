@@ -1,4 +1,4 @@
-import createJestConfig from 'testing/createJestConfig';
+import createJestConfig from '@packages/testing/createJestConfig';
 
 import { jestConfig } from './jest.config.nodejs';
 

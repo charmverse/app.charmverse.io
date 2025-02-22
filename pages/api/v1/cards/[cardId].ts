@@ -1,6 +1,6 @@
+import { SpaceAccessDeniedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { SpaceAccessDeniedError } from 'lib/middleware';
 import { getCardPageInDatabase } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 import { updateDatabaseCardPage } from 'lib/public-api/updateDatabaseCardPage';

@@ -16,7 +16,8 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { getChainById } from '@root/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
+import { isTruthy } from '@packages/utils/types';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -25,7 +26,6 @@ import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFi
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
-import { isTruthy } from 'lib/utils/types';
 
 type CreateVoteModalProps = {
   readOnly?: boolean;

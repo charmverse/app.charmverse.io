@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBounty } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
 
 describe('GET /api/rewards/:id - get reward details', () => {
   let space: Space;

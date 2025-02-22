@@ -1,13 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from '@packages/testing/utils/tokenGates';
 import { applyTokenGates } from '@root/lib/tokenGates/applyTokenGates';
 import { validateTokenGateConditionWithDelegates } from '@root/lib/tokenGates/validateTokenGateConditionWithDelegates';
 import { verifyTokenGateMembership } from '@root/lib/tokenGates/verifyTokenGateMembership';
 import type { UserToVerifyMembership } from '@root/lib/tokenGates/verifyTokenGateMemberships';
 import { walletAddress } from 'stories/lib/mockTokenGataData';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { addRoleToTokenGate, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 import { getPublicClient } from '../../blockchain/publicClient';
 

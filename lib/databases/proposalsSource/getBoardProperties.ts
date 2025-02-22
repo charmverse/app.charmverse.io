@@ -1,12 +1,13 @@
 import type { PageType, ProposalEvaluationType } from '@charmverse/core/prisma-client';
-import type { IPropertyTemplate } from '@root/lib/databases/board';
-import { proposalDbProperties } from '@root/lib/databases/proposalDbProperties';
 import { projectFieldProperties, projectMemberFieldProperties } from '@root/lib/projects/formField';
 import type { FormFieldInput, SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
+
+import type { IPropertyTemplate } from '../board';
+import { proposalDbProperties } from '../proposalDbProperties';
 
 import { filterBoardProperties } from './filterBoardProperties';
 

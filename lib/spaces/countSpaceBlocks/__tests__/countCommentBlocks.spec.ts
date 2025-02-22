@@ -1,10 +1,9 @@
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateBoard, generateBountyWithSingleApplication } from '@packages/testing/setupDatabase';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 import { v4 as uuid } from 'uuid';
-
-import { generateBoard, generateBountyWithSingleApplication } from 'testing/setupDatabase';
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 import type { CommentBlocksCount } from '../countCommentBlocks';
 import { countCommentBlocks } from '../countCommentBlocks';

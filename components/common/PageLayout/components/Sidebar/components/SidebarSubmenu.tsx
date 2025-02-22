@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
@@ -27,7 +28,6 @@ import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { headerHeight } from '../../Header/Header';
 

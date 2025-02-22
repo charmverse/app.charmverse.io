@@ -2,9 +2,8 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { arrayUtils } from '@charmverse/core/utilities';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('GET /api/spaces/[id]/pages - Get Pages in a space', () => {
   let space: Space;

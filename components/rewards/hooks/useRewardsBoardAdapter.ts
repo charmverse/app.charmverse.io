@@ -1,4 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import { isUUID } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import { sortCards } from 'components/common/DatabaseEditor/store/cards';
@@ -38,8 +40,6 @@ import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
-import { isUUID } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields; sourceProposalPage?: string };
 

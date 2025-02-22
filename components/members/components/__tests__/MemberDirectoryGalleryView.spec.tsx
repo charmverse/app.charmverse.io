@@ -1,3 +1,5 @@
+import { mockCurrentSpaceContext } from '@packages/testing/mocks/useCurrentSpace';
+import { createMockUser } from '@packages/testing/mocks/user';
 import { render } from '@testing-library/react';
 import { createElement } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -5,8 +7,6 @@ import { v4 as uuid } from 'uuid';
 // Import hooks to mock
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
-import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
-import { createMockUser } from 'testing/mocks/user';
 
 import { MemberDirectoryGalleryView } from '../MemberDirectoryGalleryView';
 

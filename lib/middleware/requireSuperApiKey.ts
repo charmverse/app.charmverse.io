@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 
 import type { SuperApiToken } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidApiKeyError } from '@root/lib/middleware/errors';
+import { InvalidApiKeyError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

@@ -1,6 +1,6 @@
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import { useSignIn } from '@farcaster/auth-kit';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import { useCallback, useEffect } from 'react';
 
 import { useFarcasterConnect, useFarcasterLogin } from 'charmClient/hooks/farcaster';

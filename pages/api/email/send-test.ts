@@ -1,5 +1,7 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { isValidEmail } from '@packages/utils/strings';
 import { charmBlue as blueColor } from '@root/config/colors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -11,8 +13,6 @@ import * as emails from 'lib/mailer/emails';
 import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { isValidEmail } from 'lib/utils/strings';
 
 const handler = nc({
   onError,

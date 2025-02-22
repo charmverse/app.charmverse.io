@@ -1,9 +1,9 @@
+import { getUserSpaces } from '@packages/profile/getUserSpaces';
+import type { UserCommunity } from '@packages/profile/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { UserCommunity } from 'lib/profile';
-import { getUserSpaces } from 'lib/profile/getUserSpaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

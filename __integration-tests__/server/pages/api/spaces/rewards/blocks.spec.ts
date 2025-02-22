@@ -1,10 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { mockRewardBlocks } from '@packages/testing/mocks/rewards';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { mockRewardBlocks } from 'testing/mocks/rewards';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
 let rewardBlocks: ReturnType<typeof mockRewardBlocks>;

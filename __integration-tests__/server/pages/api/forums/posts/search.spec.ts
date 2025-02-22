@@ -1,15 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
+import { generateForumPosts } from '@packages/testing/forums';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import {
+  generateSpaceUser,
+  generateUserAndSpace,
+  generateUserAndSpaceWithApiToken
+} from '@packages/testing/setupDatabase';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
 
 import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { generateForumPosts } from 'testing/forums';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 let firstSpace: Space;
 let firstSpaceUser: User;

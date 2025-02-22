@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
 import type { UserMentionMetadata } from '@root/lib/prosemirror/extractMentions';
 import type { CardPropertyEntity } from '@root/lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
-
-import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
 import {
   getApplicationCommentEntity,

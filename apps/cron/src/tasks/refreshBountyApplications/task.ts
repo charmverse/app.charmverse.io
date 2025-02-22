@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@root/lib/metrics';
+import { count } from '@packages/metrics';
 import { refreshUnpaidApplications } from '@root/lib/rewards/refreshUnpaidApplications';
 
 export async function refreshBountyApplications() {

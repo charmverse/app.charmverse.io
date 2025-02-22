@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utils/strings';
+import { uid } from '@packages/utils/strings';
 
 async function init() {
   // const users = await prisma.user.findMany({

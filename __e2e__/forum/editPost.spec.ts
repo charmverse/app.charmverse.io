@@ -1,10 +1,10 @@
 import type { Post, Space } from '@charmverse/core/prisma';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import { expect, test as base } from '@playwright/test';
 import type { LoggedInPage } from '__e2e__/po/loggedIn.po';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumPostPage } from '../po/forumPost.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';

@@ -1,13 +1,13 @@
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import type { Response } from 'supertest';
 import request from 'supertest';
 
 import type { CardPage as ApiPage, UnsupportedKeyDetails, UnsupportedKeysError } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /databases/{id}/cards', () => {
   const textSchema = generateSchema({ type: 'text' });

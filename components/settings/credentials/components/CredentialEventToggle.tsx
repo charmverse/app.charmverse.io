@@ -1,9 +1,9 @@
 import type { CredentialEventType } from '@charmverse/core/prisma';
 import { Box, FormControlLabel, Switch } from '@mui/material';
+import { credentialEventLabels } from '@packages/credentials/constants';
 
 import { Typography } from 'components/common/Typography';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { credentialEventLabels } from 'lib/credentials/constants';
 import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 
 export type CredentialToggled = {

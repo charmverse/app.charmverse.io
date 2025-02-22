@@ -21,7 +21,7 @@ import {
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
-import type { EASAttestationFromApi } from '@root/lib/credentials/external/getOnchainCredentials';
+import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig } from '@root/lib/projects/formField';
 import type { ProjectWithMembers } from '@root/lib/projects/interfaces';
 import { getProposalFormFields } from '@root/lib/proposals/forms/getProposalFormFields';

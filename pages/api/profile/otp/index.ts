@@ -1,14 +1,14 @@
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import type { CreateOtpResponse } from '@packages/profile/otp/createUserOtp';
+import { createUserOtp } from '@packages/profile/otp/createUserOtp';
+import { deleteUserOtp } from '@packages/profile/otp/deleteUserOtp';
+import type { GetOtpResponse } from '@packages/profile/otp/getUserOtp';
+import { getUserOtp } from '@packages/profile/otp/getUserOtp';
+import { verifyOtpToken } from '@packages/profile/otp/verifyOtpToken';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { CreateOtpResponse } from 'lib/profile/otp/createUserOtp';
-import { createUserOtp } from 'lib/profile/otp/createUserOtp';
-import { deleteUserOtp } from 'lib/profile/otp/deleteUserOtp';
-import type { GetOtpResponse } from 'lib/profile/otp/getUserOtp';
-import { getUserOtp } from 'lib/profile/otp/getUserOtp';
-import { verifyOtpToken } from 'lib/profile/otp/verifyOtpToken';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

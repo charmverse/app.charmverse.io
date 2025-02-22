@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { addSpaceDiscordServerId, createDiscordUser } from '@packages/testing/utils/discord';
+import { createRole } from '@packages/testing/utils/roles';
 import type { ExternalRole } from '@root/lib/roles';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { addSpaceDiscordServerId, createDiscordUser } from 'testing/utils/discord';
-import { createRole } from 'testing/utils/roles';
 
 describe('assignRolesCollabland', () => {
   it('should fetch roles from discord, add them and assign to user', async () => {

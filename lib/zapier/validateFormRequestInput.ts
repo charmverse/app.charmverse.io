@@ -1,6 +1,6 @@
+import { InvalidInputError } from '@packages/utils/errors';
 import { getDatabaseDetails } from '@root/lib/pages/getDatabaseDetails';
 import { DatabasePageNotFoundError } from '@root/lib/public-api/errors';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import type { AddFormResponseInput } from '@root/lib/zapier/interfaces';
 
 export async function validateFormRequestInput({

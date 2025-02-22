@@ -1,7 +1,6 @@
+import { createDiscordUser } from '@packages/testing/utils/discord';
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-
-import { createDiscordUser } from 'testing/utils/discord';
 
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';

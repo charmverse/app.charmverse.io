@@ -2,11 +2,10 @@ import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
+import { randomIntFromInterval } from '@packages/utils/random';
 import Script from 'next/script';
 import { useRef } from 'react';
 import { FaXTwitter } from 'react-icons/fa6';
-
-import { randomIntFromInterval } from 'lib/utils/random';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';

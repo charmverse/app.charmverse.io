@@ -1,8 +1,9 @@
 import { log } from '@charmverse/core/log';
+import { NotFoundError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { NotFoundError, onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { CreatePaymentMethodRequest, CreatePaymentMethodResponse } from 'lib/subscription/createPaymentMethod';
 import { createPaymentMethod } from 'lib/subscription/createPaymentMethod';

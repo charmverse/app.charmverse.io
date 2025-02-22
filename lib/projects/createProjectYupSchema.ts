@@ -1,4 +1,4 @@
-import { isValidEmail } from '@root/lib/utils/strings';
+import { isValidEmail } from '@packages/utils/strings';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 

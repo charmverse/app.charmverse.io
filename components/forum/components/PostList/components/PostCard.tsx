@@ -7,6 +7,7 @@ import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { fancyTrim } from '@packages/utils/strings';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -19,7 +20,6 @@ import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utils/browser';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
-import { fancyTrim } from 'lib/utils/strings';
 
 import { PostSummary } from './PostSummary';
 

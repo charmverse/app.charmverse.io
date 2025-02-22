@@ -10,7 +10,7 @@ import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import _uniqBy from 'lodash/uniqBy';
 import Papa from 'papaparse';
 import * as path from 'path';
-import { addUserToSpace } from 'testing/utils/spaces';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 import { v4 as uuid } from 'uuid';
 

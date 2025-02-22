@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import * as summonProfile from '@root/lib/profile/getSummonProfile';
+import * as summonProfile from '@packages/profile/getSummonProfile';
+import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { TENANT_URLS } from '@root/lib/summon/constants';
-import { randomETHWalletAddress } from '@root/lib/utils/blockchain';
 import { v4 } from 'uuid';
-
-import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
 
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 

@@ -1,10 +1,10 @@
 import type { InviteLink, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { InviteLinkInput } from 'lib/invites/createInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/invites - Create an invite', () => {
   let space: Space;

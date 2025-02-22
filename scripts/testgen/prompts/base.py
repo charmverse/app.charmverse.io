@@ -33,7 +33,7 @@ testUtilsMembers.generateRole({
     spaceId: space.id
   });
 
-import { generateBounty } from 'testing/setupDatabase';
+import { generateBounty } from '@packages/testing/setupDatabase';
 
 const reward = await generateBounty({
   approveSubmitters: false,

@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-
-import { isTruthy } from './types';
+import { isTruthy } from '@packages/utils/types';
 
 // A utilitiy to recursively call and endpoint with paginated results
 export async function paginatedCall<R, Q = object | null>(

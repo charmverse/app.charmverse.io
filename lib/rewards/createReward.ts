@@ -1,15 +1,14 @@
 import type { Page, PagePermission, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { BoardFields } from '@root/lib/databases/board';
-import { NotFoundError } from '@root/lib/middleware';
 import { generatePagePathFromPathAndTitle } from '@root/lib/pages/utils';
 import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
 
 import type { RewardFields } from 'lib/rewards/blocks/interfaces';
-
-import { trackOpUserAction } from '../metrics/mixpanel/trackOpUserAction';
 
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';

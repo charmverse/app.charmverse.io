@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { refreshPaymentStatus } from '@root/lib/rewards/refreshPaymentStatus';
-import { DataNotFoundError } from '@root/lib/utils/errors';
 
 import type { TransactionCreationData } from './interface';
 

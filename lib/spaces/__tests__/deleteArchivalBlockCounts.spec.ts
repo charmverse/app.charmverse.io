@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { deleteArchivalBlockCounts } from '@root/lib/spaces/deleteArchivalBlockCounts';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('deleteArchivalBlockCounts', () => {
   it('should remove block count entries older than 7 days', async () => {

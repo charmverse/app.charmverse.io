@@ -1,15 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
-import { createMissingCards } from '@root/lib/databases/proposalsSource/createMissingCards';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { generateProposalSourceDb } from '@root/lib/testing/proposals';
 import { v4 } from 'uuid';
-
-import { generateBoard } from 'testing/setupDatabase';
-import { generateProposalSourceDb } from 'testing/utils/proposals';
 
 import type { IPropertyOption, IPropertyTemplate } from '../board';
 import type { BoardViewFields } from '../boardView';
 import { Constants } from '../constants';
 import { generateCsvContent, loadAndGenerateCsv } from '../generateCsv';
+import { createMissingCards } from '../proposalsSource/createMissingCards';
 
 import { generateTableArrayInput } from './cardStubs';
 

@@ -1,3 +1,4 @@
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import type { Upload } from 'lib/mux/getUpload';
 import { getUpload } from 'lib/mux/getUpload';
 import { canCreate } from 'lib/mux/permissions';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 export type UploadRequest = {
   pageId: string | null;

@@ -1,5 +1,5 @@
-import type { ISystemErrorInput } from 'lib/utils/errors';
-import { SystemError } from 'lib/utils/errors';
+import type { ISystemErrorInput } from '@packages/utils/errors';
+import { SystemError } from '@packages/utils/errors';
 
 export class FormError extends SystemError {
   // eslint-disable-next-line no-useless-constructor

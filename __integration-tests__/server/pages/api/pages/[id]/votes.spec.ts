@@ -1,7 +1,6 @@
 import { testUtilsPages, testUtilsUser, testUtilsVotes } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('GET /api/pages/{id}/votes - Get all the votes for a specific page', () => {
   it('should get votes of a page for the admin user and return it, responding with 200', async () => {

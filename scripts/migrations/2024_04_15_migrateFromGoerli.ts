@@ -1,7 +1,7 @@
 import { arrayUtils } from '@charmverse/core/utilities';
 import { PaymentMethod, TokenGate, prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from 'config/constants';
-import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
+import { lowerCaseEqual, prettyPrint } from '@packages/utils/strings';
 import { goerli, sepolia } from 'viem/chains';
 import { UnsignedTransaction } from '@lens-protocol/domain/entities';
 
@@ -30,7 +30,7 @@ async function migratePaymentMethods() {
 
 async function clearGoerliTokenGates() {
   const tokenGates = (await prisma.$queryRaw`SELECT id, conditions, "spaceId" FROM "TokenGate"
-  WHERE conditions::jsonb @> 
+  WHERE conditions::jsonb @>
       '{
           "accessControlConditions": [
               {

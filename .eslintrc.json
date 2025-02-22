@@ -78,15 +78,22 @@
         "packageDir": [
           "./",
           "../..",
-          "./@connect-shared",
           "./apps/cron/",
           "./apps/farcaster/",
           "./apps/sunnyawards/",
           "./apps/websockets/",
+          "./packages/aws/",
           "./packages/charmeditor/",
+          "./packages/connect-shared/",
+          "./packages/credentials/",
+          "./packages/farcaster/",
           "./packages/github/",
+          "./packages/metrics/",
+          "./packages/nextjs/",
           "./packages/testing/",
-          "./packages/utils/"
+          "./packages/users/",
+          "./packages/utils/",
+          "./packages/profile/"
         ]
       }
     ],

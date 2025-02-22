@@ -1,11 +1,10 @@
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { InvalidInputError } from '@root/lib/utils/errors';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateUser } from '@packages/testing/utils/users';
+import { InvalidInputError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generateUser } from 'testing/utils/users';
 
 import { addGuest } from '../addGuest';
 
@@ -15,7 +14,7 @@ beforeAll(async () => {
   space = generated.space;
 });
 
-jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
+jest.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
   trackUserAction: jest.fn()
 }));
 

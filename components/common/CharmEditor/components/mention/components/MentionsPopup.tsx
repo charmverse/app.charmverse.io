@@ -1,5 +1,6 @@
 import { MoreHoriz } from '@mui/icons-material';
 import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
+import { sanitizeForRegex } from '@packages/utils/strings';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -11,7 +12,6 @@ import { useRootPages } from 'hooks/useRootPages';
 import { useSearchPages } from 'hooks/useSearchPages';
 import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
-import { sanitizeForRegex } from 'lib/utils/strings';
 
 import { useEditorViewContext, usePluginState } from '../../@bangle.dev/react/hooks';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';

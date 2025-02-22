@@ -1,9 +1,9 @@
+import type { SignupCookieType } from '@packages/metrics/userAcquisition/interfaces';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
-import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { setCookie } from 'lib/utils/browser';
 
 // 2 weeks maximum age

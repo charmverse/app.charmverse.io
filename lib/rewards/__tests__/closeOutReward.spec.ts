@@ -1,8 +1,7 @@
 import type { Application, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-
-import { generateBounty } from 'testing/setupDatabase';
+import { generateBounty } from '@packages/testing/setupDatabase';
 
 import { closeOutReward } from '../closeOutReward';
 import type { Reward } from '../interfaces';

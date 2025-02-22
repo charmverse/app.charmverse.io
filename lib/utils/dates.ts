@@ -1,7 +1,6 @@
+import { capitalize } from '@packages/utils/strings';
 import type { DateTimeUnit as LuxonTimeUnit, DurationLikeObject } from 'luxon';
 import { Duration, DateTime } from 'luxon';
-
-import { capitalize } from './strings';
 
 export type DateInput = DateTime | Date | string | number;
 export type DateTimeFormat = 'relative' | 'absolute';

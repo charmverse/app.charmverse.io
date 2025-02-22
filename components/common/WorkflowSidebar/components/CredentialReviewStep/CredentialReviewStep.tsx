@@ -1,10 +1,10 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { Box, Stack } from '@mui/material';
+import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import dynamic from 'next/dynamic';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 
 import { CredentialRow } from './CredentialRow';
 

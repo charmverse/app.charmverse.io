@@ -1,12 +1,12 @@
-import type { ApiEventMap } from '@root/lib/metrics/mixpanel/interfaces/ApiEvent';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import type { ApiEventMap } from '@packages/metrics/mixpanel/interfaces/ApiEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from '@root/lib/middleware/requireApiPageKey';
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';
 
 import { logApiRequest } from '../handler';
 
-jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
+jest.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
   trackUserAction: jest.fn()
 }));
 

@@ -1,6 +1,5 @@
+import { generateTestOtpToken } from '@packages/testing/userOtp';
 import type { Locator, Page } from '@playwright/test';
-
-import { generateTestOtpToken } from 'testing/userOtp';
 
 import { SettingsModal } from './settings.po';
 

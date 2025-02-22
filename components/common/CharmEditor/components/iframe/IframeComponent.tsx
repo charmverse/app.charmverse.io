@@ -1,8 +1,8 @@
+import { isUrl } from '@packages/utils/strings';
 import { memo, useEffect, useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
 import { isPdfEmbedLink } from 'lib/pdf/extractPdfEmbedLink';
-import { isUrl } from 'lib/utils/strings';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';

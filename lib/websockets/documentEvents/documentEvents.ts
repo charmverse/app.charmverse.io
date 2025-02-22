@@ -1,6 +1,7 @@
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isUUID } from '@packages/utils/strings';
 import { STATIC_PAGES } from '@root/lib/features/constants';
 import { trashPages } from '@root/lib/pages/trashPages';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
@@ -11,7 +12,6 @@ import { extractMentions } from '@root/lib/prosemirror/extractMentions';
 import { extractPreviewImage } from '@root/lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
-import { isUUID } from '@root/lib/utils/strings';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@root/lib/webhookPublisher/publishEvent';
 import type { Socket } from 'socket.io';

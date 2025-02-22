@@ -10,8 +10,8 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { rewardCharmsForProposal } from '@root/lib/charms/triggers/rewardCharmsForProposal';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { createPage } from '@root/lib/pages/server/createPage';
 import { getProjectById } from '@root/lib/projects/getProjectById';
 import { createForm } from '@root/lib/proposals/forms/createForm';

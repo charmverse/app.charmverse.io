@@ -5,12 +5,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { capitalize } from '@packages/utils/strings';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
-import { capitalize } from 'lib/utils/strings';
 
 import type { FormValues } from './KYCSettings';
 

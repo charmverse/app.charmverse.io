@@ -1,6 +1,6 @@
 import type { Block, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { NotFoundError } from '@root/lib/middleware';
+import { NotFoundError } from '@packages/nextjs/errors';
 
 import { getRelationData } from './getRelationData';
 

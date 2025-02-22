@@ -1,4 +1,5 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { fancyTrim } from '@packages/utils/strings';
 import { Column } from '@react-email/column';
 import { Hr } from '@react-email/hr';
 import { Img } from '@react-email/img';
@@ -10,7 +11,6 @@ import { getNotificationMetadata } from '@root/lib/notifications/getNotification
 import type { Notification } from '@root/lib/notifications/interfaces';
 import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
 import { getFormattedDateTime } from '@root/lib/utils/dates';
-import { fancyTrim } from '@root/lib/utils/strings';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 

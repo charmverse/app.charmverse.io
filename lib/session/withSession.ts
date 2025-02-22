@@ -1,3 +1,4 @@
+import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
 import { getIronSession } from 'iron-session';
 import type {
   GetServerSidePropsContext,
@@ -6,8 +7,6 @@ import type {
   NextApiRequest,
   NextApiResponse
 } from 'next';
-
-import { getIronOptions } from './getIronOptions';
 
 // For API requests
 export function withSessionRoute(handler: NextApiHandler) {

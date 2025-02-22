@@ -1,5 +1,5 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
 import { Stack, Typography } from '@mui/material';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
 import Image from 'next/image';
 
 import { TwitterShareButton } from './components/TwitterShareButton';

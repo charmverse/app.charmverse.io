@@ -1,9 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
-import { InvalidStateError } from '@root/lib/middleware';
-
-import { generateFarcasterUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { generateFarcasterUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { connectFarcaster } from '../connectFarcaster';
 

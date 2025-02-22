@@ -1,14 +1,13 @@
 import type { Space, User, Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@root/config/constants';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
-
-import { generateSchema } from 'testing/publicApi/schemas';
-import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';
 

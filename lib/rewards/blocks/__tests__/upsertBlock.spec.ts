@@ -1,11 +1,10 @@
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import type { PropertyType } from '@root/lib/databases/board';
 import type { BoardViewFields } from '@root/lib/databases/boardView';
 import { getBlocks } from '@root/lib/rewards/blocks/getBlocks';
 import type { RewardBlockInput, RewardBlockUpdateInput } from '@root/lib/rewards/blocks/interfaces';
 import { upsertBlock } from '@root/lib/rewards/blocks/upsertBlock';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('reward blocks - updateBlock', () => {
   it('Should create board block', async () => {

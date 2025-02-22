@@ -52,9 +52,9 @@ runs:
       # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
       # try a few times
       run: |
-        npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }} \
-        || npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }} \
-        || npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w @connect-shared -w apps/{0}', inputs.app_name) || '' }}
+        npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w apps/{0}', inputs.app_name) || '' }} \
+        || npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w apps/{0}', inputs.app_name) || '' }} \
+        || npm ci --no-audit --no-fund --force ${{ inputs.app_name && format('--include-workspace-root -w apps/{0}', inputs.app_name) || '' }}
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}

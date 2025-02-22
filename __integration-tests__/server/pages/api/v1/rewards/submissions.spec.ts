@@ -1,15 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import {
+  generateBountyWithSingleApplication,
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
+} from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import { _ } from 'lib/prosemirror/builders';
 import { getUserProfile } from 'lib/public-api/searchUserProfile';
 import type { PublicApiSubmission } from 'pages/api/v1/rewards/submissions';
-import { baseUrl } from 'testing/mockApiCall';
-import {
-  generateBountyWithSingleApplication,
-  generateSpaceUser,
-  generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
 
 describe('GET /api/v1/rewards/submissions', () => {
   it('should return a list of submissions in the workspace', async () => {

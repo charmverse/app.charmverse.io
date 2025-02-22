@@ -4,6 +4,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { fancyTrim } from '@packages/utils/strings';
 import type { ComponentProps } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -14,7 +15,6 @@ import { Button } from 'components/common/Button';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { fancyTrim } from 'lib/utils/strings';
 
 type TestResult = {
   status?: 'loading' | 'error' | 'success' | 'token_gate_error';

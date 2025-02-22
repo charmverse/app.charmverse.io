@@ -1,9 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-import { InvalidStateError } from '@root/lib/middleware';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 
 import { updateProposal } from '../updateProposal';
 

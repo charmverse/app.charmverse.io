@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { staticSpaceTemplates } from 'lib/spaces/config';
 import { exportSpaceData } from 'lib/templates/exportSpaceData';
 import { writeToSameFolder } from 'lib/utils/file';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 
 async function refreshSpaceTemplates(selectedTemplates?: Array<(typeof staticSpaceTemplates)[number]['id']>) {
   for (const template of staticSpaceTemplates) {

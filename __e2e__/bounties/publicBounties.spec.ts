@@ -1,6 +1,6 @@
 // TODO: [bounties-cleanup]// import type { Space, User } from '@charmverse/core/prisma';
 
-// import { generateBounty, generateRole } from 'testing/setupDatabase';
+// import { generateBounty, generateRole } from '@packages/testing/setupDatabase';
 
 // import { generateUserAndSpace } from '../utils/mocks';
 // import { login } from '../utils/session';

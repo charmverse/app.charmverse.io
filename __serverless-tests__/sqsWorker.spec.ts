@@ -1,9 +1,9 @@
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
 
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('SERVERLESS SQS worker', () => {
   it('should sign payload and execute websocket', async () => {

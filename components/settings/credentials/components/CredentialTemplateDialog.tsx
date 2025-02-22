@@ -5,9 +5,9 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import { attestationSchemaIds } from '@packages/credentials/schemas/index';
 import { useState, type ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
-import { optimism } from 'viem/chains';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
@@ -15,7 +15,6 @@ import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { attestationSchemaIds } from 'lib/credentials/schemas';
 
 import { CredentialEventsSelector } from './CredentialEventsForm';
 import type { ProposalCredentialToPreview } from './ProposalCredentialPreview';

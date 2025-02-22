@@ -1,9 +1,9 @@
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Stack } from '@mui/material';
+import type { EASAttestationWithFavorite } from '@packages/credentials/external/getOnchainCredentials';
 import type { Dispatch, SetStateAction } from 'react';
 
 import { Button } from 'components/common/Button';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 import { UserAllCredentialsList, UserFavoriteList } from '../../UserCredentials/UserCredentialsList';
 
