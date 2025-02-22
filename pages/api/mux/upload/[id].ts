@@ -1,8 +1,9 @@
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser, ActionNotPermittedError } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { Upload } from 'lib/mux/getUpload';
 import { getUpload } from 'lib/mux/getUpload';
 import { canCreate } from 'lib/mux/permissions';

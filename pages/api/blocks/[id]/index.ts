@@ -1,6 +1,7 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError, ApiError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -10,7 +11,7 @@ import type { BoardFields } from 'lib/databases/board';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { applyPropertiesToCard } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardProperties';
-import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -13,7 +13,7 @@ export const loginWithWalletAction = actionClient
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const isValidSignin = await isValidEoaOrGnosisWalletSignature({
-      message: parsedInput.message as any,
+      message: parsedInput.message,
       signature: parsedInput.signature as `0x${string}`,
       address: parsedInput.address,
       domain: getDomain(process.env.DOMAIN as string)

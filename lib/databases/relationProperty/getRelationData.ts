@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidStateError, NotFoundError } from '@root/lib/middleware';
+import { InvalidStateError, NotFoundError } from '@packages/nextjs/errors';
 
 import type { BoardFields, IPropertyTemplate } from '../board';
 

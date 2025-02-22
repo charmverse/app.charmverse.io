@@ -1,5 +1,6 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError, NotFoundError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -8,7 +9,7 @@ import { prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { updateViews } from 'lib/databases/proposalsSource/updateViews';
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';

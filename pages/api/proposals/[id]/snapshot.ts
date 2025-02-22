@@ -1,10 +1,11 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { DataNotFoundError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireKeys, requireUser, ActionNotPermittedError } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPage } from 'lib/pages/server';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';

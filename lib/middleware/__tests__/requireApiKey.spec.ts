@@ -2,11 +2,11 @@ import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import type { Space, SpaceApiToken, SuperApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { InvalidApiKeyError } from '@packages/nextjs/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import type { NextApiRequest } from 'next';
 import { v4 } from 'uuid';
 
-import { InvalidApiKeyError } from '../errors';
 import { provisionApiKey, requireApiKey } from '../requireApiKey';
 
 let user: User;
