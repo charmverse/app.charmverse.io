@@ -3,7 +3,7 @@ import * as constants from '@root/lib/projects/formField';
 import { getFieldConfig } from '@root/lib/projects/formField';
 import { v4 } from 'uuid';
 
-import type { IPropertyTemplate } from '../board';
+import type { IPropertyTemplate } from '../../board';
 import { getBoardProperties } from '../getBoardProperties';
 
 describe('getBoardProperties', () => {

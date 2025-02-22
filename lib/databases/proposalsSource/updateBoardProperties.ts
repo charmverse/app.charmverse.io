@@ -6,7 +6,8 @@ import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
-import type { IPropertyTemplate, BoardFields } from './board';
+import type { IPropertyTemplate, BoardFields } from '../board';
+
 import { getBoardProperties } from './getBoardProperties';
 
 export async function updateBoardProperties({

@@ -19,6 +19,7 @@
     "@packages/blockchain": "^0.0.0",
     "@packages/connect-shared": "^0.0.0",
     "@packages/nextjs": "^0.0.0",
+    "@packages/profile": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@typeschema/yup": "^0.13.3",
     "framer-motion": "^11.5.4",

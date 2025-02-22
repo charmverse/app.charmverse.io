@@ -1,4 +1,4 @@
-import type { IViewType } from './boardView';
+import type { IViewType } from '../boardView';
 
 export const DEFAULT_BOARD_BLOCK_ID = '__defaultBoard';
 export const DEFAULT_VIEW_BLOCK_ID = '__defaultView';
