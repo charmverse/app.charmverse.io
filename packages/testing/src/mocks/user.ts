@@ -1,5 +1,5 @@
 import type { LoggedInUser } from '@packages/profile/getUser';
-import { deterministicRandomName } from '@root/lib/utils/randomName';
+import { deterministicRandomName } from '@packages/utils/randomName';
 import { v4 as uuid } from 'uuid';
 
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
