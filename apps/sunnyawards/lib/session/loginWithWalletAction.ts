@@ -26,7 +26,6 @@ export const loginWithWalletAction = actionClient
     const { user: loggedInUser } = await createOrGetUserFromWallet({
       address: parsedInput.address
     });
-
     ctx.session.anonymousUserId = undefined;
     ctx.session.user = { id: loggedInUser.id };
     await ctx.session.save();

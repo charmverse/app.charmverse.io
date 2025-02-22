@@ -1,9 +1,8 @@
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { InvalidInputError } from '@packages/utils/errors';
 import { createWalletClient, http, publicActions } from 'viem';
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts';
 import { optimismSepolia } from 'viem/chains';
-
-import { InvalidInputError } from '../../packages/utils/src/errors';
 
 export function getWalletClient({
   chainId,

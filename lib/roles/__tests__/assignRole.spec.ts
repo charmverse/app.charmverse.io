@@ -1,20 +1,15 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { InvalidStateError } from '@packages/nextjs/errors';
+import { ExpectedAnError } from '@packages/testing/errors';
 import {
   generateRole,
   generateSpaceUser,
   generateUserAndSpace,
   generateUserAndSpaceWithApiToken
 } from '@packages/testing/setupDatabase';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '@packages/utils/errors';
 import { assignRole, listRoleMembers } from '@root/lib/roles';
 import { v4 } from 'uuid';
-
-import { ExpectedAnError } from '../../../packages/testing/src/errors';
-import {
-  DataNotFoundError,
-  InsecureOperationError,
-  UndesirableOperationError
-} from '../../../packages/utils/src/errors';
 
 let user: User;
 let space: Space;

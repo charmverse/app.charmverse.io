@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { sessionUserRelations } from '@packages/profile/constants';
 import type { LoggedInUser } from '@packages/profile/getUser';
+import { getUserProfile } from '@packages/profile/getUser';
 import { InvalidInputError, MissingDataError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { v4 } from 'uuid';
-
-import { getUserProfile } from '../@packages/profile/getUser';
 
 let user: LoggedInUser;
 const walletAddress = `0x${v4()}`;

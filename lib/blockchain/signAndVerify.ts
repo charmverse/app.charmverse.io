@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { InvalidInputError } from '@packages/utils/errors';
 import { SiweMessage } from 'siwe';
 import { hashMessage, parseAbi } from 'viem';
-
-import { InvalidInputError } from '../../packages/utils/src/errors';
 
 import { getPublicClient } from './publicClient';
 
@@ -69,9 +68,7 @@ export async function verifyEIP1271Signature({
 }: SignatureVerificationPayloadWithAddress): Promise<boolean> {
   const chainId = message.chainId;
   const parsedMessage = new SiweMessage(message).toMessage();
-
   const messageHash = hashMessage(parsedMessage);
-
   const client = getPublicClient(chainId);
 
   const data = await client

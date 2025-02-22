@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/utils/errors';
 
-import { DataNotFoundError } from '../../packages/utils/src/errors';
 import type { AvailableResourcesRequest } from '../permissions/interfaces';
 
 import { rewardWithUsersInclude } from './getReward';
