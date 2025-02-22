@@ -1,5 +1,6 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError, InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,7 +8,7 @@ import { getUserDocusignOAuthTokenFromCode } from 'lib/docusign/authentication';
 import { decodeDocusignState } from 'lib/docusign/encodeAndDecodeDocusignState';
 import { getUserDocusignAccountsInfo } from 'lib/docusign/getUserDocusignAccountsInfo';
 import { setSpaceDocusignAccount } from 'lib/docusign/setSpaceDocusignAccount';
-import { ActionNotPermittedError, InvalidStateError, onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

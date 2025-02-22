@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { MultipleThreadsInput } from 'lib/threads';

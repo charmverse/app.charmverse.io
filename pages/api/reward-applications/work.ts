@@ -1,11 +1,12 @@
 import { prisma, type Application } from '@charmverse/core/prisma-client';
 import { findSpaceIssuableRewardCredentials } from '@packages/credentials/findIssuableRewardCredentials';
 import { getProposalOrApplicationCredentials } from '@packages/credentials/getProposalOrApplicationCredentials';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';

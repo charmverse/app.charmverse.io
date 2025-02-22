@@ -4,11 +4,11 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
 import type { SelectOptionType } from '@root/lib/proposals/forms/interfaces';
 import { generateProposal } from '@root/lib/testing/proposals';
 import { v4 as uuid } from 'uuid';
 
+import type { BoardFields, IPropertyTemplate } from '../../board';
 import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
 import { updateBoardProperties } from '../updateBoardProperties';
 

@@ -1,9 +1,9 @@
-import { Constants } from '@root/lib/databases/constants';
 import type { IntlShape } from 'react-intl';
 
 import type { Board, DataSourceType, IPropertyTemplate } from './board';
 import type { BoardView } from './boardView';
 import { createBoardView } from './boardView';
+import { Constants } from './constants';
 
 type CreateViewProps = {
   board: Board;

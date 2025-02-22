@@ -1,4 +1,5 @@
 import type { Post } from '@charmverse/core/prisma';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,7 @@ import type { CreateForumPostInput } from 'lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { publishForumPostEvents } from 'lib/notifications/publishForumPostEvents';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import type { PageContent } from 'lib/prosemirror/interfaces';

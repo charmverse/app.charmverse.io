@@ -1,12 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { PageComment } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { UpdatePostCommentInput } from 'lib/forums/comments/interface';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deletePageComment } from 'lib/pages/comments/deletePageComment';
 import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';

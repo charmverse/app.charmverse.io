@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { AdministratorOnlyError } from '@packages/users/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';

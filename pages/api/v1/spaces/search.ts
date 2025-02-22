@@ -1,6 +1,6 @@
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { InvalidStateError } from 'lib/middleware';
 import { superApiHandler } from 'lib/public-api/handler';
 import type { SpaceApiResponse } from 'lib/public-api/interfaces';
 import type { SearchSpacesInput } from 'lib/public-api/searchSpaces';

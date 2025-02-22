@@ -5,14 +5,14 @@ import { generateBoard, generateProposal, generateUserAndSpace } from '@packages
 import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { generateUser } from '@packages/testing/utils/users';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import { prismaToBlock } from '@root/lib/databases/block';
-import type { Board, IPropertyTemplate } from '@root/lib/databases/board';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import { generateProposalSourceDb } from '@root/lib/testing/proposals';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 
+import { prismaToBlock } from '../../block';
+import type { Board, IPropertyTemplate } from '../../board';
 import { getCardPropertiesFromProposals } from '../getCardProperties';
 
 describe('getCardPropertiesFromProposals', () => {

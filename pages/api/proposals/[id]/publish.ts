@@ -4,13 +4,14 @@ import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { issueProposalPublishedQualifyingEvent } from '@packages/credentials/reputation/issueProposalPublishedQualifyingEvent';
 import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { FieldAnswerInput, FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { optimismSepolia } from 'viem/chains';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalFields } from 'lib/proposals/interfaces';

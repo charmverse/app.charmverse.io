@@ -1,6 +1,5 @@
 import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
-import { sleep } from '@decent.xyz/box-common';
 
 type DecentTransactionStatus = {
   transaction: {
@@ -192,7 +191,9 @@ export async function waitForDecentTransactionSettlement({
       }
 
       // Add a small delay before retrying
-      await sleep(5000);
+      await new Promise((resolve) => {
+        setTimeout(resolve, 5000);
+      });
     } catch (error) {
       log.error('Error fetching status from decent', { error, sourceTxHashChainId, sourceTxHash });
       throw error;

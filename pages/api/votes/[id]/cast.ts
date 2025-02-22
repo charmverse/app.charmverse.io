@@ -1,11 +1,12 @@
 import type { UserVote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';

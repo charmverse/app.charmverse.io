@@ -2,11 +2,12 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from '@packages/metrics/postToDiscord';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';

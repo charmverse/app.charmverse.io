@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ApiError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { updateRole } from 'lib/roles/updateRole';
 import { withSessionRoute } from 'lib/session/withSession';

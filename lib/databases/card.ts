@@ -1,8 +1,9 @@
-import type { UIBlockWithDetails } from '@root/lib/databases/block';
-import { createBlock } from '@root/lib/databases/block';
 import type { ProposalWithUsersLite } from '@root/lib/proposals/getProposals';
 import type { ProposalEvaluationStatus } from '@root/lib/proposals/interfaces';
 import type { RewardType } from '@root/lib/rewards/interfaces';
+
+import { createBlock } from './block';
+import type { UIBlockWithDetails } from './block';
 
 export type CardPropertyValue = string | string[] | number;
 

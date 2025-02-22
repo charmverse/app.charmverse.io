@@ -1,11 +1,12 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/createForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
-import { requireKeys, InvalidStateError } from 'lib/middleware';
+import { requireKeys } from 'lib/middleware';
 import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';

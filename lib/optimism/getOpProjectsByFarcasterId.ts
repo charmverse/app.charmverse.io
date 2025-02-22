@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { OptimismProjectAttestation } from '@charmverse/core/prisma-client';
+import { isTruthy } from '@packages/utils/types';
 
-import type { FarcasterUser } from '../farcaster/getFarcasterUsers';
-import { getFarcasterUsers } from '../farcaster/getFarcasterUsers';
-import { isTruthy } from '../utils/types';
+import type { FarcasterUser } from 'lib/farcaster/getFarcasterUsers';
+import { getFarcasterUsers } from 'lib/farcaster/getFarcasterUsers';
 
 import type { OptimismProjectMetadata } from './storeOptimismProjectAttestations';
 

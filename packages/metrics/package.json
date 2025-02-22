@@ -8,7 +8,7 @@
   },
   "exports": {
     "./*": "./src/*.ts",
-    ".": "./src/index.ts"
+    ".": "./src/metrics.ts"
   },
   "dependencies": {
     "@packages/utils": "^1.0.0"

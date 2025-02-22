@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { CreateCommentInput } from 'lib/comments';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';

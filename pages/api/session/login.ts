@@ -5,6 +5,7 @@ import {
   trackOpSpaceSuccessfulSigninEvent
 } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { sessionUserRelations } from '@packages/profile/constants';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { DisabledAccountError } from '@packages/utils/errors';
@@ -14,7 +15,7 @@ import nc from 'next-connect';
 import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
-import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
 

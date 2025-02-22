@@ -7,13 +7,14 @@ import type {
 } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { updateTrackPageProfile } from '@packages/metrics/mixpanel/updateTrackPageProfile';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { DataNotFoundError } from '@packages/utils/errors';
 import { isValidEmail } from '@packages/utils/strings';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { sendPageInviteEmail } from 'lib/mailer/sendPageInviteEmail';
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { addGuest } from 'lib/roles/addGuest';

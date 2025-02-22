@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { createWalletClient, http, publicActions } from 'viem';
 import { mnemonicToAccount, privateKeyToAccount } from 'viem/accounts';
 
-import { getChainById } from './chains';
+import { getChainById } from './connectors/chains';
 
 export function getWalletClient({
   chainId,

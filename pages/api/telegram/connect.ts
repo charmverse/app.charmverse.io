@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import type { TelegramUser } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, InvalidStateError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TelegramAccount } from 'lib/telegram/interfaces';
 

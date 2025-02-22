@@ -1,9 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, requireUser, onError, onNoMatch } from 'lib/middleware';
+import { requireUser, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getOrCreateReviewerNotes } from 'lib/proposals/getOrCreateReviewerNotes';
 import { withSessionRoute } from 'lib/session/withSession';

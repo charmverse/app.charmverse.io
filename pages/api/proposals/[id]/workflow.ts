@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { AdministratorOnlyError } from '@packages/users/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyProposalWorkflow } from 'lib/proposals/applyProposalWorkflow';
 import type { UpdateWorkflowRequest } from 'lib/proposals/applyProposalWorkflow';

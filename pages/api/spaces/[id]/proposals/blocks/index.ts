@@ -1,10 +1,11 @@
 import { UserIsNotSpaceMemberError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { NotFoundError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { NotFoundError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/proposals/blocks/deleteBlocks';
 import { getBlocks } from 'lib/proposals/blocks/getBlocks';
 import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from 'lib/proposals/blocks/interfaces';

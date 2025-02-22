@@ -1,11 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { IssuableProposalCredentialSpace } from '@packages/credentials/findIssuableProposalCredentials';
 
-import type { BlockWithDetails } from 'lib/databases/block';
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getProposalTemplates } from 'lib/proposals/getProposalTemplates';
+
+import type { BlockWithDetails } from '../block';
+import type { BoardFields, IPropertyTemplate } from '../board';
 
 import { applyPropertiesToCardsAndFilter } from './applyPropertiesToCards';
 import { createMissingCards } from './createMissingCards';

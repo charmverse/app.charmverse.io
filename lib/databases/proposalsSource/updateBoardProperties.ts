@@ -1,12 +1,12 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { InvalidStateError } from '@packages/nextjs/errors';
-import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/proposals/blocks/constants';
 import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
+import type { IPropertyTemplate, BoardFields } from './board';
 import { getBoardProperties } from './getBoardProperties';
 
 export async function updateBoardProperties({

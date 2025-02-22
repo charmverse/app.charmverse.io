@@ -4,13 +4,14 @@ import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from '@packages/metrics/mixpanel/updateTrackPageProfile';
+import { ActionNotPermittedError, NotFoundError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UndesirableOperationError } from '@packages/utils/errors';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { TrashOrDeletePageResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
