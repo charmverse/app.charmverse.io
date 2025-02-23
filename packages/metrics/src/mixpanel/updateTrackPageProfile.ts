@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
-import { getPage } from '@root/lib/pages/server';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { mixpanel, GroupKeys } from './mixpanel';
 
@@ -10,7 +10,14 @@ type PageFields = Pick<Page, 'createdAt' | 'title' | 'type' | 'deletedAt' | 'spa
 
 export async function updateTrackPageProfile(pageId: string) {
   try {
-    const page = await getPage(pageId);
+    const page = await prisma.page.findUnique({
+      where: {
+        id: pageId
+      },
+      include: {
+        permissions: true
+      }
+    });
 
     if (page) {
       mixpanel?.groups.set(GroupKeys.PageId, page.id, getTrackPageProfile(page));

@@ -20,7 +20,7 @@ import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertPropo
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import { v4 as uuid } from 'uuid';
 
-import { generatePagePathFromPathAndTitle } from '../pages/utils';
+import { generatePagePathFromPathAndTitle } from '../../packages/pages/src/utils';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getProposalErrors } from './getProposalErrors';

@@ -37,7 +37,6 @@ import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updat
 import { provisionApiKey } from '@root/lib/middleware/requireApiKey';
 import type { NotificationToggles } from '@root/lib/notifications/notificationToggles';
 import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
-import { getPagePath } from '@root/lib/pages/utils';
 import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from '@root/lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
 import { emptyDocument } from '@root/lib/prosemirror/constants';
@@ -415,7 +414,7 @@ export async function generateBounty({
             createdBy,
             contentText,
             content: content ?? undefined,
-            path: getPagePath(),
+            path: `page-${Math.random().toString()}`,
             title: title || 'Root',
             type,
             updatedBy: createdBy,

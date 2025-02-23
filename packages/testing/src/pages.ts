@@ -1,19 +1,17 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
-import { getPagePath } from '@root/lib/pages/utils';
 import { v4 } from 'uuid';
 
 export function createPage(
   options: Partial<Page> &
     Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
 ): Promise<PageWithPermissions> {
-  return createPageDb({
+  return prisma.page.create({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
-      path: options.path ?? getPagePath(),
+      path: options.path ?? `page-${Math.random().toString()}`,
       title: options.title || 'Example',
       type: options.type ?? 'page',
       updatedBy: options.createdBy,

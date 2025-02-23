@@ -1,5 +1,5 @@
 import { Feature, prisma } from '@charmverse/core/prisma-client';
-import { STATIC_PAGES } from 'lib/features/constants';
+import { STATIC_PAGES } from '@packages/features/constants';
 import { memberProfileNames } from '@packages/profile/memberProfiles';
 
 async function moveHiddenFeatures() {

@@ -1,5 +1,4 @@
-import type { CreatePostCommentInput } from '@root/lib/forums/comments/interface';
-import { createPageComment } from '@root/lib/pages/comments/createPageComment';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { createPage } from '../setupDatabase';
@@ -20,7 +19,7 @@ export async function generatePageWithComment(
   },
   commentInputData?: CommentInput
 ) {
-  const commentInput: CreatePostCommentInput = commentInputData ?? {
+  const commentInput = commentInputData ?? {
     content: {
       type: ''
     },
@@ -33,10 +32,20 @@ export async function generatePageWithComment(
     createdBy: userId
   });
 
-  const postComment = await createPageComment({
-    ...commentInput,
-    pageId: page.id,
-    userId
+  const postComment = await prisma.pageComment.create({
+    data: {
+      ...commentInput,
+      user: {
+        connect: {
+          id: userId
+        }
+      },
+      page: {
+        connect: {
+          id: page.id
+        }
+      }
+    }
   });
 
   return {

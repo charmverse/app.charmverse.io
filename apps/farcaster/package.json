@@ -16,6 +16,7 @@
     "@packages/charmeditor": "^1.0.0",
     "@packages/connect-shared": "^0.0.0",
     "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
     "@typeschema/yup": "^0.13.3",
     "next-safe-action": "~7.4.2"
   }

@@ -14,7 +14,7 @@ import mutator from 'components/common/DatabaseEditor/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 
-import { getPagePath } from './utils';
+import { getPagePath } from '../../packages/pages/src/utils';
 
 export type NewPageInput = Partial<Page> & {
   spaceId: string;

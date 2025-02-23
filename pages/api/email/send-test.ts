@@ -1,5 +1,6 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { FeatureJson } from '@packages/features/constants';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { isValidEmail } from '@packages/utils/strings';
 import { charmBlue as blueColor } from '@root/config/colors';
@@ -7,7 +8,6 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
 
-import type { FeatureJson } from 'lib/features/constants';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
 import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';

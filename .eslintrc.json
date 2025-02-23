@@ -90,6 +90,7 @@
           "./packages/github/",
           "./packages/metrics/",
           "./packages/nextjs/",
+          "./packages/pages/",
           "./packages/testing/",
           "./packages/users/",
           "./packages/utils/",

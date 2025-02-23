@@ -1,4 +1,5 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { getPagePath } from '@packages/pages/utils';
 import { randomName } from '@packages/utils/randomName';
 import { charmBlue as blueColor } from '@root/config/colors';
 import nc from 'next-connect';
@@ -14,7 +15,6 @@ import type {
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
-import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 import type { VoteTask } from 'lib/votes/interfaces';
 

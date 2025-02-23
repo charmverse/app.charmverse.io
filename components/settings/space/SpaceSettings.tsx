@@ -1,6 +1,7 @@
 import type { IdentityType, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormHelperText, Grid, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import type { Feature } from '@packages/features/constants';
 import type { MemberProfileJson, MemberProfileName } from '@packages/profile/memberProfiles';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
@@ -26,7 +27,6 @@ import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
-import type { Feature } from 'lib/features/constants';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';

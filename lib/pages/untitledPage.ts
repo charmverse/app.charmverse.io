@@ -1,5 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
-import { getPagePath } from '@root/lib/pages/utils';
+import { getPagePath } from '@packages/pages/utils';
 
 export function untitledPage({ userId, spaceId }: { userId: string; spaceId: string }): Partial<Page> {
   return {

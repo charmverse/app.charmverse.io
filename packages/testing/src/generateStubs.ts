@@ -2,7 +2,6 @@ import type { PageNode } from '@charmverse/core/pages';
 import type { Application, Page } from '@charmverse/core/prisma';
 import { randomETHWalletAddress as _randomETHWalletAddress } from '@packages/utils/blockchain';
 import type { RequiredNotNull } from '@packages/utils/types';
-import { getPagePath } from '@root/lib/pages/utils';
 import { v4 } from 'uuid';
 
 export function generatePageToCreateStub({
@@ -18,7 +17,7 @@ export function generatePageToCreateStub({
     id,
     createdBy: userId,
     contentText: '',
-    path: getPagePath(),
+    path: `page-${Math.random().toString()}`,
     title: title || 'Root',
     type: type ?? 'page',
     updatedBy: userId,

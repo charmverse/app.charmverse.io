@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
+import { STATIC_PAGES } from '@packages/features/constants';
 import { memberProfileNames } from '@packages/profile/memberProfiles';
-import { STATIC_PAGES } from '@root/lib/features/constants';
 import { v4 as uuid } from 'uuid';
 
 export const createMockSpace = (space?: Partial<Space>): Space => {

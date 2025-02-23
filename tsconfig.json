@@ -37,6 +37,7 @@
       "@packages/credentials/*": ["./packages/credentials/src/*"],
       "@packages/metrics/*": ["./packages/metrics/src/*"],
       "@packages/metrics": ["./packages/metrics/src/metrics.ts"],
+      "@packages/pages/*": ["./packages/pages/src/*"],
       "@packages/profile/*": ["./packages/profile/src/*"],
       "@packages/profile": ["./packages/profile/src/index.ts"],
       "@packages/users/*": ["./packages/users/src/*"],

@@ -1,7 +1,7 @@
 import type { Page, Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getPagePath } from '@packages/pages/utils';
 import { createPage } from '@root/lib/pages/server/createPage';
-import { getPagePath } from '@root/lib/pages/utils';
 import type { BoardPropertyValue } from '@root/lib/public-api';
 import { v4 } from 'uuid';
 

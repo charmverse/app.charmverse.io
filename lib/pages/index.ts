@@ -1,2 +1,2 @@
 export * from './interfaces';
-export * from './utils';
+export * from '../../packages/pages/src/utils';

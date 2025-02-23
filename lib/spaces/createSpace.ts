@@ -2,9 +2,9 @@ import path from 'node:path';
 
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@packages/features/constants';
 import { logSpaceCreation } from '@packages/metrics/postToDiscord';
 import { memberProfileNames } from '@packages/profile/memberProfiles';
-import { STATIC_PAGES } from '@root/lib/features/constants';
 import { generateDefaultPostCategories } from '@root/lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from '@root/lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from '@root/lib/members/generateDefaultPropertiesInput';

@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getPagePath } from '@packages/pages/utils';
 import { InvalidInputError } from '@packages/utils/errors';
 import { prismaToUIBlock } from '@root/lib/databases/block';
 import { createPage } from '@root/lib/pages/server/createPage';
-import { getPagePath } from '@root/lib/pages/utils';
 import { emptyDocument } from '@root/lib/prosemirror/constants';
 import { getMarkdownText } from '@root/lib/prosemirror/getMarkdownText';
 import { parseMarkdown } from '@root/lib/prosemirror/markdown/parseMarkdown';

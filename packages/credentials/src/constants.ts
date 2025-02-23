@@ -1,6 +1,6 @@
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
+import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
 import { isDevEnv, isStagingEnv, isTestEnv } from '@packages/utils/constants';
-import type { FeatureTitleVariation } from '@root/lib/features/getFeatureTitle';
 import { optimism, optimismSepolia } from 'viem/chains';
 
 // Labels require a mapper to rename features based on the space's settings

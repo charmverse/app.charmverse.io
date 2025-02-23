@@ -8,9 +8,9 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getFeatureTitle } from '@packages/features/getFeatureTitle';
+import { getPagePermalink } from '@packages/pages/getPagePermalink';
 import { lowerCaseEqual } from '@packages/utils/strings';
-import { getFeatureTitle } from '@root/lib/features/getFeatureTitle';
-import { getPagePermalink } from '@root/lib/pages/getPagePermalink';
 
 import { credentialEventLabels } from './constants';
 import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';

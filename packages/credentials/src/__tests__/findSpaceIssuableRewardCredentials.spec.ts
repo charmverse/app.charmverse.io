@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsCredentials } from '@charmverse/core/test';
+import { getSubmissionPagePermalink } from '@packages/pages/getPagePermalink';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import {
   generateBounty,
@@ -8,7 +9,6 @@ import {
 } from '@packages/testing/setupDatabase';
 import { randomETHWallet } from '@packages/utils/blockchain';
 import { pseudoRandomHexString } from '@packages/utils/random';
-import { getSubmissionPagePermalink } from '@root/lib/pages/getPagePermalink';
 import { v4 as uuid } from 'uuid';
 
 import { rewardSubmissionApprovedVerb } from '../constants';

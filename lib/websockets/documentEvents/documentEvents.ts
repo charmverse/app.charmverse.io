@@ -1,8 +1,8 @@
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { STATIC_PAGES } from '@packages/features/constants';
 import { isUUID } from '@packages/utils/strings';
-import { STATIC_PAGES } from '@root/lib/features/constants';
 import { trashPages } from '@root/lib/pages/trashPages';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { applyStepsToNode } from '@root/lib/prosemirror/applyStepsToNode';
