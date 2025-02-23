@@ -11,7 +11,7 @@ import { v4 } from 'uuid';
 
 const collablandApiUrl = 'https://fakedomain.com';
 
-jest.mock('config/constants', () => ({
+jest.mock('@packages/utils/constants', () => ({
   authSecret: 'testsecret1234567890',
   isTestEnv: true
 }));

@@ -33,7 +33,7 @@ const jestConfig = {
   moduleNameMapper: {
     // map SVG to something that Jest can read - could be used for other extensions as well?
     // source: https://github.com/vercel/next.js/discussions/42535#discussioncomment-4828013
-    '^.+\\.(svg)$': require.resolve('./testing/fileMock.js')
+    '^.+\\.(svg)$': require.resolve('@packages/testing/fileMock.js')
   }
 };
 

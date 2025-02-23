@@ -8,7 +8,7 @@ import { v4 } from 'uuid';
 
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 
-jest.mock('lib/profile/getSummonProfile', () => ({
+jest.mock('@packages/profile/getSummonProfile', () => ({
   getSummonProfile: jest.fn().mockResolvedValue(null)
 }));
 

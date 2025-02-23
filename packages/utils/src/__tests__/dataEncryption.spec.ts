@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 
 import { decryptData, encryptData } from '../dataEncryption';
 
-jest.mock('config/constants', () => ({
+jest.mock('@packages/utils/constants', () => ({
   authSecret: 'testsecret1234567890'
 }));
 

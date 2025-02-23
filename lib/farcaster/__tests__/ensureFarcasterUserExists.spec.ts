@@ -13,7 +13,7 @@ import { getFarcasterUsers } from '../getFarcasterUsers';
 jest.mock('../getFarcasterUsers');
 jest.mock('@packages/utils/strings');
 jest.mock('@packages/utils/blockchain');
-jest.mock('lib/profile/isProfilePathAvailable');
+jest.mock('@packages/profile/isProfilePathAvailable');
 
 describe('ensureFarcasterUserExists', () => {
   it('should return existing Farcaster user if already in the database', async () => {
