@@ -3,6 +3,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { actionClient } from '@packages/nextjs/actions/actionClient';
 import { isValidEoaOrGnosisWalletSignature } from '@root/lib/blockchain/signAndVerify';
+import { SiweMessage } from 'siwe';
 
 import { authSchema } from '../blockchain/config';
 
@@ -13,7 +14,7 @@ export const loginWithWalletAction = actionClient
   .schema(authSchema)
   .action(async ({ ctx, parsedInput }) => {
     const isValidSignin = await isValidEoaOrGnosisWalletSignature({
-      message: parsedInput.message,
+      message: new SiweMessage(parsedInput.message),
       signature: parsedInput.signature as `0x${string}`,
       address: parsedInput.address,
       domain: getDomain(process.env.DOMAIN as string)

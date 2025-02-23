@@ -6,7 +6,7 @@ import { hashMessage, parseAbi } from 'viem';
 import { getPublicClient } from './publicClient';
 
 export type SignatureVerificationPayload = {
-  message: string; // SiweMessage;
+  message: SiweMessage;
   signature: `0x${string}`;
 };
 
