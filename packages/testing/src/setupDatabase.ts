@@ -33,7 +33,6 @@ import { uid } from '@packages/utils/strings';
 import { typedKeys } from '@packages/utils/types';
 import type { DataSourceType } from '@root/lib/databases/board';
 import type { IViewType } from '@root/lib/databases/boardView';
-import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updateBoardProperties';
 import type { NotificationToggles } from '@root/lib/notifications/notificationToggles';
 import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from '@root/lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
@@ -1073,10 +1072,8 @@ export async function generateBoard({
   linkedSourceId,
   customProps,
   deletedAt,
-  permissions,
-  selectedProperties
+  permissions
 }: {
-  selectedProperties?: SelectedProposalProperties;
   createdBy: string;
   spaceId: string;
   cardCount?: number;
@@ -1156,13 +1153,6 @@ export async function generateBoard({
     ),
     permissionsToCreate
   ]).then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
-
-  if (selectedProperties) {
-    await updateBoardProperties({
-      boardId: createdBoard.id,
-      selectedProperties
-    });
-  }
 
   return createdBoard;
 }

@@ -13,6 +13,7 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 
 let adminSpace: Space;
 
@@ -562,7 +563,10 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       createdBy: admin.id,
       spaceId: space.id,
       viewDataSource: 'proposals',
-      cardCount: 0,
+      cardCount: 0
+    });
+    await updateBoardProperties({
+      boardId: proposalsDatabase.id,
       selectedProperties: {
         defaults: ['proposalStep', 'proposalEvaluationType'],
         customProperties: [],

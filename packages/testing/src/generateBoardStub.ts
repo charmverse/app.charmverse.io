@@ -3,11 +3,13 @@ import { typedKeys } from '@packages/utils/types';
 import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from '@root/lib/databases/board';
 import type { BoardViewFields, IViewType } from '@root/lib/databases/boardView';
 import type { CardFields } from '@root/lib/databases/card';
-import { Constants } from '@root/lib/databases/constants';
+// import { Constants } from '@root/lib/databases/constants';
 import type { RelatedPageData } from '@root/lib/templates/exportWorkspacePages';
 import { v4 } from 'uuid';
 
 import { pageContentStub } from './generatePageStub';
+
+const titleColumnId = '__title';
 
 export type CustomBoardProps = {
   propertyTemplates: (Omit<IPropertyTemplate, 'options'> & { options?: IPropertyOption[] | undefined })[];
@@ -94,8 +96,8 @@ export function boardWithCardsArgs({
         updatedBy: createdBy,
         title:
           (Array.isArray(customProps?.cardPropertyValues)
-            ? customProps?.cardPropertyValues[0]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'Beer to Web3',
+            ? customProps?.cardPropertyValues[0]?.[titleColumnId]
+            : customProps?.cardPropertyValues?.[titleColumnId]) ?? 'Beer to Web3',
         content: {
           type: 'doc',
           content: [
@@ -158,8 +160,8 @@ export function boardWithCardsArgs({
         updatedBy: createdBy,
         title:
           (Array.isArray(customProps?.cardPropertyValues)
-            ? customProps?.cardPropertyValues[1]?.[Constants.titleColumnId]
-            : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? 'How to web3 in Uni?',
+            ? customProps?.cardPropertyValues[1]?.[titleColumnId]
+            : customProps?.cardPropertyValues?.[titleColumnId]) ?? 'How to web3 in Uni?',
         content: {
           type: 'doc',
           content: [
@@ -292,8 +294,8 @@ export function boardWithCardsArgs({
   for (let i = 2; i < cardCount; i++) {
     const title =
       (Array.isArray(customProps?.cardPropertyValues)
-        ? customProps?.cardPropertyValues[i]?.[Constants.titleColumnId]
-        : customProps?.cardPropertyValues?.[Constants.titleColumnId]) ?? cardPages[i % 2 === 0 ? 0 : 1].title;
+        ? customProps?.cardPropertyValues[i]?.[titleColumnId]
+        : customProps?.cardPropertyValues?.[titleColumnId]) ?? cardPages[i % 2 === 0 ? 0 : 1].title;
 
     if (i % 2 === 0) {
       cardPages.push({ ...cardPages[0], createdAt: new Date().toISOString(), id: cardIds[i] || v4(), title });
