@@ -720,7 +720,7 @@ export function createPage(
   options: Partial<Page> &
     Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
 ): Promise<PageWithPermissions> {
-  return createPageDb({
+  return prisma.page.create({
     data: {
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
@@ -765,7 +765,7 @@ export function createPage(
         }
       }
     }
-  }) as Promise<PageWithPermissions>;
+  }) as unknown as Promise<PageWithPermissions>;
 }
 
 export async function createVote({
@@ -1154,7 +1154,7 @@ export async function createPost(
       title: options.title || 'New Forum Post',
       content: options.content || {},
       contentText: options.contentText || 'Some text in the forum',
-      path: options.path || getPagePath(),
+      path: options.path || `page-${Math.random().toString()}`,
       categoryId: options.categoryId,
       createdBy: options.createdBy,
       spaceId: options.spaceId || v4(),
