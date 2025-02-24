@@ -34,13 +34,9 @@ import { typedKeys } from '@packages/utils/types';
 import type { DataSourceType } from '@root/lib/databases/board';
 import type { IViewType } from '@root/lib/databases/boardView';
 import { updateBoardProperties } from '@root/lib/databases/proposalsSource/updateBoardProperties';
-import { provisionApiKey } from '@root/lib/middleware/requireApiKey';
 import type { NotificationToggles } from '@root/lib/notifications/notificationToggles';
-import { createPage as createPageDb } from '@root/lib/pages/server/createPage';
 import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from '@root/lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
-import { emptyDocument } from '@root/lib/prosemirror/constants';
-import { getRewardOrThrow } from '@root/lib/rewards/getReward';
 import type { RewardWithUsers } from '@root/lib/rewards/interfaces';
 import { v4 as uuid, v4 } from 'uuid';
 
@@ -178,8 +174,16 @@ export async function generateUserAndSpaceWithApiToken(
       }
     });
   }
-
-  const apiToken = (space as any).apiToken ?? (await provisionApiKey(space.id));
+  const apiToken = await prisma.spaceApiToken.create({
+    data: {
+      token: crypto.randomBytes(160 / 8).toString('hex'),
+      space: {
+        connect: {
+          id: space.id
+        }
+      }
+    }
+  });
 
   return {
     user,
@@ -440,7 +444,43 @@ export async function generateBounty({
     })
   ]);
 
-  return getRewardOrThrow({ rewardId });
+  return prisma.bounty.findUniqueOrThrow({
+    where: { id: rewardId },
+    include: {
+      applications: {
+        select: {
+          id: true,
+          createdBy: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          walletAddress: true
+        }
+      },
+      permissions: {
+        select: {
+          userId: true,
+          roleId: true,
+          permissionLevel: true
+        }
+      },
+      page: {
+        select: {
+          lensPostLink: true
+        }
+      },
+      proposal: {
+        select: {
+          page: {
+            select: {
+              id: true,
+              title: true
+            }
+          }
+        }
+      }
+    }
+  });
 }
 
 export async function generateComment({
@@ -964,47 +1004,42 @@ export async function generateProposal({
   title?: string;
 }): Promise<PageWithProposal> {
   const proposalId = v4();
-
-  const result = await createPageDb({
+  await prisma.proposal.create({
     data: {
       id: proposalId,
-      contentText: '',
-      content: {
-        type: 'doc',
-        content: []
-      },
-      path: `path-${v4()}`,
-      title,
-      type: pageType,
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      updatedBy: userId,
+      createdBy: userId,
+      status: proposalStatus,
       space: {
         connect: {
           id: spaceId
         }
       },
-      deletedAt,
-      proposal: {
-        create: {
-          id: proposalId,
-          createdBy: userId,
-          status: proposalStatus,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          authors: {
-            createMany: {
-              data: authors.map((authorId) => ({ userId: authorId }))
-            }
-          }
+      authors: {
+        createMany: {
+          data: authors.map((authorId) => ({ userId: authorId }))
         }
       }
+    }
+  });
+  await createPage({
+    id: proposalId,
+    contentText: '',
+    content: {
+      type: 'doc',
+      content: []
+    },
+    proposalId,
+    path: `path-${v4()}`,
+    title,
+    type: pageType,
+    createdBy: userId,
+    updatedBy: userId,
+    spaceId,
+    deletedAt
+  });
+  const result = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: proposalId
     },
     include: {
       proposal: {
@@ -1105,18 +1140,31 @@ export async function generateBoard({
     data: permissionCreateArgs as any
   });
 
-  const proposalsDatabase = await prisma
-    .$transaction([prisma.block.createMany(blockArgs), ...pageArgs.map((p) => createPageDb(p)), permissionsToCreate])
-    .then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
+  const createdBoard = await Promise.all([
+    prisma.block.createMany(blockArgs),
+    ...pageArgs.map((p) =>
+      createPage({
+        ...p.data,
+        additionalPaths: [],
+        content: p.data.content as Prisma.JsonValue,
+        createdAt: typeof p.data.createdAt === 'string' ? new Date(p.data.createdAt) : p.data.createdAt,
+        updatedAt: typeof p.data.updatedAt === 'string' ? new Date(p.data.updatedAt) : p.data.updatedAt,
+        deletedAt: typeof p.data.deletedAt === 'string' ? new Date(p.data.deletedAt) : p.data.deletedAt,
+        createdBy: p.data.author!.connect!.id!,
+        spaceId: p.data.space!.connect!.id!
+      })
+    ),
+    permissionsToCreate
+  ]).then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
 
   if (selectedProperties) {
     await updateBoardProperties({
-      boardId: proposalsDatabase.id,
+      boardId: createdBoard.id,
       selectedProperties
     });
   }
 
-  return proposalsDatabase;
+  return createdBoard;
 }
 
 export async function generateForumComment({
@@ -1166,6 +1214,15 @@ export async function createPost(
 }
 
 export async function generatePageComment({ createdBy, pageId }: { createdBy: string; pageId: string }) {
+  const emptyDocument = {
+    type: 'doc',
+    content: [
+      {
+        type: 'paragraph'
+      }
+    ]
+  };
+
   return prisma.pageComment.create({
     data: {
       content: emptyDocument,
