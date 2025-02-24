@@ -86,6 +86,7 @@
           "./packages/charmeditor/",
           "./packages/connect-shared/",
           "./packages/credentials/",
+          "./packages/features/",
           "./packages/farcaster/",
           "./packages/github/",
           "./packages/metrics/",

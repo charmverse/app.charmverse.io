@@ -725,7 +725,7 @@ export function createPage(
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
       index: options.index,
-      path: options.path ?? getPagePath(),
+      path: options.path ?? `page-${Math.random().toString()}`,
       title: options.title || 'Example',
       type: options.type ?? 'page',
       updatedBy: options.createdBy,

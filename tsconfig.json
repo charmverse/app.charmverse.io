@@ -35,6 +35,7 @@
       "@packages/connect-shared/*": ["./packages/connect-shared/src/*"],
       "@packages/blockchain/*": ["./packages/blockchain/src/*"],
       "@packages/credentials/*": ["./packages/credentials/src/*"],
+      "@packages/features/*": ["./packages/features/src/*"],
       "@packages/metrics/*": ["./packages/metrics/src/*"],
       "@packages/metrics": ["./packages/metrics/src/metrics.ts"],
       "@packages/pages/*": ["./packages/pages/src/*"],
