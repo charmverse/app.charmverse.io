@@ -1,19 +1,19 @@
 import { log } from '@charmverse/core/log';
 import type { Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackPageProfile } from '@packages/metrics/mixpanel/updateTrackPageProfile';
+import { logFirstUserPageCreation, logFirstWorkspacePageCreation } from '@packages/metrics/postToDiscord';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
-import { logFirstUserPageCreation, logFirstWorkspacePageCreation } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
 import { PageNotFoundError } from 'lib/pages/server/errors';
 import { getPage } from 'lib/pages/server/getPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

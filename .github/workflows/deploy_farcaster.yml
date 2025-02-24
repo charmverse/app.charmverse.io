@@ -12,11 +12,12 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/farcaster/**'
-      - '@connect-shared/**'
+      - '@packages/connect-shared/**'
       - 'adapters/**'
       - 'config/**'
       - 'hooks/**'
       - 'lib/**'
+      - 'packages/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
@@ -29,11 +30,12 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'apps/farcaster/**'
-      - '@connect-shared/**'
+      - '@packages/connect-shared/**'
       - 'adapters/**'
       - 'config/**'
       - 'hooks/**'
       - 'lib/**'
+      - 'packages/**'
 
 concurrency:
   group: farcaster-prd-${{ github.event_name }}-${{ github.ref }}

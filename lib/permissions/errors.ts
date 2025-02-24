@@ -1,4 +1,4 @@
-import { SystemError } from '@root/lib/utils/errors';
+import { SystemError } from '@packages/utils/errors';
 
 import type { AssignablePermissionGroups, AssignablePermissionGroupsWithPublic } from './interfaces';
 

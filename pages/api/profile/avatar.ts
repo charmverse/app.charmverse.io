@@ -1,11 +1,11 @@
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { updateProfileAvatar } from '@packages/profile/updateProfileAvatar';
+import type { UserAvatar } from '@packages/users/interfaces';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { updateProfileAvatar } from 'lib/profile/updateProfileAvatar';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { UserAvatar } from 'lib/users/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

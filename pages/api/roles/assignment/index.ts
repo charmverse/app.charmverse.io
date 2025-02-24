@@ -1,16 +1,16 @@
 import type { SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole, unassignRole } from 'lib/roles';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

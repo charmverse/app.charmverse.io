@@ -2,6 +2,8 @@ import { log } from '@charmverse/core/log';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import { Stack, Typography } from '@mui/material';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import * as http from '@root/adapters/http';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -13,8 +15,6 @@ import { useCreateFarcasterSigner } from 'charmClient/hooks/farcaster';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { CanvasQRCode } from 'components/settings/account/components/otp/components/CanvasQrCode';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 import type { FarcasterUser, SignedKeyRequest } from 'lib/farcaster/interfaces';
 
 import { useLocalStorage } from './useLocalStorage';

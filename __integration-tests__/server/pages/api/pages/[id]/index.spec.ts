@@ -2,10 +2,10 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/pages/{id} - update page', () => {
   const updateContent = {

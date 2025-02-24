@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { InvalidInputError } from '@root/lib/utils/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 
 import { getRewardOrThrow } from './getReward';
 import type { RewardReviewer, RewardWithUsers } from './interfaces';

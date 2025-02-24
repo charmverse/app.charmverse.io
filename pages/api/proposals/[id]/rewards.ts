@@ -1,8 +1,9 @@
 import { log } from '@charmverse/core/log';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser, InvalidStateError } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { createRewardsForProposal } from 'lib/proposals/createRewardsForProposal';
 import { withSessionRoute } from 'lib/session/withSession';

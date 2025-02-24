@@ -1,11 +1,11 @@
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
+import type { MemberProfileJson, MemberProfileName } from '@packages/profile/memberProfiles';
 import Image from 'next/image';
 
 import { Button } from 'components/common/Button';
 import type { ModalProps } from 'components/common/Modal';
 import Modal from 'components/common/Modal';
-import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
 
 export function AddMoreMemberProfilesModal({
   memberProfileTypesInput,

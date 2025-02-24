@@ -1,9 +1,10 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
 import { updateProject } from 'lib/projects/updateProject';
 import { withSessionRoute } from 'lib/session/withSession';

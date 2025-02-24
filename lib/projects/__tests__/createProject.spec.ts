@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { randomETHWallet } from '@root/lib/utils/blockchain';
+import { randomETHWallet } from '@packages/utils/blockchain';
 import { v4 } from 'uuid';
 
 import { createDefaultProject, defaultProjectMember } from '../constants';

@@ -1,8 +1,7 @@
 import type { Space, SpaceOperation, SpacePermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { addSpaceOperations } from '../addSpaceOperations';
 import { computeGroupSpacePermissions } from '../computeGroupSpacePermissions';

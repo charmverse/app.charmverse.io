@@ -1,10 +1,11 @@
 import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { deletePostCategory } from 'lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from 'lib/forums/categories/updatePostCategory';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

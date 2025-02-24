@@ -1,6 +1,6 @@
+import { getGitcoinPassportScore } from '@packages/credentials/getGitcoinCredentialsByWallets';
 import { getPoapsFromAddress } from '@root/lib/blockchain/poaps';
 import { getPublicClient } from '@root/lib/blockchain/publicClient';
-import { getGitcoinPassportScore } from '@root/lib/credentials/getGitcoinCredentialsByWallets';
 import { getUserMemberships } from '@root/lib/guild-xyz/getUserMemberships';
 import { formatUnits, getAddress, parseEther, parseAbi } from 'viem';
 

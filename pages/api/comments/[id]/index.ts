@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import { deleteComment, updateComment } from 'lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -1,4 +1,4 @@
-import { createPage, createVote, generateUserAndSpace } from 'testing/setupDatabase';
+import { createPage, createVote, generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { getVotesByPage } from '../getVotesByPage';
 

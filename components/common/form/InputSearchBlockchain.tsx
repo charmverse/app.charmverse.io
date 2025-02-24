@@ -1,13 +1,13 @@
 import type { BoxProps, SxProps, Theme } from '@mui/material';
 import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } from '@mui/material/';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
-import type { IChainDetails } from '@root/connectors/chains';
-import { getChainList, getChainById } from '@root/connectors/chains';
+import type { IChainDetails } from '@packages/blockchain/connectors/chains';
+import { getChainList, getChainById } from '@packages/blockchain/connectors/chains';
+import { isTruthy } from '@packages/utils/types';
 import { useEffect, useState, useMemo } from 'react';
 
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { isTruthy } from 'lib/utils/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, boolean, true>>, 'onChange'> {
   onChange?: (chainId: number | null) => void;

@@ -1,10 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { InvalidInputError } from '@packages/utils/errors';
 import { createForumPost } from '@root/lib/forums/posts/createForumPost';
-import { InvalidInputError } from '@root/lib/utils/errors';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 import { deletePostCategory } from '../deletePostCategory';
 import { PostCategoryNotDeleteableError } from '../errors';

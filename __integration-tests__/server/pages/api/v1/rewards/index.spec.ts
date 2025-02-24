@@ -1,16 +1,16 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import request from 'supertest';
-import { v4 } from 'uuid';
-
-import type { PublicApiReward } from 'pages/api/v1/rewards/index';
-import { baseUrl } from 'testing/mockApiCall';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import {
   generateBountyWithSingleApplication,
   generateSpaceUser,
   generateUserAndSpace,
   generateUserAndSpaceWithApiToken
-} from 'testing/setupDatabase';
+} from '@packages/testing/setupDatabase';
+import request from 'supertest';
+import { v4 } from 'uuid';
+
+import type { PublicApiReward } from 'pages/api/v1/rewards/index';
 
 describe('GET /api/v1/rewards', () => {
   // This test needs to be fixed.

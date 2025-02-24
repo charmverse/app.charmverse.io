@@ -1,8 +1,8 @@
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
+import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
-import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,

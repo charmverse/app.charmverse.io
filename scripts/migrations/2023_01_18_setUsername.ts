@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { shortWalletAddress } from 'lib/utils/blockchain';
+import { updateUsedIdentity } from '@packages/users/updateUsedIdentity';
+import { shortWalletAddress } from '@packages/utils/blockchain';
 
 export async function setUserName() {
   const usersWithWalletId = await prisma.user.findMany({

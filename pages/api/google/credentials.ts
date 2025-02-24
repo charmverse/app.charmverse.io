@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,7 +8,6 @@ import { deleteCredential, getCredentialsForUser, saveCredential } from 'lib/goo
 import { validateFormScopes } from 'lib/google/forms/validateFormScopes';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 export type CreateCredentialRequest = {
   code: string;

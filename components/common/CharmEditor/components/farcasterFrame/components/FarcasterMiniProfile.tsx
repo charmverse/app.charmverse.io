@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Button, Stack, Tooltip, Typography } from '@mui/material';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 
 import Avatar from 'components/common/Avatar';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 const StyledStackContainer = styled(Stack)`
   align-items: center;

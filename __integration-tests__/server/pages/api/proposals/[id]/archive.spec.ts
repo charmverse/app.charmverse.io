@@ -2,9 +2,8 @@ import type { Space } from '@charmverse/core/prisma';
 import type { Proposal, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/proposals/[id]/archive - Archive and unarchive proposal', () => {
   let author: User;

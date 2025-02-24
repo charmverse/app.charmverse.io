@@ -1,7 +1,8 @@
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import type { Asset } from 'lib/mux/getAsset';
 import { getPrivateAsset } from 'lib/mux/getAsset';
 import { canView } from 'lib/mux/permissions';

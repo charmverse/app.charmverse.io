@@ -1,4 +1,4 @@
-import { isDevEnv } from '@root/config/constants';
+import { isDevEnv } from '@packages/utils/constants';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

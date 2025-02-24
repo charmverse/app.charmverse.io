@@ -1,13 +1,13 @@
 import type { Proposal, Space, SuperApiToken, User } from '@charmverse/core/prisma';
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateSpaceApiKey, generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PublicProposalApiPermissions } from 'pages/api/v1/proposals/[proposalId]/compute-permissions';
-import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let proposal: Proposal;
 

@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-
-import { createVote, generateBounty } from 'testing/setupDatabase';
+import { createVote, generateBounty } from '@packages/testing/setupDatabase';
 
 import { goBackToStep } from '../goBackToStep';
 import { submitEvaluationAppealResult } from '../submitEvaluationAppealResult';

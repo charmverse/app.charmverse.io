@@ -1,8 +1,8 @@
 'use client';
 
+import { encodeFilename } from '@packages/utils/encodeFilename';
 import { GET } from '@root/adapters/http';
 import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
-import { encodeFilename } from '@root/lib/utils/encodeFilename';
 
 export const apiClient = {
   async getUploadToken(file: File) {

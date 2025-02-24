@@ -1,7 +1,8 @@
+import { renderTestEditor } from '@packages/testing/prosemirror/renderTestEditor';
+
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { builders as _ } from 'lib/prosemirror/builders';
-import { renderTestEditor } from 'testing/prosemirror/renderTestEditor';
 
 import { rowNodeAtPos } from '../rowActions';
 

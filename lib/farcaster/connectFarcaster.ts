@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
-import { InvalidStateError } from '@root/lib/middleware';
-import { getUserProfile } from '@root/lib/profile/getUser';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { sessionUserRelations } from '@root/lib/session/config';
-import { softDeleteUserWithoutConnectableIdentities } from '@root/lib/users/softDeleteUserWithoutConnectableIdentities';
-import { updateUsedIdentity } from '@root/lib/users/updateUsedIdentity';
-import { DisabledAccountError, ExternalServiceError } from '@root/lib/utils/errors';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { sessionUserRelations } from '@packages/profile/constants';
+import { getUserProfile } from '@packages/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { softDeleteUserWithoutConnectableIdentities } from '@packages/users/softDeleteUserWithoutConnectableIdentities';
+import { updateUsedIdentity } from '@packages/users/updateUsedIdentity';
+import { DisabledAccountError, ExternalServiceError } from '@packages/utils/errors';
 
 export async function connectFarcaster({
   fid,

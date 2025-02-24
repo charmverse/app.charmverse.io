@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import type { Proposal } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('GET /api/spaces/[id]/proposals - Get proposals in a space', () => {
   let space: Space;

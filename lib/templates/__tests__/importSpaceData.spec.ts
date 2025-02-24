@@ -24,12 +24,11 @@ import {
   testUtilsProposals,
   testUtilsUser
 } from '@charmverse/core/test';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 import { pageMetaSelect } from '@root/lib/pages/server/pageMetaSelect';
 import { mapPostCategoryPermissionToAssignee } from '@root/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from '@root/lib/permissions/spaces/mapSpacePermissionToAssignee';
-
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 import { exportSpaceData, type SpaceDataExport } from '../exportSpaceData';
 import type { SpaceDataImportResult } from '../importSpaceData';

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { communityProduct } from 'lib/subscription/constants';
 import { stripeClient } from 'lib/subscription/stripe';
 import type Stripe from 'stripe';

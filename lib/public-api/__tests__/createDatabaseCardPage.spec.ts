@@ -2,10 +2,9 @@ import type { Space, User } from '@charmverse/core/prisma';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { v4 as uuid } from 'uuid';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateSchema } from 'testing/publicApi/schemas';
 
 import { createDatabase } from '../createDatabase';
 import { createDatabaseCardPage } from '../createDatabaseCardPage';
@@ -159,7 +158,7 @@ describe('createDatabaseCardPage', () => {
       contentMarkdown: `# Huius disertum
 
       ## Et harenas Minyeias ignes
-      
+
       ${matchPhrase}`,
       spaceId: space.id,
       title: 'Example title'

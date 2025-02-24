@@ -1,4 +1,4 @@
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
 
 import charmClient from 'charmClient';
 import { useMembers } from 'hooks/useMembers';

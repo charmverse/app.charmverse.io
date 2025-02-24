@@ -1,9 +1,10 @@
 import type { UpdatePagePermissionDiscoverabilityRequest } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
+import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { withSessionRoute } from 'lib/session/withSession';
 

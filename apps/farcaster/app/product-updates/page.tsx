@@ -1,4 +1,4 @@
-import { PageWrapper } from '@connect-shared/components/common/PageWrapper';
+import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
 import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
 import type { Metadata } from 'next';
 

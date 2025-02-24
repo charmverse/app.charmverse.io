@@ -11,6 +11,7 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
-    "@packages/charmeditor": "^1.0.0"
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/utils": "^1.0.0"
   }
 }

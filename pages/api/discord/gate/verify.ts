@@ -1,16 +1,16 @@
 import type { Space } from '@charmverse/core/prisma';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
+import { logWorkspaceJoinedViaTokenGate } from '@packages/metrics/postToDiscord';
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { applyDiscordGate } from 'lib/discord/collabland/applyDiscordGate';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 

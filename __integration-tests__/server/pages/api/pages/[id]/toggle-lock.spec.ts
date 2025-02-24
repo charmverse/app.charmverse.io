@@ -2,10 +2,9 @@
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBoard } from 'testing/setupDatabase';
 
 describe('PUT /api/pages/{id}/toggle-lock - Toggle page lock', () => {
   let admin: User;

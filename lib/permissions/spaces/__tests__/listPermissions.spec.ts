@@ -1,6 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { listPermissions } from '../listPermissions';
 

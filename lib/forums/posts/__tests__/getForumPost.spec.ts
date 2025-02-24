@@ -1,9 +1,8 @@
 import type { Post, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateForumPost } from '@packages/testing/utils/forums';
 import { v4 } from 'uuid';
-
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
 
 import { PostNotFoundError } from '../errors';
 import { getForumPost } from '../getForumPost';

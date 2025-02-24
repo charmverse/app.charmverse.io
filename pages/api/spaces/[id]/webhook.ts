@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ApiError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 import type { SetSpaceWebhookResponse } from './set-webhook';

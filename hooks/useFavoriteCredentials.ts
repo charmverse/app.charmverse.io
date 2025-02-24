@@ -1,3 +1,5 @@
+import { lowerCaseEqual } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
 import {
@@ -6,8 +8,6 @@ import {
   useRemoveFavoriteCredential,
   useReorderFavoriteCredentials
 } from 'charmClient/hooks/credentials';
-import { lowerCaseEqual } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/types';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
 import { useUser } from './useUser';

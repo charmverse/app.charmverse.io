@@ -7,7 +7,7 @@ import { work } from 'lib/rewards/work';
 import { getSpace } from 'lib/spaces/getSpace';
 import { isAddress } from 'viem';
 import { sepolia } from 'viem/chains';
-import { generateBountyWithSingleApplication } from 'testing/setupDatabase';
+import { generateBountyWithSingleApplication } from '@packages/testing/setupDatabase';
 
 async function seedReward({
   spaceDomain,

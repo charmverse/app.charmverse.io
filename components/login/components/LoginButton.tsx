@@ -7,7 +7,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import type { SystemError } from '@packages/utils/errors';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
@@ -23,7 +24,6 @@ import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
-import type { SystemError } from 'lib/utils/errors';
 
 import { DiscordLoginHandler } from './DiscordLoginHandler';
 import { EmailAddressForm } from './EmailAddressForm';

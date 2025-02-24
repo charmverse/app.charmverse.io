@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
 
 let nonAdminUser: LoggedInUser;
 let nonAdminUserSpace: Space;

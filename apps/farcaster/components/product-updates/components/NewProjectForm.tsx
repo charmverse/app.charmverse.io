@@ -1,11 +1,11 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
-import { ImageField } from '@connect-shared/components/common/ImageField';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Button, FormLabel, Stack, TextField, Typography } from '@mui/material';
-import { concatenateStringValues } from '@root/lib/utils/strings';
+import { FormErrors } from '@packages/connect-shared/components/common/FormErrors';
+import { ImageField } from '@packages/connect-shared/components/common/ImageField';
+import { concatenateStringValues } from '@packages/utils/strings';
 import { useAction } from 'next-safe-action/hooks';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';

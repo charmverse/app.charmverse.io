@@ -1,8 +1,8 @@
+import type { CreateOtpResponse } from '@packages/profile/otp/createUserOtp';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 import { useCreateOtp } from 'charmClient/hooks/profile';
-import type { CreateOtpResponse } from 'lib/profile/otp/createUserOtp';
 
 export type Screens = 'start' | 'link' | 'confirmation' | 'finish';
 

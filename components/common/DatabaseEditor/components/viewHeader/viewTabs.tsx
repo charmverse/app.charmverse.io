@@ -18,7 +18,8 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -34,7 +35,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { BoardView, IViewType } from 'lib/databases/boardView';
 import { formatViewTitle, createBoardView } from 'lib/databases/boardView';
-import { isTruthy } from 'lib/utils/types';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

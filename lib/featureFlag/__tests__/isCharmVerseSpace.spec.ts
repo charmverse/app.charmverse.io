@@ -27,7 +27,7 @@ describe('isCharmVerseSpace', () => {
   // Optional: Only if the isDevEnv variable behavior is clear and testable
   it('should return true in a development environment regardless of the domain', async () => {
     // Dynamically mock the module only for this test
-    jest.doMock('config/constants', () => ({
+    jest.doMock('@packages/utils/constants', () => ({
       isDevEnv: true
     }));
 

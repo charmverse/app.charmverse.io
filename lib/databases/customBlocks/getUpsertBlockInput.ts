@@ -1,13 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
-import { blockToPrisma, blockToPrismaPartial } from '@root/lib/databases/block';
-import type { Board } from '@root/lib/databases/board';
-import { createBoard } from '@root/lib/databases/board';
-import type { BoardView } from '@root/lib/databases/boardView';
-import { DEFAULT_BOARD_BLOCK_ID } from '@root/lib/databases/customBlocks/constants';
 import type { ProposalBlockInput, ProposalBlockUpdateInput } from '@root/lib/proposals/blocks/interfaces';
 import type { RewardBlockInput, RewardBlockUpdateInput } from '@root/lib/rewards/blocks/interfaces';
 import { v4 } from 'uuid';
+
+import { blockToPrisma, blockToPrismaPartial } from '../block';
+import type { Board } from '../board';
+import { createBoard } from '../board';
+import type { BoardView } from '../boardView';
+import { DEFAULT_BOARD_BLOCK_ID } from '../customBlocks/constants';
 
 export function getUpsertBlockInput({
   data: upsertData,

@@ -1,5 +1,9 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { isUUID } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,16 +11,12 @@ import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { onError, onNoMatch } from 'lib/middleware';
-import { NotFoundError } from 'lib/middleware/errors';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isUUID } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/types';
-import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

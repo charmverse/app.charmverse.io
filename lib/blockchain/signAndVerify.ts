@@ -1,14 +1,10 @@
 import { log } from '@charmverse/core/log';
+import { InvalidInputError } from '@packages/utils/errors';
 import { SiweMessage } from 'siwe';
 import { hashMessage, parseAbi } from 'viem';
 
-import { InvalidInputError } from '../utils/errors';
-
 import { getPublicClient } from './publicClient';
 
-/**
- * @domain - Domain prefixed with protocol ie. http://localhost:3000
- */
 export type SignatureVerificationPayload = {
   message: SiweMessage;
   signature: `0x${string}`;
@@ -42,7 +38,6 @@ export async function isValidWalletSignature({
 
   try {
     const fields = await getSiweFields({ message, signature, domain });
-
     if (fields.success) {
       return true;
     }
@@ -67,11 +62,11 @@ export async function verifyEIP1271Signature({
   signature,
   address
 }: SignatureVerificationPayloadWithAddress): Promise<boolean> {
-  const chainId = message.chainId;
-  const parsedMessage = new SiweMessage(message).toMessage();
+  const siweMessage = new SiweMessage(message);
+  const chainId = siweMessage.chainId;
+  const parsedMessage = siweMessage.toMessage();
 
   const messageHash = hashMessage(parsedMessage);
-
   const client = getPublicClient(chainId);
 
   const data = await client

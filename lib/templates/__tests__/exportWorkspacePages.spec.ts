@@ -4,14 +4,13 @@ import fs from 'node:fs/promises';
 
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
-
 import {
   createPage,
   generateBounty,
   generateBoard,
   generateProposal,
   generateUserAndSpace
-} from 'testing/setupDatabase';
+} from '@packages/testing/setupDatabase';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 

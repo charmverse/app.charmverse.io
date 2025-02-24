@@ -3,14 +3,14 @@ import { Space } from '@charmverse/core/prisma';
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
 import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utils/strings';
-import { createOrGetUserFromWallet } from 'lib/users/createUser';
+import { uid } from '@packages/utils/strings';
+import { createOrGetUserFromWallet } from '@packages/users/createUser';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
-import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
+import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
+import { getFilenameWithExtension } from '@packages/utils/strings';
 import { DateTime } from 'luxon';
 
 /*****

@@ -1,8 +1,8 @@
+import type { FindIssuableRewardCredentialsInput } from '@packages/credentials/findIssuableRewardCredentials';
+import { findSpaceIssuableRewardCredentials } from '@packages/credentials/findIssuableRewardCredentials';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FindIssuableRewardCredentialsInput } from 'lib/credentials/findIssuableRewardCredentials';
-import { findSpaceIssuableRewardCredentials } from 'lib/credentials/findIssuableRewardCredentials';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

@@ -1,6 +1,7 @@
+import isSpaceAdmin from '@packages/users/isSpaceAdmin';
+
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import isSpaceAdmin from 'lib/users/isSpaceAdmin';
 
 export function useIsAdmin() {
   const { space } = useCurrentSpace();

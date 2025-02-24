@@ -1,7 +1,6 @@
 import type { PostCategory, Space } from '@charmverse/core/prisma';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 
 import type { CreatePostCategoryInput } from '../createPostCategory';
 import type { PostCategoryUpdate } from '../updatePostCategory';

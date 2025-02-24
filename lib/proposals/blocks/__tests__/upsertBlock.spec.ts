@@ -1,10 +1,9 @@
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import type { PropertyType } from '@root/lib/databases/board';
 import { getBlocks } from '@root/lib/proposals/blocks/getBlocks';
 import type { ProposalBlockInput, ProposalBlockUpdateInput } from '@root/lib/proposals/blocks/interfaces';
 import { upsertBlock } from '@root/lib/proposals/blocks/upsertBlock';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('proposal blocks - upsertBlock', () => {
   it('Should update properties block', async () => {

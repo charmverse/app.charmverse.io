@@ -1,9 +1,10 @@
 import type { PostOperation } from '@charmverse/core/prisma';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { voteForumPost } from 'lib/forums/posts/voteForumPost';
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

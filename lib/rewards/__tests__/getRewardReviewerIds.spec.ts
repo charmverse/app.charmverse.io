@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-
-import { generateBounty, generateRole } from 'testing/setupDatabase';
+import { generateBounty, generateRole } from '@packages/testing/setupDatabase';
 
 import { getRewardReviewerIds } from '../getRewardReviewerIds';
 

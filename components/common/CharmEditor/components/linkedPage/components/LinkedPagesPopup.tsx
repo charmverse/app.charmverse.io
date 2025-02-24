@@ -1,3 +1,4 @@
+import { STATIC_PAGES } from '@packages/features/constants';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo, useState } from 'react';
 
@@ -8,7 +9,6 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { useRootPages } from 'hooks/useRootPages';
 import { useSearchPages, sortList } from 'hooks/useSearchPages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { STATIC_PAGES } from 'lib/features/constants';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 

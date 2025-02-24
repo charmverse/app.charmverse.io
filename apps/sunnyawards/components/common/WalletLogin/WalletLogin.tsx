@@ -86,6 +86,7 @@ export function WalletLogin({ successPath }: { successPath: string }) {
       return { message, signature, address: accountAddress };
     } catch (error) {
       // handle error outside
+      log.error('Error signing in with wallet', { error });
     }
   };
   const handleWalletLogin = async (connector: Connector) => {

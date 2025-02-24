@@ -1,4 +1,4 @@
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

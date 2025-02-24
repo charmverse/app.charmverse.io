@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 
 import Avatar from 'components/common/Avatar';
 import type { Member } from 'lib/members/interfaces';
-import { hasNftAvatar } from 'lib/users/hasNftAvatar';
 
 import { MemberActions } from './MemberActions';
 

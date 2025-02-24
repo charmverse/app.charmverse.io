@@ -1,8 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError, NotFoundError } from '@packages/nextjs/errors';
+import { AdministratorOnlyError } from '@packages/users/errors';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { concealProposalSteps } from 'lib/proposals/concealProposalSteps';
 import { getProposalDocumentsToSign } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
@@ -11,8 +14,6 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { updateProposal } from 'lib/proposals/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
-import { AdministratorOnlyError } from 'lib/users/errors';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
