@@ -39,8 +39,6 @@ import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces'
 import type { RewardWithUsers } from '@root/lib/rewards/interfaces';
 import { v4 as uuid, v4 } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
-
 import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';
 
