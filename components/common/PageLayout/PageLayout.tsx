@@ -31,7 +31,7 @@ interface PageLayoutProps {
   children: ReactNode;
 }
 
-const whitelistedDomains = ['ef', 'ethrangers'];
+const whitelistedDomains = ['ef', 'ethrangers', 'blockdag-grants'];
 
 function PageLayout({ children }: PageLayoutProps) {
   const { user, isLoaded: isUserLoaded } = useUser();
