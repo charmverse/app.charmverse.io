@@ -9,6 +9,8 @@ import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from '@root/lib/utils/browser';
 import { getCustomDomainFromHost } from '@root/lib/utils/domains/getCustomDomainFromHost';
 
+import { getPagePath } from '../utils/domains/getPagePath';
+
 type ViewMeta = PageEventMap['page_view']['meta'];
 
 const staticPagesToDirect: { [key in StaticPageType]?: string } = {
@@ -32,9 +34,18 @@ export async function getDefaultPageForSpace({
   const defaultPage = await (userId
     ? getDefaultPageForSpaceRaw({ space, host, userId })
     : getDefaultPageForSpaceWithNonLoggedInUser({ space, host }));
-  // encode to handle Japanese characters
-  // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
-  return defaultPage ? encodeURI(fullyDecodeURI(defaultPage)) : null;
+  if (defaultPage) {
+    // encode to handle Japanese characters
+    // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
+    const sanitizedDefaultPage = encodeURI(fullyDecodeURI(defaultPage));
+    // call getPagePath to handle custom domains
+    return getPagePath({
+      hostName: host,
+      path: sanitizedDefaultPage,
+      spaceDomain: space.domain
+    });
+  }
+  return null;
 }
 
 async function getDefaultPageForSpaceWithNonLoggedInUser({
@@ -87,7 +98,7 @@ async function getDefaultPageForSpaceRaw({
     const fullPathname = pathname && getSubdomainPath(pathname, space, host);
     // handle forum posts
     if (lastPageView.post) {
-      // use the original path if it was the actual post page
+      // use the original path if it was the actual post
       if (fullPathname?.includes(lastPageView.post.path)) {
         return fullPathname;
       }
@@ -95,7 +106,7 @@ async function getDefaultPageForSpaceRaw({
     }
     // handle pages
     else if (lastPageView.page) {
-      // use the original path if it was the actual post page
+      // use the original path if it was the actual page
       if (fullPathname?.includes(lastPageView.page.path)) {
         return fullPathname;
       }

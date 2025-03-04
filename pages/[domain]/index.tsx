@@ -23,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   });
 
-  // 1. Handle when case does not exist
+  // 1. Handle when space does not exist
   if (!space) {
     log.warn('User tried to access space that does not exist', { domain: context.query.domain, userId: sessionUserId });
     return {
@@ -36,26 +36,25 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // 2. send user to default page for the space
 
-  const pageRedirect = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
+  let destination = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
 
-  if (pageRedirect == null) {
+  if (destination == null) {
     return {
       props: {}
     };
   }
 
-  let destination = pageRedirect;
-
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {
     if (key !== 'returnUrl' && key !== 'domain') {
-      destination += `${destination.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
+      destination += `${destination!.includes('?') ? '&' : '?'}${key}=${context.query[key]}`;
     }
   });
 
   log.info('Redirecting user to default page in space', {
     destination,
-    domain: domainOrCustomDomain
+    domain: domainOrCustomDomain,
+    userId: sessionUserId
   });
 
   return {
