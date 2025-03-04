@@ -25,7 +25,10 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   // 1. Handle when space does not exist
   if (!space) {
-    log.warn('User tried to access space that does not exist', { domain: context.query.domain, userId: sessionUserId });
+    log.warn('User tried to access space that does not exist', {
+      domain: context.query.domain,
+      userId: sessionUserId
+    });
     return {
       redirect: {
         destination: `/join?domain=${context.query.domain}`,
@@ -53,6 +56,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
   log.info('Redirecting user to default page in space', {
     destination,
+    host: context.req.headers.host,
     domain: domainOrCustomDomain,
     userId: sessionUserId
   });

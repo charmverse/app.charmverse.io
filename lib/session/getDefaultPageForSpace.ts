@@ -38,16 +38,8 @@ export async function getDefaultPageForSpace({
     // encode to handle Japanese characters
     // call fullyDecodeURI to handle cases where we saved the pathname with encoded characters
     const sanitizedDefaultPage = encodeURI(fullyDecodeURI(defaultPage));
-    // strip the beginning "/" if it exists
-    const sanitizedDefaultPageWithoutLeadingSlash = sanitizedDefaultPage.startsWith('/')
-      ? sanitizedDefaultPage.slice(1)
-      : sanitizedDefaultPage;
     // call getPagePath to handle custom domains
-    return getPagePath({
-      hostName: host,
-      path: sanitizedDefaultPageWithoutLeadingSlash,
-      spaceDomain: space.domain
-    });
+    return sanitizedDefaultPage;
   }
   return null;
 }
