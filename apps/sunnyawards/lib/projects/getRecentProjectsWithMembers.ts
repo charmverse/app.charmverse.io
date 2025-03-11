@@ -1,6 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { replaceS3Domain } from '@root/lib/utils/url';
+import { replaceS3Domain } from '@packages/utils/url';
 
 /**
  * Get recent projects with members

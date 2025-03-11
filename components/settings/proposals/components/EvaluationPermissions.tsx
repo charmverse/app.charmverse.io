@@ -2,8 +2,8 @@ import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
+import { capitalize } from '@packages/utils/strings';
 import { approvableEvaluationTypes } from '@root/lib/proposals/workflows/constants';
-import { capitalize } from '@root/lib/utils/strings';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {

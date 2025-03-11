@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidStateError } from '@root/lib/middleware';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';

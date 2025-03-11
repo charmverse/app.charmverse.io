@@ -3,7 +3,7 @@ import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { PageEventMap, StaticPageType } from '@root/lib/metrics/mixpanel/interfaces/PageEvent';
+import type { PageEventMap, StaticPageType } from '@packages/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from '@root/lib/pages/filterVisiblePages';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from '@root/lib/utils/browser';

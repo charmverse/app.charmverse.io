@@ -1,12 +1,12 @@
 import '@testing-library/jest-dom';
 import type { PageMeta } from '@charmverse/core/pages';
+import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import type { BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
-import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { mutator } from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';

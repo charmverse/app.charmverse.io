@@ -1,10 +1,10 @@
+import type { FeatureJson } from '@packages/features/constants';
+import { constructFeaturesRecord } from '@packages/features/constructFeaturesRecord';
+import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
+import { getFeatureTitle } from '@packages/features/getFeatureTitle';
 import { useCallback, useMemo } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { FeatureJson } from 'lib/features/constants';
-import { constructFeaturesRecord } from 'lib/features/constructFeaturesRecord';
-import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 
 export const useSpaceFeatures = () => {
   const { space, isLoading } = useCurrentSpace();

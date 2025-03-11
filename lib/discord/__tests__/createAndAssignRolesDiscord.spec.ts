@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateRole, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { createDiscordUser } from '@packages/testing/utils/discord';
 import { createAndAssignRolesDiscord } from '@root/lib/discord/createAndAssignRolesDiscord';
 import { v4 } from 'uuid';
-
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { createDiscordUser } from 'testing/utils/discord';
 
 describe('createAndAssignRolesDiscord', () => {
   it('should create new roles and assign to user', async () => {

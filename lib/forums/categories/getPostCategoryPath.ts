@@ -1,4 +1,4 @@
-import { stringToValidPath } from '@root/lib/utils/strings';
+import { stringToValidPath } from '@packages/utils/strings';
 
 const maxCategoryCharacters = 50;
 

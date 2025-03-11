@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { UserDetails } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { updateUserProfile } from '@packages/users/updateUserProfile';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,7 +14,6 @@ import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { sendSignupEvent as sendLoopSignupEvent } from 'lib/loopsEmail/sendSignupEvent';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { updateUserProfile } from 'lib/users/updateUserProfile';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

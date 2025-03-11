@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser } from 'testing/setupDatabase';
 
 describe('POST /api/spaces/[id]/set-public-proposal-templates - Make the space proposals public or private', () => {
   let nonAdminUser: User;

@@ -1,4 +1,4 @@
-import { fetchUserByFarcasterUsername } from '@connect-shared/lib/farcaster/fetchUserByFarcasterUsername';
+import { fetchUserByFarcasterUsername } from '@packages/connect-shared/lib/farcaster/fetchUserByFarcasterUsername';
 import { notFound } from 'next/navigation';
 
 import { ProfileDetailsPage } from 'components/profile/[username]/ProfileDetailsPage';

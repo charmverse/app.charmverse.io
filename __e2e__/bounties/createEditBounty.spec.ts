@@ -9,7 +9,7 @@
 // import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';
 // import { login } from '__e2e__/utils/session';
 
-// import { randomETHWalletAddress } from 'testing/generateStubs';
+// import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 
 // type Fixtures = {
 //   bountyBoardPage: BountyBoardPage;

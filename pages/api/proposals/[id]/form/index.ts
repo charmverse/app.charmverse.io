@@ -1,11 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormField } from '@charmverse/core/prisma-client';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { FormFieldInput } from '@root/lib/proposals/forms/interfaces';
 import { upsertProposalFormFields } from '@root/lib/proposals/forms/upsertProposalFormFields';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 

@@ -1,12 +1,12 @@
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { createPage, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { UserProfile } from 'lib/public-api';
 import type { PublicApiPage } from 'lib/public-api/getPageApi';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { baseUrl } from 'testing/mockApiCall';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
 let user: UserProfile;

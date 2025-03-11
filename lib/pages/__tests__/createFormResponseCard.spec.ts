@@ -1,9 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { createFormResponseCard } from '@root/lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from '@root/lib/pages/getDatabaseDetails';
 import { createDatabase } from '@root/lib/public-api/createDatabase';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;

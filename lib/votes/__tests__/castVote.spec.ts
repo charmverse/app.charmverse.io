@@ -1,7 +1,6 @@
-import { InvalidInputError, UndesirableOperationError } from '@root/lib/utils/errors';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { InvalidInputError, UndesirableOperationError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
-
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { castVote } from '../castVote';
 

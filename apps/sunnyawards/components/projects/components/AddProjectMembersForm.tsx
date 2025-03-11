@@ -1,7 +1,7 @@
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import { FormLabel, Stack } from '@mui/material';
-import { isTruthy } from '@root/lib/utils/types';
+import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
+import { isTruthy } from '@packages/utils/types';
 import type { Control, FieldArrayPath } from 'react-hook-form';
 import { useFieldArray } from 'react-hook-form';
 

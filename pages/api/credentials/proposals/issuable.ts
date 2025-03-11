@@ -1,8 +1,8 @@
+import type { FindIssuableProposalCredentialsInput } from '@packages/credentials/findIssuableProposalCredentials';
+import { findSpaceIssuableProposalCredentials } from '@packages/credentials/findIssuableProposalCredentials';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FindIssuableProposalCredentialsInput } from 'lib/credentials/findIssuableProposalCredentials';
-import { findSpaceIssuableProposalCredentials } from 'lib/credentials/findIssuableProposalCredentials';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

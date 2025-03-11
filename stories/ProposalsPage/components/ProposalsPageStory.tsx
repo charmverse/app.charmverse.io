@@ -1,3 +1,5 @@
+import { createMockPage } from '@packages/testing/mocks/page';
+import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { v4 } from 'uuid';
@@ -8,8 +10,6 @@ import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsB
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
-import { createMockPage } from 'testing/mocks/page';
-import { createMockProposal } from 'testing/mocks/proposal';
 
 import { members, userProfile } from '../../lib/mockData';
 

@@ -1,8 +1,7 @@
+import { baseUrl, loginOtpUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { createTestUserOtp, generateTestOtpToken } from '@packages/testing/userOtp';
 import request from 'supertest';
-
-import { baseUrl, loginOtpUser } from 'testing/mockApiCall';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { createTestUserOtp, generateTestOtpToken } from 'testing/userOtp';
 
 describe('PUT /api/profile/otp/verify - Should return a user profile', () => {
   it('should return a LoggedInUser, responding with 200', async () => {

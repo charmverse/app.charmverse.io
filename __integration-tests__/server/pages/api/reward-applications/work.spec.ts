@@ -1,12 +1,12 @@
 import type { Application, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsRandom, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBounty } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { ApplicationWithTransactions, Reward } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBounty } from 'testing/setupDatabase';
 
 describe('PUT /api/reward-applications/work - work on a reward', () => {
   let space: Space;

@@ -3,9 +3,8 @@ import type { Role, Space } from '@charmverse/core/prisma';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let user: User;
 let userCookie: string;

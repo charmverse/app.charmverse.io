@@ -1,7 +1,7 @@
 import type { PostCategoryPermission, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { uid } from '@packages/utils/strings';
 import { defaultPostCategories } from '@root/lib/forums/categories/generateDefaultPostCategories';
-import { uid } from '@root/lib/utils/strings';
 import { v4 } from 'uuid';
 
 import { gettingStartedPage } from 'seedData/gettingStartedPage';

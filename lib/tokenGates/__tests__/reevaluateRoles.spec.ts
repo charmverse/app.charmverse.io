@@ -1,10 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generateTokenGate } from '@packages/testing/utils/tokenGates';
+import { randomETHWallet } from '@packages/utils/blockchain';
 import { assignRole } from '@root/lib/roles';
 import { updateTokenGateRoles } from '@root/lib/tokenGates/updateTokenGateRoles';
-import { randomETHWallet } from '@root/lib/utils/blockchain';
-
-import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
-import { generateTokenGate } from 'testing/utils/tokenGates';
 
 jest.mock('lib/tokenGates/validateTokenGateConditionWithDelegates', () => ({
   validateTokenGateConditionWithDelegates: jest.fn().mockResolvedValue(true)

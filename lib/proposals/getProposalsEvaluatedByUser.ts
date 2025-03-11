@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { hasAccessToSpace } from '@root/lib/users/hasAccessToSpace';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 
 export type RubricProposalsUserInfo = {
   userIsEvaluator: string[];

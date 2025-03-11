@@ -1,10 +1,10 @@
 import { Box, Stack } from '@mui/material';
+import type { CommunityDetails } from '@packages/profile/interfaces';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import type { CommunityDetails } from 'lib/profile/interfaces';
 
 import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
 

@@ -1,7 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-import { recordDatabaseEvent } from '@root/lib/metrics/recordDatabaseEvent';
+import { recordDatabaseEvent } from '@packages/metrics/recordDatabaseEvent';
 
 import { getRecentHistory } from '../getRecentHistory';
 

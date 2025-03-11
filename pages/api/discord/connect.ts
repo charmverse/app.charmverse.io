@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { DiscordUser } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { mergeUserDiscordAccounts } from '@packages/users/mergeUserDiscordAccounts';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -15,7 +16,6 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
 import { withSessionRoute } from 'lib/session/withSession';
-import { mergeUserDiscordAccounts } from 'lib/users/mergeUserDiscordAccounts';
 import { updateUserDiscordSocial } from 'pages/api/discord/updateUserDiscordSocial';
 
 const handler = nc({

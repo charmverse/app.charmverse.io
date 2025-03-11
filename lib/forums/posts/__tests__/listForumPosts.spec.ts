@@ -1,8 +1,7 @@
 import type { Post, Space, User } from '@charmverse/core/prisma';
-
-import { generateForumPosts } from 'testing/forums';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
+import { generateForumPosts } from '@packages/testing/forums';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
 
 import { defaultPostsPerResult } from '../constants';
 import { listForumPosts } from '../listForumPosts';

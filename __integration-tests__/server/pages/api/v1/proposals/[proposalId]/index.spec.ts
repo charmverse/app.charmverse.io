@@ -2,15 +2,15 @@ import type { GoogleAccount, Page, Role, Space, SuperApiToken, User, UserWallet 
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateSpaceApiKey, generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 type UserWithDetails = User & {
   wallets: UserWallet[];

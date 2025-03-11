@@ -1,11 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/proposals/[id]/rubric-criteria - Update proposal rubric criteria', () => {
   it('should allow a user with permissions to update proposal rubric criteria, and respond with 200', async () => {

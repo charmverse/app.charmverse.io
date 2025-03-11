@@ -1,17 +1,17 @@
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { applyDiscordGate } from '@root/lib/discord/collabland/applyDiscordGate';
-import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from '@root/lib/metrics/mixpanel/updateTrackUserProfileById';
-import { updateUserTokenGates } from '@root/lib/tokenGates/updateUserTokenGates';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
 import {
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
   UnauthorisedActionError
-} from '@root/lib/utils/errors';
-import { isTruthy } from '@root/lib/utils/types';
+} from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
+import { applyDiscordGate } from '@root/lib/discord/collabland/applyDiscordGate';
+import { checkUserSpaceBanStatus } from '@root/lib/members/checkUserSpaceBanStatus';
+import { updateUserTokenGates } from '@root/lib/tokenGates/updateUserTokenGates';
 import { v4 } from 'uuid';
 
 import type { TokenGateJoinType } from './interfaces';

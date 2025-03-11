@@ -1,5 +1,6 @@
 import * as http from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
+import { MissingDataError } from '@packages/utils/errors';
 import { isTestEnv } from '@root/config/constants';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -8,7 +9,6 @@ import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import type { FailedImportsError } from 'lib/notion/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { MissingDataError } from 'lib/utils/errors';
 
 const handler = nc({
   onError,

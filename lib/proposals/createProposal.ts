@@ -10,8 +10,8 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { rewardCharmsForProposal } from '@root/lib/charms/triggers/rewardCharmsForProposal';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { createPage } from '@root/lib/pages/server/createPage';
 import { getProjectById } from '@root/lib/projects/getProjectById';
 import { createForm } from '@root/lib/proposals/forms/createForm';
@@ -20,7 +20,7 @@ import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertPropo
 import type { ProposalFields } from '@root/lib/proposals/interfaces';
 import { v4 as uuid } from 'uuid';
 
-import { generatePagePathFromPathAndTitle } from '../pages/utils';
+import { generatePagePathFromPathAndTitle } from '../../packages/pages/src/utils';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getProposalErrors } from './getProposalErrors';

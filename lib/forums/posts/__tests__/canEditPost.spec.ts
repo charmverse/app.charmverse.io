@@ -1,8 +1,7 @@
 import type { Post, Space, User } from '@charmverse/core/prisma';
+import { generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generateForumPost } from '@packages/testing/utils/forums';
 import { v4 } from 'uuid';
-
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateForumPost } from 'testing/utils/forums';
 
 import { canEditPost } from '../canEditPost';
 import { PostNotFoundError } from '../errors';

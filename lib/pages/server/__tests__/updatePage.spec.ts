@@ -2,7 +2,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
-import { generatePagePathFromPathAndTitle, getPagePath } from '../../utils';
+import { generatePagePathFromPathAndTitle, getPagePath } from '../../../../packages/pages/src/utils';
 import { updatePage } from '../updatePage';
 
 let user: User;

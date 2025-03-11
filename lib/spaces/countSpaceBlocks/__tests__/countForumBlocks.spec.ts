@@ -1,6 +1,5 @@
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
-
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 
 import type { ForumBlocksCount } from '../countForumBlocks';
 import { countForumBlocks } from '../countForumBlocks';

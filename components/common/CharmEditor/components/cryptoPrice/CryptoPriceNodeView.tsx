@@ -1,8 +1,9 @@
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
-import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@root/connectors/chains';
-import { CryptoCurrencies, getChainById } from '@root/connectors/chains';
+import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
+import { CryptoCurrencies, getChainById } from '@packages/blockchain/connectors/chains';
+import { isTruthy } from '@packages/utils/types';
 import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 
@@ -16,7 +17,6 @@ import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { formatMoney } from 'lib/utils/formatting';
-import { isTruthy } from 'lib/utils/types';
 
 import { enableDragAndDrop } from '../../utils';
 

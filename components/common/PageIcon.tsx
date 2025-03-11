@@ -11,9 +11,9 @@ import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Box } from '@mui/material';
+import type { StaticPageType } from '@packages/features/constants';
 import type { ComponentProps, ReactNode } from 'react';
 
-import type { StaticPageType } from 'lib/features/constants';
 import { greyColor2 } from 'theme/colors';
 
 import EmojiIcon from './Emoji';

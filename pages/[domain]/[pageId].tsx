@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { isUUID } from '@packages/utils/strings';
 import type { GetServerSidePropsContext } from 'next';
 import { useEffect } from 'react';
 
@@ -19,7 +20,6 @@ import { setUrlWithoutRerender } from 'lib/utils/browser';
 import { getCanonicalURL } from 'lib/utils/domains/getCanonicalURL';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
-import { isUUID } from 'lib/utils/strings';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {

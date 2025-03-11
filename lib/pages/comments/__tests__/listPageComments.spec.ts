@@ -1,7 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePageWithComment } from 'testing/utils/pages';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePageWithComment } from '@packages/testing/utils/pages';
 
 import { listPageComments } from '../listPageComments';
 

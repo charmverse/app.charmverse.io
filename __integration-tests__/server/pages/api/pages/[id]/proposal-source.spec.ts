@@ -2,14 +2,14 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('POST /api/pages/[id]/proposal-source', () => {
   it('Should assign proposal source to the database, responding 200', async () => {

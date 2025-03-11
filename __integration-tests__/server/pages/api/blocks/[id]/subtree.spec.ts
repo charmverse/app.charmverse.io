@@ -3,6 +3,9 @@ import type { Space } from '@charmverse/core/prisma';
 import type { Block, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
@@ -10,9 +13,7 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBoard } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 
 let adminSpace: Space;
 
@@ -562,7 +563,10 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       createdBy: admin.id,
       spaceId: space.id,
       viewDataSource: 'proposals',
-      cardCount: 0,
+      cardCount: 0
+    });
+    await updateBoardProperties({
+      boardId: proposalsDatabase.id,
       selectedProperties: {
         defaults: ['proposalStep', 'proposalEvaluationType'],
         customProperties: [],

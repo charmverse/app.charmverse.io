@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { applyPageToBlock } from '@root/lib/databases/block';
-import { isTruthy } from '@root/lib/utils/types';
+import { isTruthy } from '@packages/utils/types';
 
+import { applyPageToBlock } from './block';
 import type { BlockWithDetails } from './block';
 import type { BoardFields } from './board';
 

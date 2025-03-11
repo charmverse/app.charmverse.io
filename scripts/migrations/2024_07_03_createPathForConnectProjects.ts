@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringToValidPath } from 'lib/utils/strings';
+import { stringToValidPath } from '@packages/utils/strings';
 
 async function createPathForConnectProjects() {
   const projects = await prisma.project.findMany({

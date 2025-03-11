@@ -4,6 +4,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Box, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import Chip from '@mui/material/Chip';
+import { credentialEventLabels } from '@packages/credentials/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
@@ -11,7 +12,6 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { credentialEventLabels } from 'lib/credentials/constants';
 
 export function CredentialTemplateRow({
   template,

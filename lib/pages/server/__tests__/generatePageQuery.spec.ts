@@ -1,9 +1,8 @@
 import { ExpectedAnError, InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { generatePageQuery } from '../generatePageQuery';
 

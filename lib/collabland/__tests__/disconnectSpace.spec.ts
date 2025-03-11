@@ -1,10 +1,9 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { createDiscordUser } from '@packages/testing/utils/discord';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { v4 } from 'uuid';
-
-import { createDiscordUser } from 'testing/utils/discord';
-import { addUserToSpace } from 'testing/utils/spaces';
 
 import { disconnectSpace } from '../disconnectSpace';
 

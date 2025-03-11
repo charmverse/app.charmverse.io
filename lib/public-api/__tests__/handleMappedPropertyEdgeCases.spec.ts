@@ -1,4 +1,4 @@
-import { generateSchema } from 'testing/publicApi/schemas';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 
 import { handleMappedPropertyEdgeCases } from '../handleMappedPropertyEdgeCases';
 

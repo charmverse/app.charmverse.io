@@ -1,5 +1,5 @@
-import { getSession } from '@connect-shared/lib/session/getSession';
 import { uploadToken } from '@packages/aws/uploadToken';
+import { getSession } from '@packages/connect-shared/lib/session/getSession';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

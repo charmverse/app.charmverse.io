@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { components } from '@octokit/openapi-webhooks-types';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { baseUrl } from '@root/config/constants';
 import { createOctokitApp } from '@root/lib/github/app';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from '@root/lib/pages/server/getPageMetaList';
 import { createReward } from '@root/lib/rewards/createReward';
 import type { RewardReviewer } from '@root/lib/rewards/interfaces';

@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { createDiscordUser } from '@packages/testing/utils/discord';
 import { v4 } from 'uuid';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { createDiscordUser } from 'testing/utils/discord';
 
 import { checkUserSpaceBanStatus } from '../checkUserSpaceBanStatus';
 

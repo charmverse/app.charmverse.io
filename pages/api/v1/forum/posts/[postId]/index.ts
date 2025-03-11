@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { getPostVoteSummary } from 'lib/forums/posts/getPostMeta';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
-import { InvalidStateError } from 'lib/middleware';
 import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';

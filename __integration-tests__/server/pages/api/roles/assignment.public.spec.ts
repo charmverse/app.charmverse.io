@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { RoleAssignment } from 'lib/roles';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/roles/assignment - Assign a user to a role in free spaces', () => {
   let space: Space;

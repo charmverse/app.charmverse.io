@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
-import { DataNotFoundError } from '@root/lib/utils/errors';
 
 type VideoPermissionComputeRequest = {
   resourceId: string;

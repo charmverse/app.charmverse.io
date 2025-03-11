@@ -1,9 +1,9 @@
+import { encryptData } from '@packages/utils/dataEncryption';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { encryptData } from 'lib/utils/dataEncryption';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

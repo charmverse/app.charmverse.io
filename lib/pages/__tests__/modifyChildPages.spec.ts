@@ -1,9 +1,8 @@
 import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { v4 as uuid } from 'uuid';
-
-import { generateBoard } from 'testing/setupDatabase';
 
 import { trashOrDeletePage } from '../trashOrDeletePage';
 

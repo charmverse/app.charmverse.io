@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('POST /api/spaces/[id]/set-public-proposals - Make the space proposals public or private', () => {
   it('should fail for free tier spaces, responding with 402', async () => {

@@ -1,6 +1,6 @@
 import { Page, Proposal, ProposalReviewer, Vote, VoteStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
+import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
 import { getVote } from 'lib/votes/getVote';
 import { ExtendedVote } from 'lib/votes/interfaces';
 import { v4 as uuid } from 'uuid';

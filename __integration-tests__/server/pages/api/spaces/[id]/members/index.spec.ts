@@ -1,9 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { Member } from 'lib/members/interfaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 let space: Space;
 let adminUser: User;

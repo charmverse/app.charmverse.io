@@ -1,5 +1,5 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
-import { capitalize } from '@root/lib/utils/strings';
+import { capitalize } from '@packages/utils/strings';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 

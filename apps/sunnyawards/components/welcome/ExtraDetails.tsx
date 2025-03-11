@@ -1,7 +1,6 @@
 'use client';
 
 import { log } from '@charmverse/core/log';
-import { onboardingAction } from '@connect-shared/lib/profile/onboardingAction';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -14,12 +13,13 @@ import {
   Link,
   TextField
 } from '@mui/material';
+import { onboardingAction } from '@packages/connect-shared/lib/profile/onboardingAction';
 import { useRouter } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { Controller, useForm } from 'react-hook-form';
 
-import type { FormValues } from 'lib/profile/form';
 import { schema } from 'lib/profile/form';
+import type { FormValues } from 'lib/profile/form';
 
 const defaultValues = { email: '', terms: false, notify: true } as const;
 

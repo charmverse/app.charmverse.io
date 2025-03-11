@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { batchUpdatePageProfiles } from 'lib/metrics/mixpanel/batchUpdatePageProfiles';
+import { batchUpdatePageProfiles } from '@packages/metrics/mixpanel/batchUpdatePageProfiles';
 
 const perBatch = 1000;
 export async function importProposals({ offset = 0 }: { offset?: number } = {}): Promise<void> {

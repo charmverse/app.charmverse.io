@@ -1,9 +1,9 @@
 import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { InvalidStateError } from 'lib/middleware';
 import type { ProposalEvaluationResultExtended } from 'lib/proposals/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';

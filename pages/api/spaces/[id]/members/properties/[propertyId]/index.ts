@@ -1,10 +1,11 @@
 import type { MemberProperty } from '@charmverse/core/prisma';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { deleteMemberProperty } from 'lib/members/deleteMemberProperty';
 import { updateMemberProperty } from 'lib/members/updateMemberProperty';
-import { InvalidStateError, onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

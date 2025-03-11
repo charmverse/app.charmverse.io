@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { MixpanelEventName } from '@root/lib/metrics/mixpanel/interfaces';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import type { MixpanelEventName } from '@packages/metrics/mixpanel/interfaces';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 
 import { PostNotFoundError } from './errors';
 

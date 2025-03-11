@@ -1,8 +1,8 @@
-import type { ViewOpPageEvent } from '@root/lib/metrics/mixpanel/opEvents';
+import type { PageEventMap } from '@packages/metrics/mixpanel/interfaces/PageEvent';
+import type { ViewOpPageEvent } from '@packages/metrics/mixpanel/opEvents';
 import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { getBrowserPath } from 'lib/utils/browser';
 
 import { TrackApi } from '../apis/trackApi';

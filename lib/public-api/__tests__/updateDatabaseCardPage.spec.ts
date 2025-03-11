@@ -1,8 +1,7 @@
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-
-import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
+import { generateSchemasForAllSupportedFieldTypes } from '@packages/testing/publicApi/schemas';
 
 import { createDatabase } from '../createDatabase';
 import { createDatabaseCardPage } from '../createDatabaseCardPage';

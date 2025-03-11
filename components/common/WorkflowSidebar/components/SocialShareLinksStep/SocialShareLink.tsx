@@ -1,11 +1,11 @@
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { Box, SvgIcon } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import { capitalize } from '@packages/utils/strings';
 import type { ReactNode } from 'react';
 import { BsTwitterX } from 'react-icons/bs';
 
 import Link from 'components/common/Link';
-import { capitalize } from 'lib/utils/strings';
 import FarcasterLogo from 'public/images/logos/farcaster.svg';
 
 type ShareSite = 'x' | 'telegram' | 'warpcast';

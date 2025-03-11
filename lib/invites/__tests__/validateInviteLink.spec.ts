@@ -1,7 +1,6 @@
 import { testUtils } from '@charmverse/core/test';
+import { createMockSpace } from '@packages/testing/mocks/space';
 import { v4 } from 'uuid';
-
-import { createMockSpace } from 'testing/mocks/space';
 
 import type { InviteLinkPopulated } from '../getInviteLink';
 import { validateInviteLink } from '../validateInviteLink';

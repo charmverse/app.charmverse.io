@@ -1,7 +1,7 @@
-import { AppProviders } from '@connect-shared/components/layout/AppProviders';
-import { getCurrentUser } from '@connect-shared/lib/profile/getCurrentUser';
-import { getSession } from '@connect-shared/lib/session/getSession';
 import Box from '@mui/material/Box';
+import { AppProviders } from '@packages/connect-shared/components/layout/AppProviders';
+import { getCurrentUser } from '@packages/connect-shared/lib/profile/getCurrentUser';
+import { getSession } from '@packages/connect-shared/lib/session/getSession';
 import type { Metadata, Viewport } from 'next';
 import dynamic from 'next/dynamic';
 import Script from 'next/script';

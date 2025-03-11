@@ -1,6 +1,6 @@
 import type { ProfileItem } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import * as http from '@root/adapters/http';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import type { DisconnectGoogleAccountRequest } from 'lib/google/disconnectGoogleAccount';
 import type { EmailAccountDisconnect } from 'lib/google/disconnectVerifiedEmail';

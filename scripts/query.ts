@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 import { DateTime } from 'luxon';
 
 async function query() {

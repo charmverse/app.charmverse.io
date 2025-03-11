@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { FirebaseApp } from 'firebase/app';
 import { initializeApp } from 'firebase/app';
 import {
@@ -15,7 +16,6 @@ import charmClient from 'charmClient';
 import { googleWebClientConfig, magicLinkEmailCookie } from 'config/constants';
 import { useUser } from 'hooks/useUser';
 import { getCookie, getAppUrl } from 'lib/utils/browser';
-import { InvalidInputError } from 'lib/utils/errors';
 
 import { useLocalStorage } from './useLocalStorage';
 

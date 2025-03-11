@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 
 import type { PostVote } from 'lib/forums/posts/voteForumPost';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let space: Space;
 let user: User;

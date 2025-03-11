@@ -1,9 +1,9 @@
-import { CardMotion } from '@connect-shared/components/common/Motions/CardMotion';
 import { Add as AddIcon } from '@mui/icons-material';
 import Box from '@mui/material/Box';
 import CardActionArea from '@mui/material/CardActionArea';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { CardMotion } from '@packages/connect-shared/components/common/Motions/CardMotion';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 

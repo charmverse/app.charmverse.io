@@ -1,6 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-
-import { generateSchema } from 'testing/publicApi/schemas';
+import { generateSchema } from '@packages/testing/publicApi/schemas';
 
 import { mapPhoneFromApiToSystem } from '../mapPhoneFromApiToSystem';
 

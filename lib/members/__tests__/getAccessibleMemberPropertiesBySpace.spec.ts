@@ -1,9 +1,8 @@
+import { generateRole, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generateMemberProperty } from '@packages/testing/utils/members';
 import { createMemberPropertyPermission } from '@root/lib/members/createMemberPropertyPermission';
 import { getAccessibleMemberPropertiesBySpace } from '@root/lib/members/getAccessibleMemberPropertiesBySpace';
 import { assignRole } from '@root/lib/roles';
-
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateMemberProperty } from 'testing/utils/members';
 
 describe('getAccessibleMemberPropertiesBySpace', () => {
   it('should return all properties if user is admin', async () => {

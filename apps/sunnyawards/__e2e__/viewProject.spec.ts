@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { randomIntFromInterval } from '@root/lib/utils/random';
+import { randomIntFromInterval } from '@packages/utils/random';
 import { expect, test } from 'playwright/test';
 
 import { loginBrowserUser } from './utils/loginBrowserUser';

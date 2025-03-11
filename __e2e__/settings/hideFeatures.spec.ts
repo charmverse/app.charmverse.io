@@ -1,7 +1,6 @@
+import { STATIC_PAGES } from '@packages/features/constants';
 import { expect, test as base } from '@playwright/test';
 import { v4 } from 'uuid';
-
-import { STATIC_PAGES } from 'lib/features/constants';
 
 import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
 import { generateUserAndSpace } from '../utils/mocks';

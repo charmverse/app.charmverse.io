@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -7,7 +8,6 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { closeOutReward } from 'lib/rewards/closeOutReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

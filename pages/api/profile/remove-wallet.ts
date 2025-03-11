@@ -1,13 +1,13 @@
 import type { UserWallet } from '@charmverse/core/prisma';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import type { DisconnectWalletRequest } from '@packages/users/disconnectWallet';
+import { disconnectWallet } from '@packages/users/disconnectWallet';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { DisconnectWalletRequest } from 'lib/users/disconnectWallet';
-import { disconnectWallet } from 'lib/users/disconnectWallet';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

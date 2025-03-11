@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
+import type { MappedFeature } from '@packages/features/constants';
 import { useState } from 'react';
 import type { MouseEvent } from 'react';
 
 import Link from 'components/common/Link';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { MappedFeature } from 'lib/features/constants';
 
 import { PageIcon } from '../../../../PageIcon';
 

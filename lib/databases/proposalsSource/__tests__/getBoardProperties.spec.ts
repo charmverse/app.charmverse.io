@@ -1,10 +1,9 @@
-import type { IPropertyTemplate } from '@root/lib/databases/board';
+import { getFormInput, getProjectProfileFieldConfig } from '@packages/testing/mocks/form';
 import * as constants from '@root/lib/projects/formField';
 import { getFieldConfig } from '@root/lib/projects/formField';
 import { v4 } from 'uuid';
 
-import { getFormInput, getProjectProfileFieldConfig } from 'testing/mocks/form';
-
+import type { IPropertyTemplate } from '../../board';
 import { getBoardProperties } from '../getBoardProperties';
 
 describe('getBoardProperties', () => {

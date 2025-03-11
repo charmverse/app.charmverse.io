@@ -1,4 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import { getFeatureTitle } from '@packages/features/getFeatureTitle';
 import { useMemo } from 'react';
 
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
@@ -9,7 +10,6 @@ import {
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
-import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';

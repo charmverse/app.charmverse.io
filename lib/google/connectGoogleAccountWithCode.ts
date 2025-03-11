@@ -1,9 +1,9 @@
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { InvalidInputError } from '@packages/utils/errors';
 import { googleOAuthClientIdSensitive } from '@root/config/constants';
 import { getClient } from '@root/lib/google/authorization/authClient';
 import { connectGoogleAccount } from '@root/lib/google/connectGoogleAccount';
 import { getCallbackDomain } from '@root/lib/oauth/getCallbackDomain';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
-import { InvalidInputError } from '@root/lib/utils/errors';
 
 export type ConnectAccountRequest = {
   code: string;

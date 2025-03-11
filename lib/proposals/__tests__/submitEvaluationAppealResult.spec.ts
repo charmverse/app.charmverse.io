@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { submitEvaluationAppealResult } from '../submitEvaluationAppealResult';
 import { submitEvaluationResult } from '../submitEvaluationResult';

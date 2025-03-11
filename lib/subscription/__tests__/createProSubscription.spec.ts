@@ -1,9 +1,8 @@
-import { InvalidStateError, NotFoundError } from '@root/lib/middleware';
+import { InvalidStateError, NotFoundError } from '@packages/nextjs/errors';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { stripeMock, stripeMockIds } from '@packages/testing/stripeMock';
+import { addSpaceSubscription } from '@packages/testing/utils/spaces';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { stripeMock, stripeMockIds } from 'testing/stripeMock';
-import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { communityProduct } from '../constants';
 import { createProSubscription } from '../createProSubscription';

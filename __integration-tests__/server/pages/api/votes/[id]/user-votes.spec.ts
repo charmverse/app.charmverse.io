@@ -1,8 +1,7 @@
 import type { Page, Space, Vote } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
 let space: Space;

@@ -1,6 +1,6 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import type { LoggedInUser } from '@packages/profile/getUser';
 import * as http from '@root/adapters/http';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
 
 import type { CheckDiscordGateResult } from 'lib/discord/interface';
 import type { OauthFlowType } from 'lib/oauth/interfaces';

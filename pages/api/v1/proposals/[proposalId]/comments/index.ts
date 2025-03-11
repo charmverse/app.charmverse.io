@@ -1,11 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
+import { requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';

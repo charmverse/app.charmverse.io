@@ -1,12 +1,12 @@
 'use client';
 
-import { FormErrors } from '@connect-shared/components/common/FormErrors';
-import { ImageField } from '@connect-shared/components/common/ImageField';
-import { LoadingComponent } from '@connect-shared/components/common/Loading/LoadingComponent';
-import { MultiTextInputField } from '@connect-shared/components/common/MultiTextInputField';
-import type { LoggedInUser } from '@connect-shared/lib/profile/getCurrentUserAction';
 import { Box, Button, FormLabel, ListSubheader, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import { capitalize } from '@root/lib/utils/strings';
+import { FormErrors } from '@packages/connect-shared/components/common/FormErrors';
+import { ImageField } from '@packages/connect-shared/components/common/ImageField';
+import { LoadingComponent } from '@packages/connect-shared/components/common/Loading/LoadingComponent';
+import { MultiTextInputField } from '@packages/connect-shared/components/common/MultiTextInputField';
+import type { LoggedInUser } from '@packages/connect-shared/lib/profile/getCurrentUserAction';
+import { capitalize } from '@packages/utils/strings';
 import Link from 'next/link';
 import type { Control } from 'react-hook-form';
 import { Controller, useController } from 'react-hook-form';
