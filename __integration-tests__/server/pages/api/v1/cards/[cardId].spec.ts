@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type {
@@ -10,8 +12,6 @@ import type {
 } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { baseUrl } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 const exampleBoardSchema: PageProperty[] = [
   {

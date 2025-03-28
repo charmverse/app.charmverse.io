@@ -1,11 +1,11 @@
 import { Prisma } from '@charmverse/core/prisma';
 import type { Post } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { InsecureOperationError } from '@packages/utils/errors';
 import { extractPollIds } from '@root/lib/prosemirror/extractPollIds';
 import { getNodeFromJson } from '@root/lib/prosemirror/getNodeFromJson';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
-import { InsecureOperationError } from '@root/lib/utils/errors';
 import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
 

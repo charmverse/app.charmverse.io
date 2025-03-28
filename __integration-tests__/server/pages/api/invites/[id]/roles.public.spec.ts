@@ -1,8 +1,7 @@
 import type { InviteLink, Role, Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
-
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/invites/roles - Assign roles to an invite in a free space', () => {
   let space: Space;

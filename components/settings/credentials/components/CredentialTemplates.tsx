@@ -1,6 +1,7 @@
 import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { Box, Tooltip } from '@mui/material';
 import Stack from '@mui/material/Stack';
+import { capitalize } from '@packages/utils/strings';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -11,7 +12,6 @@ import { Typography } from 'components/common/Typography';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { capitalize } from 'lib/utils/strings';
 
 import { CredentialTemplateDialog } from './CredentialTemplateDialog';
 import { CredentialTemplateRow } from './CredentialTemplateRow';

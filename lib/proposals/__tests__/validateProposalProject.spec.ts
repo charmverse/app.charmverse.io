@@ -1,9 +1,8 @@
+import { getProjectProfileFieldConfigDefaultHidden, getProjectProfileFieldConfig } from '@packages/testing/mocks/form';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { createDefaultProject, defaultProjectMember } from '@root/lib/projects/constants';
 import { createProject } from '@root/lib/projects/createProject';
 import { v4 } from 'uuid';
-
-import { getProjectProfileFieldConfigDefaultHidden, getProjectProfileFieldConfig } from 'testing/mocks/form';
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
 

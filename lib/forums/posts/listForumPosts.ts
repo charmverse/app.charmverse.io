@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { PaginatedResponse } from '@root/lib/public-api';
-import { InvalidInputError } from '@root/lib/utils/errors';
 
 import type { PostSortOption } from './constants';
 import { defaultPostsPerResult, postSortOptions } from './constants';

@@ -1,8 +1,8 @@
+import { isUrl } from '@packages/utils/strings';
 import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
-import { isUrl } from 'lib/utils/strings';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 
 import { useCurrentSpace } from './useCurrentSpace';

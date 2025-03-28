@@ -1,6 +1,7 @@
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackOpUserAction } from '@root/lib/metrics/mixpanel/trackOpUserAction';
+import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
+import { UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -9,7 +10,6 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { markSubmissionAsPaid } from 'lib/rewards/markSubmissionAsPaid';
 import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 

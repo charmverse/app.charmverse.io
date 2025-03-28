@@ -1,11 +1,11 @@
 import { Stack, TextField } from '@mui/material';
+import { IMAGE_MAX_WIDTH, ResizeType } from '@packages/utils/constants';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import EmojiPicker from 'components/common/DatabaseEditor/widgets/emojiPicker';
 import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadButton';
 import MultiTabs from 'components/common/MultiTabs';
-import { IMAGE_MAX_WIDTH, ResizeType } from 'lib/file/constants';
 
 export function CustomEmojiPicker({ onUpdate }: { onUpdate: (icon: string) => void }) {
   const [imageLink, setImageLink] = useState('');

@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '@packages/users/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -6,7 +7,6 @@ import { removeMember } from 'lib/members/removeMember';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
-import { AdministratorOnlyError, UserIsNotSpaceMemberError } from 'lib/users/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

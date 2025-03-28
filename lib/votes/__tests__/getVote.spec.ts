@@ -1,4 +1,4 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 
 import { getVote } from '../getVote';
 

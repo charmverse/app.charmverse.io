@@ -2,8 +2,8 @@ import { uuid } from '@bangle.dev/utils';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
-import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import { createDraftProposal } from '../../../../lib/proposals/createDraftProposal';
 import { publishProposal } from '../../../../lib/proposals/publishProposal';
 import { upsertProposalFormAnswers } from '@root/lib/proposals/forms/upsertProposalFormAnswers';

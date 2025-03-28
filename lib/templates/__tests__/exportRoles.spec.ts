@@ -1,7 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { testUtilsMembers } from '@charmverse/core/test';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { exportRoles } from '../exportRoles';
 

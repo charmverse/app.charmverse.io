@@ -1,15 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import * as http from '@root/adapters/http';
 import type { Frame } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isLocalhostUrl } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -64,4 +63,7 @@ async function extractFarcasterMetadataFromUrl(
   return res.status(200).json(frame);
 }
 
+function isLocalhostUrl(text: string) {
+  return /^https?:\/\/(localhost|0|10|127|192(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}|\[::1?\])/gi.test(text);
+}
 export default withSessionRoute(handler);

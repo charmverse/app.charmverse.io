@@ -1,5 +1,6 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { requireSpaceMembership } from 'lib/middleware';
@@ -9,7 +10,6 @@ import { getWorkflowTemplates } from 'lib/proposals/workflows/getWorkflowTemplat
 import { obfuscateWorkflow } from 'lib/proposals/workflows/obfuscateWorkflow';
 import { upsertWorkflowTemplate } from 'lib/proposals/workflows/upsertWorkflowTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = defaultHandler();
 

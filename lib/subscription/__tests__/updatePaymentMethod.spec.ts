@@ -1,4 +1,4 @@
-import { stripeMock, stripeMockIds } from 'testing/stripeMock';
+import { stripeMock, stripeMockIds } from '@packages/testing/stripeMock';
 
 import { stripeClient } from '../stripe';
 import { updatePaymentMethod } from '../updatePaymentMethod';

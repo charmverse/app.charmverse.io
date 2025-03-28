@@ -1,15 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { createRole } from '@packages/testing/utils/roles';
+import { addUserToSpace } from '@packages/testing/utils/spaces';
+import { generateUser } from '@packages/testing/utils/users';
 import { createForumPost } from '@root/lib/forums/posts/createForumPost';
 import { permissionsApiClient } from '@root/lib/permissions/api/client';
 import { assignRole } from '@root/lib/roles';
 import { getPostEntity, getSpaceEntity } from '@root/lib/webhookPublisher/entities';
 import { WebhookEventNames } from '@root/lib/webhookPublisher/interfaces';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generatePostCategory } from 'testing/utils/forums';
-import { createRole } from 'testing/utils/roles';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
 
 import { createForumNotifications } from '../createForumNotifications';
 

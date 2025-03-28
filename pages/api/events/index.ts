@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { recordDatabaseEvent, type EventInput } from '@packages/metrics/recordDatabaseEvent';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 as uuid } from 'uuid';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { recordDatabaseEvent, type EventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

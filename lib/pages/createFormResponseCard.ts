@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/utils/errors';
 import { prismaToBlock } from '@root/lib/databases/block';
 import type { IPropertyTemplate } from '@root/lib/databases/board';
 import { getDatabaseDetails } from '@root/lib/pages/getDatabaseDetails';
 import { createDatabaseCardPage } from '@root/lib/public-api/createDatabaseCardPage';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { relay } from '@root/lib/websockets/relay';
 import type { AddFormResponseInput, FormResponse } from '@root/lib/zapier/interfaces';
 import { parseFormData } from '@root/lib/zapier/parseFormData';

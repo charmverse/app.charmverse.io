@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { applyPageToBlock } from '@root/lib/databases/block';
 import { createCardPage } from '@root/lib/pages/createCardPage';
 
 import type { BlockWithDetails } from '../block';
+import { applyPageToBlock } from '../block';
 
 // Create card blocks for proposals that do not exist already
 export async function createMissingCards({ boardId }: { boardId: string }): Promise<BlockWithDetails[]> {

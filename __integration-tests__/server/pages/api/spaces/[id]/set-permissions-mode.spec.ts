@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { SpacePermissionConfigurationUpdate } from 'lib/permissions/meta';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/spaces/[id]/set-permissions-mode - Define if the space should use a preset permissions mode or a custom one', () => {
   it('should update the space permissions mode if user is admin and return the space, responding with 200', async () => {

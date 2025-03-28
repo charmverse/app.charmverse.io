@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -8,7 +9,6 @@ import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposal
 import { createDraftProposal } from 'lib/proposals/createDraftProposal';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
 
 export const getServerSideProps = withSessionSsr<{ error?: string }>(async (context) => {

@@ -1,12 +1,12 @@
 import { AuthKitProvider } from '@farcaster/auth-kit';
 import { Typography } from '@mui/material';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import type { LoggedInUser } from '@packages/profile/getUser';
 
 import { FarcasterLoginModal } from 'components/login/components/FarcasterModal';
 import { useWarpcastLogin } from 'components/login/hooks/useWarpcastLogin';
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import { warpcastConfig } from 'lib/farcaster/config';
-import type { FarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
 import { ConnectedAccount } from './ConnectedAccount';
 

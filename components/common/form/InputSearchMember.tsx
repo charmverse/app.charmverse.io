@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
+import { isValidEmail } from '@packages/utils/strings';
 import type { ReactNode } from 'react';
 import { createRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
@@ -9,7 +10,6 @@ import { v4 } from 'uuid';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { isValidEmail } from 'lib/utils/strings';
 
 const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 

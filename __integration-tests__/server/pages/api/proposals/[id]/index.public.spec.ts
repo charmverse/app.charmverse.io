@@ -1,11 +1,11 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;
 let reviewer: User;

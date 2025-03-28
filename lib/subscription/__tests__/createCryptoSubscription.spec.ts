@@ -1,10 +1,9 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { NotFoundError } from '@root/lib/middleware';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { loopItemMock, stripeMock } from '@packages/testing/stripeMock';
+import { addSpaceSubscription } from '@packages/testing/utils/spaces';
 import { v4 } from 'uuid';
-
-import { loopItemMock, stripeMock } from 'testing/stripeMock';
-import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { createCryptoSubscription } from '../createCryptoSubscription';
 import { stripeClient } from '../stripe';

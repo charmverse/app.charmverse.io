@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-
-import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateRole, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 import { getProposalsReviewers } from '../getProposalsReviewers';
 

@@ -1,9 +1,9 @@
-import type { UIBlockWithDetails } from '@root/lib/databases/block';
-import { createBlock } from '@root/lib/databases/block';
+import { replaceS3Domain } from '@packages/utils/url';
 import type { PageContent } from '@root/lib/prosemirror/interfaces';
-import { replaceS3Domain } from '@root/lib/utils/url';
 import { v4 } from 'uuid';
 
+import type { UIBlockWithDetails } from './block';
+import { createBlock } from './block';
 import type { Card } from './card';
 import { Constants } from './constants';
 

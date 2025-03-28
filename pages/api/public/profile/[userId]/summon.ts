@@ -1,9 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { getSummonProfile } from '@packages/profile/getSummonProfile';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
-import { getSummonProfile } from 'lib/profile/getSummonProfile';
 import type { SummonUserProfile } from 'lib/summon/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

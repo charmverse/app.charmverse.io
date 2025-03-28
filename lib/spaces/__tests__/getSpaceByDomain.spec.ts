@@ -2,9 +2,8 @@
 /* eslint-disable no-use-before-define */
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { getSpaceByDomain } from '../getSpaceByDomain';
 

@@ -1,14 +1,14 @@
 import type { MemberProperty, Role, Space } from '@charmverse/core/prisma';
-import type { LoggedInUser } from '@root/lib/profile/getUser';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { generateMemberProperty } from '@packages/testing/utils/members';
 import request from 'supertest';
 
 import { createMemberPropertyPermission } from 'lib/members/createMemberPropertyPermission';
 import { deleteMemberPropertyPermission } from 'lib/members/deleteMemberPropertyPermission';
 import type { MemberPropertyPermissionWithRole } from 'lib/members/interfaces';
 import { assignRole } from 'lib/roles';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
-import { generateMemberProperty } from 'testing/utils/members';
 
 let space: Space;
 let adminUser: LoggedInUser;

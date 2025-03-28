@@ -1,8 +1,9 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
+import { NotFoundError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, NotFoundError } from 'lib/middleware';
+import { onError, onNoMatch } from 'lib/middleware';
 import { getRewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import { withSessionRoute } from 'lib/session/withSession';

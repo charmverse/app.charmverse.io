@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { createPublicClient, http } from 'viem';
 import { optimism } from 'viem/chains';
 
-import { getChainById } from './chains';
+import { getChainById } from './connectors/chains';
 import { getAlchemyBaseUrl } from './getAlchemyBaseUrl';
 
 /**

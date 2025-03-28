@@ -1,9 +1,8 @@
+import { createPage } from '@packages/testing/setupDatabase';
 import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@root/config/constants';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-
-import { createPage } from 'testing/setupDatabase';
 
 type Fixtures = {
   documentPage: DocumentPage;

@@ -1,7 +1,6 @@
+import { generateSpaceForUser } from '@packages/testing/utils/spaces';
 import { baseUrl } from '@root/config/constants';
 import { expect, test } from '__e2e__/testWithFixtures';
-
-import { generateSpaceForUser } from 'testing/utils/spaces';
 
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';

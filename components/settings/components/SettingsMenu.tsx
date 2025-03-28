@@ -1,6 +1,7 @@
 import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { Feature } from '@packages/features/constants';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import Link from 'components/common/Link';
@@ -14,7 +15,6 @@ import { useSettingsDialog, type SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { Feature } from 'lib/features/constants';
 import { getSpaceUrl } from 'lib/utils/browser';
 
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from '../config';

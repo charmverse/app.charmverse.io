@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import type { BoardFields, IPropertyTemplate } from '@root/lib/databases/board';
-import { syncRelationProperty } from '@root/lib/databases/relationProperty/syncRelationProperty';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
 
-import { generateBoard } from 'testing/setupDatabase';
+import type { BoardFields, IPropertyTemplate } from '../../board';
+import { syncRelationProperty } from '../syncRelationProperty';
 
 describe('syncRelationProperty', () => {
   it('should create relation property on connected board and sync card relation property values', async () => {

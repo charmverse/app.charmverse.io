@@ -1,12 +1,12 @@
 import type { Space, User, Vote } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { createVote, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { PublicApiProposal } from 'pages/api/v1/proposals';
-import { baseUrl } from 'testing/mockApiCall';
-import { createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;

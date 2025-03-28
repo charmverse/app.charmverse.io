@@ -4,7 +4,7 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { authSecret } from '@root/config/constants';
+import { authSecret } from '@packages/utils/constants';
 import { sealData, unsealData } from 'iron-session';
 
 type DocusignOAuthState = {

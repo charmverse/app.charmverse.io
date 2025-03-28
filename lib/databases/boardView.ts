@@ -1,10 +1,10 @@
-import type { UIBlockWithDetails } from '@root/lib/databases/block';
-import { createBlock } from '@root/lib/databases/block';
-import type { FilterGroup } from '@root/lib/databases/filterGroup';
-import { createFilterGroup } from '@root/lib/databases/filterGroup';
 import { upperFirst } from 'lodash';
 
+import type { UIBlockWithDetails } from './block';
+import { createBlock } from './block';
 import type { DataSourceType, GoogleFormSourceData } from './board';
+import type { FilterGroup } from './filterGroup';
+import { createFilterGroup } from './filterGroup';
 
 export type IViewType = 'board' | 'table' | 'gallery' | 'calendar';
 export type ISortOption = { propertyId: '__title' | string; reversed: boolean };

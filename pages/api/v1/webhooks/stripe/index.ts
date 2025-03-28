@@ -2,11 +2,11 @@ import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { StripeSubscription, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
 import { getLoopProducts } from 'lib/loop/loop';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
 import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';

@@ -1,6 +1,6 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 import { v4 as uuid } from 'uuid';
 
 async function getConfig({

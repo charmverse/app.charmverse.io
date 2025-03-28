@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import useMultiWalletSigs from './useMultiWalletSigs';
 import { useUser } from './useUser';

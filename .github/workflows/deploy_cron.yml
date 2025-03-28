@@ -16,7 +16,7 @@ on:
       - 'abis/**'
       - 'adapters/**'
       - 'config/**'
-      - 'connectors/**'
+      - 'packages/**'
       - 'lib/**'
   pull_request:
     types: [labeled, opened, synchronize]
@@ -34,7 +34,7 @@ on:
       - 'abis/**'
       - 'adapters/**'
       - 'config/**'
-      - 'connectors/**'
+      - 'packages/**'
       - 'lib/**'
 
 concurrency:

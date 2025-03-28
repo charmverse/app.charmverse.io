@@ -1,10 +1,10 @@
 import { SpaceOperation } from '@charmverse/core/prisma';
+import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
 
 import type { SpacePermissionFlags, SpacePermissionModification } from 'lib/permissions/spaces';
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('GET /api/permissions/space/{spaceId}/compute - Compute user space permissions', () => {
   it('should return assigned permissions for the user and respond 200', async () => {

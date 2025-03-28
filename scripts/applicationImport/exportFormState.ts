@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { writeToSameFolder } from 'lib/utils/file';
-import { prettyPrint } from 'lib/utils/strings';
+import { prettyPrint } from '@packages/utils/strings';
 
 async function exportForm({ spaceDomain, templatePath }: { spaceDomain: string; templatePath: string }) {
   const form = await prisma.proposal.findFirstOrThrow({

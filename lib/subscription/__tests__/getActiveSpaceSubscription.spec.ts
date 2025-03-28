@@ -1,7 +1,6 @@
 import { testUtilsUser } from '@charmverse/core/test';
+import { addSpaceSubscription } from '@packages/testing/utils/spaces';
 import { v4 } from 'uuid';
-
-import { addSpaceSubscription } from 'testing/utils/spaces';
 
 import { getActiveSpaceSubscription, subscriptionExpandFields } from '../getActiveSpaceSubscription';
 import { stripeClient } from '../stripe';

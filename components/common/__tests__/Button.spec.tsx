@@ -1,7 +1,7 @@
+import { mockCurrentSpaceContext } from '@packages/testing/mocks/useCurrentSpace';
 import { render, waitFor } from '@testing-library/react';
 
 import { Button } from 'components/common/Button';
-import { mockCurrentSpaceContext } from 'testing/mocks/useCurrentSpace';
 
 jest.mock('hooks/useCurrentSpace', () => ({
   useCurrentSpace: jest.fn(() => mockCurrentSpaceContext())

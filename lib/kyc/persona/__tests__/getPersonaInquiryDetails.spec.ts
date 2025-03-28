@@ -1,7 +1,6 @@
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePersonaCredential, generatePersonaUserKyc } from '@packages/testing/utils/kyc';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { generatePersonaCredential, generatePersonaUserKyc } from 'testing/utils/kyc';
 
 import { getPersonaInquiryDetails } from '../getPersonaInquiryDetails';
 

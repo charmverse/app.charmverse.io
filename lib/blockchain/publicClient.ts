@@ -1,9 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { getChainById } from '@root/connectors/chains';
-import { getAlchemyBaseUrl } from '@root/lib/blockchain/provider/alchemy/client';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import type { PublicClient } from 'viem';
 import { createPublicClient, http } from 'viem';
 
+import { getAlchemyBaseUrl } from './provider/alchemy/client';
 import { getAnkrBaseUrl } from './provider/ankr/client';
 import { isAnkrChain } from './provider/ankr/config';
 

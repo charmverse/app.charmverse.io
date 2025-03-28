@@ -1,9 +1,9 @@
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
+import { logWorkspaceJoinedViaTokenGate } from '@packages/metrics/postToDiscord';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfileById } from 'lib/metrics/mixpanel/updateTrackUserProfileById';
-import { logWorkspaceJoinedViaTokenGate } from 'lib/metrics/postToDiscord';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';

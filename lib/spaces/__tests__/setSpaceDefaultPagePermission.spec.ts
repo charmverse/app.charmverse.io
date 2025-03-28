@@ -1,10 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { InvalidInputError } from '@packages/utils/errors';
 import { SpaceNotFoundError } from '@root/lib/public-api';
-import { InvalidInputError } from '@root/lib/utils/errors';
 import { v4 } from 'uuid';
-
-import { ExpectedAnError } from 'testing/errors';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { setSpaceDefaultPagePermission } from '../setSpaceDefaultPagePermission';
 

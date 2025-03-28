@@ -1,7 +1,7 @@
 import { SunnyAwardsProjectType } from '@charmverse/core/prisma-client';
+import { typedKeys } from '@packages/utils/types';
 import { isGithubRepositoryUrl } from '@root/lib/github/isGithubRepositoryUrl';
 import type { ProjectCategory as OptimismProjectCategory } from '@root/lib/optimism/projectSchema';
-import { typedKeys } from '@root/lib/utils/objects';
 import { isAddress, type Address } from 'viem';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';

@@ -18,9 +18,9 @@ import type {
   VoteOptions
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { isBoardPageType } from '@root/lib/pages/isBoardPageType';
 import type { PageContent, TextContent } from '@root/lib/prosemirror/interfaces';
-import { DataNotFoundError } from '@root/lib/utils/errors';
 import { validate } from 'uuid';
 
 export type RelatedPageData = {

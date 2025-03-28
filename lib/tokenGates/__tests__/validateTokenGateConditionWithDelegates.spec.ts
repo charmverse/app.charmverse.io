@@ -1,13 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { clearTokenGateData, deleteTokenGate, generateTokenGate } from '@packages/testing/utils/tokenGates';
 import type { AccessControlCondition } from '@root/lib/tokenGates/interfaces';
 import { validateTokenGateConditionWithDelegates } from '@root/lib/tokenGates/validateTokenGateConditionWithDelegates';
 import { verifyTokenGateMemberships } from '@root/lib/tokenGates/verifyTokenGateMemberships';
 import { walletAddress } from 'stories/lib/mockTokenGataData';
-
-import { randomETHWalletAddress } from 'testing/generateStubs';
-import { generateUserAndSpace } from 'testing/setupDatabase';
-import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
 
 async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
   return prisma.spaceRole.findUnique({

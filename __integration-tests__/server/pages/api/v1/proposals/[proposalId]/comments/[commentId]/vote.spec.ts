@@ -2,12 +2,12 @@ import type { Space, SuperApiToken, User } from '@charmverse/core/prisma';
 import type { PageComment, Proposal, SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { generateSpaceApiKey, generateSuperApiKey } from '@packages/testing/generators/apiKeys';
+import { baseUrl } from '@packages/testing/mockApiCall';
+import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
 import request from 'supertest';
 
 import type { PublicApiProposalComment } from 'pages/api/v1/proposals/[proposalId]/comments';
-import { generateSpaceApiKey, generateSuperApiKey } from 'testing/generators/apiKeys';
-import { baseUrl } from 'testing/mockApiCall';
-import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
 describe('POST /api/v1/proposals/{proposalId}/comments/{commentId}/vote', () => {
   let space: Space;

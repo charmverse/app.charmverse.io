@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { userByEmailOrGoogleAccountQuery } from '@root/lib/profile/getUser';
+import { userByEmailOrGoogleAccountQuery } from '@packages/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 

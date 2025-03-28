@@ -1,6 +1,6 @@
 import type { User } from '@charmverse/core/prisma-client';
+import type { FeatureJson } from '@packages/features/constants';
 import { render } from '@react-email/render';
-import type { FeatureJson } from '@root/lib/features/constants';
 import { getNotificationMetadata } from '@root/lib/notifications/getNotificationMetadata';
 import type { Notification } from '@root/lib/notifications/interfaces';
 import { htmlToText } from 'html-to-text';

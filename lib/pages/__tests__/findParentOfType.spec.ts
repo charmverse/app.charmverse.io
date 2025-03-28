@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import type { PageNode, TargetPageTree } from '@charmverse/core/pages';
-
-import { generatePageNode } from 'testing/generateStubs';
+import { generatePageNode } from '@packages/testing/generateStubs';
 
 import { findParentOfType } from '../findParentOfType';
 import type { PagesMap } from '../interfaces';

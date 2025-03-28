@@ -1,6 +1,4 @@
 import { objectUtils } from '@charmverse/core/utilities';
-import type { IPropertyTemplate, ProposalPropertyType } from '@root/lib/databases/board';
-import type { Constants } from '@root/lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -16,6 +14,9 @@ import type {
   ProposalEvaluationStep
 } from '@root/lib/proposals/interfaces';
 import { v4 as uuid } from 'uuid';
+
+import type { IPropertyTemplate, ProposalPropertyType } from './board';
+import type { Constants } from './constants';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
   declined: 'Declined',

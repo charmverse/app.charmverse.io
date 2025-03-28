@@ -1,5 +1,7 @@
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
+import type { StaticPage } from '@packages/features/constants';
+import { STATIC_PAGES } from '@packages/features/constants';
 import type { EditorView } from 'prosemirror-view';
 import { memo } from 'react';
 
@@ -7,8 +9,6 @@ import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { StaticPage } from 'lib/features/constants';
-import { STATIC_PAGES } from 'lib/features/constants';
 import type { PageMetaLite } from 'lib/pages/interfaces';
 
 import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';

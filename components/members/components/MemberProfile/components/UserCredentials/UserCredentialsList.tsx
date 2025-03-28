@@ -1,6 +1,7 @@
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Alert, Box, Card, Divider, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
+import type { EASAttestationWithFavorite } from '@packages/credentials/external/getOnchainCredentials';
 
 import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import type { DraggableListItemProps } from 'components/common/DraggableListItem';
@@ -8,7 +9,6 @@ import { DraggableListItem } from 'components/common/DraggableListItem';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 import type { UserCredentialRowProps } from './UserCredentialRow';
 import { UserCredentialRow } from './UserCredentialRow';

@@ -1,8 +1,8 @@
-import { Avatar } from '@connect-shared/components/common/Avatar';
 import type { StatusAPIResponse } from '@farcaster/auth-kit';
 import type { BoxProps } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import { Stack } from '@mui/system';
+import { Avatar } from '@packages/connect-shared/components/common/Avatar';
 import { apiClient } from 'apiClient/apiClient';
 import debounce from 'lodash/debounce';
 import { useEffect, useMemo, useState } from 'react';

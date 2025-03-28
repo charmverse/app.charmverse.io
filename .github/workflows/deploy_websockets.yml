@@ -16,6 +16,7 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      - 'packages/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
@@ -32,6 +33,7 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      - 'packages/**'
       # include some paths so that we trigger deploy for web app staging
       - 'components/**'
       - 'pages/**'

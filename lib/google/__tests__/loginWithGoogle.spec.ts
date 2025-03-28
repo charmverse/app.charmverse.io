@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { DisabledAccountError } from '@root/lib/utils/errors';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { DisabledAccountError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
-
-import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { loginWithGoogle } from '../loginWithGoogle';
 

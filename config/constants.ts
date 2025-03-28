@@ -10,10 +10,7 @@ export const isDevEnv =
 export const isNodeEnv = typeof window === 'undefined';
 export const appEnv = isProdEnv ? 'production' : isStagingEnv ? 'staging' : isTestEnv ? 'test' : 'development';
 export const baseUrl = process.env.DOMAIN as string | undefined;
-// for cookies
-export const authSecret = process.env.AUTH_SECRET as string | undefined;
-export const recoveryCodeSecretKey = process.env.RECOVERY_CODE_SECRET_KEY as string | undefined;
-// export const cookieDomain = process.env.COOKIE_DOMAIN as string | undefined;
+
 export const cookieDomain = undefined; // TODO: set cookie domain so that we can have cross-subdomain sessions
 export const cookieName = 'charm.sessionId';
 // web sockets
@@ -54,10 +51,6 @@ export const permissionsApiAuthKey = process.env.PERMISSIONS_API_AUTH_KEY ?? 'ke
 export const webhookEndpoint = 'api/v1/webhooks/addToDatabase';
 
 export const appSubdomain = 'app';
-
-// In CI, we want to have a private key for signing, but we don't need a fixed one. We also want to have errors if we are not in CI environment and CREDENTIAL_WALLET_KEY is not set
-export const credentialsWalletPrivateKey = process.env.CREDENTIAL_WALLET_KEY;
-export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // Github
 export const githubPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY as string;

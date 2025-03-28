@@ -1,9 +1,8 @@
+import { UnknownError } from '@packages/nextjs/errors';
 import { validateTokenGateConditionsObject } from '@root/lib/tokenGates/validateTokenGateConditionsObject';
 import type { NextApiRequest } from 'next';
 import type { NextHandler } from 'next-connect';
 import type { Schema } from 'yup';
-
-import { UnknownError } from './errors';
 
 type ValidationTypes = 'tokenGateConditions';
 
