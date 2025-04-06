@@ -48,6 +48,8 @@ const isProdEnvironment = isProdEnv;
 const webhook = process.env.DISCORD_EVENTS_WEBHOOK;
 
 export async function postToDiscord(eventLog: IEventToLog) {
+  // dont send to discord
+  return;
   let message = `Event: **${eventLog.funnelStage.toUpperCase()}**  / ${eventLog.eventType}\r\n`;
 
   message += eventLog.message;
@@ -56,7 +58,7 @@ export async function postToDiscord(eventLog: IEventToLog) {
 
   if (isProdEnvironment && webhook) {
     try {
-      const discordReponse = await http.POST<IDiscordMessage>(webhook, { content: message });
+      const discordReponse = await http.POST<IDiscordMessage>(webhook!, { content: message });
       return discordReponse;
     } catch (error) {
       log.warn('Error posting to discord', error);
