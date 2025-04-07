@@ -105,12 +105,11 @@ function PageLayout({ children }: PageLayoutProps) {
               <BlocksExceededBanner />
               {!whitelistedDomains.includes(space?.domain || '') ? (
                 <AnnouncementBanner
-                  actionLabel='Play'
-                  actionHref='https://youtube.com/shorts/Xr9S_aJPIPs?si=1UTudvjtc-NF5Zvt'
-                  bannerId='scout-game-banner'
+                  actionLabel='More info'
+                  actionHref='https://scoutgame.substack.com/p/whats-next-for-the-scout-game-airdrops'
+                  bannerId='dev-token-banner'
                 >
-                  Preseason 2 is live! All rankings and points reset. Scout cheaper, tradeable Builder Cards, complete
-                  quests, and rack up points.
+                  Scout Game’s $DEV token launches April 21
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
