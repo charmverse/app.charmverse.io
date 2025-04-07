@@ -105,11 +105,11 @@ function PageLayout({ children }: PageLayoutProps) {
               <BlocksExceededBanner />
               {!whitelistedDomains.includes(space?.domain || '') ? (
                 <AnnouncementBanner
-                  actionLabel='More info'
+                  actionLabel='Read More'
                   actionHref='https://scoutgame.substack.com/p/whats-next-for-the-scout-game-airdrops'
                   bannerId='dev-token-banner'
                 >
-                  Scout Game’s $DEV token launches April 21
+                  Scout Game’s DEV token launches April 21
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
