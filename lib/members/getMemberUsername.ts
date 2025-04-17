@@ -67,7 +67,7 @@ export function getMemberUsername({
 }: {
   primaryMemberIdentity: IdentityType | null;
   user: UserIdentities;
-}) {
+}): string {
   const username = user.username;
   if (!primaryMemberIdentity) {
     return username;
@@ -94,7 +94,9 @@ export function getMemberUsername({
     if (!telegramUserAccount) {
       return username;
     }
-    return telegramUserAccount.username;
+    return (
+      telegramUserAccount.username || `${telegramUserAccount.first_name || ''} ${telegramUserAccount.last_name || ''}`
+    );
   }
 
   if (primaryMemberIdentity === 'Wallet') {
