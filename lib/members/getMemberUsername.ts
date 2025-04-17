@@ -67,7 +67,7 @@ export function getMemberUsername({
 }: {
   primaryMemberIdentity: IdentityType | null;
   user: UserIdentities;
-}) {
+}): string {
   const username = user.username;
   if (!primaryMemberIdentity) {
     return username;
