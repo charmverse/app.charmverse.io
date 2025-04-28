@@ -104,12 +104,8 @@ function PageLayout({ children }: PageLayoutProps) {
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
               {!whitelistedDomains.includes(space?.domain || '') ? (
-                <AnnouncementBanner
-                  actionLabel='Read More'
-                  actionHref='https://scoutgame.substack.com/p/whats-next-for-the-scout-game-airdrops'
-                  bannerId='dev-token-banner'
-                >
-                  Scout Game’s DEV token launches April 21
+                <AnnouncementBanner actionLabel='Play' actionHref='https://scoutgame.xyz' bannerId='season-one-banner'>
+                  Build the future, one card at a time. Play Scout Game Season 1!
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
