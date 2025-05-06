@@ -92,6 +92,7 @@
           "./packages/metrics/",
           "./packages/nextjs/",
           "./packages/pages/",
+          "./packages/profile/",
           "./packages/testing/",
           "./packages/users/",
           "./packages/utils/",

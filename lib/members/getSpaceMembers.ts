@@ -119,7 +119,11 @@ export async function getSpaceMembers({
         properties.forEach((property) => {
           if (visiblePropertyIds.includes(property.memberPropertyId)) {
             if (property.type === 'telegram') {
-              property.value = (telegramUser?.account as unknown as TelegramAccount)?.username;
+              const telegramAccount = telegramUser?.account as unknown as TelegramAccount;
+              if (telegramAccount) {
+                property.value =
+                  telegramAccount.username || `${telegramAccount.first_name || ''} ${telegramAccount.last_name || ''}`;
+              }
             } else if (property.type === 'discord') {
               property.value = (discordUser?.account as unknown as DiscordAccount)?.username;
             } else if (property.type === 'google') {

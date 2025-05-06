@@ -11,7 +11,7 @@ const track = new TrackApi();
 
 export function trackPageView(page: Omit<PageEventMap['page_view'], 'userId'>) {
   const fullPath = getBrowserPath();
-  const pathname = page.spaceDomain ? fullPath.replace(new RegExp(`^\\/${page.spaceDomain}`), '') : fullPath;
+  const pathname = page.spaceDomain ? fullPath.replace(new RegExp(`^\\/${page.spaceDomain}\\/`), '/') : fullPath;
 
   track.trackAction('page_view', {
     ...page,

@@ -31,7 +31,7 @@ interface PageLayoutProps {
   children: ReactNode;
 }
 
-const whitelistedDomains = ['ef', 'ethrangers'];
+const whitelistedDomains = ['ef', 'ethrangers', 'blockdag-grants'];
 
 function PageLayout({ children }: PageLayoutProps) {
   const { user, isLoaded: isUserLoaded } = useUser();
@@ -104,13 +104,8 @@ function PageLayout({ children }: PageLayoutProps) {
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
               {!whitelistedDomains.includes(space?.domain || '') ? (
-                <AnnouncementBanner
-                  actionLabel='Play'
-                  actionHref='https://youtube.com/shorts/Xr9S_aJPIPs?si=1UTudvjtc-NF5Zvt'
-                  bannerId='scout-game-banner'
-                >
-                  Preseason 2 is live! All rankings and points reset. Scout cheaper, tradeable Builder Cards, complete
-                  quests, and rack up points.
+                <AnnouncementBanner actionLabel='Play' actionHref='https://scoutgame.xyz' bannerId='season-one-banner'>
+                  Build the future, one card at a time. Play Scout Game Season 1!
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
