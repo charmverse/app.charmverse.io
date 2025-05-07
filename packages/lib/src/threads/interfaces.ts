@@ -1,5 +1,5 @@
 import type { FormFieldAnswer, Thread, Comment } from '@charmverse/core/prisma';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 
 export enum ThreadStatus {
   open,

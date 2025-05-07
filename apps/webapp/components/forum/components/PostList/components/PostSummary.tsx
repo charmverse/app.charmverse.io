@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 
 import { CharmEditor } from 'components/common/CharmEditor';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 const StyledCharmEditor = styled(CharmEditor)`
   .ProseMirror {

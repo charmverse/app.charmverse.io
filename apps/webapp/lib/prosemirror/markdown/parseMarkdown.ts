@@ -1,4 +1,4 @@
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import markdownit from 'markdown-it/lib';
 import { MarkdownParser } from 'prosemirror-markdown';
 

@@ -7,7 +7,7 @@ import { replaceStep } from 'prosemirror-transform';
 
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {

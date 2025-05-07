@@ -1,15 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generatePostCategory } from '@packages/testing/utils/forums';
-import { createRole } from '@packages/testing/utils/roles';
+import { emptyDocument } from '@packages/charmeditor/constants';
 import { createForumPost } from '@packages/lib/forums/posts/createForumPost';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from '@packages/lib/roles';
 import { createVote } from '@packages/lib/votes/createVote';
 import { getSpaceEntity, getVoteEntity } from '@packages/lib/webhookPublisher/entities';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
+import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { createRole } from '@packages/testing/utils/roles';
 
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createPollNotifications } from '../createPollNotifications';

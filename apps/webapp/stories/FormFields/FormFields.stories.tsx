@@ -1,5 +1,6 @@
-import { capitalize } from '@packages/utils/strings';
+import { createDocumentWithText } from '@packages/charmeditor/constants';
 import type { SelectOptionType, FormFieldInput, FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
+import { capitalize } from '@packages/utils/strings';
 import { useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
@@ -10,7 +11,6 @@ import { formFieldTypes } from 'components/common/form/constants';
 import { FormFieldAnswers as CustomFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
-import { createDocumentWithText } from 'lib/prosemirror/constants';
 
 const options: SelectOptionType[] = [
   {

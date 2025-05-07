@@ -1,4 +1,6 @@
 import { Box, Tooltip } from '@mui/material';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { isProdEnv } from '@packages/config/constants';
 import { useState } from 'react';
 
@@ -12,8 +14,6 @@ import { useLensProfile } from 'components/settings/account/hooks/useLensProfile
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function LensSocialShare({
   lensPostLink,

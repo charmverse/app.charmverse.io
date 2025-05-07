@@ -5,6 +5,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Box, Collapse, FormLabel, IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -12,7 +13,6 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 

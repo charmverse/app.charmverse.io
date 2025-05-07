@@ -17,9 +17,9 @@ import type {
   ProposalEvaluationApprover
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';

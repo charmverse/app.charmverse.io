@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { deleteComment, updateComment } from '@packages/lib/comments';
+import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { deleteComment, updateComment } from '@packages/lib/comments';
-import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

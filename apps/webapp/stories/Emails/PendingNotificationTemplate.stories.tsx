@@ -1,5 +1,5 @@
+import { emptyDocument } from '@packages/charmeditor/constants';
 import { NotificationTemplate } from '@packages/lib/mailer/emails/templates/NotificationTemplate';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { getCurrentDate } from '@packages/lib/utils/dates';
 import { v4 } from 'uuid';
 

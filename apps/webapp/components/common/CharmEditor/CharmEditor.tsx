@@ -4,6 +4,8 @@ import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
 import type { CryptoCurrency, FiatCurrency } from '@packages/blockchain/connectors/chains';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
@@ -20,9 +22,7 @@ import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { extractDeletedThreadIds } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';

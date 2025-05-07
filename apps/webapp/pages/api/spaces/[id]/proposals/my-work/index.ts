@@ -1,10 +1,9 @@
+import { onError, onNoMatch } from '@packages/lib/middleware';
 import type { GetUserProposalsResponse } from '@packages/lib/proposals/getUserProposals';
 import { getUserProposals } from '@packages/lib/proposals/getUserProposals';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

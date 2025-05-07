@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { useRef } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
@@ -10,7 +11,6 @@ import PageHeader, { getPageTop } from 'components/[pageId]/DocumentPage/compone
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { EMPTY_PAGE_VALUES } from '../hooks/useNewPage';

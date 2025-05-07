@@ -1,12 +1,16 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
+import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 import type {
   SelectOptionType,
   ProjectFieldValue,
   FormFieldValue,
   FieldAnswerInput
 } from '@packages/lib/proposals/forms/interfaces';
+import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 import { useCallback, useMemo } from 'react';
 import { Controller } from 'react-hook-form';
 import type { Control, UseFormGetFieldState } from 'react-hook-form';
@@ -14,10 +18,6 @@ import type { Control, UseFormGetFieldState } from 'react-hook-form';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
-import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 
 import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 import { ProjectFieldAnswer } from '../ProjectForm/components/ProjectField/ProjectFieldAnswer';

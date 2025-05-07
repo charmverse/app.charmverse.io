@@ -1,6 +1,10 @@
 import { getLogger } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { extractMentions } from '@packages/charmeditor/utils/extractMentions';
+import { extractPreviewImage } from '@packages/charmeditor/utils/extractPreviewImage';
 import { STATIC_PAGES } from '@packages/features/constants';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
@@ -11,12 +15,8 @@ import { validate } from 'uuid';
 
 import { trashPages } from 'lib/pages/trashPages';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { AuthenticatedSocketData } from '../authentication';
 import type { AbstractWebsocketBroadcaster } from '../interfaces';

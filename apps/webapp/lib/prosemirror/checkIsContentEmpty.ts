@@ -1,4 +1,4 @@
-import type { BlockNode, TextContent, PageContent } from 'lib/prosemirror/interfaces';
+import type { BlockNode, TextContent, PageContent } from '@packages/charmeditor/interfaces';
 
 export function checkIsContentEmpty(content: PageContent | null | undefined): boolean {
   return (

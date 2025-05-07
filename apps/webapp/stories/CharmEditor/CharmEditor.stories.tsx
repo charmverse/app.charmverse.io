@@ -1,4 +1,5 @@
 import { Divider, Paper } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { contentWithBlocksAndMarks, contentWithMedia } from '@packages/testing/mocks/charmEditorContent';
 import { useState } from 'react';
 import { Provider } from 'react-redux';
@@ -8,7 +9,6 @@ import { InlineCharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
 import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { renderEditorWithContent, withCharmEditorProviders } from './renderEditor';
 

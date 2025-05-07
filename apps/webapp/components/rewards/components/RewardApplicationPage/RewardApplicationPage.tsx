@@ -2,6 +2,8 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Divider, FormLabel, Grid, Tab, Tabs } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -26,8 +28,6 @@ import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 
 import { RewardEvaluations } from '../RewardEvaluations/RewardEvaluations';
 

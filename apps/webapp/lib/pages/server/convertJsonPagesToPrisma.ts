@@ -2,8 +2,8 @@ import fs from 'node:fs/promises';
 
 import type { Block, Page, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { extractPreviewImage } from '@packages/charmeditor/utils/extractPreviewImage';
 import { v4 } from 'uuid';
 
 interface AWSAssetUrl {

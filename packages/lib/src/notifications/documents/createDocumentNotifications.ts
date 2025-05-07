@@ -2,15 +2,15 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { isTruthy } from '@packages/utils/types';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { UserMentionMetadata } from '@packages/charmeditor/utils/extractMentions';
+import { extractMentions } from '@packages/charmeditor/utils/extractMentions';
 import { getPermissionsClient } from '@packages/lib/permissions/api';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadAccessGroup } from '@packages/lib/threads';
 import type { WebhookEvent } from '@packages/lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
+import { isTruthy } from '@packages/utils/types';
 
 import { saveDocumentNotification } from '../saveNotification';
 

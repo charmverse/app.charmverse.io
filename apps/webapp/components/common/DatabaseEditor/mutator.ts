@@ -1,6 +1,6 @@
 /* eslint-disable default-param-last */
 
-import charmClient from 'charmClient';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { UIBlockWithDetails, BlockPatch } from '@packages/databases/block';
 import { createPatchesFromBlocks } from '@packages/databases/block';
 import type {
@@ -19,7 +19,8 @@ import { Constants } from '@packages/databases/constants';
 import type { FilterClause } from '@packages/databases/filterClause';
 import type { FilterGroup } from '@packages/databases/filterGroup';
 import { computeGroupSpacePermissions } from '@packages/lib/permissions/spaces/computeGroupSpacePermissions';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import charmClient from 'charmClient';
 
 import { OctoUtils } from './octoUtils';
 import { publishIncrementalUpdate } from './publisher';

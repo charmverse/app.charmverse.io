@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { generatePage } from '__e2e__/utils/pages';
-
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type Fixtures = {
   documentPage: DocumentPage;

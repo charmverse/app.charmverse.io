@@ -1,6 +1,7 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { isTruthy } from '@packages/utils/types';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
@@ -37,7 +38,6 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';

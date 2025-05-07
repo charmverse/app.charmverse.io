@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { countSpaceBlocksAndSave } from 'lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
-import { deleteArchivalBlockCounts } from 'lib/spaces/deleteArchivalBlockCounts';
+import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
+import { deleteArchivalBlockCounts } from '@packages/spaces/deleteArchivalBlockCounts';
 
 const perBatch = 1000;
 export async function countAllSpacesBlocks({ offset = 0 }: { offset?: number } = {}): Promise<void> {

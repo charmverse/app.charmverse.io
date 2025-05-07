@@ -4,9 +4,9 @@ import * as hardBreak from '@packages/charmeditor/extensions/hardBreak';
 import { spec as listItemSpec } from '@packages/charmeditor/extensions/listItem';
 import { spec as orderedListItemSpec } from '@packages/charmeditor/extensions/orderedList';
 import { spec as tabIndentSpec } from '@packages/charmeditor/extensions/tabIndent';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';

@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { expect, test } from '__e2e__/testWithFixtures';
-
-import { emptyDocument } from 'lib/prosemirror/constants';
+import { emptyDocument } from '@packages/charmeditor/constants';
 import { createThread, toggleThreadStatus } from '@packages/lib/threads';
+import { expect, test } from '__e2e__/testWithFixtures';
 
 import { generateUserAndSpace, loginBrowserUser } from './utils/mocks';
 

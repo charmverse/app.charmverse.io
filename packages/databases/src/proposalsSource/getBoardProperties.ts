@@ -1,7 +1,7 @@
 import type { PageType, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { projectFieldProperties, projectMemberFieldProperties } from '@packages/lib/projects/formField';
 import type { FormFieldInput, SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';

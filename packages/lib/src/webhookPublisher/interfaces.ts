@@ -1,5 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import type { UserMentionMetadata } from '@packages/charmeditor/utils/extractMentions';
 
 export type UserEntity = {
   id: string;

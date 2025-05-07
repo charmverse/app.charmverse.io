@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { isTruthy } from '@packages/utils/types';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { DocumentNotification } from '../interfaces';
 import type { QueryCondition } from '../utils';

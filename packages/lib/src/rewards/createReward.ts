@@ -1,5 +1,6 @@
 import type { Page, PagePermission, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { extractPreviewImage } from '@packages/charmeditor/utils/extractPreviewImage';
 import type { BoardFields } from '@packages/databases/board';
 import type { RewardFields } from '@packages/lib/rewards/blocks/interfaces';
 import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
@@ -7,8 +8,6 @@ import { NotFoundError } from '@packages/nextjs/errors';
 import { generatePagePathFromPathAndTitle } from '@packages/pages/utils';
 import { InvalidInputError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
-
-import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';

@@ -1,7 +1,7 @@
 import type { Comment } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { CommentCreate } from '@packages/lib/comments/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { MultipleThreadsInput, ThreadWithComments } from '@packages/lib/threads/interfaces';
 
 import type { ResolveThreadRequest } from 'pages/api/threads/[id]/resolve';

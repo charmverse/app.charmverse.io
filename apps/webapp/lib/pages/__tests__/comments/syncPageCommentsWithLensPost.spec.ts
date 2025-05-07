@@ -1,12 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { lensClient } from '@packages/lib/lens/lensClient';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
-import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
-import { updatePageComment } from 'lib/pages/comments/updatePageComment';
+import { createPageComment } from '@packages/pages/comments/createPageComment';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateSpaceRole } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
+
+import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
+import { updatePageComment } from 'lib/pages/comments/updatePageComment';
 
 jest.mock('lib/lens/lensClient', () => ({
   lensClient: {

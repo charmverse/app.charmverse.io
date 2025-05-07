@@ -1,4 +1,5 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { createDocumentWithText } from '@packages/charmeditor/constants';
 import { charmBlue as blueColor } from '@packages/config/colors';
 import * as emails from '@packages/lib/mailer/emails/emails';
 import { onError, onNoMatch } from '@packages/lib/middleware';
@@ -10,7 +11,6 @@ import type {
   ProposalNotification,
   VoteNotification
 } from '@packages/lib/notifications/interfaces';
-import { createDocumentWithText } from 'lib/prosemirror/constants';
 import type { VoteTask } from '@packages/lib/votes/interfaces';
 import { getPagePath } from '@packages/pages/utils';
 import { randomName } from '@packages/utils/randomName';

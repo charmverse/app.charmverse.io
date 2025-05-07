@@ -4,7 +4,7 @@ import {
   type SpaceWithMixpanelProfile
 } from '@packages/metrics/mixpanel/batchUpdateSpaceProfiles';
 import { getTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
-import { getSpaceBlockCount } from 'lib/spaces/getSpaceBlockCount';
+import { getSpaceBlockCount } from '@packages/spaces/getSpaceBlockCount';
 
 const perBatch = 1000;
 export async function updateMixpanelProfiles({ offset = 0 }: { offset?: number } = {}): Promise<void> {

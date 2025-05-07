@@ -20,6 +20,7 @@ import {
   Typography,
   useMediaQuery
 } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { DateTime } from 'luxon';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
@@ -33,7 +34,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { InlineCharmEditor } from '../../index';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';

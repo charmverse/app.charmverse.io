@@ -1,7 +1,7 @@
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { ProposalFields } from '@packages/lib/proposals/interfaces';
-import { PageContent } from 'lib/prosemirror/interfaces';
+import { PageContent } from '@packages/charmeditor/interfaces';
 import { isTruthy } from '@packages/utils/types';
 import { v4 } from 'uuid';
 

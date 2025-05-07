@@ -1,14 +1,6 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from '@packages/metrics/postToDiscord';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import { UnauthorisedActionError } from '@packages/utils/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { upsertDefaultRewardsBoard } from '@packages/lib/rewards/blocks/upsertDefaultRewardsBoard';
 import type { RewardCreationData } from '@packages/lib/rewards/createReward';
@@ -17,6 +9,14 @@ import { rewardWithUsersInclude } from '@packages/lib/rewards/getReward';
 import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { mapDbRewardToReward } from '@packages/lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from '@packages/metrics/postToDiscord';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { getPageMetaList } from '@packages/pages/getPageMetaList';
+import { UnauthorisedActionError } from '@packages/utils/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

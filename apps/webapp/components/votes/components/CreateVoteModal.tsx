@@ -14,6 +14,9 @@ import {
   Typography
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ExtendedVote } from '@packages/lib/votes/interfaces';
 import { DateTime } from 'luxon';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
@@ -24,9 +27,6 @@ import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
 import { useVotes } from 'hooks/useVotes';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ExtendedVote } from '@packages/lib/votes/interfaces';
 
 interface CreateVoteModalProps {
   onClose?: () => void;

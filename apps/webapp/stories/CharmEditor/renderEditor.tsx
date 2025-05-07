@@ -1,9 +1,10 @@
+import type { PageContent } from '@packages/charmeditor/interfaces';
+
 import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
 import { CharmEditorProvider } from 'hooks/useCharmEditor';
 import { CharmEditorViewProvider } from 'hooks/useCharmEditorView';
 import { ThreadsProvider } from 'hooks/useThreads';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export function CharmEditorStorybookProviders({ children }: { children: React.ReactNode }) {
   return (

@@ -1,8 +1,9 @@
 import type { Node } from 'prosemirror-model';
 import { findChildren } from 'prosemirror-utils';
 
+import type { PageContent } from '../../../../packages/charmeditor/src/interfaces';
+
 import { getNodeFromJson } from './getNodeFromJson';
-import type { PageContent } from './interfaces';
 
 const summaryBlockTypes = ['image', 'tweet', 'video'];
 const textParagrahLimit = 3;

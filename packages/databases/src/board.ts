@@ -1,5 +1,5 @@
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { replaceS3Domain } from '@packages/utils/url';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
 
 import type { UIBlockWithDetails } from './block';

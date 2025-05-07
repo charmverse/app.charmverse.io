@@ -2,6 +2,9 @@ import { log } from '@charmverse/core/log';
 import { textOnly } from '@lens-protocol/metadata';
 import type { Session } from '@lens-protocol/react-web';
 import { SessionType, useCreateComment, useCreatePost } from '@lens-protocol/react-web';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
+import { LensChain } from '@packages/lib/lens/constants';
 import { useState } from 'react';
 
 import { useUploadToArweave } from 'charmClient/hooks/lens';
@@ -10,9 +13,6 @@ import { useHandleLensError, useLensProfile } from 'components/settings/account/
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
-import { LensChain } from '@packages/lib/lens/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
 import { usePage } from './usePage';

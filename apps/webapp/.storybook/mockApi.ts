@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw';
-import type { BlockCountInfo } from '../lib/spaces/getSpaceBlockCount';
+import type { BlockCountInfo } from '../@packages/spaces/getSpaceBlockCount';
 import { getDefaultWorkflows } from '../lib/proposals/workflows/defaultWorkflows';
 import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 

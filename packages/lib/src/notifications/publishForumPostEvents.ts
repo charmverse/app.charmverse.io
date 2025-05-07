@@ -1,8 +1,9 @@
-import { extractMentions } from 'lib/prosemirror/extractMentions';
-import { extractPollIds } from 'lib/prosemirror/extractPollIds';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { extractMentions } from '@packages/charmeditor/utils/extractMentions';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishPostEvent, publishDocumentEvent, publishVoteEvent } from '@packages/lib/webhookPublisher/publishEvent';
+
+import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 
 export async function publishForumPostEvents(post: {
   id: string;

@@ -6,6 +6,8 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import Tabs from '@mui/material/Tabs';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import { createBoard } from '@packages/databases/board';
 import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -40,8 +42,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { createBoard } from '@packages/databases/board';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';

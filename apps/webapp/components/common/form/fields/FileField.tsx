@@ -1,13 +1,13 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { replaceS3Domain } from '@packages/utils/url';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { UploadedFileInfo } from '@packages/lib/proposals/forms/interfaces';
+import { replaceS3Domain } from '@packages/utils/url';
 
 import { FileUploadForm } from 'components/common/CharmEditor/components/file/FileUploadForm';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import Link from 'components/common/Link';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { FieldWrapperProps } from './FieldWrapper';
 import { FieldWrapper } from './FieldWrapper';

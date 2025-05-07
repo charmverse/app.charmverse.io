@@ -2,12 +2,11 @@ import type { Proposal, ProposalEvaluation, Space, User } from '@charmverse/core
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import { createProposal } from '@packages/lib/proposals/createProposal';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 import { v4 as uuid, v4 } from 'uuid';
-
-import { createProposal } from '@packages/lib/proposals/createProposal';
-import { emptyDocument } from 'lib/prosemirror/constants';
 
 let space: Space;
 let proposalCreator: User;

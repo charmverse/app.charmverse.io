@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { blockToPrisma } from '@packages/databases/block';
 import { createCard } from '@packages/databases/card';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { v4 } from 'uuid';
 
 import { convertToPlainText } from '../convertToPlainText';

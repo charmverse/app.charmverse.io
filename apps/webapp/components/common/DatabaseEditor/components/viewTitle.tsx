@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { Board } from '@packages/databases/board';
 import type { KeyboardEvent } from 'react';
 import React, { useCallback, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -12,8 +14,6 @@ import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/P
 import { PageControlItem, PageHeaderControls } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import type { Board } from '@packages/databases/board';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';
 import mutator from '../mutator';

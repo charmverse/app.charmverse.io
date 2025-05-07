@@ -1,5 +1,14 @@
 import type { Bounty, BountyPermission, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { Board } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { onError, onNoMatch } from '@packages/lib/middleware';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { mapDbRewardToReward } from '@packages/lib/rewards/mapDbRewardToReward';
+import { checkPageContent } from '@packages/lib/security/checkPageContent';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { NotFoundError } from '@packages/nextjs/errors';
 import { isUUID } from '@packages/utils/strings';
 import { isTruthy } from '@packages/utils/types';
@@ -7,16 +16,7 @@ import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { Board } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { onError, onNoMatch } from '@packages/lib/middleware';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mapDbRewardToReward } from '@packages/lib/rewards/mapDbRewardToReward';
-import { checkPageContent } from '@packages/lib/security/checkPageContent';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,5 +1,7 @@
 import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Box, FormLabel, Stack } from '@mui/material';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { CommentWithChildren } from '@packages/lib/comments';
 import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
@@ -9,8 +11,6 @@ import { CommentForm } from 'components/common/comments/CommentForm';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import type { CommentWithChildren } from '@packages/lib/comments';
-import { emptyDocument } from 'lib/prosemirror/constants';
 
 export function ApplicationComments({ applicationId }: { applicationId: string }) {
   const { user } = useUser();

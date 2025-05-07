@@ -1,6 +1,8 @@
 import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import { useEffect, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
@@ -8,8 +10,6 @@ import { UserSelect } from 'components/common/DatabaseEditor/components/properti
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from '@packages/lib/proposals/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 

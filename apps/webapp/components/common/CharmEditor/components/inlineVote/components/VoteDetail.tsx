@@ -18,6 +18,9 @@ import {
 } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ExtendedVote } from '@packages/lib/votes/interfaces';
+import { isVotingClosed } from '@packages/lib/votes/utils';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import millify from 'millify';
@@ -39,10 +42,7 @@ import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
-import type { ExtendedVote } from '@packages/lib/votes/interfaces';
-import { isVotingClosed } from '@packages/lib/votes/utils';
 
 import { VotesWrapper } from './VotesWrapper';
 

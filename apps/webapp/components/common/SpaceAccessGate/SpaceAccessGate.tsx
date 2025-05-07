@@ -1,7 +1,9 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert, Box, Divider, Typography } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { Editor } from '@packages/charmeditor/ui';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { TokenGateJoinType } from '@packages/lib/tokenGates/interfaces';
+import { getSpaceUrl } from '@packages/lib/utils/browser';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
@@ -11,8 +13,6 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TokenGateJoinType } from '@packages/lib/tokenGates/interfaces';
-import { getSpaceUrl } from '@packages/lib/utils/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';

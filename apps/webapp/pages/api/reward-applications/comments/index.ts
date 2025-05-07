@@ -3,15 +3,14 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 export type CreateApplicationCommentPayload = {
   content: PageContent | null;

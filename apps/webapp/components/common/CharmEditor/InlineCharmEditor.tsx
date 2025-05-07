@@ -1,6 +1,7 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
 import * as tabIndent from '@packages/charmeditor/extensions/tabIndent';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import debounce from 'lodash/debounce';
 import { Node } from 'prosemirror-model';
 import { Plugin, PluginKey } from 'prosemirror-state';
@@ -10,7 +11,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { RawPlugins } from './components/@bangle.dev/core/plugin-loader';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';

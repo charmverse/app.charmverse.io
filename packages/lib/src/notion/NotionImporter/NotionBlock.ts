@@ -1,7 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
-import { isTruthy } from '@packages/utils/types';
-import { isPdfEmbedLink } from '@packages/lib/pdf/extractPdfEmbedLink';
 import type {
   TextContent,
   MentionNode,
@@ -12,8 +10,9 @@ import type {
   ColumnLayoutNode,
   ColumnBlockNode,
   TextMark
-} from 'lib/prosemirror/interfaces';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
+} from '@packages/charmeditor/interfaces';
+import { isPdfEmbedLink } from '@packages/lib/pdf/extractPdfEmbedLink';
+import { isTruthy } from '@packages/utils/types';
 
 import {
   MIN_EMBED_WIDTH,
@@ -24,6 +23,7 @@ import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmE
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';

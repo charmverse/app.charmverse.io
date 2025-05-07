@@ -1,11 +1,10 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
+import { emptyDocument } from '@packages/charmeditor/constants';
 import type { SelectOptionType, FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
 import { useRef, useEffect } from 'react';
 import { v4 } from 'uuid';
-
-import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 

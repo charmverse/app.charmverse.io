@@ -1,9 +1,9 @@
 import { useTheme } from '@emotion/react';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 
 import { CharmEditor } from 'components/common/CharmEditor';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number };
 

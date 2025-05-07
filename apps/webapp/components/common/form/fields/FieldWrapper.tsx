@@ -1,12 +1,12 @@
 import { Stack, type SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { memo } from 'react';
 import type { ReactNode } from 'react';
 
 import { CharmEditor } from 'components/common/CharmEditor';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import FieldLabel from '../FieldLabel';
 

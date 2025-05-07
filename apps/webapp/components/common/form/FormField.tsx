@@ -19,16 +19,16 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
 import type { SelectOptionType, FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
+import { mergeRefs } from '@packages/lib/utils/react';
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mergeRefs } from '@packages/lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';

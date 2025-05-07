@@ -1,12 +1,12 @@
-import { isUUID, isUrl, isValidEmail } from '@packages/utils/strings';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { FieldType, FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
+import { isUUID, isUrl, isValidEmail } from '@packages/utils/strings';
 import { isValidName } from 'ethers/lib/utils';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type FormFieldInput = {
   value?: any;

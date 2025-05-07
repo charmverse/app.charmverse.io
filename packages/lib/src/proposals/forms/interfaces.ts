@@ -1,5 +1,5 @@
 import type { FormFieldType, MemberPropertyType, FormField } from '@charmverse/core/prisma';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 
 // based off app.charmverse.io brand colors
 type SupportedColor =

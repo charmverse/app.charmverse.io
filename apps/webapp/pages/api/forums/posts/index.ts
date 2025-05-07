@@ -1,8 +1,5 @@
 import type { Post } from '@charmverse/core/prisma';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { CreateForumPostInput } from '@packages/lib/forums/posts/createForumPost';
 import { createForumPost, trackCreateForumPostEvent } from '@packages/lib/forums/posts/createForumPost';
 import type { ListForumPostsRequest, PaginatedPostList } from '@packages/lib/forums/posts/listForumPosts';
@@ -10,8 +7,11 @@ import { listForumPosts } from '@packages/lib/forums/posts/listForumPosts';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { publishForumPostEvents } from '@packages/lib/notifications/publishForumPostEvents';
 import { providePermissionClients } from '@packages/lib/permissions/api/permissionsClientMiddleware';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
+
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

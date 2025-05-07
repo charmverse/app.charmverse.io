@@ -1,10 +1,10 @@
 import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
 import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { PostCategoryNotFoundError } from '@packages/lib/forums/categories/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';
-import { PostCategoryNotFoundError } from '@packages/lib/forums/categories/errors';
 
 import type { PermissionCompute } from '../interfaces';
 

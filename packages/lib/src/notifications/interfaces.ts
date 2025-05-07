@@ -7,7 +7,7 @@ import type {
   VoteStatus
 } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { CardPropertyEntity, WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 
 import type { notificationGroups, bountyNotificationTypes, proposalNotificationTypes } from './constants';

@@ -5,6 +5,11 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { BountyPermissionFlags } from '@packages/lib/permissions/bounties';
+import type { RewardType } from '@packages/lib/rewards/interfaces';
+import type { WorkUpsertData } from '@packages/lib/rewards/work';
+import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -12,12 +17,7 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
-import type { BountyPermissionFlags } from '@packages/lib/permissions/bounties';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { RewardType } from '@packages/lib/rewards/interfaces';
-import type { WorkUpsertData } from '@packages/lib/rewards/work';
-import { isValidChainAddress } from '@packages/lib/tokens/validation';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 

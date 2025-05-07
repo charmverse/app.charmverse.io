@@ -1,10 +1,10 @@
 import LinkIcon from '@mui/icons-material/Link';
 import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { LensSocialShare } from './LensSocialShare';
 import { SocialShareLink } from './SocialShareLink';

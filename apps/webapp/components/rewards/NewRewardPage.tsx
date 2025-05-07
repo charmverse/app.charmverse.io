@@ -2,6 +2,17 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type {
+  RewardFields,
+  RewardPropertiesField,
+  RewardPropertyValues
+} from '@packages/lib/rewards/blocks/interfaces';
+import type { RewardPageProps } from '@packages/lib/rewards/createReward';
+import { getRewardErrors } from '@packages/lib/rewards/getRewardErrors';
+import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
+import type { RewardWorkflow } from '@packages/lib/rewards/getRewardWorkflows';
+import { inferRewardWorkflow } from '@packages/lib/rewards/inferRewardWorkflow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
@@ -28,17 +39,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type {
-  RewardFields,
-  RewardPropertiesField,
-  RewardPropertyValues
-} from '@packages/lib/rewards/blocks/interfaces';
-import type { RewardPageProps } from '@packages/lib/rewards/createReward';
-import { getRewardErrors } from '@packages/lib/rewards/getRewardErrors';
-import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
-import type { RewardWorkflow } from '@packages/lib/rewards/getRewardWorkflows';
-import { inferRewardWorkflow } from '@packages/lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
 
 import { RewardEvaluations } from './components/RewardEvaluations/RewardEvaluations';

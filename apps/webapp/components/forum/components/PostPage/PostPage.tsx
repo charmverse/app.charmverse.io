@@ -1,6 +1,9 @@
 import type { Post, PostCategory } from '@charmverse/core/prisma';
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Chip, Divider, Stack, Typography } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { PostCommentWithVoteAndChildren } from '@packages/lib/forums/comments/interface';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -33,10 +36,7 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { PostCommentWithVoteAndChildren } from '@packages/lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { fontClassName } from 'theme/fonts';
 
 import type { FormInputs } from '../interfaces';

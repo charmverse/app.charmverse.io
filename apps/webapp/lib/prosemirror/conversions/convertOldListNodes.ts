@@ -1,13 +1,14 @@
 import { log } from '@charmverse/core/log';
 import type { PageDiff, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { Fragment, Slice } from 'prosemirror-model';
 import type { Node as ProsemirrorNode } from 'prosemirror-model';
 import type { Step } from 'prosemirror-transform';
 import { replaceStep } from 'prosemirror-transform';
+
+import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
 
 export function convertDocument(doc: ProsemirrorNode) {
   const steps: Step[] = [];

@@ -1,7 +1,8 @@
+import type { PageContent } from '@packages/charmeditor/interfaces';
+
 import { Button } from 'components/common/Button';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { FieldWrapperProps } from './FieldWrapper';
 import { FieldWrapper } from './FieldWrapper';

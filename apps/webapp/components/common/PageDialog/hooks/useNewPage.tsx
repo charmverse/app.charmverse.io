@@ -1,8 +1,8 @@
 import type { PageType } from '@charmverse/core/prisma-client';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { PageHeaderValues } from 'components/[pageId]/DocumentPage/components/PageHeader';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type NewPageValues = PageHeaderValues & {
   content: PageContent | null;

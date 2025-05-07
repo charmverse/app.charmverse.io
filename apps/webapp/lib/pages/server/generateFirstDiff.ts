@@ -1,6 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { PageContent } from 'lib/prosemirror/interfaces';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { PageContent } from '@packages/charmeditor/interfaces';
+
 import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
 
 /**

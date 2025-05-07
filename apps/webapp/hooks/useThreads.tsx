@@ -1,11 +1,11 @@
+import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';

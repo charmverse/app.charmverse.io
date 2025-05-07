@@ -3,14 +3,9 @@ import path from 'node:path';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { STATIC_PAGES } from '@packages/features/constants';
-import { logSpaceCreation } from '@packages/metrics/postToDiscord';
-import { memberProfileNames } from '@packages/profile/memberProfiles';
 import { generateDefaultPostCategories } from '@packages/lib/forums/categories/generateDefaultPostCategories';
 import { setDefaultPostCategory } from '@packages/lib/forums/categories/setDefaultPostCategory';
 import { generateDefaultPropertiesInput } from '@packages/lib/members/generateDefaultPropertiesInput';
-import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
-import { createPage } from 'lib/pages/server/createPage';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { setupDefaultPaymentMethods } from '@packages/lib/payment-methods/setupDefaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from '@packages/lib/permissions/meta';
 import { createDefaultProposal } from '@packages/lib/proposals/createDefaultProposal';
@@ -20,11 +15,16 @@ import { createDefaultReward, createDefaultRewardTemplate } from '@packages/lib/
 import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 import { importSpaceData } from '@packages/lib/templates/importSpaceData';
 import { createSigningSecret, subscribeToAllEvents } from '@packages/lib/webhookPublisher/subscribeToEvents';
+import { logSpaceCreation } from '@packages/metrics/postToDiscord';
+import { memberProfileNames } from '@packages/profile/memberProfiles';
+import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
 
+import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
+import { createPage } from 'lib/pages/server/createPage';
+import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import type { SpaceTemplateType } from './config';
-import { countSpaceBlocksAndSave } from './countSpaceBlocks/countAllSpaceBlocks';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 

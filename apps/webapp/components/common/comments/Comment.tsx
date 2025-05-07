@@ -4,7 +4,10 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import { isProdEnv } from '@packages/config/constants';
+import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from '@packages/lib/comments';
+import { getRelativeTimeInThePast } from '@packages/lib/utils/dates';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -20,9 +23,6 @@ import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfil
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from '@packages/lib/comments';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRelativeTimeInThePast } from '@packages/lib/utils/dates';
 
 import Link from '../Link';
 

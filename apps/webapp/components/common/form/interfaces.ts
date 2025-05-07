@@ -1,7 +1,6 @@
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { SelectOptionType, FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
 import type { ReactNode } from 'react';
-
-import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type SelectFieldProps = {
   options?: SelectOptionType[];

@@ -1,18 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser, testUtilsBounties } from '@charmverse/core/test';
-import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generatePostCategory } from '@packages/testing/utils/forums';
-import { createRole } from '@packages/testing/utils/roles';
-import { randomETHWalletAddress } from '@packages/utils/blockchain';
+import { emptyDocument } from '@packages/charmeditor/constants';
+import type { UserMentionMetadata } from '@packages/charmeditor/utils/extractMentions';
 import { addComment } from '@packages/lib/comments/addComment';
 import { createPostComment } from '@packages/lib/forums/comments/createPostComment';
 import { createForumPost } from '@packages/lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from '@packages/lib/notifications/createNotificationsFromEvent';
-import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
-import { builders as _ } from 'lib/prosemirror/builders';
-import { emptyDocument } from 'lib/prosemirror/constants';
-import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { work } from '@packages/lib/rewards/work';
 import { assignRole } from '@packages/lib/roles';
 import { createThread } from '@packages/lib/threads';
@@ -26,7 +20,14 @@ import {
   getUserEntity
 } from '@packages/lib/webhookPublisher/entities';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
+import { createPageComment } from '@packages/pages/comments/createPageComment';
+import { createPage, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { generatePostCategory } from '@packages/testing/utils/forums';
+import { createRole } from '@packages/testing/utils/roles';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { v4 } from 'uuid';
+
+import { builders as _ } from 'lib/prosemirror/builders';
 
 import { createDocumentNotifications } from '../createDocumentNotifications';
 
