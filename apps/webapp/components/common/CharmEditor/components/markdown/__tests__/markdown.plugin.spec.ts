@@ -1,10 +1,10 @@
-import { dispatchPasteEvent, expectNodesAreEqual } from '@packages/testing/prosemirror/helpers';
-import { renderTestEditor } from '@packages/testing/prosemirror/renderTestEditor';
 import { TextSelection } from 'prosemirror-state';
 
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { builders as _ } from 'lib/prosemirror/builders';
+import { dispatchPasteEvent, expectNodesAreEqual } from 'lib/testing/prosemirror/helpers';
+import { renderTestEditor } from 'lib/testing/prosemirror/renderTestEditor';
 
 const testEditor = renderTestEditor({
   specRegistry,

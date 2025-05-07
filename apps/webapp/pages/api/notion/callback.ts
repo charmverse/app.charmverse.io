@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
+import { onError, onNoMatch } from '@packages/lib/middleware';
 import Cookies from 'cookies';
 import nc from 'next-connect';
 
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from '@packages/lib/notion/constants';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
 
 const handler = nc({
   onError,

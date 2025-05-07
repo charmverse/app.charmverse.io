@@ -13,7 +13,7 @@ import { Modal } from 'components/common/Modal';
 import Legend from 'components/settings/components/Legend';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useNotionImport } from 'hooks/useNotionImport';
-import { generateNotionImportRedirectUrl } from '@packages/lib/notion/generateNotionImportRedirectUrl';
+import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
 import NotionIcon from 'public/images/logos/notion_logo.svg';
 
 export function ImportSettings({ space }: { space: Space }) {

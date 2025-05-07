@@ -3,11 +3,12 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageType, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 import type { UIBlockWithDetails } from '@packages/databases/block';
-import type { FailedImportsError } from '@packages/lib/notion/interfaces';
 import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
 import type { RewardBlockWithTypedFields } from '@packages/lib/rewards/blocks/interfaces';
 import type { ExtendedVote, VoteTask } from '@packages/lib/votes/interfaces';
 import type { Server, Socket } from 'socket.io';
+
+import type { FailedImportsError } from 'lib/notion/interfaces';
 
 export type Resource<T = object> = { id: string } & T;
 export type ResourceWithSpaceId = Resource<{ spaceId: string }>;

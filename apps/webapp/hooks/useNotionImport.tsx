@@ -3,8 +3,6 @@ import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { IconButton, Stack } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from '@packages/lib/notion/constants';
-import type { FailedImportsError } from '@packages/lib/notion/interfaces';
 import { deleteCookie, getCookie } from '@packages/lib/utils/browser';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -12,6 +10,8 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { LoadingIcon } from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/notion/constants';
+import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { NotionImportCompleted } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';

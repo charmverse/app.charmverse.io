@@ -1,7 +1,8 @@
 import type { Prisma, Page } from '@charmverse/core/prisma';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+
 import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 
 export type CreatePageInput = {
   id: string;

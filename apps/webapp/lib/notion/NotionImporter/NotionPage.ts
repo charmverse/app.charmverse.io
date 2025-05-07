@@ -6,11 +6,12 @@ import type {
   ListBlockChildrenParameters,
   PageObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
-import { isTruthy } from '@packages/utils/types';
 import type { IPropertyTemplate } from '@packages/databases/board';
-import { relay } from 'lib/websockets/relay';
+import { isTruthy } from '@packages/utils/types';
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
+
+import { relay } from 'lib/websockets/relay';
 
 import { convertPropertyType } from '../convertPropertyType';
 import type { BlocksRecord, ChildBlockListResponse } from '../interfaces';

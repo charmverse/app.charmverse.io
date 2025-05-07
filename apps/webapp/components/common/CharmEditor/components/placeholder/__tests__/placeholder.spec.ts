@@ -1,10 +1,10 @@
-import { setSelectionNear } from '@packages/testing/prosemirror/helpers';
-import { renderTestEditor } from '@packages/testing/prosemirror/renderTestEditor';
 import type { EditorView } from 'prosemirror-view';
 
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { builders as _ } from 'lib/prosemirror/builders';
+import { setSelectionNear } from 'lib/testing/prosemirror/helpers';
+import { renderTestEditor } from 'lib/testing/prosemirror/renderTestEditor';
 
 const testEditor = renderTestEditor({
   specRegistry,

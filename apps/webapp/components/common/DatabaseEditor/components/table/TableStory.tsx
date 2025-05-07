@@ -3,7 +3,7 @@
 // import { ProposalsPageWithProviders } from 'components/proposals/ProposalsPageWithProviders';
 // import { createMockPage } from '@packages/testing/mocks/page';
 // import { createMockProposal } from '@packages/testing/mocks/proposal';
-// import { builders as _, jsonDoc } from '@packages/testing/prosemirror/builders';
+// import { builders as _, jsonDoc } from 'lib/testing/prosemirror/builders';
 
 // import { members, proposalCategories, userProfile } from '../../../../.storybook/lib/mockData';
 
