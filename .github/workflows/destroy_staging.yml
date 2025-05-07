@@ -11,7 +11,7 @@ jobs:
   clean-up:
     if: |
       (github.event.action == 'unlabeled' && startsWith(github.event.label.name, ':rocket: deploy')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-sunnyawards') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-farcaster') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-cron') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets')))
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-cron') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-websockets')))
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
@@ -47,7 +47,7 @@ jobs:
         run: |
           stage_name_suffix="${{ github.event.number }}-${{ env.GITHUB_HEAD_REF_SLUG }}"
 
-          for app in cron farcaster sunnyawards webapp websockets; do
+          for app in cron webapp websockets; do
 
             # sanitize and trim string so that it can be used as a valid subdomain. Includes removing hyphens at the start and end of the name
             stage_name=`echo "stg-${app}-${stage_name_suffix}" | sed -E -e 's/[^a-zA-Z0-9-]+//g' -e 's/(.{40}).*/\1/' -e 's/^-/0/' -e 's/-$/0/'`
@@ -62,18 +62,6 @@ jobs:
         with:
           token: ${{ steps.get-token.outputs.token }}
           environment: ${{ steps.destroy_aws_stack.outputs.cron_env }}
-
-      - name: Delete Farcaster Github deployment
-        uses: strumwolf/delete-deployment-environment@v3
-        with:
-          token: ${{ steps.get-token.outputs.token }}
-          environment: ${{ steps.destroy_aws_stack.outputs.farcaster_env }}
-
-      - name: Delete Sunny Awards Github deployment
-        uses: strumwolf/delete-deployment-environment@v3
-        with:
-          token: ${{ steps.get-token.outputs.token }}
-          environment: ${{ steps.destroy_aws_stack.outputs.sunnyawards_env }}
 
       - name: Delete Webapp Github deployment
         uses: strumwolf/delete-deployment-environment@v3

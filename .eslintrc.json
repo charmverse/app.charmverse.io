@@ -79,8 +79,6 @@
           "./",
           "../..",
           "./apps/cron/",
-          "./apps/farcaster/",
-          "./apps/sunnyawards/",
           "./apps/webapp/",
           "./apps/websockets/",
           "./packages/adapters/",
