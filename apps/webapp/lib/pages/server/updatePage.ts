@@ -2,9 +2,8 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { pageMetaSelect } from '@packages/pages/pageMetaSelect';
 import { generatePagePathFromPathAndTitle } from '@packages/pages/utils';
-
-import { pageMetaSelect } from './pageMetaSelect';
 
 type CurrentPageData = Pick<Page, 'id' | 'type' | 'path' | 'additionalPaths'>;
 
