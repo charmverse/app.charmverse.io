@@ -1,16 +1,15 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/config/constants';
 import type { FeatureJson } from '@packages/features/constants';
+import { getNotificationMetadata } from '@packages/lib/notifications/getNotificationMetadata';
+import type { Notification } from '@packages/lib/notifications/interfaces';
+import { getFormattedDateTime } from '@packages/lib/utils/dates';
 import { fancyTrim } from '@packages/utils/strings';
 import { Column } from '@react-email/column';
 import { Hr } from '@react-email/hr';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
-import { baseUrl } from '@packages/config/constants';
-import { getNotificationMetadata } from '@packages/lib/notifications/getNotificationMetadata';
-import type { Notification } from '@packages/lib/notifications/interfaces';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import { getFormattedDateTime } from '@packages/lib/utils/dates';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
@@ -66,7 +65,8 @@ function NotificationSection({
     timeStyle: 'short'
   });
 
-  const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
+  // const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
+  const text = notificationContent || '';
   const link = `${baseUrl}/${spaceDomain}${href}${href.includes('?') ? '&' : '?'}notificationId=${id}`;
   return (
     <Section

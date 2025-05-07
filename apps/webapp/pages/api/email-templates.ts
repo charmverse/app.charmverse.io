@@ -56,7 +56,7 @@ const createDocumentNotification = ({
     pagePath: getPagePath(),
     spaceName,
     pageTitle,
-    content: createDocumentWithText(mentionText),
+    content: mentionText,
     inlineCommentId: null,
     type: 'mention.created',
     createdBy: dummyUser,

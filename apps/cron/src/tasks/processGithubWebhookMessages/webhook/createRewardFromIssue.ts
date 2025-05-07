@@ -8,7 +8,7 @@ import type { RewardReviewer } from '@packages/lib/rewards/interfaces';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 
-import { relay } from 'lib/websockets/relay';
+// import { relay } from 'lib/websockets/relay';
 
 type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
 type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];
@@ -183,32 +183,32 @@ export async function createRewardFromIssue({
   const createdPageId = createdReward.createdPageId!;
   const pages = await getPageMetaList([createdPageId]);
 
-  relay.broadcast(
-    {
-      type: 'pages_created',
-      payload: pages
-    },
-    spaceId
-  );
+  // relay.broadcast(
+  //   {
+  //     type: 'pages_created',
+  //     payload: pages
+  //   },
+  //   spaceId
+  // );
 
-  if (createIssueComment) {
-    try {
-      const appOctokit = createOctokitApp(installationId);
-      await appOctokit.rest.issues.createComment({
-        owner: message.repository.owner.login,
-        repo: message.repository.name,
-        issue_number: message.issue.number,
-        body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
-      });
-    } catch (err) {
-      log.error('Failed to create issue comment', {
-        error: err,
-        issueId: message.issue.id,
-        repoId: message.repository.id,
-        installationId
-      });
-    }
-  }
+  // if (createIssueComment) {
+  //   try {
+  //     const appOctokit = createOctokitApp(installationId);
+  //     await appOctokit.rest.issues.createComment({
+  //       owner: message.repository.owner.login,
+  //       repo: message.repository.name,
+  //       issue_number: message.issue.number,
+  //       body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
+  //     });
+  //   } catch (err) {
+  //     log.error('Failed to create issue comment', {
+  //       error: err,
+  //       issueId: message.issue.id,
+  //       repoId: message.repository.id,
+  //       installationId
+  //     });
+  //   }
+  // }
 
   trackUserAction('github_issue_reward_create', {
     rewardId: createdReward.reward.id,

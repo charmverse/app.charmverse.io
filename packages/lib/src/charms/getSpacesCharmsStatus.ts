@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getSpaceBlockCount } from 'lib/spaces/getSpaceBlockCount';
 import { blocksPerCharm, defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
+import { getSpaceBlockCount } from '@packages/spaces/getSpaceBlockCount';
 
 export type SpaceCharmsStatus = {
   spaceId: string;

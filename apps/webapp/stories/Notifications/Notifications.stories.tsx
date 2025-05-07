@@ -1,8 +1,4 @@
 import { Divider, Grid, Paper, Typography } from '@mui/material';
-import { Fragment } from 'react';
-import { v4 as uuid } from 'uuid';
-
-import { NotificationContent } from 'components/common/PageLayout/components/Sidebar/components/NotificationsPopover';
 import { bountyNotificationTypes, proposalNotificationTypes } from '@packages/lib/notifications/constants';
 import type {
   BountyNotification,
@@ -15,6 +11,10 @@ import type {
   VoteNotification
 } from '@packages/lib/notifications/interfaces';
 import { getCurrentDate } from '@packages/lib/utils/dates';
+import { Fragment } from 'react';
+import { v4 as uuid } from 'uuid';
+
+import { NotificationContent } from 'components/common/PageLayout/components/Sidebar/components/NotificationsPopover';
 
 import { members } from '../lib/mockData';
 

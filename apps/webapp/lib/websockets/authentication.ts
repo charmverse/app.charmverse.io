@@ -2,13 +2,14 @@ import { IncomingMessage, ServerResponse } from 'http';
 
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { SessionData } from '@packages/lib/session/config';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
 import { authSecret } from '@packages/utils/constants';
-import type { SessionData } from '@packages/lib/session/config';
-import type { SealedUserId } from 'lib/websockets/interfaces';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
+
+import type { SealedUserId } from './interfaces';
 
 export type SocketUser = { id: string; avatar: string | null; name: string };
 export type AuthenticatedSocketData = { user: SocketUser };

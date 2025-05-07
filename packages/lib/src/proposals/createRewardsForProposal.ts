@@ -2,19 +2,20 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { InvalidStateError } from '@packages/nextjs/errors';
-import { InvalidInputError } from '@packages/utils/errors';
-import { isTruthy } from '@packages/utils/types';
-import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import type { RewardFields } from '@packages/lib/rewards/blocks/interfaces';
 import { createReward } from '@packages/lib/rewards/createReward';
 import { assignedWorkflow } from '@packages/lib/rewards/getRewardWorkflows';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishProposalEventBase } from '@packages/lib/webhookPublisher/publishEvent';
-import { relay } from 'lib/websockets/relay';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import { getPageMetaList } from '@packages/pages/getPageMetaList';
+import { InvalidInputError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import { uniqBy } from 'lodash';
+
+import { relay } from 'lib/websockets/relay';
 
 import { permissionsApiClient } from '../permissions/api/client';
 

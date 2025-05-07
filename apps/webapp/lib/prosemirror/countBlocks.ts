@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import { getNodeFromJson } from './getNodeFromJson';
 
 // dont count these nodes as "BLOCKS" because they are really inline marks
 const INLINE_NODES_TO_IGNORE = [

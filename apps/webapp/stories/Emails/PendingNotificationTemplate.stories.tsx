@@ -1,4 +1,3 @@
-import { emptyDocument } from '@packages/charmeditor/constants';
 import { NotificationTemplate } from '@packages/lib/mailer/emails/templates/NotificationTemplate';
 import { getCurrentDate } from '@packages/lib/utils/dates';
 import { v4 } from 'uuid';
@@ -19,7 +18,7 @@ export function PendingNotificationTemplate() {
         group: 'document',
         archived: false,
         commentId: null,
-        content: emptyDocument,
+        content: null,
         createdAt: getCurrentDate().toDateString(),
         createdBy: {
           avatar: null,

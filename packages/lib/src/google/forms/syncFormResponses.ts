@@ -1,14 +1,15 @@
 import { log } from '@charmverse/core/log';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { WrongStateError } from '@packages/utils/errors';
-import { isTruthy } from '@packages/utils/types';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import { blockToPrisma, prismaToBlock, prismaToUIBlock } from '@packages/databases/block';
 import { createBoard } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
+import { getPageMetaList } from '@packages/pages/getPageMetaList';
+import { WrongStateError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
+
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { relay } from 'lib/websockets/relay';
 
 import { syncThrottlePeriod } from './config';
