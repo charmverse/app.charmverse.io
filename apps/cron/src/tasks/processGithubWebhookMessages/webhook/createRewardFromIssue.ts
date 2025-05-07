@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { components } from '@octokit/openapi-webhooks-types';
+import { baseUrl } from '@packages/config/constants';
+import { createOctokitApp } from '@packages/lib/github/app';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
+import { createReward } from '@packages/lib/rewards/createReward';
+import type { RewardReviewer } from '@packages/lib/rewards/interfaces';
+import { relay } from 'lib/websockets/relay';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { baseUrl } from '@root/config/constants';
-import { createOctokitApp } from '@root/lib/github/app';
-import { getPageMetaList } from '@root/lib/pages/server/getPageMetaList';
-import { createReward } from '@root/lib/rewards/createReward';
-import type { RewardReviewer } from '@root/lib/rewards/interfaces';
-import { relay } from '@root/lib/websockets/relay';
 
 type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
 type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];

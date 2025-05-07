@@ -1,4 +1,4 @@
-import type { Social, Member } from '@root/lib/members/interfaces';
+import type { Social, Member } from '@packages/lib/members/interfaces';
 
 import { createMockUser } from './user';
 

@@ -1,6 +1,6 @@
 import type { IdentityType } from '@charmverse/core/prisma';
-import type { SpaceTemplateType } from '@root/lib/spaces/config';
-import type { TokenGateJoinType } from '@root/lib/tokenGates/interfaces';
+import type { SpaceTemplateType } from 'lib/spaces/config';
+import type { TokenGateJoinType } from '@packages/lib/tokenGates/interfaces';
 
 import type { BaseEvent, BaseEventWithoutGroup } from './BaseEvent';
 

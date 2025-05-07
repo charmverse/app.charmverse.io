@@ -26,9 +26,6 @@
       "lib/*": ["./lib/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
-      "@root/adapters/*": ["../../adapters/*"],
-      "@root/config/*": ["../../config/*"],
-      "@root/lib/*": ["../../lib/*"],
       "@root/hooks/*": ["../../hooks/*"],
       "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"]

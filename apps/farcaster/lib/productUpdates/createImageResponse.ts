@@ -1,5 +1,5 @@
 import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
-import { baseUrl } from '@root/config/constants';
+import { baseUrl } from '@packages/config/constants';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 import type { Font } from 'satori';

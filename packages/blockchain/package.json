@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./src/*.ts",
+    "./abis/ERC20.json": "./src/abis/ERC20.json",
+    "./abis/ERC721.json": "./src/abis/ERC721.json"
   },
   "dependencies": {
     "@packages/utils": "^1.0.0"

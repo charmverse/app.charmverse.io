@@ -1,5 +1,5 @@
 import { PageWrapper } from '@packages/connect-shared/components/common/PageWrapper';
-import { getFarcasterUsers } from '@root/lib/farcaster/getFarcasterUsers';
+import { getFarcasterUsers } from '@packages/lib/farcaster/getFarcasterUsers';
 import type { Metadata } from 'next';
 
 import { ProductUpdatesPage } from 'components/product-updates/ProductUpdatesPage';

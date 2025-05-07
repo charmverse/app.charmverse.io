@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { syncSummonSpaceRoles } from '@root/lib/summon/syncSummonSpaceRoles';
+import { syncSummonSpaceRoles } from '@packages/lib/summon/syncSummonSpaceRoles';
 
 export async function syncSummonSpacesRoles() {
   const spaces = await prisma.space.findMany({

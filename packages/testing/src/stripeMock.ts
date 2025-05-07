@@ -1,4 +1,4 @@
-import { loopCheckoutUrl, communityProduct } from '@root/lib/subscription/constants';
+import { loopCheckoutUrl, communityProduct } from '@packages/lib/subscription/constants';
 import { v4 } from 'uuid';
 
 export const stripeMockIds = {

@@ -1,6 +1,6 @@
-import { baseUrl } from '@root/config/constants';
-import type { FarcasterFrameInteractionToValidate } from '@root/lib/farcaster/validateFrameInteraction';
-import { validateFrameInteraction } from '@root/lib/farcaster/validateFrameInteraction';
+import { baseUrl } from '@packages/config/constants';
+import type { FarcasterFrameInteractionToValidate } from '@packages/lib/farcaster/validateFrameInteraction';
+import { validateFrameInteraction } from '@packages/lib/farcaster/validateFrameInteraction';
 
 import { encrypt } from 'lib/crypto';
 

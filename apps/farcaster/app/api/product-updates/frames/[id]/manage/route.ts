@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { baseUrl } from '@root/config/constants';
+import { baseUrl } from '@packages/config/constants';
 import { getFrameHtml } from 'frames.js';
 
 import { validateFarcasterFrame } from 'lib/validateFarcasterFrame';

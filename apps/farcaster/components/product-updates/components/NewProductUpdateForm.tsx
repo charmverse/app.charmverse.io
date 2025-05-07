@@ -5,7 +5,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack, Button, Divider, MenuItem, Select, Typography, ListItemIcon } from '@mui/material';
 import { FormErrors } from '@packages/connect-shared/components/common/FormErrors';
-import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import type { FarcasterUser } from '@packages/lib/farcaster/getFarcasterUsers';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';

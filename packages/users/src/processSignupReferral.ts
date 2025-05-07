@@ -1,7 +1,7 @@
 import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { addCharms } from '@root/lib/charms/addCharms';
-import { CharmActionTrigger, charmActionRewards } from '@root/lib/charms/constants';
+import { addCharms } from '@packages/lib/charms/addCharms';
+import { CharmActionTrigger, charmActionRewards } from '@packages/lib/charms/constants';
 
 const log = getLogger('referral');
 

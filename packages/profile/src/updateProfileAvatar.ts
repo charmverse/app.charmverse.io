@@ -4,7 +4,7 @@ import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server
 import type { UserAvatar } from '@packages/users/interfaces';
 import { InvalidInputError } from '@packages/utils/errors';
 import { getFilenameWithExtension } from '@packages/utils/strings';
-import { getNFT, verifyNFTOwner } from '@root/lib/blockchain/getNFTs';
+import { getNFT, verifyNFTOwner } from '@packages/lib/blockchain/getNFTs';
 
 import { sessionUserRelations } from './constants';
 import type { LoggedInUser } from './getUser';

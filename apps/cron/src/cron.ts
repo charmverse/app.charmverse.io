@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { relay } from '@root/lib/websockets/relay';
+import { relay } from 'lib/websockets/relay';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
 

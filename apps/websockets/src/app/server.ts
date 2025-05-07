@@ -1,10 +1,11 @@
 import { createServer } from 'http';
 
 import { log } from '@charmverse/core/log';
-import { isDevEnv, isTestEnv } from '@root/config/constants';
-import { config } from '@root/lib/websockets/config';
-import { relay } from '@root/lib/websockets/relay';
+import { isDevEnv, isTestEnv } from '@packages/config/constants';
 import { Server } from 'socket.io';
+
+import { config } from 'lib/websockets/config';
+import { relay } from 'lib/websockets/relay';
 
 import app from '../healthCheck/app';
 

@@ -1,5 +1,5 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
-import type { Social, Member } from '@root/lib/members/interfaces';
+import type { Social, Member } from '@packages/lib/members/interfaces';
 import { v4 } from 'uuid';
 
 const createdAt = new Date('2023-07-19T00:00:00.000Z');

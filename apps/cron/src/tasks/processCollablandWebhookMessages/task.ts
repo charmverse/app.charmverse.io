@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from '@root/lib/collabland/config';
+import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from '@packages/lib/collabland/config';
 
 import { processMessages } from '../../webhookSqs';
 

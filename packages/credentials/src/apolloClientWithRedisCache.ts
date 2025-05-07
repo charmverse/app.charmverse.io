@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import type { ApolloQueryResult, QueryOptions } from '@apollo/client';
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { log } from '@charmverse/core/log';
-import { redisClient } from '@root/adapters/redis/redisClient';
+import { redisClient } from '@packages/adapters/redis/redisClient';
 import type { RedisClientType } from 'redis';
 
 /**

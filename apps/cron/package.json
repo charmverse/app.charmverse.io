@@ -15,6 +15,7 @@
     "@packages/charmeditor": "^1.0.0",
     "@packages/credentials": "^0.0.0",
     "@packages/features": "^0.0.0",
+    "@packages/lib": "^0.0.0",
     "@packages/metrics": "^0.0.0",
     "@packages/nextjs": "^0.0.0",
     "@packages/pages": "^0.0.0",

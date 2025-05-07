@@ -7,7 +7,7 @@ import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { lowerCaseEqual } from '@packages/utils/strings';
-import { getPublicClient } from '@root/lib/blockchain/publicClient';
+import { getPublicClient } from '@packages/lib/blockchain/publicClient';
 import { RateLimit } from 'async-sema';
 
 import { getEasConnector, type EasSchemaChain } from './connectors';

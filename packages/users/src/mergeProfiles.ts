@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BoardFields } from 'lib/databases/board';
-import type { CardFields } from 'lib/databases/card';
+import type { BoardFields } from '@packages/databases/board';
+import type { CardFields } from '@packages/databases/card';
 
 // Please read before running. Not battle-tested
 export async function mergeProfiles({

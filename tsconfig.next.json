@@ -1,7 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "__e2e__", "apps"],
-  "compilerOptions": {
-    "jsx": "preserve"
-  }
-}

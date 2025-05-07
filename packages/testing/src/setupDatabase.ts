@@ -23,6 +23,12 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { DataSourceType } from '@packages/databases/board';
+import type { IViewType } from '@packages/databases/boardView';
+import type { NotificationToggles } from '@packages/lib/notifications/notificationToggles';
+import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from '@packages/lib/permissions/interfaces';
+import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
+import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { sessionUserRelations } from '@packages/profile/constants';
 import { getUserProfile } from '@packages/profile/getUser';
 import type { LoggedInUser } from '@packages/profile/getUser';
@@ -31,12 +37,6 @@ import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { typedKeys } from '@packages/utils/types';
-import type { DataSourceType } from '@root/lib/databases/board';
-import type { IViewType } from '@root/lib/databases/boardView';
-import type { NotificationToggles } from '@root/lib/notifications/notificationToggles';
-import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from '@root/lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric } from '@root/lib/proposals/interfaces';
-import type { RewardWithUsers } from '@root/lib/rewards/interfaces';
 import { v4 as uuid, v4 } from 'uuid';
 
 import type { CustomBoardProps } from './generateBoardStub';
@@ -361,7 +361,7 @@ export async function generateBounty({
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
     page?: Partial<Pick<Page, 'deletedAt'>>;
-  }): Promise<RewardWithUsers> {
+  }): Promise<Omit<RewardWithUsers, 'allowedSubmitterRoles' | 'reviewers' | 'assignedSubmitters'>> {
   const rewardId = id ?? v4();
   const pageId = customPageId ?? rewardId;
 
@@ -1048,7 +1048,7 @@ export async function generateProposal({
     }
   });
 
-  return result as PageWithProposal;
+  return result as unknown as PageWithProposal;
 }
 
 /**

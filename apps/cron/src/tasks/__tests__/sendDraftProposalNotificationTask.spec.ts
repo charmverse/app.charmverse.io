@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposalWorkflow } from '@root/lib/testing/proposals';
+import { generateProposalWorkflow } from '@packages/lib/testing/proposals';
 
 import { sendDraftProposalNotificationTask } from '../sendDraftProposalNotificationTask';
 

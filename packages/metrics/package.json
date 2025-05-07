@@ -8,7 +8,8 @@
   },
   "exports": {
     "./*": "./src/*.ts",
-    ".": "./src/metrics.ts"
+    ".": "./src/metrics.ts",
+    "./mixpanel/interfaces": "./src/mixpanel/interfaces/index.ts"
   },
   "dependencies": {
     "@packages/utils": "^1.0.0"

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getSpacesOfUser } from '@root/lib/spaces/getSpacesOfUser';
+import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 
 import type { UserCommunity } from './interfaces';
 

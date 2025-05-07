@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateUserAndSpace, generateSpaceUser } from '@packages/testing/setupDatabase';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import { TENANT_URLS } from '@root/lib/summon/constants';
+import { TENANT_URLS } from '@packages/lib/summon/constants';
 import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 

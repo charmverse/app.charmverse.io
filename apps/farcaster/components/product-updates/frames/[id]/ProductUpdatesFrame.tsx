@@ -1,4 +1,4 @@
-import { baseUrl } from '@root/config/constants';
+import { baseUrl } from '@packages/config/constants';
 
 import { DIVIDER } from 'lib/productUpdates/schema';
 

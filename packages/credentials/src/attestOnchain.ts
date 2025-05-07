@@ -3,8 +3,8 @@ import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { credentialsWalletPrivateKey } from '@packages/utils/constants';
-import { getCurrentGasPrice } from '@root/lib/blockchain/getCurrentGasPrice';
-import { getEthersProvider } from '@root/lib/blockchain/getEthersProvider';
+import { getCurrentGasPrice } from '@packages/lib/blockchain/getCurrentGasPrice';
+import { getEthersProvider } from '@packages/lib/blockchain/getEthersProvider';
 import { Wallet } from 'ethers';
 import { zeroAddress } from 'viem';
 

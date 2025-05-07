@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { IPropertyTemplate, BoardFields } from '@root/lib/databases/board';
-import { type CardFields } from '@root/lib/databases/card';
+import type { IPropertyTemplate, BoardFields } from '@packages/databases/board';
+import { type CardFields } from '@packages/databases/card';
 
 const grantsDatabaseBoardId = process.env.GRANTS_TRACKER_BOARD_ID;
 

@@ -1,7 +1,7 @@
-import type { UIBlockWithDetails } from '@root/lib/databases/block';
-import type { Board } from '@root/lib/databases/board';
-import type { BoardView } from '@root/lib/databases/boardView';
-import type { Card } from '@root/lib/databases/card';
+import type { UIBlockWithDetails } from '@packages/databases/block';
+import type { Board } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
 
 import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
 

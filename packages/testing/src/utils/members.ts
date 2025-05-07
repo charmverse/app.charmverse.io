@@ -1,7 +1,7 @@
 import type { MemberProperty, MemberPropertyType, MemberPropertyValue, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createMemberProperty } from '@root/lib/members/createMemberProperty';
-import type { MemberPropertyValueType } from '@root/lib/members/interfaces';
+import { createMemberProperty } from '@packages/lib/members/createMemberProperty';
+import type { MemberPropertyValueType } from '@packages/lib/members/interfaces';
 
 type GenerateMemberPropertyProps = {
   type?: MemberPropertyType;

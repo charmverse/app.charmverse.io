@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as api from '@root/lib/summon/api';
-import { TENANT_URLS } from '@root/lib/summon/constants';
-import type { SummonUserProfile } from '@root/lib/summon/interfaces';
+import * as api from '@packages/lib/summon/api';
+import { TENANT_URLS } from '@packages/lib/summon/constants';
+import type { SummonUserProfile } from '@packages/lib/summon/interfaces';
 
 export async function getSummonProfile({
   userId,

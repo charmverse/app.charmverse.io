@@ -1,0 +1,29 @@
+{
+  "name": "webapp",
+  "version": "0..0",
+  "private": true,
+  "scripts": {
+    "start": "dotenv -e .env.local -- npx next dev",
+    "build": "npx next build",
+    "start:prod": "npx next start",
+    "lint": "npx next lint",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/ia-writer-mono": "^5.2.5",
+    "@packages/aws": "^0.0.0",
+    "@packages/blockchain": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/connect-shared": "^0.0.0",
+    "@packages/lib": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
+    "@packages/profile": "^0.0.0",
+    "@packages/users": "^0.0.0",
+    "@packages/utils": "^1.0.0"
+  },
+  "devDependencies": {
+    "@packages/testing": "^1.0.0"
+  }
+}

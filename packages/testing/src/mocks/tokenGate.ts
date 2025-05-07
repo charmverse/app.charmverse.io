@@ -1,4 +1,4 @@
-import type { TokenGateWithRoles } from '@root/lib/tokenGates/interfaces';
+import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 
 let tokenGateId = 0;
 

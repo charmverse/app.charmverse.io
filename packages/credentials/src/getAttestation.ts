@@ -1,6 +1,5 @@
 import { getChainById } from '@packages/blockchain/connectors/chains';
-
-import { getEthersProvider } from '../../../lib/blockchain/getEthersProvider';
+import { getEthersProvider } from '@packages/lib/blockchain/getEthersProvider';
 
 import { type EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';

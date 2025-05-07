@@ -1,4 +1,4 @@
-import type { SubscriptionPeriod } from '@root/lib/subscription/constants';
+import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
 
 import type { BaseEvent } from './BaseEvent';
 

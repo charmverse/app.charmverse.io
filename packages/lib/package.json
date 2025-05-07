@@ -1,0 +1,35 @@
+{
+  "name": "@packages/lib",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./*": "./src/*.ts",
+    "./*.tsx": "./src/*.tsx",
+    "./mailer": "./src/mailer/index.ts",
+    "./mailer/emails": "./src/mailer/emails/index.ts",
+    "./middleware": "./src/middleware/index.ts",
+    "./pages": "./src/pages/index.ts",
+    "./pages/server": "./src/pages/server/index.ts",
+    "./public-api": "./src/public-api/index.ts",
+    "./permissions/api": "./src/permissions/api/index.ts",
+    "./permissions/bounties": "./src/permissions/bounties/index.ts",
+    "./permissions/meta": "./src/permissions/meta/index.ts",
+    "./permissions/spaces": "./src/permissions/spaces/index.ts",
+    "./notifications/getNotificationMetadata": "./src/notifications/getNotificationMetadata.tsx",
+    "./mailer/emails/templates/NotificationTemplate": "./src/mailer/emails/templates/NotificationTemplate.tsx",
+    "./comments": "./src/comments/index.ts",
+    "./roles": "./src/roles/index.ts",
+    "./threads": "./src/threads/index.ts"
+  },
+  "dependencies": {
+    "@packages/adapters": "^0.0.0",
+    "@packages/blockchain": "^0.0.0",
+    "@packages/databases": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/utils": "^1.0.0"
+  }
+}

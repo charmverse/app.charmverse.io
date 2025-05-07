@@ -1,4 +1,4 @@
-import * as adapters from '@root/adapters/http';
+import * as adapters from '@packages/adapters/http';
 
 export async function validateFarcasterFrame(data: {
   untrustedData: {

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getVotesByState } from '@root/lib/votes/getVotesByState';
-import { VOTE_STATUS } from '@root/lib/votes/interfaces';
-import { publishProposalEvent } from '@root/lib/webhookPublisher/publishEvent';
+import { getVotesByState } from '@packages/lib/votes/getVotesByState';
+import { VOTE_STATUS } from '@packages/lib/votes/interfaces';
+import { publishProposalEvent } from '@packages/lib/webhookPublisher/publishEvent';
 
 const updateVoteStatus = async () => {
   const votesPassedDeadline = await prisma.vote.findMany({

@@ -1,5 +1,5 @@
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { getUserOrSpaceBalance } from '@root/lib/charms/getUserOrSpaceBalance';
+import { getUserOrSpaceBalance } from '@packages/lib/charms/getUserOrSpaceBalance';
 
 import { getReferralCode } from '../getReferralCode';
 import { processSignupReferral } from '../processSignupReferral';

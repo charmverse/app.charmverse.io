@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from '@packages/metrics/mixpanel/interfaces';
-import type { PageEventMap } from '@packages/metrics/mixpanel/interfaces/PageEvent';
-import type { UserEventMap } from '@packages/metrics/mixpanel/interfaces/UserEvent';
 
+import type { MixpanelEvent, MixpanelEventName, MixpanelTrackBase } from './mixpanel/interfaces';
+import type { PageEventMap } from './mixpanel/interfaces/PageEvent';
+import type { UserEventMap } from './mixpanel/interfaces/UserEvent';
 import type { MixpanelOpEvent, MixpanelOpEventName } from './mixpanel/opEvents';
 
 export type EventInput<T = MixpanelEvent> = T & {

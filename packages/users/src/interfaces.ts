@@ -1,4 +1,4 @@
-import type { SupportedChainId } from '@root/lib/blockchain/getNFTs';
+import type { SupportedChainId } from '@packages/lib/blockchain/getNFTs';
 
 export interface UserAvatar {
   avatar: string | null;

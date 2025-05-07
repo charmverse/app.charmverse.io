@@ -1,7 +1,7 @@
 'use client';
 
 import { Stack } from '@mui/material';
-import type { FarcasterUser } from '@root/lib/farcaster/getFarcasterUsers';
+import type { FarcasterUser } from '@packages/lib/farcaster/getFarcasterUsers';
 import { useState } from 'react';
 
 import type { ConnectProjectMinimal } from 'lib/projects/getConnectProjectsByFid';

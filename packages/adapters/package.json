@@ -1,0 +1,16 @@
+{
+  "name": "@packages/adapters",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "exports": {
+    "./*": "./src/*.ts",
+    "./http": "./src/http/index.ts"
+  },
+  "dependencies": {
+    "@packages/utils": "^1.0.0"
+  }
+}

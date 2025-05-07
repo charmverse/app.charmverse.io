@@ -1,4 +1,4 @@
-import type { PageWithContent } from '@root/lib/pages/interfaces';
+import type { PageWithContent } from 'lib/pages/interfaces';
 import { v4 as uuid } from 'uuid';
 
 export type MockPageInput = Partial<PageWithContent>;
