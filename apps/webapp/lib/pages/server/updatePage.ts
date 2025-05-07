@@ -26,7 +26,6 @@ export async function updatePage(
   }
 
   // TODO - Figure out encoding edge cases (special chars / japanese chars)
-
   if (data.title) {
     const newPath = generatePagePathFromPathAndTitle({
       existingPagePath: page.path,
