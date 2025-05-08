@@ -1,8 +1,7 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
-import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
+import Image from 'next/image';
 
 import Legend from '../components/Legend';
 
@@ -15,7 +14,7 @@ export function EnterpriseBillingScreen() {
       </Typography>
       <Stack display='flex' flexDirection='row' alignItems='center' gap={5}>
         <Stack>
-          <EnterpriseIcon width='90px' height='90px' />
+          <Image width={90} height={90} src='/images/subscriptions/enterprise.svg' alt='Enterprise' />
         </Stack>
         <Stack>
           <Typography
