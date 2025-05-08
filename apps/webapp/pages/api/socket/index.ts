@@ -8,7 +8,6 @@ import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
-import { config } from 'lib/websockets/config';
 import type { SealedUserId, SocketAuthResponse } from 'lib/websockets/interfaces';
 import { relay } from 'lib/websockets/relay';
 
@@ -49,7 +48,10 @@ async function socketHandler(req: NextApiRequest, res: NextApiReponseWithSocketS
     res.send({ authToken: sealedUserId });
     return;
   }
-  const io = new Server(res.socket.server, config);
+  const io = new Server(res.socket.server, {
+    // increase the amount of data that can be sent to the server
+    maxHttpBufferSize: 1e7 // set from 1e6 (1MB) to 1e7 (10Mb)
+  });
   res.socket.server.io = io;
   relay.bindServer(io);
   log.info('Web socket server instantiated');

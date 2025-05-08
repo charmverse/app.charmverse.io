@@ -4,7 +4,6 @@ import { log } from '@charmverse/core/log';
 import { isDevEnv, isTestEnv } from '@packages/config/constants';
 import { Server } from 'socket.io';
 
-import { config } from 'lib/websockets/config';
 import { relay } from 'lib/websockets/relay';
 
 import app from '../healthCheck/app';
@@ -14,7 +13,8 @@ import { verifyCustomOrigin } from './verifyCustomOrigin';
 const httpServer = createServer(app.callback());
 
 const socketServer: Server = new Server(httpServer, {
-  ...config,
+  // increase the amount of data that can be sent to the server
+  maxHttpBufferSize: 1e7, // set from 1e6 (1MB) to 1e7 (10Mb)
   cors: {
     allowedHeaders: ['authorization'],
     credentials: true,
