@@ -1,23 +1,24 @@
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
-import { createOrGetUserFromWallet } from '@packages/users/createUser';
-import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import { InvalidInputError } from '@packages/utils/errors';
-import { uid } from '@packages/utils/strings';
 import { baseUrl } from '@packages/config/constants';
 import { upsertSpaceRolesFromDiscord } from '@packages/lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { upsertUserRolesFromDiscord } from '@packages/lib/discord/collabland/upsertUserRolesFromDiscord';
 import { upsertUserForDiscordId } from '@packages/lib/discord/upsertUserForDiscordId';
-import type { SpaceApiResponse } from 'lib/public-api/interfaces';
-import { staticSpaceTemplates } from 'lib/spaces/config';
-import type { SpaceCreateInput } from 'lib/spaces/createSpace';
-import { createWorkspace } from 'lib/spaces/createSpace';
-import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { isValidUrl } from '@packages/lib/utils/isValidUrl';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
+import { staticSpaceTemplates } from '@packages/spaces/config';
+import { createOrGetUserFromWallet } from '@packages/users/createUser';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
+import { InvalidInputError } from '@packages/utils/errors';
+import { uid } from '@packages/utils/strings';
+
+import type { SpaceApiResponse } from 'lib/public-api/interfaces';
+import type { SpaceCreateInput } from 'lib/spaces/createSpace';
+import { createWorkspace } from 'lib/spaces/createSpace';
+import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './interfaces';
 

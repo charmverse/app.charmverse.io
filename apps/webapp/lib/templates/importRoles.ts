@@ -1,7 +1,8 @@
 import type { Prisma, Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getSpace } from 'lib/spaces/getSpace';
 import { v4 as uuid } from 'uuid';
+
+import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import type { ImportParams, OldNewIdHashMap } from './interfaces';

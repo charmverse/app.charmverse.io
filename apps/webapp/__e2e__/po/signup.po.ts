@@ -1,8 +1,7 @@
 // playwright-dev-page.ts
 import type { Space } from '@charmverse/core/prisma';
+import type { SpaceTemplateType } from '@packages/spaces/config';
 import type { Locator, Page } from '@playwright/test';
-
-import type { SpaceTemplateType } from 'lib/spaces/config';
 
 // capture actions on the pages in signup flow
 export class SignUpPage {

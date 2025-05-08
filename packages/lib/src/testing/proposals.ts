@@ -14,15 +14,13 @@ import { prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import { updateBoardProperties } from '@packages/databases/proposalsSource/updateBoardProperties';
 import { updateViews } from '@packages/databases/proposalsSource/updateViews';
-import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import type { PopulatedEvaluation, ProposalFields } from '@packages/lib/proposals/interfaces';
 import { getDefaultPermissions } from '@packages/lib/proposals/workflows/defaultEvaluation';
+import { generateBoard } from '@packages/testing/setupDatabase';
 import { sortBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
-
-import { generateBoard } from '@packages/testing/setupDatabase';
+// import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];
@@ -138,7 +136,7 @@ export async function generateProposal({
 }): Promise<ProposalWithUsersAndPageMeta> {
   const proposalId = uuid();
 
-  const result = await createPageDb<{ proposal: ProposalWithUsersAndPageMeta; title: string; path: string }>({
+  const result = await prisma.page.create({
     data: {
       id: proposalId,
       contentText: '',
@@ -187,7 +185,7 @@ export async function generateProposal({
     }
   });
 
-  return { ...result.proposal, page: { title: result.title, path: result.path } };
+  return { ...result.proposal, page: { title: result.title, path: result.path } } as ProposalWithUsersAndPageMeta;
 }
 
 /**
@@ -321,7 +319,7 @@ export async function generateProposalSourceDb({
 }: {
   createdBy: string;
   spaceId: string;
-  selectedProperties?: SelectedProposalProperties;
+  selectedProperties?: any; // SelectedProposalProperties;
 }) {
   const database = await generateBoard({
     createdBy,

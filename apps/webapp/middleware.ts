@@ -1,12 +1,11 @@
-import { isDevEnv } from '@packages/utils/constants';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-
-import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
 import { getAppApexDomain } from '@packages/lib/utils/domains/getAppApexDomain';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from '@packages/lib/utils/domains/getSpaceDomainFromHost';
 import { getSpaceDomainFromUrlPath } from '@packages/lib/utils/domains/getSpaceDomainFromUrlPath';
+import { DOMAIN_BLACKLIST } from '@packages/spaces/config';
+import { isDevEnv } from '@packages/utils/constants';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files

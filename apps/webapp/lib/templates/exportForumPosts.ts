@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PostCategory, Post } from '@charmverse/core/prisma-client';
+
 import { getSpace } from 'lib/spaces/getSpace';
 
 export type ForumExport = { posts: Post[]; postCategories: PostCategory[] };

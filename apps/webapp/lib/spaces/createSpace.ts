@@ -13,18 +13,18 @@ import { getDefaultWorkflows } from '@packages/lib/proposals/workflows/defaultWo
 import { upsertDefaultRewardsBoard } from '@packages/lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward, createDefaultRewardTemplate } from '@packages/lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
-import { importSpaceData } from '@packages/lib/templates/importSpaceData';
 import { createSigningSecret, subscribeToAllEvents } from '@packages/lib/webhookPublisher/subscribeToEvents';
 import { logSpaceCreation } from '@packages/metrics/postToDiscord';
 import { memberProfileNames } from '@packages/profile/memberProfiles';
+import type { SpaceTemplateType } from '@packages/spaces/config';
 import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
 
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
+import { importSpaceData } from 'lib/templates/importSpaceData';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
-import type { SpaceTemplateType } from './config';
 import { getAvailableDomainName } from './getAvailableDomainName';
 import { getSpaceByDomain } from './getSpaceByDomain';
 

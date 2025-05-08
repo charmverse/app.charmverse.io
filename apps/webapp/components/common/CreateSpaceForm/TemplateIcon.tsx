@@ -1,8 +1,8 @@
 import { SvgIcon } from '@mui/material';
 import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
+import type { StaticSpaceTemplateType } from '@packages/spaces/config';
 
-import type { StaticSpaceTemplateType } from 'lib/spaces/config';
 import CreatorIcon from 'public/images/template_icons/creator_icon.svg';
 import GamingIcon from 'public/images/template_icons/gaming_icon.svg';
 import GrantRecipientIcon from 'public/images/template_icons/grantee_icon.svg';

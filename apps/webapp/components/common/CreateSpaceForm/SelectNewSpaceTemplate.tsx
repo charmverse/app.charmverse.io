@@ -1,11 +1,10 @@
 import styled from '@emotion/styled';
 import { Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { staticSpaceTemplates } from '@packages/spaces/config';
+import type { SpaceTemplateType } from '@packages/spaces/config';
 import { AiOutlineFileMarkdown } from 'react-icons/ai';
 import { SiNotion } from 'react-icons/si';
-
-import { staticSpaceTemplates } from 'lib/spaces/config';
-import type { SpaceTemplateType } from 'lib/spaces/config';
 
 import { TemplateIcon, CreateMyOwnIcon } from './TemplateIcon';
 import { TemplateOption } from './TemplateOption';

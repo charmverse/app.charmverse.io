@@ -6,8 +6,9 @@ import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
 } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
-import { getSpace } from 'lib/spaces/getSpace';
 import { v4 as uuid } from 'uuid';
+
+import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import { importPostCategories } from './importPostCategories';

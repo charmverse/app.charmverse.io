@@ -63,7 +63,7 @@ jobs:
             fi
           done
       - name: Copy Prisma files
-        run: node copyPrismaFiles.js
+        run: node node apps/serverless/copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
         uses: ryanlawson/serverless-github-action@v1.0

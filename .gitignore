@@ -6,10 +6,10 @@ jspm_packages
 /prisma
 
 # Serverless directories
-.serverless
-.build
-serverless/schema.prisma
-serverless/*.node
+apps/serverless/.serverless
+apps/serverless/.build
+apps/serverless/schema.prisma
+apps/serverless/*.node
 
 # next.js
 .next/

@@ -1,4 +1,4 @@
-import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+import { DOMAIN_BLACKLIST } from '@packages/spaces/config';
 import { string } from 'yup';
 
 export const domainSchema = string()

@@ -12,6 +12,8 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { setCookie, getSpaceUrl } from '@packages/lib/utils/browser';
+import { spaceTemplateIds } from '@packages/spaces/config';
+import type { SpaceTemplateType } from '@packages/spaces/config';
 import { randomName } from '@packages/utils/randomName';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
@@ -26,8 +28,6 @@ import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { generateNotionImportRedirectUrl } from 'lib/notion/generateNotionImportRedirectUrl';
-import { spaceTemplateIds } from 'lib/spaces/config';
-import type { SpaceTemplateType } from 'lib/spaces/config';
 
 import { ImportZippedMarkdown } from '../ImportZippedMarkdown';
 import { SpaceAccessGateWithSearch } from '../SpaceAccessGate/SpaceAccessGateWithSearch';

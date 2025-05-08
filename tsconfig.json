@@ -2,6 +2,6 @@
   // global config is used by @swc/jest. at this time, it doesnt seem to be a way to specify a specific tsconfig
   "compilerOptions": {
     // this is necessary for the jest.config.ts to import tsconfig.json
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   }
 }

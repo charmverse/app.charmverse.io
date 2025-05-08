@@ -1,13 +1,13 @@
+import { requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { spaceTemplateApiNames } from '@packages/spaces/config';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
 import { createWorkspaceApi } from 'lib/public-api/createWorkspaceApi';
 import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
-import { withSessionRoute } from '@packages/lib/session/withSession';
-import { spaceTemplateApiNames } from 'lib/spaces/config';
 
 const handler = defaultHandler();
 

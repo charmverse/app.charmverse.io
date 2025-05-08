@@ -1,4 +1,4 @@
-import { signJwt } from 'lib/webhookPublisher/authentication';
+import { signJwt } from '@packages/lib/webhookPublisher/authentication';
 
 describe('SERVERLESS integration', () => {
   it('should call an offline version of the service', async () => {

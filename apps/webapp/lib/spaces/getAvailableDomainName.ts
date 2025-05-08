@@ -1,5 +1,6 @@
+import { DOMAIN_BLACKLIST } from '@packages/spaces/config';
 import { randomName } from '@packages/utils/randomName';
-import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
+
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 

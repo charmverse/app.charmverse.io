@@ -1,12 +1,12 @@
 import type { PostCategoryPermission, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from '@packages/utils/strings';
 import { defaultPostCategories } from '@packages/lib/forums/categories/generateDefaultPostCategories';
+import { staticSpaceTemplates } from '@packages/spaces/config';
+import { uid } from '@packages/utils/strings';
 import { v4 } from 'uuid';
 
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
-import { staticSpaceTemplates } from '../config';
 import type { SpaceCreateInput } from '../createSpace';
 import { createWorkspace } from '../createSpace';
 

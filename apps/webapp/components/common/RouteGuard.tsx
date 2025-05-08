@@ -1,6 +1,8 @@
 import type { UrlObject } from 'url';
 
 import { log } from '@charmverse/core/log';
+import { redirectToAppLogin, shouldRedirectToAppLogin } from '@packages/lib/utils/browser';
+import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -9,10 +11,8 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { redirectToAppLogin, shouldRedirectToAppLogin } from '@packages/lib/utils/browser';
-import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
-// When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
+// When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in @packages/spaces/config.ts
 const publicPages = [
   '/',
   'share',

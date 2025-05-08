@@ -1,9 +1,8 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { APISpaceTemplateType } from '@packages/spaces/config';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import type { TypedDataField } from 'ethers/lib/ethers';
-
-import type { APISpaceTemplateType } from 'lib/spaces/config';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
 
@@ -91,7 +90,6 @@ export type PageProperty<T extends PropertyType = PropertyType> = Pick<IProperty
   Partial<Pick<IPropertyTemplate, 'description'>> & {
     type: T;
     options?: T extends 'select' | 'multiSelect' ? PagePropertyOption[] : undefined;
-    // eslint-disable-next-line @typescript-eslint/ban-types
   } & (T extends 'select' | 'multiSelect' ? { options: PagePropertyOption[] } : {});
 
 /**

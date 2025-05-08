@@ -14,8 +14,9 @@ import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import type { BoardFields } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
-import { getSpace } from 'lib/spaces/getSpace';
 import { v4 as uuid } from 'uuid';
+
+import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
 import type { ImportParams } from './interfaces';

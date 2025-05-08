@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { staticSpaceTemplates } from 'lib/spaces/config';
+import { staticSpaceTemplates } from '@packages/spaces/config';
 import { exportSpaceData } from 'lib/templates/exportSpaceData';
 import { writeToSameFolder } from 'lib/utils/file';
 import { prettyPrint } from '@packages/utils/strings';

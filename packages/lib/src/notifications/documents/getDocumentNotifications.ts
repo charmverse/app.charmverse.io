@@ -29,7 +29,7 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
     select: {
       id: true,
       type: true,
-      contentText: true,
+      content: true,
       page: {
         select: {
           id: true,
@@ -98,8 +98,7 @@ export async function getDocumentNotifications({ id, userId }: QueryCondition): 
         applicationCommentId: notification.applicationCommentId,
         applicationId,
         pageType: page.type,
-        // TODO: convert prosemirror content to text
-        // content: notification.content,
+        content: notification.content,
         type: notification.type,
         archived: !!notificationMetadata.archivedAt,
         read: !!notificationMetadata.seenAt,

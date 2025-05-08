@@ -6,11 +6,10 @@
     // composite is useful for referenced packages. see https://www.typescriptlang.org/docs/handbook/project-references.html#composite
     "composite": true
   },
-  "include": [
-    "src/**/*.ts","src/**/*.tsx"
-  ],
+  "include": ["src/**/*.ts","src/**/*.tsx"],
   "paths": {
     "lib/*": ["./src/*"],
     "@packages/lib/*": ["./src/*"],
-  }
+  },
+  "exclude": ["jest.config.ts"]
 }
