@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { spaceId, RetroApplication, fieldIds } from './data';
 
-import { _, jsonDoc } from 'lib/prosemirror/builders';
+import { _, jsonDoc } from '@packages/bangleeditor/builders';
 
 export function getProposals() {
   return prisma.page.findMany({

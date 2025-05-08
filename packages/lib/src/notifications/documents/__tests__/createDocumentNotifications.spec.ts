@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser, testUtilsBounties } from '@charmverse/core/test';
+import { builders as _ } from '@packages/bangleeditor/builders';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import type { UserMentionMetadata } from '@packages/charmeditor/utils/extractMentions';
 import { addComment } from '@packages/lib/comments/addComment';
@@ -26,8 +27,6 @@ import { generatePostCategory } from '@packages/testing/utils/forums';
 import { createRole } from '@packages/testing/utils/roles';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { v4 } from 'uuid';
-
-import { builders as _ } from 'lib/prosemirror/builders';
 
 import { createDocumentNotifications } from '../createDocumentNotifications';
 

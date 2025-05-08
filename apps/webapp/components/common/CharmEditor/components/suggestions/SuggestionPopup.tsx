@@ -1,11 +1,11 @@
 import { Box, ClickAwayListener, Grow } from '@mui/material';
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useUser } from 'hooks/useUser';
 
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { ThreadContainer } from '../inlineComment/components/InlineCommentThread';
 
 import { getEventsFromDoc } from './getEvents';

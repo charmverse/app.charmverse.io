@@ -6,10 +6,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PersonaEventData } from '@packages/lib/kyc/persona/interfaces';
 import { checkSignature } from '@packages/lib/kyc/persona/webhook/checkSignature';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { defaultHandler } from 'lib/public-api/handler';
-import { relay } from 'lib/websockets/relay';
 
 export const config = { api: { bodyParser: false } };
 

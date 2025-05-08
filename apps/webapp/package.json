@@ -16,6 +16,7 @@
   "dependencies": {
     "@fontsource/ia-writer-mono": "^5.2.5",
     "@packages/aws": "^0.0.0",
+    "@packages/bangleeditor": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
     "@packages/charmeditor": "^1.0.0",
     "@packages/config": "^0.0.0",

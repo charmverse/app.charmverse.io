@@ -1,10 +1,10 @@
 import type { User } from '@charmverse/core/prisma';
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { Node } from 'prosemirror-model';
 
 import { mentionSuggestMarkName } from 'components/common/CharmEditor/components/mention';
 import { mentionSuggestSpec } from 'components/common/CharmEditor/components/mention/mention.specs';
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage.utils';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 import { markdownSerializer } from './markdownSerializer';
 

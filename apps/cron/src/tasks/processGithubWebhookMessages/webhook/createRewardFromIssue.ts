@@ -8,7 +8,7 @@ import type { RewardReviewer } from '@packages/lib/rewards/interfaces';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 
-// import { relay } from 'lib/websockets/relay';
+// import { relay } from '@packages/websockets/relay';
 
 type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
 type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];

@@ -1,3 +1,6 @@
+import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
+import type { UpdateProposalRequest } from '@packages/lib/proposals/updateProposal';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo } from 'react';
 import type { KeyedMutator } from 'swr';
@@ -6,9 +9,6 @@ import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
-import type { UpdateProposalRequest } from '@packages/lib/proposals/updateProposal';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type ProposalsContextType = {
   proposals: ProposalWithUsersLite[] | undefined;

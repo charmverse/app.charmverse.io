@@ -1,3 +1,6 @@
+import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
+import type { RewardUpdate } from '@packages/lib/rewards/updateRewardSettings';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useSWRConfig, type KeyedMutator } from 'swr';
@@ -7,9 +10,6 @@ import { useGetRewards } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
-import type { RewardUpdate } from '@packages/lib/rewards/updateRewardSettings';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type RewardsContextType = {
   rewards: RewardWithUsers[] | undefined;

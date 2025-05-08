@@ -1,4 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { _ } from '@packages/bangleeditor/builders';
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import type {
   ProjectField,
@@ -15,8 +17,6 @@ import type {
 } from '@packages/lib/proposals/forms/interfaces';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 
-import { _ } from 'lib/prosemirror/builders';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
 export async function getPageMarkdown({

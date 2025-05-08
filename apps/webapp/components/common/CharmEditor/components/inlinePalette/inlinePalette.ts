@@ -1,11 +1,10 @@
-import type { Node } from 'prosemirror-model';
-import type { Command, EditorState, PluginKey } from 'prosemirror-state';
-
 import {
   queryIsSuggestTooltipActive,
   queryTriggerText,
   replaceSuggestMarkWith
-} from '../@bangle.dev/tooltip/suggestTooltipSpec';
+} from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import type { Node } from 'prosemirror-model';
+import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 
 export const commands = {};
 

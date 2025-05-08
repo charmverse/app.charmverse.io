@@ -1,8 +1,8 @@
 import { testUtilsPages } from '@charmverse/core/test';
+import { builders } from '@packages/bangleeditor/builders';
+import { saveDocumentNotification } from '@packages/lib/notifications/saveNotification';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { updateUserProfile } from '@packages/users/updateUserProfile';
-import { saveDocumentNotification } from '@packages/lib/notifications/saveNotification';
-import { builders } from 'lib/prosemirror/builders';
 import { v4 } from 'uuid';
 
 afterEach(() => {

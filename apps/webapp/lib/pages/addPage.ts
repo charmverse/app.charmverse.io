@@ -6,6 +6,7 @@ import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { createTableView } from '@packages/databases/tableView';
 import { getPagePath } from '@packages/pages/utils';
+import type { PageCreated } from '@packages/websockets/interfaces';
 import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
@@ -13,7 +14,6 @@ import charmClient from 'charmClient';
 import mutator from 'components/common/DatabaseEditor/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type { PageCreated } from 'lib/websockets/interfaces';
 
 export type NewPageInput = Partial<Page> & {
   spaceId: string;

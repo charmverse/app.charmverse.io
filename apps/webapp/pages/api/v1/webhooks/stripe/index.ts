@@ -2,16 +2,16 @@ import { InsecureOperationError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { StripeSubscription, SubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import type Stripe from 'stripe';
-
 import { getLoopProducts } from '@packages/lib/loop/loop';
-import { defaultHandler } from 'lib/public-api/handler';
 import { communityProduct, loopCheckoutUrl } from '@packages/lib/subscription/constants';
 import { getActiveSpaceSubscription } from '@packages/lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from '@packages/lib/subscription/stripe';
-import { relay } from 'lib/websockets/relay';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { relay } from '@packages/websockets/relay';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type Stripe from 'stripe';
+
+import { defaultHandler } from 'lib/public-api/handler';
 
 // Stripe requires the raw body to construct the event.https://vercel.com/guides/getting-started-with-nextjs-typescript-stripe
 export const config = { api: { bodyParser: false } };

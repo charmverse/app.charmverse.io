@@ -1,7 +1,6 @@
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { Node } from 'prosemirror-model';
 import { v4 } from 'uuid';
-
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 import { extractDeletedThreadIds } from '../extractDeletedThreadIds';
 

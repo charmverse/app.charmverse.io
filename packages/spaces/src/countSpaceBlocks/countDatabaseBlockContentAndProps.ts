@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { countBlocks } from '@packages/bangleeditor/countBlocks';
 import type { Board, IPropertyTemplate } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
 import { paginatedPrismaTask } from '@packages/lib/utils/paginatedPrismaTask';
 import _sum from 'lodash/sum';
-
-import { countBlocks } from 'lib/prosemirror/countBlocks';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 

@@ -1,8 +1,7 @@
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+import { markName } from '@packages/bangleeditor/components/inlineComment.constants';
 import { toggleMark } from 'prosemirror-commands';
 import type { Command, EditorState } from 'prosemirror-state';
-
-import { markName } from './inlineComment.constants';
 
 const getMarkFromState = (state: EditorState) => state.schema.marks[markName];
 

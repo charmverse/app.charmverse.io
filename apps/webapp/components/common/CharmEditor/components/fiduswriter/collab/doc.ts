@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
-import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
-import { EditorState } from 'prosemirror-state';
-import type { Transaction, EditorStateConfig } from 'prosemirror-state';
-import { Step } from 'prosemirror-transform';
-
 import type {
   ServerDocDataMessage,
   ClientDiffMessage,
   ClientSelectionMessage
-} from 'lib/websockets/documentEvents/interfaces';
+} from '@packages/websockets/documentEvents/interfaces';
+import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
+import { EditorState } from 'prosemirror-state';
+import type { Transaction, EditorStateConfig } from 'prosemirror-state';
+import { Step } from 'prosemirror-transform';
 
 import { getSelectionUpdate, updateCollaboratorSelection } from '../state_plugins';
 

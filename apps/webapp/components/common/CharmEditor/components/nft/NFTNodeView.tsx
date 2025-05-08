@@ -10,6 +10,10 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
+import { supportedMainnets as supportedMainnetsByAlchemy } from '@packages/lib/blockchain/provider/alchemy/config';
+import { supportedChainIds as supportedMainnetsByAnkr } from '@packages/lib/blockchain/provider/ankr/config';
+import { supportedNetworks as supportedNetworksByZora } from '@packages/lib/blockchain/provider/zora/config';
 import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
@@ -20,10 +24,6 @@ import { useGetNFT } from 'charmClient/hooks/blockchain';
 import { Button } from 'components/common/Button';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { supportedMainnets as supportedMainnetsByAlchemy } from '@packages/lib/blockchain/provider/alchemy/config';
-import { supportedChainIds as supportedMainnetsByAnkr } from '@packages/lib/blockchain/provider/ankr/config';
-import { supportedNetworks as supportedNetworksByZora } from '@packages/lib/blockchain/provider/zora/config';
-import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { enableDragAndDrop } from '../../utils';
 import { EmptyEmbed } from '../common/EmptyEmbed';

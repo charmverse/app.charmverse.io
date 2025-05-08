@@ -3,15 +3,17 @@ import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
-import { isTruthy } from '@packages/utils/types';
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
+import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
+import { highlightDomElement, setUrlWithoutRerender } from '@packages/lib/utils/browser';
+import { isTruthy } from '@packages/utils/types';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useInlineComment } from 'hooks/useInlineComment';
@@ -21,8 +23,6 @@ import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
-import { highlightDomElement, setUrlWithoutRerender } from '@packages/lib/utils/browser';
 
 const Center = styled.div`
   text-align: center;

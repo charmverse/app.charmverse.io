@@ -1,15 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import { DataNotFoundError } from '@packages/utils/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { deleteThread } from '@packages/lib/threads';
-import { relay } from 'lib/websockets/relay';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { DataNotFoundError } from '@packages/utils/errors';
+import { relay } from '@packages/websockets/relay';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

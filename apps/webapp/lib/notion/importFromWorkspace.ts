@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-
-import { relay } from 'lib/websockets/relay';
+import { relay } from '@packages/websockets/relay';
 
 import { NotionImporter } from './NotionImporter/NotionImporter';
 

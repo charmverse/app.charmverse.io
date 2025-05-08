@@ -1,15 +1,14 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { prismaToBlock } from '@packages/databases/block';
 import type { SyncRelationPropertyPayload } from '@packages/databases/relationProperty/syncRelationProperty';
 import { syncRelationProperty } from '@packages/databases/relationProperty/syncRelationProperty';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { relay } from '@packages/websockets/relay';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

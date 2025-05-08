@@ -1,8 +1,8 @@
+import { builders as _ } from '@packages/bangleeditor/builders';
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { EditorView } from 'prosemirror-view';
 
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import { builders as _ } from 'lib/prosemirror/builders';
 import { setSelectionNear } from 'lib/testing/prosemirror/helpers';
 import { renderTestEditor } from 'lib/testing/prosemirror/renderTestEditor';
 

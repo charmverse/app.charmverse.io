@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { togglePageLock } from 'lib/pages/togglePageLock';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import { withSessionRoute } from '@packages/lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

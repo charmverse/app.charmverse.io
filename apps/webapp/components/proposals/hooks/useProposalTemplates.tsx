@@ -1,3 +1,4 @@
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useEffect } from 'react';
 
 import { useGetProposalTemplatesBySpace } from 'charmClient/hooks/proposals';
@@ -5,7 +6,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposalTemplates({ load = true, detailed = false }: { detailed?: boolean; load?: boolean } = {}) {
   const { space } = useCurrentSpace();

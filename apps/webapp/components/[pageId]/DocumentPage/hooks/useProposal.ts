@@ -1,3 +1,5 @@
+import type { ProposalFields } from '@packages/lib/proposals/interfaces';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useEffect, useMemo } from 'react';
 
 import {
@@ -11,8 +13,6 @@ import {
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { ProposalFields } from '@packages/lib/proposals/interfaces';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { data: proposal, mutate: refreshProposal } = useGetProposalDetails(proposalId);

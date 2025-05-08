@@ -1,10 +1,9 @@
+import { removeSuggestMark } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import type { EditorState, PluginKey, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import { useCallback, useEffect } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-
-import { removeSuggestMark } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { getSuggestTooltipKey } from './inlinePalette';
 import type { InlinePaletteItem } from './paletteItem';

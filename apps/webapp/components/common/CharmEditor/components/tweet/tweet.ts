@@ -1,9 +1,9 @@
+import { insertNode } from '@packages/charmeditor/utils/insertNode';
 import type { Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-import { insertNode } from 'lib/prosemirror/insertNode';
 
 import { name, extractTweetAttrs } from './tweetSpec';
 

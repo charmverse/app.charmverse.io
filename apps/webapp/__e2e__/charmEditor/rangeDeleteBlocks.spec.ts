@@ -1,10 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { _ } from '@packages/bangleeditor/builders';
 import type { Page } from '@playwright/test';
 import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-
-import { _ } from 'lib/prosemirror/builders';
 
 type Fixtures = {
   documentPage: DocumentPage;

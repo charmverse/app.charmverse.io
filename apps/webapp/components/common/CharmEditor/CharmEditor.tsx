@@ -3,6 +3,7 @@ import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import { Box, Divider } from '@mui/material';
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { CryptoCurrency, FiatCurrency } from '@packages/blockchain/connectors/chains';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
@@ -71,7 +72,6 @@ import {
   mentionPluginKey,
   suggestionsPluginKey
 } from './plugins';
-import { specRegistry } from './specRegistry';
 
 export interface ICharmEditorOutput {
   doc: PageContent;

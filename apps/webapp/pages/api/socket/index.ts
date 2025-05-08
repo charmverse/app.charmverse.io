@@ -2,14 +2,13 @@ import { log } from '@charmverse/core/log';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { authSecret } from '@packages/lib/session/authSecret';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import type { SealedUserId, SocketAuthResponse } from '@packages/websockets/interfaces';
+import { relay } from '@packages/websockets/relay';
 import { sealData } from 'iron-session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
-
-import type { SealedUserId, SocketAuthResponse } from 'lib/websockets/interfaces';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -13,6 +13,8 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import { isReturnKey } from '@packages/lib/utils/react';
 import type { PluginKey } from 'prosemirror-state';
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -20,9 +22,6 @@ import { createPortal } from 'react-dom';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { isReturnKey } from '@packages/lib/utils/react';
-
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import type { LinkPluginState } from './link.plugins';
 

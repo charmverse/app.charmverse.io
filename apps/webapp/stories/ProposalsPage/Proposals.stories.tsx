@@ -1,4 +1,6 @@
 import { Box } from '@mui/material';
+import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
+import type { PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
 import { createMockPage } from '@packages/testing/mocks/page';
 import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
@@ -7,8 +9,6 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
-import type { PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
-import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 

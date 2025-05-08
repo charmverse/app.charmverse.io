@@ -1,13 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { Page, PageDiff } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { applyStepsToNode } from '@packages/bangleeditor/applyStepsToNode';
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { InvalidInputError } from '@packages/utils/errors';
-
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
+import type { ProsemirrorJSONStep } from '@packages/websockets/documentEvents/interfaces';
 
 type RestoreInput = {
   pageId: string;

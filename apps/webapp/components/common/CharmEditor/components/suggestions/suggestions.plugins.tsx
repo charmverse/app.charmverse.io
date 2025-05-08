@@ -1,4 +1,5 @@
 import { RateReviewOutlined } from '@mui/icons-material';
+import { renderSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { Plugin, Selection } from 'prosemirror-state';
 import type { EditorState, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
@@ -6,7 +7,6 @@ import { createRoot } from 'react-dom/client';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
-import { renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 

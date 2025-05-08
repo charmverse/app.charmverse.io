@@ -1,9 +1,9 @@
 import { Paper } from '@mui/material';
+import { _, jsonDoc } from '@packages/bangleeditor/builders';
 import { Provider } from 'react-redux';
 
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
-import { _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { renderEditorWithContent } from '../renderEditor';
 

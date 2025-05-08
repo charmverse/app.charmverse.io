@@ -1,3 +1,4 @@
+import { markName } from '@packages/bangleeditor/components/inlineComment.constants';
 import type { EditorState, PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
@@ -14,7 +15,6 @@ import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/toolt
 import { threadPluginKey } from '../thread/thread.plugins';
 
 import RowDecoration from './components/InlineCommentRowDecoration';
-import { markName } from './inlineComment.constants';
 
 export interface InlineCommentPluginState {
   tooltipContentDOM: HTMLElement;

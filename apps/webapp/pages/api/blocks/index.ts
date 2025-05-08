@@ -17,12 +17,12 @@ import { getPagePath } from '@packages/pages/utils';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UnauthorisedActionError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createPage } from 'lib/pages/server/createPage';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
-import { relay } from 'lib/websockets/relay';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 

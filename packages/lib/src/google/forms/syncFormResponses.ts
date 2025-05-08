@@ -8,9 +8,9 @@ import type { BoardViewFields } from '@packages/databases/boardView';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 import { WrongStateError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
+import { relay } from '@packages/websockets/relay';
 
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { relay } from 'lib/websockets/relay';
 
 import { syncThrottlePeriod } from './config';
 import { getCardsAndPages } from './getCardsAndPages';

@@ -1,6 +1,5 @@
 import type { BaseRawMarkSpec, BaseRawNodeSpec } from '@bangle.dev/core';
-
-import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import { SpecRegistry } from '@packages/bangleeditor/specRegistry';
 
 export function markdownLoader(specRegistry = new SpecRegistry()) {
   const tokens: { [key: string]: any } = Object.fromEntries(

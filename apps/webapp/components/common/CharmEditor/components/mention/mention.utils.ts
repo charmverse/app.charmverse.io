@@ -1,8 +1,8 @@
+import { replaceSuggestMarkWith } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import type { Command, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
 import type { SuggestPluginState } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
-import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {

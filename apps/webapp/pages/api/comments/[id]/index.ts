@@ -4,10 +4,9 @@ import { deleteComment, updateComment } from '@packages/lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { DataNotFoundError, UnauthorisedActionError } from '@packages/utils/errors';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

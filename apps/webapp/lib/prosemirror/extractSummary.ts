@@ -1,9 +1,7 @@
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
+import type { PageContent } from '@packages/charmeditor/src/interfaces';
 import type { Node } from 'prosemirror-model';
 import { findChildren } from 'prosemirror-utils';
-
-import type { PageContent } from '../../../../packages/charmeditor/src/interfaces';
-
-import { getNodeFromJson } from './getNodeFromJson';
 
 const summaryBlockTypes = ['image', 'tweet', 'video'];
 const textParagrahLimit = 3;

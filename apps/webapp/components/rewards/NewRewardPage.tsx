@@ -2,6 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
+import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import type {
   RewardFields,
@@ -29,7 +30,6 @@ import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSi
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';

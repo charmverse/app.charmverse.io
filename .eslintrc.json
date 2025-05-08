@@ -83,6 +83,7 @@
           "./apps/websockets/",
           "./packages/adapters/",
           "./packages/aws/",
+          "./packages/bangleeditor/",
           "./packages/charmeditor/",
           "./packages/config/",
           "./packages/connect-shared/",

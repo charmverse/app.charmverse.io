@@ -1,0 +1,18 @@
+{
+  "name": "@packages/websockets",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "../../node_modules/typescript/bin/tsc",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "devDependencies": {
+    "prosemirror-test-builder": "^1.1.1"
+  }
+}

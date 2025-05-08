@@ -1,11 +1,3 @@
-import { useCallback, useEffect, useMemo } from 'react';
-
-import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
-import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/utils/boardData';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { BoardFields, IPropertyTemplate } from '@packages/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
 import type {
@@ -15,7 +7,15 @@ import type {
   RewardsBoardFFBlock
 } from '@packages/lib/rewards/blocks/interfaces';
 import { defaultRewardViews } from '@packages/lib/rewards/blocks/views';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
+import { useCallback, useEffect, useMemo } from 'react';
+
+import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
+import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export function useRewardsBoard() {
   const { space } = useCurrentSpace();

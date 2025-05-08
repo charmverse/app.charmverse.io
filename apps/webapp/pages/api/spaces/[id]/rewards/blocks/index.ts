@@ -1,13 +1,12 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { deleteBlocks } from '@packages/lib/rewards/blocks/deleteBlocks';
 import { getBlocks } from '@packages/lib/rewards/blocks/getBlocks';
 import type { RewardBlockUpdateInput, RewardBlockWithTypedFields } from '@packages/lib/rewards/blocks/interfaces';
 import { upsertBlocks } from '@packages/lib/rewards/blocks/upsertBlocks';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
+import { relay } from '@packages/websockets/relay';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

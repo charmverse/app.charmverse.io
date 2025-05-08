@@ -9,10 +9,9 @@ import { publishForumPostEvents } from '@packages/lib/notifications/publishForum
 import { providePermissionClients } from '@packages/lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

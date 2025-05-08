@@ -4,6 +4,8 @@ import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import { MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
+import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -11,8 +13,6 @@ import { memo, useEffect, useRef, useState } from 'react';
 import charmClient from 'charmClient';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
-import { MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { enableDragAndDrop } from '../../utils';
 import { getFileBinary } from '../@bangle.dev/base-components/image';

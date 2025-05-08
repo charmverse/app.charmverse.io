@@ -1,5 +1,5 @@
-import type { NodeType, Builder } from 'lib/prosemirror/builders';
-import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
+import type { NodeType, Builder } from '@packages/bangleeditor/builders';
+import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
 
 import { updateEntityIds, _updateNode, _getExtractedPollsMap } from '../updateEntityIds';
 

@@ -1,5 +1,7 @@
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import MuxVideo from '@mux/mux-video-react';
+import { VIDEO_ASPECT_RATIO } from '@packages/bangleeditor/components/video/videoSpec';
+import type { VideoNodeAttrs } from '@packages/bangleeditor/components/video/videoSpec';
 import { useEffect, useMemo, useState } from 'react';
 import useSwr from 'swr';
 
@@ -21,8 +23,6 @@ import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable';
 
 import { extractYoutubeEmbedLink } from './utils';
-import { VIDEO_ASPECT_RATIO } from './videoSpec';
-import type { VideoNodeAttrs } from './videoSpec';
 import { VideoUploadForm } from './VideoUploadForm';
 
 export function VideoNodeView({

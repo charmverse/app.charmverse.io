@@ -5,12 +5,12 @@ import { emptyDocument } from '@packages/charmeditor/constants';
 import { prismaToUIBlock } from '@packages/databases/block';
 import { getPagePath } from '@packages/pages/utils';
 import { InvalidInputError } from '@packages/utils/errors';
+import { relay } from '@packages/websockets/relay';
 import { v4 as uuid } from 'uuid';
 
 import { createPage } from 'lib/pages/server/createPage';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
-import { relay } from 'lib/websockets/relay';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
 import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';

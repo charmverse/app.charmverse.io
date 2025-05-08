@@ -2,24 +2,24 @@ import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from '@packages/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError } from '@packages/nextjs/errors';
+import { trashOrDeletePage } from '@packages/pages/trashOrDeletePage';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UndesirableOperationError } from '@packages/utils/errors';
 import { replaceS3Domain } from '@packages/utils/url';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import type { TrashOrDeletePageResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
-import { withSessionRoute } from '@packages/lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

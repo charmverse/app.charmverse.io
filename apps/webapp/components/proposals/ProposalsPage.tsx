@@ -6,6 +6,7 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import Tabs from '@mui/material/Tabs';
+import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { createBoard } from '@packages/databases/board';
 import { debounce } from 'lodash';
@@ -15,7 +16,6 @@ import { FormattedMessage } from 'react-intl';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
-import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
 import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';

@@ -1,6 +1,8 @@
 // Reference: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/bangle-editor-state.ts
 
 import { log } from '@charmverse/core/log';
+import type { RawSpecs } from '@packages/bangleeditor/specRegistry';
+import { SpecRegistry } from '@packages/bangleeditor/specRegistry';
 import type { dropCursor as pmDropCursor } from 'prosemirror-dropcursor';
 import type { Mark, ParseOptions, Schema } from 'prosemirror-model';
 import { DOMParser, Node } from 'prosemirror-model';
@@ -10,8 +12,6 @@ import type { EditorProps } from 'prosemirror-view';
 
 import type { RawPlugins } from './plugin-loader';
 import { pluginLoader } from './plugin-loader';
-import { SpecRegistry } from './specRegistry';
-import type { RawSpecs } from './specRegistry';
 
 type InitialContent = string | Node | object;
 

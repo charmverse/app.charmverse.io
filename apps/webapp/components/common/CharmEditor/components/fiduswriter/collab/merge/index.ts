@@ -1,12 +1,11 @@
 import { log } from '@charmverse/core/log';
+import type { ServerDocDataMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
 import type { Selection } from 'prosemirror-state';
 import { EditorState } from 'prosemirror-state';
 import type { StepMap } from 'prosemirror-transform';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
-
-import type { ServerDocDataMessage } from 'lib/websockets/documentEvents/interfaces';
 
 import { getSettings } from '../../schema/convert';
 import { trackedTransaction, acceptAllNoInsertions } from '../../track';

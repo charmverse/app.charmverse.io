@@ -1,4 +1,4 @@
-import { jsonDoc, builders as _ } from 'lib/prosemirror/builders';
+import { jsonDoc, builders as _ } from '@packages/bangleeditor/builders';
 
 import { CharmEditor } from 'components/common/CharmEditor';
 import { render, MockDataProvider } from 'lib/testing/customRender';

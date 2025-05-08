@@ -1,10 +1,9 @@
+import { TABLE_CELL, TABLE_HEADER } from '@packages/bangleeditor/nodeNames';
 import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import { CellSelection, TableMap } from 'prosemirror-tables';
 import { findParentNodeOfType } from 'prosemirror-utils';
-
-import { TABLE_CELL, TABLE_HEADER } from '../../nodeNames';
 
 type Result = {
   node: Node;

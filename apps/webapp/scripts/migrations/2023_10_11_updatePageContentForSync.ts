@@ -5,10 +5,10 @@ import { PageDiff, Prisma, prisma } from '@charmverse/core/prisma-client';
 import { Fragment, Slice } from 'prosemirror-model';
 import { replaceStep } from 'prosemirror-transform';
 
-import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import { applyStepsToNode } from '@packages/bangleeditor/applyStepsToNode';
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import type { PageContent } from '@packages/charmeditor/interfaces';
-import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';
+import type { ProsemirrorJSONStep } from '@packages/websockets/documentEvents/interfaces';
 
 export function recurseDocument(content: PageContent, cb: (node: PageContent) => void) {
   function recurse(node: PageContent) {

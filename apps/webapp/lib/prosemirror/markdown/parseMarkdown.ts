@@ -1,9 +1,9 @@
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import markdownit from 'markdown-it/lib';
 import { MarkdownParser } from 'prosemirror-markdown';
 
 import { listIsTight } from 'components/common/CharmEditor/components/listItem/listIsTight';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 export const charmParser = new MarkdownParser(specRegistry.schema, markdownit('commonmark', { html: true }), {
   blockquote: { block: 'blockquote' },

@@ -1,7 +1,6 @@
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { Fragment, Node } from 'prosemirror-model';
 import { EditorState, TextSelection } from 'prosemirror-state';
-
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 
 import { indentListItem } from '../listItem.component';
 

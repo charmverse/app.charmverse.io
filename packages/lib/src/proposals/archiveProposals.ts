@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { relay } from 'lib/websockets/relay';
+import { relay } from '@packages/websockets/relay';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 

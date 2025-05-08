@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
 
-// import { relay } from 'lib/websockets/relay';
+// import { relay } from '@packages/websockets/relay';
 
 import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';

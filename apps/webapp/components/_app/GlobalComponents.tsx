@@ -1,3 +1,4 @@
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -15,7 +16,6 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
 import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { ConfirmationModal } from './components/ConfirmationModal';
 import { Snackbar } from './components/Snackbar';

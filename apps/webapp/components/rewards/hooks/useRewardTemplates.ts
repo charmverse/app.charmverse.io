@@ -1,9 +1,9 @@
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useEffect } from 'react';
 
 import { useGetRewardTemplatesBySpace } from 'charmClient/hooks/rewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useRewardTemplates(
   {

@@ -1,6 +1,5 @@
+import type { SpecRegistry } from '@packages/bangleeditor/specRegistry';
 import { MarkdownSerializer } from 'prosemirror-markdown';
-
-import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { markdownLoader } from './markdownLoader';
 

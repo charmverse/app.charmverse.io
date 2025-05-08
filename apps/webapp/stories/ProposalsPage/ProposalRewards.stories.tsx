@@ -1,4 +1,6 @@
 import { Box, Paper } from '@mui/material';
+import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
+import type { ProposalPendingReward } from '@packages/lib/proposals/interfaces';
 import { createMockPage } from '@packages/testing/mocks/page';
 import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
@@ -10,8 +12,6 @@ import { useResizeObserver } from 'usehooks-ts';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
-import type { ProposalPendingReward } from '@packages/lib/proposals/interfaces';
-import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { members } from '../lib/mockData';
 

@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentStep } from '@packages/lib/proposals/getCurrentStep';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
-import { relay } from 'lib/websockets/relay';
+import { relay } from '@packages/websockets/relay';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';

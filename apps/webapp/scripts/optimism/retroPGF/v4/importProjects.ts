@@ -10,7 +10,7 @@ import { upsertProposalFormAnswers } from '@packages/lib/proposals/forms/upsertP
 
 import { appendFileSync } from 'fs';
 import { RateLimit } from 'async-sema';
-import { _, jsonDoc } from 'lib/prosemirror/builders';
+import { _, jsonDoc } from '@packages/bangleeditor/builders';
 import type { FieldAnswerInput } from '@packages/lib/proposals/forms/interfaces';
 import {
   spaceId,

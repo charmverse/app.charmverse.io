@@ -1,11 +1,4 @@
 import { findFirstMarkPosition, filter, createObject } from '@bangle.dev/utils';
-import { keymap } from 'prosemirror-keymap';
-import type { MarkType, Schema } from 'prosemirror-model';
-import type { Command, EditorState } from 'prosemirror-state';
-import { Plugin, PluginKey } from 'prosemirror-state';
-
-import type { RawPlugins } from '../core/plugin-loader';
-
 import {
   queryIsSuggestTooltipActive,
   removeSuggestMark,
@@ -14,7 +7,14 @@ import {
   hideSuggestionsTooltip,
   renderSuggestionsTooltip,
   getTriggerText
-} from './suggestTooltipSpec';
+} from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import { keymap } from 'prosemirror-keymap';
+import type { MarkType, Schema } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
+import { Plugin, PluginKey } from 'prosemirror-state';
+
+import type { RawPlugins } from '../core/plugin-loader';
+
 import { plugins as tooltipPlacementPlugins } from './tooltipPlacement';
 import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
 import { triggerInputRule } from './triggerInputRule';

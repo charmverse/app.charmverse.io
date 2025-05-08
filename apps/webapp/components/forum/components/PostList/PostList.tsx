@@ -4,6 +4,8 @@ import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type { AlertProps } from '@mui/material/Alert';
 import MuiAlert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import type { PostSortOption } from '@packages/lib/forums/posts/constants';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWRInfinite from 'swr/infinite';
 
@@ -15,8 +17,6 @@ import { useMembers } from 'hooks/useMembers';
 import useOnScreen from 'hooks/useOnScreen';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { PostSortOption } from '@packages/lib/forums/posts/constants';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { PostCard } from './components/PostCard';
 import { PostSkeleton } from './components/PostSkeleton';

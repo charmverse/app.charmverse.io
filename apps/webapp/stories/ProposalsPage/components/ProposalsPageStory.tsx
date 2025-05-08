@@ -1,3 +1,4 @@
+import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
 import { createMockPage } from '@packages/testing/mocks/page';
 import { createMockProposal } from '@packages/testing/mocks/proposal';
 import { http, HttpResponse } from 'msw';
@@ -9,7 +10,6 @@ import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
-import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { members, userProfile } from '../../lib/mockData';
 

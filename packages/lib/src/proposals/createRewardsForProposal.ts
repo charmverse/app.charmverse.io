@@ -13,9 +13,8 @@ import { InvalidStateError } from '@packages/nextjs/errors';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
+import { relay } from '@packages/websockets/relay';
 import { uniqBy } from 'lodash';
-
-import { relay } from 'lib/websockets/relay';
 
 import { permissionsApiClient } from '../permissions/api/client';
 

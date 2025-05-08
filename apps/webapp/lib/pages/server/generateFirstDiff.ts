@@ -1,8 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import type { PageContent } from '@packages/charmeditor/interfaces';
-
-import type { ClientDiffMessage } from 'lib/websockets/documentEvents/interfaces';
+import type { ClientDiffMessage } from '@packages/websockets/documentEvents/interfaces';
 
 /**
  * @createdBy - Should be provided from the creator of the page

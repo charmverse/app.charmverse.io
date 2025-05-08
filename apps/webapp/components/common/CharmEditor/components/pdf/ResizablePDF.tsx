@@ -6,6 +6,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import type { ListItemButtonProps } from '@mui/material';
 import { Box, ListItemButton, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import { MIN_PDF_WIDTH } from '@packages/bangleeditor/components/image/constants';
 import dynamic from 'next/dynamic';
 import type { Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
@@ -16,7 +17,6 @@ import { memo, useMemo, useState } from 'react';
 import BlockAligner from 'components/common/CharmEditor/components/BlockAligner';
 import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import PdfSelector from 'components/common/PdfSelector';
-import { MIN_PDF_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import Resizable from '../Resizable/Resizable';
 

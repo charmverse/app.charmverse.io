@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { VIDEO_ASPECT_RATIO } from '@packages/bangleeditor/components/video/videoSpec';
 import { v4 as uuid } from 'uuid';
 
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/constants';
-import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';

@@ -1,0 +1,31 @@
+{
+  "name": "@packages/bangleeditor",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "../../node_modules/typescript/bin/tsc",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@bangle.dev/base-components": "^0.31.6",
+    "@bangle.dev/shared-types": "^0.31.6",
+    "@packages/charmeditor": "^1.0.0",
+    "prosemirror": "^0.11.1",
+    "prosemirror-commands": "^1.6.0",
+    "prosemirror-inputrules": "^1.4.0",
+    "prosemirror-keymap": "^1.2.2",
+    "prosemirror-markdown": "^1.13.0",
+    "prosemirror-model": "^1.22.3",
+    "prosemirror-schema-list": "^1.4.1",
+    "prosemirror-state": "^1.4.3",
+    "prosemirror-utils": "^1.2.2",
+    "prosemirror-view": "^1.34.1"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "devDependencies": {
+    "prosemirror-test-builder": "^1.1.1"
+  }
+}

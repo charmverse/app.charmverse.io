@@ -6,7 +6,6 @@ import { chainCommands } from 'prosemirror-commands';
 import { keymap } from 'prosemirror-keymap';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import {
   backspaceKeyCommand,
@@ -19,7 +18,6 @@ import {
 import { listItemNodeViewPlugin } from './listItem.nodeViewPlugin';
 import { isNodeTodo, setTodoCheckedAttr } from './todo';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   indentListItem,
@@ -45,40 +43,6 @@ const isValidList = (state: EditorState) => {
   const type = getTypeFromSchema(state.schema);
   return parentHasDirectParentOfType(type, [state.schema.nodes.bulletList, state.schema.nodes.orderedList]);
 };
-
-function specFactory(): RawSpecs {
-  const { toDOM, parseDOM } = domSerializationHelpers(name, {
-    tag: 'li.old-list-item',
-    // @ts-ignore DOMOutputSpec in @types is buggy
-    content: 0
-  });
-
-  return {
-    type: 'node',
-    name,
-    schema: {
-      content: '(paragraph) (paragraph | bulletList | orderedList)*',
-      defining: true,
-      draggable: true,
-      attrs: {
-        // We overload the todoChecked value to
-        // decide if its a regular bullet list or a list with todo
-        // todoChecked can take following values:
-        //   null => regular bullet list
-        //   true => todo list with checked
-        //   false => todo list with no check
-        todoChecked: {
-          default: null
-        },
-        track: {
-          default: []
-        }
-      },
-      toDOM,
-      parseDOM
-    }
-  };
-}
 
 function pluginsFactory({ keybindings = defaultKeys, nodeView = true, readOnly = false } = {}): RawPlugins & {
   readOnly?: boolean;

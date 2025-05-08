@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import { findChildren } from 'prosemirror-utils';
 import { writeFileSync } from 'fs';
 const hostName = 'https://app.charmverse.io';

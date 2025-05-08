@@ -1,6 +1,5 @@
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-
-import { countBlocks } from 'lib/prosemirror/countBlocks';
+import { countBlocks } from '@packages/bangleeditor/countBlocks';
 
 import { countPageEditorContentBlocks } from '../countPageEditorContentBlocks';
 

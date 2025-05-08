@@ -1,10 +1,6 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { ActionNotPermittedError, ApiError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import type { BlockWithDetails } from '@packages/databases/block';
 import { applyPageToBlock } from '@packages/databases/block';
 import type { BoardFields } from '@packages/databases/board';
@@ -12,10 +8,13 @@ import { getPageByBlockId } from '@packages/databases/getPageByBlockId';
 import { applyPropertiesToCard } from '@packages/databases/proposalsSource/applyPropertiesToCards';
 import { getCardPropertiesFromProposal } from '@packages/databases/proposalsSource/getCardProperties';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { relay } from 'lib/websockets/relay';
+import { ActionNotPermittedError, ApiError } from '@packages/nextjs/errors';
+import { trashOrDeletePage } from '@packages/pages/trashOrDeletePage';
+import { relay } from '@packages/websockets/relay';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,8 +1,8 @@
+import { builders as _ } from '@packages/bangleeditor/builders';
+import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { TextSelection } from 'prosemirror-state';
 
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
-import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import { builders as _ } from 'lib/prosemirror/builders';
 import { dispatchPasteEvent, expectNodesAreEqual } from 'lib/testing/prosemirror/helpers';
 import { renderTestEditor } from 'lib/testing/prosemirror/renderTestEditor';
 

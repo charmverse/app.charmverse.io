@@ -3,20 +3,19 @@ import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
 import { CryptoCurrencies, getChainById } from '@packages/blockchain/connectors/chains';
+import { getTokenInfo } from '@packages/lib/tokens/tokenData';
+import { formatMoney } from '@packages/lib/utils/formatting';
 import { isTruthy } from '@packages/utils/types';
 import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { CoinLogoAndTicker } from 'components/common/CoinLogoAndTicker';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency';
 import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo } from '@packages/lib/tokens/tokenData';
-import { formatMoney } from '@packages/lib/utils/formatting';
 
 import { enableDragAndDrop } from '../../utils';
 

@@ -1,11 +1,10 @@
 import type { Post, PostComment, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
+import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
 import { expect, test as base } from '@playwright/test';
-
-import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
-import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { ForumPostPage } from '../po/forumPost.po';

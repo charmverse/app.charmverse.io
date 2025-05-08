@@ -2,7 +2,7 @@ import { OverallBlocksCount, countSpaceBlocks } from 'lib/spaces/countSpaceBlock
 import { prisma } from '@charmverse/core/prisma-client';
 import { writeToSameFolder } from 'lib/utils/file';
 import type { Space } from '@charmverse/core/prisma';
-import { countBlocks } from 'lib/prosemirror/countBlocks';
+import { countBlocks } from '@packages/bangleeditor/countBlocks';
 
 function getTotal(counts: Record<string, number>): number {
   return Object.entries(counts).reduce((count, [blockType, value]) => {

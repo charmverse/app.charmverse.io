@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
+import { _, jsonDoc } from '@packages/bangleeditor/builders';
+import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
 import { getProjectProfileFieldConfigDefaultHidden } from '@packages/testing/mocks/form';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
+
 import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
-import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
-import { _, jsonDoc } from 'lib/prosemirror/builders';
 
 describe('getPageMarkdown', () => {
   it('should get markdown content for a page', async () => {

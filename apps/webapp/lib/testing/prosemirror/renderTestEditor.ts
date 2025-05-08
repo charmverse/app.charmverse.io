@@ -1,3 +1,4 @@
+import type { SpecRegistry } from '@packages/bangleeditor/specRegistry';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Selection } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
@@ -9,7 +10,6 @@ import {
   resetRenderHandlersCache,
   saveRenderHandlers
 } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { nodeViewRenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/react/node-view-helpers';
 
 const mountedEditors = new Set<BangleEditor>();

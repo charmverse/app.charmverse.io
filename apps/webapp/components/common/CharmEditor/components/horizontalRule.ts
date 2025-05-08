@@ -2,39 +2,13 @@ import { safeInsert } from '@bangle.dev/utils';
 import { InputRule } from 'prosemirror-inputrules';
 import type { DOMOutputSpec, Schema } from 'prosemirror-model';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { RawPlugins } from './@bangle.dev/core/plugin-loader';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 
 const name = 'horizontalRule';
 
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
-
-function specFactory(): RawSpecs {
-  return {
-    type: 'node',
-    name,
-    schema: {
-      attrs: {
-        track: {
-          default: []
-        }
-      },
-      group: 'block',
-      parseDOM: [{ tag: 'hr' }],
-      toDOM: (): DOMOutputSpec => ['hr']
-    },
-    markdown: {
-      toMarkdown(state, node) {
-        state.write(node.attrs.markup || '---');
-        state.closeBlock(node);
-      },
-      parseMarkdown: { hr: { node: name } }
-    }
-  };
-}
 
 function pluginsFactory({ markdownShortcut = true } = {}): RawPlugins {
   return ({ schema }) => {

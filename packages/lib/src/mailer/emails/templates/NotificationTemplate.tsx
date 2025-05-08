@@ -11,7 +11,7 @@ import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
 
-// import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+// import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 

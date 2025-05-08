@@ -2,6 +2,7 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Box, Card, CardActionArea, Typography } from '@mui/material';
+import type { BookmarkNodeAttrs } from '@packages/bangleeditor/components/bookmark/bookmarkSpec';
 import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';
 
@@ -13,8 +14,6 @@ import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
-
-import type { BookmarkNodeAttrs } from './bookmarkSpec';
 
 const iframelyWidgetJs = 'https://cdn.iframe.ly/embed.js';
 

@@ -1,4 +1,6 @@
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { STATIC_PAGES } from '@packages/features/constants';
+import { safeScrollIntoViewIfNeeded } from '@packages/lib/utils/browser';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo, useState } from 'react';
 
@@ -10,10 +12,8 @@ import { useRootPages } from 'hooks/useRootPages';
 import { useSearchPages, sortList } from 'hooks/useSearchPages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
-import { safeScrollIntoViewIfNeeded } from '@packages/lib/utils/browser';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 

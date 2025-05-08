@@ -1,6 +1,7 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { isTruthy } from '@packages/utils/types';
 import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
@@ -10,7 +11,6 @@ import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 

@@ -1,10 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { isTruthy } from '@packages/utils/types';
 import { getDraftStep } from '@packages/lib/proposals/getCurrentStep';
 import { publishProposalEvent } from '@packages/lib/webhookPublisher/publishEvent';
-import { relay } from 'lib/websockets/relay';
+import { isTruthy } from '@packages/utils/types';
+import { relay } from '@packages/websockets/relay';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 

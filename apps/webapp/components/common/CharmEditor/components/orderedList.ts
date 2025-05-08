@@ -4,13 +4,10 @@ import { createObject } from '@bangle.dev/utils';
 import { wrappingInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { RawPlugins } from './@bangle.dev/core/plugin-loader';
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   toggleOrderedList,
@@ -22,44 +19,6 @@ export const defaultKeys = {
 
 const name = 'orderedList';
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
-
-function specFactory(): RawSpecs {
-  return {
-    type: 'node',
-    name,
-    schema: {
-      attrs: {
-        order: {
-          default: 1
-        },
-        // a style preference attribute which be used for
-        // rendering output.
-        // For example markdown serializer can render a new line in
-        // between or not.
-        tight: {
-          default: false
-        },
-        track: {
-          default: []
-        }
-      },
-      content: 'listItem+',
-      group: 'block',
-      parseDOM: [
-        {
-          tag: 'ol.old-list',
-          getAttrs: (dom: any) => ({
-            order: dom.hasAttribute('start') ? +dom.getAttribute('start')! : 1
-          })
-        }
-      ],
-      toDOM: (node) =>
-        node.attrs.order === 1
-          ? ['ol', { class: 'old-list' }, 0]
-          : ['ol', { class: 'old-list', start: node.attrs.order }, 0]
-    }
-  };
-}
 
 function pluginsFactory({ keybindings = defaultKeys } = {}): RawPlugins {
   return ({ schema }) => {

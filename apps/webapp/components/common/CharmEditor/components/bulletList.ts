@@ -7,14 +7,11 @@ import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { DOMOutputSpec, Node, Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { RawPlugins } from './@bangle.dev/core/plugin-loader';
 import { toggleList } from './listItem/commands';
 import { listIsTight } from './listItem/listIsTight';
 import { isNodeTodo, removeTodo, setTodo, wrappingInputRuleForTodo } from './listItem/todo';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   toggleBulletList,
@@ -28,33 +25,6 @@ export const defaultKeys = {
 const name = 'bulletList';
 
 const getTypeFromSchema = (schema: Schema) => schema.nodes[name];
-
-function specFactory(): RawSpecs {
-  return {
-    type: 'node',
-    name,
-    schema: {
-      content: 'listItem+',
-      group: 'block',
-      parseDOM: [{ tag: 'ul.old-list' }],
-      toDOM: (): DOMOutputSpec => ['ul', { class: 'old-list' }, 0],
-      attrs: {
-        // a style preference attribute which be used for
-        // rendering output.
-        // For example markdown serializer can render a new line in
-        // between or not.
-        tight: {
-          default: false
-        }
-      }
-    },
-    markdown: {
-      toMarkdown(state: MarkdownSerializerState, node: Node) {
-        state.renderList(node, '  ', () => '- ');
-      }
-    }
-  };
-}
 
 function pluginsFactory({
   markdownShortcut = true,

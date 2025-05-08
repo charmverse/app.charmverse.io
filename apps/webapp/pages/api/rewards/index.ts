@@ -14,10 +14,9 @@ import { logUserFirstBountyEvents, logWorkspaceFirstBountyEvents } from '@packag
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 import { UnauthorisedActionError } from '@packages/utils/errors';
+import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

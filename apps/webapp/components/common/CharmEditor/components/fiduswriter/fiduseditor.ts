@@ -1,4 +1,9 @@
 import { log } from '@charmverse/core/log';
+import type {
+  ClientSubscribeMessage,
+  SocketMessage,
+  WrappedSocketMessage
+} from '@packages/websockets/documentEvents/interfaces';
 import { collab, sendableSteps } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
@@ -6,11 +11,6 @@ import type { EditorView } from 'prosemirror-view';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
-import type {
-  ClientSubscribeMessage,
-  SocketMessage,
-  WrappedSocketMessage
-} from 'lib/websockets/documentEvents/interfaces';
 
 import { ModCollab } from './collab';
 import { collabCaretsPlugin, trackPlugin } from './state_plugins';

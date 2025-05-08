@@ -23,13 +23,13 @@ import type { ITokenMetadata, ITokenMetadataRequest } from '@packages/lib/tokens
 import type { AggregatedProfileData } from '@packages/profile/getAggregatedData';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { encodeFilename } from '@packages/utils/encodeFilename';
+import type { SocketAuthResponse } from '@packages/websockets/interfaces';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
-import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 
 import { BlockchainApi } from './apis/blockchainApi';

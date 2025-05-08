@@ -4,58 +4,8 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { backspaceCmd, moveDownCmd } from './commands';
-
-export function spec() {
-  return [summarySpec(), detailsSpec()];
-}
-
-function summarySpec(): RawSpecs {
-  return {
-    type: 'node',
-    name: 'disclosureSummary',
-    schema: {
-      content: '(paragraph | heading)',
-      group: 'block',
-      parseDOM: [{ tag: 'summary' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['summary', 0];
-      }
-    },
-    markdown: {
-      toMarkdown: (state, node) => {
-        state.text(node.textContent, false);
-        state.ensureNewLine();
-        state.closeBlock(node);
-      }
-    }
-  };
-}
-
-function detailsSpec(): RawSpecs {
-  return {
-    type: 'node',
-    name: 'disclosureDetails',
-    schema: {
-      content: 'disclosureSummary block+',
-      defining: true,
-      group: 'block',
-      parseDOM: [{ tag: 'details' }],
-      toDOM: (): DOMOutputSpec => {
-        return ['details', 0];
-      }
-    },
-    markdown: {
-      toMarkdown: (state, node) => {
-        state.text(node.textContent, false);
-        state.ensureNewLine();
-        state.closeBlock(node);
-      }
-    }
-  };
-}
 
 export function plugins(): RawPlugins {
   return () => {

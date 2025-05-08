@@ -21,9 +21,7 @@ import type { Node, DOMOutputSpec } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 
 import type { RawPlugins } from '../@bangle.dev/core/plugin-loader';
-import type { BaseRawNodeSpec, RawSpecs } from '../@bangle.dev/core/specRegistry';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   convertToParagraph,
@@ -46,46 +44,6 @@ export const defaultKeys = {
   insertEmptyParaBelow: 'Mod-Enter',
   convertToParagraph: 'Ctrl-Shift-0'
 };
-
-const name = 'paragraph';
-
-function specFactory(): BaseRawNodeSpec {
-  return {
-    type: 'node',
-    name,
-    schema: {
-      attrs: {
-        track: {
-          default: []
-        }
-      },
-      content: 'inline*',
-      group: 'block',
-      draggable: false,
-      parseDOM: [
-        {
-          tag: 'p'
-        }
-      ],
-      toDOM: (node: Node): DOMOutputSpec => {
-        const attrs =
-          node.attrs.track && node.attrs.track.length ? { 'data-track': JSON.stringify(node.attrs.track) } : {};
-        return ['p', attrs, 0];
-      }
-    },
-    markdown: {
-      toMarkdown(state, node) {
-        state.renderInline(node);
-        state.closeBlock(node);
-      },
-      parseMarkdown: {
-        paragraph: {
-          block: 'paragraph'
-        }
-      }
-    }
-  };
-}
 
 function pluginsFactory({ keybindings = defaultKeys } = {}): RawPlugins {
   return ({ schema }) => {

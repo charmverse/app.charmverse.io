@@ -1,10 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
 import { websocketsHost } from '@packages/config/constants';
-import type { Plugin } from 'prosemirror-state';
-import type { Socket } from 'socket.io-client';
-import io from 'socket.io-client';
-
 import type {
   ClientDiffMessage,
   ClientMessage,
@@ -13,7 +9,10 @@ import type {
   RequestResendMessage,
   ServerMessage,
   WrappedSocketMessage
-} from 'lib/websockets/documentEvents/interfaces';
+} from '@packages/websockets/documentEvents/interfaces';
+import type { Plugin } from 'prosemirror-state';
+import type { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 import type { FidusEditor } from './fiduseditor';
 

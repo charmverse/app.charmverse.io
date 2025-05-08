@@ -1,5 +1,8 @@
 import { MoreHoriz } from '@mui/icons-material';
 import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import type { Member } from '@packages/lib/members/interfaces';
+import { safeScrollIntoViewIfNeeded } from '@packages/lib/utils/browser';
 import { sanitizeForRegex } from '@packages/utils/strings';
 import type { PluginKey } from 'prosemirror-state';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -10,12 +13,9 @@ import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useRootPages } from 'hooks/useRootPages';
 import { useSearchPages } from 'hooks/useSearchPages';
-import type { Member } from '@packages/lib/members/interfaces';
-import { safeScrollIntoViewIfNeeded } from '@packages/lib/utils/browser';
 
 import { useEditorViewContext, usePluginState } from '../../@bangle.dev/react/hooks';
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';

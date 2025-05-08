@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { createPage } from 'lib/pages/server/createPage';
 import { v4 as uuid } from 'uuid';
-import { _, jsonDoc } from 'lib/prosemirror/builders';
+import { _, jsonDoc } from '@packages/bangleeditor/builders';
 
 /**
  * Use this script to perform database searches.

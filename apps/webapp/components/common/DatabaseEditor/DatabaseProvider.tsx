@@ -1,9 +1,9 @@
+import type { Card } from '@packages/databases/card';
+import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { Card } from '@packages/databases/card';
-import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { publishDeletes, publishIncrementalUpdate } from './publisher';
 import store from './store';

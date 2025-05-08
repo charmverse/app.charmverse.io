@@ -1,5 +1,9 @@
 import { valuePlugin } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import {
+  decrementSuggestTooltipCounter,
+  incrementSuggestTooltipCounter
+} from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { keymap } from 'prosemirror-keymap';
 import type { Schema } from 'prosemirror-model';
 import type { Command } from 'prosemirror-state';
@@ -12,10 +16,6 @@ import type { SpecRegistry } from '../@bangle.dev/core/specRegistry';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import { plugins as suggestTooltipPlugins } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
-import {
-  decrementSuggestTooltipCounter,
-  incrementSuggestTooltipCounter
-} from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { paletteMarkName } from './config';
 import { queryInlinePaletteActive } from './inlinePalette';

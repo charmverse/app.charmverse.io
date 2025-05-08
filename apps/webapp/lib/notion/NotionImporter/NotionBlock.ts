@@ -1,5 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
+import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
+import { VIDEO_ASPECT_RATIO } from '@packages/bangleeditor/components/video/videoSpec';
 import type {
   TextContent,
   MentionNode,
@@ -22,8 +24,6 @@ import {
 import { extractAttrsFromUrl as extractNFTAttrs } from 'components/common/CharmEditor/components/nft/utils';
 import { extractTweetAttrs } from 'components/common/CharmEditor/components/tweet/tweetSpec';
 import { extractYoutubeLinkType } from 'components/common/CharmEditor/components/video/utils';
-import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
-import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';

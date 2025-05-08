@@ -1,3 +1,4 @@
+import * as suggestTooltip from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import type { Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
@@ -6,7 +7,6 @@ import type { EditorView } from 'prosemirror-view';
 import type { SpecRegistry } from '../@bangle.dev/core/specRegistry';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import * as suggestTooltipPlugins from '../@bangle.dev/tooltip/suggestTooltipPlugin';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { markName } from './emojiSuggest.constants';
 

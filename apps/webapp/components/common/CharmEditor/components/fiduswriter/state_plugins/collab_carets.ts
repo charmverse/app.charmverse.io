@@ -1,9 +1,8 @@
+import type { ClientSelectionMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps } from 'prosemirror-collab';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-
-import type { ClientSelectionMessage } from 'lib/websockets/documentEvents/interfaces';
 
 const key = new PluginKey('collabCarets');
 

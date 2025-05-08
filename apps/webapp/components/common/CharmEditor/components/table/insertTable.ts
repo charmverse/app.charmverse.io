@@ -1,9 +1,8 @@
+import { PARAGRAPH, TABLE, TABLE_CELL, TABLE_ROW } from '@packages/bangleeditor/nodeNames';
 import type { Schema } from 'prosemirror-model';
 import { Fragment } from 'prosemirror-model';
 import type { Transaction } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
-
-import { PARAGRAPH, TABLE, TABLE_CELL, TABLE_ROW } from '../../nodeNames';
 
 const ZERO_WIDTH_SPACE_CHAR = '\u200b';
 

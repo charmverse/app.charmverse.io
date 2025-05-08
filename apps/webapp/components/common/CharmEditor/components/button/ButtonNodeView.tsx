@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Box, Grid, Select, InputLabel, MenuItem, TextField } from '@mui/material';
 import * as http from '@packages/adapters/http';
+import type { NodeAttrs } from '@packages/bangleeditor/components/button/button.specs';
 import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
@@ -12,8 +13,6 @@ import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
-
-import type { NodeAttrs } from './button.specs';
 
 export function ButtonNodeView({
   deleteNode,
