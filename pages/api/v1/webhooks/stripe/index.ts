@@ -5,10 +5,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type Stripe from 'stripe';
 
-import { getLoopProducts } from 'lib/loop/loop';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { defaultHandler } from 'lib/public-api/handler';
-import { communityProduct, loopCheckoutUrl } from 'lib/subscription/constants';
+import { communityProduct } from 'lib/subscription/constants';
 import { getActiveSpaceSubscription } from 'lib/subscription/getActiveSpaceSubscription';
 import { stripeClient } from 'lib/subscription/stripe';
 import { relay } from 'lib/websockets/relay';
@@ -300,29 +299,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const priceId = subscriptionData?.price?.id;
-        const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
-        const encodedEmail = email ? `&email=${encodeURIComponent(email)}` : '';
 
         if (!stripeSubscription.metadata.loopCheckout && priceId) {
-          const loopItems = await getLoopProducts();
-          const loopItem = loopItems.find((product) => product.externalId === priceId);
-
-          if (!loopItem) {
-            log.warn(
-              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId}`,
-              { spaceId }
-            );
-            break;
-          }
-
-          const loopUrl = loopItem.url
-            ? `${loopItem.url}?cartEnabled=false${encodedEmail}&sub=${subscriptionId}`
-            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false${encodedEmail}&sub=${subscriptionId}`;
-
           await stripeClient.subscriptions.update(subscriptionId, {
             metadata: {
-              ...(stripeSubscription.metadata || {}),
-              loopCheckout: loopUrl
+              ...(stripeSubscription.metadata || {})
             }
           });
 
