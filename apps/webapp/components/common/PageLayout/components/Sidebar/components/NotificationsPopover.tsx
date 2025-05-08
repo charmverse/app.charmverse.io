@@ -8,6 +8,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import QueryBuilderOutlinedIcon from '@mui/icons-material/QueryBuilderOutlined';
 import { Badge, Card, Divider, IconButton, Popover, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { Member } from '@packages/lib/members/interfaces';
+import { getNotificationMetadata } from '@packages/lib/notifications/getNotificationMetadata';
+import type { Notification } from '@packages/lib/notifications/interfaces';
+import type { MarkNotifications } from '@packages/lib/notifications/markNotifications';
 import { bindPopover, usePopupState } from 'material-ui-popup-state/hooks';
 import { Fragment, useMemo, useState } from 'react';
 import { FiInbox } from 'react-icons/fi';
@@ -28,10 +32,6 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useMembers } from 'hooks/useMembers';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import type { Member } from '@packages/lib/members/interfaces';
-import { getNotificationMetadata } from '@packages/lib/notifications/getNotificationMetadata';
-import type { Notification } from '@packages/lib/notifications/interfaces';
-import type { MarkNotifications } from '@packages/lib/notifications/markNotifications';
 
 import { sidebarItemStyles } from './SidebarButton';
 

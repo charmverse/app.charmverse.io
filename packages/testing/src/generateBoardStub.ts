@@ -2,10 +2,9 @@ import type { Block, Page, PagePermission, PageType, Prisma } from '@charmverse/
 import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
 import type { BoardViewFields, IViewType } from '@packages/databases/boardView';
 import type { CardFields } from '@packages/databases/card';
+import type { RelatedPageData } from '@packages/pages/interfaces';
 import { typedKeys } from '@packages/utils/types';
 import { v4 } from 'uuid';
-
-import type { RelatedPageData } from 'lib/templates/exportWorkspacePages';
 
 import { pageContentStub } from './generatePageStub';
 

@@ -27,9 +27,8 @@ import {
 import { mapPostCategoryPermissionToAssignee } from '@packages/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
+import { pageMetaSelect } from '@packages/pages/pageMetaSelect';
 import { stubProsemirrorDoc } from '@packages/testing/stubs/pageContent';
-
-import { pageMetaSelect } from 'lib/pages/server/pageMetaSelect';
 
 import { exportSpaceData, type SpaceDataExport } from '../exportSpaceData';
 import type { SpaceDataImportResult } from '../importSpaceData';

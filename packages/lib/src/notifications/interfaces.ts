@@ -109,7 +109,7 @@ interface DocumentNotificationBase extends NotificationBase {
     | MentionNotificationType
     | CommentNotificationType
     | ApplicationCommentNotificationType;
-  content: string | null;
+  content: PageContent | null;
   mentionId: null | string;
   inlineCommentId: null | string;
   commentId: null | string;

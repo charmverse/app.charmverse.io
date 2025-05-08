@@ -11,6 +11,8 @@ import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
 
+// import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
+
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
 const MAX_CHAR = 60;
@@ -65,8 +67,7 @@ function NotificationSection({
     timeStyle: 'short'
   });
 
-  // const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
-  const text = notificationContent || '';
+  const text = ''; // notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
   const link = `${baseUrl}/${spaceDomain}${href}${href.includes('?') ? '&' : '?'}notificationId=${id}`;
   return (
     <Section

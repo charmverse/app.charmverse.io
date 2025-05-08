@@ -3,44 +3,13 @@ import path from 'node:path';
 
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { resolvePageTree } from '@charmverse/core/pages';
-import type {
-  Block,
-  Bounty,
-  BountyPermission,
-  Page,
-  PagePermission,
-  Proposal,
-  ProposalEvaluation,
-  ProposalEvaluationPermission,
-  ProposalReviewer,
-  ProposalRubricCriteria,
-  Vote,
-  VoteOptions
-} from '@charmverse/core/prisma';
+import type { Block, Page, PagePermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent, TextContent } from '@packages/charmeditor/interfaces';
+import type { RelatedPageData } from '@packages/pages/interfaces';
 import { isBoardPageType } from '@packages/pages/isBoardPageType';
 import { DataNotFoundError } from '@packages/utils/errors';
 import { validate } from 'uuid';
-
-export type RelatedPageData = {
-  blocks: {
-    board?: Omit<Block, 'schema'>;
-    views?: Omit<Block, 'schema'>[];
-    card?: Omit<Block, 'schema'>;
-  };
-  votes?: (Vote & { voteOptions: VoteOptions[] })[];
-  proposal?:
-    | (Omit<Proposal, 'categoryId'> & {
-        evaluations: (ProposalEvaluation & {
-          reviewers: ProposalReviewer[];
-          rubricCriteria: ProposalRubricCriteria[];
-          permissions: ProposalEvaluationPermission[];
-        })[];
-      })
-    | null;
-  bounty?: (Bounty & { permissions: BountyPermission[] }) | null;
-};
 
 function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
   if (node?.content) {

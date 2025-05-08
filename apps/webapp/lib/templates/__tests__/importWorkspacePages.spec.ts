@@ -20,6 +20,7 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import { blockToPrisma, prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
+import type { RelatedPageData } from '@packages/pages/interfaces';
 import { createMockBoard, createMockView } from '@packages/testing/mocks/block';
 import type { MockPageInput } from '@packages/testing/mocks/page';
 import { createMockPage } from '@packages/testing/mocks/page';
@@ -27,7 +28,7 @@ import { createMockSpace } from '@packages/testing/mocks/space';
 import { createPage, generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
 
-import type { RelatedPageData, ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
+import type { ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 import { importWorkspacePages, _generateNewPages } from '../importWorkspacePages';
 

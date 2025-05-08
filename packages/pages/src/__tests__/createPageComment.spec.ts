@@ -1,6 +1,6 @@
 import type { PageComment, Space, User } from '@charmverse/core/prisma';
-import { createPage, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import type { CreateCommentInput } from '@packages/lib/comments';
+import { createPage, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
 
 import { createPageComment } from '../createPageComment';

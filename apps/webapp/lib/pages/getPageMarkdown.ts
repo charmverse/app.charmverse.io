@@ -14,6 +14,7 @@ import type {
   SelectOptionType
 } from '@packages/lib/proposals/forms/interfaces';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
+
 import { _ } from 'lib/prosemirror/builders';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
