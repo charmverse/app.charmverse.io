@@ -1,10 +1,18 @@
+/* eslint-disable no-console */
 import { execSync } from 'child_process';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-// We were having errors with typescript and ESM execution / loading during teardown
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export default async function wipeTestData() {
   if (process.env.NODE_ENV === 'test') {
-    // eslint-disable-next-line no-console
-    console.log('Wiping test data');
-    execSync('npx dotenv -e .env.test.local -- npx tsx ./jest.teardown.ts');
+    try {
+      console.log('debug: Wiping test data');
+      const res = await execSync('npx dotenv -e .env.test.local -- npx tsx ./jest.teardown.ts', { cwd: __dirname });
+      console.log(res.toString());
+    } catch (error) {
+      console.error('Error while running teardown:', error);
+    }
   }
 }

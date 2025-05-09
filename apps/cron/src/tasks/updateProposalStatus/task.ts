@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { count } from '@root/lib/metrics';
+import { count } from '@packages/metrics';
 
 export async function task() {
   log.debug('Running Proposal status cron job');

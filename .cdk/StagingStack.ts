@@ -5,6 +5,11 @@ import * as s3assets from 'aws-cdk-lib/aws-s3-assets';
 import { Construct } from 'constructs';
 import { Options } from './ProductionStack';
 import { defaultHealthCheck } from './ProductionStack';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const domain = 'charmverse.co';
 

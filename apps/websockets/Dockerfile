@@ -11,8 +11,7 @@ RUN apt install openssl -y
 WORKDIR /app
 
 # Copy dependencies
-COPY --parents @connect-shared/package.json \
-  apps/*/package.json                       \
+COPY --parents apps/*/package.json          \
   packages/*/package.json                   \
   node_modules                              \
   package.json                              \

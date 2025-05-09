@@ -1,7 +1,7 @@
 // init app instrumentation
 import './app/datadog';
 import { log } from '@charmverse/core/log';
-import { appEnv } from '@root/config/constants';
+import { appEnv } from '@packages/config/constants';
 
 import { httpServer, socketServer } from './app/server';
 import { cleanup as originCacheCleanup } from './app/verifyCustomOrigin';

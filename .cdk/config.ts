@@ -13,16 +13,6 @@ export const apps: { [key: string]: { stg?: Options; prd?: Options } } = {
       environmentType: 'SingleInstance'
     }
   },
-  farcaster: {
-    prd: {
-      sslCert: charmverseCert
-    }
-  },
-  sunnyawards: {
-    prd: {
-      sslCert: sunnyCert
-    }
-  },
   webapp: {
     prd: {
       sslCert: charmverseCert,

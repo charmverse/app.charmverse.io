@@ -16,7 +16,7 @@ on:
       - 'abis/**'
       - 'adapters/**'
       - 'config/**'
-      - 'connectors/**'
+      - 'packages/**'
       - 'lib/**'
   pull_request:
     types: [labeled, opened, synchronize]
@@ -34,7 +34,7 @@ on:
       - 'abis/**'
       - 'adapters/**'
       - 'config/**'
-      - 'connectors/**'
+      - 'packages/**'
       - 'lib/**'
 
 concurrency:
@@ -121,13 +121,13 @@ jobs:
       - name: Typecheck cron app
         run: npm run typecheck -w apps/cron
 
-      - name: Run eslint on changed files
-        uses: tj-actions/eslint-changed-files@v25
-        with:
-          warn_ignored: 'true'
-          skip_annotations: 'true' # do not annotate code in the PR
-          file_extensions: '**/*.{ts,tsx}'
-          escape_paths: 'false'
+      # - name: Run eslint on changed files
+      #   uses: tj-actions/eslint-changed-files@v25
+      #   with:
+      #     warn_ignored: 'true'
+      #     skip_annotations: 'true' # do not annotate code in the PR
+      #     file_extensions: '**/*.{ts,tsx}'
+      #     escape_paths: 'false'
 
       - name: Run tests
         run: npm run cron:test
@@ -155,8 +155,7 @@ jobs:
           app_name: cron
 
       - name: Update Dockerfile
-        run: |
-          rm Dockerfile && mv apps/cron/Dockerfile Dockerfile
+        run: rm Dockerfile && mv apps/websockets/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push

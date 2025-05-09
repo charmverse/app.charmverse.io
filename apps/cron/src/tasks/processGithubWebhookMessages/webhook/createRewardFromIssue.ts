@@ -1,13 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { components } from '@octokit/openapi-webhooks-types';
-import { baseUrl } from '@root/config/constants';
-import { createOctokitApp } from '@root/lib/github/app';
-import { trackUserAction } from '@root/lib/metrics/mixpanel/trackUserAction';
-import { getPageMetaList } from '@root/lib/pages/server/getPageMetaList';
-import { createReward } from '@root/lib/rewards/createReward';
-import type { RewardReviewer } from '@root/lib/rewards/interfaces';
-import { relay } from '@root/lib/websockets/relay';
+import { baseUrl } from '@packages/config/constants';
+import { createOctokitApp } from '@packages/lib/github/app';
+import { createReward } from '@packages/lib/rewards/createReward';
+import type { RewardReviewer } from '@packages/lib/rewards/interfaces';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { getPageMetaList } from '@packages/pages/getPageMetaList';
+
+// import { relay } from '@packages/websockets/relay';
 
 type IssuesLabeledEvent = components['schemas']['webhook-issues-labeled'];
 type IssuesOpenedEvent = components['schemas']['webhook-issues-opened'];
@@ -182,32 +183,32 @@ export async function createRewardFromIssue({
   const createdPageId = createdReward.createdPageId!;
   const pages = await getPageMetaList([createdPageId]);
 
-  relay.broadcast(
-    {
-      type: 'pages_created',
-      payload: pages
-    },
-    spaceId
-  );
+  // relay.broadcast(
+  //   {
+  //     type: 'pages_created',
+  //     payload: pages
+  //   },
+  //   spaceId
+  // );
 
-  if (createIssueComment) {
-    try {
-      const appOctokit = createOctokitApp(installationId);
-      await appOctokit.rest.issues.createComment({
-        owner: message.repository.owner.login,
-        repo: message.repository.name,
-        issue_number: message.issue.number,
-        body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
-      });
-    } catch (err) {
-      log.error('Failed to create issue comment', {
-        error: err,
-        issueId: message.issue.id,
-        repoId: message.repository.id,
-        installationId
-      });
-    }
-  }
+  // if (createIssueComment) {
+  //   try {
+  //     const appOctokit = createOctokitApp(installationId);
+  //     await appOctokit.rest.issues.createComment({
+  //       owner: message.repository.owner.login,
+  //       repo: message.repository.name,
+  //       issue_number: message.issue.number,
+  //       body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
+  //     });
+  //   } catch (err) {
+  //     log.error('Failed to create issue comment', {
+  //       error: err,
+  //       issueId: message.issue.id,
+  //       repoId: message.repository.id,
+  //       installationId
+  //     });
+  //   }
+  // }
 
   trackUserAction('github_issue_reward_create', {
     rewardId: createdReward.reward.id,

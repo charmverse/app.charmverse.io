@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { storeOptimismProjectAttestations } from '@root/lib/optimism/storeOptimismProjectAttestations';
+import { storeOptimismProjectAttestations } from '@packages/lib/optimism/storeOptimismProjectAttestations';
 
 export async function task() {
   log.debug('Running store-optimism-project-attestation cron job');

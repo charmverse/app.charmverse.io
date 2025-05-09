@@ -11,10 +11,24 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/blockchain": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/credentials": "^0.0.0",
+    "@packages/features": "^0.0.0",
+    "@packages/lib": "^0.0.0",
+    "@packages/metrics": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
+    "@packages/profile": "^0.0.0",
+    "@packages/spaces": "^0.0.0",
+    "@packages/users": "^0.0.0",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@octokit/openapi-webhooks-types": "^8.3.0",
+    "@packages/testing": "^1.0.0",
     "@types/node-cron": "^3.0.11"
   }
 }

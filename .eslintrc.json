@@ -78,15 +78,27 @@
         "packageDir": [
           "./",
           "../..",
-          "./@connect-shared",
           "./apps/cron/",
-          "./apps/farcaster/",
-          "./apps/sunnyawards/",
+          "./apps/webapp/",
           "./apps/websockets/",
+          "./packages/adapters/",
+          "./packages/aws/",
+          "./packages/bangleeditor/",
           "./packages/charmeditor/",
+          "./packages/config/",
+          "./packages/connect-shared/",
+          "./packages/credentials/",
+          "./packages/features/",
+          "./packages/farcaster/",
           "./packages/github/",
+          "./packages/metrics/",
+          "./packages/nextjs/",
+          "./packages/pages/",
+          "./packages/profile/",
           "./packages/testing/",
-          "./packages/utils/"
+          "./packages/users/",
+          "./packages/utils/",
+          "./packages/profile/"
         ]
       }
     ],

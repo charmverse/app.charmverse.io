@@ -11,6 +11,11 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit"
   },
   "dependencies": {
-    "@packages/charmeditor": "^1.0.0"
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/spaces": "^0.0.0",
+    "@packages/utils": "^1.0.0",
+    "@packages/websockets": "^0.0.0"
   }
 }

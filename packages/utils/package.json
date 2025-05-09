@@ -3,23 +3,30 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config ./jest.config.ts --maxWorkers=2 --passWithNoTests"
   },
   "exports": {
+    "./array": "./src/array.ts",
+    "./blockchain": "./src/blockchain.ts",
     "./browser": "./src/browser.ts",
-    "./numbers": "./src/numbers.ts",
-    "./react": "./src/react.ts",
-    "./types": "./src/types.ts",
-    "./dates": "./src/dates.ts",
-    "./http": "./src/http.ts",
-    "./sleep": "./src/sleep.ts",
-    "./env": "./src/env.ts",
-    "./strings": "./src/strings.ts",
-    "./uuid": "./src/uuid.ts",
     "./constants": "./src/constants.ts",
-    "./url": "./src/url.ts",
+    "./dataEncryption": "./src/dataEncryption.ts",
+    "./dates": "./src/dates.ts",
+    "./encodeFilename": "./src/encodeFilename.ts",
+    "./env": "./src/env.ts",
+    "./errors": "./src/errors/index.ts",
+    "./errors/*": "./src/errors/*.ts",
     "./file": "./src/file.ts",
-    "./array": "./src/array.ts"
+    "./http": "./src/http.ts",
+    "./numbers": "./src/numbers.ts",
+    "./random": "./src/random.ts",
+    "./randomName": "./src/randomName.ts",
+    "./react": "./src/react.ts",
+    "./sleep": "./src/sleep.ts",
+    "./strings": "./src/strings.ts",
+    "./types": "./src/types.ts",
+    "./uuid": "./src/uuid.ts",
+    "./url": "./src/url.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2"

@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { refreshDocusignAccessToken } from '@root/lib/docusign/authentication';
+import { refreshDocusignAccessToken } from '@packages/lib/docusign/authentication';
 
 export async function refreshDocusignOAuthTask() {
   log.debug('Running Docusign credential refresh cron job');

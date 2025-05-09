@@ -1,0 +1,27 @@
+{
+  "name": "@packages/websockets",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "../../node_modules/typescript/bin/tsc",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json --noEmit",
+    "test": ""
+  },
+  "dependencies": {
+    "@packages/adapters": "^0.0.0",
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/features": "^0.0.0",
+    "@packages/lib": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
+    "@packages/utils": "^1.0.0"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "devDependencies": {
+    "prosemirror-test-builder": "^1.1.1"
+  }
+}
