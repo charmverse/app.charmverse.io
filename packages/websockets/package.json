@@ -8,7 +8,14 @@
     "test": ""
   },
   "dependencies": {
-    "@packages/pages": "^0.0.0"
+    "@packages/adapters": "^0.0.0",
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/lib": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
+    "@packages/utils": "^1.0.0"
   },
   "exports": {
     "./*": "./src/*.ts"
