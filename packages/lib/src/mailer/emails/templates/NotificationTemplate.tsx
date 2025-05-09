@@ -1,4 +1,5 @@
 import type { User } from '@charmverse/core/prisma-client';
+import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import { baseUrl } from '@packages/config/constants';
 import type { FeatureJson } from '@packages/features/constants';
 import { getNotificationMetadata } from '@packages/lib/notifications/getNotificationMetadata';
@@ -10,8 +11,6 @@ import { Hr } from '@react-email/hr';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
 import { Section } from '@react-email/section';
-
-// import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 
@@ -67,7 +66,7 @@ function NotificationSection({
     timeStyle: 'short'
   });
 
-  const text = ''; // notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
+  const text = notificationContent ? getNodeFromJson(notificationContent).textContent || '' : '';
   const link = `${baseUrl}/${spaceDomain}${href}${href.includes('?') ? '&' : '?'}notificationId=${id}`;
   return (
     <Section
