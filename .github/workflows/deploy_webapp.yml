@@ -338,6 +338,9 @@ jobs:
         with:
           REACT_APP_APP_ENV: 'production'
 
+      - name: Update Dockerfile
+        run: mv apps/webapp/Dockerfile Dockerfile
+
       - name: Build and Push Docker image
         id: docker_build_push
         uses: ./.github/actions/build_docker_image

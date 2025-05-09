@@ -1,4 +1,4 @@
-# Install dependencies only when needed
+#syntax=docker/dockerfile:1.7-labs
 
 # Use node-slim because node-alpine does not seem to supports the `sharp` npm library that gets built
 FROM node:18.19.0-slim AS base-app
@@ -10,8 +10,18 @@ RUN apt install openssl -y
 
 WORKDIR /app
 
-# We should split out dependencies copying into separate layer
-COPY . .
+# Copy dependencies
+COPY --parents apps/*/package.json          \
+  packages/*/package.json                   \
+  node_modules                              \
+  package.json                              \
+  apps/webapp/node_modules                    \
+  apps/webapp/package.json                    \
+  apps/webapp/next.config.js \
+  .
+
+# Copy compiled code
+COPY --parents apps/*/.next apps/*/public .
 
 ENV PORT=3000
 
