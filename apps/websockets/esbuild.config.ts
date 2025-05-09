@@ -10,7 +10,12 @@ esbuild
     // metafile: true, // uncomment to analyze build file contents
     outdir: './dist',
     tsconfig: './tsconfig.json',
-    packages: 'external',
+    // packages: 'external',
+    external: [
+      // esbuild cannot bundle native modules
+      '@datadog/native-metrics',
+      '@charmverse/core'
+    ],
     plugins: [ddPlugin],
     platform: 'node',
     sourcemap: true,
