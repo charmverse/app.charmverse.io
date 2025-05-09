@@ -348,7 +348,7 @@ jobs:
           REACT_APP_APP_ENV: 'production'
 
       - name: Update Dockerfile
-        run: rm Dockerfile && mv apps/websockets/Dockerfile Dockerfile
+        run: rm Dockerfile && mv apps/webapp/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
