@@ -96,62 +96,62 @@ jobs:
   #         - test_name: 'Basic tests #3'
   #           test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
 
-    steps:
-      - uses: actions/checkout@v4
+  # steps:
+  #   - uses: actions/checkout@v4
 
-      - name: Restore dependencies from cache
-        uses: ./.github/actions/install
-        with:
-          core_pkg_version: ${{ inputs.core_pkg_version }}
+  #   - name: Restore dependencies from cache
+  #     uses: ./.github/actions/install
+  #     with:
+  #       core_pkg_version: ${{ inputs.core_pkg_version }}
 
-      - name: Setup test database
-        run: npx dotenv -e .env.test.local -- npm run prisma:reset
+  #   - name: Setup test database
+  #     run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-          mask-aws-account-id: 'no'
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      - name: Run permissions api docker image
-        id: run_permissions_api
-        run: |
-          docker inspect postgres
-          docker network ls
-          cat /etc/hosts
-          echo "network ${{ job.services.postgres.network }}"
-          docker run -d --name permissions-api  \
-                     -h permissions-api \
-                     -p "3001:3001"     \
-                     -e HOST=0.0.0.0    \
-                     -e PORT=3001       \
-                     -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
-                     --network "${{ job.services.postgres.network }}"  \
-                     -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
-                     ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:latest  \
-                     node --experimental-specifier-resolution=node ./dist/main.js
+  #   - name: Configure AWS credentials
+  #     uses: aws-actions/configure-aws-credentials@v4
+  #     with:
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-region: us-east-1
+  #       mask-aws-account-id: 'no'
+  #   - name: Login to Amazon ECR
+  #     id: login-ecr
+  #     uses: aws-actions/amazon-ecr-login@v2
+  #   - name: Run permissions api docker image
+  #     id: run_permissions_api
+  #     run: |
+  #       docker inspect postgres
+  #       docker network ls
+  #       cat /etc/hosts
+  #       echo "network ${{ job.services.postgres.network }}"
+  #       docker run -d --name permissions-api  \
+  #                  -h permissions-api \
+  #                  -p "3001:3001"     \
+  #                  -e HOST=0.0.0.0    \
+  #                  -e PORT=3001       \
+  #                  -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
+  #                  --network "${{ job.services.postgres.network }}"  \
+  #                  -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
+  #                  ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:latest  \
+  #                  node --experimental-specifier-resolution=node ./dist/main.js
 
-          for i in {1..10}; do
-            docker ps
-            docker logs permissions-api
-            docker inspect permissions-api
-            curl localhost:3001/api/health && {
-              echo "permission api container is up..."
-              break
-            }
-            echo "permission api not up...sleeping"
-            sleep 10
-          done
+  #       for i in {1..10}; do
+  #         docker ps
+  #         docker logs permissions-api
+  #         docker inspect permissions-api
+  #         curl localhost:3001/api/health && {
+  #           echo "permission api container is up..."
+  #           break
+  #         }
+  #         echo "permission api not up...sleeping"
+  #         sleep 10
+  #       done
 
-      - name: Restore app from cache
-        uses: ./.github/actions/build_app
-        with:
-          app_name: webapp
-          REACT_APP_APP_ENV: 'test'
+  #   - name: Restore app from cache
+  #     uses: ./.github/actions/build_app
+  #     with:
+  #       app_name: webapp
+  #       REACT_APP_APP_ENV: 'test'
 
-      - name: Run ${{matrix.test_name}}
-        run: ${{matrix.test_command}}
+  #   - name: Run ${{matrix.test_name}}
+  #     run: ${{matrix.test_command}}
