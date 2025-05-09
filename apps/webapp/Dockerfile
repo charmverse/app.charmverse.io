@@ -18,10 +18,10 @@ COPY --parents apps/*/package.json          \
   apps/webapp/node_modules                    \
   apps/webapp/package.json                    \
   apps/webapp/next.config.js \
-  .
+  ./
 
 # Copy compiled code
-COPY --parents apps/*/.next apps/*/public .
+COPY --parents apps/*/.next apps/*/public ./
 
 ENV PORT=3000
 
