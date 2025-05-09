@@ -20,15 +20,15 @@ type DirectTransactionInput = {
   tier: SpaceSubscriptionTier;
 };
 
-type SubscriptionPaymentContext = {
+type SubscriptionContributionContext = {
   isExecutingTransaction: boolean;
   error?: string;
   sendDirectTransaction: (input: DirectTransactionInput) => Promise<unknown>;
 };
 
-export const SubscriptionPaymentContext = createContext<Readonly<SubscriptionPaymentContext | null>>(null);
+export const SubscriptionContributionContext = createContext<Readonly<SubscriptionContributionContext | null>>(null);
 
-export function SubscriptionPaymentProvider({ children }: { children: ReactNode }) {
+export function SubscriptionContributionProvider({ children }: { children: ReactNode }) {
   const { data: walletClient } = useWalletClient();
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
@@ -113,14 +113,14 @@ export function SubscriptionPaymentProvider({ children }: { children: ReactNode 
     [isExecutingTransaction, saveSubscriptionPaymentError, checkSubscriptionContributionError, sendDirectTransaction]
   );
 
-  return <SubscriptionPaymentContext.Provider value={value}>{children}</SubscriptionPaymentContext.Provider>;
+  return <SubscriptionContributionContext.Provider value={value}>{children}</SubscriptionContributionContext.Provider>;
 }
 
-export function useSubscriptionPayment() {
-  const context = useContext(SubscriptionPaymentContext);
+export function useSubscriptionContribution() {
+  const context = useContext(SubscriptionContributionContext);
 
   if (!context) {
-    throw new Error('useSubscriptionPayment must be used within a SubscriptionPaymentProvider');
+    throw new Error('useSubscriptionContribution must be used within a SubscriptionContributionProvider');
   }
 
   return context;
