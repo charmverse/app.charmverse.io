@@ -1,6 +1,5 @@
+import type { NodeAttrs } from '@packages/bangleeditor/components/nft/nft.specs';
 import { openseaChainsByPath } from '@packages/lib/blockchain/config';
-
-import type { NodeAttrs } from './nft.specs';
 
 // a function to extract user screen name and tweet id from a tweet url
 export function extractAttrsFromUrl(url: string): NodeAttrs | null {

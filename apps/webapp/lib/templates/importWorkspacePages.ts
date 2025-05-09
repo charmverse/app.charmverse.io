@@ -5,12 +5,12 @@ import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { BoardViewFields } from '@packages/databases/boardView';
 import type { Reward } from '@packages/lib/rewards/interfaces';
+import { createPage } from '@packages/pages/createPage';
 import { isBoardPageType } from '@packages/pages/isBoardPageType';
 import { generatePagePathFromPathAndTitle, getPagePath } from '@packages/pages/utils';
 import { typedKeys } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
-import { createPage } from 'lib/pages/server/createPage';
 import { updateEntityIds } from 'lib/prosemirror/updateEntityIds';
 import { getSpace } from 'lib/spaces/getSpace';
 

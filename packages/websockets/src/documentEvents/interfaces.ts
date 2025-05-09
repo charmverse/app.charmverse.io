@@ -1,3 +1,4 @@
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import type { Node } from 'prosemirror-model';
 
 export type Participant = {
@@ -63,17 +64,6 @@ export type ProsemirrorJSONStep = {
     type: string;
     attrs: Record<string, any>;
   };
-};
-
-export type ClientDiffMessage = {
-  type: 'diff';
-  rid: number;
-  cid?: number; // client id
-  ds: ProsemirrorJSONStep[]; // document steps to send
-  // ti?: string; // new title
-  doc?: Node;
-  v: number;
-  undo?: boolean;
 };
 
 export type ClientSubscribeMessage = {

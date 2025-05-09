@@ -1,8 +1,8 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getSpaceByDomainWhere } from '@packages/spaces/getSpaceByDomain';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';
-import { getSpaceByDomainWhere } from 'lib/spaces/getSpaceByDomain';
 
 import { PostNotFoundError } from './errors';
 import { getPostVoteSummary } from './getPostMeta';

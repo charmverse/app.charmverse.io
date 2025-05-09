@@ -1,5 +1,5 @@
 import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
-import type { PageContent } from '@packages/charmeditor/src/interfaces';
+import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { Node } from 'prosemirror-model';
 import { findChildren } from 'prosemirror-utils';
 

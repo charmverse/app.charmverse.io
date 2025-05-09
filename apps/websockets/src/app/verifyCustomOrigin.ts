@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
+import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 
 let cache: Record<string, { isValid: boolean }> = {};
 let intervalId: ReturnType<typeof setInterval> | undefined;

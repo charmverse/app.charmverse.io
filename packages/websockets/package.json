@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "@packages/pages": "^0.0.0"
   },
   "exports": {
     "./*": "./src/*.ts"

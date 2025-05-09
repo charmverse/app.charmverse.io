@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { convertAndSavePage } from 'lib/prosemirror/conversions/convertOldListNodes';
+import { convertAndSavePage } from '@packages/bangleeditor/conversions/convertOldListNodes';
 
 const cutoff = new Date('2023-11-01');
 const perBatch = 2;

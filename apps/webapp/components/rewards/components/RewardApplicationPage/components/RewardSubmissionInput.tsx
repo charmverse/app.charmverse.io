@@ -6,6 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { BountyPermissionFlags } from '@packages/lib/permissions/bounties';
 import type { RewardType } from '@packages/lib/rewards/interfaces';
 import type { WorkUpsertData } from '@packages/lib/rewards/work';
@@ -17,7 +18,6 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 

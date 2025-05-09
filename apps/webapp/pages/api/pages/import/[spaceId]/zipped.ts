@@ -5,6 +5,7 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packag
 import { getRequestLanguage } from '@packages/lib/middleware/getRequestLanguage';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { formatDateTime } from '@packages/lib/utils/dates';
+import { generateFirstDiff } from '@packages/pages/generateFirstDiff';
 import { pageMetaSelect } from '@packages/pages/pageMetaSelect';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { DataConflictError } from '@packages/utils/errors';
@@ -14,7 +15,6 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { getPagePath } from 'lib/pages';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 
 export const config = {

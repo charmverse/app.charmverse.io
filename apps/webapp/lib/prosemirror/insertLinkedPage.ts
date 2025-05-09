@@ -1,11 +1,11 @@
 import { rafCommandExec } from '@bangle.dev/utils';
+import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import { linkedPageNodeName } from '@packages/bangleeditor/components/linkedPage/linkedPage.constants';
 import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
-import { hideSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { replaceSuggestionMarkWith } from 'components/common/CharmEditor/components/inlinePalette/inlinePalette';
-import { linkedPageNodeName } from 'components/common/CharmEditor/components/linkedPage/linkedPage.constants';
 import { type LinkedPagePluginState } from 'components/common/CharmEditor/components/linkedPage/linkedPage.interfaces';
 
 /**

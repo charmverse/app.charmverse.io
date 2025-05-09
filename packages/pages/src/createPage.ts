@@ -1,9 +1,8 @@
 import type { Page, Prisma, PrismaPromise } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import { extractPreviewImage } from '@packages/charmeditor/utils/extractPreviewImage';
-
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { generateFirstDiff } from './generateFirstDiff';
 

@@ -1,8 +1,9 @@
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getPagePath } from 'lib/pages';
-import { createPage } from 'lib/pages/server/createPage';
+import { createPage } from '@packages/pages/createPage';
 import { v4 } from 'uuid';
+
+import { getPagePath } from 'lib/pages';
 
 import type { PageProperty } from './interfaces';
 

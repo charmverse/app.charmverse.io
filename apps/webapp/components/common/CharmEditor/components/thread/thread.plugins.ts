@@ -1,9 +1,8 @@
+import { markName as inlineCommentMarkName } from '@packages/bangleeditor/components/inlineComment/inlineComment.constants';
 import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 import { PluginKey, Plugin } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-
-import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
 
 export const threadPluginKey = new PluginKey('threads');
 

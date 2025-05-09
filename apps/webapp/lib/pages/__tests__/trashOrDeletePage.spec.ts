@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-
-import { trashOrDeletePage } from '../trashOrDeletePage';
+import { trashOrDeletePage } from '@packages/pages/trashOrDeletePage';
 
 // write a test to check if the trashOrDeletePage function is working as expected
 describe('trashOrDeletePage', () => {

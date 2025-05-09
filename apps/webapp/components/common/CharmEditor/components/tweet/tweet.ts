@@ -1,11 +1,10 @@
+import { name, extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { insertNode } from '@packages/charmeditor/utils/insertNode';
 import type { Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-
-import { name, extractTweetAttrs } from './tweetSpec';
 
 // inject a tweet node when pasting twitter url
 

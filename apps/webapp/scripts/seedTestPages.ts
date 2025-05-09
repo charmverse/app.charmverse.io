@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createPage } from 'lib/pages/server/createPage';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
+import { createPage } from '@packages/pages/createPage';
+import { generateFirstDiff } from '@packages/pages/generateFirstDiff';
 import { DataNotFoundError } from '@packages/utils/errors';
 import { boardWithCardsArgs } from '@packages/testing/generateBoardStub';
 import { pageStubToCreate } from '@packages/testing/generatePageStub';

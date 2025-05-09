@@ -1,5 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma-client';
 import { Stack, Box, Typography, Switch } from '@mui/material';
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -8,7 +9,6 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCha
 import type { CreateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 import { LoadingIcon } from '../LoadingComponent';
 

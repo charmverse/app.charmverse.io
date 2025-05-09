@@ -1,9 +1,6 @@
 import { log } from '@charmverse/core/log';
-import type {
-  ServerDocDataMessage,
-  ClientDiffMessage,
-  ClientSelectionMessage
-} from '@packages/websockets/documentEvents/interfaces';
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
+import type { ServerDocDataMessage, ClientSelectionMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import { EditorState } from 'prosemirror-state';
 import type { Transaction, EditorStateConfig } from 'prosemirror-state';

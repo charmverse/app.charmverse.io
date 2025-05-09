@@ -2,6 +2,8 @@ import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Box } from '@mui/material';
+import type { TweetNodeAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
+import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { randomIntFromInterval } from '@packages/utils/random';
 import Script from 'next/script';
 import { useRef } from 'react';
@@ -11,9 +13,6 @@ import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
 import { MediaUrlInput } from '../common/MediaUrlInput';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
-
-import type { TweetNodeAttrs } from './tweetSpec';
-import { extractTweetAttrs } from './tweetSpec';
 
 export const twitterWidgetJs = 'https://platform.x.com/widgets.js';
 

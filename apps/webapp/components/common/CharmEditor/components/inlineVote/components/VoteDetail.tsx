@@ -19,6 +19,7 @@ import {
 import Tooltip from '@mui/material/Tooltip';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { ExtendedVote } from '@packages/lib/votes/interfaces';
 import { isVotingClosed } from '@packages/lib/votes/utils';
 import { DateTime } from 'luxon';
@@ -41,7 +42,6 @@ import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 
 import { VotesWrapper } from './VotesWrapper';

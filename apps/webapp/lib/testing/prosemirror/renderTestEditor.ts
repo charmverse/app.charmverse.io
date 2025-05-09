@@ -1,4 +1,4 @@
-import type { SpecRegistry } from '@packages/bangleeditor/specRegistry';
+import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Selection } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';

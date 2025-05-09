@@ -1,7 +1,6 @@
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import { TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-
-import { checkIsContentEmpty } from './checkIsContentEmpty';
 
 export function insertAndFocusLineAtEndofDoc(view: EditorView) {
   const { tr, schema } = view.state;

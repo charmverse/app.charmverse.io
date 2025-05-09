@@ -3,7 +3,7 @@ import type { PageDiff, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import type { PageContent } from '@packages/charmeditor/interfaces';
-import type { ClientDiffMessage } from '@packages/websockets/documentEvents/interfaces';
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import { Fragment, Slice } from 'prosemirror-model';
 import type { Node as ProsemirrorNode } from 'prosemirror-model';
 import type { Step } from 'prosemirror-transform';

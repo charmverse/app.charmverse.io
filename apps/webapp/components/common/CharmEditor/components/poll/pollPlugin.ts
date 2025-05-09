@@ -1,6 +1,6 @@
-import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
+import { name } from '@packages/bangleeditor/components/poll/pollSpec';
 
-import { name } from './pollSpec';
+import { NodeView } from '../@bangle.dev/core/node-view';
 
 export function plugins() {
   return [

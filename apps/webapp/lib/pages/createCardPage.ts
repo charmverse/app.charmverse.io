@@ -1,9 +1,10 @@
 import type { Page, Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createPage } from '@packages/pages/createPage';
 import { getPagePath } from '@packages/pages/utils';
-import { createPage } from 'lib/pages/server/createPage';
-import type { BoardPropertyValue } from 'lib/public-api';
 import { v4 } from 'uuid';
+
+import type { BoardPropertyValue } from 'lib/public-api';
 
 export async function createCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {

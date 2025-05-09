@@ -1,3 +1,7 @@
+import {
+  linkedPageNodeName,
+  linkedPageSuggestMarkName
+} from '@packages/bangleeditor/components/linkedPage/linkedPage.constants';
 import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
@@ -7,7 +11,6 @@ import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 
-import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';
 import type { LinkedPagePluginState } from './linkedPage.interfaces';
 
 export function linkedPagePlugins({

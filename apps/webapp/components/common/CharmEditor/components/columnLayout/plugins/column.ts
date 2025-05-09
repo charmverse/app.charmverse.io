@@ -1,8 +1,7 @@
+import { getColumnProperties } from '@packages/bangleeditor/components/columnLayout/columnLayout.schema';
 import { Plugin, PluginKey } from 'prosemirror-state';
 
-import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
-
-import { getColumnProperties } from '../columnLayout.schema';
+import { createElement } from '../../@bangle.dev/core/createElement';
 
 export function ColumnNodeView({ name }: { name: string }) {
   return new Plugin({

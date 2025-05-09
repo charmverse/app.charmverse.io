@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
+import type { MentionSpecSchemaAttrs } from '@packages/bangleeditor/components/mention/mention.specs';
 import { isUUID } from '@packages/utils/strings';
 import type { ReactNode } from 'react';
 
@@ -12,7 +13,6 @@ import { useRoles } from 'hooks/useRoles';
 
 import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
-import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
 const MentionContainer = styled(Link)`
   border-radius: 1px;

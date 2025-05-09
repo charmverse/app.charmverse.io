@@ -12,17 +12,16 @@ import { withSessionRoute } from '@packages/lib/session/withSession';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from '@packages/lib/utils/domains/getSpaceDomainFromHost';
 import { ActionNotPermittedError, InvalidStateError, NotFoundError } from '@packages/nextjs/errors';
+import { createPage } from '@packages/pages/createPage';
 import { getPageMetaList } from '@packages/pages/getPageMetaList';
 import { getPagePath } from '@packages/pages/utils';
+import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { UnauthorisedActionError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
 import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { createPage } from 'lib/pages/server/createPage';
-import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 

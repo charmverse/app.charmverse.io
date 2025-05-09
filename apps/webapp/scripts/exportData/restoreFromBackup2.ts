@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { Prisma } from '@charmverse/core/prisma';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
+import { generateFirstDiff } from '@packages/pages/generateFirstDiff';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 

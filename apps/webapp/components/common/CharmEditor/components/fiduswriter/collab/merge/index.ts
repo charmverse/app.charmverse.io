@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { getSettings } from '@packages/bangleeditor/components/fiduswriter/schema/convert';
 import type { ServerDocDataMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';
@@ -7,7 +8,6 @@ import { EditorState } from 'prosemirror-state';
 import type { StepMap } from 'prosemirror-transform';
 import { Mapping, Step, Transform } from 'prosemirror-transform';
 
-import { getSettings } from '../../schema/convert';
 import { trackedTransaction, acceptAllNoInsertions } from '../../track';
 import type { ModCollab } from '../index';
 

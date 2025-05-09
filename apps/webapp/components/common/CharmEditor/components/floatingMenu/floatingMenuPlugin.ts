@@ -1,4 +1,5 @@
 import { createObject, filter, rafCommandExec } from '@bangle.dev/utils';
+import { markName as inlineCommentMarkName } from '@packages/bangleeditor/components/inlineComment/inlineComment.constants';
 import type { InputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import { PluginKey } from 'prosemirror-state';
@@ -14,7 +15,6 @@ import {
 } from '../@bangle.dev/tooltip/selectionTooltip';
 import type { SelectionTooltipProps } from '../@bangle.dev/tooltip/selectionTooltipPlugin';
 import { plugins as selectionTooltipPlugins } from '../@bangle.dev/tooltip/selectionTooltipPlugin';
-import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
 
 export const defaultKeys = {
   hide: 'Escape',

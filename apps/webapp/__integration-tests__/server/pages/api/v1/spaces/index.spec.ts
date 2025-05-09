@@ -1,13 +1,12 @@
 import type { Space, SuperApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getSpaceDomainFromName } from '@packages/spaces/utils';
 import { generateSuperApiKey } from '@packages/testing/generators/apiKeys';
 import { baseUrl } from '@packages/testing/mockApiCall';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { randomETHWallet } from '@packages/utils/blockchain';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
-
-import { getSpaceDomainFromName } from 'lib/spaces/utils';
 
 let superApiKey: SuperApiToken;
 const defaultSpaceData = {

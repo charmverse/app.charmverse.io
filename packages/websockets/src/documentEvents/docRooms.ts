@@ -1,8 +1,8 @@
 import type { PageType } from '@charmverse/core/prisma-client';
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import type { Node } from 'prosemirror-model';
 
 import type { DocumentEventHandler } from './documentEvents';
-import type { ClientDiffMessage } from './interfaces';
 
 export type DocumentRoom = {
   // eslint-disable-next-line no-use-before-define

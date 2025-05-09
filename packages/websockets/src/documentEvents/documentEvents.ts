@@ -12,6 +12,7 @@ import { STATIC_PAGES } from '@packages/features/constants';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import { trashPages } from '@packages/pages/trashPages';
 import { isUUID } from '@packages/utils/strings';
 import type { Socket } from 'socket.io';
@@ -23,7 +24,6 @@ import type { AbstractWebsocketBroadcaster } from '../interfaces';
 import type { DocumentRoom } from './docRooms';
 import type {
   ClientCheckVersionMessage,
-  ClientDiffMessage,
   ClientMessage,
   ClientSelectionMessage,
   Participant,

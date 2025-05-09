@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { getSpaceDomainFromName } from 'lib/spaces/utils';
+import { getSpaceDomainFromName } from '@packages/spaces/utils';
 
 async function getInvalidSpaceDomains() {
   const spaces = await prisma.space.findMany({});

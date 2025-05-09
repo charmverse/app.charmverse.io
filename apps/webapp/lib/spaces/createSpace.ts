@@ -15,18 +15,18 @@ import { createDefaultReward, createDefaultRewardTemplate } from '@packages/lib/
 import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 import { createSigningSecret, subscribeToAllEvents } from '@packages/lib/webhookPublisher/subscribeToEvents';
 import { logSpaceCreation } from '@packages/metrics/postToDiscord';
+import { createPage } from '@packages/pages/createPage';
+import { generateFirstDiff } from '@packages/pages/generateFirstDiff';
 import { memberProfileNames } from '@packages/profile/memberProfiles';
 import type { SpaceTemplateType } from '@packages/spaces/config';
 import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
+import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
-import { createPage } from 'lib/pages/server/createPage';
-import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { importSpaceData } from 'lib/templates/importSpaceData';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import { getAvailableDomainName } from './getAvailableDomainName';
-import { getSpaceByDomain } from './getSpaceByDomain';
 
 export type SpaceCreateInput = Pick<Space, 'name'> &
   Partial<

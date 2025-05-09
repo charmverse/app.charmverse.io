@@ -8,7 +8,13 @@ import type { RewardBlockWithTypedFields } from '@packages/lib/rewards/blocks/in
 import type { ExtendedVote, VoteTask } from '@packages/lib/votes/interfaces';
 import type { Server, Socket } from 'socket.io';
 
-import type { FailedImportsError } from 'lib/notion/interfaces';
+// copied from lib/notion/interfaces to avoid recursive dependency
+interface FailedImportsError {
+  pageId: string;
+  type: 'page' | 'database';
+  title: string;
+  blocks: [string, string][];
+}
 
 export type Resource<T = object> = { id: string } & T;
 export type ResourceWithSpaceId = Resource<{ spaceId: string }>;

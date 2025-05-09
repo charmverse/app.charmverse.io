@@ -1,5 +1,5 @@
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
-import { markName } from '@packages/bangleeditor/components/inlineComment.constants';
+import { markName } from '@packages/bangleeditor/components/inlineComment/inlineComment.constants';
 import { toggleMark } from 'prosemirror-commands';
 import type { Command, EditorState } from 'prosemirror-state';
 

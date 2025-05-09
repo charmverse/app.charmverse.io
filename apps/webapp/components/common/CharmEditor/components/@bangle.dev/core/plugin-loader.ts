@@ -1,6 +1,7 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/plugin-loader.ts
 
 import { log } from '@charmverse/core/log';
+import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import * as history from '@packages/charmeditor/extensions/history';
 import { baseKeymap as pmBaseKeymap } from 'prosemirror-commands';
 import { gapCursor as pmGapCursor } from 'prosemirror-gapcursor';
@@ -10,7 +11,6 @@ import type { Schema } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorProps } from 'prosemirror-view';
 
-import type { SpecRegistry } from '../../@bangle.dev/core/specRegistry';
 import { dropCursor } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 import * as editorStateCounter from './editor-state-counter';

@@ -1,4 +1,5 @@
 import { name } from '@packages/bangleeditor/components/iframe/iframeSpec';
+import type { PdfNodeAttrs } from '@packages/bangleeditor/components/pdf/pdf';
 import type { VideoNodeAttrs } from '@packages/bangleeditor/components/video/videoSpec';
 import { name as videoName } from '@packages/bangleeditor/components/video/videoSpec';
 import { insertNode } from '@packages/charmeditor/utils/insertNode';
@@ -8,7 +9,6 @@ import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
-import type { PdfNodeAttrs } from '../pdf/pdf';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { MIN_EMBED_HEIGHT } from './config';

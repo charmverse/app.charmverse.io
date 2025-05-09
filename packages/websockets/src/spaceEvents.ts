@@ -12,14 +12,13 @@ import { STATIC_PAGES } from '@packages/features/constants';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { authSecret } from '@packages/lib/session/authSecret';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { createPage } from '@packages/pages/createPage';
 import { trashPages } from '@packages/pages/trashPages';
 import { unsealData } from 'iron-session';
 import type { Node } from 'prosemirror-model';
 import { TextSelection } from 'prosemirror-state';
 import { findParentNode } from 'prosemirror-utils';
 import type { Socket } from 'socket.io';
-
-import { createPage } from 'lib/pages/server/createPage';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';

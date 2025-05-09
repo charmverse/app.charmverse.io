@@ -1,4 +1,4 @@
-import { markName } from '@packages/bangleeditor/components/inlineComment.constants';
+import { markName } from '@packages/bangleeditor/components/inlineComment/inlineComment.constants';
 import type { EditorState, PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { convertDoc } from '@packages/bangleeditor/conversions/convertOldListNodes';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -19,7 +20,6 @@ import nc from 'next-connect';
 import type { TrashOrDeletePageResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
-import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

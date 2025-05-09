@@ -1,9 +1,8 @@
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { EditorState } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import { Decoration, DecorationSet } from 'prosemirror-view';
-
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 const defaultPlaceholderText = "Type '/' for commands";
 

@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { createPage } from 'lib/pages/server/createPage';
+import { createPage } from '@packages/pages/createPage';
 import { v4 as uuid } from 'uuid';
 import { _, jsonDoc } from '@packages/bangleeditor/builders';
 

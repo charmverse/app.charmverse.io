@@ -1,8 +1,9 @@
+import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
+import { isPdfEmbedLink } from '@packages/lib/pdf/extractPdfEmbedLink';
 import { isUrl } from '@packages/utils/strings';
 import { memo, useEffect, useState } from 'react';
 
 import MultiTabs from 'components/common/MultiTabs';
-import { isPdfEmbedLink } from '@packages/lib/pdf/extractPdfEmbedLink';
 
 import BlockAligner from '../BlockAligner';
 import { IframeContainer } from '../common/IframeContainer';
@@ -12,7 +13,6 @@ import { extractEmbedType, extractIframeProps } from '../iframe/utils';
 import { extractAttrsFromUrl as extractNFTAttrs } from '../nft/utils';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import VerticalResizer from '../Resizable/VerticalResizer';
-import { extractTweetAttrs } from '../tweet/tweetSpec';
 import { extractYoutubeLinkType } from '../video/utils';
 
 import { EmbedIcon } from './components/EmbedIcon';

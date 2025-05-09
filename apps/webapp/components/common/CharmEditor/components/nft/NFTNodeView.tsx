@@ -11,6 +11,7 @@ import {
   Typography
 } from '@mui/material';
 import { MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
+import type { NodeAttrs } from '@packages/bangleeditor/components/nft/nft.specs';
 import { supportedMainnets as supportedMainnetsByAlchemy } from '@packages/lib/blockchain/provider/alchemy/config';
 import { supportedChainIds as supportedMainnetsByAnkr } from '@packages/lib/blockchain/provider/ankr/config';
 import { supportedNetworks as supportedNetworksByZora } from '@packages/lib/blockchain/provider/zora/config';
@@ -31,8 +32,6 @@ import { MediaSelectionPopupNoButton } from '../common/MediaSelectionPopup';
 import { EmbedIcon } from '../iframe/components/EmbedIcon';
 import type { CharmNodeViewProps } from '../nodeView/nodeView';
 import Resizable from '../Resizable/Resizable';
-
-import type { NodeAttrs } from './nft.specs';
 
 const StyledCard = styled(Card)`
   a {

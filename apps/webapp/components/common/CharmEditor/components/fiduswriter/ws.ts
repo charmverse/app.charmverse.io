@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
 import { websocketsHost } from '@packages/config/constants';
+import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import type {
-  ClientDiffMessage,
   ClientMessage,
   ClientRestartMessage,
   ClientSubscribeMessage,

@@ -1,6 +1,10 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
-import { SpecRegistry } from '@packages/bangleeditor/specRegistry';
+import { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
+import { pluginKeyName as emojiSuggestKeyName } from '@packages/bangleeditor/components/emojiSuggest/emojiSuggest.constants';
+import * as emoji from '@packages/bangleeditor/components/emojiSuggest/emojiSuggest.specs';
+import { spec as linkSpec } from '@packages/bangleeditor/components/link/link.specs';
+import { mentionSpecs } from '@packages/bangleeditor/components/mention/mention.specs';
 import * as tabIndent from '@packages/charmeditor/extensions/tabIndent';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import debounce from 'lodash/debounce';
@@ -17,19 +21,15 @@ import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/reac
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
-import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
-import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
 import * as floatingMenu from './components/floatingMenu/floatingMenu.plugins';
 import { plugins as linkPlugins } from './components/link/link.plugins';
-import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
 import { Mention } from './components/mention/components/Mention';
 import { MentionsPopup } from './components/mention/components/MentionsPopup';
 import { mentionPluginKeyName } from './components/mention/mention.constants';
 import { mentionPlugins } from './components/mention/mention.plugins';
-import { mentionSpecs } from './components/mention/mention.specs';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 
 export interface ICharmEditorOutput {

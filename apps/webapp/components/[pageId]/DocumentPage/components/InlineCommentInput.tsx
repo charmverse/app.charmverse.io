@@ -4,6 +4,7 @@ import SendIcon from '@mui/icons-material/Send';
 import type { Theme } from '@mui/material';
 import { Box, Divider, Stack, Typography, useMediaQuery } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { ThreadAccessGroup } from '@packages/lib/threads';
 import { useState } from 'react';
 
@@ -11,7 +12,6 @@ import { Button } from 'components/common/Button';
 import { InlineCharmEditor } from 'components/common/CharmEditor';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
 export type InlineCommentInputHandleSubmitParams = {
   commentContent: PageContent;

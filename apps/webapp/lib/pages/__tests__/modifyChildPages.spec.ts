@@ -1,10 +1,9 @@
 import type { Block, Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { trashOrDeletePage } from '@packages/pages/trashOrDeletePage';
 import { generateBoard } from '@packages/testing/setupDatabase';
 import { v4 as uuid } from 'uuid';
-
-import { trashOrDeletePage } from '../trashOrDeletePage';
 
 describe('trashOrDeletePage', () => {
   test('should delete child pages', async () => {

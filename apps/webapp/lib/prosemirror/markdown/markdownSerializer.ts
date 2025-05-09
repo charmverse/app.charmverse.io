@@ -1,4 +1,4 @@
-import type { SpecRegistry } from '@packages/bangleeditor/specRegistry';
+import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import { MarkdownSerializer } from 'prosemirror-markdown';
 
 import { markdownLoader } from './markdownLoader';

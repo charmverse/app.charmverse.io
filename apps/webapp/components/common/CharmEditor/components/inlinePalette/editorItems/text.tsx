@@ -12,14 +12,13 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
+import { linkedPageSuggestMarkName } from '@packages/bangleeditor/components/linkedPage/linkedPage.constants';
 import { commands as listItemCommands } from '@packages/charmeditor/extensions/listItem';
+import type { SpacePermissionFlags } from '@packages/lib/permissions/spaces';
 import type { EditorState, Transaction, PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
-import type { SpacePermissionFlags } from '@packages/lib/permissions/spaces';
-
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
-import { linkedPageSuggestMarkName } from '../../linkedPage/linkedPage.constants';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import { convertToParagraph } from '../../paragraph/paragraph';
 import { isList } from '../commands';

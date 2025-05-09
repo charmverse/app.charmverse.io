@@ -1,5 +1,6 @@
 import { valuePlugin } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import {
   decrementSuggestTooltipCounter,
   incrementSuggestTooltipCounter
@@ -12,7 +13,6 @@ import type { EditorView } from 'prosemirror-view';
 
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
-import type { SpecRegistry } from '../@bangle.dev/core/specRegistry';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import { plugins as suggestTooltipPlugins } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';

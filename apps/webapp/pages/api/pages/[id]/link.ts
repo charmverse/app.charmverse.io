@@ -1,12 +1,12 @@
 import type { Page, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { generatePageLink, PageNotFoundError } from 'lib/pages/server';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
