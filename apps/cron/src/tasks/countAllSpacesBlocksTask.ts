@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-// import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
+import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
 import { deleteArchivalBlockCounts } from '@packages/spaces/deleteArchivalBlockCounts';
 
 const perBatch = 1000;
