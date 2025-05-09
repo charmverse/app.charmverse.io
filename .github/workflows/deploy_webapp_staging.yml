@@ -50,8 +50,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Build app
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
         with:
+          app_name: webapp
           REACT_APP_APP_ENV: 'staging'
 
       - name: Update Dockerfile

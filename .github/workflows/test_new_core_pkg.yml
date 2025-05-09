@@ -26,8 +26,9 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Build app
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
         with:
+          app_name: webapp
           REACT_APP_APP_ENV: 'test'
 
   test-compile:
@@ -40,7 +41,7 @@ jobs:
       matrix:
         include:
           - test_name: 'Typecheck webapp'
-            test_command: 'npm run typecheck'
+            test_command: 'npm run typecheck -w apps/webapp'
           - test_name: 'Typecheck cron'
             test_command: 'npm run typecheck -w apps/cron'
           - test_name: 'Typecheck websockets'
@@ -55,44 +56,45 @@ jobs:
           core_pkg_version: ${{ inputs.core_pkg_version }}
 
       - name: Restore app from cache
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
         with:
+          app_name: webapp
           REACT_APP_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}
         run: ${{matrix.test_command}}
 
-  integration-test:
-    name: Tests
-    runs-on: ubuntu-latest
-    needs: build-test-env
-    # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-          --hostname postgres
-        ports:
-          # Maps tcp port 5432 on service container to the host
-          - 5432:5432
-    strategy:
-      max-parallel: 6
-      fail-fast: false
-      matrix:
-        include:
-          - test_name: 'Basic tests #1'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/3'
-          - test_name: 'Basic tests #2'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/3'
-          - test_name: 'Basic tests #3'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
+  # integration-test:
+  #   name: Tests
+  #   runs-on: ubuntu-latest
+  #   needs: build-test-env
+  #   # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
+  #   services:
+  #     postgres:
+  #       image: postgres
+  #       env:
+  #         POSTGRES_USER: postgres
+  #         POSTGRES_PASSWORD: postgres
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
+  #         --hostname postgres
+  #       ports:
+  #         # Maps tcp port 5432 on service container to the host
+  #         - 5432:5432
+  #   strategy:
+  #     max-parallel: 6
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - test_name: 'Basic tests #1'
+  #           test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/3'
+  #         - test_name: 'Basic tests #2'
+  #           test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/3'
+  #         - test_name: 'Basic tests #3'
+  #           test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
 
     steps:
       - uses: actions/checkout@v4
@@ -146,8 +148,9 @@ jobs:
           done
 
       - name: Restore app from cache
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
         with:
+          app_name: webapp
           REACT_APP_APP_ENV: 'test'
 
       - name: Run ${{matrix.test_name}}

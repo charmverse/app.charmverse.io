@@ -40,7 +40,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Build app
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
+        with:
+          app_name: webapp
 
       # source https://github.com/orgs/community/discussions/28474
       - name: Print head git commit message
@@ -61,7 +63,9 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Restore app from cache
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
+        with:
+          app_name: webapp
 
       - run: npm run typecheck -w apps/webapp
       # - run: npm run verifydeps
@@ -178,7 +182,9 @@ jobs:
           done
 
       - name: Restore app from cache
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
+        with:
+          app_name: webapp
 
       - name: Run ${{matrix.test_name}}
         env:
@@ -271,7 +277,9 @@ jobs:
           done
 
       - name: Restore app from cache
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
+        with:
+          app_name: webapp
 
       - name: Start services
         run: |
@@ -334,8 +342,9 @@ jobs:
           echo "build_id=$build_id" >> $GITHUB_OUTPUT
 
       - name: Build app
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_app
         with:
+          app_name: webapp
           REACT_APP_APP_ENV: 'production'
 
       - name: Update Dockerfile
