@@ -1,8 +1,8 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { assignRole, listRoleMembers } from '@packages/lib/roles';
 import { ExpectedAnError } from '@packages/testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { DataNotFoundError } from '@packages/utils/errors';
-import { assignRole, listRoleMembers } from '@packages/lib/roles';
 import { v4 } from 'uuid';
 
 let user: User;

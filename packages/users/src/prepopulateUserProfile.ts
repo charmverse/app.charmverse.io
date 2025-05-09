@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getENSDetails } from '@packages/blockchain/getENSName';
 import { getUserNFTs } from '@packages/profile/getUserNFTs';
 import { updateProfileAvatar } from '@packages/profile/updateProfileAvatar';
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
 
 const acceptedImageFormats = ['.jpg', '.jpeg', '.png', '.webp'];
 

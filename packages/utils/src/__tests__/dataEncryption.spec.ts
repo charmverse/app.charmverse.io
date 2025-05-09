@@ -1,10 +1,11 @@
+import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
 
-import { decryptData, encryptData } from '../dataEncryption';
-
-jest.mock('@packages/utils/constants', () => ({
+jest.unstable_mockModule('@packages/utils/constants', () => ({
   authSecret: 'testsecret1234567890'
 }));
+
+const { decryptData, encryptData } = await import('../dataEncryption');
 
 describe('date encryptio and decryption', () => {
   it('should encrypt and decrypt string data', () => {

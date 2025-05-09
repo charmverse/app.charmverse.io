@@ -754,40 +754,48 @@ export async function generateRoleWithSpaceRole({
 }
 
 export function createPage(
-  options: Partial<Page> &
-    Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
+  // options: Partial<Page> &
+  //   Pick<Page, 'spaceId' | 'createdBy'> & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
+  {
+    createdBy,
+    pagePermissions,
+    parentId,
+    spaceId,
+    ...options
+  }: any & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
 ): Promise<PageWithPermissions> {
   return prisma.page.create({
     data: {
+      ...options,
       id: options.id ?? v4(),
       contentText: options.contentText ?? '',
       index: options.index,
       path: options.path ?? `page-${Math.random().toString()}`,
       title: options.title || 'Example',
       type: options.type ?? 'page',
-      updatedBy: options.createdBy,
+      updatedBy: createdBy,
       content: options.content as Prisma.InputJsonObject,
       author: {
         connect: {
-          id: options.createdBy
+          id: createdBy
         }
       },
       space: {
         connect: {
-          id: options.spaceId as string
+          id: spaceId as string
         }
       },
-      parent: options.parentId
+      parent: parentId
         ? {
             connect: {
-              id: options.parentId
+              id: parentId
             }
           }
         : undefined,
-      permissions: options.pagePermissions
+      permissions: pagePermissions
         ? {
             createMany: {
-              data: options.pagePermissions
+              data: pagePermissions
             }
           }
         : undefined,
@@ -1135,22 +1143,25 @@ export async function generateBoard({
     data: permissionCreateArgs as any
   });
 
-  const createdBoard = await Promise.all([
-    prisma.block.createMany(blockArgs),
-    ...pageArgs.map((p) =>
-      createPage({
-        ...p.data,
-        additionalPaths: [],
-        content: p.data.content as Prisma.JsonValue,
-        createdAt: typeof p.data.createdAt === 'string' ? new Date(p.data.createdAt) : p.data.createdAt,
-        updatedAt: typeof p.data.updatedAt === 'string' ? new Date(p.data.updatedAt) : p.data.updatedAt,
-        deletedAt: typeof p.data.deletedAt === 'string' ? new Date(p.data.deletedAt) : p.data.deletedAt,
-        createdBy: p.data.author!.connect!.id!,
-        spaceId: p.data.space!.connect!.id!
-      })
-    ),
-    permissionsToCreate
-  ]).then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
+  const createdBoard = await prisma
+    .$transaction([
+      prisma.block.createMany(blockArgs),
+      ...pageArgs.map(
+        (p) =>
+          createPage({
+            ...p.data,
+            additionalPaths: [],
+            content: p.data.content as Prisma.JsonValue,
+            createdAt: typeof p.data.createdAt === 'string' ? new Date(p.data.createdAt) : p.data.createdAt,
+            updatedAt: typeof p.data.updatedAt === 'string' ? new Date(p.data.updatedAt) : p.data.updatedAt,
+            deletedAt: typeof p.data.deletedAt === 'string' ? new Date(p.data.deletedAt) : p.data.deletedAt,
+            createdBy: p.data.author!.connect!.id!,
+            spaceId: p.data.space!.connect!.id!
+          }) as any
+      ),
+      permissionsToCreate
+    ])
+    .then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
 
   return createdBoard;
 }

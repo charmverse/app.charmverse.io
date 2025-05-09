@@ -4,7 +4,7 @@
     // this is necessary for the jest.config.ts to import tsconfig.json
     "resolveJsonModule": true,
     // added these for aws cdk
-    "target": "ESNEXT",
-    "module": "commonjs"
+    "target": "esnext",
+    "module": "preserve"
   }
 }
