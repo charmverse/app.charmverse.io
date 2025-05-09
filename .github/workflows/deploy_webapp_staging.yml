@@ -48,6 +48,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Build app
         uses: ./.github/actions/build_app

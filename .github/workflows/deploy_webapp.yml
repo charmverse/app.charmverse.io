@@ -38,6 +38,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Build app
         uses: ./.github/actions/build_app
@@ -61,6 +63,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app
@@ -136,6 +140,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -232,6 +238,8 @@ jobs:
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Setup test database
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
@@ -334,6 +342,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Calculate Build ID
         id: get_build_id
@@ -399,6 +409,8 @@ jobs:
 
       - name: Install dependencies
         uses: ./.github/actions/install
+        with:
+          app_name: webapp
 
       - name: Calculate Build ID and add to env file
         id: get_build_id
