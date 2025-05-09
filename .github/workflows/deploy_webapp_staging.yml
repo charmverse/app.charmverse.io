@@ -54,6 +54,9 @@ jobs:
         with:
           REACT_APP_APP_ENV: 'staging'
 
+      - name: Update Dockerfile
+        run: mv apps/webapp/Dockerfile Dockerfile
+
       - name: Build and Push Docker image
         id: docker_build_push
         uses: ./.github/actions/build_docker_image
@@ -138,7 +141,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload static assets to S3
-        run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        run: aws s3 sync apps/webapp/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Package
         run: |
@@ -170,7 +173,7 @@ jobs:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install @datadog/datadog-ci --force
-          npx datadog-ci sourcemaps upload .next/static  \
+          npx datadog-ci sourcemaps upload apps/webapp/.next/static  \
             --service=webapp                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
             --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static
