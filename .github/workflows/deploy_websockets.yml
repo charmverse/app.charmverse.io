@@ -152,7 +152,7 @@ jobs:
           app_name: websockets
 
       - name: Update Dockerfile
-        run: mv apps/websockets/Dockerfile Dockerfile
+        run: rm Dockerfile && mv apps/websockets/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push
