@@ -359,14 +359,14 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload static assets to S3
-        run: aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
+        run: aws s3 sync apps/webapp/.next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
       - name: Upload JS source maps to Datadog
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
         run: |
           npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
+          datadog-ci sourcemaps upload apps/webapp/.next/static       \
             --service=webapp                              \
             --release-version=${{ steps.get_build_id.outputs.build_id }}  \
             --minified-path-prefix=https://cdn.charmverse.io/_next/static
