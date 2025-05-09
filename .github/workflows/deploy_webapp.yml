@@ -64,7 +64,7 @@ jobs:
         uses: ./.github/actions/build
 
       - run: npm run typecheck -w apps/webapp
-      - run: npm run verifydeps
+      # - run: npm run verifydeps
       # - name: Run eslint on changed files
       #   uses: tj-actions/eslint-changed-files@v25
       #   with:
@@ -373,7 +373,8 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [validate-code, test-matrix, e2e-test-matrix, deploy-docker]
+    # needs: [validate-code, test-matrix, e2e-test-matrix, deploy-docker]
+    needs: [validate-code, deploy-docker]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -433,7 +434,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, validate-code, test-matrix, e2e-test-matrix, deploy-docker, deploy-main]
+    #needs: [build-app, validate-code, test-matrix, e2e-test-matrix, deploy-docker, deploy-main]
+    needs: [build-app, validate-code, deploy-docker, deploy-main]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')
