@@ -5,11 +5,6 @@ const createJestConfig = nextJest({
   dir: './'
 });
 
-/*
- * For a detailed explanation regarding each configuration property and type check, visit:
- * https://jestjs.io/docs/configuration
- */
-
 /**
  * Configuration copied from
  * https://nextjs.org/docs/testing
@@ -33,7 +28,7 @@ const jestConfig = {
   moduleNameMapper: {
     // map SVG to something that Jest can read - could be used for other extensions as well?
     // source: https://github.com/vercel/next.js/discussions/42535#discussioncomment-4828013
-    '^.+\\.(svg)$': require.resolve('@packages/testing/fileMock.js')
+    '^.+\\.(svg)$': require.resolve('./lib/testing/fileMock.js')
   }
 };
 
@@ -41,6 +36,10 @@ export default function makeConfig(testDir: string) {
   return createJestConfig({
     ...jestConfig,
     rootDir: __dirname,
-    testMatch: [`${testDir}/**/*.spec.ts?(x)`]
+    testMatch: [`${testDir}/**/*.spec.ts?(x)`],
+    transform: {
+      '^.+.(t|j)sx?$': '@swc/jest'
+    },
+    extensionsToTreatAsEsm: ['.ts', '.tsx']
   });
 }

@@ -1,13 +1,4 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "jsx": "react-jsx",
-      "module": "commonjs",
-      "jsxImportSource": ""
-    },
-    "require": ["tsconfig-paths/register"],
-    "transpileOnly": true
-  },
   "compilerOptions": {
     "importHelpers": true,
     "baseUrl": ".",
@@ -27,33 +18,10 @@
     "incremental": true,
     "isolatedModules": true,
     "paths": {
-      // "@packages/charmeditor/*": ["./packages/charmeditor/src/*"],
-      // "@packages/utils/*": ["./packages/utils/src/*"],
-      // "@packages/github/*": ["./packages/github/src/*"],
-      // "@packages/farcaster/*": ["./packages/farcaster/src/*"],
-      // "@packages/aws/*": ["./packages/aws/src/*"],
-      // "@packages/connect-shared/*": ["./packages/connect-shared/src/*"],
-      // "@packages/blockchain/*": ["./packages/blockchain/src/*"],
-      // "@packages/credentials/*": ["./packages/credentials/src/*"],
-      // "@packages/features/*": ["./packages/features/src/*"],
-      // "@packages/metrics/*": ["./packages/metrics/src/*"],
-      // "@packages/metrics": ["./packages/metrics/src/metrics.ts"],
-      // "@packages/pages/*": ["./packages/pages/src/*"],
-      // "@packages/profile/*": ["./packages/profile/src/*"],
-      // "@packages/profile": ["./packages/profile/src/index.ts"],
-      // "@packages/users/*": ["./packages/users/src/*"],
-      // "@packages/nextjs/*": ["./packages/nextjs/src/*"],
-      // "@packages/testing/*": ["./packages/testing/src/*"],
-      // "@root/abis/*": ["./abis/*"],
-      // "@root/adapters/*": ["./adapters/*"],
-      // "@root/config/*": ["./config/*"],
-      // "@root/lib/*": ["./lib/*"],
-      // "config/*": ["./config/*"],
       "scripts/*": ["./scripts/*"],
       "lib/*": ["./lib/*"],
       "components/*": ["./components/*"],
       "hooks/*": ["./hooks/*"],
-      // "abis/*": ["./abis/*"],
       "pages/*": ["./pages/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
@@ -77,5 +45,5 @@
     }
   },
   "exclude": ["node_modules", "scripts"],
-  "include": ["**/*.ts", "**/*.tsx", "../../packages/spaces/src/config.ts", "../../packages/pages/src/__tests__/isBoardPageType.spec.ts", "../../packages/spaces/src/utils.ts", "../../jest.teardown.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }
