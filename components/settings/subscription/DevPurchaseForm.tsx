@@ -5,6 +5,7 @@ import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
 import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
 import { relativeTime } from '@root/lib/utils/dates';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { erc20Abi, formatUnits, parseUnits } from 'viem';
@@ -59,14 +60,17 @@ function SpaceSubscriptionReceiptsList({ spaceReceipts }: { spaceReceipts: Space
                   {relativeTime(receipt.createdAt)}
                 </Typography>
               </Box>
-              <Typography
-                variant='body2'
-                fontWeight={600}
-                color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
-              >
-                {receipt.type === 'contribution' ? '+' : '-'}
-                {formatUnits(BigInt(receipt.paidTokenAmount), 18)} DEV
-              </Typography>
+              <Stack flexDirection='row' alignItems='center' gap={1}>
+                <Typography
+                  variant='body2'
+                  fontWeight={600}
+                  color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
+                >
+                  {receipt.type === 'contribution' ? '+' : '-'}
+                  {formatUnits(BigInt(receipt.paidTokenAmount), 18)}
+                </Typography>
+                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
+              </Stack>
             </Stack>
           ))}
         </>
@@ -93,7 +97,7 @@ function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: b
   }, [open, onClose, address, connectModalOpen, openConnectModal, isRainbowKitOpen]);
 
   return (
-    <Button variant='contained' onClick={openConnectModal}>
+    <Button variant='contained' onClick={openConnectModal} sx={{ width: 'fit-content' }}>
       Connect Wallet
     </Button>
   );
@@ -117,10 +121,13 @@ export function DevPurchaseButton() {
 
   return (
     <>
-      <Typography>Space token balance: {spaceTokenBalance} DEV</Typography>
+      <Stack flexDirection='row' alignItems='center' gap={0.5}>
+        <Typography>Space token balance: {spaceTokenBalance} </Typography>
+        <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
+      </Stack>
       <SpaceSubscriptionReceiptsList spaceReceipts={spaceReceipts} />
       {address ? (
-        <Button variant='contained' onClick={() => setIsModalOpen(true)}>
+        <Button variant='contained' onClick={() => setIsModalOpen(true)} sx={{ width: 'fit-content' }}>
           Send DEV
         </Button>
       ) : (
@@ -241,9 +248,12 @@ export function SpaceContributionModal({
             disabled={!address || isBalanceLoading}
             onChange={(e) => setAmount(Number(e.target.value))}
           />
-          <Typography variant='caption' color='text.secondary'>
-            Balance: {formattedBalance} DEV
-          </Typography>
+          <Stack flexDirection='row' alignItems='center' gap={0.5}>
+            <Typography variant='body2' color='text.secondary'>
+              Balance: {formattedBalance}
+            </Typography>
+            <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+          </Stack>
         </Stack>
         <Button
           loading={isLoading || isBalanceLoading}
