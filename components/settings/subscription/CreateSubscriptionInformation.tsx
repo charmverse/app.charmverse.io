@@ -11,6 +11,7 @@ import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import { subscriptionDetails } from 'lib/subscription/constants';
 
 import Legend from '../components/Legend';
@@ -35,6 +36,16 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
   );
 }
 
+const whiteListedUserIds = [
+  '0f7a6e61-acb8-4227-b618-4dcab1f429eb',
+  // devorein in prod
+  '5906c806-9497-43c7-9ffc-2eecd3c3a3ec',
+  // mattcasey in prod
+  '4e1d4522-6437-4393-8ed1-9c56e53235f4',
+  // chris in prod
+  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835'
+];
+
 export function CreateSubscriptionInformation({
   onUpgrade,
   pendingPayment,
@@ -44,6 +55,7 @@ export function CreateSubscriptionInformation({
   pendingPayment?: boolean;
   spaceId: string;
 }) {
+  const { user } = useUser();
   const { refetchSpaceSubscription, subscriptionTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
@@ -92,7 +104,7 @@ export function CreateSubscriptionInformation({
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
-      <DevPurchaseButton />
+      {user && whiteListedUserIds.includes(user.id) ? <DevPurchaseButton /> : null}
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
           <DesktopIconContainer>

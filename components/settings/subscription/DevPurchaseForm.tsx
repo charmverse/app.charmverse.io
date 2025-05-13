@@ -85,9 +85,7 @@ function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: b
   // we need to keep track of this so we can close the modal when the user cancels
   const [isRainbowKitOpen, setIsRainbowKitOpen] = useState(false);
 
-  // open Rainbowkit modal if not connected
   useEffect(() => {
-    // If rainbowkit modal was closed by user, but our state is not updated yet, update it so we reset the parent open state
     if (!connectModalOpen && isRainbowKitOpen && !address) {
       setIsRainbowKitOpen(false);
       onClose();
