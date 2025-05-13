@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { relativeTime } from '@packages/lib/utils/dates';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
-import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
-import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
-import { relativeTime } from '@root/lib/utils/dates';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -14,13 +13,14 @@ import { useAccount, useWalletClient } from 'wagmi';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { SpaceReceipt } from 'lib/spaces/getSpaceReceipts';
 
 import '@rainbow-me/rainbowkit/styles.css';
-import { Button } from 'components/common/Button';
 
 import { devTokenAddress, useDevTokenBalance } from './hooks/useDevTokenBalance';
 

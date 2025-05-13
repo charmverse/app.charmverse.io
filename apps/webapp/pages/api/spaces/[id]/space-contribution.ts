@@ -1,12 +1,12 @@
-import { withSessionRoute } from '@root/lib/session/withSession';
-import type { CreateSpaceContributionRequest } from '@root/lib/spaces/createSpaceContribution';
-import { createSpaceContribution } from '@root/lib/spaces/createSpaceContribution';
-import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
-import { getSpaceReceipts } from '@root/lib/spaces/getSpaceReceipts';
+import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
+import type { CreateSpaceContributionRequest } from 'lib/spaces/createSpaceContribution';
+import { createSpaceContribution } from 'lib/spaces/createSpaceContribution';
+import type { SpaceReceipt } from 'lib/spaces/getSpaceReceipts';
+import { getSpaceReceipts } from 'lib/spaces/getSpaceReceipts';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

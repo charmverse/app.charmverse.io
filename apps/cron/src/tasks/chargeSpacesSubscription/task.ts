@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { chargeSpaceSubscription } from '@root/lib/subscription/chargeSpaceSubscription';
+import { chargeSpaceSubscription } from '@packages/lib/subscription/chargeSpaceSubscription';
 
 export async function task() {
   log.debug('Running charge spaces subscription cron job');
