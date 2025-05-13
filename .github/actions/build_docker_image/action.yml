@@ -31,9 +31,7 @@ runs:
       shell: bash
       run: |
         npm prune --omit=dev
-        rm -rf .next/cache
-        rm -rf apps/sunnyawards/.next/cache
-        rm -rf apps/farcaster/.next/cache
+        rm -rf apps/webapp/.next/cache
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3

@@ -1,0 +1,38 @@
+{
+  "name": "webapp",
+  "version": "0..0",
+  "private": true,
+  "scripts": {
+    "start": "dotenv -e .env.local -- npx next dev",
+    "build": "npx next build",
+    "start:prod": "npx next start",
+    "lint": "npx next lint",
+    "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
+    "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
+    "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
+    "test:integration": "npx jest --config='./__integration-tests__/jest.config.ts' --maxWorkers=2",
+    "test:browser": "TZ=UTC node --experimental-vm-modules ../../node_modules/.bin/jest --config='./components/jest.config.ts' && TZ=UTC node --experimental-vm-modules ../../node_modules/.bin/jest --config='./hooks/jest.config.ts'"
+  },
+  "dependencies": {
+    "@fontsource/ia-writer-mono": "^5.2.5",
+    "@packages/aws": "^0.0.0",
+    "@packages/bangleeditor": "^0.0.0",
+    "@packages/blockchain": "^0.0.0",
+    "@packages/charmeditor": "^1.0.0",
+    "@packages/config": "^0.0.0",
+    "@packages/connect-shared": "^0.0.0",
+    "@packages/features": "^0.0.0",
+    "@packages/github": "^0.0.0",
+    "@packages/lib": "^0.0.0",
+    "@packages/nextjs": "^0.0.0",
+    "@packages/pages": "^0.0.0",
+    "@packages/profile": "^0.0.0",
+    "@packages/spaces": "^0.0.0",
+    "@packages/users": "^0.0.0",
+    "@packages/utils": "^1.0.0",
+    "@packages/websockets": "^0.0.0"
+  },
+  "devDependencies": {
+    "@packages/testing": "^1.0.0"
+  }
+}

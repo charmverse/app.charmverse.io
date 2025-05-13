@@ -14,7 +14,7 @@ runs:
       # Instead of hasing files, use the latest git commit in a directory to speed up cache key https://github.com/actions/runner/issues/1840#issuecomment-2094847172
       run: |
         echo "NPM_PACKAGES_COMMIT=$(git log -1 --pretty=format:%H -- package-lock.json)" >> $GITHUB_ENV
-        echo "SOURCE_CODE_COMMIT=$(git log -1 --pretty=format:%H -- lib packages @connect-shared apps/${{ inputs.app_name }})" >> $GITHUB_ENV
+        echo "SOURCE_CODE_COMMIT=$(git log -1 --pretty=format:%H -- lib packages apps/${{ inputs.app_name }})" >> $GITHUB_ENV
 
     - name: Restore build
       id: restore_build

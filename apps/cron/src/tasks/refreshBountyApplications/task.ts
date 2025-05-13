@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@root/lib/metrics';
-import { refreshUnpaidApplications } from '@root/lib/rewards/refreshUnpaidApplications';
+import { count } from '@packages/metrics';
+import { refreshUnpaidApplications } from '@packages/lib/rewards/refreshUnpaidApplications';
 
 export async function refreshBountyApplications() {
   log.debug('Running refresh unpaid applications statuses cron job');

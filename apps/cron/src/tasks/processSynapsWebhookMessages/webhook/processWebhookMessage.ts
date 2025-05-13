@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { SynapsEventData } from '@root/lib/kyc/synaps/interfaces';
+import type { SynapsEventData } from '@packages/lib/kyc/synaps/interfaces';
 
 import type { WebhookMessageProcessResult } from '../../processCollablandWebhookMessages/webhook/interfaces';
 

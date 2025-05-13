@@ -4,13 +4,12 @@
 import type { PutObjectCommandInput } from '@aws-sdk/client-s3';
 import { S3Client } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { awsS3Bucket } from '@packages/utils/constants';
 import { v4 as uuid } from 'uuid';
 
 import { getS3ClientConfig } from './getS3ClientConfig';
 
 const client = new S3Client(getS3ClientConfig());
-
-const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 export async function uploadFileToS3(file: {
   pathInS3: string;

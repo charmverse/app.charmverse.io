@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@root/lib/metrics';
-import { deleteArchivedPages } from '@root/lib/pages/server/deleteArchivedPages';
+import { count } from '@packages/metrics';
+import { deleteArchivedPages } from '@packages/pages/deleteArchivedPages';
 
 const MAX_ARCHIVE_DAYS = process.env.MAX_ARCHIVE_DAYS ? parseInt(process.env.MAX_ARCHIVE_DAYS) : 30;
 

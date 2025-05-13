@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { EasSchemaChain } from '@root/lib/credentials/connectors';
-import { indexGnosisSafeCredentialTransaction } from '@root/lib/credentials/indexGnosisSafeCredentialTransaction';
-import { count } from '@root/lib/metrics';
+import type { EasSchemaChain } from '@packages/credentials/connectors';
+import { indexGnosisSafeCredentialTransaction } from '@packages/credentials/indexGnosisSafeCredentialTransaction';
+import { count } from '@packages/metrics';
 
 export async function indexPendingCredentialsTask() {
   log.debug('Running Credential indexing cron job');

@@ -10,6 +10,8 @@ APP_STAGING_DIR="/var/app/staging"              # this is where amazon puts app 
     exit 0
 }
 
+echo "Running pull_secrets.sh to update env file ($env_file_grep)"
+
 if [[ $env_file_grep =~ ^EBSTALK_ENV_FILE=(.+)$ ]]; then
     ebstalk_env_file="$APP_STAGING_DIR/.ebstalk.apps.env/${BASH_REMATCH[1]}"
 

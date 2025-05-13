@@ -1,8 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { countSpaceBlocksAndSave } from '@root/lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
-import { deleteArchivalBlockCounts } from '@root/lib/spaces/deleteArchivalBlockCounts';
+import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
+import { deleteArchivalBlockCounts } from '@packages/spaces/deleteArchivalBlockCounts';
 
 const perBatch = 1000;
+
 export async function countAllSpacesBlocks({ offset = 0 }: { offset?: number } = {}): Promise<void> {
   // Load limited number of spaces at a time
   const spaces = await prisma.space.findMany({
@@ -24,6 +25,7 @@ export async function countAllSpacesBlocks({ offset = 0 }: { offset?: number } =
     return countAllSpacesBlocks({ offset: offset + perBatch });
   }
 }
+
 export async function countAllSpacesBlocksTask(): Promise<void> {
   // Delete old block count entries
   await deleteArchivalBlockCounts();
