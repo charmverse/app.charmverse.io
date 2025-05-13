@@ -11,13 +11,23 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .post(createSpaceContributionController);
+  .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
+  .post(createSpaceContributionController)
+  .get(getSpaceContributionsController);
 
 export type CreateSpaceContributionRequest = {
   hash: string;
   walletAddress: string;
   paidTokenAmount: string;
+};
+
+export type SpaceContributionInfo = {
+  id: string;
+  userId: string;
+  txHash: string;
+  paidTokenAmount: string;
+  createdAt: Date;
+  walletAddress: string;
 };
 
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
@@ -88,6 +98,33 @@ async function createSpaceContributionController(req: NextApiRequest, res: NextA
   });
 
   res.status(200).json(spaceContribution.id);
+}
+
+async function getSpaceContributionsController(req: NextApiRequest, res: NextApiResponse<SpaceContributionInfo[]>) {
+  const { id: spaceId } = req.query as { id: string };
+
+  const spaceContributions = await prisma.spaceSubscriptionContribution.findMany({
+    where: { spaceId, txHash: { not: null }, userId: { not: null } },
+    select: {
+      id: true,
+      txHash: true,
+      paidTokenAmount: true,
+      createdAt: true,
+      walletAddress: true,
+      userId: true
+    }
+  });
+
+  res.status(200).json(
+    spaceContributions.map((contribution) => ({
+      id: contribution.id,
+      userId: contribution.userId!,
+      txHash: contribution.txHash!,
+      paidTokenAmount: contribution.paidTokenAmount,
+      createdAt: contribution.createdAt,
+      walletAddress: contribution.walletAddress
+    }))
+  );
 }
 
 export default withSessionRoute(handler);
