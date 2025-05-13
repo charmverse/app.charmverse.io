@@ -4,6 +4,7 @@ import cron from 'node-cron';
 import { Server } from 'socket.io';
 
 import app from './healthCheck/app';
+import { task as chargeSpacesSubscriptionTask } from './tasks/chargeSpacesSubscription';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
@@ -80,6 +81,9 @@ cron.schedule('0 * * * *', storeOptimismProjectAttestations);
 
 // Send proposal evaluation notifications every hour
 cron.schedule('0 * * * *', () => sendProposalEvaluationNotifications());
+
+// once every month
+cron.schedule('0 0 1 * *', chargeSpacesSubscriptionTask);
 
 const port = process.env.PORT || 4000;
 

@@ -19,7 +19,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
 const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 
-function SpaceContributionsList() {
+function SpaceSubscriptionReceiptsList() {
   const { space } = useCurrentSpace();
   const { members } = useMembers();
 
@@ -80,7 +80,7 @@ export function DevPurchaseButton() {
   return (
     <>
       <Typography>Space token balance: {spaceTokenBalance} DEV</Typography>
-      <SpaceContributionsList />
+      <SpaceSubscriptionReceiptsList />
       <Button variant='contained' onClick={() => setIsModalOpen(true)}>
         Send DEV
       </Button>
