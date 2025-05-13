@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { erc20Abi, formatUnits, parseUnits } from 'viem';
 import { base } from 'viem/chains';
-import { useWalletClient, useAccount } from 'wagmi';
+import { useAccount, useWalletClient } from 'wagmi';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -18,9 +18,11 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import '@rainbow-me/rainbowkit/styles.css';
+import { Button } from 'components/common/Button';
+
+import { devTokenAddress, useDevTokenBalance } from './hooks/useDevTokenBalance';
 
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
-const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 
 function SpaceSubscriptionReceiptsList() {
   const { space } = useCurrentSpace();
@@ -145,6 +147,7 @@ export function SpaceContributionModal({
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const [isLoading, setIsLoading] = useState(false);
+  const { balance, formattedBalance, isLoading: isBalanceLoading, refreshBalance } = useDevTokenBalance({ address });
 
   const handleSend = async () => {
     setIsLoading(true);
@@ -198,6 +201,7 @@ export function SpaceContributionModal({
 
       onSuccess();
       onClose();
+      refreshBalance();
     } catch (error) {
       log.error('Error sending space contribution', { error });
       showMessage('Error sending space contribution', 'error');
@@ -215,18 +219,24 @@ export function SpaceContributionModal({
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography>Send DEV</Typography>
-        <TextField
-          fullWidth
-          type='number'
-          value={amount}
-          disabled={!address}
-          onChange={(e) => setAmount(Number(e.target.value))}
-        />
+        <Stack gap={1}>
+          <TextField
+            fullWidth
+            type='number'
+            value={amount}
+            disabled={!address || isBalanceLoading}
+            onChange={(e) => setAmount(Number(e.target.value))}
+          />
+          <Typography variant='caption' color='text.secondary'>
+            Balance: {formattedBalance} DEV
+          </Typography>
+        </Stack>
         <Button
+          loading={isLoading || isBalanceLoading}
           variant='contained'
           onClick={handleSend}
           sx={{ width: 'fit-content' }}
-          disabled={isLoading || amount === 0}
+          disabled={amount === 0 || balance < amount}
         >
           Send
         </Button>
