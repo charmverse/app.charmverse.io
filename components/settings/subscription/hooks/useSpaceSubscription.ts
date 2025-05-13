@@ -58,6 +58,6 @@ export function useSpaceSubscription() {
     hasPassedBlockQuota,
     spaceBlockQuota,
     spaceBlockCount: count,
-    paidTier: currentSpace?.paidTier
+    subscriptionTier: currentSpace?.subscriptionTier
   };
 }

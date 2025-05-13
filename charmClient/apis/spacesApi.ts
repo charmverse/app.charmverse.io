@@ -1,5 +1,5 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
-import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
+import type { Prisma, RewardsGithubRepo, Space } from '@charmverse/core/prisma';
 import * as http from '@root/adapters/http';
 
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
@@ -7,6 +7,7 @@ import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
+import type { CreateSpaceContributionRequest } from 'pages/api/spaces/[id]/create-space-contribution';
 import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
 import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
@@ -118,5 +119,9 @@ export class SpacesApi {
     payload: UpdateGithubRepoWithReward;
   }) {
     return http.PUT<RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
+  }
+
+  createSpaceContribution(spaceId: string, payload: CreateSpaceContributionRequest) {
+    return http.POST(`/api/spaces/${spaceId}/create-space-contribution`, payload);
   }
 }
