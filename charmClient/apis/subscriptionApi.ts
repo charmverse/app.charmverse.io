@@ -8,8 +8,6 @@ import type {
 } from 'lib/subscription/getActiveSpaceSubscription';
 import type { CouponDetails } from 'lib/subscription/getCouponDetails';
 import type {
-  CreateCryptoSubscriptionRequest,
-  CreateCryptoSubscriptionResponse,
   CreateProSubscriptionRequest,
   SubscriptionPaymentIntent
 } from 'lib/subscription/interfaces';
@@ -24,10 +22,6 @@ export class SubscriptionApi {
 
   getSpaceSubscription({ spaceId }: SpaceSubscriptionRequest) {
     return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
-  }
-
-  createCryptoSubscription(spaceId: string, payload: CreateCryptoSubscriptionRequest) {
-    return http.POST<CreateCryptoSubscriptionResponse>(`/api/spaces/${spaceId}/crypto-subscription`, payload);
   }
 
   updateSpaceSubscription(spaceId: string, payload: UpdateSubscriptionRequest) {
