@@ -1,9 +1,8 @@
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { getSpaceTokenBalance } from 'lib/spaces/getSpaceTokenBalance';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

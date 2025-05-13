@@ -11,6 +11,7 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@packages/utils": "^1.0.0"
+    "@packages/utils": "^1.0.0",
+    "viem": "^2.29.2"
   }
 }

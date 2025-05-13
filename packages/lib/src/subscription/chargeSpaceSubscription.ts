@@ -1,9 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { parseUnits } from 'viem';
-
-import { getSpaceTokenBalance } from '../spaces/getSpaceTokenBalance';
 
 export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint> = {
   free: parseUnits('0', 18),
