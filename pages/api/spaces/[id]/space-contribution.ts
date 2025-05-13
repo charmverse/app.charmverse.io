@@ -1,9 +1,10 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { withSessionRoute } from '@root/lib/session/withSession';
+import type { CreateSpaceContributionRequest } from '@root/lib/spaces/createSpaceContribution';
+import { createSpaceContribution } from '@root/lib/spaces/createSpaceContribution';
+import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
+import { getSpaceReceipts } from '@root/lib/spaces/getSpaceReceipts';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { base } from 'viem/chains';
 
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 
@@ -15,116 +16,24 @@ handler
   .post(createSpaceContributionController)
   .get(getSpaceContributionsController);
 
-export type CreateSpaceContributionRequest = {
-  hash: string;
-  walletAddress: string;
-  paidTokenAmount: string;
-};
-
-export type SpaceContributionInfo = {
-  id: string;
-  userId: string;
-  txHash: string;
-  paidTokenAmount: string;
-  createdAt: Date;
-  walletAddress: string;
-};
-
-const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
-const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
-
 async function createSpaceContributionController(req: NextApiRequest, res: NextApiResponse<string>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
-  const { hash, walletAddress, paidTokenAmount } = req.body as CreateSpaceContributionRequest;
 
-  const publicClient = getPublicClient(base.id);
-
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: hash.toLowerCase() as `0x${string}` });
-
-  if (receipt.status !== 'success') {
-    throw new Error('Transaction failed');
-  }
-
-  const tx = await publicClient.getTransaction({ hash: hash.toLowerCase() as `0x${string}` });
-
-  if (tx.from.toLowerCase() !== walletAddress.toLowerCase()) {
-    throw new Error('Transaction sender does not match provided wallet address');
-  }
-
-  // Get the transfer logs from the transaction
-  const logs = await publicClient.getLogs({
-    fromBlock: receipt.blockNumber,
-    toBlock: receipt.blockNumber,
-    address: devTokenAddress,
-    event: {
-      type: 'event',
-      name: 'Transfer',
-      inputs: [
-        { type: 'address', name: 'from', indexed: true },
-        { type: 'address', name: 'to', indexed: true },
-        { type: 'uint256', name: 'value' }
-      ]
-    }
-  });
-
-  if (logs.length === 0) {
-    throw new Error('No transfer event found in transaction');
-  }
-
-  const transferLog = logs.find(
-    (log) =>
-      log.args.to &&
-      log.args.from &&
-      log.args.to.toLowerCase() === recipientAddress.toLowerCase() &&
-      log.args.from.toLowerCase() === walletAddress.toLowerCase()
-  );
-
-  if (!transferLog || transferLog.args.value !== BigInt(paidTokenAmount)) {
-    throw new Error('Transfer amount does not match paid token amount');
-  }
-
-  const spaceContribution = await prisma.spaceSubscriptionContribution.create({
-    data: {
-      spaceId,
-      walletAddress,
-      paidTokenAmount,
-      decentPayload: {},
-      decentStatus: 'success',
-      chainId: base.id,
-      txHash: hash.toLowerCase() as `0x${string}`,
-      userId
-    }
+  const spaceContribution = await createSpaceContribution({
+    ...(req.body as CreateSpaceContributionRequest),
+    spaceId,
+    userId
   });
 
   res.status(200).json(spaceContribution.id);
 }
 
-async function getSpaceContributionsController(req: NextApiRequest, res: NextApiResponse<SpaceContributionInfo[]>) {
+async function getSpaceContributionsController(req: NextApiRequest, res: NextApiResponse<SpaceReceipt[]>) {
   const { id: spaceId } = req.query as { id: string };
+  const spaceReceipts = await getSpaceReceipts(spaceId);
 
-  const spaceContributions = await prisma.spaceSubscriptionContribution.findMany({
-    where: { spaceId, txHash: { not: null }, userId: { not: null } },
-    select: {
-      id: true,
-      txHash: true,
-      paidTokenAmount: true,
-      createdAt: true,
-      walletAddress: true,
-      userId: true
-    }
-  });
-
-  res.status(200).json(
-    spaceContributions.map((contribution) => ({
-      id: contribution.id,
-      userId: contribution.userId!,
-      txHash: contribution.txHash!,
-      paidTokenAmount: contribution.paidTokenAmount,
-      createdAt: contribution.createdAt,
-      walletAddress: contribution.walletAddress
-    }))
-  );
+  res.status(200).json(spaceReceipts);
 }
 
 export default withSessionRoute(handler);

@@ -23,42 +23,42 @@ function SpaceContributionsList() {
   const { space } = useCurrentSpace();
   const { members } = useMembers();
 
-  const { data: spaceContributions = [] } = useSWR(space ? `space-contributions/${space.id}` : null, () =>
+  const { data: spaceReceipts = [] } = useSWR(space ? `space-receipts/${space.id}` : null, () =>
     space ? charmClient.spaces.getSpaceContributions(space.id) : []
   );
 
-  const spaceContributionsWithUser = spaceContributions
-    .map((contribution) => ({
-      ...contribution,
-      user: members.find((member) => member.id === contribution.userId)!
+  const spaceReceiptsWithUser = spaceReceipts
+    .map((receipt) => ({
+      ...receipt,
+      user: members.find((member) => member.id === receipt.userId)!
     }))
-    .filter((contribution) => contribution.user);
+    .filter((receipt) => receipt.user);
 
   return (
     <Stack gap={2} my={2}>
-      {spaceContributions.length === 0 ? (
-        <Typography>No space contributions yet</Typography>
+      {spaceReceipts.length === 0 ? (
+        <Typography>No space receipts yet</Typography>
       ) : (
         <>
-          <Typography variant='h6'>Space contributions</Typography>
-          {spaceContributionsWithUser.map((contribution) => (
-            <Stack key={contribution.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography variant='h6'>Space receipts</Typography>
+          {spaceReceiptsWithUser.map((receipt) => (
+            <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
               <Box display='flex' alignItems='center' gap={1}>
                 <Avatar
-                  name={contribution.user.username}
-                  avatar={contribution.user?.avatar}
+                  name={receipt.user.username}
+                  avatar={receipt.user?.avatar}
                   size='small'
-                  isNft={hasNftAvatar(contribution.user)}
+                  isNft={hasNftAvatar(receipt.user)}
                 />
                 <Box>
-                  <Typography variant='body1'>{contribution.user.username}</Typography>
+                  <Typography variant='body1'>{receipt.user.username}</Typography>
                 </Box>
                 <Typography variant='caption' color='text.secondary'>
-                  {relativeTime(contribution.createdAt)}
+                  {relativeTime(receipt.createdAt)}
                 </Typography>
               </Box>
               <Typography variant='body2' fontWeight={600} color='success.main'>
-                +{formatUnits(BigInt(contribution.paidTokenAmount), 18)} DEV
+                +{formatUnits(BigInt(receipt.paidTokenAmount), 18)} DEV
               </Typography>
             </Stack>
           ))}

@@ -1,6 +1,8 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Prisma, RewardsGithubRepo, Space } from '@charmverse/core/prisma';
 import * as http from '@root/adapters/http';
+import type { CreateSpaceContributionRequest } from '@root/lib/spaces/createSpaceContribution';
+import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
 
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
@@ -10,7 +12,6 @@ import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpaceP
 import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
 import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
-import type { CreateSpaceContributionRequest, SpaceContributionInfo } from 'pages/api/spaces/[id]/space-contribution';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
 export class SpacesApi {
@@ -126,7 +127,7 @@ export class SpacesApi {
   }
 
   getSpaceContributions(spaceId: string) {
-    return http.GET<SpaceContributionInfo[]>(`/api/spaces/${spaceId}/space-contribution`);
+    return http.GET<SpaceReceipt[]>(`/api/spaces/${spaceId}/space-contribution`);
   }
 
   getSpaceTokenBalance(spaceId: string) {
