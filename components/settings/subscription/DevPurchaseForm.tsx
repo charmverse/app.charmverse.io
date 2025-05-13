@@ -122,7 +122,12 @@ export function DevPurchaseButton() {
   return (
     <>
       <Stack flexDirection='row' alignItems='center' gap={0.5}>
-        <Typography>Space token balance: {spaceTokenBalance} </Typography>
+        <Typography>
+          Space tier: <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{space?.subscriptionTier}</span>
+        </Typography>
+      </Stack>
+      <Stack flexDirection='row' alignItems='center' gap={0.5}>
+        <Typography>Space DEV balance: {spaceTokenBalance} </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
       </Stack>
       <SpaceSubscriptionReceiptsList spaceReceipts={spaceReceipts} />
