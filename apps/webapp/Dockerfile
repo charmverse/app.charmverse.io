@@ -17,6 +17,7 @@ COPY --parents apps/*/package.json          \
   package.json                              \
   apps/webapp/node_modules                    \
   apps/webapp/package.json                    \
+  apps/webapp/seedData                    \
   apps/webapp/next.config.js \
   ./
 
