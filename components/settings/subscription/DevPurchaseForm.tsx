@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
+import type { SpaceReceipt } from '@root/lib/spaces/getSpaceReceipts';
 import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
 import { relativeTime } from '@root/lib/utils/dates';
 import { useEffect, useState } from 'react';
@@ -24,13 +25,9 @@ import { devTokenAddress, useDevTokenBalance } from './hooks/useDevTokenBalance'
 
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
 
-function SpaceSubscriptionReceiptsList() {
+function SpaceSubscriptionReceiptsList({ spaceReceipts }: { spaceReceipts: SpaceReceipt[] }) {
   const { space } = useCurrentSpace();
   const { members } = useMembers();
-
-  const { data: spaceReceipts = [] } = useSWR(space ? `space-receipts/${space.id}` : null, () =>
-    space ? charmClient.spaces.getSpaceContributions(space.id) : []
-  );
 
   const spaceReceiptsWithUser = spaceReceipts.map((receipt) => ({
     ...receipt,
@@ -106,8 +103,14 @@ export function DevPurchaseButton() {
   const { space } = useCurrentSpace();
   const { address } = useAccount();
 
-  const { data: spaceTokenBalance, mutate } = useSWR(space ? `space-token-balance/${space.id}` : null, () =>
-    space ? charmClient.spaces.getSpaceTokenBalance(space.id) : 0
+  const { data: spaceTokenBalance, mutate: refreshSpaceTokenBalance } = useSWR(
+    space ? `space-token-balance/${space.id}` : null,
+    () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : 0)
+  );
+
+  const { data: spaceReceipts = [], mutate: refreshSpaceReceipts } = useSWR(
+    space ? `space-receipts/${space.id}` : null,
+    () => (space ? charmClient.spaces.getSpaceContributions(space.id) : [])
   );
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,7 +118,7 @@ export function DevPurchaseButton() {
   return (
     <>
       <Typography>Space token balance: {spaceTokenBalance} DEV</Typography>
-      <SpaceSubscriptionReceiptsList />
+      <SpaceSubscriptionReceiptsList spaceReceipts={spaceReceipts} />
       {address ? (
         <Button variant='contained' onClick={() => setIsModalOpen(true)}>
           Send DEV
@@ -125,7 +128,14 @@ export function DevPurchaseButton() {
           <ConnectWalletButton onClose={() => setIsModalOpen(false)} open={isModalOpen} />
         </RainbowKitProvider>
       )}
-      <SpaceContributionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => mutate()} />
+      <SpaceContributionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => {
+          refreshSpaceReceipts();
+          refreshSpaceTokenBalance();
+        }}
+      />
     </>
   );
 }
@@ -174,6 +184,10 @@ export function SpaceContributionModal({
 
       const transferredAmount = parseUnits(amount.toString(), 18);
 
+      // Sign a message to verify ownership
+      const message = `I authorize this DEV token transfer of ${amount} DEV to the ${space.name} charmverse space`;
+      const signature = await walletClient.signMessage({ message });
+
       const transferTxHash = await walletClient.writeContract({
         address: devTokenAddress,
         abi: erc20Abi,
@@ -194,7 +208,9 @@ export function SpaceContributionModal({
       await charmClient.spaces.createSpaceContribution(space.id, {
         hash: transferTxHash,
         walletAddress: address,
-        paidTokenAmount: transferredAmount.toString()
+        paidTokenAmount: transferredAmount.toString(),
+        signature,
+        message
       });
 
       onSuccess();

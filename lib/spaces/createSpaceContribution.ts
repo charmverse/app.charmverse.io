@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { verifyMessage } from 'viem';
 import { base } from 'viem/chains';
 
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
@@ -9,6 +10,8 @@ export type CreateSpaceContributionRequest = {
   hash: string;
   walletAddress: string;
   paidTokenAmount: string;
+  signature: string;
+  message: string;
 };
 
 export async function createSpaceContribution(
@@ -17,7 +20,18 @@ export async function createSpaceContribution(
     userId: string;
   }
 ) {
-  const { hash, walletAddress, paidTokenAmount, spaceId, userId } = payload;
+  const { hash, walletAddress, paidTokenAmount, spaceId, userId, signature, message } = payload;
+
+  // Verify the signature first
+  const recoveredAddress = await verifyMessage({
+    message,
+    signature: signature as `0x${string}`,
+    address: walletAddress as `0x${string}`
+  });
+
+  if (!recoveredAddress) {
+    throw new Error('Invalid signature: could not verify message');
+  }
 
   const publicClient = getPublicClient(base.id);
 
