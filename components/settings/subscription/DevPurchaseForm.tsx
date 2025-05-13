@@ -1,13 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import { hasNftAvatar } from '@root/lib/users/hasNftAvatar';
 import { relativeTime } from '@root/lib/utils/dates';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { erc20Abi, formatUnits, parseUnits } from 'viem';
 import { base } from 'viem/chains';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useWalletClient, useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -15,6 +16,8 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
+
+import '@rainbow-me/rainbowkit/styles.css';
 
 const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
 const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
@@ -73,8 +76,35 @@ function SpaceSubscriptionReceiptsList() {
   );
 }
 
+function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: boolean }) {
+  const { openConnectModal, connectModalOpen } = useConnectModal();
+  const { address } = useAccount();
+
+  // we need to keep track of this so we can close the modal when the user cancels
+  const [isRainbowKitOpen, setIsRainbowKitOpen] = useState(false);
+
+  // open Rainbowkit modal if not connected
+  useEffect(() => {
+    // If rainbowkit modal was closed by user, but our state is not updated yet, update it so we reset the parent open state
+    if (!connectModalOpen && isRainbowKitOpen && !address) {
+      setIsRainbowKitOpen(false);
+      onClose();
+    } else if (open && !address) {
+      openConnectModal?.();
+      setIsRainbowKitOpen(true);
+    }
+  }, [open, onClose, address, connectModalOpen, openConnectModal, isRainbowKitOpen]);
+
+  return (
+    <Button variant='contained' onClick={openConnectModal}>
+      Connect Wallet
+    </Button>
+  );
+}
+
 export function DevPurchaseButton() {
   const { space } = useCurrentSpace();
+  const { address } = useAccount();
 
   const { data: spaceTokenBalance, mutate } = useSWR(space ? `space-token-balance/${space.id}` : null, () =>
     space ? charmClient.spaces.getSpaceTokenBalance(space.id) : 0
@@ -86,9 +116,15 @@ export function DevPurchaseButton() {
     <>
       <Typography>Space token balance: {spaceTokenBalance} DEV</Typography>
       <SpaceSubscriptionReceiptsList />
-      <Button variant='contained' onClick={() => setIsModalOpen(true)}>
-        Send DEV
-      </Button>
+      {address ? (
+        <Button variant='contained' onClick={() => setIsModalOpen(true)}>
+          Send DEV
+        </Button>
+      ) : (
+        <RainbowKitProvider>
+          <ConnectWalletButton onClose={() => setIsModalOpen(false)} open={isModalOpen} />
+        </RainbowKitProvider>
+      )}
       <SpaceContributionModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSuccess={() => mutate()} />
     </>
   );
@@ -170,6 +206,11 @@ export function SpaceContributionModal({
     }
   };
 
+  if (!address) {
+    // we should never get here, but just in case
+    return null;
+  }
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -185,9 +226,9 @@ export function SpaceContributionModal({
           variant='contained'
           onClick={handleSend}
           sx={{ width: 'fit-content' }}
-          disabled={isLoading || (address && amount === 0)}
+          disabled={isLoading || amount === 0}
         >
-          {address ? 'Send' : 'Connect Wallet'}
+          Send
         </Button>
       </Box>
     </Modal>
