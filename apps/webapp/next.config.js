@@ -65,6 +65,10 @@ if (process.env.NODE_ENV === 'test') {
   );
 }
 
+// Next.js requires this configured at build and run time
+const useCDN =
+  process.env.CI || process.env.REACT_APP_APP_ENV === 'production' || process.env.REACT_APP_APP_ENV === 'staging';
+
 const config = {
   poweredByHeader: false,
   eslint: {
@@ -105,7 +109,7 @@ const config = {
       transform: 'lodash/{{member}}'
     }
   },
-  assetPrefix: process.env.REACT_APP_APP_ENV === 'production' ? 'https://cdn.charmverse.io' : undefined,
+  assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
     return [
