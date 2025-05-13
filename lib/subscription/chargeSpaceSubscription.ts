@@ -8,8 +8,8 @@ import { getSpaceTokenBalance } from '../spaces/getSpaceTokenBalance';
 export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint> = {
   free: parseUnits('0', 18),
   bronze: parseUnits('1000', 18),
-  silver: parseUnits('2000', 18),
-  gold: parseUnits('3000', 18),
+  silver: parseUnits('2500', 18),
+  gold: parseUnits('10000', 18),
   grant: parseUnits('0', 18),
   readonly: parseUnits('0', 18)
 };
@@ -33,7 +33,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
 
   const subscriptionTierAmount = SubscriptionTierAmountRecord[subscriptionTier];
 
-  if (spaceTokenBalance < subscriptionTierAmount) {
+  if (parseUnits(spaceTokenBalance.toString(), 18) < subscriptionTierAmount) {
     await prisma.space.update({
       where: { id: spaceId },
       data: {

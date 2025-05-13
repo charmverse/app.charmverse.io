@@ -1,15 +1,33 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type SpaceReceipt = {
+type SpacePaymentReceipt = {
+  type: 'payment';
+  id: string;
+  paidTokenAmount: string;
+  createdAt: Date;
+};
+
+type SpaceContributionReceipt = {
+  type: 'contribution';
   id: string;
   txHash: string;
   paidTokenAmount: string;
   createdAt: Date;
-  walletAddress: string;
   userId: string;
 };
 
+export type SpaceReceipt = SpacePaymentReceipt | SpaceContributionReceipt;
+
 export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]> {
+  const spacePayments = await prisma.spaceSubscriptionPayment.findMany({
+    where: { spaceId },
+    select: {
+      id: true,
+      paidTokenAmount: true,
+      createdAt: true
+    }
+  });
+
   const spaceContributions = await prisma.spaceSubscriptionContribution.findMany({
     where: { spaceId, txHash: { not: null }, userId: { not: null } },
     select: {
@@ -17,17 +35,24 @@ export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]>
       txHash: true,
       paidTokenAmount: true,
       createdAt: true,
-      walletAddress: true,
       userId: true
     }
   });
 
-  return spaceContributions.map((contribution) => ({
-    id: contribution.id,
-    txHash: contribution.txHash!,
-    paidTokenAmount: contribution.paidTokenAmount,
-    createdAt: contribution.createdAt,
-    walletAddress: contribution.walletAddress,
-    userId: contribution.userId!
-  }));
+  return [
+    ...spaceContributions.map((contribution) => ({
+      id: contribution.id,
+      txHash: contribution.txHash!,
+      paidTokenAmount: contribution.paidTokenAmount,
+      createdAt: contribution.createdAt,
+      userId: contribution.userId!,
+      type: 'contribution' as const
+    })),
+    ...spacePayments.map((payment) => ({
+      id: payment.id,
+      paidTokenAmount: payment.paidTokenAmount,
+      createdAt: payment.createdAt,
+      type: 'payment' as const
+    }))
+  ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }

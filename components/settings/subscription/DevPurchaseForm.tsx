@@ -27,12 +27,10 @@ function SpaceSubscriptionReceiptsList() {
     space ? charmClient.spaces.getSpaceContributions(space.id) : []
   );
 
-  const spaceReceiptsWithUser = spaceReceipts
-    .map((receipt) => ({
-      ...receipt,
-      user: members.find((member) => member.id === receipt.userId)!
-    }))
-    .filter((receipt) => receipt.user);
+  const spaceReceiptsWithUser = spaceReceipts.map((receipt) => ({
+    ...receipt,
+    user: receipt.type === 'contribution' ? members.find((member) => member.id === receipt.userId)! : undefined
+  }));
 
   return (
     <Stack gap={2} my={2}>
@@ -45,20 +43,27 @@ function SpaceSubscriptionReceiptsList() {
             <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
               <Box display='flex' alignItems='center' gap={1}>
                 <Avatar
-                  name={receipt.user.username}
-                  avatar={receipt.user?.avatar}
+                  name={receipt.user ? receipt.user.username : space?.name}
+                  avatar={receipt.user ? receipt.user?.avatar : space?.spaceImage}
                   size='small'
-                  isNft={hasNftAvatar(receipt.user)}
+                  isNft={receipt.user ? hasNftAvatar(receipt.user) : false}
                 />
                 <Box>
-                  <Typography variant='body1'>{receipt.user.username}</Typography>
+                  <Typography variant='body1'>
+                    {receipt.user ? `Contribution by ${receipt.user.username}` : 'Monthly Payment'}
+                  </Typography>
                 </Box>
                 <Typography variant='caption' color='text.secondary'>
                   {relativeTime(receipt.createdAt)}
                 </Typography>
               </Box>
-              <Typography variant='body2' fontWeight={600} color='success.main'>
-                +{formatUnits(BigInt(receipt.paidTokenAmount), 18)} DEV
+              <Typography
+                variant='body2'
+                fontWeight={600}
+                color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
+              >
+                {receipt.type === 'contribution' ? '+' : '-'}
+                {formatUnits(BigInt(receipt.paidTokenAmount), 18)} DEV
               </Typography>
             </Stack>
           ))}
