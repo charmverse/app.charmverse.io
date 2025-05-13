@@ -1,10 +1,10 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { CreateSpaceContributionRequest } from '@packages/spaces/createSpaceContribution';
+import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { CreateSpaceContributionRequest } from 'lib/spaces/createSpaceContribution';
-import type { SpaceReceipt } from 'lib/spaces/getSpaceReceipts';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
