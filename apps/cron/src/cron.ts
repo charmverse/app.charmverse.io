@@ -1,7 +1,8 @@
 import { log } from '@charmverse/core/log';
-import { relay } from '@root/lib/websockets/relay';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
+
+// import { relay } from '@packages/websockets/relay';
 
 import app from './healthCheck/app';
 import { task as chargeSpacesSubscriptionTask } from './tasks/chargeSpacesSubscription';
@@ -25,7 +26,7 @@ import { task as voteTask } from './tasks/updateVotesStatus';
 import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateMemberships';
 
 // Initiate Redis adapter for socket.io
-relay.bindServer(new Server());
+// relay.bindServer(new Server());
 
 log.info('Starting cron jobs');
 

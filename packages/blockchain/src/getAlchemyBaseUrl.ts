@@ -1,6 +1,6 @@
 import env from '@beam-australia/react-env';
 
-import { getChainById } from './chains';
+import { getChainById } from './connectors/chains';
 
 type AlchemyApiSuffix = '' | 'nft';
 

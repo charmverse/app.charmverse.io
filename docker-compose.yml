@@ -43,7 +43,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
       ]
     # environment:
     #   - FORCE_SUBDOMAINS=true
@@ -59,41 +59,13 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging
       - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-webapp
-
-  prd-sunnyawards:
-    extends:
-      service: defaults
-    ports:
-      - '80:3000'
-    command:
-      [
-        'sh',
-        '-c',
-        'npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/sunnyawards --keepAliveTimeout 70000'
-      ]
-    profiles:
-      - prd-sunnyawards
-
-  stg-sunnyawards:
-    extends:
-      service: defaults
-    ports:
-      - '80:3000'
-    command:
-      [
-        'sh',
-        '-c',
-        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/sunnyawards/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start  apps/sunnyawards --keepAliveTimeout 70000'
-      ]
-    profiles:
-      - stg-sunnyawards
 
   prd-sockets:
     extends:
@@ -116,34 +88,6 @@ services:
     profiles:
       - stg-sockets
       #- stg-webapp
-
-  prd-farcaster:
-    extends:
-      service: defaults
-    ports:
-      - '80:3000'
-    command:
-      [
-        'sh',
-        '-c',
-        'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
-      ]
-    profiles:
-      - prd-farcaster
-
-  stg-farcaster:
-    extends:
-      service: defaults
-    ports:
-      - '80:3000'
-    command:
-      [
-        'sh',
-        '-c',
-        'npx react-env --path .env --dest ./apps/farcaster/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/farcaster --keepAliveTimeout 70000'
-      ]
-    profiles:
-      - stg-farcaster
 
   devapp:
     build:
@@ -209,6 +153,5 @@ services:
     profiles:
       - prd-cron
       - prd-webapp
-      - prd-sunnyawards
       - prd-sockets
       - ddtst

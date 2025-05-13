@@ -1,0 +1,24 @@
+{
+  "name": "serverless-game7",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "build": "npx serverless package",
+    "start": "serverless offline start --httpPort=3020",
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.ts --maxWorkers=2 --passWithNoTests"
+  },
+  "dependencies": {
+    "serverless": "^4.1.19"
+  },
+  "devDependencies": {
+    "aws-lambda": "^1.0.7",
+    "serverless-esbuild": "^1.48.5",
+    "serverless-lift": "^1.29.0",
+    "serverless-offline": "^14.3.4",
+    "serverless-scriptable-plugin": "^1.3.1"
+  },
+  "overrides": {
+    "serverless": "^4.1.19"
+  }
+}

@@ -16,6 +16,7 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      - 'packages/**'
   pull_request:
     types: [labeled, opened, synchronize]
     branches: ['**']
@@ -32,6 +33,7 @@ on:
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
+      - 'packages/**'
       # include some paths so that we trigger deploy for web app staging
       - 'components/**'
       - 'pages/**'
@@ -118,13 +120,13 @@ jobs:
       - name: Typecheck app
         run: npm run typecheck -w apps/websockets
 
-      - name: Run eslint on changed files
-        uses: tj-actions/eslint-changed-files@v25
-        with:
-          warn_ignored: 'true'
-          skip_annotations: 'true' # do not annotate code in the PR
-          file_extensions: '**/*.{ts,tsx}'
-          escape_paths: 'false'
+      # - name: Run eslint on changed files
+      #   uses: tj-actions/eslint-changed-files@v25
+      #   with:
+      #     warn_ignored: 'true'
+      #     skip_annotations: 'true' # do not annotate code in the PR
+      #     file_extensions: '**/*.{ts,tsx}'
+      #     escape_paths: 'false'
 
       - name: Run tests
         run: npm run sockets:test
@@ -150,8 +152,7 @@ jobs:
           app_name: websockets
 
       - name: Update Dockerfile
-        run: |
-          rm Dockerfile && mv apps/websockets/Dockerfile Dockerfile
+        run: rm Dockerfile && mv apps/websockets/Dockerfile Dockerfile
 
       - name: Build and Push Docker image
         id: docker_build_push

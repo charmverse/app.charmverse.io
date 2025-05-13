@@ -2,9 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import {
   batchUpdateSpaceProfiles,
   type SpaceWithMixpanelProfile
-} from '@root/lib/metrics/mixpanel/batchUpdateSpaceProfiles';
-import { getTrackGroupProfile } from '@root/lib/metrics/mixpanel/updateTrackGroupProfile';
-import { getSpaceBlockCount } from '@root/lib/spaces/getSpaceBlockCount';
+} from '@packages/metrics/mixpanel/batchUpdateSpaceProfiles';
+import { getTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
+import { getSpaceBlockCount } from '@packages/spaces/getSpaceBlockCount';
 
 const perBatch = 1000;
 export async function updateMixpanelProfiles({ offset = 0 }: { offset?: number } = {}): Promise<void> {

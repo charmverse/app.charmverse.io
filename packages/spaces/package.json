@@ -1,0 +1,16 @@
+{
+  "name": "@packages/spaces",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config ./jest.config.ts --maxWorkers=2 --passWithNoTests"
+  },
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@packages/utils": "^1.0.0"
+  }
+}

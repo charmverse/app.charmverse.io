@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": ""
   },
   "dependencies": {
     "@nytimes/react-prosemirror": "^0.6.2",
@@ -19,15 +19,9 @@
     "prosemirror-state": "^1.4.3"
   },
   "exports": {
+    "./*": "./src/*.ts",
     "./ui": "./src/ui/index.tsx",
-    "./schema": "./src/schema.ts",
     "./utils": "./src/utils/index.ts",
-    "./toHTMLString": "./src/utils/toHTMLString.ts",
-    "./extensions/hardBreak": "./src/extensions/hardBreak.ts",
-    "./extensions/history": "./src/extensions/history.ts",
-    "./extensions/tabIndent": "./src/extensions/tabIndent.ts",
-    "./extensions/bulletList": "./src/extensions/bulletList.ts",
-    "./extensions/listItem": "./src/extensions/listItem/index.ts",
-    "./extensions/orderedList": "./src/extensions/orderedList.ts"
+    "./extensions/listItem": "./src/extensions/listItem/index.ts"
   }
 }

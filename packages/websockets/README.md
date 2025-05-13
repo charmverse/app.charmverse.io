@@ -1,0 +1,1 @@
+This package captures the specs used by the document version of CharmEditor, which is required by multiple backend apps. In the future, it would be better if these specs were all moved into the charmeditor package.

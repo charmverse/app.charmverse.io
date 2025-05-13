@@ -4,17 +4,9 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@packages/charmeditor/*": ["../../packages/charmeditor/src/*"],
-      "@packages/utils/*": ["../../packages/utils/src/*"],
-      "@root/adapters/*": ["../../adapters/*"],
-      "@root/config/*": ["../../config/*"],
-      "@root/abis/*": ["../../abis/*"],
-      "@root/connectors/*": ["../../connectors/*"],
-      "@root/lib/*": ["../../lib/*"],
-      "@root/testing/*": ["../../testing/*"],
-      "components/*": ["../../components/*"],
-      "lib/*": ["../../lib/*"]
+      "components/*": ["../../apps/webapp/components/*"]
     }
   },
+  "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["jest.config.ts", "esbuild.config.ts", "jest.teardown.ts"]
 }
