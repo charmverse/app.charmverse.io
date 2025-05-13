@@ -163,7 +163,7 @@ export async function createWorkspace({
   // Provision default space data
   if (spaceTemplate === 'default') {
     const sourceDataPath = path.resolve(
-      'seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286'
+      `${process.env.NODE_ENV === 'production' ? 'apps/webapp/' : ''}seedData/space/space-da74cab3-c2b6-40bb-8734-0de5375b0fce-pages-1657887621286`
     );
 
     const seedPagesTransactionInput = await convertJsonPagesToPrisma({
