@@ -1,11 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateDefaultPropertiesInput } from '@packages/lib/members/generateDefaultPropertiesInput';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { DuplicateDataError, InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { typedKeys } from '@packages/utils/types';
-import { generateDefaultPropertiesInput } from '@packages/lib/members/generateDefaultPropertiesInput';
 import { v4 } from 'uuid';
+import { vi } from 'vitest';
 
 import type { UpdateableSpaceFields } from '../updateSpace';
 import { updateSpace } from '../updateSpace';
@@ -15,7 +16,7 @@ let secondUser: User;
 
 let mockedMixpanelFn: jest.Mock;
 
-jest.mock('lib/snapshot/getSpace', () => ({
+vi.mock('lib/snapshot/getSpace', () => ({
   getSnapshotSpace: jest.fn().mockReturnValueOnce({})
 }));
 
