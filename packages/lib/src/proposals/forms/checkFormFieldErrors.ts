@@ -1,7 +1,8 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
-import type { FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
 
-import { nonDuplicateFieldTypes } from './constants';
+import type { FormFieldInput } from './interfaces';
+
+const nonDuplicateFieldTypes = ['project_profile', 'milestone'] as FormFieldType[];
 
 export function checkFormFieldErrors(formFields: FormFieldInput[]): string | undefined {
   if (formFields.length === 0) {

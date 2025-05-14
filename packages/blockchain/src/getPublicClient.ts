@@ -38,8 +38,8 @@ export const getPublicClient = (chainId: number) => {
   return createPublicClient({
     chain,
     transport: http(providerUrl, {
-      retryCount: 1,
-      timeout: 5000
+      retryCount: 1
+      // timeout: 5000
     })
   });
 };

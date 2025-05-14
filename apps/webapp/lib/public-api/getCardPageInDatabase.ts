@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { PageNotFoundError } from '@packages/pages/errors';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 
+import { PageNotFoundError } from './errors';
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
 import type { CardPage } from './interfaces';
 import { PageFromBlock } from './pageFromBlock.class';

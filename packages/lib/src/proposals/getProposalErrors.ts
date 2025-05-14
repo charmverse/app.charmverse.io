@@ -3,9 +3,8 @@ import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 import { validateAnswers } from '@packages/lib/proposals/forms/validateAnswers';
 import { isTruthy } from '@packages/utils/types';
 
-import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
+import { checkFormFieldErrors } from './forms/checkFormFieldErrors';
 import { validateProposalProject } from './validateProposalProject';
 
 export type ProposalToErrorCheck = Pick<
