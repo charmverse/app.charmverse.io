@@ -1,8 +1,8 @@
 import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
-import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
-
 import type { IPropertyTemplate } from '@packages/databases/board';
 import type { Constants } from '@packages/databases/constants';
+import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
+
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -17,7 +17,7 @@ import {
   REWARD_APPLICANTS_COUNT,
   REWARD_PROPOSAL_LINK,
   APPLICANT_STATUS_BLOCK_ID
-} from '@packages/lib/rewards/blocks/constants';
+} from './constants';
 
 // define properties that will apply to all source fields
 const defaultOptions = { readOnly: true, options: [] };
