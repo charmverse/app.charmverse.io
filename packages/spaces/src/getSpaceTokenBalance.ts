@@ -14,7 +14,7 @@ export async function getSpaceTokenBalance({ spaceId }: { spaceId: string }) {
       },
       spaceSubscriptionContributions: {
         select: {
-          paidTokenAmount: true
+          devTokenAmount: true
         }
       }
     }
@@ -25,7 +25,7 @@ export async function getSpaceTokenBalance({ spaceId }: { spaceId: string }) {
     BigInt(0)
   );
   const spaceSubscriptionContributionsAmount = space?.spaceSubscriptionContributions.reduce(
-    (acc, curr) => acc + BigInt(curr.paidTokenAmount),
+    (acc, curr) => acc + BigInt(curr.devTokenAmount),
     BigInt(0)
   );
 

@@ -33,7 +33,7 @@ export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]>
     select: {
       id: true,
       txHash: true,
-      paidTokenAmount: true,
+      devTokenAmount: true,
       createdAt: true,
       userId: true
     }
@@ -43,7 +43,7 @@ export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]>
     ...spaceContributions.map((contribution) => ({
       id: contribution.id,
       txHash: contribution.txHash!,
-      paidTokenAmount: contribution.paidTokenAmount,
+      paidTokenAmount: contribution.devTokenAmount,
       createdAt: contribution.createdAt,
       userId: contribution.userId!,
       type: 'contribution' as const

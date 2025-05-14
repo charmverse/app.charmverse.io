@@ -83,7 +83,7 @@ export async function createSpaceContribution(
     data: {
       spaceId,
       walletAddress,
-      paidTokenAmount,
+      devTokenAmount: paidTokenAmount,
       decentPayload: {},
       decentStatus: 'success',
       chainId: base.id,
