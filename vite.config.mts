@@ -41,6 +41,15 @@ export default defineConfig({
           include: ['apps/cron/src/**/*.spec.ts'],
           globalSetup: './vite.globalSetup.ts'
         }
+      },
+      {
+        // add "extends: true" to inherit the options from the root config
+        extends: true,
+        test: {
+          name: 'websockets',
+          include: ['apps/websockets/**/*.spec.ts'],
+          globalSetup: './vite.globalSetup.ts'
+        }
       }
     ]
   }
