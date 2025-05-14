@@ -5,13 +5,31 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
-    environment: 'jsdom',
+    globals: true,
     setupFiles: ['./vite.setup.ts'],
-    globalSetup: '../vite.globalSetup.ts',
     server: {
       deps: {
         inline: ['@charmverse/core']
       }
-    }
+    },
+    workspace: [
+      {
+        // add "extends: true" to inherit the options from the root config
+        extends: true,
+        test: {
+          name: 'browser',
+          include: ['components/**/*.spec.{ts,tsx}', 'hooks/**/*.spec.{ts,tsx}'],
+          environment: 'jsdom'
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: 'lib',
+          include: ['lib/**/*.spec.{ts,tsx}'],
+          globalSetup: '../vite.globalSetup.ts'
+        }
+      }
+    ]
   }
 });

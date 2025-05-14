@@ -1,42 +1,43 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { act } from 'react';
+import { vi } from 'vitest';
 
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 
 import { useMagicLink } from './useMagicLink';
 
-jest.mock('hooks/useFirebaseAuth', () => ({
-  useFirebaseAuth: jest.fn()
+vi.mock('hooks/useFirebaseAuth', () => ({
+  useFirebaseAuth: vi.fn()
 }));
 
-jest.mock('next/router', () => ({
+vi.mock('next/router', () => ({
   useRouter: () => ({
-    replace: jest.fn()
+    replace: vi.fn()
   })
 }));
 
-jest.mock('hooks/useVerifyLoginOtp', () => ({
+vi.mock('hooks/useVerifyLoginOtp', () => ({
   useVerifyLoginOtp: () => ({
-    open: jest.fn()
+    open: vi.fn()
   })
 }));
 
 describe.skip('useMagicLink()', () => {
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('initial status is undefined', () => {
-    (useFirebaseAuth as jest.Mock<any, any>).mockReturnValue({});
+    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({});
     const { result } = renderHook(() => useMagicLink());
 
     expect(result.current.status).toBeUndefined();
   });
 
   test('should request to verify email', async () => {
-    (useFirebaseAuth as jest.Mock<any, any>).mockReturnValue({
+    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
       emailForSignIn: 'matt@acme.blockchain',
-      validateMagicLink: jest.fn().mockReturnValueOnce(Promise.resolve({ id: '123' }))
+      validateMagicLink: vi.fn().mockReturnValueOnce(Promise.resolve({ id: '123' }))
     });
 
     const { result } = renderHook(() => useMagicLink());
@@ -48,9 +49,9 @@ describe.skip('useMagicLink()', () => {
   });
 
   test('should handle error from firebase', async () => {
-    (useFirebaseAuth as jest.Mock<any, any>).mockReturnValue({
+    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
       emailForSignIn: 'matt@acme.blockchain',
-      validateMagicLink: jest.fn(() => Promise.reject())
+      validateMagicLink: vi.fn(() => Promise.reject())
     });
 
     const { result } = renderHook(() => useMagicLink());
@@ -61,8 +62,8 @@ describe.skip('useMagicLink()', () => {
   });
 
   test('should request a magic link', async () => {
-    (useFirebaseAuth as jest.Mock<any, any>).mockReturnValue({
-      requestMagicLinkViaFirebase: jest.fn()
+    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
+      requestMagicLinkViaFirebase: vi.fn()
     });
 
     const { result } = renderHook(() => useMagicLink());

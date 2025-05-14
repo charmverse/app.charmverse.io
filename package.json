@@ -86,8 +86,8 @@
     "webapp:start:test:ci": "npx react-env --path .env.test.local --dest ./apps/webapp/public -- npm run start:test:ci -w=apps/webapp",
     "webapp:debug:e2e": "npm run debug:e2e -w=apps/webapp",
     "webapp:test:e2e:ci": "npm run test:e2e:ci -w=apps/webapp",
-    "webapp:test:browser": "dotenv -e .env.test.local -- npx vitest apps/webapp/components --globals --update --root apps/webapp",
-    "webapp:test:lib": "dotenv -e .env.test.local -- npx vitest apps/webapp/lib --globals --root apps/webapp"
+    "webapp:test:browser": "dotenv -e .env.test.local -- npx vitest --root apps/webapp --project=browser",
+    "webapp:test:lib": "dotenv -e .env.test.local -- npx vitest --root apps/webapp --project=lib"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
