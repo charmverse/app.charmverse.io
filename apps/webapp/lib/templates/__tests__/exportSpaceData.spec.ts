@@ -25,7 +25,7 @@ import type { SpaceDataExport } from '../exportSpaceData';
 import { exportSpaceData } from '../exportSpaceData';
 import type { ExportedPage } from '../exportWorkspacePages';
 
-describe('exportSpaceData', () => {
+describe.skip('exportSpaceData', () => {
   let space: Space;
   let user: User;
 

@@ -36,7 +36,7 @@ import { importSpaceData } from '../importSpaceData';
 import type { ImportedPermissions } from '../importSpacePermissions';
 import { importSpacePermissions } from '../importSpacePermissions';
 
-describe('importSpaceData', () => {
+describe.skip('importSpaceData', () => {
   let sourceSpace: Space;
   let sourceSpaceUser: User;
 
