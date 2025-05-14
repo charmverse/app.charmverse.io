@@ -7,9 +7,6 @@ import { isTruthy } from '@packages/utils/types';
 import { stringify } from 'csv-stringify/sync';
 import { sortBy } from 'lodash-es';
 
-import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
-import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
-
 import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
 import type { Card } from './card';
@@ -17,6 +14,8 @@ import { CardFilter } from './cardFilter';
 import { Constants } from './constants';
 import type { FilterGroup } from './filterGroup';
 import { getRelatedBlocks } from './getRelatedBlocks';
+import { OctoUtils } from './octoUtils';
+import type { Formatters, PropertyContext } from './octoUtils';
 import { getBlocks as getBlocksForProposalSource } from './proposalsSource/getBlocks';
 import { Utils } from './utils';
 import { blockToFBBlock } from './utils/blockUtils';

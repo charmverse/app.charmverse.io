@@ -1,6 +1,6 @@
 import * as http from '@packages/adapters/http';
-import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
 
+import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from './block';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from './utils/blockUtils';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;

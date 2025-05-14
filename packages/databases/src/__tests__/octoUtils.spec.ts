@@ -1,5 +1,4 @@
-import type { UIBlockWithDetails } from '@packages/databases/block';
-
+import type { UIBlockWithDetails } from '../block';
 import { OctoUtils } from '../octoUtils';
 import { TestBlockFactory } from '../test/testBlockFactory';
 

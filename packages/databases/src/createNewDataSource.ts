@@ -1,9 +1,9 @@
 import type { PageType } from '@charmverse/core/prisma';
-import mutator from '@packages/databases/mutator';
 
 import type { PagesContext } from 'hooks/usePages';
 
 import type { Board } from './board';
+import mutator from './mutator';
 import { createTableView } from './tableView';
 
 // to create a 'data source', this function just changes the board type to 'inline_board or 'linked_board' and adds a view to it

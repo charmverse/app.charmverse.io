@@ -16,7 +16,7 @@ Object.defineProperty(Constants, 'versionString', { value: '1.0.0' });
 vi.mock('@packages/databases/utils');
 vi.mock('@packages/databases/mutator');
 
-const mockedUtils = vi.mocked(Utils, { shallow: true });
+const mockedUtils = vi.mocked(Utils);
 mockedUtils.createGuid.mockReturnValue('test-id');
 describe('components/centerPanel', () => {
   const board = TestBlockFactory.createBoard();

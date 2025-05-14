@@ -4,6 +4,7 @@ import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';
 import { Constants } from '@packages/databases/constants';
+import { OctoUtils } from '@packages/databases/octoUtils';
 import { PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
 import { sortCards } from '@packages/databases/store/cards';
 import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
@@ -14,7 +15,6 @@ import { getProposals } from '@packages/lib/proposals/getProposals';
 import { formatDate, formatDateTime } from '@packages/lib/utils/dates';
 import { stringify } from 'csv-stringify/sync';
 
-import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { mapProposalToCard } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 

@@ -1,6 +1,7 @@
-import type { Board } from '@packages/databases/board';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+
+import type { Board } from '../board';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 

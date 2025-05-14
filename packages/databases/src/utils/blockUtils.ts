@@ -1,6 +1,7 @@
-import type { UIBlockWithDetails, BlockWithDetails } from '@packages/databases/block';
-import { OctoUtils } from '@packages/databases/octoUtils';
 import { replaceS3Domain } from '@packages/utils/url';
+
+import type { UIBlockWithDetails, BlockWithDetails } from '../block';
+import { OctoUtils } from '../octoUtils';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
