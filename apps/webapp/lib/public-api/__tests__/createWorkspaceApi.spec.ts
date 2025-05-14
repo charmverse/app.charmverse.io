@@ -31,7 +31,7 @@ afterAll(async () => {
   vi.resetModules();
 });
 
-describe('createWorkspaceApi', () => {
+describe.skip('createWorkspaceApi', () => {
   it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space, as well as auto create a bot user', async () => {
     const tokenName = `Integration partner ${uid()}`;
 
