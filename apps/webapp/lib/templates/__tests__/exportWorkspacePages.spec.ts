@@ -11,10 +11,11 @@ import {
   generateProposal,
   generateUserAndSpace
 } from '@packages/testing/setupDatabase';
+import { vi } from 'vitest';
 
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 
-jest.mock('node:fs/promises');
+vi.mock('node:fs/promises');
 
 let space: Space;
 let user: User;

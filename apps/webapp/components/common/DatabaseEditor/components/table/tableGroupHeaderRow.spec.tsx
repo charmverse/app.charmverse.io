@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
 import TableGroupHeaderRowElement from './tableGroupHeaderRow';

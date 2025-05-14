@@ -1,17 +1,17 @@
 import { Stack } from '@mui/material';
+import type { Board } from '@packages/databases/board';
+import { createSelectedPropertiesStateFromBoardProperties } from '@packages/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch } from '@packages/databases/store/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { Board } from '@packages/databases/board';
-import { createSelectedPropertiesStateFromBoardProperties } from '@packages/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
 
 import type { SelectedProposalProperties } from './interfaces';
 import { ProposalSourcePropertiesDialog } from './ProposalSourcePropertiesDialog';

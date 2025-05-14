@@ -1,7 +1,7 @@
-import { jest } from '@jest/globals';
 import { v4 } from 'uuid';
+import { vi } from 'vitest';
 
-jest.unstable_mockModule('@packages/utils/constants', () => ({
+vi.mock('@packages/utils/constants', () => ({
   authSecret: 'testsecret1234567890'
 }));
 

@@ -1,9 +1,9 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
-
-import type { CreateCommentInput, UpdateCommentInput } from '@packages/lib/comments';
 import type { FilterGroup } from '@packages/databases/filterGroup';
+import type { CreateCommentInput, UpdateCommentInput } from '@packages/lib/comments';
+
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';

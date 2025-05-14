@@ -18,6 +18,12 @@ import type { TabProps } from '@mui/material/Tab';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
+import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { BoardView, IViewType } from '@packages/databases/boardView';
+import { formatViewTitle, createBoardView } from '@packages/databases/boardView';
+import mutator from '@packages/databases/mutator';
+import { publishIncrementalUpdate } from '@packages/databases/publisher';
+import { Utils } from '@packages/databases/utils';
 import { capitalize } from '@packages/utils/strings';
 import { isTruthy } from '@packages/utils/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -32,14 +38,8 @@ import { injectIntl } from 'react-intl';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
-import type { BoardView, IViewType } from '@packages/databases/boardView';
-import { formatViewTitle, createBoardView } from '@packages/databases/boardView';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
-import { publishIncrementalUpdate } from '../../publisher';
-import { Utils } from '../../utils';
 import AddViewMenu from '../addViewMenu';
 import { iconForViewType } from '../viewMenu';
 

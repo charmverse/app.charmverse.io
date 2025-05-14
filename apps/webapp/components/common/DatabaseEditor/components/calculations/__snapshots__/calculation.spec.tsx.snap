@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/calculations/Calculation should match snapshot - count 1`] = `
+exports[`components/calculations/Calculation > should match snapshot - count 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Calculation count fooClass  hovered"
@@ -25,10 +25,10 @@ exports[`components/calculations/Calculation should match snapshot - count 1`] =
 </div>
 `;
 
-exports[`components/calculations/Calculation should match snapshot - countUniqueValue 1`] = `
+exports[`components/calculations/Calculation > should match snapshot - countUniqueValue 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Calculation countUniqueValue fooClass  hovered"
@@ -50,10 +50,10 @@ exports[`components/calculations/Calculation should match snapshot - countUnique
 </div>
 `;
 
-exports[`components/calculations/Calculation should match snapshot - countValue 1`] = `
+exports[`components/calculations/Calculation > should match snapshot - countValue 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Calculation countValue fooClass  hovered"
@@ -75,10 +75,10 @@ exports[`components/calculations/Calculation should match snapshot - countValue 
 </div>
 `;
 
-exports[`components/calculations/Calculation should match snapshot - none 1`] = `
+exports[`components/calculations/Calculation > should match snapshot - none 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Calculation none fooClass  hovered"

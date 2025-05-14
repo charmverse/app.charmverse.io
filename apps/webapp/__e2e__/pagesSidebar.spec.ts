@@ -1,5 +1,5 @@
-import { expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
+import { expect } from '@playwright/test';
 
 import { test } from './testWithFixtures';
 import { generateUserAndSpace } from './utils/mocks';

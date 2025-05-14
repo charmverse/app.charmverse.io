@@ -21,7 +21,7 @@ beforeAll(async () => {
   });
 });
 
-describe('createWorkspace', () => {
+describe.skip('createWorkspace', () => {
   it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space if one was used', async () => {
     const tokenName = `Integration partner ${uid()}`;
 

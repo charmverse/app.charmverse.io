@@ -1,15 +1,15 @@
 import { v4 } from 'uuid';
 
 import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
-import { Utils } from 'components/common/DatabaseEditor/utils';
 
 import type { IPropertyTemplate } from '../board';
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import { createFilterClause } from '../filterClause';
 import { createFilterGroup } from '../filterGroup';
+import { Utils } from '../utils';
 
-jest.mock('components/common/DatabaseEditor/utils');
+jest.mock('./utils');
 const mockedUtils = jest.mocked(Utils, { shallow: true });
 describe('src/cardFilter', () => {
   const board = TestBlockFactory.createBoard();

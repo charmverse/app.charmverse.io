@@ -1,7 +1,6 @@
-import { isTruthy } from '@packages/utils/types';
-
 import type { IPropertyTemplate } from '@packages/databases/board';
 import { Constants } from '@packages/databases/constants';
+import { isTruthy } from '@packages/utils/types';
 
 export function filterPropertyTemplates(visiblePropertyIds: string[], cardProperties: IPropertyTemplate[]) {
   const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };

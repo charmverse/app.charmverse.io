@@ -1,11 +1,13 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateDefaultPropertiesInput } from '@packages/lib/members/generateDefaultPropertiesInput';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { DuplicateDataError, InvalidInputError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { typedKeys } from '@packages/utils/types';
-import { generateDefaultPropertiesInput } from '@packages/lib/members/generateDefaultPropertiesInput';
 import { v4 } from 'uuid';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import type { UpdateableSpaceFields } from '../updateSpace';
 import { updateSpace } from '../updateSpace';
@@ -13,10 +15,10 @@ import { updateSpace } from '../updateSpace';
 let firstUser: User;
 let secondUser: User;
 
-let mockedMixpanelFn: jest.Mock;
+let mockedMixpanelFn: Mock;
 
-jest.mock('lib/snapshot/getSpace', () => ({
-  getSnapshotSpace: jest.fn().mockReturnValueOnce({})
+vi.mock('@packages/lib/snapshot/getSpace', () => ({
+  getSnapshotSpace: vi.fn().mockReturnValueOnce({})
 }));
 
 beforeAll(async () => {
@@ -35,8 +37,8 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  jest.unmock('@packages/metrics/mixpanel/updateTrackGroupProfile');
-  jest.resetModules();
+  vi.unmock('@packages/metrics/mixpanel/updateTrackGroupProfile');
+  vi.resetModules();
 });
 
 describe('updateSpace', () => {
@@ -248,11 +250,11 @@ describe('updateSpace', () => {
       }
     });
 
-    jest.resetModules();
+    vi.resetModules();
 
-    mockedMixpanelFn = jest.fn();
+    mockedMixpanelFn = vi.fn();
 
-    jest.mock('@packages/metrics/mixpanel/updateTrackGroupProfile', () => ({
+    vi.doMock('@packages/metrics/mixpanel/updateTrackGroupProfile', () => ({
       updateTrackGroupProfile: mockedMixpanelFn
     }));
 

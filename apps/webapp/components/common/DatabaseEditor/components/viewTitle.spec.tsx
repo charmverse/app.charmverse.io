@@ -1,24 +1,21 @@
-import '@testing-library/jest-dom';
-import { act, render, screen } from '@testing-library/react';
+import mutator from '@packages/databases/mutator';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
+import { Utils } from '@packages/databases/utils';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
+import { vi } from 'vitest';
 
-import mutator from '../mutator';
-import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapIntl } from '../testUtils';
-import { Utils } from '../utils';
 
 import ViewTitle from './viewTitle';
 
-jest.mock('../mutator');
-jest.mock('../utils');
+vi.mock('@packages/databases/mutator');
+vi.mock('@packages/databases/utils');
 
-jest.mock('next/router', () => ({
-  useRouter: () => ({ query: {} })
-}));
-
-const mockedMutator = jest.mocked(mutator, { shallow: true });
-const mockedUtils = jest.mocked(Utils, { shallow: true });
+const mockedMutator = vi.mocked(mutator);
+const mockedUtils = vi.mocked(Utils);
 mockedUtils.createGuid.mockReturnValue('test-id');
 
 beforeAll(() => {

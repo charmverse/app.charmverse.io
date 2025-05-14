@@ -6,6 +6,7 @@ import type { BlockWithDetails } from '@packages/databases/block';
 import { prismaToBlock, prismaToUIBlock } from '@packages/databases/block';
 import type { BoardFields } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
+import type { ServerBlockFields } from '@packages/databases/utils/blockUtils';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -22,8 +23,6 @@ import { isTruthy } from '@packages/utils/types';
 import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

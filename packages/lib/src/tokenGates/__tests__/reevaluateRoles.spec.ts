@@ -1,12 +1,13 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { assignRole } from '@packages/lib/roles';
+import { updateTokenGateRoles } from '@packages/lib/tokenGates/updateTokenGateRoles';
 import { generateRole, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateTokenGate } from '@packages/testing/utils/tokenGates';
 import { randomETHWallet } from '@packages/utils/blockchain';
-import { assignRole } from '@packages/lib/roles';
-import { updateTokenGateRoles } from '@packages/lib/tokenGates/updateTokenGateRoles';
+import { vi } from 'vitest';
 
-jest.mock('lib/tokenGates/validateTokenGateConditionWithDelegates', () => ({
-  validateTokenGateConditionWithDelegates: jest.fn().mockResolvedValue(true)
+vi.mock('../validateTokenGateConditionWithDelegates', () => ({
+  validateTokenGateConditionWithDelegates: vi.fn().mockResolvedValue(true)
 }));
 
 describe('reevaluateRoles', () => {

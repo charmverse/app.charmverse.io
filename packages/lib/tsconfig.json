@@ -10,6 +10,5 @@
   "paths": {
     "lib/*": ["./src/*"],
     "@packages/lib/*": ["./src/*"],
-  },
-  "exclude": ["jest.config.ts"]
+  }
 }

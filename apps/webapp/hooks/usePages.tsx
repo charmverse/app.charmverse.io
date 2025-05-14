@@ -1,6 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import type { UIBlockWithDetails } from '@packages/databases/block';
+import mutator from '@packages/databases/mutator';
 import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
@@ -9,7 +10,6 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import mutator from 'components/common/DatabaseEditor/mutator';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
 

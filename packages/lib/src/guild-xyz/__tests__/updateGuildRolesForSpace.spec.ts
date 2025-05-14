@@ -2,6 +2,7 @@ import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
+import { vi } from 'vitest';
 
 let user1: User;
 let user2: User;
@@ -124,7 +125,7 @@ it('Should correctly update guild roles for space', async () => {
       userId: user1.id
     }
   });
-  jest.mock('lib/guild-xyz/client', () => ({
+  vi.mock('lib/guild-xyz/client', () => ({
     user: {
       getMemberships: (address: string) => {
         if (address === wallet.address) {

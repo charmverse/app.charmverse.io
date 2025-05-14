@@ -46,7 +46,7 @@ export function renderTestEditor(
       // include bangle-editor-core to support prosemirror-tables fork
       attributes: { class: 'bangle-editor content bangle-editor-core' }
     };
-    const editor: BangleEditor = new BangleEditor(container, {
+    let editor: BangleEditor = new BangleEditor(container, {
       state: new BangleEditorState({
         specRegistry,
         plugins,

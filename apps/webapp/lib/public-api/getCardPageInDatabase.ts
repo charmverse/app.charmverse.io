@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 

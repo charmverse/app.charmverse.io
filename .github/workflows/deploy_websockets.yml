@@ -129,7 +129,7 @@ jobs:
       #     escape_paths: 'false'
 
       - name: Run tests
-        run: npm run sockets:test
+        run: npm run test:websockets
 
   upload-docker:
     name: Upload Docker image

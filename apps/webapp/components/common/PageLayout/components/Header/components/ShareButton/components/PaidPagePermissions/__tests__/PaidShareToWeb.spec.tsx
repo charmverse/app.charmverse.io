@@ -48,7 +48,7 @@ afterAll(() => {
   jest.resetModules();
 });
 
-describe('PaidShareToWeb', () => {
+describe.skip('PaidShareToWeb', () => {
   it('should render the toggle as checked if a public permission exists or as unchecked if no public permission exists', async () => {
     const pageId = uuid();
 

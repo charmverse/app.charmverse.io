@@ -1,12 +1,12 @@
+import type { BlockWithDetails } from '@packages/databases/block';
 import { getSubtree } from '@packages/databases/getSubtree';
+import type { ServerBlockFields } from '@packages/databases/utils/blockUtils';
+import { onError, onNoMatch } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BlockWithDetails } from '@packages/databases/block';
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 // TODO: frontend should tell us which space to use
-export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

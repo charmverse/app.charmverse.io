@@ -1,23 +1,22 @@
 import { Add } from '@mui/icons-material';
 import { Box, Typography } from '@mui/material';
-import type { Dispatch, ReactNode, SetStateAction } from 'react';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import { createBoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { useAppDispatch } from '@packages/databases/store/hooks';
+import { updateView } from '@packages/databases/store/views';
+import { Utils } from '@packages/databases/utils';
 import React, { useCallback, useEffect, memo, useRef } from 'react';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import { createBoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-
-import mutator from '../../mutator';
-import { useAppDispatch } from '../../store/hooks';
-import { updateView } from '../../store/views';
-import { Utils } from '../../utils';
 
 import CalculationRow from './calculation/calculationRow';
 import { TableGroups } from './tableGroups';

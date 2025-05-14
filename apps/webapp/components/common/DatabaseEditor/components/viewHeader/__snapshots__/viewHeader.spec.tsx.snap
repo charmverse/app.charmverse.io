@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
+exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="MuiStack-root css-1y52uev-MuiStack-root"
@@ -138,7 +138,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                style="font-size: 16px;"
+                style="color: var(--primary-color); font-size: 16px;"
                 viewBox="0 0 24 24"
                 width="1em"
                 xmlns="http://www.w3.org/2000/svg"
@@ -243,10 +243,10 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
 </div>
 `;
 
-exports[`components/viewHeader/viewHeader return viewHeader readonly 1`] = `
+exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="MuiStack-root css-1y52uev-MuiStack-root"

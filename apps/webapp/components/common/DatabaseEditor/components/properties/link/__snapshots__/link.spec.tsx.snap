@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/properties/link returns link properties correctly 1`] = `
+exports[`components/properties/link > returns link properties correctly 1`] = `
 <div>
   <div
     class="URLProperty property-link url"

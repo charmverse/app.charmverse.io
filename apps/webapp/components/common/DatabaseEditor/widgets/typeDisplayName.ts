@@ -1,8 +1,6 @@
-import type { IntlShape } from 'react-intl';
-
 import type { PropertyType } from '@packages/databases/board';
-
-import { Utils } from '../utils';
+import { Utils } from '@packages/databases/utils';
+import type { IntlShape } from 'react-intl';
 
 export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
   switch (type) {

@@ -1,33 +1,22 @@
+import { Constants } from '@packages/databases/constants';
+import type { RootState } from '@packages/databases/store/index';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
+import { Utils } from '@packages/databases/utils';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as ReduxProvider } from 'react-redux';
+import { vi } from 'vitest';
 
-import { Constants } from '@packages/databases/constants';
-
-import type { RootState } from '../store';
-import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
-import { Utils } from '../utils';
 
 import CenterPanel from './centerPanel';
 
 Object.defineProperty(Constants, 'versionString', { value: '1.0.0' });
 
-jest.mock('../utils');
-jest.mock('../mutator');
+vi.mock('@packages/databases/utils');
+vi.mock('@packages/databases/mutator');
 
-jest.mock('next/router', () => ({
-  useRouter: () => ({
-    asPath: '/test-space',
-    pathname: '/[domain]/',
-    query: {
-      domain: 'test-space'
-    },
-    isReady: true
-  })
-}));
-
-const mockedUtils = jest.mocked(Utils, { shallow: true });
+const mockedUtils = vi.mocked(Utils);
 mockedUtils.createGuid.mockReturnValue('test-id');
 describe('components/centerPanel', () => {
   const board = TestBlockFactory.createBoard();
@@ -82,7 +71,7 @@ describe('components/centerPanel', () => {
   });
   beforeEach(() => {
     activeView.fields.viewType = 'board';
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
   test('should match snapshot for Kanban', () => {
     const { container } = render(
@@ -90,13 +79,13 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            showView={jest.fn()}
+            showView={vi.fn()}
             setPage={() => {}}
             views={[activeView]}
             board={board}
             activeView={activeView}
             readOnly={false}
-            showCard={jest.fn()}
+            showCard={vi.fn()}
           />
         </ReduxProvider>
       )
@@ -110,13 +99,13 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            showView={jest.fn()}
+            showView={vi.fn()}
             setPage={() => {}}
             views={[activeView]}
             board={board}
             activeView={activeView}
             readOnly={false}
-            showCard={jest.fn()}
+            showCard={vi.fn()}
           />
         </ReduxProvider>
       )
@@ -130,13 +119,13 @@ describe('components/centerPanel', () => {
         <ReduxProvider store={store}>
           <CenterPanel
             currentRootPageId={board.id}
-            showView={jest.fn()}
+            showView={vi.fn()}
             setPage={() => {}}
             views={[activeView]}
             board={board}
             activeView={activeView}
             readOnly={false}
-            showCard={jest.fn()}
+            showCard={vi.fn()}
           />
         </ReduxProvider>
       )
@@ -146,13 +135,13 @@ describe('components/centerPanel', () => {
   describe('return centerPanel and', () => {
     test('click on card to show card', () => {
       activeView.fields.viewType = 'board';
-      const mockedShowCard = jest.fn();
+      const mockedShowCard = vi.fn();
       const { container } = render(
         wrapDNDIntl(
           <ReduxProvider store={store}>
             <CenterPanel
               currentRootPageId={board.id}
-              showView={jest.fn()}
+              showView={vi.fn()}
               setPage={() => {}}
               views={[activeView]}
               board={board}

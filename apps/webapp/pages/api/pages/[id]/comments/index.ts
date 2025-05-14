@@ -7,12 +7,12 @@ import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@packages/lib/webhookPublisher/publishEvent';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { createPageComment } from '@packages/pages/comments/createPageComment';
+import { PageNotFoundError } from '@packages/pages/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import { listPageComments } from 'lib/pages/comments/listPageComments';
-import { PageNotFoundError } from 'lib/pages/server';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

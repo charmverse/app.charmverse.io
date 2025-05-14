@@ -1,15 +1,14 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup, Typography } from '@mui/material';
+import type { Card } from '@packages/databases/card';
+import { makeSelectBoardTemplates } from '@packages/databases/store/cards';
+import { useAppSelector } from '@packages/databases/store/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { memo, useRef, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import type { Card } from '@packages/databases/card';
-
-import { makeSelectBoardTemplates } from '../../store/cards';
-import { useAppSelector } from '../../store/hooks';
 
 type Props = {
   addCard: () => void;

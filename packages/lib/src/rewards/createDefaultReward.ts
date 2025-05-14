@@ -1,7 +1,6 @@
+import { MAX_EMBED_WIDTH } from '@packages/bangleeditor/components/iframe/constants';
 import { VIDEO_ASPECT_RATIO } from '@packages/bangleeditor/components/video/videoSpec';
 import { Constants } from '@packages/databases/constants';
-
-import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/constants';
 
 import {
   REWARDS_APPLICANTS_BLOCK_ID,

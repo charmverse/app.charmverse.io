@@ -1,5 +1,9 @@
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Stack, Tooltip } from '@mui/material';
+import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { mutator } from '@packages/databases/mutator';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
@@ -7,11 +11,7 @@ import React from 'react';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import Link from 'components/common/Link';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
 
-import { mutator } from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 import { ViewFilterControl } from '../ViewFilterControl';

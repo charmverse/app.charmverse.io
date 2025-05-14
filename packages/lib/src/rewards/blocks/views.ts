@@ -11,8 +11,6 @@ import {
 import type { RewardType } from '@packages/lib/rewards/interfaces';
 import { v4 as uuid } from 'uuid';
 
-import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   CREATED_AT_ID,
@@ -26,6 +24,7 @@ import {
   REWARD_APPLICANTS_COUNT,
   APPLICANT_STATUS_BLOCK_ID
 } from './constants';
+import { getDefaultRewardProperties } from './getDefaultRewardProperties';
 
 export const defaultRewardViews = [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_VIEW_BLOCK_ID];
 

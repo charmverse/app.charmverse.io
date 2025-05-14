@@ -1,9 +1,8 @@
 import { Box } from '@mui/material';
-
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
 
-import mutator from '../../../../mutator';
 import DateRange from '../../../properties/dateRange/dateRange';
 
 import { PropertyMenu } from './PropertyMenu';

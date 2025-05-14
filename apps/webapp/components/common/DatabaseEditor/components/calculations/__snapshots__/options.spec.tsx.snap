@@ -1,19 +1,19 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/calculations/Options should match snapshot 1`] = `
+exports[`components/calculations/Options > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   />
 </div>
 `;
 
-exports[`components/calculations/Options should match snapshot menu open 1`] = `
+exports[`components/calculations/Options > should match snapshot menu open 1`] = `
 <div
   aria-hidden="true"
 >
   <span
-    class="variable variable"
+    class="mocked mocked"
   />
 </div>
 `;

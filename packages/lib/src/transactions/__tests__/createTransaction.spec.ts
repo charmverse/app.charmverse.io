@@ -1,16 +1,18 @@
 import type { Application, Bounty, Space, User } from '@charmverse/core/prisma';
-import { ExpectedAnError } from '@packages/testing/errors';
-import { generateBounty, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
-import { DataNotFoundError } from '@packages/utils/errors';
 import { refreshPaymentStatus } from '@packages/lib/rewards/refreshPaymentStatus';
 import { work } from '@packages/lib/rewards/work';
 import { createTransaction } from '@packages/lib/transactions/createTransaction';
+import { ExpectedAnError } from '@packages/testing/errors';
+import { generateBounty, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
+import { DataNotFoundError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
-jest.mock('lib/rewards/refreshPaymentStatus', () => ({
-  refreshPaymentStatus: jest.fn()
+vi.mock('../../rewards/refreshPaymentStatus', () => ({
+  refreshPaymentStatus: vi.fn()
 }));
-const mockedRefreshPaymentStatus: jest.Mocked<typeof refreshPaymentStatus> = refreshPaymentStatus;
+const mockedRefreshPaymentStatus = vi.mocked(refreshPaymentStatus);
 
 let user: User;
 let space: Space;

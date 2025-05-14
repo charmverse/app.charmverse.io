@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { PageNotFoundError } from 'lib/pages/server';
+import { PageNotFoundError } from '@packages/pages/errors';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { GettingStartedPage } from 'seedData/gettingStartedPage';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';

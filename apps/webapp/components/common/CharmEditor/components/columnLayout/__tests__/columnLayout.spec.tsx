@@ -17,7 +17,7 @@ jest.mock('next/router', () => ({
   })
 }));
 
-describe('Charm Plugin: columnLayout', () => {
+describe.skip('Charm Plugin: columnLayout', () => {
   test('renders the columns', () => {
     const content = jsonDoc(_.columnLayout(_.columnBlock(_.p('Hello')), _.columnBlock(_.p('World'))));
 

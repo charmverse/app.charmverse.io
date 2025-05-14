@@ -8,5 +8,5 @@
       "components/*": ["../../components/*"]
     }
   },
-  "exclude": ["jest.config.ts", "esbuild.config.ts"]
+  "exclude": ["esbuild.config.ts"]
 }

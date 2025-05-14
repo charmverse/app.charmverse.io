@@ -1,4 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import type { RootState } from '@packages/databases/store';
+import { createTableView } from '@packages/databases/tableView';
 import { createMockBoard, createMockCard } from '@packages/testing/mocks/block';
 import { createMockPage } from '@packages/testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from '@packages/testing/publicApi/schemas';
@@ -8,10 +11,7 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
 import Table from 'components/common/DatabaseEditor/components/table/table';
-import type { RootState } from 'components/common/DatabaseEditor/store';
 import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import { createTableView } from '@packages/databases/tableView';
 
 export default {
   title: 'Databases/Composites',
