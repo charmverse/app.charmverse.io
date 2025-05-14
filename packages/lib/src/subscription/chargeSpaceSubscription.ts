@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
+import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
 export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint> = {
@@ -14,6 +15,7 @@ export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint>
 };
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
+  const startOfMonth = DateTime.now().startOf('month');
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -36,7 +38,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     await prisma.space.update({
       where: { id: spaceId },
       data: {
-        subscriptionTier: 'free'
+        subscriptionTier: 'readonly'
       }
     });
     log.warn(`Insufficient space token balance, space downgraded to free tier`, {
@@ -48,7 +50,10 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     await prisma.spaceSubscriptionPayment.create({
       data: {
         paidTokenAmount: subscriptionTierAmount.toString(),
-        spaceId
+        spaceId,
+        subscriptionTier,
+        subscriptionPeriodStart: startOfMonth.toJSDate(),
+        subscriptionPrice: subscriptionTierAmount.toString()
       }
     });
   }

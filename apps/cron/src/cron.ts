@@ -48,6 +48,8 @@ cron.schedule('0 * * * *', archiveTask);
 // Send notification to draft proposal authors once an hour
 cron.schedule('0 * * * *', sendDraftProposalNotificationTask);
 
+cron.schedule('0 * * * *', chargeSpacesSubscriptionTask);
+
 // Index pending gnosis safe credentials every 30 minutes
 cron.schedule('*/30 * * * *', indexPendingCredentialsTask);
 
@@ -82,9 +84,6 @@ cron.schedule('0 * * * *', storeOptimismProjectAttestations);
 
 // Send proposal evaluation notifications every hour
 cron.schedule('0 * * * *', () => sendProposalEvaluationNotifications());
-
-// once every month
-cron.schedule('0 0 1 * *', chargeSpacesSubscriptionTask);
 
 const port = process.env.PORT || 4000;
 
