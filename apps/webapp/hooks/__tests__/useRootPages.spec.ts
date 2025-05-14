@@ -1,6 +1,7 @@
 import { createMockPage } from '@packages/testing/mocks/page';
 import { renderHook } from '@testing-library/react';
 import { v4 as uuid } from 'uuid';
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
 
 import { usePages } from 'hooks/usePages';
@@ -23,7 +24,7 @@ describe('useRootPages', () => {
       [uuid()]: createMockPage({ id: sortedIds[1], index: 3 }),
       [uuid()]: createMockPage({ id: sortedIds[0], index: 1 })
     };
-    (usePages as vi.Mock<any, any>).mockReturnValue({
+    (usePages as Mock).mockReturnValue({
       pages
     });
     const { result } = renderHook(() => useRootPages());

@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { act } from 'react';
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
 
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
@@ -28,14 +29,14 @@ describe.skip('useMagicLink()', () => {
   });
 
   test('initial status is undefined', () => {
-    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({});
+    (useFirebaseAuth as Mock).mockReturnValue({});
     const { result } = renderHook(() => useMagicLink());
 
     expect(result.current.status).toBeUndefined();
   });
 
   test('should request to verify email', async () => {
-    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
+    (useFirebaseAuth as Mock).mockReturnValue({
       emailForSignIn: 'matt@acme.blockchain',
       validateMagicLink: vi.fn().mockReturnValueOnce(Promise.resolve({ id: '123' }))
     });
@@ -49,7 +50,7 @@ describe.skip('useMagicLink()', () => {
   });
 
   test('should handle error from firebase', async () => {
-    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
+    (useFirebaseAuth as Mock).mockReturnValue({
       emailForSignIn: 'matt@acme.blockchain',
       validateMagicLink: vi.fn(() => Promise.reject())
     });
@@ -62,7 +63,7 @@ describe.skip('useMagicLink()', () => {
   });
 
   test('should request a magic link', async () => {
-    (useFirebaseAuth as vi.Mock<any, any>).mockReturnValue({
+    (useFirebaseAuth as Mock).mockReturnValue({
       requestMagicLinkViaFirebase: vi.fn()
     });
 

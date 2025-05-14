@@ -27,18 +27,18 @@ vi.mock('next/font/local', () => ({
 
 // Mock external requests globally
 
-vi.mock('@packages/blockchain/getENSName', () => ({
-  ...vi.requireActual('@packages/blockchain/getENSName'),
+vi.mock('@packages/blockchain/getENSName', async () => ({
+  ...(await vi.importActual('@packages/blockchain/getENSName')),
   __esModule: true,
   getENSName: vi.fn().mockImplementation(() => Promise.resolve(null)),
   getENSDetails: vi.fn().mockImplementation(() => Promise.resolve(null)),
   resolveENSName: vi.fn().mockImplementation(() => Promise.resolve(null))
 }));
 
-vi.mock('lib/blockchain/provider/alchemy/client', () => ({
-  ...vi.requireActual('lib/blockchain/provider/alchemy/client'),
+vi.mock('lib/blockchain/provider/alchemy/client', async () => ({
+  ...(await vi.importActual('lib/blockchain/provider/alchemy/client')),
   __esModule: true,
-  getNFTs: jest.fn().mockImplementation(() => Promise.resolve([]))
+  getNFTs: vi.fn().mockImplementation(() => Promise.resolve([]))
 }));
 
 // fix dynamic imports in next.js 13: https://github.com/vercel/next.js/issues/41725

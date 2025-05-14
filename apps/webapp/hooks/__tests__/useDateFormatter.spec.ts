@@ -1,5 +1,6 @@
 import { normalizeWhitespace } from '@packages/testing/normalizeWhitespace';
 import { renderHook } from '@testing-library/react';
+import type { Mock } from 'vitest';
 import { vi } from 'vitest';
 
 import { useDateFormatter } from 'hooks/useDateFormatter';
@@ -15,7 +16,7 @@ describe('useDateFormatter', () => {
   });
 
   test('should format date and time according to locale from user preferences', () => {
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-US' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-US' } });
     const { result, rerender } = renderHook(() => useDateFormatter());
     const testDate = '2023-02-08T07:59:48.698Z';
     const testDate2 = '2023-02-28T17:59:48.698Z';
@@ -23,7 +24,7 @@ describe('useDateFormatter', () => {
     expect(normalizeWhitespace(result.current.formatDateTime(testDate))).toEqual('2/8/23, 7:59 AM');
     expect(normalizeWhitespace(result.current.formatDateTime(testDate2))).toEqual('2/28/23, 5:59 PM');
 
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
     rerender();
 
     expect(normalizeWhitespace(result.current.formatDateTime(testDate))).toEqual('08/02/2023, 07:59');
@@ -31,7 +32,7 @@ describe('useDateFormatter', () => {
   });
 
   test('should format date in user friendly format using locale from user preferences', () => {
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-US' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-US' } });
     const currentYear = new Date().getFullYear();
     const { result, rerender } = renderHook(() => useDateFormatter());
     const testDate = `${currentYear}-02-08T07:59:48.698Z`;
@@ -46,7 +47,7 @@ describe('useDateFormatter', () => {
     expect(normalizeWhitespace(result.current.formatDate(testDatePastYear))).toEqual('Mar 8, 2020');
     expect(normalizeWhitespace(result.current.formatDate(testDatePastYear, { withYear: false }))).toEqual('Mar 8');
 
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
     rerender();
 
     expect(normalizeWhitespace(result.current.formatDate(testDate))).toEqual('8 Feb');
@@ -59,7 +60,7 @@ describe('useDateFormatter', () => {
   });
 
   test('should format time using locale from user preferences', () => {
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-US' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-US' } });
     const { result, rerender } = renderHook(() => useDateFormatter());
     const testDate = '2023-02-08T07:59:48.698Z';
     const testDate2 = '2023-02-28T17:59:48.698Z';
@@ -67,7 +68,7 @@ describe('useDateFormatter', () => {
     expect(normalizeWhitespace(result.current.formatTime(testDate))).toEqual('7:59 AM');
     expect(normalizeWhitespace(result.current.formatTime(testDate2))).toEqual('5:59 PM');
 
-    (useUserPreferences as vi.Mock<any, any>).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
+    (useUserPreferences as Mock).mockReturnValue({ userPreferences: { locale: 'en-GB' } });
     rerender();
 
     expect(normalizeWhitespace(result.current.formatTime(testDate))).toEqual('07:59');
