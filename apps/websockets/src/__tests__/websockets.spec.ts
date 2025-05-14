@@ -61,18 +61,20 @@ describe('Web Socket server', () => {
     expect(response.text).toEqual(expect.stringContaining('0{"sid":'));
   });
 
-  test('should communicate', (done) => {
+  test('should communicate', async () => {
     client.on('connection', (socket) => {
       expect(socket).toBeDefined();
     });
 
-    client.once('echo', (message) => {
-      // Check that the message matches
-      expect(message).toBe('Hello World');
-      done();
-    });
+    await new Promise((resolve) => {
+      client.once('echo', (message) => {
+        // Check that the message matches
+        expect(message).toBe('Hello World');
+        resolve(undefined);
+      });
 
-    // once connected, emit Hello World
-    socketServer.emit('echo', 'Hello World');
+      // once connected, emit Hello World
+      socketServer.emit('echo', 'Hello World');
+    });
   });
 });
