@@ -1,6 +1,8 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { CreateSpaceContributionRequest } from '@packages/spaces/createSpaceContribution';
+import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
@@ -118,5 +120,17 @@ export class SpacesApi {
     payload: UpdateGithubRepoWithReward;
   }) {
     return http.PUT<RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
+  }
+
+  createSpaceContribution(spaceId: string, payload: CreateSpaceContributionRequest) {
+    return http.POST(`/api/spaces/${spaceId}/space-contribution`, payload);
+  }
+
+  getSpaceContributions(spaceId: string) {
+    return http.GET<SpaceReceipt[]>(`/api/spaces/${spaceId}/space-contribution`);
+  }
+
+  getSpaceTokenBalance(spaceId: string) {
+    return http.GET<number>(`/api/spaces/${spaceId}/space-token-balance`);
   }
 }

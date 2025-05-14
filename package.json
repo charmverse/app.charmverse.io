@@ -160,6 +160,7 @@
     "@octokit/auth-oauth-app": "^8.1.0",
     "@octokit/rest": "^21.0.2",
     "@popperjs/core": "^2.11.8",
+    "@rainbow-me/rainbowkit": "^2.2.4",
     "@react-dnd/shallowequal": "^4.0.0",
     "@react-email/column": "^0.0.12",
     "@react-email/container": "^0.0.14",

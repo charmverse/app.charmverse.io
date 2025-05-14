@@ -3,32 +3,23 @@ import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CloseIcon from '@mui/icons-material/Close';
 import { Divider, Drawer, Grid, IconButton, InputLabel, Stack, TextField, Typography } from '@mui/material';
+import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
+import { communityProduct, loopCheckoutUrl } from '@packages/lib/subscription/constants';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import type { FormEvent, SyntheticEvent } from 'react';
+import type { FormEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Iframe from 'react-iframe';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import Link from 'components/common/Link';
-import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
-import { communityProduct, loopCheckoutUrl } from '@packages/lib/subscription/constants';
-import type {
-  CreateCryptoSubscriptionRequest,
-  CreateProSubscriptionRequest,
-  SubscriptionPaymentIntent
-} from '@packages/lib/subscription/interfaces';
 
 import { CardSection } from './CardSection';
 import { OrderSummary } from './OrderSummary';
-import type { PaymentType } from './PaymentTabs';
-import PaymentTabs, { PaymentTabPanel } from './PaymentTabs';
 
 const schema = yup
   .object({
@@ -79,32 +70,11 @@ export function CheckoutForm({
   const emailField = watch('email');
   useTrackPageView({ type: 'billing/checkout' });
 
-  const [paymentType, setPaymentType] = useState<PaymentType>('card');
   const [cryptoDrawerOpen, setCryptoDrawerOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [cardDisabled, setCardDisabled] = useState(true);
 
   const { showMessage } = useSnackbar();
-
-  const {
-    data: checkoutUrl,
-    trigger: createCryptoSubscription,
-    isMutating: isLoadingCreateSubscriptionIntent
-  } = useSWRMutation(
-    `/api/spaces/${space?.id}/crypto-subscription`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateCryptoSubscriptionRequest } }>) =>
-      charmClient.subscription.createCryptoSubscription(arg.spaceId, arg.payload),
-    {
-      onError(error) {
-        showMessage('Payment failed! Please try again', 'error');
-        log.error(`[stripe]: Payment failed. ${error.message}`, {
-          errorType: error.type,
-          errorCode: error.code
-        });
-        setCryptoDrawerOpen(false);
-      }
-    }
-  );
 
   const {
     trigger: validateCoupon,
@@ -130,12 +100,6 @@ export function CheckoutForm({
       spaceId: space.id,
       payload: { coupon: coupon ?? '' }
     });
-  };
-
-  const changePaymentType = (_event: SyntheticEvent, newValue: PaymentType) => {
-    if (newValue !== null) {
-      setPaymentType(newValue);
-    }
   };
 
   useEffect(() => {
@@ -235,24 +199,6 @@ export function CheckoutForm({
     setIsProcessing(false);
   };
 
-  const startCryptoPayment = async () => {
-    if (!emailField || !!errors.coupon || !!errors.email) {
-      return;
-    }
-
-    setCryptoDrawerOpen(true);
-    await createCryptoSubscription({
-      spaceId: space.id,
-      payload: {
-        billingEmail: emailField,
-        coupon: couponData?.code || undefined,
-        blockQuota,
-        period,
-        name: space.name
-      }
-    });
-  };
-
   const handleCardDetails = (disabled: boolean) => {
     setCardDisabled(disabled);
   };
@@ -267,14 +213,13 @@ export function CheckoutForm({
     !elements ||
     isValidationLoading ||
     isProcessing ||
-    (paymentType === 'card' ? cardDisabled : false);
+    cardDisabled;
 
   return (
     <>
       <Divider sx={{ mb: 1 }} />
       <Grid container gap={2} sx={{ flexWrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={8} onSubmit={createSubscription}>
-          <PaymentTabs value={paymentType} onChange={changePaymentType} />
           <Stack gap={0.5} mt={2}>
             <InputLabel sx={{ color: (theme) => theme.palette.text.primary }}>Email (required)</InputLabel>
             <TextField
@@ -289,33 +234,7 @@ export function CheckoutForm({
               }}
             />
           </Stack>
-          <PaymentTabPanel value={paymentType} index='card'>
-            <CardSection disabled={isProcessing} handleCardDetails={handleCardDetails} />
-          </PaymentTabPanel>
-          <PaymentTabPanel value={paymentType} index='crypto'>
-            <Typography mb={1}>
-              We accept crypto payments through our partner{' '}
-              <Link href='https://www.loopcrypto.xyz' external target='_blank'>
-                Loop
-              </Link>
-              . After you click Upgrade a popup will appear with instructions on finishing your payment.
-            </Typography>
-            <Typography mb={1}>
-              The suggested allowance for your subscription is {price * blockQuota * (period === 'annual' ? 12 : 1)}{' '}
-              USDC. Learn more how it works{' '}
-              <Link href='https://www.loopcrypto.xyz/frequently-asked-questions' external target='_blank'>
-                here
-              </Link>
-              .
-            </Typography>
-            <Typography mb={1}>
-              Paying with Safe multisig?{' '}
-              <Link href='https://www.charmverse.io/faq' external target='_blank'>
-                See FAQs, under Payments
-              </Link>
-              .
-            </Typography>
-          </PaymentTabPanel>
+          <CardSection disabled={isProcessing} handleCardDetails={handleCardDetails} />
         </Grid>
         <Grid item xs={12} sm={4}>
           <OrderSummary
@@ -325,7 +244,7 @@ export function CheckoutForm({
             period={period}
             isLoading={isProcessing}
             disabledButton={disableUpgradeButton}
-            handleCheckout={paymentType === 'card' ? createSubscription : startCryptoPayment}
+            handleCheckout={createSubscription}
             handleCancelCheckout={onCloseCheckout}
           >
             <Typography>Coupon code</Typography>
@@ -367,8 +286,6 @@ export function CheckoutForm({
         >
           <CloseIcon fontSize='small' />
         </IconButton>
-        {checkoutUrl && <Iframe loading='lazy' url={checkoutUrl} position='relative' width='100%' height='100%' />}
-        <LoadingComponent height='100%' isLoading={isLoadingCreateSubscriptionIntent} />
       </Drawer>
     </>
   );

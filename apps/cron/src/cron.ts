@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 // import { relay } from '@packages/websockets/relay';
 
 import app from './healthCheck/app';
+import { task as chargeSpacesSubscriptionTask } from './tasks/chargeSpacesSubscription';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
@@ -46,6 +47,8 @@ cron.schedule('0 * * * *', archiveTask);
 
 // Send notification to draft proposal authors once an hour
 cron.schedule('0 * * * *', sendDraftProposalNotificationTask);
+
+cron.schedule('0 * * * *', chargeSpacesSubscriptionTask);
 
 // Index pending gnosis safe credentials every 30 minutes
 cron.schedule('*/30 * * * *', indexPendingCredentialsTask);

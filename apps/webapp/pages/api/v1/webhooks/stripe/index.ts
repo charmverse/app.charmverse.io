@@ -25,7 +25,7 @@ function buffer(req: NextApiRequest) {
     });
 
     req.on('end', () => {
-      resolve(Buffer.concat(chunks));
+      resolve(Buffer.concat(chunks as any));
     });
 
     req.on('error', reject);
@@ -300,29 +300,11 @@ export async function stripePayment(req: NextApiRequest, res: NextApiResponse): 
         const spaceId = stripeSubscription.metadata.spaceId;
         const subscriptionData: Stripe.InvoiceLineItem | undefined = invoice.lines.data[0];
         const priceId = subscriptionData?.price?.id;
-        const email = (stripeSubscription.customer as Stripe.Customer)?.email as string | undefined | null;
-        const encodedEmail = email ? `&email=${encodeURIComponent(email)}` : '';
 
         if (!stripeSubscription.metadata.loopCheckout && priceId) {
-          const loopItems = await getLoopProducts();
-          const loopItem = loopItems.find((product) => product.externalId === priceId);
-
-          if (!loopItem) {
-            log.warn(
-              `Loop item was not found in order to create a loop url checkout in stripe for the price ${priceId}`,
-              { spaceId }
-            );
-            break;
-          }
-
-          const loopUrl = loopItem.url
-            ? `${loopItem.url}?cartEnabled=false${encodedEmail}&sub=${subscriptionId}`
-            : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?&cartEnabled=false${encodedEmail}&sub=${subscriptionId}`;
-
           await stripeClient.subscriptions.update(subscriptionId, {
             metadata: {
-              ...(stripeSubscription.metadata || {}),
-              loopCheckout: loopUrl
+              ...(stripeSubscription.metadata || {})
             }
           });
 

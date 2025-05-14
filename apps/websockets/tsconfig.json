@@ -4,10 +4,6 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@root/adapters/*": ["../../adapters/*"],
-      "@root/config/*": ["../../config/*"],
-      "@root/lib/*": ["../../lib/*"],
-      "@root/abis/*": ["../../abis/*"],
       "lib/*": ["../../lib/*"],
       "components/*": ["../../components/*"]
     }
