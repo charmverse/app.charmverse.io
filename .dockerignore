@@ -12,5 +12,4 @@ cdk.json
 docker-compose.yml
 Dockerfile
 files_to_zip.txt
-jest.config*
-jest.setup*
+vite.*

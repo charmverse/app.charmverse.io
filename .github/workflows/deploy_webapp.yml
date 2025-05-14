@@ -121,9 +121,9 @@ jobs:
           # - test_name: 'Server integration tests #2'
           #   test_command: 'npm run webapp:start:test:ci & npm run test:server:ci -w apps/webapp -- --shard 2/2'
           - test_name: 'Browser tests'
-            test_command: 'npm run webapp:test:browser'
+            test_command: 'npm run test:browser'
           - test_name: 'Webapp lib tests'
-            test_command: 'npm run webapp:test:lib'
+            test_command: 'npm run test:lib'
 
     steps:
       - uses: actions/checkout@v4

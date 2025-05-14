@@ -1,10 +1,10 @@
 import { from } from '@apollo/client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { jest } from '@jest/globals';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { shortWalletAddress } from '@packages/utils/blockchain';
+import { vi } from 'vitest';
 
-jest.unstable_mockModule('@packages/blockchain/getENSName', () => {
+vi.mock('@packages/blockchain/getENSName', () => {
   return {
     getENSName: (address: string) => {
       if (address.match('include')) {
@@ -26,7 +26,7 @@ jest.unstable_mockModule('@packages/blockchain/getENSName', () => {
   };
 });
 
-jest.unstable_mockModule('@packages/lib/blockchain/getNFTs', () => {
+vi.mock('@packages/lib/blockchain/getNFTs', () => {
   return {
     getNFT: (input: { wallets: any[] }) => {
       return null;
@@ -40,15 +40,15 @@ jest.unstable_mockModule('@packages/lib/blockchain/getNFTs', () => {
   };
 });
 
-jest.unstable_mockModule('@packages/metrics/mixpanel/trackUserAction', () => ({
-  trackUserAction: jest.fn()
+vi.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
+  trackUserAction: vi.fn()
 }));
 
 const { trackUserAction } = await import('@packages/metrics/mixpanel/trackUserAction');
 const { createOrGetUserFromWallet } = await import('../createUser');
 
 afterAll(async () => {
-  jest.resetModules();
+  vi.resetModules();
 });
 
 describe('createOrGetUserFromWallet', () => {
