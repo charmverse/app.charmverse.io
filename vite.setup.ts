@@ -35,10 +35,10 @@ vi.mock('@packages/blockchain/getENSName', async () => ({
   resolveENSName: vi.fn().mockImplementation(() => Promise.resolve(null))
 }));
 
-vi.mock('lib/blockchain/provider/alchemy/client', async () => ({
-  ...(await vi.importActual('lib/blockchain/provider/alchemy/client')),
+vi.mock('lib/blockchain/provider/alchemy/client', () => ({
+  ...vi.importActual('lib/blockchain/provider/alchemy/client'),
   __esModule: true,
-  getNFTs: vi.fn().mockImplementation(() => Promise.resolve([]))
+  getNFTs: jest.fn().mockImplementation(() => Promise.resolve([]))
 }));
 
 // fix dynamic imports in next.js 13: https://github.com/vercel/next.js/issues/41725
