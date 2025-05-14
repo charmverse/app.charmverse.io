@@ -47,7 +47,16 @@ export default defineConfig({
         extends: true,
         test: {
           name: 'websockets',
-          include: ['apps/websockets/**/*.spec.ts'],
+          include: ['apps/websockets/src/**/*.spec.ts'],
+          globalSetup: './vite.globalSetup.ts'
+        }
+      },
+      {
+        // add "extends: true" to inherit the options from the root config
+        extends: true,
+        test: {
+          name: 'packages',
+          include: ['packages/**/src/**/*.spec.ts'],
           globalSetup: './vite.globalSetup.ts'
         }
       }

@@ -1,33 +1,18 @@
-import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { randomETHWalletAddress } from '@packages/testing/generateStubs';
-import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { clearTokenGateData, deleteTokenGate, generateTokenGate } from '@packages/testing/utils/tokenGates';
 import type { AccessControlCondition } from '@packages/lib/tokenGates/interfaces';
 import { validateTokenGateConditionWithDelegates } from '@packages/lib/tokenGates/validateTokenGateConditionWithDelegates';
-import { verifyTokenGateMemberships } from '@packages/lib/tokenGates/verifyTokenGateMemberships';
-import { walletAddress } from 'stories/lib/mockTokenGataData';
-
-async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
-  return prisma.spaceRole.findUnique({
-    where: {
-      spaceUser: {
-        spaceId,
-        userId
-      }
-    }
-  });
-}
+import { randomETHWalletAddress } from '@packages/testing/generateStubs';
+import { vi } from 'vitest';
 
 const validWallet = randomETHWalletAddress();
 
-jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
+vi.mock('../validateTokenGateCondition', () => ({
   validateTokenGateCondition: (condition: any, address: string) => {
     return address === validWallet;
   }
 }));
 
-jest.mock('lib/blockchain/delegateXYZ/client', () => ({
+vi.mock('@packages/lib/blockchain/delegateXYZ/client', () => ({
   getIncomingDelegations: async () => [
     // an example delegation that provides all access to an address
     {
@@ -44,7 +29,7 @@ jest.mock('lib/blockchain/delegateXYZ/client', () => ({
 
 describe('validateTokenGateConditionWithDelegates', () => {
   afterEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it('should return valid for an address that is delegated thru Delegate.xyz', async () => {

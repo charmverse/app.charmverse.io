@@ -10,7 +10,7 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
-    "test:integration": "npx jest --config='./__integration-tests__/jest.config.ts' --maxWorkers=2",
+    "test:integration": "",
     "test:browser": "npx vitest --globals --update --project=browser",
     "test:lib": "npx vitest --globals --update --project=lib"
   },

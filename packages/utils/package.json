@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config ./jest.config.ts --maxWorkers=2 --passWithNoTests"
+    "test": ""
   },
   "exports": {
     "./array": "./src/array.ts",

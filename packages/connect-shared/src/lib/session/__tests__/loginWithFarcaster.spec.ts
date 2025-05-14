@@ -2,17 +2,18 @@ import { DisabledAccountError, InvalidInputError } from '@charmverse/core/errors
 import { verifySignInMessage } from '@farcaster/auth-client';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { generateFarcasterUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
+import { vi } from 'vitest';
 
 import type { LoginWithFarcasterParams } from '../loginWithFarcaster';
 import { loginWithFarcaster } from '../loginWithFarcaster';
 
-jest.mock('@farcaster/auth-client', () => ({
-  verifySignInMessage: jest.fn().mockResolvedValue({ success: true }),
-  viemConnector: jest.fn().mockReturnValue({ rpcUrls: ['http://localhost:8545'] }),
-  createAppClient: jest.fn().mockReturnValue({})
+vi.mock('@farcaster/auth-client', () => ({
+  verifySignInMessage: vi.fn().mockResolvedValue({ success: true }),
+  viemConnector: vi.fn().mockReturnValue({ rpcUrls: ['http://localhost:8545'] }),
+  createAppClient: vi.fn().mockReturnValue({})
 }));
 
-const mockedVerifySignInMessage = jest.mocked(verifySignInMessage);
+const mockedVerifySignInMessage = vi.mocked(verifySignInMessage);
 
 const defaultBody = {
   bio: 'biooo',
@@ -35,7 +36,7 @@ const defaultBody = {
 describe('loginWithFarcaster', () => {
   test('should fail if the signature cannot be verified', async () => {
     mockedVerifySignInMessage.mockResolvedValueOnce({ success: false } as any);
-    const body = { ...defaultBody, fid: Math.floor(Math.random() * 1000), username: '@test' };
+    const body = { ...defaultBody, fid: Math.floor(Math.random() * 100000), username: '@test' };
 
     await expect(loginWithFarcaster(body)).rejects.toThrow(InvalidStateError);
   });

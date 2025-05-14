@@ -8,7 +8,7 @@ import { vi } from 'vitest';
 import { logApiRequest } from '../handler';
 
 vi.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
-  trackUserAction: jest.fn()
+  trackUserAction: vi.fn()
 }));
 
 /**

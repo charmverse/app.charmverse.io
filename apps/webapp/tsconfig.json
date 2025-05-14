@@ -42,8 +42,9 @@
       "@charmverse/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
       "@charmverse/core/protocol": ["../../node_modules/@charmverse/core/dist/cjs/protocol"],
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "scripts"],
-  "include": ["**/*.ts", "**/*.tsx", "../../packages/databases/src/undoManager.spec.ts", "../../packages/databases/src/undomanager.ts", "../../packages/databases/src/mutator.ts", "../../packages/databases/src/publisher.ts", "../../packages/databases/src/utils/blockUtils.ts", "../../packages/databases/src/i18n.ts", "../../vite.setup.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

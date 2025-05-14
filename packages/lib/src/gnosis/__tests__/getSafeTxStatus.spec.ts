@@ -1,24 +1,27 @@
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
+
 describe('getSafeTxStatus', () => {
-  let getTransactionMock: jest.Mock;
-  let getAllTransactionsMock: jest.Mock;
-  let getMantleTransactionMock: jest.Mock;
-  let getAllMantleTransactionsMock: jest.Mock;
+  let getTransactionMock: Mock;
+  let getAllTransactionsMock: Mock;
+  let getMantleTransactionMock: Mock;
+  let getAllMantleTransactionsMock: Mock;
 
   beforeAll(() => {
-    getTransactionMock = jest.fn();
-    getAllTransactionsMock = jest.fn();
+    getTransactionMock = vi.fn();
+    getAllTransactionsMock = vi.fn();
 
-    getMantleTransactionMock = jest.fn();
-    getAllMantleTransactionsMock = jest.fn();
+    getMantleTransactionMock = vi.fn();
+    getAllMantleTransactionsMock = vi.fn();
 
-    jest.mock('@packages/blockchain/getSafeApiClient', () => ({
+    vi.doMock('@packages/blockchain/getSafeApiClient', () => ({
       getSafeApiClient: () => ({
         getTransaction: getTransactionMock,
         getAllTransactions: getAllTransactionsMock
       })
     }));
 
-    jest.mock('../mantleClient.ts', () => ({
+    vi.doMock('../mantleClient.ts', () => ({
       getMantleSafeTransaction: getMantleTransactionMock,
       getAllMantleSafeTransactions: getAllMantleTransactionsMock
     }));
@@ -30,7 +33,7 @@ describe('getSafeTxStatus', () => {
         throw new Error('Not found');
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
       expect(status).toBe(null);
@@ -42,8 +45,7 @@ describe('getSafeTxStatus', () => {
         txHash: '0x456'
       });
       getAllMantleTransactionsMock.mockResolvedValue([]);
-
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
 
@@ -62,7 +64,7 @@ describe('getSafeTxStatus', () => {
         txHash: '0x456'
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
       expect(status?.status).toBe('cancelled');
@@ -76,7 +78,7 @@ describe('getSafeTxStatus', () => {
         txHash: '0x456'
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
       expect(status?.status).toBe('cancelled');
@@ -108,7 +110,7 @@ describe('getSafeTxStatus', () => {
         }
       ]);
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
       expect(status?.status).toBe('cancelled');
@@ -126,7 +128,7 @@ describe('getSafeTxStatus', () => {
         txHash: '0x456'
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 5001 });
       expect(status?.status).toBe('paid');
@@ -141,7 +143,7 @@ describe('getSafeTxStatus', () => {
         throw new Error('Not found');
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
       expect(status).toBe(null);
@@ -156,7 +158,7 @@ describe('getSafeTxStatus', () => {
       });
       getAllTransactionsMock.mockResolvedValue({ results: [] });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
 
@@ -179,7 +181,7 @@ describe('getSafeTxStatus', () => {
         data: null
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
       expect(status?.status).toBe('cancelled');
@@ -205,7 +207,7 @@ describe('getSafeTxStatus', () => {
         ]
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
       expect(status?.status).toBe('cancelled');
@@ -221,7 +223,7 @@ describe('getSafeTxStatus', () => {
         transactionHash: '0x456'
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
       expect(status?.status).toBe('paid');
@@ -238,7 +240,7 @@ describe('getSafeTxStatus', () => {
         data: '0xa9059cbb00000000000000000000000012345678901234567890123456789012345678900000000000'
       });
 
-      const { getSafeTxStatus } = await import('lib/gnosis/getSafeTxStatus');
+      const { getSafeTxStatus } = await import('../getSafeTxStatus');
 
       const status = await getSafeTxStatus({ safeTxHash: '0x123', chainId: 1 });
       expect(status?.status).toBe('paid');
@@ -247,5 +249,3 @@ describe('getSafeTxStatus', () => {
     });
   });
 });
-
-export {};
