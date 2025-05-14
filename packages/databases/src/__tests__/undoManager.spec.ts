@@ -1,4 +1,4 @@
-import undoManager from './undomanager';
+import undoManager from '../undomanager';
 
 test('Basic undo/redo', async () => {
   expect(undoManager.canUndo).toBe(false);

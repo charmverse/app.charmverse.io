@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Divider, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
+import type { Board, IPropertyTemplate, RelationPropertyData } from '@packages/databases/board';
+import { useAppSelector } from '@packages/databases/store/hooks';
 import { useEffect, useState } from 'react';
 
 import {
@@ -13,9 +15,6 @@ import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate, RelationPropertyData } from '@packages/databases/board';
-
-import { useAppSelector } from '../../../../store/hooks';
 
 export const StyledMenuItem = styled(MenuItem)`
   padding: ${({ theme }) => theme.spacing(0, 1)};

@@ -7,7 +7,8 @@
     "test": ""
   },
   "exports": {
-    "./*": "./src/*.ts"
+    "./*": "./src/*.ts",
+    "./i18n/en.json": "./src/i18n/en.json"
   },
   "dependencies": {
     "@packages/utils": "^1.0.0"

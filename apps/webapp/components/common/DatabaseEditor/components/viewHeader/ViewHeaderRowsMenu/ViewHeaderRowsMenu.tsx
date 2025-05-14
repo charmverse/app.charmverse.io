@@ -4,6 +4,20 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import PaidIcon from '@mui/icons-material/Paid';
 import type { SxProps } from '@mui/material';
 import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
+import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { Card, CardPropertyValue } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import type { CreateEventPayload } from '@packages/lib/notifications/interfaces';
+import {
+  APPLICANT_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARD_STATUS_BLOCK_ID
+} from '@packages/lib/rewards/blocks/constants';
+import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import dynamic from 'next/dynamic';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
@@ -15,21 +29,6 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
-import type { Card, CardPropertyValue } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-import type { CreateEventPayload } from '@packages/lib/notifications/interfaces';
-import {
-  APPLICANT_BLOCK_ID,
-  REWARDS_APPLICANTS_BLOCK_ID,
-  REWARDS_AVAILABLE_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT,
-  REWARD_PROPOSAL_LINK,
-  REWARD_STATUS_BLOCK_ID
-} from '@packages/lib/rewards/blocks/constants';
-import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
-
-import mutator from '../../../mutator';
 
 import { ArchiveProposals } from './components/ArchiveProposals';
 import { BatchPaymentRewards } from './components/BatchPaymentRewards';

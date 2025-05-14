@@ -1,15 +1,14 @@
 import type { Card } from '@packages/databases/card';
+import { publishDeletes, publishIncrementalUpdate } from '@packages/databases/publisher';
+import { updateCards } from '@packages/databases/store/cards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch } from '@packages/databases/store/hooks';
+import store from '@packages/databases/store/index';
 import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-
-import { publishDeletes, publishIncrementalUpdate } from './publisher';
-import store from './store';
-import { updateCards } from './store/cards';
-import { initialDatabaseLoad } from './store/databaseBlocksLoad';
-import { useAppDispatch } from './store/hooks';
 
 // load focalboard data when a workspace is selected
 function DatabaseWatcher({ children }: { children: JSX.Element }) {

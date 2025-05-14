@@ -1,15 +1,14 @@
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-
-import mutator from '../../mutator';
-import { Utils } from '../../utils';
 
 import GalleryCard from './galleryCard';
 

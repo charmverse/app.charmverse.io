@@ -1,19 +1,19 @@
 import { Box, Card, Grid, Stack, Typography } from '@mui/material';
-import { useCallback } from 'react';
-import type { IntlShape } from 'react-intl';
-import { injectIntl } from 'react-intl';
-
-import SelectMenu from 'components/common/Menu';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView, IViewType } from '@packages/databases/boardView';
 import { createBoardView } from '@packages/databases/boardView';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { useAppDispatch } from '@packages/databases/store/hooks';
+import { updateView } from '@packages/databases/store/views';
+import { Utils } from '@packages/databases/utils';
+import { useCallback } from 'react';
+import { injectIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
-import mutator from '../../mutator';
-import { useAppDispatch } from '../../store/hooks';
-import { updateView } from '../../store/views';
-import { Utils } from '../../utils';
+import SelectMenu from 'components/common/Menu';
+import { useIsAdmin } from 'hooks/useIsAdmin';
+
 import BoardIcon from '../../widgets/icons/board';
 import CalendarIcon from '../../widgets/icons/calendar';
 import GalleryIcon from '../../widgets/icons/gallery';

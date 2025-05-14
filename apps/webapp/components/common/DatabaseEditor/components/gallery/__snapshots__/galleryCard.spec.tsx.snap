@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`src/components/gallery/GalleryCard without block content should match snapshot 1`] = `
+exports[`src/components/gallery/GalleryCard > without block content > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="GalleryCard selected MuiBox-root css-1ck4zfx"

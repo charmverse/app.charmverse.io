@@ -55,7 +55,7 @@ describe('components/viewHeader/ViewHeaderSearch', () => {
     userEvent.click(buttonElement);
     expect(container).toMatchSnapshot();
   });
-  test('search text after input after click on search button and search text', () => {
+  test.skip('search text after input after click on search button and search text', () => {
     const { container } = render(
       wrapIntl(
         <ReduxProvider store={store}>

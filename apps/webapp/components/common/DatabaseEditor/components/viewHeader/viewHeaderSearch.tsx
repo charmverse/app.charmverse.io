@@ -1,12 +1,12 @@
 import SearchIcon from '@mui/icons-material/Search';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { getSearchText, setSearchText } from '@packages/databases/store/searchText';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { getSearchText, setSearchText } from '../../store/searchText';
 import Button from '../../widgets/buttons/button';
 import IconButton from '../../widgets/buttons/iconButton';
 import Editable from '../../widgets/editable';

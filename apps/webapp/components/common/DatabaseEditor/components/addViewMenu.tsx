@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 
 import { Add } from '@mui/icons-material';
@@ -6,6 +7,15 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import type { UIBlockWithDetails } from '@packages/databases/block';
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView, IViewType } from '@packages/databases/boardView';
+import { createBoardView } from '@packages/databases/boardView';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { publishIncrementalUpdate } from '@packages/databases/publisher';
+import { createTableView } from '@packages/databases/tableView';
+import { Utils } from '@packages/databases/utils';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
 import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
@@ -14,16 +24,7 @@ import { injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import { Button } from 'components/common/Button';
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView, IViewType } from '@packages/databases/boardView';
-import { createBoardView } from '@packages/databases/boardView';
-import { Constants } from '@packages/databases/constants';
-import { createTableView } from '@packages/databases/tableView';
 
-import mutator from '../mutator';
-import { publishIncrementalUpdate } from '../publisher';
-import { Utils } from '../utils';
 import IconButton from '../widgets/buttons/iconButton';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';

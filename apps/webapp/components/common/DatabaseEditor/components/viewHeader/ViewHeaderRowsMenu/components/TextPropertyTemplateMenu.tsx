@@ -1,10 +1,9 @@
 import { Box } from '@mui/material';
-import { useState } from 'react';
-
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
+import { useState } from 'react';
 
-import mutator from '../../../../mutator';
 import { TextInput } from '../../../properties/TextInput';
 import { validatePropertyValue } from '../../../propertyValueElement';
 

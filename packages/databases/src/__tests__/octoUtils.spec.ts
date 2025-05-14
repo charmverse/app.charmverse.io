@@ -1,7 +1,7 @@
 import type { UIBlockWithDetails } from '@packages/databases/block';
 
-import { OctoUtils } from './octoUtils';
-import { TestBlockFactory } from './test/testBlockFactory';
+import { OctoUtils } from '../octoUtils';
+import { TestBlockFactory } from '../test/testBlockFactory';
 
 test('duplicateBlockTree: Board', async () => {
   const [blocks, sourceBlock] = createBoardTree();

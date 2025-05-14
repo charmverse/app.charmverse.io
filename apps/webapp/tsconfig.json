@@ -45,5 +45,5 @@
     }
   },
   "exclude": ["node_modules", "scripts"],
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "../../packages/databases/src/undoManager.spec.ts", "../../packages/databases/src/undomanager.ts", "../../packages/databases/src/mutator.ts", "../../packages/databases/src/publisher.ts", "../../packages/databases/src/utils/blockUtils.ts", "../../packages/databases/src/i18n.ts"]
 }

@@ -1,13 +1,12 @@
 import { batch } from 'react-redux';
 
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import type { Board } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-
-import store from './store';
+import type { UIBlockWithDetails } from './block';
+import type { Board } from './board';
+import type { BoardView } from './boardView';
+import type { Card } from './card';
 import { deleteBoards, updateBoards } from './store/boards';
 import { deleteCards, updateCards } from './store/cards';
+import store from './store/index';
 import { deleteViews, updateViews } from './store/views';
 
 // this code is normally called by a websocket connection in focalboard

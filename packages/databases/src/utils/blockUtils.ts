@@ -1,9 +1,8 @@
+import type { UIBlockWithDetails, BlockWithDetails } from '@packages/databases/block';
+import { OctoUtils } from '@packages/databases/octoUtils';
 import { replaceS3Domain } from '@packages/utils/url';
 
-import type { UIBlockWithDetails, BlockWithDetails } from '@packages/databases/block';
-import type { ServerBlockFields } from 'pages/api/blocks';
-
-import { OctoUtils } from '../octoUtils';
+export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
 export function fixBlocks(blocks: UIBlockWithDetails[]): UIBlockWithDetails[] {
   // Hydrate is important, as it ensures that each block is complete to the current model

@@ -1,6 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
+import mutator from '@packages/databases/mutator';
 
-import mutator from 'components/common/DatabaseEditor/mutator';
 import type { PagesContext } from 'hooks/usePages';
 
 import type { Board } from './board';

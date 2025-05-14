@@ -1,8 +1,8 @@
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-import { TestBlockFactory } from '../../../test/testBlockFactory';
 import { wrapIntl } from '../../../testUtils';
 
 import { KanbanCalculationOptions } from './calculationOptions';

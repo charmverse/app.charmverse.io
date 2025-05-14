@@ -1,20 +1,20 @@
 import type { Page } from '@charmverse/core/prisma';
+import { getBoards } from '@packages/databases/store/boards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { makeSelectSortedViews, makeSelectView } from '@packages/databases/store/views';
+import debouncePromise from '@packages/lib/utils/debouncePromise';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import FocalBoardPortal from 'components/common/DatabaseEditor/DatabasePortal';
-import { getBoards } from 'components/common/DatabaseEditor/store/boards';
-import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
-import { makeSelectSortedViews, makeSelectView } from 'components/common/DatabaseEditor/store/views';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import debouncePromise from '@packages/lib/utils/debouncePromise';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 

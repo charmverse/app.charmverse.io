@@ -1,23 +1,23 @@
 /* eslint-disable max-lines */
 import { Box, Menu, TextField } from '@mui/material';
 import Button from '@mui/material/Button';
-import { isTruthy } from '@packages/utils/types';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useCallback, useState } from 'react';
-import type { IntlShape } from 'react-intl';
-import { FormattedMessage, injectIntl } from 'react-intl';
-
-import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
 import { proposalPropertyTypesList } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { Constants } from '@packages/databases/constants';
+import type { BlockChange } from '@packages/databases/mutator';
+import mutator from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
+import { isTruthy } from '@packages/utils/types';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useCallback, useState } from 'react';
+import { FormattedMessage, injectIntl } from 'react-intl';
+import type { IntlShape } from 'react-intl';
 
-import type { BlockChange } from '../../mutator';
-import mutator from '../../mutator';
-import { Utils } from '../../utils';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+
 import { typeDisplayName } from '../../widgets/typeDisplayName';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 

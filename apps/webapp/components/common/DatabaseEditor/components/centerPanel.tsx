@@ -8,6 +8,25 @@ import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { webhookEndpoint } from '@packages/config/constants';
+import type { UIBlockWithDetails } from '@packages/databases/block';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { createCard } from '@packages/databases/card';
+import { CardFilter } from '@packages/databases/cardFilter';
+import mutator from '@packages/databases/mutator';
+import { makeSelectBoard } from '@packages/databases/store/boards';
+import {
+  makeSelectViewCardsSortedFilteredAndGrouped,
+  sortCards,
+  addCard as _addCard,
+  addTemplate,
+  getAllCards
+} from '@packages/databases/store/cards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { updateView } from '@packages/databases/store/views';
+import { Utils } from '@packages/databases/utils';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -27,26 +46,6 @@ import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { createCard } from '@packages/databases/card';
-import { CardFilter } from '@packages/databases/cardFilter';
-
-import mutator from '../mutator';
-import { makeSelectBoard } from '../store/boards';
-import {
-  makeSelectViewCardsSortedFilteredAndGrouped,
-  sortCards,
-  addCard as _addCard,
-  addTemplate,
-  getAllCards
-} from '../store/cards';
-import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { updateView } from '../store/views';
-import { Utils } from '../utils';
 
 import { CreateLinkedView } from './createLinkedView';
 import Gallery from './gallery/gallery';

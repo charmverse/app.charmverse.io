@@ -1,4 +1,229 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`src/components/kanban/kanbanColumnHeader > return kanbanColumnHeader and edit title 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-header-cell KanbanColumnHeader"
+      draggable="true"
+      style="opacity: 1;"
+    >
+      <span
+        class="Label propColorDefault "
+      >
+        <input
+          class="Editable undefined"
+          placeholder="New Select"
+          spellcheck="true"
+          title="New Title"
+          value="New Title"
+        />
+      </span>
+      <div
+        class="KanbanCalculation"
+      >
+        <button
+          class="Button size--small"
+          title="0"
+          type="button"
+        >
+          <span>
+            0
+          </span>
+        </button>
+      </div>
+      <div
+        class="octo-spacer"
+      />
+      <div
+        aria-label="menuwrapper"
+        class="MenuWrapper"
+        data-testid="menu-wrapper"
+        role="button"
+      >
+        <span
+          class=""
+          data-mui-internal-clone-element="true"
+        >
+          <button
+            class="Button IconButton css-w119tu"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="MoreHorizIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+              />
+            </svg>
+          </button>
+        </span>
+      </div>
+      <span
+        class=""
+        data-mui-internal-clone-element="true"
+      >
+        <button
+          class="Button IconButton css-w119tu"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+            data-testid="AddIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+            />
+          </svg>
+        </button>
+      </span>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`src/components/kanban/kanbanColumnHeader > should match snapshot 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-header-cell KanbanColumnHeader"
+      draggable="true"
+      style="opacity: 1;"
+    >
+      <span
+        class="Label propColorDefault "
+      >
+        <input
+          class="Editable undefined"
+          placeholder="New Select"
+          spellcheck="true"
+          title="Title"
+          value="Title"
+        />
+      </span>
+      <div
+        class="KanbanCalculation"
+      >
+        <button
+          class="Button size--small"
+          title="0"
+          type="button"
+        >
+          <span>
+            0
+          </span>
+        </button>
+      </div>
+      <div
+        class="octo-spacer"
+      />
+      <div
+        aria-label="menuwrapper"
+        class="MenuWrapper"
+        data-testid="menu-wrapper"
+        role="button"
+      >
+        <span
+          class=""
+          data-mui-internal-clone-element="true"
+        >
+          <button
+            class="Button IconButton css-w119tu"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="MoreHorizIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+              />
+            </svg>
+          </button>
+        </span>
+      </div>
+      <span
+        class=""
+        data-mui-internal-clone-element="true"
+      >
+        <button
+          class="Button IconButton css-w119tu"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+            data-testid="AddIcon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+            />
+          </svg>
+        </button>
+      </span>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`src/components/kanban/kanbanColumnHeader > should match snapshot readonly 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="octo-board-header-cell KanbanColumnHeader"
+      draggable="true"
+      style="opacity: 1;"
+    >
+      <span
+        class="Label propColorDefault "
+      >
+        <input
+          class="Editable readonly undefined"
+          placeholder="New Select"
+          readonly=""
+          spellcheck="true"
+          title="Title"
+          value="Title"
+        />
+      </span>
+      <div
+        class="KanbanCalculation"
+      >
+        <button
+          class="Button size--small"
+          title="0"
+          type="button"
+        >
+          <span>
+            0
+          </span>
+        </button>
+      </div>
+      <div
+        class="octo-spacer"
+      />
+    </div>
+  </span>
+</div>
+`;
 
 exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and edit title 1`] = `
 <div>

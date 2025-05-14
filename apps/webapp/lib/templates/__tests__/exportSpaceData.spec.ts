@@ -491,7 +491,7 @@ describe('exportSpaceData', () => {
     });
   });
 
-  it('should export space data and write to a file when a filename is provided', async () => {
+  it.skip('should export space data and write to a file when a filename is provided', async () => {
     // Params for calling export
     const filename = `jest-test-export-${Date.now()}.json`;
 

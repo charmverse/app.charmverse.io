@@ -1,4 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
+import type { UIBlockWithDetails } from '@packages/databases/block';
 import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
@@ -10,7 +11,6 @@ import configureStore from 'redux-mock-store';
 import { v4 } from 'uuid';
 
 import { PagesContext } from 'hooks/usePages';
-import type { UIBlockWithDetails } from '@packages/databases/block';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 export const wrapIntl = (children?: React.ReactNode): JSX.Element => (

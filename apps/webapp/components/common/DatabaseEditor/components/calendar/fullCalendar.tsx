@@ -5,17 +5,17 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import FullCalendar from '@fullcalendar/react';
 import AddIcon from '@mui/icons-material/Add';
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
 import { isTruthy } from '@packages/utils/types';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
 import { useUserPreferences } from 'hooks/useUserPreferences';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
 
-import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';
 import { createDatePropertyFromString } from '../properties/dateRange/dateRange';
 import PropertyValueElement from '../propertyValueElement';

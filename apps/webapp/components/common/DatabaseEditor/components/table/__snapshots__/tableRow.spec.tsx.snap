@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/table/TableRow should match snapshot 1`] = `
+exports[`components/table/TableRow > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row hidden"
@@ -111,10 +111,10 @@ exports[`components/table/TableRow should match snapshot 1`] = `
 </div>
 `;
 
-exports[`components/table/TableRow should match snapshot, display properties 1`] = `
+exports[`components/table/TableRow > should match snapshot, display properties 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row hidden"
@@ -289,10 +289,10 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
 </div>
 `;
 
-exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
+exports[`components/table/TableRow > should match snapshot, isSelected 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row selected hidden"
@@ -400,10 +400,10 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
 </div>
 `;
 
-exports[`components/table/TableRow should match snapshot, read-only 1`] = `
+exports[`components/table/TableRow > should match snapshot, read-only 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row hidden"
@@ -487,10 +487,10 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
 </div>
 `;
 
-exports[`components/table/TableRow should match snapshot, resizing column 1`] = `
+exports[`components/table/TableRow > should match snapshot, resizing column 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row hidden"
@@ -665,15 +665,15 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
 </div>
 `;
 
-exports[`components/table/TableRow should match snapshots with a nested row 1`] = `
+exports[`components/table/TableRow > should match snapshots with a nested row 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="TableRow octo-table-row hidden"
       data-test="database-row-card-1"
-      style="z-index: 85; opacity: 1; cursor: move;"
+      style="background-color: var(--input-bg); z-index: 85; opacity: 1; cursor: move;"
     >
       <div
         class="MuiStack-root css-1v111ru-MuiStack-root"

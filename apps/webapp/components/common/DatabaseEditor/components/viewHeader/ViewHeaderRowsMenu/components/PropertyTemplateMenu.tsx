@@ -1,13 +1,8 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
-import type { DateTime } from 'luxon';
-
-import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
-import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
-import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { Card, CardPropertyValue } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
 import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
 import {
   DUE_DATE_ID,
@@ -19,8 +14,13 @@ import {
 } from '@packages/lib/rewards/blocks/constants';
 import { getRewardType } from '@packages/lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails } from '@packages/lib/rewards/interfaces';
+import type { DateTime } from 'luxon';
 
-import mutator from '../../../../mutator';
+import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
+import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
+import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+
 import { RelationPropertyPagesAutocomplete } from '../../../properties/RelationPropertyPagesAutocomplete';
 import { TokenAmount } from '../../../properties/tokenAmount/tokenAmount';
 import { TokenChain } from '../../../properties/tokenChain/tokenChain';

@@ -1,8 +1,7 @@
-import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
-
-import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { UIBlockWithDetails as FBBlock, BlockWithDetails } from '@packages/databases/block';
 import { createBoard } from '@packages/databases/board';
+import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
+import type { FeatureTitleVariation } from '@packages/features/getFeatureTitle';
 import { DEFAULT_BOARD_BLOCK_ID } from '@packages/lib/rewards/blocks/constants';
 import { defaultRewardViews } from '@packages/lib/rewards/blocks/views';
 

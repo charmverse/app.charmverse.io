@@ -3,12 +3,11 @@ import { log } from '@charmverse/core/log';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import { createBoard } from '@packages/databases/board';
-import { createBoardView } from '@packages/databases/boardView';
-import { createCard } from '@packages/databases/card';
-
-import type { IAppWindow } from './types';
+import type { UIBlockWithDetails } from './block';
+import { createBoard } from './board';
+import { createBoardView } from './boardView';
+import { createCard } from './card';
+import type { IAppWindow } from './interfaces';
 
 declare let window: IAppWindow;
 

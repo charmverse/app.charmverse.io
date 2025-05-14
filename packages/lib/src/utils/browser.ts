@@ -1,5 +1,5 @@
-import { addQueryToUrl } from '@packages/utils/url';
 import { baseUrl, isDevEnv } from '@packages/config/constants';
+import { addQueryToUrl } from '@packages/utils/url';
 
 import { getAppApexDomain } from './domains/getAppApexDomain';
 import { getCustomDomainFromHost } from './domains/getCustomDomainFromHost';
@@ -280,6 +280,7 @@ export function getSubdomainPath(
   if (subdomain) {
     return path.replace(new RegExp(`^\\/${subdomain}\\/`), '/');
   }
+
   // if we are not using a custom domain or subdomain, make sure that the space domain exists in the URL
   if (config && !customDomain && !path.startsWith(`/${config?.domain}/`)) {
     return `/${config.domain}${path}`;

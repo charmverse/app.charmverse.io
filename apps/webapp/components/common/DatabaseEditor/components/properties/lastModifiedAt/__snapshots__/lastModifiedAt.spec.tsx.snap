@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/properties/lastModifiedAt should match snapshot 1`] = `
+exports[`components/properties/lastModifiedAt > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="octo-propertyvalue readonly MuiBox-root css-yl62nh"

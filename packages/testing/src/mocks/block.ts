@@ -2,8 +2,7 @@ import type { UIBlockWithDetails } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
-
-import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 
 export function createMockBoard(): Board {
   return TestBlockFactory.createBoard();

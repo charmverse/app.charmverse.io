@@ -1,19 +1,11 @@
 import { objectUtils } from '@charmverse/core/utilities';
-import { useMemo } from 'react';
-
-import { sortCards } from 'components/common/DatabaseEditor/store/cards';
-import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import { useMembers } from 'hooks/useMembers';
-import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { Board } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card, CardWithRelations } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';
 import { PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
+import { sortCards } from '@packages/databases/store/cards';
+import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -28,6 +20,14 @@ import {
 import type { ProposalPropertyValue } from '@packages/lib/proposals/blocks/interfaces';
 import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
+import { useMemo } from 'react';
+
+import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useMembers } from 'hooks/useMembers';
+import { useProposalBlocks } from 'hooks/useProposalBlocks';
 
 export function useProposalsBoardAdapter() {
   const { space } = useCurrentSpace();

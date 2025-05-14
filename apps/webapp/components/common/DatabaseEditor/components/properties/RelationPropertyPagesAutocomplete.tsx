@@ -1,12 +1,11 @@
+import type { IPropertyTemplate } from '@packages/databases/board';
+import { makeSelectBoard } from '@packages/databases/store/boards';
+import { makeSelectCardsFromBoard } from '@packages/databases/store/cards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
 import { useEffect, useMemo } from 'react';
 
-import type { IPropertyTemplate } from '@packages/databases/board';
-
 import type { PropertyValueDisplayType } from '../../interfaces';
-import { makeSelectBoard } from '../../store/boards';
-import { makeSelectCardsFromBoard } from '../../store/cards';
-import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import { PagesAutocomplete } from './PagesAutocomplete';
 

@@ -1,12 +1,11 @@
+import englishMessages from '@packages/databases/i18n/en.json';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { fetchLanguage, getLanguage } from '@packages/databases/store/language';
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 
-// import { getMessages } from 'components/common/DatabaseEditor/i18n';
-import englishMessages from 'components/common/DatabaseEditor/i18n/en.json';
-import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
-import { fetchLanguage, getLanguage } from 'components/common/DatabaseEditor/store/language';
-
+// import { getMessages } from '@packages/databases/i18n';
 export default function IntlProviderComponent({ children }: { children: ReactNode }) {
   const language = useAppSelector<string>(getLanguage);
   const dispatch = useAppDispatch();

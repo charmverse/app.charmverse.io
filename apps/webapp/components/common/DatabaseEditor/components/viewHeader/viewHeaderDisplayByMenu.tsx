@@ -1,12 +1,12 @@
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import mutator from '@packages/databases/mutator';
 import React from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { Button } from 'components/common/Button';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
 
-import mutator from '../../mutator';
 import Menu from '../../widgets/menu';
 import MenuWrapper from '../../widgets/menuWrapper';
 import { typeDisplayName } from '../../widgets/typeDisplayName';

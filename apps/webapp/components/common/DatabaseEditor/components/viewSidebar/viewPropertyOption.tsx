@@ -4,16 +4,15 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useMemo, useState } from 'react';
-
 import type { Board, IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
 import { isReturnKey } from '@packages/lib/utils/react';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useMemo, useState } from 'react';
 
-import mutator from '../../mutator';
 import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
 import { RelationPropertyEditOptions } from '../properties/relation/RelationPropertyMenu/RelationPropertyOptions';
 

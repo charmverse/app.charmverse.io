@@ -9,6 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { createBoard } from '@packages/databases/board';
+import mutator from '@packages/databases/mutator';
 import { debounce } from 'lodash';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -24,7 +25,6 @@ import { iconForViewType } from 'components/common/DatabaseEditor/components/vie
 import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
 import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
 import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
-import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';

@@ -1,16 +1,15 @@
+import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from '@packages/lib/middleware/requireApiPageKey';
 import type { ApiEventMap } from '@packages/metrics/mixpanel/interfaces/ApiEvent';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import type { InjectedPageApiKey, NextApiRequestWithApiPageKey } from '@packages/lib/middleware/requireApiPageKey';
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';
+import { vi } from 'vitest';
 
 import { logApiRequest } from '../handler';
 
-jest.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
+vi.mock('@packages/metrics/mixpanel/trackUserAction', () => ({
   trackUserAction: jest.fn()
 }));
-
-beforeAll(() => {});
 
 /**
  * Next.js takes queries from the URL and the parameters and puts them in the query object ie. /endpoint/{key}/action is the same as /endpoint?key=value and the req.query object will be { key: value }

@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/centerPanel return centerPanel and click on card to show card 1`] = `
+exports[`components/centerPanel > return centerPanel and > click on card to show card 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="BoardComponent drag-area-container "
@@ -145,7 +145,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    style="font-size: 16px;"
+                    style="color: var(--primary-color); font-size: 16px;"
                     viewBox="0 0 24 24"
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
@@ -733,6 +733,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         height="1em"
                         stroke="currentColor"
                         stroke-width="0"
+                        style="color: var(--secondary-text);"
                         viewBox="0 0 24 24"
                         width="1em"
                         xmlns="http://www.w3.org/2000/svg"
@@ -779,10 +780,10 @@ exports[`components/centerPanel return centerPanel and click on card to show car
 </div>
 `;
 
-exports[`components/centerPanel should match snapshot for Gallery 1`] = `
+exports[`components/centerPanel > should match snapshot for Gallery 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="BoardComponent drag-area-container "
@@ -924,7 +925,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    style="font-size: 16px;"
+                    style="color: var(--primary-color); font-size: 16px;"
                     viewBox="0 0 24 24"
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
@@ -1250,6 +1251,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                         height="1em"
                         stroke="currentColor"
                         stroke-width="0"
+                        style="color: var(--secondary-text);"
                         viewBox="0 0 24 24"
                         width="1em"
                         xmlns="http://www.w3.org/2000/svg"
@@ -1296,10 +1298,10 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
 </div>
 `;
 
-exports[`components/centerPanel should match snapshot for Kanban 1`] = `
+exports[`components/centerPanel > should match snapshot for Kanban 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="BoardComponent drag-area-container "
@@ -1441,7 +1443,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    style="font-size: 16px;"
+                    style="color: var(--primary-color); font-size: 16px;"
                     viewBox="0 0 24 24"
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
@@ -2029,6 +2031,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         height="1em"
                         stroke="currentColor"
                         stroke-width="0"
+                        style="color: var(--secondary-text);"
                         viewBox="0 0 24 24"
                         width="1em"
                         xmlns="http://www.w3.org/2000/svg"
@@ -2075,10 +2078,10 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
 </div>
 `;
 
-exports[`components/centerPanel should match snapshot for Table 1`] = `
+exports[`components/centerPanel > should match snapshot for Table 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="BoardComponent drag-area-container "
@@ -2220,7 +2223,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    style="font-size: 16px;"
+                    style="color: var(--primary-color); font-size: 16px;"
                     viewBox="0 0 24 24"
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
@@ -3025,6 +3028,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         height="1em"
                         stroke="currentColor"
                         stroke-width="0"
+                        style="color: var(--secondary-text);"
                         viewBox="0 0 24 24"
                         width="1em"
                         xmlns="http://www.w3.org/2000/svg"

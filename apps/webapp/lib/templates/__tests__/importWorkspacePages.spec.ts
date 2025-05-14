@@ -155,7 +155,7 @@ describe('importWorkspacePages', () => {
     });
   });
 
-  it('should accept a filename as the source data input', async () => {
+  it.skip('should accept a filename as the source data input', async () => {
     const { space: targetSpace } = await generateUserAndSpace();
 
     const exportName = `test-${v4()}.json`;

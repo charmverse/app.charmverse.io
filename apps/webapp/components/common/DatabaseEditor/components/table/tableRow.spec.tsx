@@ -1,10 +1,10 @@
 import '@testing-library/jest-dom';
 
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { render } from '@testing-library/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
 import TableRow from './tableRow';

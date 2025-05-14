@@ -1,12 +1,11 @@
 import { Autocomplete, TextField, Stack } from '@mui/material';
+import { makeSelectCardsFromBoard } from '@packages/databases/store/cards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
 import { useMemo, useEffect } from 'react';
 
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-
-import { makeSelectCardsFromBoard } from '../../store/cards';
-import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 type Props = {
   boardPageId?: string;

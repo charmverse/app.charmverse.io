@@ -1,17 +1,15 @@
 import { getChainList } from '@packages/blockchain/connectors/chains';
-import type { PayloadAction } from '@reduxjs/toolkit';
-import { createSelector, createSlice } from '@reduxjs/toolkit';
-
 import type { Board } from '@packages/databases/board';
 import type { BoardView, ISortOption } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';
 import { Constants } from '@packages/databases/constants';
 import type { FilterGroup } from '@packages/databases/filterGroup';
+import { Utils } from '@packages/databases/utils';
 import type { Member } from '@packages/lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
-
-import { Utils } from '../utils';
+import { createSelector, createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 import { getSearchText } from './searchText';

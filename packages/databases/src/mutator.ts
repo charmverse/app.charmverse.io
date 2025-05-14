@@ -1,27 +1,19 @@
 /* eslint-disable default-param-last */
 
 import type { PageContent } from '@packages/charmeditor/interfaces';
-import type { UIBlockWithDetails, BlockPatch } from '@packages/databases/block';
-import { createPatchesFromBlocks } from '@packages/databases/block';
-import type {
-  Board,
-  IPropertyOption,
-  IPropertyTemplate,
-  PropertyType,
-  RelationPropertyData
-} from '@packages/databases/board';
-import { createBoard } from '@packages/databases/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from '@packages/databases/boardView';
-import { createBoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { createCard } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-import type { FilterClause } from '@packages/databases/filterClause';
-import type { FilterGroup } from '@packages/databases/filterGroup';
-import { computeGroupSpacePermissions } from '@packages/lib/permissions/spaces/computeGroupSpacePermissions';
 
-import charmClient from 'charmClient';
-
+import type { UIBlockWithDetails, BlockPatch } from './block';
+import { createPatchesFromBlocks } from './block';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType, RelationPropertyData } from './board';
+import { createBoard } from './board';
+import type { BoardView, ISortOption, KanbanCalculationFields } from './boardView';
+import { createBoardView } from './boardView';
+import type { Card } from './card';
+import { createCard } from './card';
+import charmClient from './charmClient';
+import { Constants } from './constants';
+import type { FilterClause } from './filterClause';
+import type { FilterGroup } from './filterGroup';
 import { OctoUtils } from './octoUtils';
 import { publishIncrementalUpdate } from './publisher';
 import undoManager from './undomanager';
@@ -1077,7 +1069,7 @@ export class Mutator {
     beforeUndo?: () => Promise<void>;
   }): Promise<[UIBlockWithDetails[], string]> {
     const blocks = await charmClient.getSubtree({ pageId: card.pageId! });
-    const pageDetails = card.pageId ? await charmClient.pages.getPage(card.pageId) : null;
+    const pageDetails = card.pageId ? await charmClient.getPage(card.pageId) : null;
     const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, card.id) as [
       UIBlockWithDetails[],
       Card,

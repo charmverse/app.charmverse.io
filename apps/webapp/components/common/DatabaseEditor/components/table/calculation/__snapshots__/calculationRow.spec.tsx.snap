@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/table/calculation/CalculationRow should match snapshot 1`] = `
+exports[`components/table/calculation/CalculationRow > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="CalculationRow octo-table-row"
@@ -82,10 +82,10 @@ exports[`components/table/calculation/CalculationRow should match snapshot 1`] =
 </div>
 `;
 
-exports[`components/table/calculation/CalculationRow should render three calculation elements 1`] = `
+exports[`components/table/calculation/CalculationRow > should render three calculation elements 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="CalculationRow octo-table-row"

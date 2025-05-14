@@ -1,14 +1,14 @@
 import { v4 } from 'uuid';
 
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import type { Board, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
-import { createBoard } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import { createBoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { createCard } from '@packages/databases/card';
-import { createFilterClause } from '@packages/databases/filterClause';
-import { createFilterGroup } from '@packages/databases/filterGroup';
+import type { UIBlockWithDetails } from '../block';
+import type { Board, IPropertyOption, IPropertyTemplate } from '../board';
+import { createBoard } from '../board';
+import type { BoardView } from '../boardView';
+import { createBoardView } from '../boardView';
+import type { Card } from '../card';
+import { createCard } from '../card';
+import { createFilterClause } from '../filterClause';
+import { createFilterGroup } from '../filterGroup';
 
 class TestBlockFactory {
   static createBoard(): Board {

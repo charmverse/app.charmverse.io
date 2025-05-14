@@ -2,13 +2,13 @@ import styled from '@emotion/styled';
 import type { LinkProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiLink from '@mui/material/Link';
+import { getSubdomainPath } from '@packages/lib/utils/browser';
+import { isExternalUrl } from '@packages/lib/utils/isExternalUrl';
 import NextLink from 'next/link';
 import type { MouseEvent, MouseEventHandler } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSubdomainPath } from '@packages/lib/utils/browser';
-import { isExternalUrl } from '@packages/lib/utils/isExternalUrl';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',

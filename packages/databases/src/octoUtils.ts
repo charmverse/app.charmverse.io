@@ -1,20 +1,19 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
+import { getAbsolutePath } from '@packages/lib/utils/browser';
 import { isTruthy } from '@packages/utils/types';
 import { DateTime } from 'luxon';
 
-import type { UIBlockWithDetails } from '@packages/databases/block';
-import { createBlock } from '@packages/databases/block';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import { createBoard } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import { createBoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { createCard } from '@packages/databases/card';
-import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
-import type { ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
-
+import type { UIBlockWithDetails } from './block';
+import { createBlock } from './block';
+import type { IPropertyTemplate } from './board';
+import { createBoard } from './board';
+import type { BoardView } from './boardView';
+import { createBoardView } from './boardView';
+import type { Card } from './card';
+import { createCard } from './card';
+import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from './proposalDbProperties';
 import { Utils } from './utils';
 
 export type Formatters = {

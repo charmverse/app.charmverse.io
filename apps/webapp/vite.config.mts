@@ -6,6 +6,12 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./vite.setup.ts']
+    setupFiles: ['./vite.setup.ts'],
+    globalSetup: '../vite.globalSetup.ts',
+    server: {
+      deps: {
+        inline: ['@charmverse/core']
+      }
+    }
   }
 });

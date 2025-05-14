@@ -1,5 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
+import type { BoardFields, Board } from '@packages/databases/board';
+import type { BoardView, BoardViewFields } from '@packages/databases/boardView';
+import { createNewDataSource } from '@packages/databases/createNewDataSource';
+import mutator from '@packages/databases/mutator';
+import { getBoards } from '@packages/databases/store/boards';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { getViews } from '@packages/databases/store/views';
+import { createTableView } from '@packages/databases/tableView';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
 import { v4 as uuid } from 'uuid';
@@ -11,16 +20,6 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { BoardFields, Board } from '@packages/databases/board';
-import type { BoardView, BoardViewFields } from '@packages/databases/boardView';
-import { createNewDataSource } from '@packages/databases/createNewDataSource';
-import { createTableView } from '@packages/databases/tableView';
-
-import mutator from '../../../mutator';
-import { getBoards } from '../../../store/boards';
-import { initialDatabaseLoad } from '../../../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { getViews } from '../../../store/views';
 
 export const allowedSourceDatabasePageTypes = ['board', 'inline_board'];
 type Props = {
