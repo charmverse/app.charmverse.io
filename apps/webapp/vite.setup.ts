@@ -66,20 +66,22 @@ vi.mock('next/router', () => ({
 }));
 
 // Needed for prosemirror tests https://github.com/jsdom/jsdom/issues/3002
-Range.prototype.getBoundingClientRect = () => ({
-  bottom: 0,
-  height: 0,
-  left: 0,
-  right: 0,
-  top: 0,
-  width: 0,
-  x: 0,
-  y: 0,
-  toJSON: jest.fn()
-});
+if (typeof Range !== 'undefined') {
+  Range.prototype.getBoundingClientRect = () => ({
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+    toJSON: jest.fn()
+  });
 
-Range.prototype.getClientRects = () => ({
-  item: () => null,
-  length: 0,
-  [Symbol.iterator]: jest.fn()
-});
+  Range.prototype.getClientRects = () => ({
+    item: () => null,
+    length: 0,
+    [Symbol.iterator]: jest.fn()
+  });
+}
