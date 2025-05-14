@@ -1,3 +1,11 @@
+/* eslint-disable import/order */
+/* eslint-disable import/first */
+
+// load env vars for this file
+import { config } from 'dotenv';
+
+config({ path: '.env.test.local' });
+
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
