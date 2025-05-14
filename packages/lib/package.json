@@ -31,6 +31,7 @@
     "@packages/databases": "^0.0.0",
     "@packages/metrics": "^0.0.0",
     "@packages/nextjs": "^0.0.0",
+    "@packages/spaces": "^0.0.0",
     "@packages/users": "^0.0.0",
     "@packages/utils": "^1.0.0"
   }

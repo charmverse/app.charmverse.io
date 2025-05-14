@@ -1,15 +1,22 @@
 import { useTheme } from '@emotion/react';
-import InputLabel from '@mui/material/InputLabel';
+import styled from '@emotion/styled';
+import { InputLabel, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Slider from '@mui/material/Slider';
 import Stack from '@mui/material/Stack';
-import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
 
 import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
 import { communityProduct } from '@packages/lib/subscription/constants';
 import Lock from 'public/images/subscriptions/lock.svg';
 
-import { StyledToggleButtonGroup } from './PaymentTabs';
+export const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  '& .MuiToggleButton-root': {
+    borderColor: theme.palette.primary.main,
+    '&.Mui-selected': {
+      backgroundColor: theme.palette.sidebar.background
+    }
+  }
+}));
 
 export function PlanSelection({
   period,
