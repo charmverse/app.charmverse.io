@@ -9,6 +9,7 @@ export default defineConfig({
     // passing 'test' in here results in .env.test.local being loaded
     env: loadEnv('test', process.cwd(), ''),
     globals: true,
+    // note: this file runs once before each test file
     setupFiles: ['./vite.setup.ts'],
     server: {
       deps: {
