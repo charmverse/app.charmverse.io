@@ -1,8 +1,10 @@
-import { Box, Stack, TextField, Typography } from '@mui/material';
+import { Box, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { type UpgradableTier, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
+import { DowngradeableTiers, type DowngradeableTier } from '@packages/lib/subscription/downgradeSubscriptionTier';
 import { relativeTime } from '@packages/lib/utils/dates';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
+import { capitalize } from '@packages/utils/strings';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -120,6 +122,7 @@ export function DevPurchaseButton() {
   const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
   const [isCancelTierModalOpen, setIsCancelTierModalOpen] = useState(false);
+  const [isDowngradeTierModalOpen, setIsDowngradeTierModalOpen] = useState(false);
 
   return (
     <>
@@ -146,6 +149,11 @@ export function DevPurchaseButton() {
           >
             Upgrade
           </Button>
+          {space?.subscriptionTier !== 'cancelled' && space?.subscriptionTier !== 'free' ? (
+            <Button variant='contained' onClick={() => setIsDowngradeTierModalOpen(true)} sx={{ width: 'fit-content' }}>
+              Downgrade
+            </Button>
+          ) : null}
           {UpgradableTiers.includes(space?.subscriptionTier as UpgradableTier) && (
             <Button
               variant='outlined'
@@ -188,7 +196,71 @@ export function DevPurchaseButton() {
           setIsCancelTierModalOpen(false);
         }}
       />
+      <DowngradeTierModal
+        isOpen={isDowngradeTierModalOpen}
+        onClose={() => setIsDowngradeTierModalOpen(false)}
+        onSuccess={() => {
+          refreshCurrentSpace();
+          setIsDowngradeTierModalOpen(false);
+        }}
+      />
     </>
+  );
+}
+
+function DowngradeTierModal({
+  isOpen,
+  onClose: _onClose,
+  onSuccess
+}: {
+  isOpen: boolean;
+  onClose: VoidFunction;
+  onSuccess: VoidFunction;
+}) {
+  const { space } = useCurrentSpace();
+
+  const [selectedTier, setSelectedTier] = useState<DowngradeableTier | null>(null);
+
+  const onClose = () => {
+    setSelectedTier(null);
+    _onClose();
+  };
+
+  const onConfirm = async () => {
+    if (!space) {
+      return;
+    }
+
+    await charmClient.spaces.downgradeSubscriptionTier(space.id, {
+      tier: selectedTier as DowngradeableTier
+    });
+    onSuccess();
+    onClose();
+  };
+
+  if (!space) {
+    return null;
+  }
+
+  const currentTierIndex = DowngradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
+  const downgradeableTiers = DowngradeableTiers.slice(0, currentTierIndex);
+
+  return (
+    <Modal open={isOpen} onClose={onClose}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Typography>Downgrade subscription</Typography>
+        <Select value={selectedTier} onChange={(e) => setSelectedTier(e.target.value as DowngradeableTier)}>
+          {downgradeableTiers.map((tier) => (
+            <MenuItem key={tier} value={tier}>
+              {capitalize(tier)}
+            </MenuItem>
+          ))}
+        </Select>
+        <Button variant='contained' onClick={onConfirm} disabled={!selectedTier} sx={{ width: 'fit-content' }}>
+          Downgrade
+        </Button>
+      </Box>
+    </Modal>
   );
 }
 
@@ -219,8 +291,8 @@ function CancelTierModal({
       onClose={onClose}
       onConfirm={onConfirm}
       question='Are you sure you want to cancel your subscription?'
-      title='Cancel Subscription'
-      buttonText='Cancel Subscription'
+      title='Cancel current subscription'
+      buttonText='Cancel'
     />
   );
 }

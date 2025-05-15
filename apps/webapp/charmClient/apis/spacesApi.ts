@@ -1,6 +1,7 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { DowngradeSubscriptionTierRequest } from '@packages/lib/subscription/downgradeSubscriptionTier';
 import type { UpgradeSubscriptionTierRequest } from '@packages/lib/subscription/upgradeSubscriptionTier';
 import type { CreateSpaceContributionRequest } from '@packages/spaces/createSpaceContribution';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
@@ -141,5 +142,9 @@ export class SpacesApi {
 
   cancelSubscriptionTier(spaceId: string) {
     return http.POST<void>(`/api/spaces/${spaceId}/cancel-tier`);
+  }
+
+  downgradeSubscriptionTier(spaceId: string, payload: DowngradeSubscriptionTierRequest) {
+    return http.POST<void>(`/api/spaces/${spaceId}/downgrade-tier`, payload);
   }
 }
