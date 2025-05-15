@@ -4,13 +4,17 @@ import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscr
 import Image from 'next/image';
 import { useState } from 'react';
 
+import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
+
+import { useTransferDevToken } from './hooks/useTransferDevToken';
 
 export function SpaceSubscriptionForm({
   isOpen,
-  onClose,
+  onClose: _onClose,
   onSuccess,
   spaceTokenBalance
 }: {
@@ -19,11 +23,12 @@ export function SpaceSubscriptionForm({
   onSuccess: VoidFunction;
   spaceTokenBalance: number;
 }) {
-  const { space } = useCurrentSpace();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
   const [selectedTier, setSelectedTier] = useState<UpgradableTier | null>(null);
-  const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>();
+  const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
   const currentTier = space?.subscriptionTier as UpgradableTier | null;
+  const { showMessage } = useSnackbar();
 
   const { totalCost, fullMonthPrice, unusedValue } = calculateSubscriptionCost({
     currentTier,
@@ -32,11 +37,39 @@ export function SpaceSubscriptionForm({
     spaceTokenBalance
   });
 
-  const onUpgrade = () => {
-    if (!space || !selectedTier || paymentMonths === 0) return;
-    // TODO: Call backend with prorated calculation
-    onSuccess();
-  };
+  function onClose() {
+    _onClose();
+    setSelectedTier(null);
+    setPaymentPeriod('month');
+    setPaymentMonths(1);
+  }
+
+  const { isTransferring, transferDevToken } = useTransferDevToken({
+    amount: totalCost,
+    onSuccess: async ({ hash, signature, message, address: walletAddress, transferredAmount }) => {
+      if (!space || !selectedTier) return;
+
+      await charmClient.spaces
+        .upgradeSubscriptionTier(space.id, {
+          tier: selectedTier,
+          paymentMonths,
+          hash,
+          walletAddress,
+          paidTokenAmount: transferredAmount.toString(),
+          signature,
+          message
+        })
+        .catch((err) => {
+          showMessage(err?.message ?? 'Failed to upgrade space subscription. Please try again later.', 'error');
+        })
+        .then(() => {
+          showMessage('Space subscription upgraded successfully', 'success');
+          refreshCurrentSpace();
+          onSuccess();
+          onClose();
+        });
+    }
+  });
 
   if (!space) return null;
 
@@ -50,7 +83,6 @@ export function SpaceSubscriptionForm({
           </Typography>
         </Stack>
         <Divider />
-        {/* Tier Selection */}
         <Stack gap={1}>
           <Typography variant='subtitle2'>Select a tier</Typography>
           <Stack direction='row' spacing={1}>
@@ -60,18 +92,18 @@ export function SpaceSubscriptionForm({
                 sx={{ flex: 1 }}
                 variant={selectedTier === tier ? 'contained' : 'outlined'}
                 onClick={() => setSelectedTier(tier)}
-                disabled={currentTier === tier}
+                disabled={currentTier === tier || isTransferring}
               >
                 {tier.charAt(0).toUpperCase() + tier.slice(1)}
               </Button>
             ))}
           </Stack>
         </Stack>
-        {/* Period Selection */}
         <Stack gap={1}>
           <Typography variant='subtitle2'>Select a period</Typography>
           <Stack direction='row' spacing={1}>
             <Button
+              disabled={isTransferring}
               sx={{ flex: 1 }}
               variant={paymentPeriod === 'month' ? 'contained' : 'outlined'}
               onClick={() => {
@@ -82,6 +114,7 @@ export function SpaceSubscriptionForm({
               1 month
             </Button>
             <Button
+              disabled={isTransferring}
               sx={{ flex: 1 }}
               variant={paymentPeriod === 'year' ? 'contained' : 'outlined'}
               onClick={() => {
@@ -92,6 +125,7 @@ export function SpaceSubscriptionForm({
               1 year
             </Button>
             <Button
+              disabled={isTransferring}
               sx={{ flex: 1 }}
               variant={paymentPeriod === 'custom' ? 'contained' : 'outlined'}
               onClick={() => {
@@ -108,6 +142,7 @@ export function SpaceSubscriptionForm({
                 Months
               </Typography>
               <TextField
+                disabled={isTransferring}
                 variant='outlined'
                 type='number'
                 value={paymentMonths}
@@ -118,7 +153,6 @@ export function SpaceSubscriptionForm({
             </Stack>
           )}
         </Stack>
-        {/* Price Summary */}
         <Card variant='outlined' sx={{ p: 2, bgcolor: 'grey.50' }}>
           <Stack gap={1}>
             <Stack direction='row' justifyContent='space-between'>
@@ -156,9 +190,8 @@ export function SpaceSubscriptionForm({
             </Stack>
           </Stack>
         </Card>
-        {/* Actions */}
         <Stack direction='row' spacing={2} justifyContent='flex-end'>
-          <Button variant='outlined' onClick={onClose} color='error'>
+          <Button variant='outlined' onClick={onClose} color='error' disabled={isTransferring}>
             Cancel
           </Button>
           <Tooltip title={!selectedTier || !paymentPeriod ? 'Select tier and period' : ''}>
@@ -166,7 +199,8 @@ export function SpaceSubscriptionForm({
               <Button
                 variant='contained'
                 disabled={!selectedTier || paymentMonths === 0 || !paymentPeriod}
-                onClick={onUpgrade}
+                loading={isTransferring}
+                onClick={transferDevToken}
               >
                 Upgrade tier
               </Button>

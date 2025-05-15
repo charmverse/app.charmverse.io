@@ -9,10 +9,7 @@ import type {
   SpaceSubscriptionWithStripeData
 } from '@packages/lib/subscription/getActiveSpaceSubscription';
 import type { CouponDetails } from '@packages/lib/subscription/getCouponDetails';
-import type {
-  CreateProSubscriptionRequest,
-  SubscriptionPaymentIntent
-} from '@packages/lib/subscription/interfaces';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import type { UpdatePaymentMethodRequest } from '@packages/lib/subscription/updatePaymentMethod';
 import type { UpdateSubscriptionRequest } from '@packages/lib/subscription/updateProSubscription';
 import type { UpgradeSubscriptionRequest } from '@packages/lib/subscription/upgradeProSubscription';

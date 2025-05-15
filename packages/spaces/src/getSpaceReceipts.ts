@@ -13,7 +13,8 @@ type SpaceContributionReceipt = {
   txHash: string;
   paidTokenAmount: string;
   createdAt: Date;
-  userId: string;
+  userId: string | null;
+  walletAddress?: string;
 };
 
 export type SpaceReceipt = SpacePaymentReceipt | SpaceContributionReceipt;
@@ -29,13 +30,14 @@ export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]>
   });
 
   const spaceContributions = await prisma.spaceSubscriptionContribution.findMany({
-    where: { spaceId, txHash: { not: null }, userId: { not: null } },
+    where: { spaceId, txHash: { not: null } },
     select: {
       id: true,
       txHash: true,
       devTokenAmount: true,
       createdAt: true,
-      userId: true
+      userId: true,
+      walletAddress: true
     }
   });
 
@@ -45,7 +47,8 @@ export async function getSpaceReceipts(spaceId: string): Promise<SpaceReceipt[]>
       txHash: contribution.txHash!,
       paidTokenAmount: contribution.devTokenAmount,
       createdAt: contribution.createdAt,
-      userId: contribution.userId!,
+      userId: contribution.userId,
+      walletAddress: contribution.walletAddress,
       type: 'contribution' as const
     })),
     ...spacePayments.map((payment) => ({

@@ -15,6 +15,7 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { useSnackbar } from 'hooks/useSnackbar';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -129,6 +130,7 @@ export function DevPurchaseButton() {
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
       </Stack>
       <SpaceSubscriptionReceiptsList spaceReceipts={spaceReceipts} />
+
       {address ? (
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={2}>
           <Button variant='contained' onClick={() => setIsSendDevModalOpen(true)} sx={{ width: 'fit-content' }}>
@@ -181,6 +183,7 @@ function SpaceContributionModal({
   const [amount, setAmount] = useState(0);
   const { address } = useAccount();
   const { space } = useCurrentSpace();
+  const { showMessage } = useSnackbar();
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
   const { isTransferring, transferDevToken } = useTransferDevToken({
@@ -190,16 +193,22 @@ function SpaceContributionModal({
         return;
       }
 
-      await charmClient.spaces.createSpaceContribution(space.id, {
-        hash,
-        walletAddress,
-        paidTokenAmount: transferredAmount,
-        signature,
-        message
-      });
-
-      onSuccess();
-      onClose();
+      await charmClient.spaces
+        .createSpaceContribution(space.id, {
+          hash,
+          walletAddress,
+          paidTokenAmount: transferredAmount.toString(),
+          signature,
+          message
+        })
+        .catch((err) => {
+          showMessage(err?.message ?? 'The transfer of DEV tokens could not be made. Please try again later.', 'error');
+        })
+        .then(() => {
+          showMessage('DEV tokens sent successfully', 'success');
+          onSuccess();
+          onClose();
+        });
     }
   });
 
@@ -212,6 +221,10 @@ function SpaceContributionModal({
             fullWidth
             type='number'
             value={amount}
+            inputProps={{
+              min: 1,
+              max: balance
+            }}
             disabled={!address || isBalanceLoading}
             onChange={(e) => setAmount(Number(e.target.value))}
           />

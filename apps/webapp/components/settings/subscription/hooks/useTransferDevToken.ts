@@ -23,7 +23,7 @@ export function useTransferDevToken({
     signature: string;
     message: string;
     address: string;
-    transferredAmount: string;
+    transferredAmount: bigint;
   }) => Promise<void>;
 }) {
   const { address } = useAccount();
@@ -79,18 +79,13 @@ export function useTransferDevToken({
       const receipt = await publicClient.waitForTransactionReceipt({ hash: transferTxHash });
 
       if (receipt.status === 'success') {
-        onSuccess({ hash: transferTxHash, signature, message, address, transferredAmount: amount.toString() }).then(
-          () => {
-            showMessage('Transaction sent successfully', 'success');
-            refreshBalance();
-          }
-        );
+        onSuccess({ hash: transferTxHash, signature, message, address, transferredAmount }).then(refreshBalance);
       } else {
         showMessage('Transaction failed', 'error');
       }
     } catch (error) {
       log.error('Error transferring DEV token', { error });
-      showMessage('Transaction failed', 'error');
+      showMessage('Failed to transfer DEV token. Please try again later.', 'error');
     } finally {
       setIsTransferring(false);
     }

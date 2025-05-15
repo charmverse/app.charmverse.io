@@ -1,6 +1,7 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { UpgradeSubscriptionTierRequest } from '@packages/lib/subscription/upgradeSubscriptionTier';
 import type { CreateSpaceContributionRequest } from '@packages/spaces/createSpaceContribution';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 
@@ -132,5 +133,9 @@ export class SpacesApi {
 
   getSpaceTokenBalance(spaceId: string) {
     return http.GET<number>(`/api/spaces/${spaceId}/space-token-balance`);
+  }
+
+  upgradeSubscriptionTier(spaceId: string, payload: UpgradeSubscriptionTierRequest) {
+    return http.POST<void>(`/api/spaces/${spaceId}/upgrade-tier`, payload);
   }
 }
