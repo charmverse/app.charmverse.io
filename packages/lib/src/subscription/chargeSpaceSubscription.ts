@@ -5,13 +5,13 @@ import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
-export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint> = {
-  free: parseUnits('0', 18),
-  bronze: parseUnits('1000', 18),
-  silver: parseUnits('2500', 18),
-  gold: parseUnits('10000', 18),
-  grant: parseUnits('0', 18),
-  readonly: parseUnits('0', 18)
+export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, number> = {
+  free: 0,
+  bronze: 10,
+  silver: 25,
+  gold: 100,
+  grant: 0,
+  readonly: 0
 };
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
@@ -34,7 +34,10 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
 
   const subscriptionTierAmount = SubscriptionTierAmountRecord[subscriptionTier];
 
-  if (parseUnits(spaceTokenBalance.toString(), 18) < subscriptionTierAmount) {
+  const spaceTokenBalanceInWei = parseUnits(spaceTokenBalance.toString(), 18);
+  const subscriptionTierAmountInWei = parseUnits(subscriptionTierAmount.toString(), 18);
+
+  if (spaceTokenBalanceInWei < subscriptionTierAmountInWei) {
     await prisma.space.update({
       where: { id: spaceId },
       data: {

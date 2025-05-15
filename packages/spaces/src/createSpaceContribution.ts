@@ -85,7 +85,6 @@ export async function createSpaceContribution(
       walletAddress,
       devTokenAmount: paidTokenAmount,
       decentPayload: {},
-      decentStatus: 'success',
       chainId: base.id,
       txHash: hash.toLowerCase() as `0x${string}`,
       userId

@@ -1,61 +1,12 @@
 import { Stack, TextField, Typography, Card, Divider, Tooltip } from '@mui/material';
-import { DateTime } from 'luxon';
+import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
+import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
 import Image from 'next/image';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-
-type SelectableTier = 'bronze' | 'silver' | 'gold' | 'readonly' | 'free';
-
-const tierPaymentRecord: Record<SelectableTier, number> = {
-  readonly: 0,
-  free: 0,
-  bronze: 1000,
-  silver: 2500,
-  gold: 10000
-};
-
-function calculateTotalCost({
-  currentTier,
-  selectedTier,
-  paymentMonths,
-  spaceTokenBalance
-}: {
-  currentTier?: SelectableTier | null;
-  selectedTier: SelectableTier | null;
-  paymentMonths: number;
-  spaceTokenBalance: number;
-}) {
-  const fullMonthPrice = selectedTier ? tierPaymentRecord[selectedTier] : 0;
-
-  let unusedValue = 0;
-  let proratedFirstMonthCost = 0;
-  let remainingMonthsCost = 0;
-  let totalCost = 0;
-
-  const now = DateTime.now();
-  const monthEnd = now.endOf('month');
-  const daysRemaining = Math.floor(monthEnd.diff(now, 'days').days) + 1;
-  const totalDays = monthEnd.diff(now.startOf('month'), 'days').days + 1;
-
-  if (selectedTier && (currentTier === 'free' || currentTier === 'readonly')) {
-    unusedValue = Math.round(fullMonthPrice * (daysRemaining / totalDays));
-    proratedFirstMonthCost = fullMonthPrice - unusedValue;
-    remainingMonthsCost = (paymentMonths - 1) * fullMonthPrice;
-    totalCost = Math.max(Math.round(proratedFirstMonthCost + remainingMonthsCost - spaceTokenBalance), 0);
-  } else {
-    // handle paid-to-paid upgrade if needed
-    totalCost = Math.max(fullMonthPrice * paymentMonths - spaceTokenBalance, 0);
-  }
-
-  return {
-    fullMonthPrice,
-    totalCost,
-    unusedValue
-  };
-}
 
 export function SpaceSubscriptionForm({
   isOpen,
@@ -69,12 +20,12 @@ export function SpaceSubscriptionForm({
   spaceTokenBalance: number;
 }) {
   const { space } = useCurrentSpace();
-  const [selectedTier, setSelectedTier] = useState<SelectableTier | null>(null);
+  const [selectedTier, setSelectedTier] = useState<UpgradableTier | null>(null);
   const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>();
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
-  const currentTier = space?.subscriptionTier as SelectableTier | null;
+  const currentTier = space?.subscriptionTier as UpgradableTier | null;
 
-  const { totalCost, fullMonthPrice, unusedValue } = calculateTotalCost({
+  const { totalCost, fullMonthPrice, unusedValue } = calculateSubscriptionCost({
     currentTier,
     selectedTier,
     paymentMonths,
@@ -103,7 +54,7 @@ export function SpaceSubscriptionForm({
         <Stack gap={1}>
           <Typography variant='subtitle2'>Select a tier</Typography>
           <Stack direction='row' spacing={1}>
-            {(['bronze', 'silver', 'gold'] as SelectableTier[]).map((tier) => (
+            {UpgradableTiers.map((tier) => (
               <Button
                 key={tier}
                 sx={{ flex: 1 }}
