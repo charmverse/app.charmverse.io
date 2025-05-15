@@ -1,7 +1,4 @@
-import { log } from '@charmverse/core/log';
-import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { Box, Stack, TextField, Typography } from '@mui/material';
-import { getPublicClient } from '@packages/blockchain/getPublicClient';
 import { relativeTime } from '@packages/lib/utils/dates';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
@@ -9,9 +6,8 @@ import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import { erc20Abi, formatUnits, parseUnits } from 'viem';
-import { base } from 'viem/chains';
-import { useAccount, useWalletClient } from 'wagmi';
+import { formatUnits } from 'viem';
+import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
@@ -19,14 +15,12 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { useSnackbar } from 'hooks/useSnackbar';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { devTokenAddress, useDevTokenBalance } from './hooks/useDevTokenBalance';
+import { useDevTokenBalance } from './hooks/useDevTokenBalance';
+import { useTransferDevToken } from './hooks/useTransferDevToken';
 import { SpaceSubscriptionForm } from './SpaceSubscriptionForm';
-
-const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
 
 function SpaceSubscriptionReceiptsList({ spaceReceipts }: { spaceReceipts: SpaceReceipt[] }) {
   const { space } = useCurrentSpace();
@@ -186,83 +180,28 @@ function SpaceContributionModal({
 }) {
   const [amount, setAmount] = useState(0);
   const { address } = useAccount();
-  const { data: walletClient } = useWalletClient();
-  const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
-  const [isLoading, setIsLoading] = useState(false);
-  const { balance, formattedBalance, isLoading: isBalanceLoading, refreshBalance } = useDevTokenBalance({ address });
+  const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
-  const handleSend = async () => {
-    setIsLoading(true);
-    try {
+  const { isTransferring, transferDevToken } = useTransferDevToken({
+    amount,
+    onSuccess: async ({ hash, signature, message, address: walletAddress, transferredAmount }) => {
       if (!space) {
         return;
       }
 
-      if (amount === 0) {
-        return;
-      }
-
-      if (!address || !walletClient) {
-        return;
-      }
-
-      if (walletClient.chain.id !== 8453) {
-        try {
-          await walletClient.switchChain({
-            id: 8453
-          });
-        } catch (error) {
-          log.warn('Error switching chain for space contribution', { error });
-        }
-      }
-
-      const transferredAmount = parseUnits(amount.toString(), 18);
-
-      // Sign a message to verify ownership
-      const message = `I authorize this DEV token transfer of ${amount} DEV to the ${space.name} charmverse space`;
-      const signature = await walletClient.signMessage({ message });
-
-      const transferTxHash = await walletClient.writeContract({
-        address: devTokenAddress,
-        abi: erc20Abi,
-        functionName: 'transfer',
-        args: [recipientAddress, transferredAmount]
-      });
-
-      const publicClient = getPublicClient(base.id);
-
-      const receipt = await publicClient.waitForTransactionReceipt({ hash: transferTxHash });
-
-      if (receipt.status === 'success') {
-        showMessage('Transaction sent successfully', 'success');
-      } else {
-        showMessage('Transaction failed', 'error');
-      }
-
       await charmClient.spaces.createSpaceContribution(space.id, {
-        hash: transferTxHash,
-        walletAddress: address,
-        paidTokenAmount: transferredAmount.toString(),
+        hash,
+        walletAddress,
+        paidTokenAmount: transferredAmount,
         signature,
         message
       });
 
       onSuccess();
       onClose();
-      refreshBalance();
-    } catch (error) {
-      log.error('Error sending space contribution', { error });
-      showMessage('Error sending space contribution', 'error');
-    } finally {
-      setIsLoading(false);
     }
-  };
-
-  if (!address) {
-    // we should never get here, but just in case
-    return null;
-  }
+  });
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -284,9 +223,9 @@ function SpaceContributionModal({
           </Stack>
         </Stack>
         <Button
-          loading={isLoading || isBalanceLoading}
+          loading={isTransferring || isBalanceLoading}
           variant='contained'
-          onClick={handleSend}
+          onClick={transferDevToken}
           sx={{ width: 'fit-content' }}
           disabled={amount === 0 || balance < amount}
         >
