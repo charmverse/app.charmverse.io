@@ -39,7 +39,7 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 }
 
 const whiteListedUserIds = [
-  '0f7a6e61-acb8-4227-b618-4dcab1f429eb',
+  '3bb5e378-50e3-440d-b908-b82d5107f1fc',
   // devorein in prod
   '5906c806-9497-43c7-9ffc-2eecd3c3a3ec',
   // mattcasey in prod
