@@ -138,4 +138,8 @@ export class SpacesApi {
   upgradeSubscriptionTier(spaceId: string, payload: UpgradeSubscriptionTierRequest) {
     return http.POST<void>(`/api/spaces/${spaceId}/upgrade-tier`, payload);
   }
+
+  cancelSubscriptionTier(spaceId: string) {
+    return http.POST<void>(`/api/spaces/${spaceId}/cancel-tier`);
+  }
 }

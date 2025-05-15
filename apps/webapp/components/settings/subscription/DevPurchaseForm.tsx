@@ -1,4 +1,5 @@
 import { Box, Stack, TextField, Typography } from '@mui/material';
+import { type UpgradableTier, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { relativeTime } from '@packages/lib/utils/dates';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
@@ -13,6 +14,7 @@ import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -101,7 +103,7 @@ function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: b
 }
 
 export function DevPurchaseButton() {
-  const { space } = useCurrentSpace();
+  const { space, refreshCurrentSpace } = useCurrentSpace();
   const { address } = useAccount();
 
   const { data: spaceTokenBalance = 0, mutate: refreshSpaceTokenBalance } = useSWR(
@@ -117,6 +119,7 @@ export function DevPurchaseButton() {
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
   const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
+  const [isCancelTierModalOpen, setIsCancelTierModalOpen] = useState(false);
 
   return (
     <>
@@ -143,6 +146,16 @@ export function DevPurchaseButton() {
           >
             Upgrade
           </Button>
+          {UpgradableTiers.includes(space?.subscriptionTier as UpgradableTier) && (
+            <Button
+              variant='outlined'
+              color='error'
+              onClick={() => setIsCancelTierModalOpen(true)}
+              sx={{ width: 'fit-content' }}
+            >
+              Cancel
+            </Button>
+          )}
         </Stack>
       ) : (
         <RainbowKitProvider>
@@ -167,7 +180,48 @@ export function DevPurchaseButton() {
           setIsSpaceTierPurchaseModalOpen(false);
         }}
       />
+      <CancelTierModal
+        isOpen={isCancelTierModalOpen}
+        onClose={() => setIsCancelTierModalOpen(false)}
+        onSuccess={() => {
+          refreshCurrentSpace();
+          setIsCancelTierModalOpen(false);
+        }}
+      />
     </>
+  );
+}
+
+function CancelTierModal({
+  isOpen,
+  onClose,
+  onSuccess
+}: {
+  isOpen: boolean;
+  onClose: VoidFunction;
+  onSuccess: VoidFunction;
+}) {
+  const { space } = useCurrentSpace();
+
+  const onConfirm = async () => {
+    if (!space) {
+      return;
+    }
+
+    await charmClient.spaces.cancelSubscriptionTier(space.id);
+    onSuccess();
+    onClose();
+  };
+
+  return (
+    <ConfirmDeleteModal
+      open={isOpen}
+      onClose={onClose}
+      onConfirm={onConfirm}
+      question='Are you sure you want to cancel your subscription?'
+      title='Cancel Subscription'
+      buttonText='Cancel Subscription'
+    />
   );
 }
 

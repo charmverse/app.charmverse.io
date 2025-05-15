@@ -5,13 +5,16 @@ import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
+import { UpgradableTiers, type UpgradableTier } from './calculateSubscriptionCost';
+
 export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, number> = {
   free: 0,
   bronze: 10,
   silver: 25,
   gold: 100,
   grant: 0,
-  readonly: 0
+  readonly: 0,
+  cancelled: 0
 };
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
@@ -27,6 +30,14 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
 
   if (!space.subscriptionTier) {
     throw new Error('Space is not a subscription space');
+  }
+
+  if (space.subscriptionTier === 'cancelled') {
+    throw new Error('Space subscription is cancelled');
+  }
+
+  if (!UpgradableTiers.includes(space.subscriptionTier as UpgradableTier)) {
+    throw new Error('Space subscription is not chargeable');
   }
 
   const subscriptionTier = space.subscriptionTier;
