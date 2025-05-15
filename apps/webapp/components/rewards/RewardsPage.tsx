@@ -6,6 +6,7 @@ import type { PageContent } from '@packages/charmeditor/interfaces';
 import { createBoard } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
 import { viewTypeToBlockId } from '@packages/databases/customBlocks/constants';
+import mutator from '@packages/databases/mutator';
 import { APPLICANT_STATUS_BLOCK_ID, DUE_DATE_ID, REWARD_STATUS_BLOCK_ID } from '@packages/lib/rewards/blocks/constants';
 import { supportedRewardViewTypes } from '@packages/lib/rewards/blocks/views';
 import { debounce } from 'lodash';
@@ -30,7 +31,6 @@ import ViewTabs from 'components/common/DatabaseEditor/components/viewHeader/vie
 import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
 import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
 import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
-import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';

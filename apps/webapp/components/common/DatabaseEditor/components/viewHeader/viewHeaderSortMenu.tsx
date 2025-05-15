@@ -1,16 +1,16 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import { Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
-import React, { useCallback } from 'react';
-
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView, ISortOption } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import React, { useCallback } from 'react';
 
-import mutator from '../../mutator';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
+
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 type Props = {

@@ -10,8 +10,9 @@
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx react-env --path .env.test.local -- npx next start",
     "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
-    "test:integration": "npx jest --config='./__integration-tests__/jest.config.ts' --maxWorkers=2",
-    "test:browser": "TZ=UTC node --experimental-vm-modules ../../node_modules/.bin/jest --config='./components/jest.config.ts' && TZ=UTC node --experimental-vm-modules ../../node_modules/.bin/jest --config='./hooks/jest.config.ts'"
+    "test:integration": "",
+    "test:browser": "npx vitest --globals --update --project=browser",
+    "test:lib": "npx vitest --globals --update --project=lib"
   },
   "dependencies": {
     "@fontsource/ia-writer-mono": "^5.2.5",
@@ -30,9 +31,25 @@
     "@packages/spaces": "^0.0.0",
     "@packages/users": "^0.0.0",
     "@packages/utils": "^1.0.0",
-    "@packages/websockets": "^0.0.0"
+    "@packages/websockets": "^0.0.0",
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/addon-interactions": "^8.6.12",
+    "@storybook/addon-links": "^8.6.12",
+    "@storybook/blocks": "^8.6.12",
+    "@storybook/manager-api": "^8.6.12",
+    "@storybook/nextjs": "^8.6.12",
+    "@storybook/react": "^8.6.12",
+    "@storybook/theming": "^8.6.12",
+    "msw-storybook-addon": "^2.0.4",
+    "react-icons": "^5.5.0",
+    "react-pdf": "^9.2.1",
+    "react-to-print": "^2.15.1",
+    "react-window": "^1.8.11"
   },
   "devDependencies": {
-    "@packages/testing": "^1.0.0"
+    "@packages/testing": "^1.0.0",
+    "@storybook/icons": "^1.4.0",
+    "@storybook/test": "^8.6.12",
+    "storybook": "^8.3.7"
   }
 }

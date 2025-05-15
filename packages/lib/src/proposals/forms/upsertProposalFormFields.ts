@@ -5,7 +5,7 @@ import type { FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
 import { isUUID } from '@packages/utils/strings';
 import { v4 } from 'uuid';
 
-import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
+import { checkFormFieldErrors } from './checkFormFieldErrors';
 
 export async function upsertProposalFormFields({
   proposalId,

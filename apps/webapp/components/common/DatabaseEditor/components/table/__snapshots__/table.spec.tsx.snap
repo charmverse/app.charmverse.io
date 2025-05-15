@@ -1,4 +1,3212 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`components/table/Table extended > should match snapshot with CreatedBy 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="Table"
+    >
+      <div
+        class="octo-table-body"
+      >
+        <div
+          class="octo-table-header TableHeaders"
+          id="mainBoardHeader"
+        >
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="SubjectIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Title"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Title
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 1"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 1
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowDownwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m20 12-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 2"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 2
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowUpwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 3"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 3
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            style="flex-grow: 1;"
+          >
+            <button
+              class="Button size--small"
+              type="button"
+            >
+              <span>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  data-test="add-table-prop"
+                  data-testid="AddIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="table-row-container"
+          style="margin-top: 2px;"
+        >
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-1"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
+                    href="/card-id-1"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-2"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
+                    href="/card-id-2"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+        </div>
+        <div
+          class="octo-table-footer"
+        >
+          <div
+            class="octo-table-cell"
+            data-test="table-add-card"
+          >
+            <div
+              class="MuiBox-root css-1c1kq07"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                data-testid="AddIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                />
+              </svg>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                id="TableComponent.plus-new"
+              >
+                New
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
+        >
+          <div
+            class="Calculation count octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Count
+            </span>
+            <span
+              class="calculationValue"
+            >
+              2
+            </span>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`components/table/Table extended > should match snapshot with CreatedBy 2`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="Table"
+    >
+      <div
+        class="octo-table-body"
+      >
+        <div
+          class="octo-table-header TableHeaders"
+          id="mainBoardHeader"
+        >
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="SubjectIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Title"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Title
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 1"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 1
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowDownwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m20 12-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 2"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 2
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowUpwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 3"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 3
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            style="flex-grow: 1;"
+          >
+            <button
+              class="Button size--small"
+              type="button"
+            >
+              <span>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  data-test="add-table-prop"
+                  data-testid="AddIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="table-row-container"
+          style="margin-top: 2px;"
+        >
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-1"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
+                    href="/card-id-1"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-2"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
+                    href="/card-id-2"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+        </div>
+        <div
+          class="octo-table-footer"
+        >
+          <div
+            class="octo-table-cell"
+            data-test="table-add-card"
+          >
+            <div
+              class="MuiBox-root css-1c1kq07"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                data-testid="AddIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                />
+              </svg>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                id="TableComponent.plus-new"
+              >
+                New
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
+        >
+          <div
+            class="Calculation count octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Count
+            </span>
+            <span
+              class="calculationValue"
+            >
+              2
+            </span>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`components/table/Table extended > should match snapshot with UpdatedAt 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="Table"
+    >
+      <div
+        class="octo-table-body"
+      >
+        <div
+          class="octo-table-header TableHeaders"
+          id="mainBoardHeader"
+        >
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="SubjectIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Title"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Title
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 1"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 1
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowDownwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m20 12-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 2"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 2
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowUpwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 3"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 3
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            style="flex-grow: 1;"
+          >
+            <button
+              class="Button size--small"
+              type="button"
+            >
+              <span>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  data-test="add-table-prop"
+                  data-testid="AddIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="table-row-container"
+          style="margin-top: 2px;"
+        >
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-1"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
+                    href="/card-id-1"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-2"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
+                    href="/card-id-2"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+        </div>
+        <div
+          class="octo-table-footer"
+        >
+          <div
+            class="octo-table-cell"
+            data-test="table-add-card"
+          >
+            <div
+              class="MuiBox-root css-1c1kq07"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                data-testid="AddIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                />
+              </svg>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                id="TableComponent.plus-new"
+              >
+                New
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
+        >
+          <div
+            class="Calculation count octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Count
+            </span>
+            <span
+              class="calculationValue"
+            >
+              2
+            </span>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>
+`;
+
+exports[`components/table/Table extended > should match snapshot with UpdatedBy 1`] = `
+<div>
+  <span
+    class="mocked mocked"
+  >
+    <div
+      class="Table"
+    >
+      <div
+        class="octo-table-body"
+      >
+        <div
+          class="octo-table-header TableHeaders"
+          id="mainBoardHeader"
+        >
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="SubjectIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Title"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Title
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 1"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 1
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowDownwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m20 12-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 2"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 2
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        data-testid="ArrowUpwardOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"
+                        />
+                      </svg>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
+            draggable="true"
+            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
+          >
+            <div
+              class="MuiStack-root css-19zgtxi-MuiStack-root"
+            >
+              <div>
+                <div>
+                  <span
+                    class="Label empty "
+                  >
+                    <div
+                      style="margin-right: 4px; display: flex;"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        data-testid="ArrowDropDownCircleOutlinedIcon"
+                        focusable="false"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <span
+                      aria-label="Property 3"
+                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      data-mui-internal-clone-element="true"
+                    >
+                      Property 3
+                    </span>
+                    <button
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      tabindex="0"
+                      type="button"
+                    />
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-spacer"
+            />
+            <div
+              class="HorizontalGrip"
+              draggable="true"
+            />
+          </div>
+          <div
+            class="octo-table-cell header-cell disable-drag-selection"
+            style="flex-grow: 1;"
+          >
+            <button
+              class="Button size--small"
+              type="button"
+            >
+              <span>
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  data-test="add-table-prop"
+                  data-testid="AddIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                  />
+                </svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div
+          class="table-row-container"
+          style="margin-top: 2px;"
+        >
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-1"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-1"
+                    data-test-resolved="false"
+                    href="/card-id-1"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-1-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+          <div
+            class="TableRow octo-table-row"
+            data-test="database-row-card-id-2"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+          >
+            <div
+              class="MuiStack-root css-1v111ru-MuiStack-root"
+            >
+              <div
+                class="icons row-actions"
+                draggable="true"
+                style="padding: 0px;"
+              >
+                <div
+                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    data-testid="DragIndicatorIcon"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+            >
+              <div
+                style="display: flex; width: 100%;"
+              >
+                <div
+                  class="octo-icontitle"
+                  style="align-self: flex-start; align-items: flex-start;"
+                >
+                  <div
+                    class="css-1s68mph"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      data-testid="InsertDriveFileOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                      />
+                    </svg>
+                  </div>
+                  <div
+                    style="width: 100%; height: 100%;"
+                  >
+                    <div
+                      style="height: 100%;"
+                    >
+                      <div
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        spellcheck="true"
+                      >
+                        <input
+                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          placeholder="Untitled"
+                          type="text"
+                          value="title"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="open-button"
+                >
+                  <a
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    data-test="database-open-button-card-id-2"
+                    data-test-resolved="false"
+                    href="/card-id-2"
+                    style="text-decoration: none;"
+                  >
+                    <button
+                      class="Button size--small"
+                      type="button"
+                    >
+                      <span>
+                        Open
+                      </span>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property1"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      >
+                        <div
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          data-test="select-preview-value-value1"
+                        >
+                          <span
+                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                          >
+                            value 1
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property2"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              data-test="database-card-card-id-2-column-property3"
+              style="align-items: flex-start; width: 100px; overflow-x: hidden;"
+            >
+              <div
+                style="width: 100%; height: 100%;"
+              >
+                <div
+                  style="height: 100%;"
+                >
+                  <div
+                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    data-test="closed-select-input"
+                  >
+                    <div
+                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      data-test="select-preview"
+                    >
+                      <div
+                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        data-mui-internal-clone-element="true"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="octo-table-cell"
+              style="flex-grow: 1;"
+            />
+          </div>
+        </div>
+        <div
+          class="octo-table-footer"
+        >
+          <div
+            class="octo-table-cell"
+            data-test="table-add-card"
+          >
+            <div
+              class="MuiBox-root css-1c1kq07"
+            >
+              <svg
+                aria-hidden="true"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                data-testid="AddIcon"
+                focusable="false"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
+                />
+              </svg>
+              <p
+                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                id="TableComponent.plus-new"
+              >
+                New
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="CalculationRow octo-table-row"
+          style="margin-left: 25px;"
+        >
+          <div
+            class="Calculation count octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Count
+            </span>
+            <span
+              class="calculationValue"
+            >
+              2
+            </span>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+          <div
+            class="Calculation none octo-table-cell   "
+            style="width: 100px;"
+            tabindex="0"
+          >
+            <div />
+            <span
+              class="calculationLabel"
+            >
+              Calculate
+            </span>
+            <svg
+              aria-hidden="true"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              data-testid="ExpandMoreIcon"
+              focusable="false"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+</div>
+`;
 
 exports[`components/table/Table extended should match snapshot with CreatedBy 1`] = `
 <div>
@@ -3154,337 +6362,6 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                 d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
               />
             </svg>
-          </div>
-          <div
-            class="Calculation none octo-table-cell   "
-            style="width: 100px;"
-            tabindex="0"
-          >
-            <div />
-            <span
-              class="calculationLabel"
-            >
-              Calculate
-            </span>
-            <svg
-              aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-              data-testid="ExpandMoreIcon"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
-              />
-            </svg>
-          </div>
-          <div
-            class="Calculation none octo-table-cell   "
-            style="width: 100px;"
-            tabindex="0"
-          >
-            <div />
-            <span
-              class="calculationLabel"
-            >
-              Calculate
-            </span>
-            <svg
-              aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-              data-testid="ExpandMoreIcon"
-              focusable="false"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M16.59 8.59 12 13.17 7.41 8.59 6 10l6 6 6-6z"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
-    </div>
-  </span>
-</div>
-`;
-
-exports[`components/table/Table should match snapshot 1`] = `
-<div>
-  <span
-    class="variable variable"
-  >
-    <div
-      class="Table"
-    >
-      <div
-        class="octo-table-body"
-      >
-        <div
-          class="octo-table-header TableHeaders"
-          id="mainBoardHeader"
-        >
-          <div
-            class="octo-table-cell header-cell disable-drag-selection"
-            data-test="table-property-text"
-            draggable="true"
-            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
-          >
-            <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
-            >
-              <div>
-                <div>
-                  <span
-                    class="Label empty "
-                  >
-                    <div
-                      style="margin-right: 4px; display: flex;"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
-                        data-testid="SubjectIcon"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
-                        />
-                      </svg>
-                    </div>
-                    <span
-                      aria-label="Title"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
-                      data-mui-internal-clone-element="true"
-                    >
-                      Title
-                    </span>
-                    <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
-                      tabindex="0"
-                      type="button"
-                    />
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="octo-spacer"
-            />
-            <div
-              class="HorizontalGrip"
-              draggable="true"
-            />
-          </div>
-          <div
-            class="octo-table-cell header-cell disable-drag-selection"
-            data-test="table-property-select"
-            draggable="true"
-            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
-          >
-            <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
-            >
-              <div>
-                <div>
-                  <span
-                    class="Label empty "
-                  >
-                    <div
-                      style="margin-right: 4px; display: flex;"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
-                        data-testid="ArrowDropDownCircleOutlinedIcon"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
-                        />
-                      </svg>
-                    </div>
-                    <span
-                      aria-label="Property 1"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
-                      data-mui-internal-clone-element="true"
-                    >
-                      Property 1
-                    </span>
-                    <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
-                      tabindex="0"
-                      type="button"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-                        data-testid="ArrowDownwardOutlinedIcon"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="m20 12-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8z"
-                        />
-                      </svg>
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="octo-spacer"
-            />
-            <div
-              class="HorizontalGrip"
-              draggable="true"
-            />
-          </div>
-          <div
-            class="octo-table-cell header-cell disable-drag-selection"
-            data-test="table-property-select"
-            draggable="true"
-            style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
-          >
-            <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
-            >
-              <div>
-                <div>
-                  <span
-                    class="Label empty "
-                  >
-                    <div
-                      style="margin-right: 4px; display: flex;"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
-                        data-testid="ArrowDropDownCircleOutlinedIcon"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="M12 4c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8m0-2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 13-4-4h8z"
-                        />
-                      </svg>
-                    </div>
-                    <span
-                      aria-label="Property 2"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
-                      data-mui-internal-clone-element="true"
-                    >
-                      Property 2
-                    </span>
-                    <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
-                      tabindex="0"
-                      type="button"
-                    >
-                      <svg
-                        aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-                        data-testid="ArrowUpwardOutlinedIcon"
-                        focusable="false"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          d="m4 12 1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8z"
-                        />
-                      </svg>
-                    </button>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div
-              class="octo-spacer"
-            />
-            <div
-              class="HorizontalGrip"
-              draggable="true"
-            />
-          </div>
-          <div
-            class="octo-table-cell header-cell disable-drag-selection"
-            style="flex-grow: 1;"
-          >
-            <button
-              class="Button size--small"
-              type="button"
-            >
-              <span>
-                <svg
-                  aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-                  data-test="add-table-prop"
-                  data-testid="AddIcon"
-                  focusable="false"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
-                  />
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-        <div
-          class="table-row-container"
-          style="margin-top: 2px;"
-        />
-        <div
-          class="octo-table-footer"
-        >
-          <div
-            class="octo-table-cell"
-            data-test="table-add-card"
-          >
-            <div
-              class="MuiBox-root css-1c1kq07"
-            >
-              <svg
-                aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
-                data-testid="AddIcon"
-                focusable="false"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
-                />
-              </svg>
-              <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
-                id="TableComponent.plus-new"
-              >
-                New
-              </p>
-            </div>
-          </div>
-        </div>
-        <div
-          class="CalculationRow octo-table-row"
-          style="margin-left: 25px;"
-        >
-          <div
-            class="Calculation count octo-table-cell   "
-            style="width: 100px;"
-            tabindex="0"
-          >
-            <div />
-            <span
-              class="calculationLabel"
-            >
-              Count
-            </span>
-            <span
-              class="calculationValue"
-            >
-              0
-            </span>
           </div>
           <div
             class="Calculation none octo-table-cell   "

@@ -1,15 +1,17 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { TENANT_URLS } from '@packages/lib/summon/constants';
 import * as summonProfile from '@packages/profile/getSummonProfile';
 import { createUserWithWallet, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import { TENANT_URLS } from '@packages/lib/summon/constants';
 import { v4 } from 'uuid';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
 
-jest.mock('@packages/profile/getSummonProfile', () => ({
-  getSummonProfile: jest.fn().mockResolvedValue(null)
+vi.mock('@packages/profile/getSummonProfile', () => ({
+  getSummonProfile: vi.fn().mockResolvedValue(null)
 }));
 
 const spaceXpsEngineId = Object.keys(TENANT_URLS)[0];
@@ -50,7 +52,7 @@ describe('syncSummonSpaceRoles', () => {
       userId: user2.id
     });
 
-    (summonProfile.getSummonProfile as jest.Mock<any, any>)
+    (summonProfile.getSummonProfile as Mock)
       .mockResolvedValueOnce({
         tenantId: spaceXpsEngineId,
         user: userXpsEngineId,
@@ -126,7 +128,7 @@ describe('syncSummonSpaceRoles', () => {
     expect(user2SpaceRoleToRole).toBeTruthy();
     expect(totalSpaceRolesAdded).toBe(2);
     expect(totalSpaceRolesUpdated).toBe(0);
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it(`Should create new role for a single user if userId is also passed`, async () => {
@@ -143,7 +145,7 @@ describe('syncSummonSpaceRoles', () => {
 
     const userXpsEngineId = v4();
 
-    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+    (summonProfile.getSummonProfile as Mock).mockResolvedValue({
       tenantId: spaceXpsEngineId,
       user: userXpsEngineId,
       meta: {
@@ -206,14 +208,14 @@ describe('syncSummonSpaceRoles', () => {
     expect(user2SpaceRoleToRole).toBeFalsy();
     expect(totalSpaceRolesAdded).toBe(1);
     expect(totalSpaceRolesUpdated).toBe(0);
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it(`Should skip updating role if it already exist and space role to role if it doesn't change`, async () => {
     const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
 
-    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+    (summonProfile.getSummonProfile as Mock).mockResolvedValue({
       tenantId: spaceXpsEngineId,
       user: userXpsEngineId,
       meta: {
@@ -256,14 +258,14 @@ describe('syncSummonSpaceRoles', () => {
 
     expect(totalSpaceRolesAdded).toBe(0);
     expect(totalSpaceRolesUpdated).toBe(0);
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 
   it(`Should skip creating role if it already exist and but space role to role if it changes`, async () => {
     const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
 
-    (summonProfile.getSummonProfile as jest.Mock<any, any>).mockResolvedValue({
+    (summonProfile.getSummonProfile as Mock).mockResolvedValue({
       tenantId: spaceXpsEngineId,
       user: userXpsEngineId,
       meta: {
@@ -323,6 +325,6 @@ describe('syncSummonSpaceRoles', () => {
     expect(previousLevel1SpaceRoleToRole).toBeFalsy();
     expect(totalSpaceRolesAdded).toBe(0);
     expect(totalSpaceRolesUpdated).toBe(1);
-    jest.resetAllMocks();
+    vi.resetAllMocks();
   });
 });

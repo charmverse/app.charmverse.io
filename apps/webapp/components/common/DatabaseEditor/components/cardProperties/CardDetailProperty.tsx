@@ -1,13 +1,12 @@
 import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Menu, Stack, Tooltip } from '@mui/material';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-
 import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
+import type { Mutator } from '@packages/databases/mutator';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { useSortable } from '../../hooks/sortable';
-import type { Mutator } from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import PropertyMenu from '../../widgets/propertyMenu';
 import { PropertyLabel } from '../properties/PropertyLabel';

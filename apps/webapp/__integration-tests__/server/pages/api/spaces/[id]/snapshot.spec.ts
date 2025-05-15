@@ -1,11 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 import request from 'supertest';
+import type { MockedFunction } from 'vitest';
 
-const mockedGetSnapshotSpace = getSnapshotSpace as jest.MockedFunction<typeof getSnapshotSpace>;
+const mockedGetSnapshotSpace = getSnapshotSpace as MockedFunction<typeof getSnapshotSpace>;
 
 let nonAdminUser: User;
 let nonAdminUserCookie: string;
@@ -32,7 +33,7 @@ beforeEach(() => {
   mockedGetSnapshotSpace.mockReset();
 });
 
-xdescribe('PUT /api/spaces/[id]/snapshot - Update snapshot connection', () => {
+describe.skip('PUT /api/spaces/[id]/snapshot - Update snapshot connection', () => {
   it("should update a space's snapshot connection if the user is a space admin, responding with 200", async () => {
     const update = {
       snapshotDomain: 'aave.eth'

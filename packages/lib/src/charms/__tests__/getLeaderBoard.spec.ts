@@ -1,7 +1,7 @@
-import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { addCharms } from '@packages/lib/charms/addCharms';
 import { getLeaderBoard } from '@packages/lib/charms/getLeaderBoard';
 import { getUserOrSpaceWallet } from '@packages/lib/charms/getUserOrSpaceWallet';
+import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 
 async function createMockUsersWithBalance(number = 20) {
   const arr = Array.from({ length: number }).fill(true);

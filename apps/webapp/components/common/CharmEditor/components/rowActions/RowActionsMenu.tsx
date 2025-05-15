@@ -9,6 +9,9 @@ import {
 import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
+import { getSortedBoards } from '@packages/databases/store/boards';
+import { useAppSelector } from '@packages/databases/store/hooks';
+import { isMac } from '@packages/lib/utils/browser';
 import { slugify } from '@packages/utils/strings';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { TextSelection } from 'prosemirror-state';
@@ -19,12 +22,9 @@ import { useCopyToClipboard } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
-import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { isMac } from '@packages/lib/utils/browser';
 
 import { getHeadingLink } from '../heading';
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';

@@ -1,13 +1,12 @@
 /* eslint-disable max-lines */
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { useDrop } from 'react-dnd';
-import type { IntlShape } from 'react-intl';
-
 import type { BoardGroup } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
+import { useDrop } from 'react-dnd';
+import type { IntlShape } from 'react-intl';
 
-import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import Label from '../../widgets/label';
 import Menu from '../../widgets/menu';

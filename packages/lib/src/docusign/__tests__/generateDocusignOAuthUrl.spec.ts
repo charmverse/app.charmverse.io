@@ -1,12 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { baseUrl, docusignClientId, docusignOauthBaseUri } from '@packages/config/constants';
 import { v4 as uuid } from 'uuid';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import { encodeDocusignState } from '../encodeAndDecodeDocusignState';
 import { docusignScopes, generateDocusignOAuthUrl } from '../generateDocusignOAuthUrl';
 
-jest.mock('../encodeAndDecodeDocusignState.ts', () => ({
-  encodeDocusignState: jest.fn()
+vi.mock('../encodeAndDecodeDocusignState.ts', () => ({
+  encodeDocusignState: vi.fn()
 }));
 
 describe('generateDocusignOAuthUrl', () => {
@@ -14,12 +16,12 @@ describe('generateDocusignOAuthUrl', () => {
   const validSpaceId = uuid();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return a valid OAuth URL for valid input', async () => {
     const state = 'sealedState';
-    (encodeDocusignState as jest.Mock).mockResolvedValue(state);
+    (encodeDocusignState as Mock).mockResolvedValue(state);
 
     const result = await generateDocusignOAuthUrl({ spaceId: validSpaceId, userId: validUserId });
 
@@ -35,7 +37,7 @@ describe('generateDocusignOAuthUrl', () => {
 
   it('should throw InvalidInputError for invalid userId', async () => {
     const invalidUserId = 'invalid-uuid';
-    (encodeDocusignState as jest.Mock).mockRejectedValue(new InvalidInputError('Invalid spaceId or userId'));
+    (encodeDocusignState as Mock).mockRejectedValue(new InvalidInputError('Invalid spaceId or userId'));
 
     await expect(generateDocusignOAuthUrl({ spaceId: validSpaceId, userId: invalidUserId })).rejects.toThrow(
       InvalidInputError
@@ -44,7 +46,7 @@ describe('generateDocusignOAuthUrl', () => {
 
   it('should throw InvalidInputError for invalid spaceId', async () => {
     const invalidSpaceId = 'invalid-uuid';
-    (encodeDocusignState as jest.Mock).mockRejectedValue(new InvalidInputError('Invalid spaceId or userId'));
+    (encodeDocusignState as Mock).mockRejectedValue(new InvalidInputError('Invalid spaceId or userId'));
 
     await expect(generateDocusignOAuthUrl({ spaceId: invalidSpaceId, userId: validUserId })).rejects.toThrow(
       InvalidInputError
@@ -53,7 +55,7 @@ describe('generateDocusignOAuthUrl', () => {
 
   it('should handle errors from encodeDocusignState', async () => {
     const error = new Error('encodeDocusignState error');
-    (encodeDocusignState as jest.Mock).mockRejectedValue(error);
+    (encodeDocusignState as Mock).mockRejectedValue(error);
 
     await expect(generateDocusignOAuthUrl({ spaceId: validSpaceId, userId: validUserId })).rejects.toThrow(error);
   });

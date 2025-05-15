@@ -1,8 +1,6 @@
-import { createIntl } from 'react-intl';
-
 import type { IPropertyTemplate } from '@packages/databases/board';
-
-import { TestBlockFactory } from '../../test/testBlockFactory';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
+import { createIntl } from 'react-intl';
 
 import Calculations from './calculations';
 

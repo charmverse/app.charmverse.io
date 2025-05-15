@@ -3,7 +3,39 @@ import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/pri
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { CardWithRelations } from '@packages/databases/card';
+import type { Mutator } from '@packages/databases/mutator';
+import defaultMutator from '@packages/databases/mutator';
+import { OctoUtils } from '@packages/databases/octoUtils';
+import {
+  EVALUATION_STATUS_LABELS,
+  PROPOSAL_STEP_LABELS,
+  proposalStatusColors
+} from '@packages/databases/proposalDbProperties';
+import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
+import type { ProposalReviewerProperty } from '@packages/lib/proposals/blocks/interfaces';
 import type { OpProjectFieldValue } from '@packages/lib/proposals/forms/interfaces';
+import { getProposalEvaluationStatus } from '@packages/lib/proposals/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
+import {
+  APPLICANT_STATUS_BLOCK_ID,
+  DUE_DATE_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_AMOUNT,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
+  REWARD_PROPOSAL_LINK,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID,
+  REWARD_TOKEN
+} from '@packages/lib/rewards/blocks/constants';
+import { getRewardType } from '@packages/lib/rewards/getRewardType';
+import type { RewardReviewer, RewardStatus } from '@packages/lib/rewards/interfaces';
+import { getAbsolutePath } from '@packages/lib/utils/browser';
+import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import type { ReactElement, ReactNode } from 'react';
@@ -28,40 +60,8 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
-import type { CardWithRelations } from '@packages/databases/card';
-import {
-  EVALUATION_STATUS_LABELS,
-  PROPOSAL_STEP_LABELS,
-  proposalStatusColors
-} from '@packages/databases/proposalDbProperties';
-import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
-import type { ProposalReviewerProperty } from '@packages/lib/proposals/blocks/interfaces';
-import { getProposalEvaluationStatus } from '@packages/lib/proposals/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
-import {
-  APPLICANT_STATUS_BLOCK_ID,
-  DUE_DATE_ID,
-  REWARDS_APPLICANTS_BLOCK_ID,
-  REWARDS_AVAILABLE_BLOCK_ID,
-  REWARD_AMOUNT,
-  REWARD_APPLICANTS_COUNT,
-  REWARD_CHAIN,
-  REWARD_CUSTOM_VALUE,
-  REWARD_PROPOSAL_LINK,
-  REWARD_REVIEWERS_BLOCK_ID,
-  REWARD_STATUS_BLOCK_ID,
-  REWARD_TOKEN
-} from '@packages/lib/rewards/blocks/constants';
-import { getRewardType } from '@packages/lib/rewards/getRewardType';
-import type { RewardReviewer, RewardStatus } from '@packages/lib/rewards/interfaces';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
-import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 
 import type { PropertyValueDisplayType } from '../interfaces';
-import type { Mutator } from '../mutator';
-import defaultMutator from '../mutator';
-import { OctoUtils } from '../octoUtils';
 import Checkbox from '../widgets/checkbox';
 
 import CreatedAt from './properties/createdAt/createdAt';

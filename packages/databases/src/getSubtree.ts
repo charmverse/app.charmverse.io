@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { DataNotFoundError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
-
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 
 import type { BlockWithDetails } from './block';
 import type { Board, BoardFields } from './board';

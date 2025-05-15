@@ -1,7 +1,4 @@
 /* eslint-disable default-param-last */
-import { Mutator } from 'components/common/DatabaseEditor/mutator';
-import { Utils } from 'components/common/DatabaseEditor/utils';
-import type { RewardBlocksContextType } from 'components/rewards/hooks/useRewardBlocks';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import type {
   Board,
@@ -12,7 +9,11 @@ import type {
 } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
+import { Mutator } from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
 import type { RewardPropertiesField } from '@packages/lib/rewards/blocks/interfaces';
+
+import type { RewardBlocksContextType } from 'components/rewards/hooks/useRewardBlocks';
 
 export interface BlockChange {
   block: UIBlockWithDetails;

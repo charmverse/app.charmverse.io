@@ -6,20 +6,20 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import { Tooltip, Typography } from '@mui/material';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
+import { proposalPropertyTypesList } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
 import { useDisableClickPropagation } from 'hooks/useDisablePropagation';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
-import { proposalPropertyTypesList } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import { Constants } from '@packages/databases/constants';
-import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import IconButton from '../../widgets/buttons/iconButton';
 import Editable from '../../widgets/editable';

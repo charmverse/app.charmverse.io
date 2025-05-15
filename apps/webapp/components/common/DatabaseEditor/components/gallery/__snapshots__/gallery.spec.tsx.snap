@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
+exports[`src/components/gallery/Gallery > return Gallery and click new 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Gallery"
@@ -74,10 +74,10 @@ exports[`src/components/gallery/Gallery return Gallery and click new 1`] = `
 </div>
 `;
 
-exports[`src/components/gallery/Gallery return Gallery readonly 1`] = `
+exports[`src/components/gallery/Gallery > return Gallery readonly 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Gallery"
@@ -99,10 +99,10 @@ exports[`src/components/gallery/Gallery return Gallery readonly 1`] = `
 </div>
 `;
 
-exports[`src/components/gallery/Gallery should match snapshot 1`] = `
+exports[`src/components/gallery/Gallery > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="Gallery"

@@ -1,9 +1,11 @@
+import { vi } from 'vitest';
+
 import Link from 'components/common/Link';
 import { renderWithTheme } from 'lib/testing/customRender';
 import { mockCurrentSpaceContext } from 'lib/testing/mocks/useCurrentSpace';
 
-jest.mock('hooks/useCurrentSpace', () => ({
-  useCurrentSpace: jest.fn(() => mockCurrentSpaceContext())
+vi.mock('hooks/useCurrentSpace', () => ({
+  useCurrentSpace: vi.fn(() => mockCurrentSpaceContext())
 }));
 
 describe('Atomic Link component', () => {

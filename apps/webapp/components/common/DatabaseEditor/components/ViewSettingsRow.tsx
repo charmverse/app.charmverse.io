@@ -1,11 +1,10 @@
 import type { SxProps } from '@mui/material';
 import { Stack, Tooltip, Typography } from '@mui/material';
+import type { BoardView } from '@packages/databases/boardView';
+import mutator from '@packages/databases/mutator';
 
 import { Button } from 'components/common/Button';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { BoardView } from '@packages/databases/boardView';
-
-import mutator from '../mutator';
 
 type Props = {
   activeView: BoardView;

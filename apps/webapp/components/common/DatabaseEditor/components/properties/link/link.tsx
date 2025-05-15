@@ -1,9 +1,9 @@
 import LinkIcon from '@mui/icons-material/Link';
+import type { PropertyValueDisplayType } from '@packages/databases/interfaces';
+import { Utils } from '@packages/databases/utils';
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import type { PropertyValueDisplayType } from '../../../interfaces';
-import { Utils } from '../../../utils';
 import { TextInput } from '../TextInput';
 
 type Props = {

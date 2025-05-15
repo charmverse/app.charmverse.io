@@ -1,28 +1,24 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
+import type { Board } from '@packages/databases/board';
+import mutator from '@packages/databases/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from '@packages/databases/store/boards';
+import { initialDatabaseLoad, databaseViewsLoad, blockLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { getCurrentBoardViews, setCurrent as setCurrentView } from '@packages/databases/store/views';
+import { Utils } from '@packages/databases/utils';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import CenterPanel from 'components/common/DatabaseEditor/components/centerPanel';
 import DatabasePortal from 'components/common/DatabaseEditor/DatabasePortal';
-import mutator from 'components/common/DatabaseEditor/mutator';
-import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/DatabaseEditor/store/boards';
-import {
-  initialDatabaseLoad,
-  databaseViewsLoad,
-  blockLoad
-} from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
-import { getCurrentBoardViews, setCurrent as setCurrentView } from 'components/common/DatabaseEditor/store/views';
-import { Utils } from 'components/common/DatabaseEditor/utils';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board } from '@packages/databases/board';
 
 /**
  *

@@ -2,11 +2,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getENSDetails } from '@packages/blockchain/getENSName';
 import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
+import { vi } from 'vitest';
 
 import { getEnsProfile } from '../getEnsProfile';
 
-jest.mock('@packages/blockchain/getENSName', () => ({
-  getENSDetails: jest.fn().mockResolvedValue({
+vi.mock('@packages/blockchain/getENSName', () => ({
+  getENSDetails: vi.fn().mockResolvedValue({
     avatar: 'https://test-avatar.png',
     description: 'my bio',
     discord: null,
@@ -16,7 +17,7 @@ jest.mock('@packages/blockchain/getENSName', () => ({
     linkedin: null,
     emails: null
   }),
-  getENSName: jest.fn().mockImplementation(() => Promise.resolve(null))
+  getENSName: vi.fn().mockImplementation(() => Promise.resolve(null))
 }));
 
 describe('getEnsProfile', () => {

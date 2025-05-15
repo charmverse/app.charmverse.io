@@ -1,9 +1,8 @@
 import Box from '@mui/material/Box';
-
 import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
 
-import mutator from '../../../../mutator';
 import { TagSelect } from '../../../properties/TagSelect/TagSelect';
 import type { TagSelectProps } from '../../../properties/TagSelect/TagSelect';
 

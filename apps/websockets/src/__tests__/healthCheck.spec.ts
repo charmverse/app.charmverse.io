@@ -10,8 +10,10 @@ beforeAll(() => {
   server = app.listen();
 });
 
-afterAll((done) => {
-  server.close(done);
+afterAll(async () => {
+  await new Promise((resolve) => {
+    server.close(resolve);
+  });
 });
 
 describe('health check', () => {

@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -6,7 +7,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import charmClient from 'charmClient';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapIntl } from '../../testUtils';
 
 import NewCardButton from './newCardButton';

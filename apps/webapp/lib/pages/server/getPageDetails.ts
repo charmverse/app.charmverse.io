@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { PageNotFoundError } from '@packages/pages/errors';
 
 import type { PageDetails } from '../interfaces';
 
-import { PageNotFoundError } from './errors';
 import { generatePageQuery } from './generatePageQuery';
 
 export async function getPageDetails(pageIdOrPath: string, spaceId?: string): Promise<PageDetails> {

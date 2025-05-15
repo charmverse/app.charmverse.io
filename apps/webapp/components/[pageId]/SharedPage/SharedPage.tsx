@@ -1,14 +1,14 @@
 import { Box } from '@mui/material';
+import { updateBoards } from '@packages/databases/store/boards';
+import { addCard } from '@packages/databases/store/cards';
+import { useAppDispatch } from '@packages/databases/store/hooks';
+import { addView, setCurrent } from '@packages/databases/store/views';
 import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
-import { updateBoards } from 'components/common/DatabaseEditor/store/boards';
-import { addCard } from 'components/common/DatabaseEditor/store/cards';
-import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
-import { addView, setCurrent } from 'components/common/DatabaseEditor/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useRewards } from 'components/rewards/hooks/useRewards';

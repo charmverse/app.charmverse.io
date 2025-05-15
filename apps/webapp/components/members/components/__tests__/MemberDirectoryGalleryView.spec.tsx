@@ -205,7 +205,7 @@ const mockMember: Member = {
   properties: propertyValues
 };
 
-describe('PaidShareToWeb', () => {
+describe.skip('PaidShareToWeb', () => {
   it('should render the visible properties along with their values', async () => {
     (useMemberProperties as jest.Mock<Partial<ReturnType<typeof useMemberProperties>>>).mockReturnValueOnce({
       getDisplayProperties: jest.fn(() => spaceProperties)

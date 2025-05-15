@@ -23,22 +23,22 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { Dispatch, SetStateAction } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from '@packages/databases/board';
 import { isReadonlyPropertyTitle } from '@packages/databases/board';
 import type { BoardView, ISortOption } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
 import { isReturnKey } from '@packages/lib/utils/react';
+import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewSortOptions } from 'hooks/useViewSortOptions';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
-import { Utils } from '../../utils';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 import Label from '../../widgets/label';
 import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';

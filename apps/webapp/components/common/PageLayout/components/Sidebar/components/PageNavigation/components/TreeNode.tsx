@@ -1,16 +1,16 @@
 import type { Page } from '@charmverse/core/prisma';
 import Typography from '@mui/material/Typography';
 import { useTreeItemState } from '@mui/x-tree-view/TreeItem';
+import { formatViewTitle } from '@packages/databases/boardView';
+import { databaseViewsLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '@packages/databases/store/hooks';
+import { makeSelectSortedViews, getLoadedBoardViews } from '@packages/databases/store/views';
+import { mergeRefs } from '@packages/lib/utils/react';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
-import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/DatabaseEditor/store/views';
 import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import useRefState from 'hooks/useRefState';
-import { formatViewTitle } from '@packages/databases/boardView';
-import { mergeRefs } from '@packages/lib/utils/react';
 import { greyColor2 } from 'theme/colors';
 
 import BoardViewTreeItem from './BoardViewTreeItem';

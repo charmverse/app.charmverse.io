@@ -1,8 +1,8 @@
 import type { Page, Space, User, Vote } from '@charmverse/core/prisma';
 import { testUtilsProposals } from '@charmverse/core/test';
+import { generateProposal } from '@packages/lib/testing/proposals';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { createPage, createVote, generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { generateProposal } from '@packages/lib/testing/proposals';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -137,7 +137,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a page poll', () => {
   });
 });
 describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
-  xit('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
+  it.skip('Should allow voting if the proposal is in vote_active stage and user has permission', async () => {
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space1.id,
       userId: proposalAuthor.id as string,

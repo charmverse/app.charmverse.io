@@ -1,16 +1,16 @@
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { blockToFBBlock, fbBlockToBlock } from '@packages/databases/utils/blockUtils';
+import type { RewardBlockInput, RewardBlockUpdateInput } from '@packages/lib/rewards/blocks/interfaces';
 import { useEffect } from 'react';
 
 import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
-import mutator from 'components/common/DatabaseEditor/mutator';
-import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { usePages } from 'hooks/usePages';
-import type { BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import { Constants } from '@packages/databases/constants';
-import type { RewardBlockInput, RewardBlockUpdateInput } from '@packages/lib/rewards/blocks/interfaces';
 
 export function useRewardsBoardMutator() {
   const {

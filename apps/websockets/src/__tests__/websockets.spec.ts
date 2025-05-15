@@ -13,8 +13,9 @@ let socketUrl: string;
 /**
  * Setup WS & HTTP servers
  */
-beforeAll((done) => {
-  httpServer.listen(done);
+beforeAll(async () => {
+  // eslint-disable-next-line no-promise-executor-return
+  await new Promise((resolve) => httpServer.listen(resolve));
   const httpServerAddr = httpServer.address() as AddressInfo;
   socketUrl = `http://[${httpServerAddr.address}]:${httpServerAddr.port}`;
 });
@@ -22,34 +23,36 @@ beforeAll((done) => {
 /**
  *  Cleanup WS & HTTP servers
  */
-afterAll((done) => {
+afterAll(async () => {
   cleanup();
-  httpServer.close(done);
+  // eslint-disable-next-line no-promise-executor-return
+  await new Promise((resolve) => httpServer.close(resolve));
 });
 
 /**
  * Run before each test
  */
-beforeEach((done) => {
+beforeEach(async () => {
   // Setup
   // Do not hardcode server port and address, square brackets are used for IPv6
   client = io(socketUrl, {
     transports: ['websocket']
   });
-  client.on('connect', () => {
-    done();
+  await new Promise((resolve) => {
+    client.on('connect', () => {
+      resolve(undefined);
+    });
   });
 });
 
 /**
  * Run after each test
  */
-afterEach((done) => {
+afterEach(() => {
   // Cleanup
   if (client.connected) {
     client.disconnect();
   }
-  done();
 });
 
 describe('Web Socket server', () => {
@@ -58,18 +61,20 @@ describe('Web Socket server', () => {
     expect(response.text).toEqual(expect.stringContaining('0{"sid":'));
   });
 
-  test('should communicate', (done) => {
+  test('should communicate', async () => {
     client.on('connection', (socket) => {
       expect(socket).toBeDefined();
     });
 
-    client.once('echo', (message) => {
-      // Check that the message matches
-      expect(message).toBe('Hello World');
-      done();
-    });
+    await new Promise((resolve) => {
+      client.once('echo', (message) => {
+        // Check that the message matches
+        expect(message).toBe('Hello World');
+        resolve(undefined);
+      });
 
-    // once connected, emit Hello World
-    socketServer.emit('echo', 'Hello World');
+      // once connected, emit Hello World
+      socketServer.emit('echo', 'Hello World');
+    });
   });
 });

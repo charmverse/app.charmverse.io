@@ -1,8 +1,8 @@
 import { Prisma, VoteType, prisma } from '@charmverse/core/prisma-client';
-import { DuplicateDataError } from '@packages/utils/errors';
-import { PageNotFoundError } from 'lib/pages/server';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishVoteEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import { PageNotFoundError } from '@packages/pages/errors';
+import { DuplicateDataError } from '@packages/utils/errors';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { getVotingPowerForVotes } from './getVotingPowerForVotes';
@@ -51,7 +51,7 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
 
   const maxChoices = type !== VoteType.Approval && vote.maxChoices ? vote.maxChoices : 1;
   const voteType = maxChoices > 1 ? VoteType.MultiChoice : type;
-  const threshold = voteType === VoteType.MultiChoice ? 0 : (+vote.threshold ?? DEFAULT_THRESHOLD);
+  const threshold = voteType === VoteType.MultiChoice ? 0 : +vote.threshold;
 
   const dbVote = await prisma.vote.create({
     data: {

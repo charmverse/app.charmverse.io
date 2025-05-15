@@ -761,6 +761,7 @@ export function createPage(
     pagePermissions,
     parentId,
     spaceId,
+    proposalId,
     ...options
   }: any & { pagePermissions?: Prisma.PagePermissionCreateManyPageInput[] }
 ): Promise<PageWithPermissions> {
@@ -780,6 +781,13 @@ export function createPage(
           id: createdBy
         }
       },
+      proposal: proposalId
+        ? {
+            connect: {
+              id: proposalId
+            }
+          }
+        : undefined,
       space: {
         connect: {
           id: spaceId as string

@@ -2,15 +2,15 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
-import { useMemo } from 'react';
-
-import { Button } from 'components/common/Button';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { useMemo } from 'react';
+
+import { Button } from 'components/common/Button';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 interface LayoutOptionsProps {

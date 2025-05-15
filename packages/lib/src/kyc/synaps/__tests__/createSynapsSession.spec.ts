@@ -3,10 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateSynapsCredential, generateSynapsUserKyc } from '@packages/testing/utils/kyc';
 import { v4 } from 'uuid';
+import { vi } from 'vitest';
 
 import { createSynapsSession } from '../createSynapsSession';
 
-jest.mock('../initSynapsSession', () => ({
+vi.mock('../initSynapsSession', () => ({
   initSynapsSession: async (userId: string, apiKey: string) => ({
     session_id: v4()
   })
@@ -14,7 +15,7 @@ jest.mock('../initSynapsSession', () => ({
 
 describe('createSynapsSession', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should fail if no api key is found', async () => {

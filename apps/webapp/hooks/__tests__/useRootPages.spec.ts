@@ -1,18 +1,20 @@
 import { createMockPage } from '@packages/testing/mocks/page';
 import { renderHook } from '@testing-library/react';
 import { v4 as uuid } from 'uuid';
+import type { Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import { usePages } from 'hooks/usePages';
 import { useRootPages } from 'hooks/useRootPages';
 import type { PagesMap } from 'lib/pages';
 
-jest.mock('hooks/usePages', () => ({
-  usePages: jest.fn()
+vi.mock('hooks/usePages', () => ({
+  usePages: vi.fn()
 }));
 
 describe('useRootPages', () => {
   afterAll(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('should sort pages by index', () => {
@@ -22,7 +24,7 @@ describe('useRootPages', () => {
       [uuid()]: createMockPage({ id: sortedIds[1], index: 3 }),
       [uuid()]: createMockPage({ id: sortedIds[0], index: 1 })
     };
-    (usePages as jest.Mock<any, any>).mockReturnValue({
+    (usePages as Mock).mockReturnValue({
       pages
     });
     const { result } = renderHook(() => useRootPages());

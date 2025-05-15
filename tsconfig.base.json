@@ -13,6 +13,7 @@
     "removeComments": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "types": ["vitest/globals"]
   }
 }

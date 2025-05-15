@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-
-import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
-import mutator from 'components/common/DatabaseEditor/mutator';
-import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
-import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { blockToFBBlock, fbBlockToBlock } from '@packages/databases/utils/blockUtils';
 import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from '@packages/lib/proposals/blocks/interfaces';
+import { useEffect } from 'react';
+
+import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
+import { useProposals } from 'components/proposals/hooks/useProposals';
+import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
+import { useProposalBlocks } from 'hooks/useProposalBlocks';
 
 export function useProposalsBoardMutator() {
   const { updateBlock, createBlock, getBlock, updateBlocks } = useProposalBlocks();

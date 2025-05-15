@@ -1,13 +1,4 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "jsx": "react-jsx",
-      "module": "commonjs",
-      "jsxImportSource": ""
-    },
-    "require": ["tsconfig-paths/register"],
-    "transpileOnly": true
-  },
   "compilerOptions": {
     "importHelpers": true,
     "baseUrl": ".",
@@ -51,8 +42,9 @@
       "@charmverse/core/utilities": ["../../node_modules/@charmverse/core/dist/cjs/utilities"],
       "@charmverse/core/protocol": ["../../node_modules/@charmverse/core/dist/cjs/protocol"],
       "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
-    }
+    },
+    "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "scripts"],
-  "include": ["**/*.ts", "**/*.tsx", "../../packages/spaces/src/config.ts", "../../packages/pages/src/__tests__/isBoardPageType.spec.ts", "../../packages/spaces/src/utils.ts", "../../jest.teardown.ts"]
+  "include": ["**/*.ts", "**/*.tsx", "../../packages/pages/src/errors.ts", "../../packages/lib/src/rewards/blocks/getDefaultRewardProperties.ts"]
 }

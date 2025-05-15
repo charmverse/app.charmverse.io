@@ -1,6 +1,5 @@
+import { Utils } from '@packages/databases/utils';
 import React from 'react';
-
-import { Utils } from '../../utils';
 
 type Props = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;

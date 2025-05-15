@@ -3,13 +3,6 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Divider, MenuItem, Select, Typography, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { capitalize } from '@packages/utils/strings';
-import React, { useCallback } from 'react';
-import { FormattedMessage } from 'react-intl';
-import { v4 } from 'uuid';
-
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import { useViewFilter } from 'hooks/useViewFilter';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import { Constants } from '@packages/databases/constants';
@@ -17,8 +10,14 @@ import type { FilterClause, FilterCondition } from '@packages/databases/filterCl
 import { createFilterClause } from '@packages/databases/filterClause';
 import type { FilterGroup, FilterGroupOperation } from '@packages/databases/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from '@packages/databases/filterGroup';
+import mutator from '@packages/databases/mutator';
+import { capitalize } from '@packages/utils/strings';
+import React, { useCallback } from 'react';
+import { FormattedMessage } from 'react-intl';
+import { v4 } from 'uuid';
 
-import mutator from '../../mutator';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useViewFilter } from 'hooks/useViewFilter';
 
 import FilterEntry from './filterEntry';
 

@@ -1,5 +1,17 @@
 import { useTheme } from '@emotion/react';
 import { Box, Menu } from '@mui/material';
+import {
+  type RelationPropertyData,
+  type Board,
+  type IPropertyTemplate,
+  type PropertyType
+} from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import type { Mutator } from '@packages/databases/mutator';
+import defaultMutator from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
 import { isTruthy } from '@packages/utils/types';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -10,19 +22,7 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import {
-  type RelationPropertyData,
-  type Board,
-  type IPropertyTemplate,
-  type PropertyType
-} from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
 
-import type { Mutator } from '../../mutator';
-import defaultMutator from '../../mutator';
-import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import { PropertyTypes } from '../../widgets/propertyTypes';
 import { typeDisplayName } from '../../widgets/typeDisplayName';

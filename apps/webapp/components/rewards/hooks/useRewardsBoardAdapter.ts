@@ -1,22 +1,11 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { isUUID } from '@packages/utils/strings';
-import { isTruthy } from '@packages/utils/types';
-import { useMemo } from 'react';
-
-import { sortCards } from 'components/common/DatabaseEditor/store/cards';
-import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
-import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
-import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import { useMembers } from 'hooks/useMembers';
 import type { BoardView, IViewType } from '@packages/databases/boardView';
 import type { Card, CardWithRelations } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';
 import { Constants } from '@packages/databases/constants';
 import { viewTypeToBlockId } from '@packages/databases/customBlocks/constants';
+import { sortCards } from '@packages/databases/store/cards';
+import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
 import type { Member } from '@packages/lib/members/interfaces';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
@@ -40,6 +29,17 @@ import { getDefaultView } from '@packages/lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from '@packages/lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { getAbsolutePath } from '@packages/lib/utils/browser';
+import { isUUID } from '@packages/utils/strings';
+import { isTruthy } from '@packages/utils/types';
+import { useMemo } from 'react';
+
+import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
+import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import { useMembers } from 'hooks/useMembers';
 
 export type BoardReward = { id?: string; fields: RewardFields; sourceProposalPage?: string };
 

@@ -4,6 +4,7 @@ import type { Board } from '@packages/databases/board';
 import { createBoard } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
+import mutator from '@packages/databases/mutator';
 import { createTableView } from '@packages/databases/tableView';
 import { getPagePath } from '@packages/pages/utils';
 import type { PageCreated } from '@packages/websockets/interfaces';
@@ -11,7 +12,6 @@ import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import mutator from 'components/common/DatabaseEditor/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 

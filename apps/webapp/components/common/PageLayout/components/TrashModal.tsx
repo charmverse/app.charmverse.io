@@ -12,6 +12,8 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
+import { useAppDispatch } from '@packages/databases/store/hooks';
 import { fancyTrim } from '@packages/utils/strings';
 import { DateTime } from 'luxon';
 import Link from 'next/link';
@@ -21,8 +23,6 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCharmRouter } from 'hooks/useCharmRouter';

@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/kanban/calculation/KanbanCalculation base case 1`] = `
+exports[`components/kanban/calculation/KanbanCalculation > base case 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="KanbanCalculation"
@@ -22,12 +22,12 @@ exports[`components/kanban/calculation/KanbanCalculation base case 1`] = `
 </div>
 `;
 
-exports[`components/kanban/calculation/KanbanCalculation calculations menu open 1`] = `
+exports[`components/kanban/calculation/KanbanCalculation > calculations menu open 1`] = `
 <div
   aria-hidden="true"
 >
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="KanbanCalculation"
@@ -46,10 +46,10 @@ exports[`components/kanban/calculation/KanbanCalculation calculations menu open 
 </div>
 `;
 
-exports[`components/kanban/calculation/KanbanCalculation no menu should appear in readonly mode 1`] = `
+exports[`components/kanban/calculation/KanbanCalculation > no menu should appear in readonly mode 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="KanbanCalculation"

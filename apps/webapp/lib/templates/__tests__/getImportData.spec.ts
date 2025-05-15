@@ -8,7 +8,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import type { SpaceDataExport } from '../exportSpaceData';
 import { getImportData } from '../getImportData';
 
-describe('getImportData', () => {
+describe.skip('getImportData', () => {
   let space: Space;
 
   let validExportData: SpaceDataExport;

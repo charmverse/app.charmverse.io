@@ -1,6 +1,6 @@
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { render } from '@testing-library/react';
 
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapIntl } from '../../testUtils';
 import { TableCalculationOptions } from '../table/calculation/tableCalculationOptions';
 

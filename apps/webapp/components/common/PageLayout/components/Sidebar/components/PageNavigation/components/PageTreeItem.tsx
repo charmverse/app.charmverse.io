@@ -9,6 +9,8 @@ import Menu from '@mui/material/Menu';
 import Tooltip from '@mui/material/Tooltip';
 import type { TreeItemContentProps } from '@mui/x-tree-view';
 import { TreeItem, treeItemClasses } from '@mui/x-tree-view';
+import { getSortedBoards } from '@packages/databases/store/boards';
+import { useAppSelector } from '@packages/databases/store/hooks';
 import type { Identifier } from 'dnd-core';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode, DragEvent, SyntheticEvent } from 'react';
@@ -17,8 +19,6 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
-import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
-import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';

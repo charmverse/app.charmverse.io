@@ -12,6 +12,7 @@ import type {
 import * as http from '@packages/adapters/http';
 import type { FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from '@packages/databases/utils/blockUtils';
 import type { ExtendedPoap } from '@packages/lib/blockchain/interfaces';
 import type { FarcasterUser } from '@packages/lib/farcaster/getFarcasterUsers';
 import type { InviteLinkPopulated } from '@packages/lib/invites/getInviteLink';
@@ -26,7 +27,6 @@ import { encodeFilename } from '@packages/utils/encodeFilename';
 import type { SocketAuthResponse } from '@packages/websockets/interfaces';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
-import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';

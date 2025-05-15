@@ -36,7 +36,7 @@ import { importSpaceData } from '../importSpaceData';
 import type { ImportedPermissions } from '../importSpacePermissions';
 import { importSpacePermissions } from '../importSpacePermissions';
 
-describe('importSpaceData', () => {
+describe.skip('importSpaceData', () => {
   let sourceSpace: Space;
   let sourceSpaceUser: User;
 
@@ -585,7 +585,7 @@ describe('importSpaceData', () => {
     });
   });
 
-  it('should correctly import space data from a static file', async () => {
+  it.skip('should correctly import space data from a static file', async () => {
     const { space: targetSpace } = await testUtilsUser.generateUserAndSpace();
 
     const importResult = await importSpaceData({

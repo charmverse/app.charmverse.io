@@ -2,19 +2,20 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getUserProfile } from '@packages/profile/getUser';
 import { uid } from '@packages/utils/strings';
 import { v4 } from 'uuid';
+import { vi } from 'vitest';
 
 import { connectGoogleAccount } from '../connectGoogleAccount';
 
 const googleUserName = 'Test User Google Account';
 const googleAvatarUrl = 'https://example.com/google-avatar-1.png';
 
-jest.mock('../verifyGoogleToken', () => {
+vi.mock('../verifyGoogleToken', () => {
   return {
     verifyGoogleToken: (email: string) => ({ email }) as any
   };
 });
 afterAll(async () => {
-  jest.resetModules();
+  vi.resetModules();
 });
 
 // This test suite mocks the verify google token method, we pass the email as the ID token from google, since real verifyGoogleToken method returns an email from an ID token

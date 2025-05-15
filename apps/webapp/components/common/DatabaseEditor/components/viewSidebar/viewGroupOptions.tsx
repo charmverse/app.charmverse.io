@@ -1,11 +1,10 @@
 import { DeleteOutlined } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
-
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
+import mutator from '@packages/databases/mutator';
 
-import mutator from '../../mutator';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 interface LayoutOptionsProps {

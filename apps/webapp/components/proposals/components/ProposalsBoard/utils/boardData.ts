@@ -1,6 +1,3 @@
-import { v4 } from 'uuid';
-
-import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import { createBoard } from '@packages/databases/board';
@@ -11,6 +8,7 @@ import {
   proposalStatusColors
 } from '@packages/databases/proposalDbProperties';
 import { createTableView } from '@packages/databases/tableView';
+import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -23,6 +21,7 @@ import {
 } from '@packages/lib/proposals/blocks/constants';
 import type { ProposalBoardBlock } from '@packages/lib/proposals/blocks/interfaces';
 import type { ProposalEvaluationStatus } from '@packages/lib/proposals/interfaces';
+import { v4 } from 'uuid';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 

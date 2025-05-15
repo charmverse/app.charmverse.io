@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
-import { InvalidInputError } from '@packages/utils/errors';
-import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from '@packages/lib/tokenGates/applyTokenGates';
 import { evaluateTokenGateEligibility } from '@packages/lib/tokenGates/evaluateEligibility';
+import { getSpaceMembershipWithRoles } from '@packages/spaces/getSpaceMembershipWithRoles';
+import { InvalidInputError } from '@packages/utils/errors';
 
 export async function reevaluateRoles({ userId, spaceId }: { spaceId: string; userId: string }) {
   try {

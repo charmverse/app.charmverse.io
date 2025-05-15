@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Utils } from 'components/common/DatabaseEditor/utils';
+import { Utils } from '@packages/databases/utils';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from '@packages/databases/board';
 
 async function init() {

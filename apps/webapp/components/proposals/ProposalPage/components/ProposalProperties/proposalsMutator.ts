@@ -1,7 +1,4 @@
 /* eslint-disable default-param-last */
-import { Mutator } from 'components/common/DatabaseEditor/mutator';
-import { Utils } from 'components/common/DatabaseEditor/utils';
-import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import type {
   Board,
@@ -12,7 +9,11 @@ import type {
 } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
+import { Mutator } from '@packages/databases/mutator';
+import { Utils } from '@packages/databases/utils';
 import type { ProposalBoardBlockFields, ProposalPropertiesField } from '@packages/lib/proposals/blocks/interfaces';
+
+import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 
 export interface BlockChange {
   block: UIBlockWithDetails;

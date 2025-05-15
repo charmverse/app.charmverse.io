@@ -130,7 +130,7 @@ jobs:
       #     escape_paths: 'false'
 
       - name: Run tests
-        run: npm run cron:test
+        run: npm run test:cron
 
   upload-docker:
     name: Upload Docker image

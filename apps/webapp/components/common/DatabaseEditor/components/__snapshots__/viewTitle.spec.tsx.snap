@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`components/viewTitle hide description 1`] = `
+exports[`components/viewTitle > hide description 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="ViewTitle"
@@ -100,10 +100,10 @@ exports[`components/viewTitle hide description 1`] = `
 </div>
 `;
 
-exports[`components/viewTitle should match snapshot 1`] = `
+exports[`components/viewTitle > should match snapshot 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="ViewTitle"
@@ -203,10 +203,10 @@ exports[`components/viewTitle should match snapshot 1`] = `
 </div>
 `;
 
-exports[`components/viewTitle should match snapshot readonly 1`] = `
+exports[`components/viewTitle > should match snapshot readonly 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="ViewTitle"
@@ -258,10 +258,10 @@ exports[`components/viewTitle should match snapshot readonly 1`] = `
 </div>
 `;
 
-exports[`components/viewTitle show description 1`] = `
+exports[`components/viewTitle > show description 1`] = `
 <div>
   <span
-    class="variable variable"
+    class="mocked mocked"
   >
     <div
       class="ViewTitle"

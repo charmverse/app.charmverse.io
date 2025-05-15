@@ -2,8 +2,6 @@ import { log } from '@charmverse/core/log';
 import { getProposalEvaluationStatus } from '@packages/lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
 
-import { Utils } from 'components/common/DatabaseEditor/utils';
-
 import type { IPropertyTemplate } from './board';
 import type { Card, CardPropertyValue, CardWithRelations } from './card';
 import { Constants } from './constants';
@@ -19,6 +17,7 @@ import type {
 import { propertyConfigs } from './filterClause';
 import type { FilterGroup } from './filterGroup';
 import { isAFilterGroupInstance } from './filterGroup';
+import { Utils } from './utils';
 
 class CardFilter {
   static applyFilterGroup(

@@ -1,12 +1,11 @@
-import { useState } from 'react';
-
 import type { Board } from '@packages/databases/board';
 import { createBoard } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { Constants } from '@packages/databases/constants';
+import mutator from '@packages/databases/mutator';
+import { useState } from 'react';
 
-import mutator from '../../../mutator';
 import { filterPropertyTemplates } from '../../../utils/updateVisibilePropertyIds';
 import Calculation from '../../calculations/calculation';
 import { Options } from '../../calculations/options';

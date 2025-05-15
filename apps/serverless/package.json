@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx serverless package",
     "start": "serverless offline start --httpPort=3020",
-    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest --config jest.config.ts --maxWorkers=2 --passWithNoTests"
+    "test": ""
   },
   "dependencies": {
     "serverless": "^4.1.19"

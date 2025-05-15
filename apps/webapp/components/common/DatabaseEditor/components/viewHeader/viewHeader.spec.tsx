@@ -1,10 +1,8 @@
+import type { RootState } from '@packages/databases/store/index';
+import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';
 import { render } from '@testing-library/react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import '@testing-library/jest-dom';
-
-import type { RootState } from '../../store';
-import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 
 import ViewHeader from './viewHeader';
