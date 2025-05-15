@@ -8,7 +8,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import { DevPurchaseButton } from 'components/settings/subscription/DevPurchaseForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,6 +20,7 @@ import Legend from '../components/Legend';
 
 import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import { SpaceSubscription } from './SpaceSubscription/SpaceSubscription';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -106,7 +106,7 @@ export function CreateSubscriptionInformation({
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
-      {user && whiteListedUserIds.includes(user.id) ? <DevPurchaseButton /> : null}
+      {user && whiteListedUserIds.includes(user.id) ? <SpaceSubscription /> : null}
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
           <DesktopIconContainer>

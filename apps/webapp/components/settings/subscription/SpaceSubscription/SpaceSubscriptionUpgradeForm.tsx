@@ -10,9 +10,9 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { useTransferDevToken } from './hooks/useTransferDevToken';
+import { useTransferDevToken } from '../hooks/useTransferDevToken';
 
-export function SpaceSubscriptionForm({
+export function SpaceSubscriptionUpgradeForm({
   isOpen,
   onClose: _onClose,
   onSuccess,

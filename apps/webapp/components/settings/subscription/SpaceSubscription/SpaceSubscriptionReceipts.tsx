@@ -1,0 +1,63 @@
+import { Box, Stack, Typography } from '@mui/material';
+import { relativeTime } from '@packages/lib/utils/dates';
+import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
+import { hasNftAvatar } from '@packages/users/hasNftAvatar';
+import Image from 'next/image';
+import { formatUnits } from 'viem';
+
+import Avatar from 'components/common/Avatar';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
+
+export function SpaceSubscriptionReceiptsList({ spaceReceipts }: { spaceReceipts: SpaceReceipt[] }) {
+  const { space } = useCurrentSpace();
+  const { members } = useMembers();
+
+  const spaceReceiptsWithUser = spaceReceipts.map((receipt) => ({
+    ...receipt,
+    user: receipt.type === 'contribution' ? members.find((member) => member.id === receipt.userId)! : undefined
+  }));
+
+  return (
+    <Stack gap={2} my={2}>
+      {spaceReceipts.length === 0 ? (
+        <Typography>No space receipts yet</Typography>
+      ) : (
+        <>
+          <Typography variant='h6'>Space receipts</Typography>
+          {spaceReceiptsWithUser.map((receipt) => (
+            <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
+              <Box display='flex' alignItems='center' gap={1}>
+                <Avatar
+                  name={receipt.user ? receipt.user.username : space?.name}
+                  avatar={receipt.user ? receipt.user?.avatar : space?.spaceImage}
+                  size='small'
+                  isNft={receipt.user ? hasNftAvatar(receipt.user) : false}
+                />
+                <Box>
+                  <Typography variant='body1'>
+                    {receipt.user ? `Contribution by ${receipt.user.username}` : 'Monthly Payment'}
+                  </Typography>
+                </Box>
+                <Typography variant='caption' color='text.secondary'>
+                  {relativeTime(receipt.createdAt)}
+                </Typography>
+              </Box>
+              <Stack flexDirection='row' alignItems='center' gap={1}>
+                <Typography
+                  variant='body2'
+                  fontWeight={600}
+                  color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
+                >
+                  {receipt.type === 'contribution' ? '+' : '-'}
+                  {formatUnits(BigInt(receipt.paidTokenAmount), 18)}
+                </Typography>
+                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
+              </Stack>
+            </Stack>
+          ))}
+        </>
+      )}
+    </Stack>
+  );
+}
