@@ -1,3 +1,4 @@
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 type SubscriptionPaymentReceipt = {
@@ -5,6 +6,7 @@ type SubscriptionPaymentReceipt = {
   id: string;
   paidTokenAmount: string;
   createdAt: Date;
+  tier: SpaceSubscriptionTier;
 };
 
 type SubscriptionContributionReceipt = {
@@ -25,7 +27,8 @@ export async function getSubscriptionReceipts(spaceId: string): Promise<Subscrip
     select: {
       id: true,
       paidTokenAmount: true,
-      createdAt: true
+      createdAt: true,
+      subscriptionTier: true
     }
   });
 
@@ -55,7 +58,8 @@ export async function getSubscriptionReceipts(spaceId: string): Promise<Subscrip
       id: payment.id,
       paidTokenAmount: payment.paidTokenAmount,
       createdAt: payment.createdAt,
-      type: 'payment' as const
+      type: 'payment' as const,
+      tier: payment.subscriptionTier
     }))
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 }
