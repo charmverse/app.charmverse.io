@@ -4,6 +4,7 @@ import type { CreateSpaceContributionRequest } from '@packages/spaces/createSpac
 import { createSpaceContribution } from '@packages/spaces/createSpaceContribution';
 import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
 import { getSpaceReceipts } from '@packages/spaces/getSpaceReceipts';
+import { verifyDevTokenTransfer } from '@packages/spaces/verifyDevTokenTransfer';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -19,8 +20,12 @@ async function createSpaceContributionController(req: NextApiRequest, res: NextA
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
 
+  const payload = req.body as CreateSpaceContributionRequest;
+
+  await verifyDevTokenTransfer(payload);
+
   const spaceContribution = await createSpaceContribution({
-    ...(req.body as CreateSpaceContributionRequest),
+    ...payload,
     spaceId,
     userId
   });

@@ -14,12 +14,10 @@ handler
 
 async function upgradeTierController(req: NextApiRequest, res: NextApiResponse<string>) {
   const { id: spaceId } = req.query as { id: string };
-  const userId = req.session.user.id;
 
   await upgradeSubscriptionTier({
     ...(req.body as UpgradeSubscriptionTierRequest),
-    spaceId,
-    userId
+    spaceId
   });
 
   res.status(200).end();

@@ -1,4 +1,4 @@
-import { Stack, TextField, Typography, Card, Divider, Tooltip } from '@mui/material';
+import { Card, Divider, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
 import Image from 'next/image';
@@ -45,33 +45,41 @@ export function SpaceSubscriptionUpgradeForm({
   }
 
   const { isTransferring, transferDevToken } = useTransferDevToken({
-    amount: totalCost,
-    onSuccess: async ({ hash, signature, message, address: walletAddress, transferredAmount }) => {
-      if (!space || !selectedTier) return;
-
-      await charmClient.spaces
-        .upgradeSubscriptionTier(space.id, {
-          tier: selectedTier,
-          paymentMonths,
-          hash,
-          walletAddress,
-          paidTokenAmount: transferredAmount.toString(),
-          signature,
-          message
-        })
-        .catch((err) => {
-          showMessage(err?.message ?? 'Failed to upgrade space subscription. Please try again later.', 'error');
-        })
-        .then(() => {
-          showMessage('Space subscription upgraded successfully', 'success');
-          refreshCurrentSpace();
-          onSuccess();
-          onClose();
-        });
-    }
+    amount: totalCost
   });
 
   if (!space) return null;
+
+  async function onUpgrade() {
+    if (!space || !selectedTier) return;
+
+    if (totalCost !== 0) {
+      const result = await transferDevToken();
+      if (!result) return;
+      await charmClient.spaces.createSpaceContribution(space.id, {
+        hash: result.hash,
+        walletAddress: result.address,
+        paidTokenAmount: result.transferredAmount.toString(),
+        signature: result.signature,
+        message: result.message
+      });
+    }
+
+    await charmClient.spaces
+      .upgradeSubscriptionTier(space.id, {
+        tier: selectedTier,
+        paymentMonths
+      })
+      .catch((err) => {
+        showMessage(err?.message ?? 'Failed to upgrade space subscription. Please try again later.', 'error');
+      })
+      .then(() => {
+        showMessage('Space subscription upgraded successfully', 'success');
+        refreshCurrentSpace();
+        onSuccess();
+        onClose();
+      });
+  }
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -200,9 +208,9 @@ export function SpaceSubscriptionUpgradeForm({
                 variant='contained'
                 disabled={!selectedTier || paymentMonths === 0 || !paymentPeriod}
                 loading={isTransferring}
-                onClick={transferDevToken}
+                onClick={onUpgrade}
               >
-                Upgrade tier
+                Upgrade
               </Button>
             </span>
           </Tooltip>

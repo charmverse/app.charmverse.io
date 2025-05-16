@@ -31,19 +31,19 @@ export function SpaceContributionForm({
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
   const { isTransferring, transferDevToken } = useTransferDevToken({
-    amount,
-    onSuccess: async ({ hash, signature, message, address: walletAddress, transferredAmount }) => {
-      if (!space) {
-        return;
-      }
+    amount
+  });
 
+  async function onDevTransfer() {
+    const result = await transferDevToken();
+    if (result && space) {
       await charmClient.spaces
         .createSpaceContribution(space.id, {
-          hash,
-          walletAddress,
-          paidTokenAmount: transferredAmount.toString(),
-          signature,
-          message
+          hash: result.hash,
+          walletAddress: result.address,
+          paidTokenAmount: result.transferredAmount.toString(),
+          signature: result.signature,
+          message: result.message
         })
         .catch((err) => {
           showMessage(err?.message ?? 'The transfer of DEV tokens could not be made. Please try again later.', 'error');
@@ -54,7 +54,7 @@ export function SpaceContributionForm({
           onClose();
         });
     }
-  });
+  }
 
   return (
     <Modal open={isOpen} onClose={onClose}>
@@ -82,7 +82,7 @@ export function SpaceContributionForm({
         <Button
           loading={isTransferring || isBalanceLoading}
           variant='contained'
-          onClick={transferDevToken}
+          onClick={onDevTransfer}
           sx={{ width: 'fit-content' }}
           disabled={amount === 0 || balance < amount}
         >
