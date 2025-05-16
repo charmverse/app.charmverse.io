@@ -4,7 +4,9 @@ import {
   UpgradableTiers,
   type UpgradableTier
 } from '@packages/lib/subscription/calculateSubscriptionCost';
+import { SubscriptionTierAmountRecord } from '@packages/lib/subscription/chargeSpaceSubscription';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
+import { capitalize } from 'lodash';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -82,25 +84,51 @@ export function SpaceSubscription() {
     : 0;
   const isDowngraded = latestSubscriptionEventTierIndex < currentTierIndex;
 
+  // Calculate how many months the current or downgraded tier will last
+  let monthsLeft = 0;
+  let tierToCheck = space?.subscriptionTier;
+  if (isDowngraded && latestSubscriptionEvent?.newTier) {
+    tierToCheck = latestSubscriptionEvent.newTier;
+  }
+  let tierPrice = 0;
+  if (tierToCheck && typeof tierToCheck === 'string') {
+    tierPrice = SubscriptionTierAmountRecord[tierToCheck] || 0;
+  }
+  if (tierPrice > 0 && spaceTokenBalance > 0) {
+    monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
+  }
+
   return (
     <>
       <Stack flexDirection='row' alignItems='center' gap={0.5}>
         <Typography>
-          Space tier: <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{space?.subscriptionTier}</span>
+          Tier: <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{space?.subscriptionTier}</span>
         </Typography>
       </Stack>
       <Stack flexDirection='row' alignItems='center' gap={0.5}>
-        <Typography>Space DEV balance: {spaceTokenBalance} </Typography>
+        <Typography>DEV balance: {spaceTokenBalance} </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
       </Stack>
+      {tierToCheck && tierPrice > 0 && monthsLeft > 0 && (
+        <Stack flexDirection='row' alignItems='center' gap={0.5}>
+          <Typography>
+            {capitalize(tierToCheck)} will last for{' '}
+            <b>
+              {monthsLeft} month{monthsLeft > 1 ? 's' : ''}
+            </b>{' '}
+            with your current balance.
+          </Typography>
+        </Stack>
+      )}
       {isCancelled ? (
         <Alert severity='error' variant='standard'>
-          Your subscription has been cancelled. You will not be able to send DEV tokens or upgrade your subscription.
+          Your subscription has been cancelled and will last until the space balance is depleted. You will not be able
+          to send DEV tokens or upgrade your subscription.
         </Alert>
       ) : null}
       {isDowngraded ? (
         <Alert severity='warning' variant='standard'>
-          Your subscription is scheduled to be downgraded to {latestSubscriptionEvent?.newTier} on the beginning of next
+          Your subscription is scheduled to be downgraded to {latestSubscriptionEvent?.newTier} at the beginning of next
           month.
         </Alert>
       ) : null}
@@ -190,6 +218,7 @@ export function SpaceSubscription() {
         onClose={() => setIsDowngradeSubscriptionModalOpen(false)}
         onSuccess={() => {
           refreshCurrentSpace();
+          refreshSubscriptionEvents();
           setIsDowngradeSubscriptionModalOpen(false);
         }}
       />
