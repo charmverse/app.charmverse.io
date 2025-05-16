@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space, SpaceSubscriptionTierChangeEvent } from '@charmverse/core/prisma-client';
 import * as http from '@packages/adapters/http';
 import type {
   CreatePaymentMethodRequest,
@@ -77,5 +77,9 @@ export class SubscriptionApi {
 
   downgradeSubscription(spaceId: string, payload: DowngradeSubscriptionRequest) {
     return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/downgrade`, payload);
+  }
+
+  getSubscriptionEvents(spaceId: string) {
+    return http.GET<SpaceSubscriptionTierChangeEvent[]>(`/api/spaces/${spaceId}/subscriptions/events`);
   }
 }

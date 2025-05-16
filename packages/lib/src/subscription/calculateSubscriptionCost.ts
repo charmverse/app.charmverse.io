@@ -5,6 +5,8 @@ import { SubscriptionTierAmountRecord } from './chargeSpaceSubscription';
 
 export const UpgradableTiers = ['bronze', 'silver', 'gold'] as const;
 
+export const SubscriptionTiers = ['readonly', 'free', 'bronze', 'silver', 'gold', 'grant'] as const;
+
 export type UpgradableTier = (typeof UpgradableTiers)[number];
 
 export function calculateSubscriptionCost({

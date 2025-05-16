@@ -14,14 +14,7 @@ export async function task() {
         // Only charge spaces that don't have a subscription payment in the current month
         subscriptionPayments: {
           none: {
-            createdAt: {
-              gte: startOfMonth.toJSDate()
-            }
-          }
-        },
-        subscriptionTier: {
-          not: {
-            in: ['free', 'readonly', 'grant']
+            createdAt: startOfMonth.toJSDate()
           }
         }
       },

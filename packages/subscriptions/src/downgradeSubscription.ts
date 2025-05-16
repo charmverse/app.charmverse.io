@@ -43,12 +43,11 @@ export async function downgradeSubscription(
     throw new Error('Cannot downgrade to a higher tier');
   }
 
-  await prisma.space.update({
-    where: {
-      id: spaceId
-    },
+  await prisma.spaceSubscriptionTierChangeEvent.create({
     data: {
-      subscriptionTier: tier
+      spaceId,
+      previousTier: space.subscriptionTier ?? 'readonly',
+      newTier: tier
     }
   });
 }

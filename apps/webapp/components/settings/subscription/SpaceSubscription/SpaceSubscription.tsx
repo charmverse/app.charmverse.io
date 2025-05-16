@@ -1,5 +1,9 @@
 import { Alert, Stack, Typography } from '@mui/material';
-import { UpgradableTiers, type UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
+import {
+  SubscriptionTiers,
+  UpgradableTiers,
+  type UpgradableTier
+} from '@packages/lib/subscription/calculateSubscriptionCost';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -57,6 +61,13 @@ export function SpaceSubscription() {
     () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
   );
 
+  const { data: subscriptionEvents = [], mutate: refreshSubscriptionEvents } = useSWR(
+    space ? `space-subscription-events/${space.id}` : null,
+    () => (space ? charmClient.subscription.getSubscriptionEvents(space.id) : [])
+  );
+
+  const latestSubscriptionEvent = subscriptionEvents[0];
+
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
   const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
@@ -65,6 +76,11 @@ export function SpaceSubscription() {
   const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
 
   const isCancelled = space?.subscriptionCancelledAt !== null;
+  const currentTierIndex = space?.subscriptionTier ? SubscriptionTiers.indexOf(space?.subscriptionTier) : 0;
+  const latestSubscriptionEventTierIndex = latestSubscriptionEvent?.newTier
+    ? SubscriptionTiers.indexOf(latestSubscriptionEvent?.newTier)
+    : 0;
+  const isDowngraded = latestSubscriptionEventTierIndex < currentTierIndex;
 
   return (
     <>
@@ -80,6 +96,12 @@ export function SpaceSubscription() {
       {isCancelled ? (
         <Alert severity='error' variant='standard'>
           Your subscription has been cancelled. You will not be able to send DEV tokens or upgrade your subscription.
+        </Alert>
+      ) : null}
+      {isDowngraded ? (
+        <Alert severity='warning' variant='standard'>
+          Your subscription is scheduled to be downgraded to {latestSubscriptionEvent?.newTier} on the beginning of next
+          month.
         </Alert>
       ) : null}
       <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
@@ -102,7 +124,7 @@ export function SpaceSubscription() {
           >
             Upgrade
           </Button>
-          {space?.subscriptionTier !== 'free' && space?.subscriptionTier !== 'readonly' ? (
+          {space?.subscriptionTier !== 'free' && space?.subscriptionTier !== 'readonly' && !isDowngraded ? (
             <Button
               disabled={isCancelled}
               variant='contained'

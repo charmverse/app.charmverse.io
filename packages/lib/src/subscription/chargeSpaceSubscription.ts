@@ -23,11 +23,19 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
       id: spaceId
     },
     select: {
-      subscriptionTier: true
+      subscriptionTier: true,
+      subscriptionTierChangeEvents: {
+        take: 1,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }
     }
   });
 
-  if (!space.subscriptionTier) {
+  const subscriptionTier = space.subscriptionTierChangeEvents[0]?.newTier ?? space.subscriptionTier;
+
+  if (!subscriptionTier) {
     throw new Error('Space is not a subscription space');
   }
 
@@ -35,7 +43,6 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     throw new Error('Space subscription is not chargeable');
   }
 
-  const subscriptionTier = space.subscriptionTier;
   const spaceTokenBalance = await getSpaceTokenBalance({ spaceId });
 
   const subscriptionTierAmount = SubscriptionTierAmountRecord[subscriptionTier];
@@ -66,13 +73,29 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
       subscriptionTier
     });
   } else {
-    await prisma.spaceSubscriptionPayment.create({
-      data: {
-        paidTokenAmount: subscriptionTierAmount.toString(),
-        spaceId,
-        subscriptionTier,
-        subscriptionPeriodStart: startOfMonth.toJSDate(),
-        subscriptionPrice: subscriptionTierAmount.toString()
+    await prisma.$transaction(async () => {
+      await prisma.spaceSubscriptionPayment.create({
+        data: {
+          paidTokenAmount: subscriptionTierAmount.toString(),
+          spaceId,
+          subscriptionTier,
+          subscriptionPeriodStart: startOfMonth.toJSDate(),
+          subscriptionPrice: subscriptionTierAmount.toString()
+        }
+      });
+
+      if (subscriptionTier !== space.subscriptionTier) {
+        await prisma.space.update({
+          where: { id: spaceId },
+          data: { subscriptionTier }
+        });
+        await prisma.spaceSubscriptionTierChangeEvent.create({
+          data: {
+            spaceId,
+            newTier: subscriptionTier,
+            previousTier: space.subscriptionTier!
+          }
+        });
       }
     });
   }
