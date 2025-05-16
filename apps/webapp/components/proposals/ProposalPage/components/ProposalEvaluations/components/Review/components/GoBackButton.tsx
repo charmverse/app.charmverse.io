@@ -43,18 +43,13 @@ export function GoBackButton({
   }
 
   async function onClick() {
-    // no confirmation needed for draft or feedback
-    if (!previousStep) {
-      goToPreviousStep();
-    } else {
-      const { confirmed } = await showConfirmation({
-        message: 'Moving back will clear the result of the current and previous steps and cannot be undone.',
-        confirmButton: 'Continue'
-      });
+    const { confirmed } = await showConfirmation({
+      message: 'Moving back will clear the result of the current and previous steps and cannot be undone.',
+      confirmButton: 'Continue'
+    });
 
-      if (confirmed) {
-        goToPreviousStep();
-      }
+    if (confirmed) {
+      goToPreviousStep();
     }
   }
 
