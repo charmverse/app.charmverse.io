@@ -45,7 +45,9 @@ const whiteListedUserIds = [
   // mattcasey in prod
   '4e1d4522-6437-4393-8ed1-9c56e53235f4',
   // chris in prod
-  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835'
+  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
+  // Alex in prod
+  'dc521ceb-495e-40cc-940e-3b1cafc7a2e1'
 ];
 
 export function CreateSubscriptionInformation({
@@ -106,7 +108,7 @@ export function CreateSubscriptionInformation({
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
-      <SpaceSubscription />
+      {user && whiteListedUserIds.includes(user.id) && <SpaceSubscription />}
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
           <DesktopIconContainer>
