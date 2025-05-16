@@ -8,7 +8,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import { DevPurchaseButton } from 'components/settings/subscription/DevPurchaseForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -21,6 +20,7 @@ import Legend from '../components/Legend';
 
 import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import { SpaceSubscription } from './SpaceSubscription/SpaceSubscription';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -39,13 +39,15 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 }
 
 const whiteListedUserIds = [
-  '0f7a6e61-acb8-4227-b618-4dcab1f429eb',
+  '3bb5e378-50e3-440d-b908-b82d5107f1fc',
   // devorein in prod
   '5906c806-9497-43c7-9ffc-2eecd3c3a3ec',
   // mattcasey in prod
   '4e1d4522-6437-4393-8ed1-9c56e53235f4',
   // chris in prod
-  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835'
+  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
+  // Alex in prod
+  'dc521ceb-495e-40cc-940e-3b1cafc7a2e1'
 ];
 
 export function CreateSubscriptionInformation({
@@ -106,7 +108,7 @@ export function CreateSubscriptionInformation({
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
-      {user && whiteListedUserIds.includes(user.id) ? <DevPurchaseButton /> : null}
+      {user && whiteListedUserIds.includes(user.id) && <SpaceSubscription />}
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
           <DesktopIconContainer>

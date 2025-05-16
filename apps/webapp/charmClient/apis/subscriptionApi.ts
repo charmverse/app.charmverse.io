@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space, SpaceSubscriptionTierChangeEvent } from '@charmverse/core/prisma-client';
 import * as http from '@packages/adapters/http';
 import type {
   CreatePaymentMethodRequest,
@@ -9,13 +9,14 @@ import type {
   SpaceSubscriptionWithStripeData
 } from '@packages/lib/subscription/getActiveSpaceSubscription';
 import type { CouponDetails } from '@packages/lib/subscription/getCouponDetails';
-import type {
-  CreateProSubscriptionRequest,
-  SubscriptionPaymentIntent
-} from '@packages/lib/subscription/interfaces';
+import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import type { UpdatePaymentMethodRequest } from '@packages/lib/subscription/updatePaymentMethod';
 import type { UpdateSubscriptionRequest } from '@packages/lib/subscription/updateProSubscription';
-import type { UpgradeSubscriptionRequest } from '@packages/lib/subscription/upgradeProSubscription';
+import type { UpgradeSubscriptionRequest as UpgradeSubscriptionRequestV2 } from '@packages/lib/subscription/upgradeProSubscription';
+import type { CreateSubscriptionContributionRequest } from '@packages/subscriptions/createSubscriptionContribution';
+import type { DowngradeSubscriptionRequest } from '@packages/subscriptions/downgradeSubscription';
+import type { SubscriptionReceipt } from '@packages/subscriptions/getSubscriptionReceipts';
+import type { UpgradeSubscriptionRequest } from '@packages/subscriptions/upgradeSubscription';
 
 export class SubscriptionApi {
   createSubscription(spaceId: string, payload: CreateProSubscriptionRequest) {
@@ -42,7 +43,7 @@ export class SubscriptionApi {
     return http.POST<CouponDetails | null>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
 
-  upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {
+  upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequestV2) {
     return http.PUT<void>(`/api/spaces/${spaceId}/upgrade-subscription`, payload);
   }
 
@@ -52,5 +53,33 @@ export class SubscriptionApi {
 
   updatePaymentMethod(spaceId: string, payload: UpdatePaymentMethodRequest) {
     return http.PUT<void>(`/api/spaces/${spaceId}/payment-method`, payload);
+  }
+
+  cancelSubscription(spaceId: string) {
+    return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/cancel`);
+  }
+
+  reactivateSubscription(spaceId: string) {
+    return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/reactivate`);
+  }
+
+  createSubscriptionContribution(spaceId: string, payload: CreateSubscriptionContributionRequest) {
+    return http.POST(`/api/spaces/${spaceId}/subscriptions/contribution`, payload);
+  }
+
+  getSubscriptionReceipts(spaceId: string) {
+    return http.GET<SubscriptionReceipt[]>(`/api/spaces/${spaceId}/subscriptions/receipts`);
+  }
+
+  upgradeSubscription(spaceId: string, payload: UpgradeSubscriptionRequest) {
+    return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/upgrade`, payload);
+  }
+
+  downgradeSubscription(spaceId: string, payload: DowngradeSubscriptionRequest) {
+    return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/downgrade`, payload);
+  }
+
+  getSubscriptionEvents(spaceId: string) {
+    return http.GET<SpaceSubscriptionTierChangeEvent[]>(`/api/spaces/${spaceId}/subscriptions/events`);
   }
 }

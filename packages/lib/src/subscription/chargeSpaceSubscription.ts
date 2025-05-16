@@ -5,13 +5,15 @@ import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
-export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, bigint> = {
-  free: parseUnits('0', 18),
-  bronze: parseUnits('1000', 18),
-  silver: parseUnits('2500', 18),
-  gold: parseUnits('10000', 18),
-  grant: parseUnits('0', 18),
-  readonly: parseUnits('0', 18)
+import { UpgradableTiers, type UpgradableTier } from './calculateSubscriptionCost';
+
+export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, number> = {
+  free: 0,
+  bronze: 10,
+  silver: 25,
+  gold: 100,
+  grant: 0,
+  readonly: 0
 };
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
@@ -21,39 +23,79 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
       id: spaceId
     },
     select: {
-      subscriptionTier: true
+      subscriptionTier: true,
+      subscriptionTierChangeEvents: {
+        take: 1,
+        orderBy: {
+          createdAt: 'desc'
+        }
+      }
     }
   });
 
-  if (!space.subscriptionTier) {
+  const subscriptionTier = space.subscriptionTierChangeEvents[0]?.newTier ?? space.subscriptionTier;
+
+  if (!subscriptionTier) {
     throw new Error('Space is not a subscription space');
   }
 
-  const subscriptionTier = space.subscriptionTier;
+  if (!UpgradableTiers.includes(space.subscriptionTier as UpgradableTier)) {
+    throw new Error('Space subscription is not chargeable');
+  }
+
   const spaceTokenBalance = await getSpaceTokenBalance({ spaceId });
 
   const subscriptionTierAmount = SubscriptionTierAmountRecord[subscriptionTier];
 
-  if (parseUnits(spaceTokenBalance.toString(), 18) < subscriptionTierAmount) {
-    await prisma.space.update({
-      where: { id: spaceId },
-      data: {
-        subscriptionTier: 'readonly'
-      }
-    });
+  const spaceTokenBalanceInWei = parseUnits(spaceTokenBalance.toString(), 18);
+  const subscriptionTierAmountInWei = parseUnits(subscriptionTierAmount.toString(), 18);
+
+  if (spaceTokenBalanceInWei < subscriptionTierAmountInWei) {
+    await prisma.$transaction([
+      prisma.space.update({
+        where: { id: spaceId },
+        data: {
+          subscriptionTier: 'readonly'
+        }
+      }),
+      prisma.spaceSubscriptionTierChangeEvent.create({
+        data: {
+          spaceId,
+          newTier: 'readonly',
+          previousTier: subscriptionTier
+        }
+      })
+    ]);
+
     log.warn(`Insufficient space token balance, space downgraded to free tier`, {
       spaceId,
       spaceTokenBalance,
       subscriptionTier
     });
   } else {
-    await prisma.spaceSubscriptionPayment.create({
-      data: {
-        paidTokenAmount: subscriptionTierAmount.toString(),
-        spaceId,
-        subscriptionTier,
-        subscriptionPeriodStart: startOfMonth.toJSDate(),
-        subscriptionPrice: subscriptionTierAmount.toString()
+    await prisma.$transaction(async () => {
+      await prisma.spaceSubscriptionPayment.create({
+        data: {
+          paidTokenAmount: subscriptionTierAmount.toString(),
+          spaceId,
+          subscriptionTier,
+          subscriptionPeriodStart: startOfMonth.toJSDate(),
+          subscriptionPrice: subscriptionTierAmount.toString()
+        }
+      });
+
+      if (subscriptionTier !== space.subscriptionTier) {
+        await prisma.space.update({
+          where: { id: spaceId },
+          data: { subscriptionTier }
+        });
+        await prisma.spaceSubscriptionTierChangeEvent.create({
+          data: {
+            spaceId,
+            newTier: subscriptionTier,
+            previousTier: space.subscriptionTier!
+          }
+        });
       }
     });
   }
