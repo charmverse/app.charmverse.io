@@ -13,7 +13,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { DowngradeTierModal } from './DowngradeTierModal';
+import { DowngradeSubscriptionModal } from './DowngradeSubscriptionModal';
 import { SpaceContributionForm } from './SpaceContributionForm';
 import { SpaceSubscriptionReceiptsList } from './SpaceSubscriptionReceipts';
 import { SpaceSubscriptionUpgradeForm } from './SpaceSubscriptionUpgradeForm';
@@ -51,16 +51,16 @@ export function SpaceSubscription() {
     () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : 0)
   );
 
-  const { data: spaceReceipts = [], mutate: refreshSpaceReceipts } = useSWR(
+  const { data: subscriptionReceipts = [], mutate: refreshSubscriptionReceipts } = useSWR(
     space ? `space-receipts/${space.id}` : null,
-    () => (space ? charmClient.subscription.getSubscriptionContributions(space.id) : [])
+    () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
   );
 
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
   const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
-  const [isCancelTierModalOpen, setIsCancelTierModalOpen] = useState(false);
-  const [isDowngradeTierModalOpen, setIsDowngradeTierModalOpen] = useState(false);
+  const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
+  const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
 
   return (
     <>
@@ -73,7 +73,7 @@ export function SpaceSubscription() {
         <Typography>Space DEV balance: {spaceTokenBalance} </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
       </Stack>
-      <SpaceSubscriptionReceiptsList spaceReceipts={spaceReceipts} />
+      <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
 
       {address ? (
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={2}>
@@ -88,7 +88,11 @@ export function SpaceSubscription() {
             Upgrade
           </Button>
           {space?.subscriptionCancelledAt !== null && space?.subscriptionTier !== 'free' ? (
-            <Button variant='contained' onClick={() => setIsDowngradeTierModalOpen(true)} sx={{ width: 'fit-content' }}>
+            <Button
+              variant='contained'
+              onClick={() => setIsDowngradeSubscriptionModalOpen(true)}
+              sx={{ width: 'fit-content' }}
+            >
               Downgrade
             </Button>
           ) : null}
@@ -96,7 +100,7 @@ export function SpaceSubscription() {
             <Button
               variant='outlined'
               color='error'
-              onClick={() => setIsCancelTierModalOpen(true)}
+              onClick={() => setIsCancelSubscriptionModalOpen(true)}
               sx={{ width: 'fit-content' }}
             >
               Cancel
@@ -112,7 +116,7 @@ export function SpaceSubscription() {
         isOpen={isSendDevModalOpen}
         onClose={() => setIsSendDevModalOpen(false)}
         onSuccess={() => {
-          refreshSpaceReceipts();
+          refreshSubscriptionReceipts();
           refreshSpaceTokenBalance();
         }}
       />
@@ -121,32 +125,32 @@ export function SpaceSubscription() {
         onClose={() => setIsSpaceTierPurchaseModalOpen(false)}
         spaceTokenBalance={spaceTokenBalance}
         onSuccess={() => {
-          refreshSpaceReceipts();
+          refreshSubscriptionReceipts();
           refreshSpaceTokenBalance();
           setIsSpaceTierPurchaseModalOpen(false);
         }}
       />
-      <CancelTierModal
-        isOpen={isCancelTierModalOpen}
-        onClose={() => setIsCancelTierModalOpen(false)}
+      <CancelSubscriptionModal
+        isOpen={isCancelSubscriptionModalOpen}
+        onClose={() => setIsCancelSubscriptionModalOpen(false)}
         onSuccess={() => {
           refreshCurrentSpace();
-          setIsCancelTierModalOpen(false);
+          setIsCancelSubscriptionModalOpen(false);
         }}
       />
-      <DowngradeTierModal
-        isOpen={isDowngradeTierModalOpen}
-        onClose={() => setIsDowngradeTierModalOpen(false)}
+      <DowngradeSubscriptionModal
+        isOpen={isDowngradeSubscriptionModalOpen}
+        onClose={() => setIsDowngradeSubscriptionModalOpen(false)}
         onSuccess={() => {
           refreshCurrentSpace();
-          setIsDowngradeTierModalOpen(false);
+          setIsDowngradeSubscriptionModalOpen(false);
         }}
       />
     </>
   );
 }
 
-function CancelTierModal({
+function CancelSubscriptionModal({
   isOpen,
   onClose,
   onSuccess

@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { relativeTime } from '@packages/lib/utils/dates';
-import type { SpaceReceipt } from '@packages/spaces/getSpaceReceipts';
+import type { SubscriptionReceipt } from '@packages/subscriptions/getSubscriptionReceipts';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import Image from 'next/image';
 import { formatUnits } from 'viem';
@@ -9,23 +9,27 @@ import Avatar from 'components/common/Avatar';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 
-export function SpaceSubscriptionReceiptsList({ spaceReceipts }: { spaceReceipts: SpaceReceipt[] }) {
+export function SpaceSubscriptionReceiptsList({
+  subscriptionReceipts
+}: {
+  subscriptionReceipts: SubscriptionReceipt[];
+}) {
   const { space } = useCurrentSpace();
   const { members } = useMembers();
 
-  const spaceReceiptsWithUser = spaceReceipts.map((receipt) => ({
+  const subscriptionReceiptsWithUser = subscriptionReceipts.map((receipt) => ({
     ...receipt,
     user: receipt.type === 'contribution' ? members.find((member) => member.id === receipt.userId)! : undefined
   }));
 
   return (
     <Stack gap={2} my={2}>
-      {spaceReceipts.length === 0 ? (
-        <Typography>No space receipts yet</Typography>
+      {subscriptionReceipts.length === 0 ? (
+        <Typography>No subscription receipts yet</Typography>
       ) : (
         <>
-          <Typography variant='h6'>Space receipts</Typography>
-          {spaceReceiptsWithUser.map((receipt) => (
+          <Typography variant='h6'>Subscription receipts</Typography>
+          {subscriptionReceiptsWithUser.map((receipt) => (
             <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
               <Box display='flex' alignItems='center' gap={1}>
                 <Avatar

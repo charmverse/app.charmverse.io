@@ -29,6 +29,7 @@
     "@packages/pages": "^0.0.0",
     "@packages/profile": "^0.0.0",
     "@packages/spaces": "^0.0.0",
+    "@packages/subscriptions": "^0.0.0",
     "@packages/users": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@packages/websockets": "^0.0.0",

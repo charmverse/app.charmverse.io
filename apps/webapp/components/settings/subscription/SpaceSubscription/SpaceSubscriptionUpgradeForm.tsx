@@ -65,8 +65,8 @@ export function SpaceSubscriptionUpgradeForm({
       });
     }
 
-    await charmClient.spaces
-      .upgradeSubscriptionTier(space.id, {
+    await charmClient.subscription
+      .upgradeSubscription(space.id, {
         tier: selectedTier,
         paymentMonths
       })
