@@ -37,8 +37,8 @@ export function SpaceContributionForm({
   async function onDevTransfer() {
     const result = await transferDevToken();
     if (result && space) {
-      await charmClient.spaces
-        .createSpaceContribution(space.id, {
+      await charmClient.subscription
+        .createSubscriptionContribution(space.id, {
           hash: result.hash,
           walletAddress: result.address,
           paidTokenAmount: result.transferredAmount.toString(),

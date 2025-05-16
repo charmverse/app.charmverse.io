@@ -56,7 +56,7 @@ export function SpaceSubscriptionUpgradeForm({
     if (totalCost !== 0) {
       const result = await transferDevToken();
       if (!result) return;
-      await charmClient.spaces.createSpaceContribution(space.id, {
+      await charmClient.subscription.createSubscriptionContribution(space.id, {
         hash: result.hash,
         walletAddress: result.address,
         paidTokenAmount: result.transferredAmount.toString(),

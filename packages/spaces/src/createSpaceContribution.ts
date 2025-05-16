@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { base } from 'viem/chains';
 
-export type CreateSpaceContributionRequest = {
+export type CreateSubscriptionContributionRequest = {
   hash: string;
   walletAddress: string;
   paidTokenAmount: string;
@@ -9,8 +9,8 @@ export type CreateSpaceContributionRequest = {
   message: string;
 };
 
-export async function createSpaceContribution(
-  payload: CreateSpaceContributionRequest & {
+export async function createSubscriptionContribution(
+  payload: CreateSubscriptionContributionRequest & {
     spaceId: string;
     userId: string;
   }

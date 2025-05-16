@@ -53,7 +53,7 @@ export function SpaceSubscription() {
 
   const { data: spaceReceipts = [], mutate: refreshSpaceReceipts } = useSWR(
     space ? `space-receipts/${space.id}` : null,
-    () => (space ? charmClient.spaces.getSpaceContributions(space.id) : [])
+    () => (space ? charmClient.subscription.getSubscriptionContributions(space.id) : [])
   );
 
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
@@ -87,7 +87,7 @@ export function SpaceSubscription() {
           >
             Upgrade
           </Button>
-          {space?.subscriptionTier !== 'cancelled' && space?.subscriptionTier !== 'free' ? (
+          {space?.subscriptionCancelledAt !== null && space?.subscriptionTier !== 'free' ? (
             <Button variant='contained' onClick={() => setIsDowngradeTierModalOpen(true)} sx={{ width: 'fit-content' }}>
               Downgrade
             </Button>
@@ -162,7 +162,7 @@ function CancelTierModal({
       return;
     }
 
-    await charmClient.spaces.cancelSubscriptionTier(space.id);
+    await charmClient.subscription.cancelSubscription(space.id);
     onSuccess();
     onClose();
   };
