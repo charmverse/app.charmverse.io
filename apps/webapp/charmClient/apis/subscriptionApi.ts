@@ -59,6 +59,10 @@ export class SubscriptionApi {
     return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/cancel`);
   }
 
+  reactivateSubscription(spaceId: string) {
+    return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/reactivate`);
+  }
+
   createSubscriptionContribution(spaceId: string, payload: CreateSubscriptionContributionRequest) {
     return http.POST(`/api/spaces/${spaceId}/subscriptions/contribution`, payload);
   }

@@ -17,6 +17,19 @@ export async function createSubscriptionContribution(
 ) {
   const { hash, walletAddress, paidTokenAmount, userId, spaceId } = payload;
 
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      subscriptionCancelledAt: true
+    }
+  });
+
+  if (space.subscriptionCancelledAt) {
+    throw new Error('Space subscription cancelled');
+  }
+
   const spaceContribution = await prisma.spaceSubscriptionContribution.create({
     data: {
       spaceId,

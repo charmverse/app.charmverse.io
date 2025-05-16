@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Alert, Stack, Typography } from '@mui/material';
 import { UpgradableTiers, type UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
 import Image from 'next/image';
@@ -8,12 +8,13 @@ import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
+import { CancelSubscriptionModal } from './CancelSubscriptionModal';
 import { DowngradeSubscriptionModal } from './DowngradeSubscriptionModal';
+import { ReactivateSubscriptionModal } from './ReactivateSubscriptionModal';
 import { SpaceContributionForm } from './SpaceContributionForm';
 import { SpaceSubscriptionReceiptsList } from './SpaceSubscriptionReceipts';
 import { SpaceSubscriptionUpgradeForm } from './SpaceSubscriptionUpgradeForm';
@@ -60,7 +61,10 @@ export function SpaceSubscription() {
   const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
   const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
+  const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
   const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
+
+  const isCancelled = space?.subscriptionCancelledAt !== null;
 
   return (
     <>
@@ -73,22 +77,34 @@ export function SpaceSubscription() {
         <Typography>Space DEV balance: {spaceTokenBalance} </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
       </Stack>
+      {isCancelled ? (
+        <Alert severity='error' variant='standard'>
+          Your subscription has been cancelled. You will not be able to send DEV tokens or upgrade your subscription.
+        </Alert>
+      ) : null}
       <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
 
       {address ? (
         <Stack flexDirection='row' alignItems='center' gap={0.5} mb={2}>
-          <Button variant='contained' onClick={() => setIsSendDevModalOpen(true)} sx={{ width: 'fit-content' }}>
+          <Button
+            disabled={isCancelled}
+            variant='contained'
+            onClick={() => setIsSendDevModalOpen(true)}
+            sx={{ width: 'fit-content' }}
+          >
             Send DEV
           </Button>
           <Button
+            disabled={isCancelled}
             variant='contained'
             onClick={() => setIsSpaceTierPurchaseModalOpen(true)}
             sx={{ width: 'fit-content' }}
           >
             Upgrade
           </Button>
-          {space?.subscriptionCancelledAt !== null && space?.subscriptionTier !== 'free' ? (
+          {space?.subscriptionTier !== 'free' && space?.subscriptionTier !== 'readonly' ? (
             <Button
+              disabled={isCancelled}
               variant='contained'
               onClick={() => setIsDowngradeSubscriptionModalOpen(true)}
               sx={{ width: 'fit-content' }}
@@ -96,7 +112,7 @@ export function SpaceSubscription() {
               Downgrade
             </Button>
           ) : null}
-          {UpgradableTiers.includes(space?.subscriptionTier as UpgradableTier) && (
+          {!isCancelled && UpgradableTiers.includes(space?.subscriptionTier as UpgradableTier) && (
             <Button
               variant='outlined'
               color='error'
@@ -104,6 +120,15 @@ export function SpaceSubscription() {
               sx={{ width: 'fit-content' }}
             >
               Cancel
+            </Button>
+          )}
+          {isCancelled && (
+            <Button
+              variant='outlined'
+              onClick={() => setIsReactivateSubscriptionModalOpen(true)}
+              sx={{ width: 'fit-content' }}
+            >
+              Reactivate
             </Button>
           )}
         </Stack>
@@ -146,39 +171,14 @@ export function SpaceSubscription() {
           setIsDowngradeSubscriptionModalOpen(false);
         }}
       />
+      <ReactivateSubscriptionModal
+        isOpen={isReactivateSubscriptionModalOpen}
+        onClose={() => setIsReactivateSubscriptionModalOpen(false)}
+        onSuccess={() => {
+          refreshCurrentSpace();
+          setIsReactivateSubscriptionModalOpen(false);
+        }}
+      />
     </>
-  );
-}
-
-function CancelSubscriptionModal({
-  isOpen,
-  onClose,
-  onSuccess
-}: {
-  isOpen: boolean;
-  onClose: VoidFunction;
-  onSuccess: VoidFunction;
-}) {
-  const { space } = useCurrentSpace();
-
-  const onConfirm = async () => {
-    if (!space) {
-      return;
-    }
-
-    await charmClient.subscription.cancelSubscription(space.id);
-    onSuccess();
-    onClose();
-  };
-
-  return (
-    <ConfirmDeleteModal
-      open={isOpen}
-      onClose={onClose}
-      onConfirm={onConfirm}
-      question='Are you sure you want to cancel your subscription?'
-      title='Cancel current subscription'
-      buttonText='Cancel'
-    />
   );
 }
