@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 
 const subscriptionCancellationDetails = {
-  first: 'If you use the Free Edition, the following changes will apply: ',
+  first: 'If you use the Public Edition, the following changes will apply: ',
   list: [
     'All content will be public and shared on the web',
     'Custom roles will no longer apply',
@@ -26,10 +26,10 @@ type Props = {
 export function ConfirmFreeDowngradeModal({ isOpen, onClose, onConfirmDowngrade, disabled }: Props) {
   return (
     <ConfirmDeleteModal
-      title='Confirm Free Edition downgrade'
+      title='Confirm Public Edition'
       size='large'
       open={isOpen}
-      buttonText='Downgrade to Free Edition'
+      buttonText='Switch to Public Edition'
       secondaryButtonText='Keep current plan'
       question={
         <>

@@ -1,5 +1,5 @@
 import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
@@ -10,7 +10,7 @@ import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
 export function useSpaceSubscription() {
-  const { space: currentSpace } = useCurrentSpace();
+  const { space: currentSpace, refreshCurrentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { setSpace } = useSpaces();
   const { user } = useUser();
@@ -26,10 +26,7 @@ export function useSpaceSubscription() {
     { shouldRetryOnError: false }
   );
 
-  const subscriptionEnded = useMemo(
-    () => spaceSubscription?.status === 'past_due' || spaceSubscription?.status === 'unpaid',
-    [spaceSubscription?.status]
-  );
+  const isSpaceReadonly = currentSpace?.subscriptionTier === 'readonly';
 
   const spaceBlockQuota = defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000 + additionalQuota;
   const hasPassedBlockQuota = (count || 0) > spaceBlockQuota;
@@ -50,15 +47,24 @@ export function useSpaceSubscription() {
     };
   }, [currentSpace]);
 
+  const downgradeToFreeTier = useCallback(async () => {
+    await charmClient.subscription.downgradeSubscription(currentSpace!.id, {
+      tier: 'free'
+    });
+    refreshCurrentSpace();
+  }, [currentSpace, refreshCurrentSpace]);
+
   return {
     spaceSubscription,
     isLoading,
-    subscriptionEnded,
+    isSpaceReadonly,
     refetchSpaceSubscription,
     hasPassedBlockQuota,
     spaceBlockQuota,
     spaceBlockCount: count,
     paidTier: currentSpace?.paidTier,
+    downgradeToFreeTier,
+    isDowngradingToFreeTier: currentSpace?.subscriptionTier !== 'free',
     subscriptionTier: currentSpace?.subscriptionTier
   };
 }

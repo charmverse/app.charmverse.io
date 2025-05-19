@@ -10,21 +10,23 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { useTransferDevToken } from '../hooks/useTransferDevToken';
+import { useTransferDevToken } from '../../hooks/useTransferDevToken';
 
 export function SpaceSubscriptionUpgradeForm({
   isOpen,
   onClose: _onClose,
   onSuccess,
-  spaceTokenBalance
+  spaceTokenBalance,
+  newTier
 }: {
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
   spaceTokenBalance: number;
+  newTier: UpgradableTier | null;
 }) {
   const { space, refreshCurrentSpace } = useCurrentSpace();
-  const [selectedTier, setSelectedTier] = useState<UpgradableTier | null>(null);
+  const [selectedTier, setSelectedTier] = useState<UpgradableTier | null>(newTier);
   const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
   const currentTier = space?.subscriptionTier as UpgradableTier | null;

@@ -125,6 +125,7 @@ export function SubscriptionHeader({
             </Typography>
           </Stack>
         )}
+        {isReadOnly && <Typography>Upgrade now to unlock editing</Typography>}
       </Alert>
       {/* <Stack flexDirection='row' alignItems='center' gap={0.5}>
         <Typography>DEV balance: {spaceTokenBalance} </Typography>

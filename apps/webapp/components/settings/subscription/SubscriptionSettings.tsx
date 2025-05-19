@@ -1,13 +1,10 @@
-import type { Space } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
+import type { Space, SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { Stack, Typography } from '@mui/material';
-import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
-import type { CreateProSubscriptionRequest } from '@packages/lib/subscription/interfaces';
+import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
-import { Elements } from '@stripe/react-stripe-js';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
@@ -16,14 +13,15 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 import { EnterpriseBillingScreen } from './components/EnterpriseBillingScreen';
 import { CancelSubscriptionModal } from './components/modals/CancelSubscriptionModal';
+import { ConfirmFreeDowngradeModal } from './components/modals/ConfirmFreeDowngradeModal';
 import { DowngradeSubscriptionModal } from './components/modals/DowngradeSubscriptionModal';
 import { ReactivateSubscriptionModal } from './components/modals/ReactivateSubscriptionModal';
+import { SpaceSubscriptionUpgradeForm } from './components/modals/SpaceSubscriptionUpgradeForm';
 import { SpaceContributionForm } from './components/SpaceContributionForm';
 import { SpaceSubscriptionReceiptsList } from './components/SpaceSubscriptionReceipts';
 import { SubscriptionHeader } from './components/SubscriptionHeader';
 import { SubscriptionTiers } from './components/SubscriptionTiers';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
-import { SpaceSubscriptionUpgradeForm } from './SpaceSubscription/SpaceSubscriptionUpgradeForm';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -41,7 +39,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
   );
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
-  const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState(false);
+  const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState<SpaceSubscriptionTier | null>(null);
   const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
   const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
   const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
@@ -50,11 +48,28 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     space ? `space-subscription-events/${space.id}` : null,
     () => (space ? charmClient.subscription.getSubscriptionEvents(space.id) : [])
   );
-  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
+
+  const {
+    isOpen: isConfirmDowngradeDialogOpen,
+    close: closeConfirmFreeTierDowngradeDialog,
+    open: openConfirmFreeTierDowngradeDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
+  const {
+    spaceSubscription,
+    isLoading: isLoadingSpaceSubscription,
+    downgradeToFreeTier,
+    isDowngradingToFreeTier
+  } = useSpaceSubscription();
 
   useTrackPageView({ type: 'billing/settings' });
 
-  function handleShowCheckoutForm() {}
+  function handleShowCheckoutForm(tier: UpgradableTier) {
+    if (tier === 'grant') {
+      setIsSendDevModalOpen(true);
+    } else {
+      setIsSpaceTierPurchaseModalOpen(tier);
+    }
+  }
 
   if (space.paidTier === 'enterprise' || space.subscriptionTier === 'grant') {
     return <EnterpriseBillingScreen />;
@@ -67,9 +82,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           spaceTokenBalance={spaceTokenBalance}
           subscriptionEvents={subscriptionEvents}
           onClickSendDev={() => setIsSendDevModalOpen(true)}
-          onClickUpgrade={() => setIsSpaceTierPurchaseModalOpen(true)}
+          onClickUpgrade={() => setIsSpaceTierPurchaseModalOpen('free')}
         />
-        <SubscriptionTiers spaceId={space.id} />
+        <SubscriptionTiers
+          onClickShowCheckoutForm={handleShowCheckoutForm}
+          onClickFreeTier={() => openConfirmFreeTierDowngradeDialog()}
+        />
         <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
       </Stack>
       <SpaceContributionForm
@@ -81,13 +99,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         }}
       />
       <SpaceSubscriptionUpgradeForm
-        isOpen={isSpaceTierPurchaseModalOpen}
-        onClose={() => setIsSpaceTierPurchaseModalOpen(false)}
+        isOpen={!!isSpaceTierPurchaseModalOpen}
+        onClose={() => setIsSpaceTierPurchaseModalOpen(null)}
         spaceTokenBalance={spaceTokenBalance}
+        newTier={isSpaceTierPurchaseModalOpen}
         onSuccess={() => {
           refreshSubscriptionReceipts();
           refreshSpaceTokenBalance();
-          setIsSpaceTierPurchaseModalOpen(false);
+          setIsSpaceTierPurchaseModalOpen(null);
         }}
       />
       <CancelSubscriptionModal
@@ -114,6 +133,12 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           refreshCurrentSpace();
           setIsReactivateSubscriptionModalOpen(false);
         }}
+      />
+      <ConfirmFreeDowngradeModal
+        disabled={isDowngradingToFreeTier}
+        isOpen={isConfirmDowngradeDialogOpen}
+        onClose={closeConfirmFreeTierDowngradeDialog}
+        onConfirmDowngrade={downgradeToFreeTier}
       />
     </RainbowKitProvider>
   );

@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { MemberPropertyType, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { updateCustomerStripeInfo } from '@packages/lib/subscription/updateCustomerStripeInfo';
 import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from '@packages/spaces/utils';
@@ -146,21 +145,6 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
   });
 
   await updateTrackGroupProfile(updatedSpace);
-
-  if (updatedSpace.domain !== existingSpace.domain) {
-    try {
-      await updateCustomerStripeInfo({
-        spaceId,
-        update: {
-          metadata: {
-            domain: updatedSpace.domain
-          }
-        }
-      });
-    } catch (err) {
-      log.error(`Error updating stripe customer details`, { spaceId, err });
-    }
-  }
 
   return updatedSpace;
 }
