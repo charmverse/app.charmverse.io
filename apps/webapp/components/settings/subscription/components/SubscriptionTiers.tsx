@@ -1,6 +1,7 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { subscriptionDetails } from '@packages/lib/subscription/constants';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
@@ -28,12 +29,10 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 export function SubscriptionTiers({
   pendingPayment,
   onClickShowCheckoutForm,
-  onClickFreeTier,
   subscriptionTier
 }: {
   pendingPayment?: boolean;
-  onClickShowCheckoutForm: (tier: SpaceSubscriptionTier) => void;
-  onClickFreeTier: () => void;
+  onClickShowCheckoutForm: (tier: UpgradableTier | 'free') => void;
   subscriptionTier?: SpaceSubscriptionTier;
 }) {
   return (
@@ -59,7 +58,12 @@ export function SubscriptionTiers({
             <Image width={140} height={140} src='/images/subscriptions/public.webp' alt='Free' />
           </MobileIconContainer>
           {subscriptionTier !== 'free' && (
-            <Button fullWidth variant='outlined' onClick={onClickFreeTier} disabled={pendingPayment}>
+            <Button
+              fullWidth
+              variant='outlined'
+              onClick={() => onClickShowCheckoutForm('free')}
+              disabled={pendingPayment}
+            >
               Select
             </Button>
           )}

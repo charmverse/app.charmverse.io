@@ -39,7 +39,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
   );
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
-  const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState<SpaceSubscriptionTier | null>(null);
+  const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState<UpgradableTier | null>(null);
   const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
   const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
   const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
@@ -54,18 +54,14 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     close: closeConfirmFreeTierDowngradeDialog,
     open: openConfirmFreeTierDowngradeDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
-  const {
-    spaceSubscription,
-    isLoading: isLoadingSpaceSubscription,
-    downgradeToFreeTier,
-    isDowngradingToFreeTier
-  } = useSpaceSubscription();
+
+  const { downgradeToFreeTier, isDowngradingToFreeTier } = useSpaceSubscription();
 
   useTrackPageView({ type: 'billing/settings' });
 
-  function handleShowCheckoutForm(tier: UpgradableTier) {
-    if (tier === 'grant') {
-      setIsSendDevModalOpen(true);
+  function handleShowCheckoutForm(tier: UpgradableTier | 'free') {
+    if (tier === 'free') {
+      openConfirmFreeTierDowngradeDialog();
     } else {
       setIsSpaceTierPurchaseModalOpen(tier);
     }
@@ -82,12 +78,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           spaceTokenBalance={spaceTokenBalance}
           subscriptionEvents={subscriptionEvents}
           onClickSendDev={() => setIsSendDevModalOpen(true)}
-          onClickUpgrade={() => setIsSpaceTierPurchaseModalOpen('free')}
+          onClickUpgrade={() => setIsSpaceTierPurchaseModalOpen('bronze')}
         />
-        <SubscriptionTiers
-          onClickShowCheckoutForm={handleShowCheckoutForm}
-          onClickFreeTier={() => openConfirmFreeTierDowngradeDialog()}
-        />
+        <SubscriptionTiers onClickShowCheckoutForm={handleShowCheckoutForm} />
         <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
       </Stack>
       <SpaceContributionForm
