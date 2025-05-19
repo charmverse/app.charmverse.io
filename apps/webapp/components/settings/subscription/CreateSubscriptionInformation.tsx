@@ -43,7 +43,7 @@ export function CreateSubscriptionInformation({
   pendingPayment?: boolean;
   spaceId: string;
 }) {
-  const { refetchSpaceSubscription, paidTier } = useSpaceSubscription();
+  const { refetchSpaceSubscription, subscriptionTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
   const { refreshCurrentSpace, space } = useCurrentSpace();
@@ -151,12 +151,12 @@ export function CreateSubscriptionInformation({
               1,000 $DEV / month
             </Typography>
 
-            {paidTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            {subscriptionTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src='/images/subscriptions/bronze.svg' alt='Bronze' />
           </MobileIconContainer>
-          {space?.paidTier !== 'bronze' && (
+          {space?.subscriptionTier !== 'bronze' && (
             <Button
               variant='outlined'
               onClick={switchToCommunityPlan}
@@ -191,12 +191,12 @@ export function CreateSubscriptionInformation({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               2,500 $DEV / month
             </Typography>
-            {paidTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            {subscriptionTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src='/images/subscriptions/silver.svg' alt='Free' />
           </MobileIconContainer>
-          {space?.paidTier !== 'silver' && (
+          {space?.subscriptionTier !== 'silver' && (
             <Button
               variant='outlined'
               onClick={switchToCommunityPlan}
@@ -232,12 +232,12 @@ export function CreateSubscriptionInformation({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               10,000 $DEV / month
             </Typography>
-            {paidTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            {subscriptionTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src='/images/subscriptions/gold.svg' alt='Gold' />
           </MobileIconContainer>
-          {space?.paidTier !== 'gold' && (
+          {space?.subscriptionTier !== 'gold' && (
             <Button
               variant='outlined'
               onClick={switchToCommunityPlan}
@@ -279,15 +279,15 @@ export function CreateSubscriptionInformation({
               <Image width={150} height={150} src='/images/subscriptions/grant.webp' alt='Grants' />
             </MobileIconContainer>
           </div>
-          {space?.paidTier !== 'grants' && (
-            <Button
-              variant='outlined'
-              onClick={switchToCommunityPlan}
-              disabled={pendingPayment || isSwitchToCommunityLoading}
-            >
-              Switch to grant
-            </Button>
-          )}
+          <Button
+            fullWidth
+            variant='outlined'
+            href='mailto:hello@charmverse.io'
+            external
+            sx={{ whiteSpace: 'normal', textAlign: 'left' }}
+          >
+            Contact hello@charmverse.io
+          </Button>
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>

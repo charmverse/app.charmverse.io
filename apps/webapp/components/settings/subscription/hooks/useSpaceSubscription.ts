@@ -1,3 +1,4 @@
+import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 import { useEffect, useMemo } from 'react';
 import useSWR from 'swr';
 
@@ -7,7 +8,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 
 export function useSpaceSubscription() {
   const { space: currentSpace } = useCurrentSpace();

@@ -1,7 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { createProSubscription } from '@packages/lib/subscription/createProSubscription';
@@ -11,6 +8,8 @@ import { getActiveSpaceSubscription } from '@packages/lib/subscription/getActive
 import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import type { UpdateSubscriptionRequest } from '@packages/lib/subscription/updateProSubscription';
 import { updateProSubscription } from '@packages/lib/subscription/updateProSubscription';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
