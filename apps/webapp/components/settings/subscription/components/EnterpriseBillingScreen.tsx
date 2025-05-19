@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 
 import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
 
-import Legend from '../components/Legend';
+import Legend from '../../components/Legend';
 
 export function EnterpriseBillingScreen() {
   return (

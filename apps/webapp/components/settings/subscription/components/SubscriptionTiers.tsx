@@ -13,10 +13,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import Legend from '../components/Legend';
-
-import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
-import { useSpaceSubscription } from './hooks/useSpaceSubscription';
+import Legend from '../../components/Legend';
+import { ConfirmFreeDowngradeModal } from '../ConfirmFreeDowngradeModal';
+import { useSpaceSubscription } from '../hooks/useSpaceSubscription';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -34,15 +33,7 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
   );
 }
 
-export function CreateSubscriptionInformation({
-  onUpgrade,
-  pendingPayment,
-  spaceId
-}: {
-  onUpgrade: () => void;
-  pendingPayment?: boolean;
-  spaceId: string;
-}) {
+export function SubscriptionTiers({ pendingPayment, spaceId }: { pendingPayment?: boolean; spaceId: string }) {
   const { refetchSpaceSubscription, subscriptionTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
