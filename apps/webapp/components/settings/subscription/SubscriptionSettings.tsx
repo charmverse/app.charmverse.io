@@ -8,6 +8,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
+import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -80,8 +81,22 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           onClickSendDev={() => setIsSendDevModalOpen(true)}
           onClickUpgrade={() => setIsSpaceTierPurchaseModalOpen('bronze')}
         />
-        <SubscriptionTiers onClickShowCheckoutForm={handleShowCheckoutForm} />
-        <SpaceSubscriptionReceiptsList subscriptionReceipts={subscriptionReceipts} />
+
+        <MultiTabs
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          tabs={[
+            [
+              'Subscription Plan',
+              <SubscriptionTiers key='subscription' onClickShowCheckoutForm={handleShowCheckoutForm} />
+            ],
+            [
+              'Payment History',
+              <SpaceSubscriptionReceiptsList key='payments' subscriptionReceipts={subscriptionReceipts} />
+            ]
+          ]}
+        />
       </Stack>
       <SpaceContributionForm
         isOpen={isSendDevModalOpen}

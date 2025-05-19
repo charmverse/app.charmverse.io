@@ -37,9 +37,6 @@ export function SubscriptionTiers({
 }) {
   return (
     <>
-      <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
-        Upgrade CharmVerse
-      </Legend>
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
@@ -82,7 +79,7 @@ export function SubscriptionTiers({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1 }} />
+      <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
@@ -119,7 +116,7 @@ export function SubscriptionTiers({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
@@ -141,7 +138,7 @@ export function SubscriptionTiers({
             </Button>
           )}
         </Grid>
-        <Divider sx={{ mb: 1, mt: 2 }} />
+        <Divider sx={{ my: 2 }} />
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
@@ -156,7 +153,7 @@ export function SubscriptionTiers({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
@@ -178,7 +175,7 @@ export function SubscriptionTiers({
             </Button>
           )}
         </Grid>
-        <Divider sx={{ mb: 1, mt: 2 }} />
+        <Divider sx={{ my: 2 }} />
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
@@ -193,7 +190,7 @@ export function SubscriptionTiers({
           </List>
         </Grid>
       </Grid>
-      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
