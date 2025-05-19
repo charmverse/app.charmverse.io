@@ -2,6 +2,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import { subscriptionDetails } from '@packages/lib/subscription/constants';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import Image from 'next/image';
 import type { ReactNode } from 'react';
 import useSWRMutation from 'swr/mutation';
 
@@ -11,16 +12,11 @@ import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
-import CommunityIcon from 'public/images/subscriptions/community.svg';
-import EnterpriseIcon from 'public/images/subscriptions/enterprise.svg';
-import FreeIcon from 'public/images/subscriptions/free.svg';
 
 import Legend from '../components/Legend';
 
 import { ConfirmFreeDowngradeModal } from './ConfirmFreeDowngradeModal';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
-import { SpaceSubscription } from './SpaceSubscription/SpaceSubscription';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -38,18 +34,6 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
   );
 }
 
-const whiteListedUserIds = [
-  '3bb5e378-50e3-440d-b908-b82d5107f1fc',
-  // devorein in prod
-  '5906c806-9497-43c7-9ffc-2eecd3c3a3ec',
-  // mattcasey in prod
-  '4e1d4522-6437-4393-8ed1-9c56e53235f4',
-  // chris in prod
-  'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
-  // Alex in prod
-  'dc521ceb-495e-40cc-940e-3b1cafc7a2e1'
-];
-
 export function CreateSubscriptionInformation({
   onUpgrade,
   pendingPayment,
@@ -62,7 +46,6 @@ export function CreateSubscriptionInformation({
   const { refetchSpaceSubscription, paidTier } = useSpaceSubscription();
   const { isFreeSpace } = useIsFreeSpace();
   const { showMessage } = useSnackbar();
-  const { user } = useUser();
   const { refreshCurrentSpace, space } = useCurrentSpace();
 
   const { trigger: switchToFreePlan, isMutating: isSwitchToFreeLoading } = useSWRMutation(
@@ -108,20 +91,20 @@ export function CreateSubscriptionInformation({
       <Legend variantMapping={{ inherit: 'div' }} whiteSpace='normal' mb={1}>
         Upgrade CharmVerse
       </Legend>
-      {user && whiteListedUserIds.includes(user.id) && <SpaceSubscription />}
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
         <Grid item xs={12} sm={4.5}>
           <DesktopIconContainer>
             <Box mt={-1}>
-              <FreeIcon width='100px' height='100px' />
+              <Image width={100} height={100} src='/images/subscriptions/public.webp' alt='Free' />
             </Box>
           </DesktopIconContainer>
-          <Typography variant='h6' mb={1}>
-            Public Goods
+          <Typography variant='h6'>Public</Typography>
+          <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
+            Free
           </Typography>
-          {isFreeSpace ? <Chip size='small' label='Current Plan' /> : null}
+          {!isFreeSpace ? <Chip size='small' label='Current Plan' /> : null}
           <MobileIconContainer>
-            <FreeIcon width='140px' height='140px' />
+            <Image width={140} height={140} src='/images/subscriptions/public.webp' alt='Free' />
           </MobileIconContainer>
           {!isFreeSpace && (
             <>
@@ -131,7 +114,7 @@ export function CreateSubscriptionInformation({
                 onClick={openConfirmFreeTierDowngradeDialog}
                 disabled={pendingPayment || isSwitchToFreeLoading}
               >
-                Switch to Public Goods
+                Switch to Public
               </Button>
               <ConfirmFreeDowngradeModal
                 isOpen={isConfirmDowngradeDialogOpen}
@@ -145,7 +128,7 @@ export function CreateSubscriptionInformation({
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
-            {subscriptionDetails.free.map((detail) => (
+            {subscriptionDetails.public.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
                   <CheckIcon fontSize='small' />
@@ -161,39 +144,32 @@ export function CreateSubscriptionInformation({
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
-              <CommunityIcon width='100px' height='100px' />
+              <Image width={100} height={100} src='/images/subscriptions/bronze.svg' alt='Bronze' />
             </DesktopIconContainer>
-            <Typography variant='h6' mb={1}>
-              Community
+            <Typography variant='h6'>Bronze</Typography>
+            <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
+              1,000 $DEV / month
             </Typography>
 
-            <Chip
-              size='small'
-              label={paidTier === 'community' ? 'Current Plan' : 'Recommended Plan'}
-              variant='outlined'
-            />
+            {paidTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
-            <CommunityIcon width='150px' height='150px' />
+            <Image width={150} height={150} src='/images/subscriptions/bronze.svg' alt='Bronze' />
           </MobileIconContainer>
-          {space?.paidTier === 'community' ? (
-            <Button onClick={onUpgrade} disabled={pendingPayment}>
-              {pendingPayment ? 'Payment pending' : 'Get more blocks'}
-            </Button>
-          ) : (
+          {space?.paidTier !== 'bronze' && (
             <Button
               variant='outlined'
               onClick={switchToCommunityPlan}
               disabled={pendingPayment || isSwitchToCommunityLoading}
             >
-              Switch to community
+              Switch to bronze
             </Button>
           )}
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
-            {subscriptionDetails.community.map((detail) => (
+            {subscriptionDetails.bronze.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
                   <CheckIcon fontSize='small' />
@@ -209,23 +185,114 @@ export function CreateSubscriptionInformation({
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
-              <EnterpriseIcon width='90px' height='90px' />
+              <Image width={100} height={100} src='/images/subscriptions/silver.svg' alt='Silver' />
+            </DesktopIconContainer>
+            <Typography variant='h6'>Silver</Typography>
+            <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
+              2,500 $DEV / month
+            </Typography>
+            {paidTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
+          </div>
+          <MobileIconContainer>
+            <Image width={150} height={150} src='/images/subscriptions/silver.svg' alt='Free' />
+          </MobileIconContainer>
+          {space?.paidTier !== 'silver' && (
+            <Button
+              variant='outlined'
+              onClick={switchToCommunityPlan}
+              disabled={pendingPayment || isSwitchToCommunityLoading}
+            >
+              Switch to silver
+            </Button>
+          )}
+        </Grid>
+        <Divider sx={{ mb: 1, mt: 2 }} />
+        <Grid item xs={12} sm={7.5}>
+          <Typography fontWeight='bold'>Features included</Typography>
+          <List dense sx={{ mt: -1 }}>
+            {subscriptionDetails.silver.map((detail) => (
+              <ListItem key={detail} sx={{ py: 0 }}>
+                <ListItemIcon>
+                  <CheckIcon fontSize='small' />
+                </ListItemIcon>
+                <ListItemText primary={detail} />
+              </ListItem>
+            ))}
+          </List>
+        </Grid>
+      </Grid>
+      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
+        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+          <div>
+            <DesktopIconContainer>
+              <Image width={95} height={95} src='/images/subscriptions/gold.svg' alt='Gold' />
+            </DesktopIconContainer>
+            <Typography variant='h6'>Gold</Typography>
+            <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
+              10,000 $DEV / month
+            </Typography>
+            {paidTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
+          </div>
+          <MobileIconContainer>
+            <Image width={150} height={150} src='/images/subscriptions/gold.svg' alt='Gold' />
+          </MobileIconContainer>
+          {space?.paidTier !== 'gold' && (
+            <Button
+              variant='outlined'
+              onClick={switchToCommunityPlan}
+              disabled={pendingPayment || isSwitchToCommunityLoading}
+            >
+              Switch to gold
+            </Button>
+          )}
+        </Grid>
+        <Divider sx={{ mb: 1, mt: 2 }} />
+        <Grid item xs={12} sm={7.5}>
+          <Typography fontWeight='bold'>Features included</Typography>
+          <List dense sx={{ mt: -1 }}>
+            {subscriptionDetails.gold.map((detail) => (
+              <ListItem key={detail} sx={{ py: 0 }}>
+                <ListItemIcon>
+                  <CheckIcon fontSize='small' />
+                </ListItemIcon>
+                <ListItemText primary={detail} />
+              </ListItem>
+            ))}
+          </List>
+        </Grid>
+      </Grid>
+      <Divider sx={{ mb: 1, mt: 2 }} />
+      <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
+        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+          <div>
+            <DesktopIconContainer>
+              <Image width={95} height={95} src='/images/subscriptions/grant.webp' alt='Grants' />
             </DesktopIconContainer>
             <Typography variant='h6' mb={1}>
-              Enterprise
+              Grants
+            </Typography>
+            <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
+              Annual fee starts at 1% of grant size*
             </Typography>
             <MobileIconContainer>
-              <EnterpriseIcon width='150px' height='150px' />
+              <Image width={150} height={150} src='/images/subscriptions/grant.webp' alt='Grants' />
             </MobileIconContainer>
           </div>
-          <Button fullWidth variant='outlined' href='mailto:hello@charmverse.io'>
-            Contact us for pricing
-          </Button>
+          {space?.paidTier !== 'grants' && (
+            <Button
+              variant='outlined'
+              onClick={switchToCommunityPlan}
+              disabled={pendingPayment || isSwitchToCommunityLoading}
+            >
+              Switch to grant
+            </Button>
+          )}
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
-            {subscriptionDetails.enterprise.map((detail) => (
+            {subscriptionDetails.grant.map((detail) => (
               <ListItem key={detail} sx={{ py: 0 }}>
                 <ListItemIcon>
                   <CheckIcon fontSize='small' />
