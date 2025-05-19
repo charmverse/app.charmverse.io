@@ -2,12 +2,12 @@ import styled from '@emotion/styled';
 import { Box } from '@mui/material';
 import Head from 'next/head';
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
 
 import { PageSidebarProvider, usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
@@ -39,6 +39,7 @@ function PageLayout({ children }: PageLayoutProps) {
   const { activeView: rightSidebarOpen, closeSidebar: closeRightSidebar } = usePageSidebar();
 
   const isFreeTierSpace = space?.paidTier === 'free';
+  const isEnterpriseTierSpace = space?.paidTier === 'enterprise';
   const enableSidebar = !!user || isFreeTierSpace;
 
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
@@ -59,6 +60,7 @@ function PageLayout({ children }: PageLayoutProps) {
   // do not show navigation sidebar when the workflow sidebar is open
   const workflowSidebarOpen = rightSidebarOpen === 'proposal_evaluation' || rightSidebarOpen === 'reward_evaluation';
   const leftSidebarOpen = open && !workflowSidebarOpen;
+  const { openSettings } = useSettingsDialog();
 
   // open left sidebar and close right sidebar if it is open
   function openLeftSidebar() {
@@ -103,9 +105,16 @@ function PageLayout({ children }: PageLayoutProps) {
             <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
-              {!whitelistedDomains.includes(space?.domain || '') ? (
-                <AnnouncementBanner actionLabel='Play' actionHref='https://scoutgame.xyz' bannerId='season-one-banner'>
-                  Build the future, one card at a time. Play Scout Game Season 1!
+              {!isEnterpriseTierSpace ? (
+                <AnnouncementBanner
+                  errorBackground
+                  actionLabel='Billing'
+                  onActionClick={() => {
+                    openSettings('subscription');
+                  }}
+                  bannerId='subscription-pricing-change-banner'
+                >
+                  Introducing Our New Community-Based Pricing Model
                 </AnnouncementBanner>
               ) : null}
               {space?.domain === 'sporkdao---ethdenver' && (
