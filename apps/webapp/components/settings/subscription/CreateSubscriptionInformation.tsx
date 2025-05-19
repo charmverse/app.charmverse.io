@@ -218,7 +218,7 @@ export function CreateSubscriptionInformation({
               <EnterpriseIcon width='150px' height='150px' />
             </MobileIconContainer>
           </div>
-          <Button fullWidth variant='outlined' href='mailto:hello@charmverse.io'>
+          <Button fullWidth variant='outlined' href='mailto:hello@charmverse.io' external>
             Contact us for pricing
           </Button>
         </Grid>

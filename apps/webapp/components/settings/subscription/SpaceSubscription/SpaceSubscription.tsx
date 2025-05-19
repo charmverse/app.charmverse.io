@@ -1,3 +1,4 @@
+import { EditOff as EditOffIcon } from '@mui/icons-material';
 import { Alert, Stack, Typography } from '@mui/material';
 import {
   SubscriptionTiers,
@@ -98,28 +99,53 @@ export function SpaceSubscription() {
     monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
   }
 
+  const isReadOnly = tierToCheck === 'readonly';
+
   return (
     <>
-      <Stack flexDirection='row' alignItems='center' gap={0.5}>
-        <Typography>
-          Tier: <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{space?.subscriptionTier}</span>
-        </Typography>
-      </Stack>
-      <Stack flexDirection='row' alignItems='center' gap={0.5}>
+      <Alert
+        sx={{ display: 'flex', alignItems: 'center', '.MuiAlert-action': { p: 0 } }}
+        icon={
+          isReadOnly ? (
+            <EditOffIcon sx={{ fontSize: 28 }} />
+          ) : (
+            <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={32} height={32} />
+          )
+        }
+        severity={isReadOnly ? 'error' : 'info'}
+        action={
+          isReadOnly ? (
+            <Button variant='contained' onClick={() => setIsSpaceTierPurchaseModalOpen(true)}>
+              Upgrade now
+            </Button>
+          ) : (
+            <Button
+              startIcon={<Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />}
+              variant='outlined'
+              onClick={() => setIsSendDevModalOpen(true)}
+            >
+              Send DEV to space
+            </Button>
+          )
+        }
+      >
+        <Typography variant='h6'>Tier: {capitalize(tierToCheck || '')}</Typography>
+        {tierToCheck && tierPrice > 0 && monthsLeft > 0 && (
+          <Stack flexDirection='row' alignItems='center' gap={0.5}>
+            <Typography>
+              {capitalize(tierToCheck)} will last for{' '}
+              <b>
+                {monthsLeft} month{monthsLeft > 1 ? 's' : ''}
+              </b>{' '}
+              with your current balance.
+            </Typography>
+          </Stack>
+        )}
+      </Alert>
+      {/* <Stack flexDirection='row' alignItems='center' gap={0.5}>
         <Typography>DEV balance: {spaceTokenBalance} </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
-      </Stack>
-      {tierToCheck && tierPrice > 0 && monthsLeft > 0 && (
-        <Stack flexDirection='row' alignItems='center' gap={0.5}>
-          <Typography>
-            {capitalize(tierToCheck)} will last for{' '}
-            <b>
-              {monthsLeft} month{monthsLeft > 1 ? 's' : ''}
-            </b>{' '}
-            with your current balance.
-          </Typography>
-        </Stack>
-      )}
+      </Stack> */}
       {isCancelled ? (
         <Alert severity='error' variant='standard'>
           Your subscription has been cancelled and will last until the space balance is depleted. You will not be able
