@@ -1,4 +1,5 @@
 import { Img } from '@react-email/img';
+import * as React from 'react';
 
 import Link from './Link';
 
