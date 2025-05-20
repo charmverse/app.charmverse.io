@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
-import { upgradableTiers } from '@packages/subscriptions/constants';
 import type { UpgradableTier } from '@packages/subscriptions/constants';
+import { upgradableTiers } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
@@ -14,6 +14,7 @@ export type UpgradeSubscriptionRequest = {
 export async function upgradeSubscription(
   payload: UpgradeSubscriptionRequest & {
     spaceId: string;
+    userId: string;
   }
 ) {
   const { spaceId, tier } = payload;
@@ -72,7 +73,8 @@ export async function upgradeSubscription(
       data: {
         spaceId,
         previousTier: space.subscriptionTier ?? 'readonly',
-        newTier: tier
+        newTier: tier,
+        userId: payload.userId
       }
     })
   ]);

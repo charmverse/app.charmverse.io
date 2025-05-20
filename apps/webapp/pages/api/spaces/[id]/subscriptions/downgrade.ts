@@ -14,10 +14,12 @@ handler
 
 async function downgradeSubscriptionController(req: NextApiRequest, res: NextApiResponse<string>) {
   const { id: spaceId } = req.query as { id: string };
+  const userId = req.session.user.id;
 
   await downgradeSubscription({
     ...(req.body as DowngradeSubscriptionRequest),
-    spaceId
+    spaceId,
+    userId
   });
 
   res.status(200).end();

@@ -13,10 +13,12 @@ handler
 
 async function upgradeSubscriptionController(req: NextApiRequest, res: NextApiResponse<string>) {
   const { id: spaceId } = req.query as { id: string };
+  const userId = req.session.user.id;
 
   await upgradeSubscription({
     ...(req.body as UpgradeSubscriptionRequest),
-    spaceId
+    spaceId,
+    userId
   });
 
   res.status(200).end();

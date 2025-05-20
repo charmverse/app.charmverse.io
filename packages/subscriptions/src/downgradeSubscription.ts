@@ -10,6 +10,7 @@ export type DowngradeSubscriptionRequest = {
 export async function downgradeSubscription(
   payload: DowngradeSubscriptionRequest & {
     spaceId: string;
+    userId: string;
   }
 ) {
   const { spaceId, tier } = payload;
@@ -47,7 +48,8 @@ export async function downgradeSubscription(
     data: {
       spaceId,
       previousTier: space.subscriptionTier ?? 'readonly',
-      newTier: tier
+      newTier: tier,
+      userId: payload.userId
     }
   });
 }

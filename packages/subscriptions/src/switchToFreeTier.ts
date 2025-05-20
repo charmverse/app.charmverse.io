@@ -24,7 +24,8 @@ export async function switchToFreeTier(spaceId: string, userId: string) {
     data: {
       spaceId,
       previousTier: space.subscriptionTier ?? 'readonly',
-      newTier: 'free'
+      newTier: 'free',
+      userId
     }
   });
 }
