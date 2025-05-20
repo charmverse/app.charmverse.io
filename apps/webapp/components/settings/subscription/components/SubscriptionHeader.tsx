@@ -44,7 +44,6 @@ export function SubscriptionHeader({
 }) {
   const { space, isLoading } = useCurrentSpace();
   const { address } = useAccount();
-
   const latestSubscriptionEvent = subscriptionEvents?.[0];
 
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);

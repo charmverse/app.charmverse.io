@@ -58,7 +58,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
       })
     ]);
 
-    log.warn(`Insufficient space token balance, space downgraded to free tier`, {
+    log.warn(`Insufficient space token balance, space downgraded to readonly tier`, {
       spaceId,
       spaceTokenBalance,
       subscriptionTier
