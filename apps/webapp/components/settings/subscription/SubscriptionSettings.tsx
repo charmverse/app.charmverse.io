@@ -70,7 +70,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
   }
 
   if (!subscriptionStatus) {
-    return null;
+    return <>&nbsp;</>;
   }
 
   if (paidTier === 'enterprise' || subscriptionStatus.tier === 'grant') {
