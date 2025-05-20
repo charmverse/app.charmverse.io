@@ -1,8 +1,8 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { DateTime } from 'luxon';
 
-import { tierConfig } from './constants';
 import type { UpgradableTier } from './constants';
+import { tierConfig } from './constants';
 
 export function calculateSubscriptionCost({
   currentTier,

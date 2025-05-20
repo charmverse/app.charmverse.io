@@ -7,23 +7,22 @@ export async function task() {
   log.debug('Running charge spaces subscription cron job');
 
   const startOfMonth = DateTime.now().startOf('month');
+  const endOfMonth = DateTime.now().endOf('month');
 
   try {
     const spaces = await prisma.space.findMany({
       where: {
-        AND: [
-          {
-            subscriptionTier: {
-              not: null
-            }
-          },
-          { subscriptionTier: { not: 'grant' } }
-        ],
-        // Only charge spaces that don't have a subscription payment in the current month
+        // Only charge spaces that don't have any subscription payment in the current month
         subscriptionPayments: {
           none: {
-            createdAt: startOfMonth.toJSDate()
+            createdAt: {
+              gte: startOfMonth.toJSDate(),
+              lte: endOfMonth.toJSDate()
+            }
           }
+        },
+        subscriptionTier: {
+          notIn: ['free', 'readonly', 'grant']
         }
       },
       select: {
