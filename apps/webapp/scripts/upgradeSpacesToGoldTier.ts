@@ -15,6 +15,9 @@ async function upgradeSpacesToGoldTier() {
     },
     select: {
       id: true
+    },
+    orderBy: {
+      id: 'asc'
     }
   });
 

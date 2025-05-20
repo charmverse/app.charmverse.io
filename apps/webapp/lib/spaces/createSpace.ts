@@ -135,8 +135,7 @@ export async function createWorkspace({
       subscriptionTierChangeEvents: {
         create: {
           newTier: 'gold',
-          previousTier: 'readonly',
-          userId
+          previousTier: 'readonly'
         }
       }
     },
