@@ -9,9 +9,9 @@ import { UpgradableTiers, type UpgradableTier } from './calculateSubscriptionCos
 
 export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, number> = {
   free: 0,
-  bronze: 10,
-  silver: 25,
-  gold: 100,
+  bronze: 1000,
+  silver: 2500,
+  gold: 10000,
   grant: 0,
   readonly: 0
 };

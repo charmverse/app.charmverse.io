@@ -21,6 +21,10 @@ import { memberProfileNames } from '@packages/profile/memberProfiles';
 import type { SpaceTemplateType } from '@packages/spaces/config';
 import { countSpaceBlocksAndSave } from '@packages/spaces/countSpaceBlocks/countAllSpaceBlocks';
 import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
+import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
+import { tierConfig } from '@packages/subscriptions/constants';
+import { parseUnits } from 'viem';
+import { base } from 'viem/chains';
 
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { importSpaceData } from 'lib/templates/importSpaceData';
@@ -76,6 +80,12 @@ export async function createWorkspace({
     signingSecret = createSigningSecret();
   }
 
+  const { immediatePayment, priceForMonths } = calculateSubscriptionCost({
+    paymentMonths: 2,
+    newTier: 'gold',
+    currentTier: null
+  });
+
   const space = await prisma.space.create({
     data: {
       name: spaceData.name,
@@ -97,6 +107,7 @@ export async function createWorkspace({
       blockQuota: defaultFreeBlockQuota,
       memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
       features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
+      subscriptionTier: 'gold',
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -105,7 +116,28 @@ export async function createWorkspace({
           }))
         }
       },
-      origin: spaceData.origin
+      origin: spaceData.origin,
+      subscriptionContributions: {
+        create: {
+          decentPayload: {},
+          devTokenAmount: parseUnits(priceForMonths.toString(), 18).toString(),
+          chainId: base.id
+        }
+      },
+      subscriptionPayments: {
+        create: {
+          paidTokenAmount: parseUnits(immediatePayment.toString(), 18).toString(),
+          subscriptionPeriodStart: new Date(),
+          subscriptionPrice: parseUnits(tierConfig.gold.tokenPrice.toString(), 18).toString(),
+          subscriptionTier: 'gold'
+        }
+      },
+      subscriptionTierChangeEvents: {
+        create: {
+          newTier: 'gold',
+          previousTier: 'readonly'
+        }
+      }
     },
     include: { pages: true }
   });

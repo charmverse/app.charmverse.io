@@ -12,11 +12,9 @@ type SubscriptionPaymentReceipt = {
 type SubscriptionContributionReceipt = {
   type: 'contribution';
   id: string;
-  txHash: string;
   paidTokenAmount: string;
   createdAt: Date;
   userId: string | null;
-  walletAddress?: string;
 };
 
 export type SubscriptionReceipt = SubscriptionPaymentReceipt | SubscriptionContributionReceipt;
@@ -33,25 +31,21 @@ export async function getSubscriptionReceipts(spaceId: string): Promise<Subscrip
   });
 
   const subscriptionContributions = await prisma.spaceSubscriptionContribution.findMany({
-    where: { spaceId, txHash: { not: null } },
+    where: { spaceId },
     select: {
       id: true,
-      txHash: true,
       devTokenAmount: true,
       createdAt: true,
-      userId: true,
-      walletAddress: true
+      userId: true
     }
   });
 
   return [
     ...subscriptionContributions.map((contribution) => ({
       id: contribution.id,
-      txHash: contribution.txHash!,
       paidTokenAmount: contribution.devTokenAmount,
       createdAt: contribution.createdAt,
       userId: contribution.userId,
-      walletAddress: contribution.walletAddress,
       type: 'contribution' as const
     })),
     ...subscriptionPayments.map((payment) => ({
