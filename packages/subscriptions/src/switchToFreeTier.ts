@@ -9,7 +9,7 @@ export async function switchToFreeTier(spaceId: string, userId: string) {
 
   // these tiers convert to free immediately
   if (space.subscriptionTier === 'readonly' || space.subscriptionTier === 'grant') {
-    const updatedSpace = await prisma.space.update({
+    await prisma.space.update({
       where: {
         id: spaceId
       },
@@ -19,13 +19,12 @@ export async function switchToFreeTier(spaceId: string, userId: string) {
         subscriptionTier: 'free'
       }
     });
-  } else {
-    await prisma.spaceSubscriptionTierChangeEvent.create({
-      data: {
-        spaceId,
-        previousTier: space.subscriptionTier ?? 'readonly',
-        newTier: 'free'
-      }
-    });
   }
+  await prisma.spaceSubscriptionTierChangeEvent.create({
+    data: {
+      spaceId,
+      previousTier: space.subscriptionTier ?? 'readonly',
+      newTier: 'free'
+    }
+  });
 }
