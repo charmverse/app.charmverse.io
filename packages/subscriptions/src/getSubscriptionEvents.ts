@@ -23,6 +23,7 @@ export type SubscriptionTierChangeEvent = {
   createdAt: Date;
   tier: SpaceSubscriptionTier;
   userId: string | null;
+  previousTier: SpaceSubscriptionTier;
 };
 
 export type SubscriptionEvent = SubscriptionPaymentEvent | SubscriptionContributionEvent | SubscriptionTierChangeEvent;
@@ -55,6 +56,7 @@ export async function getSubscriptionEvents(spaceId: string): Promise<Subscripti
         id: true,
         createdAt: true,
         newTier: true,
+        previousTier: true,
         userId: true
       }
     })
@@ -82,7 +84,8 @@ export async function getSubscriptionEvents(spaceId: string): Promise<Subscripti
       createdAt: tierChange.createdAt,
       type: 'tier-change' as const,
       tier: tierChange.newTier,
-      userId: tierChange.userId
+      userId: tierChange.userId,
+      previousTier: tierChange.previousTier
     }))
   ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 

@@ -58,8 +58,8 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
     if (tier === 'free') {
       openConfirmFreeTierDialog();
     } else if (subscriptionStatus) {
-      const latestTier = subscriptionStatus.pendingTier || subscriptionStatus.tier;
-      const currentTierIndex = downgradeableTiers.indexOf(latestTier as DowngradeableTier);
+      // const latestTier = subscriptionStatus.pendingTier || subscriptionStatus.tier;
+      const currentTierIndex = downgradeableTiers.indexOf(subscriptionStatus.tier as DowngradeableTier);
       const newTierIndex = downgradeableTiers.indexOf(tier);
       if (currentTierIndex > newTierIndex) {
         setTierToDowngrade(tier);

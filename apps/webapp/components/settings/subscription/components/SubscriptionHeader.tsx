@@ -59,7 +59,7 @@ export function SubscriptionHeader({
   const currentTier = space?.subscriptionTier;
   const tierAfterDowngrade = isDowngraded && pendingTier;
   const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
-  if (tierPrice > 0 && spaceTokenBalance && spaceTokenBalance > 0) {
+  if (tierPrice > 0 && typeof spaceTokenBalance === 'number') {
     const monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
     expiresAt = DateTime.utc()
       .endOf('month')

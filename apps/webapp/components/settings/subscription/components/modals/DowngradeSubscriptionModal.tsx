@@ -40,7 +40,7 @@ export function DowngradeSubscriptionModal({
       </Box>
       <Box display='flex' justifyContent='flex-end'>
         <Button variant='contained' onClick={onConfirm} sx={{ width: 'fit-content' }}>
-          Downgrade
+          Confirm downgrade
         </Button>
       </Box>
     </Modal>

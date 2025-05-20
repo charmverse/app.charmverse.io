@@ -1,5 +1,6 @@
 import { Box, capitalize, Stack, Typography } from '@mui/material';
 import { formatDate } from '@packages/lib/utils/dates';
+import { isDowngrade, tierConfig } from '@packages/subscriptions/constants';
 import type {
   SubscriptionContributionEvent,
   SubscriptionEvent,
@@ -16,6 +17,7 @@ import { useMembers } from 'hooks/useMembers';
 function SubscriptionTierChangeEventRow({ event }: { event: SubscriptionTierChangeEvent }) {
   const { members } = useMembers();
   const user = members.find((member) => member.id === event.userId);
+  const _isDowngrade = isDowngrade(event.previousTier, event.tier);
 
   return (
     <Stack key={event.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
@@ -26,13 +28,13 @@ function SubscriptionTierChangeEventRow({ event }: { event: SubscriptionTierChan
           size='small'
           isNft={user ? hasNftAvatar(user) : false}
         />
-        {event.tier !== 'readonly' ? (
-          <Typography variant='body1'>
-            {user?.username} changed the tier to {capitalize(event.tier)}
-          </Typography>
-        ) : (
-          'Your space was downgraded to Expired'
-        )}
+        <Typography variant='body1'>
+          {user
+            ? _isDowngrade
+              ? `${user.username} selected ${tierConfig[event.tier].name} tier for next month`
+              : `${user.username} upgraded to ${capitalize(event.tier)} tier`
+            : `CharmVerse ${_isDowngrade ? 'downgraded' : 'upgraded'} the tier to ${tierConfig[event.tier].name}`}
+        </Typography>
         <Typography variant='caption' color='text.secondary'>
           {formatDate(event.createdAt, { month: 'long', withYear: true })}
         </Typography>

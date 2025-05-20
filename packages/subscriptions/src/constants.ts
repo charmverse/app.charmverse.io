@@ -52,3 +52,7 @@ export const tierConfig: Record<SpaceSubscriptionTier, { name: string; iconPath:
     iconPath: '/images/subscriptions/gold.svg'
   }
 };
+
+export function isDowngrade(oldTier: DowngradeableTier, newTier: DowngradeableTier) {
+  return subscriptionTierOrder.indexOf(oldTier) > subscriptionTierOrder.indexOf(newTier);
+}

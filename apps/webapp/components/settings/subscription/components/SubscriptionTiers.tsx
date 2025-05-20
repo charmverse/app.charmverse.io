@@ -83,7 +83,7 @@ export function SubscriptionTiers({
             </DesktopIconContainer>
             <Typography variant='h6'>{tierConfig.bronze.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              {tierConfig.bronze.tokenPrice.toLocaleString()} $DEV / month
+              {tierConfig.bronze.tokenPrice.toLocaleString()} DEV / month
             </Typography>
 
             {subscriptionTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
@@ -121,7 +121,7 @@ export function SubscriptionTiers({
             </DesktopIconContainer>
             <Typography variant='h6'>{tierConfig.silver.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              {tierConfig.silver.tokenPrice.toLocaleString()} $DEV / month
+              {tierConfig.silver.tokenPrice.toLocaleString()} DEV / month
             </Typography>
             {subscriptionTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
@@ -159,7 +159,7 @@ export function SubscriptionTiers({
             </DesktopIconContainer>
             <Typography variant='h6'>{tierConfig.gold.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              {tierConfig.gold.tokenPrice.toLocaleString()} $DEV / month
+              {tierConfig.gold.tokenPrice.toLocaleString()} DEV / month
             </Typography>
             {subscriptionTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
