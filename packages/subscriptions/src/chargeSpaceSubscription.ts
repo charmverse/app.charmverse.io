@@ -8,7 +8,7 @@ import { parseUnits } from 'viem';
 import type { UpgradableTier } from './constants';
 import { upgradableTiers } from './constants';
 
-export async function chargeSpaceSubscription({ spaceId, userId }: { spaceId: string }) {
+export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
   const startOfMonth = DateTime.now().startOf('month');
   const space = await prisma.space.findUniqueOrThrow({
     where: {

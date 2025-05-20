@@ -20,10 +20,19 @@ function SubscriptionTierChangeEventRow({ event }: { event: SubscriptionTierChan
   return (
     <Stack key={event.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
       <Box display='flex' alignItems='center' gap={1}>
-        <Avatar name={user?.username} avatar={user?.avatar} size='small' isNft={user ? hasNftAvatar(user) : false} />
-        <Typography variant='body1'>
-          {user?.username} changed the tier to {capitalize(event.tier)}
-        </Typography>
+        <Avatar
+          name={user?.username}
+          avatar={user ? user?.avatar : 'https://app.charmverse.io/images/logos/charmverse_black.png'}
+          size='small'
+          isNft={user ? hasNftAvatar(user) : false}
+        />
+        {event.tier !== 'readonly' ? (
+          <Typography variant='body1'>
+            {user?.username} changed the tier to {capitalize(event.tier)}
+          </Typography>
+        ) : (
+          'Your space was downgraded to Expired'
+        )}
         <Typography variant='caption' color='text.secondary'>
           {formatDate(event.createdAt, { month: 'long', withYear: true })}
         </Typography>
