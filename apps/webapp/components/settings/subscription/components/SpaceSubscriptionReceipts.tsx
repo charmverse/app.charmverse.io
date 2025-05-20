@@ -29,48 +29,43 @@ export function SpaceSubscriptionReceiptsList({
   }));
 
   return (
-    <Stack gap={2} my={2}>
+    <Stack gap={2}>
       {subscriptionReceipts.length === 0 ? (
         <Typography>No subscription receipts yet</Typography>
       ) : (
-        <>
-          <Typography variant='h6'>Subscription receipts</Typography>
-          {subscriptionReceiptsWithUser.map((receipt) => (
-            <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center'>
-              <Box display='flex' alignItems='center' gap={1}>
-                <Avatar
-                  name={receipt.user ? receipt.user.username : space?.name}
-                  avatar={receipt.user ? receipt.user?.avatar : space?.spaceImage}
-                  size='small'
-                  isNft={receipt.user ? hasNftAvatar(receipt.user) : false}
-                />
-                <Box>
-                  <Typography variant='body1'>
-                    {receipt.type === 'contribution'
-                      ? `Contribution by ${receipt.user?.username}`
-                      : isStartOfMonth(receipt.createdAt)
-                        ? 'Monthly Payment'
-                        : `Changed tier to ${capitalize(receipt.tier)}`}
-                  </Typography>
-                </Box>
-                <Typography variant='caption' color='text.secondary'>
-                  {relativeTime(receipt.createdAt)}
-                </Typography>
-              </Box>
-              <Stack flexDirection='row' alignItems='center' gap={1}>
-                <Typography
-                  variant='body2'
-                  fontWeight={600}
-                  color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
-                >
-                  {receipt.type === 'contribution' ? '+' : '-'}
-                  {formatUnits(BigInt(receipt.paidTokenAmount), 18)}
-                </Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
-              </Stack>
+        subscriptionReceiptsWithUser.map((receipt) => (
+          <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center' gap={2}>
+            <Box display='flex' alignItems='center' gap={1} flexGrow={1}>
+              <Avatar
+                name={receipt.user ? receipt.user.username : space?.name}
+                avatar={receipt.user ? receipt.user?.avatar : space?.spaceImage}
+                size='small'
+                isNft={receipt.user ? hasNftAvatar(receipt.user) : false}
+              />
+              <Typography variant='body1'>
+                {receipt.type === 'contribution'
+                  ? `Contribution by ${receipt.user?.username}`
+                  : isStartOfMonth(receipt.createdAt)
+                    ? 'Monthly Payment'
+                    : `Changed tier to ${capitalize(receipt.tier)}`}
+              </Typography>
+              <Typography variant='caption' color='text.secondary'>
+                {relativeTime(receipt.createdAt)}
+              </Typography>
+            </Box>
+            <Stack flexDirection='row' alignItems='center' gap={1}>
+              <Typography
+                variant='body2'
+                fontWeight={600}
+                color={receipt.type === 'contribution' ? 'success.main' : 'error.main'}
+              >
+                {receipt.type === 'contribution' ? '+' : '-'}
+                {formatUnits(BigInt(receipt.paidTokenAmount), 18)}
+              </Typography>
+              <Image src='/images/logos/dev-token-logo.png' alt='' width={18} height={18} />
             </Stack>
-          ))}
-        </>
+          </Stack>
+        ))
       )}
     </Stack>
   );

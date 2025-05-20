@@ -2,8 +2,8 @@ import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packag
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import {
   type CreateSubscriptionContributionRequest,
-  createSubscriptionContribution
-} from '@packages/subscriptions/createSubscriptionContribution';
+  recordSubscriptionContribution
+} from '@packages/subscriptions/recordSubscriptionContribution';
 import { verifyDevTokenTransfer } from '@packages/subscriptions/verifyDevTokenTransfer';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,9 +13,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler
   .use(requireUser)
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
-  .post(createSubscriptionContributionController);
+  .post(recordSubscriptionContributionEndpoint);
 
-async function createSubscriptionContributionController(req: NextApiRequest, res: NextApiResponse<string>) {
+async function recordSubscriptionContributionEndpoint(req: NextApiRequest, res: NextApiResponse<string>) {
   const { id: spaceId } = req.query as { id: string };
   const userId = req.session.user.id;
 
@@ -23,7 +23,7 @@ async function createSubscriptionContributionController(req: NextApiRequest, res
 
   await verifyDevTokenTransfer(payload);
 
-  const spaceContribution = await createSubscriptionContribution({
+  const spaceContribution = await recordSubscriptionContribution({
     ...payload,
     spaceId,
     userId

@@ -20,17 +20,17 @@ const subscriptionCancellationDetails = {
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onConfirmDowngrade: () => void;
+  onConfirm: () => void;
   disabled: boolean;
 };
-export function ConfirmFreeDowngradeModal({ isOpen, onClose, onConfirmDowngrade, disabled }: Props) {
+export function ConfirmFreeTierModal({ isOpen, onClose, onConfirm, disabled }: Props) {
   return (
     <ConfirmDeleteModal
       title='Confirm Public Edition'
       size='large'
       open={isOpen}
       buttonText='Switch to Public Edition'
-      secondaryButtonText='Keep current plan'
+      secondaryButtonText='Cancel'
       question={
         <>
           <Typography>{subscriptionCancellationDetails.first}</Typography>
@@ -44,7 +44,7 @@ export function ConfirmFreeDowngradeModal({ isOpen, onClose, onConfirmDowngrade,
           <Typography>{subscriptionCancellationDetails.last}</Typography>
         </>
       }
-      onConfirm={onConfirmDowngrade}
+      onConfirm={onConfirm}
       onClose={onClose}
       disabled={disabled}
     />

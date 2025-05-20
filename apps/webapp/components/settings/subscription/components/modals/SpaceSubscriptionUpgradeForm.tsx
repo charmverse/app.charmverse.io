@@ -1,4 +1,4 @@
-import { Card, Divider, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { capitalize, Card, Divider, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
 import Image from 'next/image';
@@ -23,49 +23,42 @@ export function SpaceSubscriptionUpgradeForm({
   onClose: VoidFunction;
   onSuccess: VoidFunction;
   spaceTokenBalance: number;
-  newTier: UpgradableTier | null;
+  newTier: UpgradableTier;
 }) {
   const { space, refreshCurrentSpace } = useCurrentSpace();
-  const [selectedTier, setSelectedTier] = useState<UpgradableTier | null>(newTier);
   const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
   const currentTier = space?.subscriptionTier as UpgradableTier | null;
   const { showMessage } = useSnackbar();
   const [isUpgrading, setIsUpgrading] = useState(false);
 
-  const { spaceBalanceUsed, totalCost, fullMonthPrice, unusedCurrentTierValue, proratedNewTierUnusedValue } =
+  const { newTierPrice, amountToProrate, immediatePayment, priceForMonths, devTokensToSend } =
     calculateSubscriptionCost({
       currentTier,
-      selectedTier,
-      paymentMonths,
-      spaceTokenBalance
+      newTier,
+      paymentMonths
     });
 
   function onClose() {
     _onClose();
-    setSelectedTier(null);
     setPaymentPeriod('month');
     setPaymentMonths(1);
   }
 
-  const { isTransferring, transferDevToken } = useTransferDevToken({
-    amount: totalCost
-  });
-
-  if (!space) return null;
+  const { isTransferring, transferDevToken } = useTransferDevToken();
 
   const isLoading = isTransferring || isUpgrading;
 
   async function onUpgrade() {
-    if (!space || !selectedTier) return;
+    if (!space) return;
 
     setIsUpgrading(true);
 
     try {
-      if (totalCost !== 0) {
-        const result = await transferDevToken();
+      if (devTokensToSend !== 0) {
+        const result = await transferDevToken(devTokensToSend);
         if (!result) return;
-        await charmClient.subscription.createSubscriptionContribution(space.id, {
+        await charmClient.subscription.recordSubscriptionContribution(space.id, {
           hash: result.hash,
           walletAddress: result.address,
           paidTokenAmount: result.transferredAmount.toString(),
@@ -76,7 +69,7 @@ export function SpaceSubscriptionUpgradeForm({
 
       await charmClient.subscription
         .upgradeSubscription(space.id, {
-          tier: selectedTier,
+          tier: newTier,
           paymentMonths
         })
         .catch((err) => {
@@ -95,32 +88,15 @@ export function SpaceSubscriptionUpgradeForm({
     }
   }
 
+  if (!space) return null;
+
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Stack gap={2}>
-        <Stack gap={0.5}>
-          <Typography variant='h6'>Upgrade {space.name}</Typography>
-          <Typography variant='body2' color='text.secondary'>
-            Current tier: <b style={{ textTransform: 'capitalize' }}>{space.subscriptionTier}</b>
-          </Typography>
-        </Stack>
+        <Typography variant='h6'>
+          Switch to <strong>{capitalize(newTier)}</strong>
+        </Typography>
         <Divider />
-        <Stack gap={1}>
-          <Typography variant='subtitle2'>Select a tier</Typography>
-          <Stack direction='row' spacing={1}>
-            {UpgradableTiers.map((tier) => (
-              <Button
-                key={tier}
-                sx={{ flex: 1 }}
-                variant={selectedTier === tier ? 'contained' : 'outlined'}
-                onClick={() => setSelectedTier(tier)}
-                disabled={currentTier === tier || isLoading}
-              >
-                {tier.charAt(0).toUpperCase() + tier.slice(1)}
-              </Button>
-            ))}
-          </Stack>
-        </Stack>
         <Stack gap={1}>
           <Typography variant='subtitle2'>Select a period</Typography>
           <Stack direction='row' spacing={1}>
@@ -178,41 +154,31 @@ export function SpaceSubscriptionUpgradeForm({
         <Card variant='outlined' sx={{ p: 2, bgcolor: 'grey.50' }}>
           <Stack gap={1}>
             <Stack direction='row' justifyContent='space-between'>
-              <Typography variant='body2'>New tier price</Typography>
+              <Typography variant='body2'>
+                {paymentMonths} months x {newTierPrice}
+              </Typography>
               <Stack direction='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>{fullMonthPrice * paymentMonths}</Typography>
+                <Typography variant='body2'>{priceForMonths}</Typography>
                 <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
               </Stack>
             </Stack>
-            <Stack direction='row' justifyContent='space-between'>
-              <Typography variant='body2'>Unused value (current tier, prorated)</Typography>
-              <Stack direction='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>- {unusedCurrentTierValue}</Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+            {amountToProrate ? (
+              <Stack direction='row' justifyContent='space-between'>
+                <Typography variant='body2'>Prorated discount</Typography>
+                <Stack direction='row' alignItems='center' gap={0.5}>
+                  <Typography variant='body2'>- {amountToProrate}</Typography>
+                  <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+                </Stack>
               </Stack>
-            </Stack>
-            <Stack direction='row' justifyContent='space-between'>
-              <Typography variant='body2'>Unused value (new tier, prorated)</Typography>
-              <Stack direction='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>- {proratedNewTierUnusedValue}</Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
-              </Stack>
-            </Stack>
-            <Stack direction='row' justifyContent='space-between'>
-              <Typography variant='body2'>Space Balance</Typography>
-              <Stack direction='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>- {spaceBalanceUsed}</Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
-              </Stack>
-            </Stack>
+            ) : null}
             <Divider />
             <Stack direction='row' justifyContent='space-between'>
               <Typography variant='subtitle2' fontWeight={600}>
-                Total cost
+                Total payment
               </Typography>
               <Stack direction='row' alignItems='center' gap={0.5}>
                 <Typography variant='subtitle2' fontWeight={600}>
-                  {totalCost}
+                  {devTokensToSend}
                 </Typography>
                 <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
               </Stack>
@@ -223,11 +189,11 @@ export function SpaceSubscriptionUpgradeForm({
           <Button variant='outlined' onClick={onClose} color='error' disabled={isLoading}>
             Cancel
           </Button>
-          <Tooltip title={!selectedTier || !paymentPeriod ? 'Select tier and period' : ''}>
+          <Tooltip title={!paymentPeriod ? 'Select a period' : ''}>
             <span>
               <Button
                 variant='contained'
-                disabled={!selectedTier || paymentMonths === 0 || !paymentPeriod}
+                disabled={paymentMonths === 0 || !paymentPeriod}
                 loading={isLoading}
                 onClick={onUpgrade}
               >

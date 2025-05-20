@@ -31,5 +31,5 @@ export async function getSpaceTokenBalance({ spaceId }: { spaceId: string }) {
 
   const remainingSpaceTokenBalance = subscriptionContributionsAmount - subscriptionPaymentsAmount;
 
-  return Number(formatUnits(remainingSpaceTokenBalance, 18));
+  return { value: remainingSpaceTokenBalance, formatted: Number(formatUnits(remainingSpaceTokenBalance, 18)) };
 }

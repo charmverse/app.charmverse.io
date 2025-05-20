@@ -12,10 +12,9 @@ import type { CouponDetails } from '@packages/lib/subscription/getCouponDetails'
 import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import type { UpdatePaymentMethodRequest } from '@packages/lib/subscription/updatePaymentMethod';
 import type { UpdateSubscriptionRequest } from '@packages/lib/subscription/updateProSubscription';
-import type { UpgradeSubscriptionRequest as UpgradeSubscriptionRequestV2 } from '@packages/lib/subscription/upgradeProSubscription';
-import type { CreateSubscriptionContributionRequest } from '@packages/subscriptions/createSubscriptionContribution';
 import type { DowngradeSubscriptionRequest } from '@packages/subscriptions/downgradeSubscription';
 import type { SubscriptionReceipt } from '@packages/subscriptions/getSubscriptionReceipts';
+import type { CreateSubscriptionContributionRequest } from '@packages/subscriptions/recordSubscriptionContribution';
 import type { UpgradeSubscriptionRequest } from '@packages/subscriptions/upgradeSubscription';
 
 export class SubscriptionApi {
@@ -43,10 +42,6 @@ export class SubscriptionApi {
     return http.POST<CouponDetails | null>(`/api/spaces/${spaceId}/validate-discount`, payload);
   }
 
-  upgradeSpaceSubscription(spaceId: string, payload: UpgradeSubscriptionRequestV2) {
-    return http.PUT<void>(`/api/spaces/${spaceId}/upgrade-subscription`, payload);
-  }
-
   createPaymentMethod(spaceId: string, payload: CreatePaymentMethodRequest) {
     return http.POST<CreatePaymentMethodResponse>(`/api/spaces/${spaceId}/payment-method`, payload);
   }
@@ -63,7 +58,7 @@ export class SubscriptionApi {
     return http.POST<void>(`/api/spaces/${spaceId}/subscriptions/reactivate`);
   }
 
-  createSubscriptionContribution(spaceId: string, payload: CreateSubscriptionContributionRequest) {
+  recordSubscriptionContribution(spaceId: string, payload: CreateSubscriptionContributionRequest) {
     return http.POST(`/api/spaces/${spaceId}/subscriptions/contribution`, payload);
   }
 

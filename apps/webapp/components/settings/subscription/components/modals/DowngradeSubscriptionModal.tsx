@@ -1,5 +1,5 @@
 import { Box, MenuItem, Select, Typography } from '@mui/material';
-import { type DowngradeableTier, DowngradeableTiers } from '@packages/subscriptions/downgradeSubscription';
+import { type DowngradeableTier, downgradeableTiers } from '@packages/subscriptions/downgradeSubscription';
 import { capitalize } from '@packages/utils/strings';
 import { useState } from 'react';
 
@@ -42,15 +42,15 @@ export function DowngradeSubscriptionModal({
     return null;
   }
 
-  const currentTierIndex = DowngradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
-  const downgradeableTiers = DowngradeableTiers.slice(0, currentTierIndex);
+  const currentTierIndex = downgradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
+  const lowerDowngradeableTiers = downgradeableTiers.slice(0, currentTierIndex);
 
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Typography>Downgrade subscription</Typography>
         <Select value={selectedTier} onChange={(e) => setSelectedTier(e.target.value as DowngradeableTier)}>
-          {downgradeableTiers.map((tier) => (
+          {lowerDowngradeableTiers.map((tier) => (
             <MenuItem key={tier} value={tier}>
               {capitalize(tier)}
             </MenuItem>

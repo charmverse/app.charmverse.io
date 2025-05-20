@@ -1,6 +1,6 @@
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { updateToFreeTier } from '@packages/lib/subscription/updateToFreeTier';
+import { switchToFreeTier } from '@packages/subscriptions/switchToFreeTier';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -14,13 +14,13 @@ handler
       spaceIdKey: 'id'
     })
   )
-  .post(switchToFreeTier);
+  .post(switchToFreeTierEndpoint);
 
-async function switchToFreeTier(req: NextApiRequest, res: NextApiResponse<void>) {
+async function switchToFreeTierEndpoint(req: NextApiRequest, res: NextApiResponse<void>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  await updateToFreeTier(spaceId, userId);
+  await switchToFreeTier(spaceId, userId);
 
   res.status(200).end();
 }

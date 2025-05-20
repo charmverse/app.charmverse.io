@@ -99,7 +99,8 @@
           "./packages/testing/",
           "./packages/users/",
           "./packages/utils/",
-          "./packages/profile/"
+          "./packages/profile/",
+          "./packages/subscriptions/"
         ]
       }
     ],

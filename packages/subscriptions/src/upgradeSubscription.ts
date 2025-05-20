@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
-import { SubscriptionTierAmountRecord } from '@packages/lib/subscription/chargeSpaceSubscription';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
@@ -35,22 +34,18 @@ export async function upgradeSubscription(
     throw new Error('Invalid tier');
   }
 
-  const spaceTokenBalance = await getSpaceTokenBalance({ spaceId });
+  const { value: spaceTokenBalanceInWei } = await getSpaceTokenBalance({ spaceId });
 
-  const { proratedMonthCost, totalCost } = calculateSubscriptionCost({
+  const { newTierPrice, immediatePayment } = calculateSubscriptionCost({
     currentTier: space.subscriptionTier,
-    selectedTier: tier,
-    paymentMonths: payload.paymentMonths,
-    spaceTokenBalance
+    newTier: tier,
+    paymentMonths: payload.paymentMonths
   });
 
-  const subscriptionPrice = SubscriptionTierAmountRecord[tier];
-  const subscriptionPriceInWei = parseUnits(subscriptionPrice.toString(), 18);
-  const proratedMonthCostInWei = parseUnits(proratedMonthCost.toString(), 18);
-  const totalCostInWei = parseUnits(totalCost.toString(), 18);
-  const spaceTokenBalanceInWei = parseUnits(spaceTokenBalance.toString(), 18);
+  const subscriptionPriceInWei = parseUnits(newTierPrice.toString(), 18);
+  const immediatePaymentInWei = parseUnits(immediatePayment.toString(), 18);
 
-  if (spaceTokenBalanceInWei < totalCostInWei) {
+  if (spaceTokenBalanceInWei < immediatePaymentInWei) {
     throw new Error('Insufficient space token balance');
   }
 
@@ -69,7 +64,7 @@ export async function upgradeSubscription(
         subscriptionTier: tier,
         subscriptionPeriodStart: DateTime.now().toJSDate(),
         subscriptionPrice: subscriptionPriceInWei.toString(),
-        paidTokenAmount: proratedMonthCostInWei.toString()
+        paidTokenAmount: immediatePaymentInWei.toString()
       }
     }),
     prisma.spaceSubscriptionTierChangeEvent.create({

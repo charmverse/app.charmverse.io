@@ -1,70 +1,40 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
+import { tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 
-import { SubscriptionTierAmountRecord } from './chargeSpaceSubscription';
-
 export const UpgradableTiers = ['bronze', 'silver', 'gold'] as const;
-
-export const SubscriptionTiers = ['readonly', 'free', 'bronze', 'silver', 'gold', 'grant'] as const;
 
 export type UpgradableTier = (typeof UpgradableTiers)[number];
 
 export function calculateSubscriptionCost({
   currentTier,
-  selectedTier,
-  paymentMonths,
-  spaceTokenBalance
+  newTier,
+  paymentMonths
 }: {
   currentTier?: SpaceSubscriptionTier | null;
-  selectedTier: UpgradableTier | null;
+  newTier: UpgradableTier;
   paymentMonths: number;
-  spaceTokenBalance: number;
 }) {
-  const fullMonthPrice = selectedTier ? SubscriptionTierAmountRecord[selectedTier] : 0;
-  const currentTierPrice = currentTier ? SubscriptionTierAmountRecord[currentTier] : 0;
+  const currentTierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
+  const newTierPrice = tierConfig[newTier].tokenPrice;
 
   const now = DateTime.now();
   const monthEnd = now.endOf('month');
   const daysRemaining = Math.floor(monthEnd.diff(now, 'days').days) + 1;
-  const totalDays = monthEnd.diff(now.startOf('month'), 'days').days + 1;
+  const daysInThisMonth = monthEnd.diff(now.startOf('month'), 'days').days + 1;
 
-  let proratedMonthCost = 0;
-  let remainingMonthsCost = 0;
-  let totalCost = 0;
-  let unusedCurrentTierValue = 0;
-  let proratedNewTierUnusedValue = 0;
-  let spaceBalanceUsed = 0;
-
-  if (selectedTier) {
-    // Value of unused days at the new tier rate
-    proratedNewTierUnusedValue = Number((fullMonthPrice * (daysRemaining / totalDays)).toFixed(2));
-    // Value of unused days at the current tier rate
-    unusedCurrentTierValue = Number((currentTierPrice * (daysRemaining / totalDays)).toFixed(2));
-
-    // Calculate the cost for remaining months
-    remainingMonthsCost = (paymentMonths - 1) * fullMonthPrice;
-
-    spaceBalanceUsed = Math.min(
-      spaceTokenBalance,
-      Number((fullMonthPrice - (proratedNewTierUnusedValue + unusedCurrentTierValue)).toFixed(2))
-    );
-
-    // Total cost is the prorated new tier cost plus remaining months, minus unused current tier value
-    totalCost = Math.max(
-      Number((proratedNewTierUnusedValue + remainingMonthsCost - unusedCurrentTierValue - spaceBalanceUsed).toFixed(2)),
-      0
-    );
-
-    // Set proratedMonthCost to the actual prorated amount for the new tier
-    proratedMonthCost = spaceBalanceUsed;
-  }
-
+  // calculate price for the number of months
+  const priceForMonths = paymentMonths * newTierPrice;
+  // Value of unused days at the current tier rate
+  const amountToProrate = Math.ceil(daysRemaining * (currentTierPrice / daysInThisMonth));
+  const priceForMonthsMinusProrated = priceForMonths - amountToProrate;
+  const immediatePaymentRaw = newTierPrice - amountToProrate; // we will subtract this from the space token balance
+  const immediatePayment = immediatePaymentRaw > 0 ? immediatePaymentRaw : 0;
   return {
-    spaceBalanceUsed,
-    proratedMonthCost,
-    fullMonthPrice,
-    totalCost,
-    unusedCurrentTierValue,
-    proratedNewTierUnusedValue
+    newTierPrice,
+    amountToProrate,
+    immediatePayment,
+    priceForMonths,
+    devTokensToSend: priceForMonthsMinusProrated
   };
 }

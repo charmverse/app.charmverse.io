@@ -30,15 +30,13 @@ export function SpaceContributionForm({
   const { showMessage } = useSnackbar();
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
-  const { isTransferring, transferDevToken } = useTransferDevToken({
-    amount
-  });
+  const { isTransferring, transferDevToken } = useTransferDevToken();
 
   async function onDevTransfer() {
-    const result = await transferDevToken();
+    const result = await transferDevToken(amount);
     if (result && space) {
       await charmClient.subscription
-        .createSubscriptionContribution(space.id, {
+        .recordSubscriptionContribution(space.id, {
           hash: result.hash,
           walletAddress: result.address,
           paidTokenAmount: result.transferredAmount.toString(),

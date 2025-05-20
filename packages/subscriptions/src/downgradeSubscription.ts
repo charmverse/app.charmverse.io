@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 
-export const DowngradeableTiers = ['free', 'bronze', 'silver', 'gold'] as const;
-export type DowngradeableTier = (typeof DowngradeableTiers)[number];
+export const downgradeableTiers: SpaceSubscriptionTier[] = ['free', 'bronze', 'silver', 'gold'] as const;
+export type DowngradeableTier = (typeof downgradeableTiers)[number];
 
 export type DowngradeSubscriptionRequest = {
   tier: DowngradeableTier;
@@ -14,10 +15,9 @@ export async function downgradeSubscription(
 ) {
   const { spaceId, tier } = payload;
 
-  if (!DowngradeableTiers.includes(tier)) {
+  if (!downgradeableTiers.includes(tier)) {
     throw new Error('Invalid tier to downgrade to');
   }
-
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -36,9 +36,10 @@ export async function downgradeSubscription(
     throw new Error('Cannot downgrade a cancelled subscription');
   }
 
-  const currentTierIndex = DowngradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
-  const newTierIndex = DowngradeableTiers.indexOf(tier);
+  const currentTierIndex = downgradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
+  const newTierIndex = downgradeableTiers.indexOf(tier);
 
+  // a space in readonly may "downgrade" to a higher tier
   if (newTierIndex > currentTierIndex) {
     throw new Error('Cannot downgrade to a higher tier');
   }

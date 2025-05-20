@@ -3,12 +3,11 @@ import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { subscriptionDetails } from '@packages/lib/subscription/constants';
+import { tierConfig } from '@packages/subscriptions/constants';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
-
-import Legend from '../../components/Legend';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -33,7 +32,7 @@ export function SubscriptionTiers({
 }: {
   pendingPayment?: boolean;
   onClickShowCheckoutForm: (tier: UpgradableTier | 'free') => void;
-  subscriptionTier?: SpaceSubscriptionTier;
+  subscriptionTier: SpaceSubscriptionTier | null;
 }) {
   return (
     <>
@@ -42,17 +41,17 @@ export function SubscriptionTiers({
           <div>
             <DesktopIconContainer>
               <Box mt={-1}>
-                <Image width={100} height={100} src='/images/subscriptions/public.webp' alt='Free' />
+                <Image width={100} height={100} src={tierConfig.free.iconPath} alt='Free' />
               </Box>
             </DesktopIconContainer>
-            <Typography variant='h6'>Public</Typography>
+            <Typography variant='h6'>{tierConfig.free.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               Free
             </Typography>
             {subscriptionTier === 'free' ? <Chip size='small' label='Current Plan' /> : null}
           </div>
           <MobileIconContainer>
-            <Image width={140} height={140} src='/images/subscriptions/public.webp' alt='Free' />
+            <Image width={140} height={140} src={tierConfig.free.iconPath} alt='Free' />
           </MobileIconContainer>
           {subscriptionTier !== 'free' && (
             <Button
@@ -84,17 +83,17 @@ export function SubscriptionTiers({
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
-              <Image width={100} height={100} src='/images/subscriptions/bronze.svg' alt='Bronze' />
+              <Image width={100} height={100} src={tierConfig.bronze.iconPath} alt='Bronze' />
             </DesktopIconContainer>
-            <Typography variant='h6'>Bronze</Typography>
+            <Typography variant='h6'>{tierConfig.bronze.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              1,000 $DEV / month
+              {tierConfig.bronze.tokenPrice.toLocaleString()} $DEV / month
             </Typography>
 
             {subscriptionTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
-            <Image width={150} height={150} src='/images/subscriptions/bronze.svg' alt='Bronze' />
+            <Image width={150} height={150} src={tierConfig.bronze.iconPath} alt='Bronze' />
           </MobileIconContainer>
           {subscriptionTier !== 'bronze' && (
             <Button variant='outlined' onClick={() => onClickShowCheckoutForm('bronze')} disabled={pendingPayment}>
@@ -121,16 +120,16 @@ export function SubscriptionTiers({
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
-              <Image width={100} height={100} src='/images/subscriptions/silver.svg' alt='Silver' />
+              <Image width={100} height={100} src={tierConfig.silver.iconPath} alt='Silver' />
             </DesktopIconContainer>
-            <Typography variant='h6'>Silver</Typography>
+            <Typography variant='h6'>{tierConfig.silver.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              2,500 $DEV / month
+              {tierConfig.silver.tokenPrice.toLocaleString()} $DEV / month
             </Typography>
             {subscriptionTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
-            <Image width={150} height={150} src='/images/subscriptions/silver.svg' alt='Free' />
+            <Image width={150} height={150} src={tierConfig.silver.iconPath} alt='Free' />
           </MobileIconContainer>
           {subscriptionTier !== 'silver' && (
             <Button variant='outlined' onClick={() => onClickShowCheckoutForm('silver')} disabled={pendingPayment}>
@@ -158,16 +157,16 @@ export function SubscriptionTiers({
         <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
-              <Image width={95} height={95} src='/images/subscriptions/gold.svg' alt='Gold' />
+              <Image width={95} height={95} src={tierConfig.gold.iconPath} alt='Gold' />
             </DesktopIconContainer>
-            <Typography variant='h6'>Gold</Typography>
+            <Typography variant='h6'>{tierConfig.gold.name}</Typography>
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
-              10,000 $DEV / month
+              {tierConfig.gold.tokenPrice.toLocaleString()} $DEV / month
             </Typography>
             {subscriptionTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
           </div>
           <MobileIconContainer>
-            <Image width={150} height={150} src='/images/subscriptions/gold.svg' alt='Gold' />
+            <Image width={150} height={150} src={tierConfig.gold.iconPath} alt='Gold' />
           </MobileIconContainer>
           {subscriptionTier !== 'gold' && (
             <Button variant='outlined' onClick={() => onClickShowCheckoutForm('gold')} disabled={pendingPayment}>

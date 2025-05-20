@@ -9,7 +9,7 @@ export type CreateSubscriptionContributionRequest = {
   message: string;
 };
 
-export async function createSubscriptionContribution(
+export async function recordSubscriptionContribution(
   payload: CreateSubscriptionContributionRequest & {
     spaceId: string;
     userId: string;

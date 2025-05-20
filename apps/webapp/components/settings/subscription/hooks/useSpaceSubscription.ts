@@ -1,6 +1,7 @@
 import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 import { useCallback } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
@@ -17,18 +18,18 @@ export function useSpaceSubscription() {
     () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
     { shouldRetryOnError: false }
   );
+  const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSWRMutation(
+    !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/switch-to-free-tier` : null,
+    () =>
+      charmClient.subscription.switchToFreeTier(currentSpace!.id).then((r) => {
+        refreshCurrentSpace();
+      })
+  );
 
   const isSpaceReadonly = currentSpace?.subscriptionTier === 'readonly';
 
   const spaceBlockQuota = defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000 + additionalQuota;
   const hasPassedBlockQuota = (count || 0) > spaceBlockQuota;
-
-  const downgradeToFreeTier = useCallback(async () => {
-    await charmClient.subscription.downgradeSubscription(currentSpace!.id, {
-      tier: 'free'
-    });
-    refreshCurrentSpace();
-  }, [currentSpace, refreshCurrentSpace]);
 
   return {
     isSpaceReadonly,
@@ -36,8 +37,8 @@ export function useSpaceSubscription() {
     spaceBlockQuota,
     spaceBlockCount: count,
     paidTier: currentSpace?.paidTier,
-    downgradeToFreeTier,
-    isDowngradingToFreeTier: currentSpace?.subscriptionTier !== 'free',
+    switchToFreeTier,
+    isSwitchingToFreeTier,
     subscriptionTier: currentSpace?.subscriptionTier
   };
 }

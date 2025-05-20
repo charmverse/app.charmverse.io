@@ -1,20 +1,11 @@
 import { log } from '@charmverse/core/log';
-import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
+import { tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
 import { UpgradableTiers, type UpgradableTier } from './calculateSubscriptionCost';
-
-export const SubscriptionTierAmountRecord: Record<SpaceSubscriptionTier, number> = {
-  free: 0,
-  bronze: 10,
-  silver: 25,
-  gold: 100,
-  grant: 0,
-  readonly: 0
-};
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
   const startOfMonth = DateTime.now().startOf('month');
@@ -43,14 +34,13 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     throw new Error('Space subscription is not chargeable');
   }
 
-  const spaceTokenBalance = await getSpaceTokenBalance({ spaceId });
+  const { value: spaceTokenBalance } = await getSpaceTokenBalance({ spaceId });
 
-  const subscriptionTierAmount = SubscriptionTierAmountRecord[subscriptionTier];
+  const subscriptionTierAmount = tierConfig[subscriptionTier].tokenPrice;
 
-  const spaceTokenBalanceInWei = parseUnits(spaceTokenBalance.toString(), 18);
   const subscriptionTierAmountInWei = parseUnits(subscriptionTierAmount.toString(), 18);
 
-  if (spaceTokenBalanceInWei < subscriptionTierAmountInWei) {
+  if (spaceTokenBalance < subscriptionTierAmountInWei) {
     await prisma.$transaction([
       prisma.space.update({
         where: { id: spaceId },
