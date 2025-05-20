@@ -1,7 +1,8 @@
 import type { Space } from '@charmverse/core/prisma';
 import { Box, Divider, Link, Stack, Typography } from '@mui/material';
-import type { UpgradableTier, DowngradeableTier } from '@packages/subscriptions/constants';
+import type { DowngradeableTier, UpgradableTier } from '@packages/subscriptions/constants';
 import { downgradeableTiers } from '@packages/subscriptions/constants';
+import type { SubscriptionTierChangeEvent } from '@packages/subscriptions/getSubscriptionEvents';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -21,7 +22,7 @@ import { DowngradeSubscriptionModal } from './components/modals/DowngradeSubscri
 import { ReactivateSubscriptionModal } from './components/modals/ReactivateSubscriptionModal';
 import { UpgradeSubscriptionModal } from './components/modals/UpgradeSubscriptionModal';
 import { SpaceContributionForm } from './components/SpaceContributionForm';
-import { SpaceSubscriptionReceiptsList } from './components/SpaceSubscriptionReceipts';
+import { SpaceSubscriptionEventsList } from './components/SpaceSubscriptionEvents';
 import { SubscriptionHeader } from './components/SubscriptionHeader';
 import { SubscriptionTiers } from './components/SubscriptionTiers';
 import { useSpaceSubscription } from './hooks/useSpaceSubscription';
@@ -35,20 +36,15 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : { value: '0', formatted: 0 })
   );
 
-  const { data: subscriptionReceipts = [], mutate: refreshSubscriptionReceipts } = useSWR(
-    space ? `space-receipts/${space.id}` : null,
-    () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
+  const { data: subscriptionEvents = [], mutate: refreshSubscriptionEvents } = useSWR(
+    space ? `space-subscription-events/${space.id}` : null,
+    () => (space ? charmClient.subscription.getSubscriptionEvents(space.id) : [])
   );
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
   const [tierToUpgrade, setTierToUpgrade] = useState<UpgradableTier | null>(null);
   const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
   const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
   const [tierToDowngrade, setTierToDowngrade] = useState<DowngradeableTier | null>(null);
-
-  const { data: subscriptionEvents, mutate: refreshSubscriptionEvents } = useSWR(
-    space ? `space-subscription-events/${space.id}` : null,
-    () => (space ? charmClient.subscription.getSubscriptionEvents(space.id) : [])
-  );
 
   const {
     isOpen: isFreeTierConfirmationOpen,
@@ -60,12 +56,15 @@ export function SubscriptionSettings({ space }: { space: Space }) {
 
   useTrackPageView({ type: 'billing/settings' });
 
+  const subscriptionTierChangeEvents = subscriptionEvents.filter(
+    (event) => event.type === 'tier-change'
+  ) as SubscriptionTierChangeEvent[];
+
   function handleShowCheckoutForm(tier: UpgradableTier | 'free') {
     if (tier === 'free') {
       openConfirmFreeTierDialog();
     } else {
-      const latestTier =
-        subscriptionEvents && subscriptionEvents.length > 0 ? subscriptionEvents[0].newTier : space.subscriptionTier;
+      const latestTier = subscriptionTierChangeEvents?.[0]?.tier ?? space.subscriptionTier;
       const currentTierIndex = downgradeableTiers.indexOf(latestTier as DowngradeableTier);
       const newTierIndex = downgradeableTiers.indexOf(tier);
       if (currentTierIndex > newTierIndex) {
@@ -86,7 +85,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Stack gap={1}>
         <SubscriptionHeader
           spaceTokenBalance={spaceTokenBalance}
-          subscriptionEvents={subscriptionEvents}
+          subscriptionEvents={subscriptionTierChangeEvents}
           onClickSendDev={() => setIsSendDevModalOpen(true)}
         />
 
@@ -105,8 +104,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               { sx: { px: 0, pb: 1 } }
             ],
             [
-              'Payment History',
-              <SpaceSubscriptionReceiptsList key='payments' subscriptionReceipts={subscriptionReceipts} />,
+              'Plan History',
+              <SpaceSubscriptionEventsList key='payments' subscriptionEvents={subscriptionEvents} />,
               { sx: { px: 0, pb: 1 } }
             ]
           ]}
@@ -129,7 +128,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         isOpen={isSendDevModalOpen}
         onClose={() => setIsSendDevModalOpen(false)}
         onSuccess={() => {
-          refreshSubscriptionReceipts();
+          refreshSubscriptionEvents();
           refreshSpaceTokenBalance();
         }}
       />
@@ -140,7 +139,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         onClose={() => setTierToUpgrade(null)}
         newTier={tierToUpgrade || 'bronze'}
         onSuccess={() => {
-          refreshSubscriptionReceipts();
+          refreshSubscriptionEvents();
           refreshSpaceTokenBalance();
           refreshCurrentSpace();
         }}

@@ -1,7 +1,7 @@
-import type { Space, SpaceSubscriptionTierChangeEvent } from '@charmverse/core/prisma-client';
 import { EditOff as EditOffIcon } from '@mui/icons-material';
 import { Alert, Stack, Typography } from '@mui/material';
-import { tierConfig, subscriptionTierOrder } from '@packages/subscriptions/constants';
+import { subscriptionTierOrder, tierConfig } from '@packages/subscriptions/constants';
+import type { SubscriptionTierChangeEvent } from '@packages/subscriptions/getSubscriptionEvents';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { DateTime } from 'luxon';
 import Image from 'next/image';
@@ -40,7 +40,7 @@ export function SubscriptionHeader({
   onClickSendDev
 }: {
   spaceTokenBalance: number;
-  subscriptionEvents?: SpaceSubscriptionTierChangeEvent[];
+  subscriptionEvents?: SubscriptionTierChangeEvent[];
   onClickSendDev: VoidFunction;
 }) {
   const { space, isLoading } = useCurrentSpace();
@@ -51,15 +51,15 @@ export function SubscriptionHeader({
 
   const isCancelled = space?.subscriptionCancelledAt !== null;
   const currentTierIndex = space?.subscriptionTier ? subscriptionTierOrder.indexOf(space?.subscriptionTier) : 0;
-  const latestSubscriptionEventTierIndex = latestSubscriptionEvent?.newTier
-    ? subscriptionTierOrder.indexOf(latestSubscriptionEvent?.newTier)
+  const latestSubscriptionEventTierIndex = latestSubscriptionEvent?.tier
+    ? subscriptionTierOrder.indexOf(latestSubscriptionEvent?.tier)
     : 0;
   const isDowngraded = !isLoading && subscriptionEvents && latestSubscriptionEventTierIndex < currentTierIndex;
 
   // Calculate how many months the current tier will last
   let expiresAt = '';
   const currentTier = space?.subscriptionTier;
-  const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.newTier;
+  const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.tier;
   const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
   if (tierPrice > 0 && spaceTokenBalance > 0) {
     const monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
