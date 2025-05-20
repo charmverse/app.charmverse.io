@@ -102,18 +102,18 @@ export function SubscriptionSettings({ space }: { space: Space }) {
                 onClickShowCheckoutForm={handleShowCheckoutForm}
                 subscriptionTier={space.subscriptionTier}
               />,
-              { sx: { px: 0 } }
+              { sx: { px: 0, pb: 1 } }
             ],
             [
               'Payment History',
               <SpaceSubscriptionReceiptsList key='payments' subscriptionReceipts={subscriptionReceipts} />,
-              { sx: { px: 0 } }
+              { sx: { px: 0, pb: 1 } }
             ]
           ]}
         />
-        <Divider sx={{ py: 2 }} />
-        <Box pb={4}>
-          <Typography>
+        <Divider />
+        <Box pt={2} pb={4}>
+          <Typography variant='body2' align='center'>
             Read more about our new pricing tiers{' '}
             <Link href='https://charmverse.io/post/community-pricing' target='_blank'>
               here

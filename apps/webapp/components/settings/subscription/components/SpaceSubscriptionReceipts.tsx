@@ -31,7 +31,9 @@ export function SpaceSubscriptionReceiptsList({
   return (
     <Stack gap={2}>
       {subscriptionReceipts.length === 0 ? (
-        <Typography>No subscription receipts yet</Typography>
+        <Typography align='center' sx={{ my: 2 }}>
+          No subscription receipts yet
+        </Typography>
       ) : (
         subscriptionReceiptsWithUser.map((receipt) => (
           <Stack key={receipt.id} flexDirection='row' justifyContent='space-between' alignItems='center' gap={2}>
