@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import type { DowngradeableTier } from '@packages/subscriptions/constants';
+import { tierConfig } from '@packages/subscriptions/constants';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -28,8 +29,16 @@ export function DowngradeSubscriptionModal({
 
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography>Downgrade subscription</Typography>
+      <Box sx={{ mb: 2 }}>
+        <Typography variant='h6' gutterBottom>
+          Confirm downgrade
+        </Typography>
+        <Typography>
+          This action will downgrade your subscription to <strong>{tierConfig[newTier].name}</strong> at the beginning
+          of next month.
+        </Typography>
+      </Box>
+      <Box display='flex' justifyContent='flex-end'>
         <Button variant='contained' onClick={onConfirm} sx={{ width: 'fit-content' }}>
           Downgrade
         </Button>
