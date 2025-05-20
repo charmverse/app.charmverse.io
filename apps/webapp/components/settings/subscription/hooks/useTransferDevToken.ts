@@ -80,6 +80,8 @@ export function useTransferDevToken() {
   };
 
   return {
+    address,
+    formattedBalance,
     isTransferring,
     transferDevToken
   };

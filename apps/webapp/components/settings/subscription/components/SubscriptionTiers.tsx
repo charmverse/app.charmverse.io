@@ -8,6 +8,7 @@ import Image from 'next/image';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 
 function MobileIconContainer({ children }: { children: ReactNode }) {
   return (
@@ -32,6 +33,7 @@ export function SubscriptionTiers({
   onClickShowCheckoutForm: (tier: UpgradableTier | 'free') => void;
   subscriptionTier: SpaceSubscriptionTier | null;
 }) {
+  const isAdmin = useIsAdmin();
   return (
     <>
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
@@ -51,11 +53,12 @@ export function SubscriptionTiers({
           <MobileIconContainer>
             <Image width={140} height={140} src={tierConfig.free.iconPath} alt='Free' />
           </MobileIconContainer>
-          {subscriptionTier !== 'free' && (
-            <Button fullWidth variant='outlined' onClick={() => onClickShowCheckoutForm('free')}>
-              Select
-            </Button>
-          )}
+          <SelectTierButton
+            currentTier={subscriptionTier}
+            tier='free'
+            onClick={onClickShowCheckoutForm}
+            isAdmin={isAdmin}
+          />
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
@@ -88,11 +91,12 @@ export function SubscriptionTiers({
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.bronze.iconPath} alt='Bronze' />
           </MobileIconContainer>
-          {subscriptionTier !== 'bronze' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('bronze')}>
-              Select
-            </Button>
-          )}
+          <SelectTierButton
+            currentTier={subscriptionTier}
+            tier='bronze'
+            onClick={onClickShowCheckoutForm}
+            isAdmin={isAdmin}
+          />
         </Grid>
         <Grid item xs={12} sm={7.5}>
           <Typography fontWeight='bold'>Features included</Typography>
@@ -124,11 +128,12 @@ export function SubscriptionTiers({
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.silver.iconPath} alt='Free' />
           </MobileIconContainer>
-          {subscriptionTier !== 'silver' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('silver')}>
-              Select
-            </Button>
-          )}
+          <SelectTierButton
+            currentTier={subscriptionTier}
+            tier='silver'
+            onClick={onClickShowCheckoutForm}
+            isAdmin={isAdmin}
+          />
         </Grid>
         <Divider sx={{ my: 2 }} />
         <Grid item xs={12} sm={7.5}>
@@ -161,11 +166,12 @@ export function SubscriptionTiers({
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.gold.iconPath} alt='Gold' />
           </MobileIconContainer>
-          {subscriptionTier !== 'gold' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('gold')}>
-              Select
-            </Button>
-          )}
+          <SelectTierButton
+            currentTier={subscriptionTier}
+            tier='gold'
+            onClick={onClickShowCheckoutForm}
+            isAdmin={isAdmin}
+          />
         </Grid>
         <Divider sx={{ my: 2 }} />
         <Grid item xs={12} sm={7.5}>
@@ -224,5 +230,29 @@ export function SubscriptionTiers({
         </Grid>
       </Grid>
     </>
+  );
+}
+
+function SelectTierButton({
+  isAdmin,
+  currentTier,
+  tier,
+  onClick
+}: {
+  isAdmin: boolean;
+  currentTier: SpaceSubscriptionTier | null;
+  tier: UpgradableTier | 'free';
+  onClick: (tier: UpgradableTier | 'free') => void;
+}) {
+  if (!isAdmin) {
+    return null;
+  }
+  if (currentTier === tier) {
+    return null;
+  }
+  return (
+    <Button variant='outlined' onClick={() => onClick(tier)}>
+      Select
+    </Button>
   );
 }
