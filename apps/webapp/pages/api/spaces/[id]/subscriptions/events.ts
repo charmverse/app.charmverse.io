@@ -1,7 +1,6 @@
-import type { SpaceSubscriptionTierChangeEvent } from '@charmverse/core/prisma-client';
-import { prisma } from '@charmverse/core/prisma-client';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { type SubscriptionEvent, getSubscriptionEvents } from '@packages/subscriptions/getSubscriptionEvents';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -12,20 +11,9 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getSubscriptionEventsController);
 
-async function getSubscriptionEventsController(
-  req: NextApiRequest,
-  res: NextApiResponse<SpaceSubscriptionTierChangeEvent[]>
-) {
+async function getSubscriptionEventsController(req: NextApiRequest, res: NextApiResponse<SubscriptionEvent[]>) {
   const { id: spaceId } = req.query as { id: string };
-
-  const subscriptionEvents = await prisma.spaceSubscriptionTierChangeEvent.findMany({
-    where: {
-      spaceId
-    },
-    orderBy: {
-      createdAt: 'desc'
-    }
-  });
+  const subscriptionEvents = await getSubscriptionEvents(spaceId);
 
   res.status(200).json(subscriptionEvents);
 }

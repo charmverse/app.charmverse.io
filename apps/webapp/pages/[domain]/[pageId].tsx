@@ -1,5 +1,9 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
+import { getCanonicalURL } from '@packages/lib/utils/domains/getCanonicalURL';
+import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
+import { getPagePath } from '@packages/lib/utils/domains/getPagePath';
 import { isUUID } from '@packages/utils/strings';
 import type { GetServerSidePropsContext } from 'next';
 import { useEffect } from 'react';
@@ -16,10 +20,6 @@ import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
-import { getCanonicalURL } from '@packages/lib/utils/domains/getCanonicalURL';
-import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
-import { getPagePath } from '@packages/lib/utils/domains/getPagePath';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
@@ -137,7 +137,7 @@ export default function PageView() {
   const { isSpaceMember } = useIsSpaceMember();
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const { subscriptionEnded } = useSpaceSubscription();
+  const { isSpaceReadonly } = useSpaceSubscription();
   const { subscribe } = useWebSocketClient();
   useEffect(() => {
     const unsubscribe = subscribe('pages_meta_updated', (updates) => {
@@ -184,7 +184,7 @@ export default function PageView() {
   }, [router.query.reload, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
-    if (subscriptionEnded) {
+    if (isSpaceReadonly) {
       return <ErrorPage message='Sorry, looks like you do not have access to this page' />;
     }
     return <SharedPage publicPage={publicPage} />;

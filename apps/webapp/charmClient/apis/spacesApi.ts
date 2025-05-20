@@ -121,6 +121,6 @@ export class SpacesApi {
   }
 
   getSpaceTokenBalance(spaceId: string) {
-    return http.GET<number>(`/api/spaces/${spaceId}/token-balance`);
+    return http.GET<{ value: string; formatted: number }>(`/api/spaces/${spaceId}/token-balance`);
   }
 }

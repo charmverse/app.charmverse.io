@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { chargeSpaceSubscription } from '@packages/lib/subscription/chargeSpaceSubscription';
+import { chargeSpaceSubscription } from '@packages/subscriptions/chargeSpaceSubscription';
 import { DateTime } from 'luxon';
 
 export async function task() {

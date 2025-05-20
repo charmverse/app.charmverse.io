@@ -11,12 +11,18 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, spaceIdKey: 'id' }))
   .get(getSpaceTokenBalanceController);
 
-async function getSpaceTokenBalanceController(req: NextApiRequest, res: NextApiResponse<number>) {
+async function getSpaceTokenBalanceController(
+  req: NextApiRequest,
+  res: NextApiResponse<{ value: string; formatted: number }>
+) {
   const { id: spaceId } = req.query as { id: string };
 
-  const spaceTokenBalance = await getSpaceTokenBalance({ spaceId });
+  const { value, formatted } = await getSpaceTokenBalance({ spaceId });
 
-  res.status(200).json(spaceTokenBalance);
+  res.status(200).json({
+    value: value.toString(),
+    formatted
+  });
 }
 
 export default withSessionRoute(handler);

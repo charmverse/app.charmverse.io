@@ -1,153 +1,179 @@
 import type { Space } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
-import { Stack, Typography } from '@mui/material';
-import { Elements } from '@stripe/react-stripe-js';
-import { useEffect, useState } from 'react';
-import useSWRMutation from 'swr/mutation';
+import { Box, Divider, Link, Stack, Typography } from '@mui/material';
+import type { DowngradeableTier, UpgradableTier } from '@packages/subscriptions/constants';
+import { downgradeableTiers } from '@packages/subscriptions/constants';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
+import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetSubscriptionStatus, useSwitchToFreeTier } from 'charmClient/hooks/subscriptions';
 import { useTrackPageView } from 'charmClient/hooks/track';
-import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useSessionStorage } from 'hooks/useSessionStorage';
-import { useSnackbar } from 'hooks/useSnackbar';
-import type { SubscriptionPeriod } from '@packages/lib/subscription/constants';
-import type { CreateProSubscriptionRequest } from '@packages/lib/subscription/interfaces';
+import MultiTabs from 'components/common/MultiTabs';
 
 import Legend from '../components/Legend';
 
-import { CheckoutForm } from './CheckoutForm';
-import { CreateSubscriptionInformation } from './CreateSubscriptionInformation';
-import { EnterpriseBillingScreen } from './EnterpriseBillingScreen';
-import { useBlockCount } from './hooks/useBlockCount';
-import { useSpaceSubscription } from './hooks/useSpaceSubscription';
-import { LoadingSubscriptionSkeleton } from './LoadingSkeleton';
-import { loadStripe } from './loadStripe';
-import { PlanSelection } from './PlanSelection';
-import { SubscriptionInformation } from './SubscriptionInformation';
+import { EnterpriseBillingScreen } from './components/EnterpriseBillingScreen';
+import { CancelSubscriptionModal } from './components/modals/CancelSubscriptionModal';
+import { ConfirmFreeTierModal } from './components/modals/ConfirmFreeTierModal';
+import { DowngradeSubscriptionModal } from './components/modals/DowngradeSubscriptionModal';
+import { ReactivateSubscriptionModal } from './components/modals/ReactivateSubscriptionModal';
+import { UpgradeSubscriptionModal } from './components/modals/UpgradeSubscriptionModal';
+import { SendDevToSpaceForm } from './components/SendDevToSpaceForm';
+import { SpaceSubscriptionEventsList } from './components/SpaceSubscriptionEvents';
+import { SubscriptionHeader } from './components/SubscriptionHeader';
+import { SubscriptionTiers } from './components/SubscriptionTiers';
 
-export function SubscriptionSettings({ space }: { space: Space }) {
-  const { showMessage } = useSnackbar();
-  const isAdmin = useIsAdmin();
+import '@rainbow-me/rainbowkit/styles.css';
 
-  const { spaceSubscription, isLoading: isLoadingSpaceSubscription, refetchSpaceSubscription } = useSpaceSubscription();
-
-  const [pendingPayment, setPendingPayment] = useSessionStorage<boolean>(`pending-payment-${space.id}`, false);
-  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
-
-  const { trigger: createSubscription, isMutating: isSubscriptionCreationLoading } = useSWRMutation(
-    `/api/spaces/${space.id}/subscription`,
-    (_url, { arg }: Readonly<{ arg: { spaceId: string; payload: CreateProSubscriptionRequest } }>) =>
-      charmClient.subscription.createSubscription(arg.spaceId, arg.payload),
-    {
-      onError() {
-        showMessage('Checkout failed! Please try again', 'error');
-      }
-    }
+export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { space: Space }) {
+  const { data: subscriptionEvents = [], mutate: refreshSubscriptionEvents } = useSWR(
+    spaceId ? `space-subscription-events/${spaceId}` : null,
+    () => (spaceId ? charmClient.subscription.getSubscriptionEvents(spaceId) : [])
   );
+  const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
+  const [tierToUpgrade, setTierToUpgrade] = useState<UpgradableTier | null>(null);
+  const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
+  const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
+  const [tierToDowngrade, setTierToDowngrade] = useState<DowngradeableTier | null>(null);
 
-  const { count: blockCount, data: blockCountData } = useBlockCount();
+  const {
+    isOpen: isFreeTierConfirmationOpen,
+    close: closeConfirmFreeTierDialog,
+    open: openConfirmFreeTierDialog
+  } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
-  const minimumBlockQuota = blockCount > 10000 ? Math.ceil(blockCount / 10000) * 10 : 10;
-
-  const [period, setPeriod] = useState<SubscriptionPeriod>('annual');
-  const [blockQuota, setBlockQuota] = useState(10);
+  const { data: subscriptionStatus, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
+  const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSwitchToFreeTier(spaceId, {
+    onSuccess: () => {
+      refreshSubscriptionStatus();
+      refreshSubscriptionEvents();
+    }
+  });
 
   useTrackPageView({ type: 'billing/settings' });
 
-  useEffect(() => {
-    // Ensure that we remove the pending screen after the subscription is created
-    if (pendingPayment && spaceSubscription?.id && spaceSubscription?.status === 'active') {
-      setPendingPayment(false);
+  function handleShowCheckoutForm(tier: UpgradableTier | 'free') {
+    if (tier === 'free') {
+      openConfirmFreeTierDialog();
+    } else if (subscriptionStatus) {
+      // const latestTier = subscriptionStatus.pendingTier || subscriptionStatus.tier;
+      const currentTierIndex = downgradeableTiers.indexOf(subscriptionStatus.tier as DowngradeableTier);
+      const newTierIndex = downgradeableTiers.indexOf(tier);
+      if (currentTierIndex > newTierIndex) {
+        setTierToDowngrade(tier);
+      } else {
+        setTierToUpgrade(tier);
+      }
     }
-  }, [spaceSubscription?.id, spaceSubscription?.status, pendingPayment]);
-
-  async function handleShowCheckoutForm() {
-    if (minimumBlockQuota > blockQuota) {
-      setBlockQuota(minimumBlockQuota);
-    }
-
-    setShowCheckoutForm(true);
   }
 
-  const handlePlanSelect = (_blockQuota: number | null, _period: SubscriptionPeriod | null) => {
-    if (_blockQuota) {
-      setBlockQuota(minimumBlockQuota > _blockQuota ? minimumBlockQuota : _blockQuota);
-    } else if (_period) {
-      setPeriod(_period);
-    }
-  };
-
-  const theme = useTheme();
-
-  const stripePromise = loadStripe();
-
-  const handleCreateSubscription = async (args: { spaceId: string; payload: CreateProSubscriptionRequest }) => {
-    return createSubscription(args);
-  };
-
-  if (!isAdmin) {
-    return <Typography>Please talk to an administrator about this space.</Typography>;
+  if (!subscriptionStatus) {
+    return <>&nbsp;</>;
   }
 
-  if (space.paidTier === 'enterprise') {
+  if (paidTier === 'enterprise' || subscriptionStatus.tier === 'grant') {
     return <EnterpriseBillingScreen />;
   }
 
-  if (!showCheckoutForm) {
-    return (
-      <Stack gap={1}>
-        {isLoadingSpaceSubscription ? (
-          <LoadingSubscriptionSkeleton isLoading={isLoadingSpaceSubscription} />
-        ) : spaceSubscription && !!spaceSubscription.status ? (
-          <SubscriptionInformation
-            minimumBlockQuota={minimumBlockQuota}
-            space={space}
-            spaceSubscription={spaceSubscription}
-            refetchSpaceSubscription={refetchSpaceSubscription}
-          />
-        ) : (
-          <CreateSubscriptionInformation
-            pendingPayment={pendingPayment || false}
-            onUpgrade={handleShowCheckoutForm}
-            spaceId={space.id}
-          />
-        )}
-      </Stack>
-    );
-  }
-
   return (
-    <Stack gap={1}>
-      <Legend mb={1}>Upgrade to Community</Legend>
-      <Typography>
-        Community Edition includes comprehensive access control, roles, guests, custom domain, API access and more.
-      </Typography>
-      {!!blockCountData && (
-        <PlanSelection
-          disabled={isSubscriptionCreationLoading}
-          onSelect={handlePlanSelect}
-          blockQuotaInThousands={blockQuota}
-          period={period}
-          hideSelection
+    <RainbowKitProvider>
+      <Legend>Billing</Legend>
+      <Stack gap={1}>
+        <SubscriptionHeader
+          spaceTokenBalance={subscriptionStatus?.tokenBalance.formatted}
+          pendingTier={subscriptionStatus?.pendingTier}
+          onClickSendDev={() => setIsSendDevModalOpen(true)}
         />
-      )}
-      <Elements
-        stripe={stripePromise}
-        options={{
-          appearance: {
-            theme: theme.palette.mode === 'dark' ? 'night' : 'stripe'
-          }
+
+        <MultiTabs
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          tabs={[
+            [
+              'Subscription Plan',
+              <SubscriptionTiers
+                key='subscription'
+                onClickShowCheckoutForm={handleShowCheckoutForm}
+                subscriptionTier={subscriptionStatus.tier}
+              />,
+              { sx: { px: 0, pb: 1 } }
+            ],
+            [
+              'Plan History',
+              <SpaceSubscriptionEventsList key='payments' subscriptionEvents={subscriptionEvents} />,
+              { sx: { px: 0, pb: 1 } }
+            ]
+          ]}
+        />
+        <Divider />
+        <Box pt={2} pb={4}>
+          <Typography variant='body2' align='center'>
+            Read more about our new pricing tiers{' '}
+            <Link href='https://charmverse.io/post/community-pricing' target='_blank'>
+              here
+            </Link>
+            . Have questions? Contact{' '}
+            <Link target='_blank' href='mailto:hello@charmverse.io'>
+              hello@charmverse.io
+            </Link>
+          </Typography>
+        </Box>
+      </Stack>
+      <SendDevToSpaceForm
+        isOpen={isSendDevModalOpen}
+        onClose={() => setIsSendDevModalOpen(false)}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
         }}
-      >
-        <CheckoutForm
-          space={space}
-          blockQuota={blockQuota}
-          period={period}
-          handlePending={() => setPendingPayment(true)}
-          onCloseCheckout={() => setShowCheckoutForm(false)}
-          handleCreateSubscription={handleCreateSubscription}
-        />
-      </Elements>
-    </Stack>
+      />
+      <UpgradeSubscriptionModal
+        spaceId={spaceId}
+        currentTier={subscriptionStatus.tier}
+        isOpen={!!tierToUpgrade}
+        onClose={() => setTierToUpgrade(null)}
+        newTier={tierToUpgrade || 'bronze'}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
+        }}
+      />
+      <CancelSubscriptionModal
+        isOpen={isCancelSubscriptionModalOpen}
+        onClose={() => setIsCancelSubscriptionModalOpen(false)}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
+        }}
+      />
+      <DowngradeSubscriptionModal
+        spaceId={spaceId}
+        isOpen={!!tierToDowngrade}
+        onClose={() => setTierToDowngrade(null)}
+        newTier={tierToDowngrade || 'bronze'}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
+        }}
+      />
+      <ReactivateSubscriptionModal
+        spaceId={spaceId}
+        isOpen={isReactivateSubscriptionModalOpen}
+        onClose={() => setIsReactivateSubscriptionModalOpen(false)}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
+        }}
+      />
+      <ConfirmFreeTierModal
+        disabled={isSwitchingToFreeTier}
+        isOpen={isFreeTierConfirmationOpen}
+        onClose={closeConfirmFreeTierDialog}
+        onConfirm={switchToFreeTier}
+      />
+    </RainbowKitProvider>
   );
 }

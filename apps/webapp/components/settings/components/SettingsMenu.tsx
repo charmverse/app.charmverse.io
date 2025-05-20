@@ -2,6 +2,7 @@ import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import { Menu, MenuItem, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { Feature } from '@packages/features/constants';
+import { getSpaceUrl } from '@packages/lib/utils/browser';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import Link from 'components/common/Link';
@@ -15,7 +16,6 @@ import { useSettingsDialog, type SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { getSpaceUrl } from '@packages/lib/utils/browser';
 
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from '../config';
 import { useSpaceSubscription } from '../subscription/hooks/useSpaceSubscription';
@@ -35,7 +35,7 @@ export function SettingsMenu({ activePath, onSelectPath }: Props) {
   const { user } = useUser();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
-  const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
+  const { isSpaceReadonly, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   const { showUserProfile } = useMemberProfileDialog();
   const { onClose: closeSettingsDialog } = useSettingsDialog();
@@ -95,7 +95,7 @@ export function SettingsMenu({ activePath, onSelectPath }: Props) {
             </SidebarLink>
           ) : null
         )}
-      {subscriptionEnded && memberSpaces.length > 1 && (
+      {isSpaceReadonly && memberSpaces.length > 1 && (
         <Box>
           <SidebarLink
             data-test='space-settings-tab-switch-space'

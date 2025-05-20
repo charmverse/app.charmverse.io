@@ -3,7 +3,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 
 import { updateToCommunityTier } from '../updateToCommunityTier';
 
-describe('updateProSubscription', () => {
+describe('updateToCommunityTier', () => {
   it(`Should update the space to community`, async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace({ spacePaidTier: 'free' });
 

@@ -78,7 +78,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const { space: currentSpace } = useCurrentSpace();
   const isMobile = useSmallScreen();
 
-  const { subscriptionEnded } = useSpaceSubscription();
+  const { isSpaceReadonly } = useSpaceSubscription();
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <SettingsMenu activePath={activePath} onSelectPath={onSelectPath} />
@@ -125,7 +125,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
           );
         })}
       </Box>
-      {!subscriptionEnded && (
+      {!isSpaceReadonly && (
         <Box>
           {isMobile ? (
             <Button

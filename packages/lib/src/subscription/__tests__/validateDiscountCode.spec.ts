@@ -7,7 +7,7 @@ import { validateDiscountCode } from '../validateDiscountCode';
 
 jest.doMock('../stripe', () => ({ ...stripeMock }));
 
-describe('updateProSubscription', () => {
+describe('validateDiscountCode', () => {
   it(`Should validate a coupon and return the discount details`, async () => {
     const couponId = v4();
 
