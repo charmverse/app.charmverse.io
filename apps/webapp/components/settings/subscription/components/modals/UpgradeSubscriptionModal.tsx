@@ -53,7 +53,7 @@ export function UpgradeSubscriptionModal({
     setIsUpgrading(true);
 
     try {
-      if (devTokensToSend !== 0) {
+      if (devTokensToSend > 0) {
         const result = await transferDevToken(devTokensToSend);
         if (!result) return;
         await charmClient.subscription.recordSubscriptionContribution(spaceId, {
@@ -181,7 +181,7 @@ export function UpgradeSubscriptionModal({
           </Stack>
         </Card>
         <Stack direction='row' spacing={2} justifyContent='flex-end'>
-          <Button variant='outlined' onClick={onClose} color='error' disabled={isLoading}>
+          <Button variant='outlined' onClick={onClose} color='secondary' disabled={isLoading}>
             Cancel
           </Button>
           <Tooltip title={!paymentPeriod ? 'Select a period' : ''}>

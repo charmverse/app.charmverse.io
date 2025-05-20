@@ -1,7 +1,7 @@
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { Launch as LaunchIcon } from '@mui/icons-material';
+import { Box, Stack, TextField, Typography, Link, Divider } from '@mui/material';
+import { uniswapSwapUrl } from '@packages/subscriptions/constants';
+import { shortenHex } from '@packages/utils/blockchain';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -15,7 +15,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useDevTokenBalance } from '../hooks/useDevTokenBalance';
 import { useTransferDevToken } from '../hooks/useTransferDevToken';
 
-export function SpaceContributionForm({
+export function SendDevToSpaceForm({
   isOpen,
   onClose,
   onSuccess
@@ -57,11 +57,31 @@ export function SpaceContributionForm({
   return (
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <Typography>Send DEV</Typography>
+        <Typography variant='h6'>Send DEV to {space?.name}</Typography>
+        <Typography>Your contribution will be used to pay for the subscription.</Typography>
+        <Divider />
+        <Box>
+          <Typography variant='body2' color='text.secondary' gutterBottom>
+            Connected wallet: {shortenHex(address, 4)}
+          </Typography>
+          <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
+            <Stack flexDirection='row' alignItems='center' gap={0.5}>
+              <Typography variant='body2'>
+                Balance: <b>{formattedBalance}</b>
+              </Typography>
+              <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+            </Stack>
+            <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
+              Buy DEV on Uniswap
+              <LaunchIcon fontSize='inherit' />
+            </Typography>
+          </Stack>
+        </Box>
         <Stack gap={1}>
           <TextField
             fullWidth
             type='number'
+            error={amount > balance}
             value={amount}
             inputProps={{
               min: 1,
@@ -70,22 +90,18 @@ export function SpaceContributionForm({
             disabled={!address || isBalanceLoading}
             onChange={(e) => setAmount(Number(e.target.value))}
           />
-          <Stack flexDirection='row' alignItems='center' gap={0.5}>
-            <Typography variant='body2' color='text.secondary'>
-              Balance: {formattedBalance}
-            </Typography>
-            <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
-          </Stack>
         </Stack>
-        <Button
-          loading={isTransferring || isBalanceLoading}
-          variant='contained'
-          onClick={onDevTransfer}
-          sx={{ width: 'fit-content' }}
-          disabled={amount === 0 || balance < amount}
-        >
-          Send
-        </Button>
+        <Stack flexDirection='row' justifyContent='flex-end'>
+          <Button
+            loading={isTransferring || isBalanceLoading}
+            variant='contained'
+            onClick={onDevTransfer}
+            sx={{ width: 'fit-content' }}
+            disabled={amount === 0 || balance < amount}
+          >
+            Send
+          </Button>
+        </Stack>
       </Box>
     </Modal>
   );

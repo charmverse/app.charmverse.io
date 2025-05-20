@@ -20,7 +20,7 @@ import { ConfirmFreeTierModal } from './components/modals/ConfirmFreeTierModal';
 import { DowngradeSubscriptionModal } from './components/modals/DowngradeSubscriptionModal';
 import { ReactivateSubscriptionModal } from './components/modals/ReactivateSubscriptionModal';
 import { UpgradeSubscriptionModal } from './components/modals/UpgradeSubscriptionModal';
-import { SpaceContributionForm } from './components/SpaceContributionForm';
+import { SendDevToSpaceForm } from './components/SendDevToSpaceForm';
 import { SpaceSubscriptionReceiptsList } from './components/SpaceSubscriptionReceipts';
 import { SubscriptionHeader } from './components/SubscriptionHeader';
 import { SubscriptionTiers } from './components/SubscriptionTiers';
@@ -125,7 +125,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           </Typography>
         </Box>
       </Stack>
-      <SpaceContributionForm
+      <SendDevToSpaceForm
         isOpen={isSendDevModalOpen}
         onClose={() => setIsSendDevModalOpen(false)}
         onSuccess={() => {

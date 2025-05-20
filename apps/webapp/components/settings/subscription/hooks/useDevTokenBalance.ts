@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { devTokenAddress } from '@packages/subscriptions/constants';
 import { useCallback } from 'react';
 import useSWR, { mutate } from 'swr';
 import type { Address } from 'viem';
@@ -6,8 +7,6 @@ import { erc20Abi } from 'viem';
 import { readContract } from 'viem/actions';
 import { base } from 'viem/chains';
 import { usePublicClient } from 'wagmi';
-
-export const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 
 const ceilToPrecision = (value: number, precision: number) => {
   const multiplier = 10 ** precision;
