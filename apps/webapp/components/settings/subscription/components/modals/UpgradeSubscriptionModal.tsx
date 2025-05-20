@@ -1,6 +1,7 @@
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { capitalize, Card, Divider, Stack, TextField, Tooltip, Typography } from '@mui/material';
-import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
-import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
+import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
+import type { UpgradableTier } from '@packages/subscriptions/constants';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -12,23 +13,23 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 import { useTransferDevToken } from '../../hooks/useTransferDevToken';
 
-export function SpaceSubscriptionUpgradeForm({
+export function UpgradeSubscriptionModal({
+  spaceId,
   isOpen,
   onClose: _onClose,
   onSuccess,
-  spaceTokenBalance,
+  currentTier,
   newTier
 }: {
+  spaceId: string;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
-  spaceTokenBalance: number;
+  currentTier: SpaceSubscriptionTier | null;
   newTier: UpgradableTier;
 }) {
-  const { space, refreshCurrentSpace } = useCurrentSpace();
   const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
-  const currentTier = space?.subscriptionTier as UpgradableTier | null;
   const { showMessage } = useSnackbar();
   const [isUpgrading, setIsUpgrading] = useState(false);
 
@@ -50,15 +51,13 @@ export function SpaceSubscriptionUpgradeForm({
   const isLoading = isTransferring || isUpgrading;
 
   async function onUpgrade() {
-    if (!space) return;
-
     setIsUpgrading(true);
 
     try {
       if (devTokensToSend !== 0) {
         const result = await transferDevToken(devTokensToSend);
         if (!result) return;
-        await charmClient.subscription.recordSubscriptionContribution(space.id, {
+        await charmClient.subscription.recordSubscriptionContribution(spaceId, {
           hash: result.hash,
           walletAddress: result.address,
           paidTokenAmount: result.transferredAmount.toString(),
@@ -68,7 +67,7 @@ export function SpaceSubscriptionUpgradeForm({
       }
 
       await charmClient.subscription
-        .upgradeSubscription(space.id, {
+        .upgradeSubscription(spaceId, {
           tier: newTier,
           paymentMonths
         })
@@ -77,7 +76,6 @@ export function SpaceSubscriptionUpgradeForm({
         })
         .then(() => {
           showMessage('Space subscription upgraded successfully', 'success');
-          refreshCurrentSpace();
           onSuccess();
           onClose();
         });
@@ -87,8 +85,6 @@ export function SpaceSubscriptionUpgradeForm({
       setIsUpgrading(false);
     }
   }
-
-  if (!space) return null;
 
   return (
     <Modal open={isOpen} onClose={onClose}>

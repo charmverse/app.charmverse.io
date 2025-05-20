@@ -9,6 +9,12 @@ export const subscriptionTierOrder: SpaceSubscriptionTier[] = [
   'grant'
 ] as const;
 
+export const upgradableTiers = ['bronze', 'silver', 'gold'] as const;
+export type UpgradableTier = (typeof upgradableTiers)[number];
+
+export const downgradeableTiers: SpaceSubscriptionTier[] = ['free', 'bronze', 'silver', 'gold'] as const;
+export type DowngradeableTier = (typeof downgradeableTiers)[number];
+
 export const tierConfig: Record<SpaceSubscriptionTier, { name: string; iconPath: string; tokenPrice: number }> = {
   readonly: {
     name: 'Locked',

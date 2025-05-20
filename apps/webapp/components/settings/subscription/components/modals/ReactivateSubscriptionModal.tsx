@@ -1,24 +1,19 @@
 import charmClient from 'charmClient';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export function ReactivateSubscriptionModal({
+  spaceId,
   isOpen,
   onClose,
   onSuccess
 }: {
+  spaceId: string;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
 }) {
-  const { space } = useCurrentSpace();
-
   const onConfirm = async () => {
-    if (!space) {
-      return;
-    }
-
-    await charmClient.subscription.reactivateSubscription(space.id);
+    await charmClient.subscription.reactivateSubscription(spaceId);
     onSuccess();
     onClose();
   };

@@ -11,7 +11,6 @@ import type {
 import type { CouponDetails } from '@packages/lib/subscription/getCouponDetails';
 import type { CreateProSubscriptionRequest, SubscriptionPaymentIntent } from '@packages/lib/subscription/interfaces';
 import type { UpdatePaymentMethodRequest } from '@packages/lib/subscription/updatePaymentMethod';
-import type { UpdateSubscriptionRequest } from '@packages/lib/subscription/updateProSubscription';
 import type { DowngradeSubscriptionRequest } from '@packages/subscriptions/downgradeSubscription';
 import type { SubscriptionReceipt } from '@packages/subscriptions/getSubscriptionReceipts';
 import type { CreateSubscriptionContributionRequest } from '@packages/subscriptions/recordSubscriptionContribution';
@@ -24,10 +23,6 @@ export class SubscriptionApi {
 
   getSpaceSubscription({ spaceId }: SpaceSubscriptionRequest) {
     return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
-  }
-
-  updateSpaceSubscription(spaceId: string, payload: UpdateSubscriptionRequest) {
-    return http.PUT<void>(`/api/spaces/${spaceId}/subscription`, payload);
   }
 
   switchToFreeTier(spaceId: string) {

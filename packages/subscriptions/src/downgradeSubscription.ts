@@ -1,8 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 
-export const downgradeableTiers: SpaceSubscriptionTier[] = ['free', 'bronze', 'silver', 'gold'] as const;
-export type DowngradeableTier = (typeof downgradeableTiers)[number];
+import type { DowngradeableTier } from './constants';
+import { downgradeableTiers } from './constants';
 
 export type DowngradeSubscriptionRequest = {
   tier: DowngradeableTier;

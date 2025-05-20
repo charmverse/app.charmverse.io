@@ -1,16 +1,16 @@
-import type { Space, SpaceSubscriptionTier } from '@charmverse/core/prisma';
-import { Stack, Typography } from '@mui/material';
-import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
-import { RainbowKitProvider, useConnectModal } from '@rainbow-me/rainbowkit';
+import type { Space } from '@charmverse/core/prisma';
+import { Stack } from '@mui/material';
+import type { UpgradableTier, DowngradeableTier } from '@packages/subscriptions/constants';
+import { downgradeableTiers } from '@packages/subscriptions/constants';
+import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import MultiTabs from 'components/common/MultiTabs';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
 
 import Legend from '../components/Legend';
 
@@ -19,7 +19,7 @@ import { CancelSubscriptionModal } from './components/modals/CancelSubscriptionM
 import { ConfirmFreeTierModal } from './components/modals/ConfirmFreeTierModal';
 import { DowngradeSubscriptionModal } from './components/modals/DowngradeSubscriptionModal';
 import { ReactivateSubscriptionModal } from './components/modals/ReactivateSubscriptionModal';
-import { SpaceSubscriptionUpgradeForm } from './components/modals/SpaceSubscriptionUpgradeForm';
+import { UpgradeSubscriptionModal } from './components/modals/UpgradeSubscriptionModal';
 import { SpaceContributionForm } from './components/SpaceContributionForm';
 import { SpaceSubscriptionReceiptsList } from './components/SpaceSubscriptionReceipts';
 import { SubscriptionHeader } from './components/SubscriptionHeader';
@@ -41,10 +41,10 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
   );
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
-  const [isSpaceTierPurchaseModalOpen, setIsSpaceTierPurchaseModalOpen] = useState<UpgradableTier | null>(null);
+  const [tierToUpgrade, setTierToUpgrade] = useState<UpgradableTier | null>(null);
   const [isCancelSubscriptionModalOpen, setIsCancelSubscriptionModalOpen] = useState(false);
   const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
-  const [isDowngradeSubscriptionModalOpen, setIsDowngradeSubscriptionModalOpen] = useState(false);
+  const [tierToDowngrade, setTierToDowngrade] = useState<DowngradeableTier | null>(null);
 
   const { data: subscriptionEvents, mutate: refreshSubscriptionEvents } = useSWR(
     space ? `space-subscription-events/${space.id}` : null,
@@ -65,7 +65,13 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     if (tier === 'free') {
       openConfirmFreeTierDialog();
     } else {
-      setIsSpaceTierPurchaseModalOpen(tier);
+      const currentTierIndex = downgradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
+      const newTierIndex = downgradeableTiers.indexOf(tier);
+      if (currentTierIndex > newTierIndex) {
+        setTierToDowngrade(tier);
+      } else {
+        setTierToUpgrade(tier);
+      }
     }
   }
 
@@ -113,15 +119,16 @@ export function SubscriptionSettings({ space }: { space: Space }) {
           refreshSpaceTokenBalance();
         }}
       />
-      <SpaceSubscriptionUpgradeForm
-        isOpen={!!isSpaceTierPurchaseModalOpen}
-        onClose={() => setIsSpaceTierPurchaseModalOpen(null)}
-        spaceTokenBalance={spaceTokenBalance}
-        newTier={isSpaceTierPurchaseModalOpen || 'bronze'}
+      <UpgradeSubscriptionModal
+        spaceId={space.id}
+        currentTier={space.subscriptionTier}
+        isOpen={!!tierToUpgrade}
+        onClose={() => setTierToUpgrade(null)}
+        newTier={tierToUpgrade || 'bronze'}
         onSuccess={() => {
           refreshSubscriptionReceipts();
           refreshSpaceTokenBalance();
-          setIsSpaceTierPurchaseModalOpen(null);
+          refreshCurrentSpace();
         }}
       />
       <CancelSubscriptionModal
@@ -129,24 +136,24 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         onClose={() => setIsCancelSubscriptionModalOpen(false)}
         onSuccess={() => {
           refreshCurrentSpace();
-          setIsCancelSubscriptionModalOpen(false);
         }}
       />
       <DowngradeSubscriptionModal
-        isOpen={isDowngradeSubscriptionModalOpen}
-        onClose={() => setIsDowngradeSubscriptionModalOpen(false)}
+        spaceId={space.id}
+        isOpen={!!tierToDowngrade}
+        onClose={() => setTierToDowngrade(null)}
+        newTier={tierToDowngrade || 'bronze'}
         onSuccess={() => {
           refreshCurrentSpace();
           refreshSubscriptionEvents();
-          setIsDowngradeSubscriptionModalOpen(false);
         }}
       />
       <ReactivateSubscriptionModal
+        spaceId={space.id}
         isOpen={isReactivateSubscriptionModalOpen}
         onClose={() => setIsReactivateSubscriptionModalOpen(false)}
         onSuccess={() => {
           refreshCurrentSpace();
-          setIsReactivateSubscriptionModalOpen(false);
         }}
       />
       <ConfirmFreeTierModal

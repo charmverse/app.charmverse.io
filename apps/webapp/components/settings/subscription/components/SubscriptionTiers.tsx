@@ -1,8 +1,8 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { subscriptionDetails } from '@packages/lib/subscription/constants';
+import type { UpgradableTier } from '@packages/subscriptions/constants';
 import { tierConfig } from '@packages/subscriptions/constants';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
@@ -26,11 +26,9 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 }
 
 export function SubscriptionTiers({
-  pendingPayment,
   onClickShowCheckoutForm,
   subscriptionTier
 }: {
-  pendingPayment?: boolean;
   onClickShowCheckoutForm: (tier: UpgradableTier | 'free') => void;
   subscriptionTier: SpaceSubscriptionTier | null;
 }) {
@@ -54,12 +52,7 @@ export function SubscriptionTiers({
             <Image width={140} height={140} src={tierConfig.free.iconPath} alt='Free' />
           </MobileIconContainer>
           {subscriptionTier !== 'free' && (
-            <Button
-              fullWidth
-              variant='outlined'
-              onClick={() => onClickShowCheckoutForm('free')}
-              disabled={pendingPayment}
-            >
+            <Button fullWidth variant='outlined' onClick={() => onClickShowCheckoutForm('free')}>
               Select
             </Button>
           )}
@@ -96,7 +89,7 @@ export function SubscriptionTiers({
             <Image width={150} height={150} src={tierConfig.bronze.iconPath} alt='Bronze' />
           </MobileIconContainer>
           {subscriptionTier !== 'bronze' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('bronze')} disabled={pendingPayment}>
+            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('bronze')}>
               Select
             </Button>
           )}
@@ -132,7 +125,7 @@ export function SubscriptionTiers({
             <Image width={150} height={150} src={tierConfig.silver.iconPath} alt='Free' />
           </MobileIconContainer>
           {subscriptionTier !== 'silver' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('silver')} disabled={pendingPayment}>
+            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('silver')}>
               Select
             </Button>
           )}
@@ -169,7 +162,7 @@ export function SubscriptionTiers({
             <Image width={150} height={150} src={tierConfig.gold.iconPath} alt='Gold' />
           </MobileIconContainer>
           {subscriptionTier !== 'gold' && (
-            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('gold')} disabled={pendingPayment}>
+            <Button variant='outlined' onClick={() => onClickShowCheckoutForm('gold')}>
               Select
             </Button>
           )}

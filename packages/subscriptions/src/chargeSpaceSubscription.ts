@@ -5,7 +5,8 @@ import { tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
-import { UpgradableTiers, type UpgradableTier } from './calculateSubscriptionCost';
+import type { UpgradableTier } from './constants';
+import { upgradableTiers } from './constants';
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
   const startOfMonth = DateTime.now().startOf('month');
@@ -30,7 +31,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     throw new Error('Space is not a subscription space');
   }
 
-  if (!UpgradableTiers.includes(space.subscriptionTier as UpgradableTier)) {
+  if (!upgradableTiers.includes(space.subscriptionTier as UpgradableTier)) {
     throw new Error('Space subscription is not chargeable');
   }
 

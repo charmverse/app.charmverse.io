@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { UpgradableTier } from '@packages/lib/subscription/calculateSubscriptionCost';
-import { calculateSubscriptionCost, UpgradableTiers } from '@packages/lib/subscription/calculateSubscriptionCost';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
+import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
+import { upgradableTiers } from '@packages/subscriptions/constants';
+import type { UpgradableTier } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
@@ -30,7 +31,7 @@ export async function upgradeSubscription(
     throw new Error('You cannot upgrade subscription after it has been cancelled');
   }
 
-  if (!UpgradableTiers.includes(tier)) {
+  if (!upgradableTiers.includes(tier)) {
     throw new Error('Invalid tier');
   }
 
