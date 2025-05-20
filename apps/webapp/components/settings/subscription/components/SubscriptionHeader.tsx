@@ -63,7 +63,6 @@ export function SubscriptionHeader({
   if (tierPrice > 0 && spaceTokenBalance > 0) {
     monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
   }
-
   const currentTierName = space?.subscriptionTier ? tierConfig[space.subscriptionTier]?.name : '';
   const isReadOnly = currentTier === 'readonly';
 

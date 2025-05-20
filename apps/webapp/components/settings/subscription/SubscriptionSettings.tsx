@@ -30,9 +30,9 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 export function SubscriptionSettings({ space }: { space: Space }) {
   const { refreshCurrentSpace } = useCurrentSpace();
-  const { data: spaceTokenBalance = 0, mutate: refreshSpaceTokenBalance } = useSWR(
+  const { data: { formatted: spaceTokenBalance } = { formatted: 0 }, mutate: refreshSpaceTokenBalance } = useSWR(
     space ? `space-token-balance/${space.id}` : null,
-    () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : 0)
+    () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : { value: '0', formatted: 0 })
   );
 
   const { data: subscriptionReceipts = [], mutate: refreshSubscriptionReceipts } = useSWR(
