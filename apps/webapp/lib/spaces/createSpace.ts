@@ -80,7 +80,7 @@ export async function createWorkspace({
     signingSecret = createSigningSecret();
   }
 
-  const { immediatePayment } = calculateSubscriptionCost({
+  const { immediatePayment, priceForMonths } = calculateSubscriptionCost({
     paymentMonths: 2,
     newTier: 'gold',
     currentTier: null
@@ -120,7 +120,7 @@ export async function createWorkspace({
       subscriptionContributions: {
         create: {
           decentPayload: {},
-          devTokenAmount: parseUnits(immediatePayment.toString(), 18).toString(),
+          devTokenAmount: parseUnits(priceForMonths.toString(), 18).toString(),
           userId,
           chainId: base.id
         }
