@@ -2,6 +2,7 @@ import * as http from '@packages/adapters/http';
 import type { SWRConfiguration } from 'swr';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
+import type { SWRMutationConfiguration } from 'swr/mutation';
 import useSWRMutation from 'swr/mutation';
 
 export type MaybeString = string | null | undefined;
@@ -24,10 +25,14 @@ export function useDELETE<T>(path: string) {
   });
 }
 
-export function usePOST<T, U = unknown>(path: string) {
-  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
-    return http.POST<U>(url, arg);
-  });
+export function usePOST<T, U = unknown>(path: string, options?: SWRMutationConfiguration<U, Error, string, T>) {
+  return useSWRMutation<U, Error, string, T>(
+    path,
+    (url: string, { arg }: { arg: any }) => {
+      return http.POST<U>(url, arg);
+    },
+    options
+  );
 }
 
 export function usePUT<T, U = unknown>(path: string, options?: { revalidate?: boolean }) {

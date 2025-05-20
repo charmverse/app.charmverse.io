@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { charmVerseBankAddress, devTokenAddress } from '@packages/subscriptions/constants';
 import { useState } from 'react';
 import { erc20Abi, parseUnits } from 'viem';
 import { base } from 'viem/chains';
@@ -9,9 +10,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import { useDevTokenBalance } from './useDevTokenBalance';
-
-const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
-const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 
 export function useTransferDevToken() {
   const { address } = useAccount();
@@ -59,7 +57,7 @@ export function useTransferDevToken() {
         address: devTokenAddress,
         abi: erc20Abi,
         functionName: 'transfer',
-        args: [recipientAddress, transferredAmount]
+        args: [charmVerseBankAddress, transferredAmount]
       });
 
       const publicClient = getPublicClient(base.id);
@@ -82,6 +80,8 @@ export function useTransferDevToken() {
   };
 
   return {
+    address,
+    formattedBalance,
     isTransferring,
     transferDevToken
   };

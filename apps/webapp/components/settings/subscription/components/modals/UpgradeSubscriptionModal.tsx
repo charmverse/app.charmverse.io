@@ -1,7 +1,10 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
-import { capitalize, Card, Divider, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Launch as LaunchIcon } from '@mui/icons-material';
+import { capitalize, Box, Card, Divider, Stack, TextField, Tooltip, Typography, Link } from '@mui/material';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
 import type { UpgradableTier } from '@packages/subscriptions/constants';
+import { uniswapSwapUrl } from '@packages/subscriptions/constants';
+import { shortenHex } from '@packages/utils/blockchain';
 import Image from 'next/image';
 import { useState } from 'react';
 
@@ -45,7 +48,7 @@ export function UpgradeSubscriptionModal({
     setPaymentMonths(1);
   }
 
-  const { isTransferring, transferDevToken } = useTransferDevToken();
+  const { isTransferring, transferDevToken, address, formattedBalance } = useTransferDevToken();
 
   const isLoading = isTransferring || isUpgrading;
 
@@ -53,7 +56,7 @@ export function UpgradeSubscriptionModal({
     setIsUpgrading(true);
 
     try {
-      if (devTokensToSend !== 0) {
+      if (devTokensToSend > 0) {
         const result = await transferDevToken(devTokensToSend);
         if (!result) return;
         await charmClient.subscription.recordSubscriptionContribution(spaceId, {
@@ -91,6 +94,24 @@ export function UpgradeSubscriptionModal({
         <Typography variant='h6'>
           Switch to <strong>{capitalize(newTier)}</strong>
         </Typography>
+        <Divider />
+        <Box>
+          <Typography variant='body2' color='text.secondary' gutterBottom>
+            Connected wallet: {shortenHex(address, 4)}
+          </Typography>
+          <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
+            <Stack flexDirection='row' alignItems='center' gap={0.5}>
+              <Typography variant='body2'>
+                Balance: <b>{formattedBalance}</b>
+              </Typography>
+              <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+            </Stack>
+            <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
+              Buy DEV on Uniswap
+              <LaunchIcon fontSize='inherit' />
+            </Typography>
+          </Stack>
+        </Box>
         <Divider />
         <Stack gap={1}>
           <Typography variant='subtitle2'>Select a period</Typography>
@@ -181,7 +202,7 @@ export function UpgradeSubscriptionModal({
           </Stack>
         </Card>
         <Stack direction='row' spacing={2} justifyContent='flex-end'>
-          <Button variant='outlined' onClick={onClose} color='error' disabled={isLoading}>
+          <Button variant='outlined' onClick={onClose} color='secondary' disabled={isLoading}>
             Cancel
           </Button>
           <Tooltip title={!paymentPeriod ? 'Select a period' : ''}>

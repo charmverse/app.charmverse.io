@@ -1,9 +1,7 @@
 import { getPublicClient } from '@packages/lib/blockchain/publicClient';
+import { charmVerseBankAddress, devTokenAddress } from '@packages/subscriptions/constants';
 import { verifyMessage } from 'viem';
 import { base } from 'viem/chains';
-
-const recipientAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
-const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 
 export async function verifyDevTokenTransfer(payload: {
   hash: string;
@@ -63,7 +61,7 @@ export async function verifyDevTokenTransfer(payload: {
     (log) =>
       log.args.to &&
       log.args.from &&
-      log.args.to.toLowerCase() === recipientAddress.toLowerCase() &&
+      log.args.to.toLowerCase() === charmVerseBankAddress.toLowerCase() &&
       log.args.from.toLowerCase() === walletAddress.toLowerCase()
   );
 

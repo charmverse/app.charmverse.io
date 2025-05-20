@@ -1,3 +1,4 @@
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { EditOff as EditOffIcon } from '@mui/icons-material';
 import { Alert, Stack, Typography } from '@mui/material';
 import { subscriptionTierOrder, tierConfig } from '@packages/subscriptions/constants';
@@ -36,34 +37,35 @@ function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: b
 }
 export function SubscriptionHeader({
   spaceTokenBalance,
-  subscriptionEvents,
+  pendingTier,
   onClickSendDev
 }: {
-  spaceTokenBalance: number;
-  subscriptionEvents?: SubscriptionTierChangeEvent[];
+  spaceTokenBalance?: number;
+  pendingTier?: SpaceSubscriptionTier;
   onClickSendDev: VoidFunction;
 }) {
   const { space, isLoading } = useCurrentSpace();
   const { address } = useAccount();
-  const latestSubscriptionEvent = subscriptionEvents?.[0];
 
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
 
   const isCancelled = space?.subscriptionCancelledAt !== null;
   const currentTierIndex = space?.subscriptionTier ? subscriptionTierOrder.indexOf(space?.subscriptionTier) : 0;
-  const latestSubscriptionEventTierIndex = latestSubscriptionEvent?.tier
-    ? subscriptionTierOrder.indexOf(latestSubscriptionEvent?.tier)
-    : 0;
-  const isDowngraded = !isLoading && subscriptionEvents && latestSubscriptionEventTierIndex < currentTierIndex;
+  const latestSubscriptionEventTierIndex = pendingTier ? subscriptionTierOrder.indexOf(pendingTier) : 0;
+  const isDowngraded = !isLoading && pendingTier && latestSubscriptionEventTierIndex < currentTierIndex;
 
   // Calculate how many months the current tier will last
   let expiresAt = '';
   const currentTier = space?.subscriptionTier;
-  const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.tier;
+  const tierAfterDowngrade = isDowngraded && pendingTier;
   const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
-  if (tierPrice > 0 && spaceTokenBalance > 0) {
+  if (tierPrice > 0 && spaceTokenBalance && spaceTokenBalance > 0) {
     const monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
-    expiresAt = DateTime.utc().endOf('month').plus({ months: monthsLeft }).endOf('month').toLocaleString();
+    expiresAt = DateTime.utc()
+      .endOf('month')
+      .plus({ months: monthsLeft })
+      .endOf('month')
+      .toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' });
   }
   const currentTierName = space?.subscriptionTier ? tierConfig[space.subscriptionTier]?.name : '';
   const isReadOnly = currentTier === 'readonly';
@@ -71,7 +73,7 @@ export function SubscriptionHeader({
   return (
     <>
       <Alert
-        sx={{ display: 'flex', alignItems: 'center', '.MuiAlert-action': { pt: 0, pr: 1 } }}
+        sx={{ display: 'flex', alignItems: 'flex-start', '.MuiAlert-action': { pt: 1, pr: 1 } }}
         icon={
           isReadOnly ? (
             <EditOffIcon sx={{ fontSize: 28 }} />
@@ -112,10 +114,6 @@ export function SubscriptionHeader({
         )}
         {isReadOnly && <Typography>Select a tier below to unlock editing</Typography>}
       </Alert>
-      {/* <Stack flexDirection='row' alignItems='center' gap={0.5}>
-        <Typography>DEV balance: {spaceTokenBalance} </Typography>
-        <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
-      </Stack> */}
       {isCancelled ? (
         <Alert severity='error' variant='standard'>
           Your subscription has been cancelled and will last until the space balance is depleted. You will not be able
