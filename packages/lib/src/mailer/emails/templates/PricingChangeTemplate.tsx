@@ -25,7 +25,7 @@ export function PricingChangeTemplate({ adminName, emailBranding }: PricingChang
         <Text>Hi {adminName},</Text>
         <Text>We're officially turning on payments for CharmVerse Spaces and you're among the first to take part.</Text>
         <Text>
-          To keep your Space active and unlock premium features, you'll now need to select a plan and contribute in $DEV
+          To keep your Space active and unlock premium features, you'll now need to select a plan and contribute in DEV
           tokens. This is a big step toward sustainable, community-owned infrastructure and we're excited to build it
           with you.
         </Text>
@@ -33,15 +33,15 @@ export function PricingChangeTemplate({ adminName, emailBranding }: PricingChang
         <Text style={{ marginTop: 24 }}>🌐 How the New Pricing Works</Text>
 
         <Text bold>Community-Based Payments</Text>
-        <Text>Each Space now pays monthly in $DEV tokens to stay on a paid tier.</Text>
+        <Text>Each Space now pays monthly in DEV tokens to stay on a paid tier.</Text>
 
         <Text bold>Anyone Can Contribute</Text>
         <Text>
-          Community members can buy and pledge $DEV to support your Space. It's shared like a Discord server boost.
+          Community members can buy and pledge DEV to support your Space. It's shared like a Discord server boost.
         </Text>
 
         <Text bold>The More You Contribute, The More You Unlock</Text>
-        <Text>Additional $DEV pledges unlock more advanced features.</Text>
+        <Text>Additional DEV pledges unlock more advanced features.</Text>
 
         <Text style={{ marginTop: 24 }}>💡 CharmVerse Pricing Tiers</Text>
         <Text>
@@ -72,7 +72,7 @@ export function PricingChangeTemplate({ adminName, emailBranding }: PricingChang
           ✅ What To Do Next
         </Text>
         <Text>• Go to your Space settings to review your tier.</Text>
-        <Text>• Invite your community to pledge $DEV.</Text>
+        <Text>• Invite your community to pledge DEV.</Text>
         <Text>• Reach out if you need help with anything.</Text>
 
         <Text style={{ marginTop: 24 }}>
