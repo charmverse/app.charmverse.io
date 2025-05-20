@@ -121,7 +121,6 @@ export async function createWorkspace({
         create: {
           decentPayload: {},
           devTokenAmount: parseUnits(priceForMonths.toString(), 18).toString(),
-          userId,
           chainId: base.id
         }
       },
@@ -131,6 +130,13 @@ export async function createWorkspace({
           subscriptionPeriodStart: new Date(),
           subscriptionPrice: parseUnits(tierConfig.gold.tokenPrice.toString(), 18).toString(),
           subscriptionTier: 'gold'
+        }
+      },
+      subscriptionTierChangeEvents: {
+        create: {
+          newTier: 'gold',
+          previousTier: 'readonly',
+          userId
         }
       }
     },
