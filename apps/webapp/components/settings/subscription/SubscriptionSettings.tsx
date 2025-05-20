@@ -8,9 +8,9 @@ import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetSubscriptionStatus, useSwitchToFreeTier } from 'charmClient/hooks/subscriptions';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import MultiTabs from 'components/common/MultiTabs';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import Legend from '../components/Legend';
 
@@ -28,16 +28,10 @@ import { useSpaceSubscription } from './hooks/useSpaceSubscription';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-export function SubscriptionSettings({ space }: { space: Space }) {
-  const { refreshCurrentSpace } = useCurrentSpace();
-  const { data: { formatted: spaceTokenBalance } = { formatted: 0 }, mutate: refreshSpaceTokenBalance } = useSWR(
-    space ? `space-token-balance/${space.id}` : null,
-    () => (space ? charmClient.spaces.getSpaceTokenBalance(space.id) : { value: '0', formatted: 0 })
-  );
-
+export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { space: Space }) {
   const { data: subscriptionReceipts = [], mutate: refreshSubscriptionReceipts } = useSWR(
-    space ? `space-receipts/${space.id}` : null,
-    () => (space ? charmClient.subscription.getSubscriptionReceipts(space.id) : [])
+    spaceId ? `space-receipts/${spaceId}` : null,
+    () => (spaceId ? charmClient.subscription.getSubscriptionReceipts(spaceId) : [])
   );
   const [isSendDevModalOpen, setIsSendDevModalOpen] = useState(false);
   const [tierToUpgrade, setTierToUpgrade] = useState<UpgradableTier | null>(null);
@@ -45,27 +39,27 @@ export function SubscriptionSettings({ space }: { space: Space }) {
   const [isReactivateSubscriptionModalOpen, setIsReactivateSubscriptionModalOpen] = useState(false);
   const [tierToDowngrade, setTierToDowngrade] = useState<DowngradeableTier | null>(null);
 
-  const { data: subscriptionEvents, mutate: refreshSubscriptionEvents } = useSWR(
-    space ? `space-subscription-events/${space.id}` : null,
-    () => (space ? charmClient.subscription.getSubscriptionEvents(space.id) : [])
-  );
-
   const {
     isOpen: isFreeTierConfirmationOpen,
     close: closeConfirmFreeTierDialog,
     open: openConfirmFreeTierDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
-  const { switchToFreeTier, isSwitchingToFreeTier } = useSpaceSubscription();
+  const { data: subscriptionStatus, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
+  const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSwitchToFreeTier(spaceId, {
+    onSuccess: () => {
+      refreshSubscriptionStatus();
+      refreshSubscriptionReceipts();
+    }
+  });
 
   useTrackPageView({ type: 'billing/settings' });
 
   function handleShowCheckoutForm(tier: UpgradableTier | 'free') {
     if (tier === 'free') {
       openConfirmFreeTierDialog();
-    } else {
-      const latestTier =
-        subscriptionEvents && subscriptionEvents.length > 0 ? subscriptionEvents[0].newTier : space.subscriptionTier;
+    } else if (subscriptionStatus) {
+      const latestTier = subscriptionStatus.pendingTier || subscriptionStatus.tier;
       const currentTierIndex = downgradeableTiers.indexOf(latestTier as DowngradeableTier);
       const newTierIndex = downgradeableTiers.indexOf(tier);
       if (currentTierIndex > newTierIndex) {
@@ -76,7 +70,11 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     }
   }
 
-  if (space.paidTier === 'enterprise' || space.subscriptionTier === 'grant') {
+  if (!subscriptionStatus) {
+    return null;
+  }
+
+  if (paidTier === 'enterprise' || subscriptionStatus.tier === 'grant') {
     return <EnterpriseBillingScreen />;
   }
 
@@ -85,8 +83,8 @@ export function SubscriptionSettings({ space }: { space: Space }) {
       <Legend>Billing</Legend>
       <Stack gap={1}>
         <SubscriptionHeader
-          spaceTokenBalance={spaceTokenBalance}
-          subscriptionEvents={subscriptionEvents}
+          spaceTokenBalance={subscriptionStatus?.tokenBalance.formatted}
+          pendingTier={subscriptionStatus?.pendingTier}
           onClickSendDev={() => setIsSendDevModalOpen(true)}
         />
 
@@ -100,7 +98,7 @@ export function SubscriptionSettings({ space }: { space: Space }) {
               <SubscriptionTiers
                 key='subscription'
                 onClickShowCheckoutForm={handleShowCheckoutForm}
-                subscriptionTier={space.subscriptionTier}
+                subscriptionTier={subscriptionStatus.tier}
               />,
               { sx: { px: 0, pb: 1 } }
             ],
@@ -130,44 +128,45 @@ export function SubscriptionSettings({ space }: { space: Space }) {
         onClose={() => setIsSendDevModalOpen(false)}
         onSuccess={() => {
           refreshSubscriptionReceipts();
-          refreshSpaceTokenBalance();
+          refreshSubscriptionStatus();
         }}
       />
       <UpgradeSubscriptionModal
-        spaceId={space.id}
-        currentTier={space.subscriptionTier}
+        spaceId={spaceId}
+        currentTier={subscriptionStatus.tier}
         isOpen={!!tierToUpgrade}
         onClose={() => setTierToUpgrade(null)}
         newTier={tierToUpgrade || 'bronze'}
         onSuccess={() => {
           refreshSubscriptionReceipts();
-          refreshSpaceTokenBalance();
-          refreshCurrentSpace();
+          refreshSubscriptionStatus();
         }}
       />
       <CancelSubscriptionModal
         isOpen={isCancelSubscriptionModalOpen}
         onClose={() => setIsCancelSubscriptionModalOpen(false)}
         onSuccess={() => {
-          refreshCurrentSpace();
+          refreshSubscriptionReceipts();
+          refreshSubscriptionStatus();
         }}
       />
       <DowngradeSubscriptionModal
-        spaceId={space.id}
+        spaceId={spaceId}
         isOpen={!!tierToDowngrade}
         onClose={() => setTierToDowngrade(null)}
         newTier={tierToDowngrade || 'bronze'}
         onSuccess={() => {
-          refreshCurrentSpace();
-          refreshSubscriptionEvents();
+          refreshSubscriptionReceipts();
+          refreshSubscriptionStatus();
         }}
       />
       <ReactivateSubscriptionModal
-        spaceId={space.id}
+        spaceId={spaceId}
         isOpen={isReactivateSubscriptionModalOpen}
         onClose={() => setIsReactivateSubscriptionModalOpen(false)}
         onSuccess={() => {
-          refreshCurrentSpace();
+          refreshSubscriptionReceipts();
+          refreshSubscriptionStatus();
         }}
       />
       <ConfirmFreeTierModal

@@ -18,13 +18,6 @@ export function useSpaceSubscription() {
     () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
     { shouldRetryOnError: false }
   );
-  const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSWRMutation(
-    !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/switch-to-free-tier` : null,
-    () =>
-      charmClient.subscription.switchToFreeTier(currentSpace!.id).then((r) => {
-        refreshCurrentSpace();
-      })
-  );
 
   const isSpaceReadonly = currentSpace?.subscriptionTier === 'readonly';
 
@@ -37,8 +30,6 @@ export function useSpaceSubscription() {
     spaceBlockQuota,
     spaceBlockCount: count,
     paidTier: currentSpace?.paidTier,
-    switchToFreeTier,
-    isSwitchingToFreeTier,
     subscriptionTier: currentSpace?.subscriptionTier
   };
 }

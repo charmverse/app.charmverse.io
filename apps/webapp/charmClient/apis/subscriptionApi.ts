@@ -25,10 +25,6 @@ export class SubscriptionApi {
     return http.GET<SpaceSubscriptionWithStripeData | null>(`/api/spaces/${spaceId}/subscription`);
   }
 
-  switchToFreeTier(spaceId: string) {
-    return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-free-tier`);
-  }
-
   switchToCommunityTier(spaceId: string) {
     return http.POST<Space>(`/api/spaces/${spaceId}/switch-to-community-tier`);
   }

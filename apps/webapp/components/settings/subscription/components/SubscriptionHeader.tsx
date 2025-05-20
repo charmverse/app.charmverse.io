@@ -1,4 +1,4 @@
-import type { Space, SpaceSubscriptionTierChangeEvent } from '@charmverse/core/prisma-client';
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { EditOff as EditOffIcon } from '@mui/icons-material';
 import { Alert, Stack, Typography } from '@mui/material';
 import { tierConfig, subscriptionTierOrder } from '@packages/subscriptions/constants';
@@ -36,32 +36,29 @@ function ConnectWalletButton({ onClose, open }: { onClose: VoidFunction; open: b
 }
 export function SubscriptionHeader({
   spaceTokenBalance,
-  subscriptionEvents,
+  pendingTier,
   onClickSendDev
 }: {
-  spaceTokenBalance: number;
-  subscriptionEvents?: SpaceSubscriptionTierChangeEvent[];
+  spaceTokenBalance?: number;
+  pendingTier?: SpaceSubscriptionTier;
   onClickSendDev: VoidFunction;
 }) {
   const { space, isLoading } = useCurrentSpace();
   const { address } = useAccount();
-  const latestSubscriptionEvent = subscriptionEvents?.[0];
 
   const [isConnectWalletModalOpen, setIsConnectWalletModalOpen] = useState(false);
 
   const isCancelled = space?.subscriptionCancelledAt !== null;
   const currentTierIndex = space?.subscriptionTier ? subscriptionTierOrder.indexOf(space?.subscriptionTier) : 0;
-  const latestSubscriptionEventTierIndex = latestSubscriptionEvent?.newTier
-    ? subscriptionTierOrder.indexOf(latestSubscriptionEvent?.newTier)
-    : 0;
-  const isDowngraded = !isLoading && subscriptionEvents && latestSubscriptionEventTierIndex < currentTierIndex;
+  const latestSubscriptionEventTierIndex = pendingTier ? subscriptionTierOrder.indexOf(pendingTier) : 0;
+  const isDowngraded = !isLoading && pendingTier && latestSubscriptionEventTierIndex < currentTierIndex;
 
   // Calculate how many months the current tier will last
   let expiresAt = '';
   const currentTier = space?.subscriptionTier;
-  const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.newTier;
+  const tierAfterDowngrade = isDowngraded && pendingTier;
   const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
-  if (tierPrice > 0 && spaceTokenBalance > 0) {
+  if (tierPrice > 0 && spaceTokenBalance && spaceTokenBalance > 0) {
     const monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
     expiresAt = DateTime.utc()
       .endOf('month')
