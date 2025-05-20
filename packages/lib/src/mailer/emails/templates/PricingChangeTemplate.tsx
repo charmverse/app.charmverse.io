@@ -49,17 +49,15 @@ export function PricingChangeTemplate({ adminName, emailBranding }: PricingChang
           details about the tiers.
         </Text>
 
-        <Text style={{ marginTop: 24 }}>⏳ Grace Period for Existing Spaces</Text>
+        <Text style={{ marginTop: 24 }}>What should I do?</Text>
         <Text>
-          If your Space was created before April 2025, you're eligible for a 1-month grace period. This gives you time
-          to:
+          New pricing plans begin June 1, 2025. You should:
         </Text>
         <Text>• Review your pricing tier.</Text>
         <Text>• Rally your community to contribute.</Text>
         <Text>• Explore what features each tier includes.</Text>
         <Text>
-          Need to move off CharmVerse? You'll be able to export and download your Space's content before billing begins
-          in June 2025.
+          Need to move off CharmVerse? You'll be able to export and download your Space's content before billing begins in June 2025.
         </Text>
 
         <Text bold style={{ marginTop: 24 }}>
