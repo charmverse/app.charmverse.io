@@ -55,19 +55,17 @@ export function SubscriptionHeader({
     : 0;
   const isDowngraded = !isLoading && subscriptionEvents && latestSubscriptionEventTierIndex < currentTierIndex;
 
-  // Calculate how many months the current or downgraded tier will last
+  // Calculate how many months the current tier will last
   let monthsLeft = 0;
-  let tierToCheck = space?.subscriptionTier;
-  if (isDowngraded && latestSubscriptionEvent?.newTier) {
-    tierToCheck = latestSubscriptionEvent.newTier;
-  }
-  const tierPrice = tierToCheck ? tierConfig[tierToCheck].tokenPrice : 0;
+  const currentTier = space?.subscriptionTier;
+  const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.newTier;
+  const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
   if (tierPrice > 0 && spaceTokenBalance > 0) {
     monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
   }
 
-  const isReadOnly = tierToCheck === 'readonly';
-  const tierName = tierToCheck ? tierConfig[tierToCheck]?.name : '';
+  const currentTierName = space?.subscriptionTier ? tierConfig[space.subscriptionTier]?.name : '';
+  const isReadOnly = currentTier === 'readonly';
 
   return (
     <>
@@ -77,13 +75,16 @@ export function SubscriptionHeader({
           isReadOnly ? (
             <EditOffIcon sx={{ fontSize: 28 }} />
           ) : (
-            <Image src={tierToCheck ? tierConfig[tierToCheck]?.iconPath : ''} alt='' width={48} height={48} />
+            <Image src={currentTier ? tierConfig[currentTier]?.iconPath : ''} alt='' width={48} height={48} />
           )
         }
         severity={isReadOnly ? 'error' : 'info'}
         action={
           address ? (
-            isReadOnly || tierToCheck === 'free' ? null : (
+            currentTier === 'readonly' ||
+            currentTier === 'free' ||
+            tierAfterDowngrade === 'readonly' ||
+            tierAfterDowngrade === 'free' ? null : (
               <Button
                 startIcon={<Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />}
                 variant='outlined'
@@ -97,11 +98,11 @@ export function SubscriptionHeader({
           )
         }
       >
-        <Typography variant='h6'>Current Plan: {tierName}</Typography>
-        {tierToCheck && tierPrice > 0 && monthsLeft > 0 && (
+        <Typography variant='h6'>Current Plan: {currentTierName}</Typography>
+        {currentTierName && tierPrice > 0 && monthsLeft > 0 && (
           <Stack flexDirection='row' alignItems='center' gap={0.5}>
             <Typography>
-              {tierName} will last for{' '}
+              {currentTierName} will last for{' '}
               <b>
                 {monthsLeft} month{monthsLeft > 1 ? 's' : ''}
               </b>{' '}
@@ -121,10 +122,10 @@ export function SubscriptionHeader({
           to send DEV tokens or upgrade your subscription.
         </Alert>
       ) : null}
-      {isDowngraded ? (
+      {tierAfterDowngrade ? (
         <Alert severity='warning' variant='standard'>
-          Your subscription is scheduled to be downgraded to {latestSubscriptionEvent?.newTier} at the beginning of next
-          month.
+          Your subscription is scheduled to be downgraded to {tierConfig[tierAfterDowngrade]?.name} at the beginning of
+          next month.
         </Alert>
       ) : null}
     </>
