@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { chargeSpaceSubscription } from '@packages/lib/subscription/chargeSpaceSubscription';
+import { chargeSpaceSubscription } from '@packages/subscriptions/chargeSpaceSubscription';
 import { DateTime } from 'luxon';
 
 export async function task() {
@@ -11,6 +11,14 @@ export async function task() {
   try {
     const spaces = await prisma.space.findMany({
       where: {
+        AND: [
+          {
+            subscriptionTier: {
+              not: null
+            }
+          },
+          { subscriptionTier: { not: 'grant' } }
+        ],
         // Only charge spaces that don't have a subscription payment in the current month
         subscriptionPayments: {
           none: {

@@ -33,12 +33,11 @@ export function UpgradeSubscriptionModal({
   const { showMessage } = useSnackbar();
   const [isUpgrading, setIsUpgrading] = useState(false);
 
-  const { newTierPrice, amountToProrate, immediatePayment, priceForMonths, devTokensToSend } =
-    calculateSubscriptionCost({
-      currentTier,
-      newTier,
-      paymentMonths
-    });
+  const { newTierPrice, amountToProrate, priceForMonths, devTokensToSend } = calculateSubscriptionCost({
+    currentTier,
+    newTier,
+    paymentMonths
+  });
 
   function onClose() {
     _onClose();

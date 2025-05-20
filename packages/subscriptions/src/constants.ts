@@ -17,7 +17,7 @@ export type DowngradeableTier = (typeof downgradeableTiers)[number];
 
 export const tierConfig: Record<SpaceSubscriptionTier, { name: string; iconPath: string; tokenPrice: number }> = {
   readonly: {
-    name: 'Locked',
+    name: 'Expired',
     tokenPrice: 0,
     iconPath: '/images/logos/dev-token-logo.png'
   },

@@ -3,6 +3,7 @@ import { EditOff as EditOffIcon } from '@mui/icons-material';
 import { Alert, Stack, Typography } from '@mui/material';
 import { tierConfig, subscriptionTierOrder } from '@packages/subscriptions/constants';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -56,12 +57,13 @@ export function SubscriptionHeader({
   const isDowngraded = !isLoading && subscriptionEvents && latestSubscriptionEventTierIndex < currentTierIndex;
 
   // Calculate how many months the current tier will last
-  let monthsLeft = 0;
+  let expiresAt = '';
   const currentTier = space?.subscriptionTier;
   const tierAfterDowngrade = isDowngraded && latestSubscriptionEvent?.newTier;
   const tierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
   if (tierPrice > 0 && spaceTokenBalance > 0) {
-    monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
+    const monthsLeft = Math.floor(spaceTokenBalance / tierPrice);
+    expiresAt = DateTime.utc().endOf('month').plus({ months: monthsLeft }).endOf('month').toLocaleString();
   }
   const currentTierName = space?.subscriptionTier ? tierConfig[space.subscriptionTier]?.name : '';
   const isReadOnly = currentTier === 'readonly';
@@ -74,7 +76,7 @@ export function SubscriptionHeader({
           isReadOnly ? (
             <EditOffIcon sx={{ fontSize: 28 }} />
           ) : (
-            <Image src={currentTier ? tierConfig[currentTier]?.iconPath : ''} alt='' width={48} height={48} />
+            <Image src={currentTier ? tierConfig[currentTier]?.iconPath : ''} alt='' width={60} height={60} />
           )
         }
         severity={isReadOnly ? 'error' : 'info'}
@@ -98,14 +100,13 @@ export function SubscriptionHeader({
         }
       >
         <Typography variant='h6'>Current Plan: {currentTierName}</Typography>
-        {currentTierName && tierPrice > 0 && monthsLeft > 0 && (
+        <Typography>
+          DEV Balance: <strong>{spaceTokenBalance}</strong>
+        </Typography>
+        {currentTierName && tierPrice > 0 && expiresAt && (
           <Stack flexDirection='row' alignItems='center' gap={0.5}>
             <Typography>
-              {currentTierName} will last for{' '}
-              <b>
-                {monthsLeft} month{monthsLeft > 1 ? 's' : ''}
-              </b>{' '}
-              with your current balance.
+              Your plan will end on <b>{expiresAt}</b>.
             </Typography>
           </Stack>
         )}

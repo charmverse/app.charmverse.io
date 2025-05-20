@@ -9,7 +9,7 @@ import Legend from '../../components/Legend';
 export function EnterpriseBillingScreen() {
   return (
     <Box>
-      <Legend whiteSpace='normal'>Plan & Billing</Legend>
+      <Legend>Billing</Legend>
       <Typography variant='h6' mb={2}>
         Enterprise Edition
       </Typography>
@@ -27,8 +27,8 @@ export function EnterpriseBillingScreen() {
               justifyContent: 'center'
             }}
           >
-            You are on our Enteprise plan. For any queries related to billing, please reach out to your billing contact
-            at CharmVerse
+            You are on our Grants plan. For any queries related to billing, please reach out to your billing contact at
+            CharmVerse
           </Typography>
         </Stack>
       </Stack>

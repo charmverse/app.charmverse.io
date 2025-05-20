@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Stack } from '@mui/material';
+import { Box, Divider, Link, Stack, Typography } from '@mui/material';
 import type { UpgradableTier, DowngradeableTier } from '@packages/subscriptions/constants';
 import { downgradeableTiers } from '@packages/subscriptions/constants';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
@@ -64,7 +64,9 @@ export function SubscriptionSettings({ space }: { space: Space }) {
     if (tier === 'free') {
       openConfirmFreeTierDialog();
     } else {
-      const currentTierIndex = downgradeableTiers.indexOf(space.subscriptionTier as DowngradeableTier);
+      const latestTier =
+        subscriptionEvents && subscriptionEvents.length > 0 ? subscriptionEvents[0].newTier : space.subscriptionTier;
+      const currentTierIndex = downgradeableTiers.indexOf(latestTier as DowngradeableTier);
       const newTierIndex = downgradeableTiers.indexOf(tier);
       if (currentTierIndex > newTierIndex) {
         setTierToDowngrade(tier);
@@ -109,6 +111,19 @@ export function SubscriptionSettings({ space }: { space: Space }) {
             ]
           ]}
         />
+        <Divider sx={{ py: 2 }} />
+        <Box pb={4}>
+          <Typography>
+            Read more about our new pricing tiers{' '}
+            <Link href='https://charmverse.io/post/community-pricing' target='_blank'>
+              here
+            </Link>
+            . Have questions? Contact{' '}
+            <Link target='_blank' href='mailto:hello@charmverse.io'>
+              hello@charmverse.io
+            </Link>
+          </Typography>
+        </Box>
       </Stack>
       <SpaceContributionForm
         isOpen={isSendDevModalOpen}
