@@ -1,7 +1,10 @@
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { Launch as LaunchIcon } from '@mui/icons-material';
 import { Box, Stack, TextField, Typography, Link, Divider } from '@mui/material';
 import { uniswapSwapUrl } from '@packages/subscriptions/constants';
+import { getExpiresAt } from '@packages/subscriptions/getExpiresAt';
 import { shortenHex } from '@packages/utils/blockchain';
+import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -16,10 +19,14 @@ import { useDevTokenBalance } from '../hooks/useDevTokenBalance';
 import { useTransferDevToken } from '../hooks/useTransferDevToken';
 
 export function SendDevToSpaceForm({
+  spaceTokenBalance,
+  spaceTier,
   isOpen,
   onClose,
   onSuccess
 }: {
+  spaceTokenBalance: number;
+  spaceTier: SpaceSubscriptionTier | null;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
@@ -31,6 +38,9 @@ export function SendDevToSpaceForm({
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
   const { isTransferring, transferDevToken } = useTransferDevToken();
+
+  const expiresAt = getExpiresAt(spaceTier, spaceTokenBalance);
+  const newExpiresAt = getExpiresAt(spaceTier, spaceTokenBalance + amount);
 
   async function onDevTransfer() {
     const result = await transferDevToken(amount);
@@ -90,6 +100,14 @@ export function SendDevToSpaceForm({
             disabled={!address || isBalanceLoading}
             onChange={(e) => setAmount(Number(e.target.value))}
           />
+        </Stack>
+        <Stack gap={1}>
+          <Typography variant='body2'>
+            New expiration:{' '}
+            <strong>
+              {newExpiresAt ? newExpiresAt.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A'}
+            </strong>
+          </Typography>
         </Stack>
         <Stack flexDirection='row' justifyContent='flex-end'>
           <Button
