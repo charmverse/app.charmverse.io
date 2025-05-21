@@ -37,12 +37,13 @@ export function SendDevToSpaceForm({
   const { showMessage } = useSnackbar();
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
-  const { isTransferring, transferDevToken } = useTransferDevToken();
+  const { transferDevToken } = useTransferDevToken();
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const expiresAt = getExpiresAt(spaceTier, spaceTokenBalance);
   const newExpiresAt = getExpiresAt(spaceTier, spaceTokenBalance + amount);
 
   async function onDevTransfer() {
+    setIsProcessing(true);
     const result = await transferDevToken(amount);
     if (result && space) {
       await charmClient.subscription
@@ -62,6 +63,7 @@ export function SendDevToSpaceForm({
           onClose();
         });
     }
+    setIsProcessing(false);
   }
 
   return (
@@ -111,11 +113,11 @@ export function SendDevToSpaceForm({
         </Stack>
         <Stack flexDirection='row' justifyContent='flex-end'>
           <Button
-            loading={isTransferring || isBalanceLoading}
+            loading={isProcessing}
             variant='contained'
             onClick={onDevTransfer}
             sx={{ width: 'fit-content' }}
-            disabled={amount === 0 || balance < amount}
+            disabled={amount === 0 || balance < amount || isBalanceLoading}
           >
             Send
           </Button>
