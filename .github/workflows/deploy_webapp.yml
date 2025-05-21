@@ -281,9 +281,13 @@ jobs:
         with:
           app_name: webapp
 
+      # unbuffer insures that we print to the log in realtime
+      - name: Install unbuffer
+        run: sudo apt-get update && sudo apt-get install -y expect-dev
+
       - name: Start services
         run: |
-          npm run start:test:ci &> connect.log &
+          unbuffer npm run start:test:ci 2>&1 | tee server.log &
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -314,7 +318,7 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      ${{matrix.test_command}}
+                      ${{matrix.test_command}} || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
         # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
         # with:
         #   args: ${{matrix.test_command}}
