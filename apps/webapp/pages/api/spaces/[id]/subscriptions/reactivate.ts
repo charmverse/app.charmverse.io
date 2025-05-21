@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -18,6 +19,11 @@ async function reactivateSubscriptionController(req: NextApiRequest, res: NextAp
   await prisma.space.update({
     where: { id: spaceId },
     data: { subscriptionCancelledAt: null, subscriptionCancelledBy: null }
+  });
+
+  log.info(`[charmverse-payments] Recorded subscription reactivation`, {
+    userId,
+    spaceId
   });
 
   res.status(200).end();

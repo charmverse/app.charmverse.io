@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import {
@@ -27,6 +28,12 @@ async function recordSubscriptionContributionEndpoint(req: NextApiRequest, res: 
     ...payload,
     spaceId,
     userId
+  });
+
+  log.info(`[charmverse-payments] Recorded DEV token contribution`, {
+    amount: spaceContribution.devTokenAmount,
+    userId,
+    spaceId
   });
 
   res.status(200).json(spaceContribution.id);

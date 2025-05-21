@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { type UpgradeSubscriptionRequest, upgradeSubscription } from '@packages/subscriptions/upgradeSubscription';
@@ -19,6 +20,12 @@ async function upgradeSubscriptionController(req: NextApiRequest, res: NextApiRe
     ...(req.body as UpgradeSubscriptionRequest),
     spaceId,
     userId
+  });
+
+  log.info(`[charmverse-payments] Recorded subscription upgrade`, {
+    newTier: req.body.newTier,
+    userId,
+    spaceId
   });
 
   res.status(200).end();
