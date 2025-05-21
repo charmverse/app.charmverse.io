@@ -1,5 +1,7 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import type { Space } from '@charmverse/core/prisma';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
@@ -8,8 +10,6 @@ import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
