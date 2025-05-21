@@ -124,7 +124,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
       </Stack>
       <SendDevToSpaceForm
         spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
-        spaceTier={subscriptionStatus.tier}
+        spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
         isOpen={isSendDevModalOpen}
         onClose={() => setIsSendDevModalOpen(false)}
         onSuccess={() => {

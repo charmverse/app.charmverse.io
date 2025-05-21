@@ -8,13 +8,14 @@ import { getExpiresAt } from './getExpiresAt';
 export type SpaceSubscriptionStatus = {
   tier: SpaceSubscriptionTier;
   pendingTier?: SpaceSubscriptionTier; // if the user is upgrading or downgrading next month
+  pendingTierExpiresAt?: string;
   tokenBalance: { value: string; formatted: number };
   subscriptionCancelledAt?: string;
   expiresAt?: string;
   isReadonlyNextMonth: boolean;
 };
 
-export async function getSubscriptionStatus(spaceId: string) {
+export async function getSubscriptionStatus(spaceId: string): Promise<SpaceSubscriptionStatus> {
   const [space, tokenBalance, subscriptionEvents] = await Promise.all([
     prisma.space.findUniqueOrThrow({
       where: {
@@ -43,7 +44,7 @@ export async function getSubscriptionStatus(spaceId: string) {
   // determine if there is not enough balance to cover the next tier, the user will be downgraded to readonly
   const finalExpiresAt = getExpiresAt(nextTier, tokenBalance.formatted);
   const nextMonth = DateTime.utc().endOf('month').plus({ months: 1 }).startOf('month');
-  const isReadonlyNextMonth = !space.subscriptionCancelledAt && finalExpiresAt && finalExpiresAt < nextMonth;
+  const isReadonlyNextMonth = Boolean(!space.subscriptionCancelledAt && finalExpiresAt && finalExpiresAt < nextMonth);
 
   return {
     tokenBalance: {
@@ -52,8 +53,9 @@ export async function getSubscriptionStatus(spaceId: string) {
     },
     tier: currentTier,
     pendingTier: nextTier !== currentTier ? nextTier : undefined,
+    pendingTierExpiresAt: finalExpiresAt?.toJSDate().toISOString() || undefined,
     subscriptionCancelledAt: space.subscriptionCancelledAt?.toISOString() || undefined,
-    expiresAt,
+    expiresAt: expiresAt?.toJSDate().toISOString() || undefined,
     isReadonlyNextMonth
   };
 }

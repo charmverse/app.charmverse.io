@@ -23,6 +23,7 @@ export function SubscriptionHeader({
     subscriptionCancelledAt,
     tier: currentTier,
     pendingTier,
+    pendingTierExpiresAt,
     expiresAt,
     isReadonlyNextMonth
   } = subscriptionStatus;
@@ -90,10 +91,14 @@ export function SubscriptionHeader({
           to send DEV tokens or upgrade your subscription.
         </Alert>
       ) : null}
-      {!isReadonlyNextMonth && newTierAfterDowngrade ? (
+      {newTierAfterDowngrade ? (
         <Alert severity='warning' variant='standard'>
-          Your subscription is scheduled to be downgraded to {tierConfig[newTierAfterDowngrade]?.name} on{' '}
-          {firstOfNextMonth.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })}.
+          Your plan will be downgraded to <strong>{tierConfig[pendingTier]?.name}</strong> at the end of the month and
+          will expire on{' '}
+          <strong>
+            {DateTime.fromISO(pendingTierExpiresAt!).toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })}
+          </strong>
+          .
         </Alert>
       ) : null}
     </>
