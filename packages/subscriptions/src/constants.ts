@@ -38,7 +38,7 @@ export const tierConfig: Record<SpaceSubscriptionTier, { name: string; iconPath:
   },
   bronze: {
     name: 'Bronze',
-    tokenPrice: 2,
+    tokenPrice: 1_000,
     iconPath: '/images/subscriptions/bronze.svg'
   },
   silver: {
