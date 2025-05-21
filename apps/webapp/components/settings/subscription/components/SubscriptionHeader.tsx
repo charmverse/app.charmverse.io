@@ -69,13 +69,25 @@ export function SubscriptionHeader({
         <Typography>
           DEV Balance: <strong>{spaceTokenBalance.toLocaleString()}</strong>
         </Typography>
-        {expiresAt && (
-          <Stack flexDirection='row' alignItems='center' gap={0.5}>
-            <Typography>
-              Your plan will end on{' '}
-              <b>{DateTime.fromISO(expiresAt).toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })}</b>.
-            </Typography>
-          </Stack>
+        {expiresAt && !newTierAfterDowngrade && (
+          <Typography>
+            Your plan will end on{' '}
+            <b>{DateTime.fromISO(expiresAt).toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })}</b>.
+          </Typography>
+        )}
+        {newTierAfterDowngrade && (
+          <Typography>
+            Your plan will be downgraded to <strong>{tierConfig[pendingTier]?.name}</strong> at the end of the month and
+            will expire on{' '}
+            <strong>
+              {DateTime.fromISO(pendingTierExpiresAt!).toLocaleString({
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </strong>
+            .
+          </Typography>
         )}
         {!isReadonly && isReadonlyNextMonth ? (
           <Typography variant='body2' sx={{ mt: 1 }}>
@@ -89,16 +101,6 @@ export function SubscriptionHeader({
         <Alert severity='error' variant='standard'>
           Your subscription has been cancelled and will last until the space balance is depleted. You will not be able
           to send DEV tokens or upgrade your subscription.
-        </Alert>
-      ) : null}
-      {newTierAfterDowngrade ? (
-        <Alert severity='warning' variant='standard'>
-          Your plan will be downgraded to <strong>{tierConfig[pendingTier]?.name}</strong> at the end of the month and
-          will expire on{' '}
-          <strong>
-            {DateTime.fromISO(pendingTierExpiresAt!).toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })}
-          </strong>
-          .
         </Alert>
       ) : null}
     </>
