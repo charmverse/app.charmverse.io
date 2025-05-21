@@ -1,7 +1,10 @@
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { Launch as LaunchIcon } from '@mui/icons-material';
 import { Box, Stack, TextField, Typography, Link, Divider } from '@mui/material';
 import { uniswapSwapUrl } from '@packages/subscriptions/constants';
+import { getExpiresAt } from '@packages/subscriptions/getExpiresAt';
 import { shortenHex } from '@packages/utils/blockchain';
+import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -16,10 +19,14 @@ import { useDevTokenBalance } from '../hooks/useDevTokenBalance';
 import { useTransferDevToken } from '../hooks/useTransferDevToken';
 
 export function SendDevToSpaceForm({
+  spaceTokenBalance,
+  spaceTier,
   isOpen,
   onClose,
   onSuccess
 }: {
+  spaceTokenBalance: number;
+  spaceTier: SpaceSubscriptionTier | null;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
@@ -30,9 +37,13 @@ export function SendDevToSpaceForm({
   const { showMessage } = useSnackbar();
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
-  const { isTransferring, transferDevToken } = useTransferDevToken();
+  const { transferDevToken } = useTransferDevToken();
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const newExpiresAt = getExpiresAt(spaceTier, spaceTokenBalance + amount);
 
   async function onDevTransfer() {
+    setIsProcessing(true);
     const result = await transferDevToken(amount);
     if (result && space) {
       await charmClient.subscription
@@ -52,6 +63,7 @@ export function SendDevToSpaceForm({
           onClose();
         });
     }
+    setIsProcessing(false);
   }
 
   return (
@@ -67,7 +79,7 @@ export function SendDevToSpaceForm({
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
             <Stack flexDirection='row' alignItems='center' gap={0.5}>
               <Typography variant='body2'>
-                Balance: <b>{formattedBalance}</b>
+                Balance: <b>{formattedBalance.toLocaleString()}</b>
               </Typography>
               <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
             </Stack>
@@ -91,13 +103,21 @@ export function SendDevToSpaceForm({
             onChange={(e) => setAmount(Number(e.target.value))}
           />
         </Stack>
+        <Stack gap={1}>
+          <Typography variant='body2'>
+            New expiration:{' '}
+            <strong>
+              {newExpiresAt ? newExpiresAt.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A'}
+            </strong>
+          </Typography>
+        </Stack>
         <Stack flexDirection='row' justifyContent='flex-end'>
           <Button
-            loading={isTransferring || isBalanceLoading}
+            loading={isProcessing}
             variant='contained'
             onClick={onDevTransfer}
             sx={{ width: 'fit-content' }}
-            disabled={amount === 0 || balance < amount}
+            disabled={amount === 0 || balance < amount || isBalanceLoading}
           >
             Send
           </Button>

@@ -102,7 +102,7 @@ export function UpgradeSubscriptionModal({
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
             <Stack flexDirection='row' alignItems='center' gap={0.5}>
               <Typography variant='body2'>
-                Balance: <b>{formattedBalance}</b>
+                Balance: <b>{formattedBalance.toLocaleString()}</b>
               </Typography>
               <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
             </Stack>
@@ -201,6 +201,11 @@ export function UpgradeSubscriptionModal({
             </Stack>
           </Stack>
         </Card>
+        {formattedBalance < devTokensToSend && (
+          <Typography variant='body2' color='error'>
+            You do not have enough DEV tokens.
+          </Typography>
+        )}
         <Stack direction='row' spacing={2} justifyContent='flex-end'>
           <Button variant='outlined' onClick={onClose} color='secondary' disabled={isLoading}>
             Cancel
@@ -209,7 +214,7 @@ export function UpgradeSubscriptionModal({
             <span>
               <Button
                 variant='contained'
-                disabled={paymentMonths === 0 || !paymentPeriod}
+                disabled={paymentMonths === 0 || !paymentPeriod || formattedBalance < devTokensToSend}
                 loading={isLoading}
                 onClick={onUpgrade}
               >

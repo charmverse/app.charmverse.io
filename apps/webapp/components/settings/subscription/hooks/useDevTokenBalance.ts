@@ -8,11 +8,6 @@ import { readContract } from 'viem/actions';
 import { base } from 'viem/chains';
 import { usePublicClient } from 'wagmi';
 
-const ceilToPrecision = (value: number, precision: number) => {
-  const multiplier = 10 ** precision;
-  return Math.ceil(value * multiplier) / multiplier;
-};
-
 export function getCacheKey(address: Address, connectedChainId?: number) {
   return ['tokenBalance', address, connectedChainId];
 }
@@ -59,5 +54,5 @@ export function useDevTokenBalance({ address }: { address?: Address }) {
     }
   }
 
-  return { balance, formattedBalance: ceilToPrecision(balance, 3), refreshBalance, isLoading };
+  return { balance, formattedBalance: Math.floor(balance), refreshBalance, isLoading };
 }
