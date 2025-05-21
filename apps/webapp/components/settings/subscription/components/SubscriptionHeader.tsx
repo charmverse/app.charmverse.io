@@ -42,8 +42,7 @@ export function SubscriptionHeader({
   const currentTierName = currentTier ? tierConfig[currentTier]?.name : '';
   const isReadonly = currentTier === 'readonly';
   // hide the send dev button if the space is expired (requiring an upgrade), is free, or has chosen to downgrade to free
-  const hideSendDevButton =
-    currentTier === 'readonly' || currentTier === 'free' || pendingTier === 'free' || !spaceTokenBalance;
+  const hideSendDevButton = currentTier === 'readonly' || currentTier === 'free' || pendingTier === 'free';
 
   return (
     <>
