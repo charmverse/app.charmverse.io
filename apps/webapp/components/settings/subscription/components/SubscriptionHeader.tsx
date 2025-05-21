@@ -66,7 +66,7 @@ export function SubscriptionHeader({
       >
         <Typography variant='h6'>Current Plan: {currentTierName}</Typography>
         <Typography>
-          DEV Balance: <strong>{spaceTokenBalance}</strong>
+          DEV Balance: <strong>{spaceTokenBalance.toLocaleString()}</strong>
         </Typography>
         {expiresAt && (
           <Stack flexDirection='row' alignItems='center' gap={0.5}>
