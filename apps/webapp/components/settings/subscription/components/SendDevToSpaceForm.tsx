@@ -77,7 +77,7 @@ export function SendDevToSpaceForm({
           <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
             <Stack flexDirection='row' alignItems='center' gap={0.5}>
               <Typography variant='body2'>
-                Balance: <b>{formattedBalance}</b>
+                Balance: <b>{formattedBalance.toLocaleString()}</b>
               </Typography>
               <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
             </Stack>
