@@ -1,7 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
+import type { SpaceSubscriptionStatus } from '@packages/subscriptions/getSubscriptionStatus';
 import type { SWRMutationConfiguration } from 'swr/mutation';
-
-import type { SpaceSubscriptionStatus } from 'pages/api/spaces/[id]/subscriptions/status';
 
 import type { MaybeString } from './helpers';
 import { useGET, usePOST } from './helpers';

@@ -82,8 +82,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
       <Legend>Billing</Legend>
       <Stack gap={1}>
         <SubscriptionHeader
-          spaceTokenBalance={subscriptionStatus?.tokenBalance.formatted}
-          pendingTier={subscriptionStatus?.pendingTier}
+          subscriptionStatus={subscriptionStatus}
           onClickSendDev={() => setIsSendDevModalOpen(true)}
         />
 
@@ -97,7 +96,8 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
               <SubscriptionTiers
                 key='subscription'
                 onClickShowCheckoutForm={handleShowCheckoutForm}
-                subscriptionTier={subscriptionStatus.tier}
+                currentTier={subscriptionStatus.tier}
+                pendingTier={subscriptionStatus.pendingTier}
               />,
               { sx: { px: 0, pb: 1 } }
             ],
