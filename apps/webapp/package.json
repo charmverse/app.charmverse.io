@@ -3,7 +3,7 @@
   "version": "0..0",
   "private": true,
   "scripts": {
-    "start": "dotenv -e .env.local -- npx next dev",
+    "start": "npx dotenv -e .env.local -- npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint",
