@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
+import { getVideoSizeLimit } from '@packages/lib/mux/constants';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
@@ -15,6 +16,18 @@ type Props = {
   pageId: string | null;
 };
 
+function formatFileSize(bytes: number): string {
+  if (bytes === Infinity) return 'Unlimited';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  let size = bytes;
+  let unitIndex = 0;
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex += 1;
+  }
+  return `${Math.round(size)} ${units[unitIndex]}`;
+}
+
 export function VideoUploadForm(props: Props) {
   const [isUploading, setIsUploading] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
@@ -22,6 +35,7 @@ export function VideoUploadForm(props: Props) {
   const [progress, setProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const { space } = useCurrentSpace();
+  const sizeLimit = getVideoSizeLimit(space?.subscriptionTier);
 
   // poll endpoint until video is ready
   const { data: upload, error } = useSwr(
@@ -46,9 +60,9 @@ export function VideoUploadForm(props: Props) {
 
   if (error) return <Alert severity='error'>Error fetching api</Alert>;
 
-  async function createUpload() {
+  async function createUpload(fileSize: number) {
     try {
-      const result = await charmClient.mux.createUpload();
+      const result = await charmClient.mux.createUpload(fileSize, space!.id);
       setUploadId(result.id);
       return result.url;
     } catch (e) {
@@ -59,9 +73,14 @@ export function VideoUploadForm(props: Props) {
   }
 
   function startUpload(file: File) {
+    if (file.size > sizeLimit) {
+      setErrorMessage(`Video size exceeds the limit of ${formatFileSize(sizeLimit)} for your subscription tier`);
+      return;
+    }
+
     setIsUploading(true);
     const req = UpChunk.createUpload({
-      endpoint: createUpload,
+      endpoint: () => createUpload(file.size),
       file
     });
 
