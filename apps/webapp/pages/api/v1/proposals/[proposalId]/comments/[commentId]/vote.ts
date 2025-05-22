@@ -1,12 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { requireKeys } from '@packages/lib/middleware';
-import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
-import { superApiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { MixpanelEventName } from '@packages/metrics/mixpanel/interfaces';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
+import { superApiHandler } from 'lib/public-api/handler';
 
 import type { PublicApiProposalComment } from '../index';
 

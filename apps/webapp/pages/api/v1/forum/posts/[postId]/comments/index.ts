@@ -1,19 +1,19 @@
 import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { PostComment } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidStateError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { createPostComment } from '@packages/lib/forums/comments/createPostComment';
 import type { PostCommentVote } from '@packages/lib/forums/comments/interface';
 import { requireApiKey, requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = defaultHandler();
 

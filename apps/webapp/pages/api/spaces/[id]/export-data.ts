@@ -1,14 +1,13 @@
 import { log } from '@charmverse/core/log';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { ContentToCompress, MarkdownPageToCompress } from '@packages/lib/utils/file';
 import { zipContent } from '@packages/lib/utils/file';
 import { paginatedPrismaTask } from '@packages/lib/utils/paginatedPrismaTask';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

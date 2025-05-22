@@ -11,6 +11,11 @@ import type {
   VoteOptions
 } from '@charmverse/core/prisma';
 
+export type PageLink = {
+  title: string;
+  url: string;
+};
+
 export type RelatedPageData = {
   blocks: {
     board?: Omit<Block, 'schema'>;

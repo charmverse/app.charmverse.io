@@ -1,20 +1,20 @@
 import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidStateError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { createForumPost, trackCreateForumPostEvent } from '@packages/lib/forums/posts/createForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from '@packages/lib/forums/posts/getPostMeta';
 import { listForumPosts } from '@packages/lib/forums/posts/listForumPosts';
 import { requireKeys } from '@packages/lib/middleware';
 import { requireSuperApiKey } from '@packages/lib/middleware/requireSuperApiKey';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { apiHandler } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = apiHandler();
 

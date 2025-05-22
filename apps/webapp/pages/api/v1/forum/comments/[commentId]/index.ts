@@ -1,14 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { deletePostComment } from '@packages/lib/forums/comments/deletePostComment';
+import { requireKeys } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { deletePostComment } from '@packages/lib/forums/comments/deletePostComment';
-import { requireKeys } from '@packages/lib/middleware';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments';
 

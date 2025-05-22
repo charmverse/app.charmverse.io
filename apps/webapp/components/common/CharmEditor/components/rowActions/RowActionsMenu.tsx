@@ -9,6 +9,7 @@ import {
 import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
+import { nestedPageNodeName } from '@packages/bangleeditor/components/nestedPage/nestedPage.constants';
 import { getSortedBoards } from '@packages/databases/store/boards';
 import { useAppSelector } from '@packages/databases/store/hooks';
 import { isMac } from '@packages/lib/utils/browser';
@@ -27,7 +28,6 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import { getHeadingLink } from '../heading';
-import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
 import { deleteRowNode, getNodeForRowPosition, type PluginState } from './rowActions';
 

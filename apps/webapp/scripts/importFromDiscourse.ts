@@ -10,7 +10,7 @@ import {
 import { GET } from '@charmverse/core/http';
 import { htmlToText } from 'html-to-text';
 import { RateLimit } from 'async-sema';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import TurndownService from 'turndown';
 import emoji from 'emoji-js';
 import { PremiumPermissionsClient } from '@charmverse/core/permissions';

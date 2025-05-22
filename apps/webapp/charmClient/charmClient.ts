@@ -21,6 +21,7 @@ import type { InviteLinkWithRoles } from '@packages/lib/invites/getSpaceInviteLi
 import type { CreateEventPayload } from '@packages/lib/notifications/interfaces';
 import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from '@packages/lib/tokens/tokenData';
+import type { PageLink } from '@packages/pages/interfaces';
 import type { AggregatedProfileData } from '@packages/profile/getAggregatedData';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { encodeFilename } from '@packages/utils/encodeFilename';
@@ -28,7 +29,7 @@ import type { SocketAuthResponse } from '@packages/websockets/interfaces';
 
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import type { FailedImportsError } from 'lib/notion/interfaces';
-import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
+import type { TrashOrDeletePageResponse } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 
