@@ -1,14 +1,13 @@
 import type { TokenGateToRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
 import { requireSpaceMembership } from '@packages/lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { updateTokenGateRoles } from '@packages/lib/tokenGates/updateTokenGateRoles';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
