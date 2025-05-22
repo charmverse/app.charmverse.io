@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -18,6 +19,11 @@ async function cancelSubscriptionController(req: NextApiRequest, res: NextApiRes
   await prisma.space.update({
     where: { id: spaceId },
     data: { subscriptionCancelledAt: new Date(), subscriptionCancelledBy: userId }
+  });
+
+  log.info(`[charmverse-payments] Recorded subscription cancellation`, {
+    userId,
+    spaceId
   });
 
   res.status(200).end();

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { DowngradeSubscriptionRequest } from '@packages/subscriptions/downgradeSubscription';
@@ -20,6 +21,12 @@ async function downgradeSubscriptionController(req: NextApiRequest, res: NextApi
     ...(req.body as DowngradeSubscriptionRequest),
     spaceId,
     userId
+  });
+
+  log.info(`[charmverse-payments] Recorded subscription downgrade`, {
+    newTier: req.body.newTier,
+    userId,
+    spaceId
   });
 
   res.status(200).end();

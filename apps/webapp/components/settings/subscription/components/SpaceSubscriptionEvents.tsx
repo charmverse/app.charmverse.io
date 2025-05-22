@@ -63,7 +63,7 @@ function SubscriptionContributionEventRow({ event }: { event: SubscriptionContri
       </Box>
       <Stack flexDirection='row' alignItems='center' gap={1}>
         <Typography variant='body2' fontWeight={600} color='success.main'>
-          +{formatUnits(BigInt(event.paidTokenAmount), 18)}
+          +{Number(formatUnits(BigInt(event.paidTokenAmount), 18)).toLocaleString()}
         </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='' width={18} height={18} />
       </Stack>
@@ -88,7 +88,7 @@ function SubscriptionPaymentEventRow({ event }: { event: SubscriptionPaymentEven
       </Box>
       <Stack flexDirection='row' alignItems='center' gap={1}>
         <Typography variant='body2' fontWeight={600} color='error.main'>
-          -{formatUnits(BigInt(event.paidTokenAmount), 18)}
+          -{Number(formatUnits(BigInt(event.paidTokenAmount), 18)).toLocaleString()}
         </Typography>
         <Image src='/images/logos/dev-token-logo.png' alt='' width={18} height={18} />
       </Stack>

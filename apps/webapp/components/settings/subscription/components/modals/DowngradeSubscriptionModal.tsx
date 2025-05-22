@@ -31,16 +31,19 @@ export function DowngradeSubscriptionModal({
     <Modal open={isOpen} onClose={onClose}>
       <Box sx={{ mb: 2 }}>
         <Typography variant='h6' gutterBottom>
-          Confirm downgrade
+          Downgrade to {tierConfig[newTier].name}
         </Typography>
         <Typography>
           This action will downgrade your subscription to <strong>{tierConfig[newTier].name}</strong> at the beginning
           of next month.
         </Typography>
       </Box>
-      <Box display='flex' justifyContent='flex-end'>
-        <Button variant='contained' onClick={onConfirm} sx={{ width: 'fit-content' }}>
-          Confirm downgrade
+      <Box display='flex' justifyContent='flex-end' gap={2}>
+        <Button variant='outlined' color='secondary' onClick={onClose}>
+          Cancel
+        </Button>
+        <Button variant='contained' onClick={onConfirm}>
+          Confirm
         </Button>
       </Box>
     </Modal>

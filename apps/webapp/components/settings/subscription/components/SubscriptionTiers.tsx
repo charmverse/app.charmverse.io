@@ -28,10 +28,12 @@ function DesktopIconContainer({ children }: { children: ReactNode }) {
 
 export function SubscriptionTiers({
   onClickShowCheckoutForm,
-  subscriptionTier
+  currentTier,
+  pendingTier
 }: {
   onClickShowCheckoutForm: (tier: UpgradableTier | 'free') => void;
-  subscriptionTier: SpaceSubscriptionTier | null;
+  currentTier: SpaceSubscriptionTier | null;
+  pendingTier?: SpaceSubscriptionTier;
 }) {
   const isAdmin = useIsAdmin();
   return (
@@ -48,13 +50,14 @@ export function SubscriptionTiers({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               Free
             </Typography>
-            {subscriptionTier === 'free' ? <Chip size='small' label='Current Plan' /> : null}
+            <TierStatusChip currentTier={currentTier} pendingTier={pendingTier} tier='free' />
           </div>
           <MobileIconContainer>
             <Image width={140} height={140} src={tierConfig.free.iconPath} alt='Free' />
           </MobileIconContainer>
           <SelectTierButton
-            currentTier={subscriptionTier}
+            currentTier={currentTier}
+            pendingTier={pendingTier}
             tier='free'
             onClick={onClickShowCheckoutForm}
             isAdmin={isAdmin}
@@ -85,14 +88,14 @@ export function SubscriptionTiers({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               {tierConfig.bronze.tokenPrice.toLocaleString()} DEV / month
             </Typography>
-
-            {subscriptionTier === 'bronze' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            <TierStatusChip currentTier={currentTier} pendingTier={pendingTier} tier='bronze' />
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.bronze.iconPath} alt='Bronze' />
           </MobileIconContainer>
           <SelectTierButton
-            currentTier={subscriptionTier}
+            currentTier={currentTier}
+            pendingTier={pendingTier}
             tier='bronze'
             onClick={onClickShowCheckoutForm}
             isAdmin={isAdmin}
@@ -123,13 +126,14 @@ export function SubscriptionTiers({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               {tierConfig.silver.tokenPrice.toLocaleString()} DEV / month
             </Typography>
-            {subscriptionTier === 'silver' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            <TierStatusChip currentTier={currentTier} pendingTier={pendingTier} tier='silver' />
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.silver.iconPath} alt='Free' />
           </MobileIconContainer>
           <SelectTierButton
-            currentTier={subscriptionTier}
+            currentTier={currentTier}
+            pendingTier={pendingTier}
             tier='silver'
             onClick={onClickShowCheckoutForm}
             isAdmin={isAdmin}
@@ -161,13 +165,14 @@ export function SubscriptionTiers({
             <Typography variant='body2' sx={{ mb: 1, fontStyle: 'italic', fontWeight: 'bold' }}>
               {tierConfig.gold.tokenPrice.toLocaleString()} DEV / month
             </Typography>
-            {subscriptionTier === 'gold' && <Chip size='small' label='Current Plan' variant='outlined' />}
+            <TierStatusChip currentTier={currentTier} pendingTier={pendingTier} tier='gold' />
           </div>
           <MobileIconContainer>
             <Image width={150} height={150} src={tierConfig.gold.iconPath} alt='Gold' />
           </MobileIconContainer>
           <SelectTierButton
-            currentTier={subscriptionTier}
+            currentTier={currentTier}
+            pendingTier={pendingTier}
             tier='gold'
             onClick={onClickShowCheckoutForm}
             isAdmin={isAdmin}
@@ -233,21 +238,47 @@ export function SubscriptionTiers({
   );
 }
 
+function TierStatusChip({
+  currentTier,
+  pendingTier,
+  tier
+}: {
+  currentTier: SpaceSubscriptionTier | null;
+  pendingTier?: SpaceSubscriptionTier;
+  tier: UpgradableTier | 'free';
+}) {
+  if (currentTier === tier) {
+    return <Chip size='small' label='Current Plan' variant='outlined' />;
+  }
+  if (pendingTier === tier) {
+    return <Chip size='small' label='Pending' variant='outlined' />;
+  }
+  return null;
+}
+
 function SelectTierButton({
   isAdmin,
   currentTier,
+  pendingTier,
   tier,
   onClick
 }: {
   isAdmin: boolean;
   currentTier: SpaceSubscriptionTier | null;
+  pendingTier?: SpaceSubscriptionTier;
   tier: UpgradableTier | 'free';
   onClick: (tier: UpgradableTier | 'free') => void;
 }) {
+  // only admins can select a tier
   if (!isAdmin) {
     return null;
   }
-  if (currentTier === tier) {
+  // if the tier is pending, don't show the button
+  if (pendingTier === tier) {
+    return null;
+  }
+  // if the tier is the current tier, don't show the button unless a new tier is pending
+  if (currentTier === tier && !pendingTier) {
     return null;
   }
   return (
