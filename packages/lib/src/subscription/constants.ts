@@ -24,6 +24,8 @@ export const communityProduct = {
   }
 } as const;
 
+export type SubscriptionProductId = typeof communityProduct.id;
+
 // Loop constants
 
 export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';
@@ -79,3 +81,10 @@ export const SubscriptionStatus = {
 export type SubscriptionStatusType = keyof typeof SubscriptionStatus;
 
 export const DeprecatedFreeTrial = 'deprecated_free_trial';
+
+// Custom domain access tiers
+export const CUSTOM_DOMAIN_TIERS = ['silver', 'gold', 'grant'] as const;
+
+export function hasCustomDomainAccess(subscriptionTier: string | null | undefined): boolean {
+  return CUSTOM_DOMAIN_TIERS.includes(subscriptionTier as any);
+}

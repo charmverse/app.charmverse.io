@@ -8,6 +8,7 @@ import {
   AccordionSummary,
   Chip,
   InputAdornment,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -16,9 +17,9 @@ import {
   TableRow,
   TextField,
   Tooltip,
-  Typography,
-  Stack
+  Typography
 } from '@mui/material';
+import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
 import type { UseFormRegister } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
@@ -29,7 +30,6 @@ import { LabelWithCopy } from 'components/settings/space/components/LabelWithCop
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCustomDomainVerification } from 'hooks/useCustomDomainVerification';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 
 import type { FormValues } from '../SpaceSettings';
 
@@ -45,9 +45,8 @@ export function SetupCustomDomain({
   errorMessage?: string;
   register: UseFormRegister<FormValues>;
 }) {
-  const { isFreeSpace } = useIsFreeSpace();
-
   const isAdmin = useIsAdmin();
+  const hasAccess = hasCustomDomainAccess(space.subscriptionTier);
 
   const {
     isCustomDomainVerified,
@@ -78,16 +77,18 @@ export function SetupCustomDomain({
             InputProps={{
               startAdornment: <InputAdornment position='start'>https://</InputAdornment>
             }}
-            disabled={!isAdmin || isFreeSpace}
+            disabled={!isAdmin || !hasAccess}
             fullWidth
             error={!!errorMessage}
-            helperText={errorMessage}
+            helperText={
+              errorMessage || (!hasAccess ? 'Custom domains are only available for Silver tier and above' : '')
+            }
             data-test='space-custom-domain-input'
             placeholder='dao.example.com'
           />
         </Stack>
 
-        {!!space.customDomain && isAdmin && (
+        {!!space.customDomain && isAdmin && hasAccess && (
           <Accordion
             expanded={showCustomDomainVerification}
             onChange={() => {
