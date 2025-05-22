@@ -1,6 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
+import { scrollIntoView } from '@packages/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
@@ -12,8 +13,8 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
+import { useRoleAccess } from 'hooks/useRoleAccess';
 import { useRoles } from 'hooks/useRoles';
-import { scrollIntoView } from '@packages/lib/utils/browser';
 
 import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
 
@@ -37,6 +38,7 @@ export function RoleSettings({ space }: { space: Space }) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
   const { mutateMembers } = useMembers();
+  const { canCreateRole, hasReachedLimit, currentCount, maxCount } = useRoleAccess({ space });
 
   useTrackPageView({ type: 'settings/roles-and-permissions' });
 
@@ -69,6 +71,12 @@ export function RoleSettings({ space }: { space: Space }) {
     });
   }
 
+  const roleLimitTooltip = !isAdmin
+    ? 'Only space admins can create roles'
+    : !canCreateRole
+      ? `You have reached the maximum number of custom roles (${currentCount}/${maxCount}) for your subscription tier`
+      : '';
+
   return (
     <>
       <Legend sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -98,7 +106,11 @@ export function RoleSettings({ space }: { space: Space }) {
               </Button>
             </UpgradeWrapper>
             <UpgradeWrapper upgradeContext='custom_roles' onClick={rolesInfoPopup.open}>
-              <Button onClick={showCreateRoleForm} disabled={isValidating || isFreeSpace}>
+              <Button
+                onClick={showCreateRoleForm}
+                disabled={isValidating || isFreeSpace || !canCreateRole}
+                title={roleLimitTooltip}
+              >
                 Add a role
               </Button>
             </UpgradeWrapper>
@@ -119,6 +131,11 @@ export function RoleSettings({ space }: { space: Space }) {
 
           <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
             Custom roles
+            {hasReachedLimit && (
+              <Typography variant='caption' color='error'>
+                (Limit reached: {currentCount}/{maxCount})
+              </Typography>
+            )}
           </Typography>
 
           <Typography variant='caption'>Custom role permissions override Default.</Typography>
@@ -138,7 +155,13 @@ export function RoleSettings({ space }: { space: Space }) {
                 No roles have been created yet.
               </Typography>
               {isAdmin && (
-                <Button sx={{ mt: 2 }} onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
+                <Button
+                  sx={{ mt: 2 }}
+                  onClick={showCreateRoleForm}
+                  disabled={isValidating || !canCreateRole}
+                  title={roleLimitTooltip}
+                  variant='outlined'
+                >
                   Add a role
                 </Button>
               )}
