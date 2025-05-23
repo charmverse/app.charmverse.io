@@ -5,15 +5,7 @@ import { generateUserAndSpace } from '__e2e__/utils/mocks';
 import { login } from '__e2e__/utils/session';
 import { v4 as uuid } from 'uuid';
 
-type Fixtures = {
-  spaceSettings: SpaceProfileSettings;
-  accountTwoFactorAuth: AccountTwoFactorAuth;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceProfileSettings(page)),
-  accountTwoFactorAuth: ({ page }, use) => use(new AccountTwoFactorAuth(page))
-});
+import { test } from '../testWithFixtures';
 
 test('Account settings - Two Factor Authentication flow', async ({ page, spaceSettings, accountTwoFactorAuth }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({

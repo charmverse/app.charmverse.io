@@ -63,7 +63,7 @@ test.beforeAll(async () => {
 test.describe.serial('Structured proposal template', () => {
   test('Proposal reviewer creates a comment on a form field', async ({
     proposalPage,
-    proposalsListPage,
+    proposalListPage,
     proposalFormFieldPage,
     page
   }) => {
@@ -101,7 +101,7 @@ test.describe.serial('Structured proposal template', () => {
     });
 
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 

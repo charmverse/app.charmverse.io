@@ -1,24 +1,14 @@
 import { testUtilsUser } from '@charmverse/core/test';
+import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
 import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
-import { test as base, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { v4 } from 'uuid';
 
-import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
-
+import { test } from '../testWithFixtures';
 import { createUserAndSpace, generateSpaceRole, createUser } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumPostPage: ForumPostPage;
-  pageHeader: PageHeader;
-};
-
-const test = base.extend<Fixtures>({
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  pageHeader: ({ page }, use) => use(new PageHeader(page))
-});
 
 test.skip('convert post to proposal - create a post, convert that post to proposal and assert editor is readonly with proposal banner', async ({
   pageHeader,

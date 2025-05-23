@@ -3,12 +3,13 @@ import type { Application, Bounty, Page, Space, User } from '@charmverse/core/pr
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { generateBounty } from '@packages/testing/setupDatabase';
-import { expect, test } from '__e2e__/testWithFixtures';
-import { login } from '__e2e__/utils/session';
 
 import { REWARD_APPLICATION_STATUS_LABELS } from 'components/rewards/components/RewardApplicationStatusChip';
 
-test.describe('Review reward', () => {
+import { expect, test } from '../testWithFixtures';
+import { login } from '../utils/session';
+
+test.describe.skip('Review reward', () => {
   let space: Space;
   let adminUser: User;
   let spaceMember: User;

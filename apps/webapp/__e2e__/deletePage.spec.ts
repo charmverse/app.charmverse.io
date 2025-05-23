@@ -1,17 +1,14 @@
-import { expect, test as base } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
+import { expect } from '@playwright/test';
+import type { DocumentPage } from '__e2e__/po/document.po';
 
 import type { UserAndSpaceContext } from './utils/mocks';
 import { generateUserAndSpace } from './utils/mocks';
 import { login } from './utils/session';
+import { test } from './utils/test';
 
 type Fixtures = {
   documentPage: DocumentPage;
 };
-
-const test = base.extend<Fixtures>({
-  documentPage: ({ page }, use) => use(new DocumentPage(page))
-});
 
 let mocked: UserAndSpaceContext;
 

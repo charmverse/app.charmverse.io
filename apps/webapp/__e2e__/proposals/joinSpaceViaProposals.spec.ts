@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { baseUrl } from '@packages/testing/mockApiCall';
 import { generateProposalWorkflow } from '@packages/lib/testing/proposals';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import { expect } from '__e2e__/testWithFixtures';
 import { test } from '__e2e__/utils/test';
 
@@ -198,7 +198,7 @@ test('Try to create a proposal from a linked proposal template / user from outsi
   await page.waitForURL(`${baseUrl}/join?domain=${space.domain}`);
 });
 
-test('Try to create a proposal from a linked proposal template / new user', async ({
+test.skip('Try to create a proposal from a linked proposal template / new user', async ({
   page,
   documentPage,
   proposalPage

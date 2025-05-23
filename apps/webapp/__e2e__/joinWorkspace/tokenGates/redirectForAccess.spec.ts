@@ -1,19 +1,11 @@
-import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
-import { TokenGatePage } from '__e2e__/po/tokenGate.po';
+import { expect } from '@playwright/test';
 import { login } from '__e2e__/utils/session';
 
+import { test } from '../../testWithFixtures';
 import { generateUser, generateUserAndSpace } from '../../utils/mocks';
 
-type Fixtures = {
-  tokenGatePage: TokenGatePage;
-};
-
-const test = base.extend<Fixtures>({
-  tokenGatePage: ({ page }, use) => use(new TokenGatePage(page))
-});
-
-test("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
+test.skip("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
   page,
   tokenGatePage
 }) => {

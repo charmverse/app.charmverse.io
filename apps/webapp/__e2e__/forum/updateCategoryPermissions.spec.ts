@@ -1,19 +1,12 @@
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
-import { expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { ForumHomePage } from '../po/forumHome.po';
+import { test } from '../testWithFixtures';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumHomePage: ForumHomePage;
-};
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page))
-});
 
 let space: Space;
 let adminUser: User;

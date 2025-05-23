@@ -2,17 +2,9 @@ import { generateSpaceForUser } from '@packages/testing/utils/spaces';
 import { test as base } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
+import { test } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  spaceSettings: SpaceProfileSettings;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceProfileSettings(page))
-});
 
 test.describe('Space settings - delete space', () => {
   // test('When user has another space, redirect to next space', async ({ page, spaceSettings }) => {

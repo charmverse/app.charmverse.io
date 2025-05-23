@@ -81,16 +81,16 @@ test.describe('Duplicate a proposal template', async () => {
     });
   });
 
-  test('Copies data from the original template', async ({ proposalsListPage, proposalPage, page }) => {
+  test('Copies data from the original template', async ({ proposalListPage, proposalPage, page }) => {
     await loginBrowserUser({ browserPage: page, userId: admin.id });
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
     // open template menu
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.proposalTemplateSelect.click();
     // open context menu
-    await proposalsListPage.templateContextMenu.click();
+    await proposalListPage.templateContextMenu.click();
     // select Duplicate action
-    await proposalsListPage.duplicateTemplateButton.click();
+    await proposalListPage.duplicateTemplateButton.click();
     await proposalPage.waitForNewProposalPage();
 
     await expect(proposalPage.charmEditor).toHaveText('This is a template description');

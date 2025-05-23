@@ -6,6 +6,8 @@ import type {
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
+import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -18,8 +20,6 @@ import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole'
 import Loader from 'components/common/Loader';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
-import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 export const schema = yup.object({
