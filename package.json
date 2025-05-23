@@ -233,7 +233,7 @@
     "merkletreejs": "^0.4.0",
     "millify": "^4.0.0",
     "mixpanel": "^0.17.0",
-    "next": "^14.2.29",
+    "next": "^15.2.4",
     "next-bundle-analyzer": "^0.6.8",
     "next-connect": "^0.13.0",
     "next-swagger-doc": "^0.3.6",
