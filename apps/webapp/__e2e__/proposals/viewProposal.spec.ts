@@ -2,24 +2,13 @@ import type { Page, Proposal, Role, Space, User } from '@charmverse/core/prisma'
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { baseUrl } from '@packages/testing/mockApiCall';
-import { test as base, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
 import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
+import { test } from '../testWithFixtures';
 import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
-
-type Fixtures = {
-  proposalListPage: ProposalsListPage;
-  documentPage: DocumentPage;
-  pagePermissions: PagePermissionsDialog;
-};
-
-const test = base.extend<Fixtures>({
-  proposalListPage: ({ page }, use) => use(new ProposalsListPage(page)),
-  documentPage: ({ page }, use) => use(new DocumentPage(page)),
-  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page))
-});
 
 let space: Space;
 let spaceAdmin: User;

@@ -1,27 +1,16 @@
 import type { Space, User, Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { baseUrl } from '@packages/config/constants';
 import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { generateBoard } from '@packages/testing/setupDatabase';
-import { test as base, expect } from '@playwright/test';
-import { baseUrl } from '@packages/config/constants';
+import { expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
+import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
-
-type Fixtures = {
-  pagesSidebar: PagesSidebarPage;
-  document: DocumentPage;
-  databasePage: DatabasePage;
-};
-
-const test = base.extend<Fixtures>({
-  pagesSidebar: ({ page }, use) => use(new PagesSidebarPage(page)),
-  document: ({ page }, use) => use(new DocumentPage(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page))
-});
 
 // Will be set by the first test
 let spaceUser: User;

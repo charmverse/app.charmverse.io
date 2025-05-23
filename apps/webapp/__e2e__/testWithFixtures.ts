@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
+import type { IntegrationsSettings } from '__e2e__/po/settings/integrationsSettings.po';
 
 import { BountyBoardPage } from './po/bountyBoard.po';
 import { BountyPage } from './po/bountyPage.po';
@@ -18,6 +19,7 @@ import { PagesSidebarPage } from './po/pagesSidebar.po';
 import { ProposalPage } from './po/proposalPage.po';
 import { ProposalsListPage } from './po/proposalsList.po';
 import { RewardPage } from './po/rewardPage.po';
+import { AccountTwoFactorAuth } from './po/settings/accountTwoFactorAuth.po';
 import { ProjectSettings } from './po/settings/projectSettings.po';
 import { SettingsModal } from './po/settings/settings.po';
 import { ApiSettings } from './po/settings/spaceApiSettings.po';
@@ -46,16 +48,18 @@ export type E2EFixtures = {
   pagesSidebar: PagesSidebarPage;
   proposalPage: ProposalPage;
   proposalFormFieldPage: FormField;
-  proposalsListPage: ProposalsListPage;
+  proposalListPage: ProposalsListPage;
   settingsModal: SettingsModal;
   apiSettings: ApiSettings;
   permissionSettings: PermissionSettings;
-  spaceProfileSettings: SpaceProfileSettings;
+  spaceSettings: SpaceProfileSettings;
+  spaceIntegrationsSettings: IntegrationsSettings;
   signUpPage: SignUpPage;
   spacesDropdown: SpacesDropdown;
   tokenGatePage: TokenGatePage;
   projectSettings: ProjectSettings;
   page: Page;
+  accountTwoFactorAuth: AccountTwoFactorAuth;
 };
 
 // Used for reusing a Page Object Model, but scoped to a part of the screen
@@ -63,6 +67,27 @@ export type E2EFixtures = {
 const dialogSelector = `data-test=dialog`;
 
 export const test = base.extend<E2EFixtures>({
+  page: async ({ page }, use) => {
+    // Set up routing for all requests
+    await page.route('**/*', async (route) => {
+      const url = route.request().url();
+      if (url.startsWith('https://cdn.charmverse.io/')) {
+        const newUrl = url.replace('https://cdn.charmverse.io/', 'http://localhost:3335/');
+        // console.log(`Redirecting ${url} to ${newUrl}`);
+        await route.fulfill({
+          status: 301,
+          headers: {
+            Location: newUrl
+          }
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Use the page with the custom routing
+    await use(page);
+  },
   bountyBoardPage: async ({ page }, use) => use(new BountyBoardPage(page)),
   bountyPage: async ({ page }, use) => use(new BountyPage(page)),
   databasePage: async ({ page }, use) => use(new DatabasePage(page)),
@@ -81,14 +106,16 @@ export const test = base.extend<E2EFixtures>({
   pagesSidebar: async ({ page }, use) => use(new PagesSidebarPage(page)),
   proposalPage: async ({ page }, use) => use(new ProposalPage(page)),
   proposalFormFieldPage: async ({ page }, use) => use(new FormField(page)),
-  proposalsListPage: async ({ page }, use) => use(new ProposalsListPage(page)),
+  proposalListPage: async ({ page }, use) => use(new ProposalsListPage(page)),
   settingsModal: async ({ page }, use) => use(new SettingsModal(page)),
   apiSettings: async ({ page }, use) => use(new ApiSettings(page)),
   permissionSettings: async ({ page }, use) => use(new PermissionSettings(page)),
-  spaceProfileSettings: async ({ page }, use) => use(new SpaceProfileSettings(page)),
+  spaceSettings: async ({ page }, use) => use(new SpaceProfileSettings(page)),
+  spaceIntegrationsSettings: async ({ page }, use) => use(new IntegrationsSettings(page)),
   signUpPage: async ({ page }, use) => use(new SignUpPage(page)),
   spacesDropdown: async ({ page }, use) => use(new SpacesDropdown(page)),
   tokenGatePage: async ({ page }, use) => use(new TokenGatePage(page)),
-  projectSettings: async ({ page }, use) => use(new ProjectSettings(page))
+  projectSettings: async ({ page }, use) => use(new ProjectSettings(page)),
+  accountTwoFactorAuth: ({ page }, use) => use(new AccountTwoFactorAuth(page))
 });
 export { chromium, expect } from '@playwright/test';

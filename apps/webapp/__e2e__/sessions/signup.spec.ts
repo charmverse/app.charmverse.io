@@ -1,10 +1,10 @@
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
 import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
+import { test as base } from '../testWithFixtures';
 import { createUser } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 

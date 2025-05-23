@@ -1,16 +1,14 @@
-import { createPage } from '@packages/testing/setupDatabase';
-import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
-import { DocumentPage } from '__e2e__/po/document.po';
+import { createPage } from '@packages/testing/setupDatabase';
+import { expect } from '@playwright/test';
+import type { DocumentPage } from '__e2e__/po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
+
+import { test } from '../utils/test';
 
 type Fixtures = {
   documentPage: DocumentPage;
 };
-
-const test = base.extend<Fixtures>({
-  documentPage: async ({ page }, use) => use(new DocumentPage(page))
-});
 
 test('Create linkedPage using inline palette in the charmEditor', async ({ documentPage }) => {
   const { space, user, page: generatedPage } = await generateUserAndSpace({ isAdmin: true });

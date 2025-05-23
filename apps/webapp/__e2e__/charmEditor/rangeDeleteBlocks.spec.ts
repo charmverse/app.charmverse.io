@@ -1,17 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { _ } from '@packages/bangleeditor/builders';
 import type { Page } from '@playwright/test';
-import { test as base, expect } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
+import { expect } from '@playwright/test';
+import type { DocumentPage } from '__e2e__/po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
+
+import { test } from '../utils/test';
 
 type Fixtures = {
   documentPage: DocumentPage;
 };
-
-const test = base.extend<Fixtures>({
-  documentPage: async ({ page }, use) => use(new DocumentPage(page))
-});
 
 const confirmDiffFrameReceived = (page: Page) => {
   return new Promise<void>((resolve) => {

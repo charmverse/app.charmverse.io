@@ -1,21 +1,12 @@
-import { createPage } from '@packages/testing/setupDatabase';
 import { generateProposalWorkflowWithEvaluations } from '@packages/lib/testing/proposals';
+import { createPage } from '@packages/testing/setupDatabase';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { expect, test as base } from '__e2e__/utils/test';
 
 import { DocumentPage } from '../po/document.po';
+import { test } from '../testWithFixtures';
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  documentPage: DocumentPage;
-  pageHeader: PageHeader;
-};
-
-const test = base.extend<Fixtures>({
-  pageHeader: ({ page }, use) => use(new PageHeader(page)),
-  documentPage: ({ page }, use) => use(new DocumentPage(page))
-});
 
 test('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
   documentPage,

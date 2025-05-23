@@ -1,10 +1,10 @@
 import { createDiscordUser } from '@packages/testing/utils/discord';
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
 
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
+import { test as base } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 

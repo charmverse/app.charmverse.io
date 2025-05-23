@@ -17,6 +17,27 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+  page: async ({ page }, use) => {
+    // Set up routing for all requests
+    await page.route('**/*', async (route) => {
+      const url = route.request().url();
+      if (url.startsWith('https://cdn.charmverse.io/')) {
+        const newUrl = url.replace('https://cdn.charmverse.io/', 'http://localhost:3335/');
+        // console.log(`Redirecting ${url} to ${newUrl}`);
+        await route.fulfill({
+          status: 301,
+          headers: {
+            Location: newUrl
+          }
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    // Use the page with the custom routing
+    await use(page);
+  },
   globalPage: ({ page }, use) => use(new GlobalPage(page)),
   bountyBoardPage: ({ page }, use) => use(new BountyBoardPage(page)),
   documentPage: ({ page }, use) => use(new DocumentPage(page)),

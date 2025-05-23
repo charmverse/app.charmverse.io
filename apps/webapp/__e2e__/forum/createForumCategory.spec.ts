@@ -1,16 +1,9 @@
-import { test as base, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { ForumHomePage } from '../po/forumHome.po';
+import { test } from '../testWithFixtures';
 import { createUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumHomePage: ForumHomePage;
-};
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page))
-});
 
 test('add forum category - navigate to forum and add a forum category', async ({ page, forumHomePage }) => {
   const { space, user } = await createUserAndSpace({

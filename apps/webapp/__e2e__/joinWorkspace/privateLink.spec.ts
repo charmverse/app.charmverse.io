@@ -1,19 +1,11 @@
-import { test as base } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
+import { createInviteLink } from '@packages/lib/invites/createInviteLink';
+import { test as base } from '@playwright/test';
 import { AcceptInvitePage } from '__e2e__/po/inviteLink.po';
 import { login } from '__e2e__/utils/session';
 
-import { createInviteLink } from '@packages/lib/invites/createInviteLink';
-
+import { test } from '../testWithFixtures';
 import { generateUser, generateUserAndSpace } from '../utils/mocks';
-
-type Fixtures = {
-  acceptInvitePage: AcceptInvitePage;
-};
-
-const test = base.extend<Fixtures>({
-  acceptInvitePage: ({ page }, use) => use(new AcceptInvitePage(page))
-});
 
 test('private invite link - accepting invite sends user your space', async ({ page, acceptInvitePage }) => {
   const { space, user: spaceUser } = await generateUserAndSpace();

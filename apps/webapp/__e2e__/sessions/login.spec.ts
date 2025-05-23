@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
+import { test as base } from '../testWithFixtures';
 import { createUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 

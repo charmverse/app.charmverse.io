@@ -1,18 +1,16 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
-import { test as base, expect } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
+import { expect } from '@playwright/test';
+import type { DocumentPage } from '__e2e__/po/document.po';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { generatePage } from '__e2e__/utils/pages';
+
+import { test } from '../utils/test';
 
 type Fixtures = {
   documentPage: DocumentPage;
 };
-
-const test = base.extend<Fixtures>({
-  documentPage: async ({ page }, use) => use(new DocumentPage(page))
-});
 
 test('Drag and drop one paragraph over another in the CharmEditor', async ({ documentPage }) => {
   const { space, user } = await generateUserAndSpace({ isAdmin: true });

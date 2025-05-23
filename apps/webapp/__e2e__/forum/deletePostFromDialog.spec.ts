@@ -1,23 +1,15 @@
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
+import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
+import { addSpaceOperations } from '@packages/lib/permissions/spaces';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { generateRole } from '@packages/testing/setupDatabase';
 import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
-import { expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { createUser, createUserAndSpace, generateSpaceRole } from '__e2e__/utils/mocks';
 
-import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
-import { addSpaceOperations } from '@packages/lib/permissions/spaces';
-
+import { test } from '../testWithFixtures';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumHomePage: ForumHomePage;
-};
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page))
-});
 
 let space: Space;
 let authorUser: User;

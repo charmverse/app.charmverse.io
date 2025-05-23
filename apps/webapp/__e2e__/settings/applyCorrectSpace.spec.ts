@@ -1,19 +1,11 @@
-import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
+import { expect } from '@playwright/test';
 import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 import { v4 } from 'uuid';
 
+import { test } from '../testWithFixtures';
 import { generateSpaceRole, generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  spaceSettings: PermissionSettings;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new PermissionSettings(page))
-});
-
 // We have had a bug where the incorrect space was being used in the space settings page, which meant you'd always see the same members whatever the space
 test('User has correct access in the space settings', async ({ page, spaceSettings }) => {
   const { space: isMemberSpace, user: otherSpaceAdmin } = await generateUserAndSpace({

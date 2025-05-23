@@ -2,11 +2,12 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum } from '@charmverse/core/test';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
-import { expect, test as base } from '@playwright/test';
-import { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
+import { expect } from '@playwright/test';
+import type { PermissionSettings } from '__e2e__/po/settings/spacePermissionSettings.po';
 
-import { ForumHomePage } from '../po/forumHome.po';
-import { ForumPostPage } from '../po/forumPost.po';
+import type { ForumHomePage } from '../po/forumHome.po';
+import type { ForumPostPage } from '../po/forumPost.po';
+import { test } from '../testWithFixtures';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
 
@@ -15,13 +16,6 @@ type Fixtures = {
   forumPostPage: ForumPostPage;
   permissionSettings: PermissionSettings;
 };
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  permissionSettings: ({ page }, use) => use(new PermissionSettings(page))
-});
-
 let adminUser: User;
 let moderatorUser: User;
 let space: Space;
