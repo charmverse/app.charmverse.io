@@ -1,21 +1,14 @@
 import { prisma, type User } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/config/constants';
 import { generateSpaceUser } from '@packages/testing/setupDatabase';
 import { randomETHWallet } from '@packages/utils/blockchain';
-import { test as base, expect } from '@playwright/test';
-import { baseUrl } from '@packages/config/constants';
+import { expect } from '@playwright/test';
 import { ProjectSettings } from '__e2e__/po/settings/projectSettings.po';
 import { v4 } from 'uuid';
 
+import { test } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  projectSettings: ProjectSettings;
-};
-
-const test = base.extend<Fixtures>({
-  projectSettings: ({ page }, use) => use(new ProjectSettings(page))
-});
 
 test.describe.serial('Create and edit project from user settings', () => {
   let spaceUser: User;

@@ -1,28 +1,13 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { generateBoard } from '@packages/testing/setupDatabase';
-import { test as base, expect } from '@playwright/test';
-import { DatabasePage } from '__e2e__/po/databasePage.po';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
-
 import type { IPropertyTemplate } from '@packages/databases/board';
 import { Constants } from '@packages/databases/constants';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { expect } from '@playwright/test';
 
+import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
-
-type Fixtures = {
-  pagesSidebar: PagesSidebarPage;
-  document: DocumentPage;
-  databasePage: DatabasePage;
-};
-
-const test = base.extend<Fixtures>({
-  pagesSidebar: ({ page }, use) => use(new PagesSidebarPage(page)),
-  document: ({ page }, use) => use(new DocumentPage(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page))
-});
 
 // Will be set by the first test
 let spaceUser: User;
@@ -34,7 +19,7 @@ test.beforeAll(async () => {
   }));
 });
 
-test('create and edit relation property values', async ({ page, document, databasePage }) => {
+test('create and edit relation property values', async ({ page, documentPage, databasePage }) => {
   // Arrange ------------------
   const sourceBoardPage = await generateBoard({
     createdBy: spaceUser.id,
@@ -121,7 +106,7 @@ test('create and edit relation property values', async ({ page, document, databa
     userId: spaceUser.id
   });
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });
@@ -165,7 +150,7 @@ test('create and edit relation property values', async ({ page, document, databa
   await databasePage.waitForBlockRelationsUpdate();
 
   // This is a workaround for the fact that the relation property is not receiving socket events
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });
@@ -238,7 +223,7 @@ test('create and edit relation property values', async ({ page, document, databa
     }
   });
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: targetBoardPage.path
   });
@@ -266,7 +251,7 @@ test('create and edit relation property values', async ({ page, document, databa
 
   await databasePage.page.locator(`data-test=page-option-${sourceBoardCards[0].id}`).getByTestId('RemoveIcon').click();
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });

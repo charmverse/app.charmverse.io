@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
+import { isTestEnv } from '@packages/config/constants';
 import { createPublicClient, http } from 'viem';
 import { optimism } from 'viem/chains';
 
@@ -26,7 +27,7 @@ export const getPublicClient = (chainId: number) => {
 
   const chain = chainDetails.viem;
 
-  if (chainDetails.alchemyUrl) {
+  if (chainDetails.alchemyUrl && !isTestEnv) {
     try {
       const alchemyProviderUrl = getAlchemyBaseUrl(chainId);
       providerUrl = alchemyProviderUrl;

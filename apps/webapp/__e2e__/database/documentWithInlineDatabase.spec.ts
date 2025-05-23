@@ -1,29 +1,20 @@
 import type { Block, Space, User, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
-import { generateBoard } from '@packages/testing/setupDatabase';
-import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import type { CardFields } from '@packages/databases/card';
+import { generateBoard } from '@packages/testing/setupDatabase';
+import { expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 
-import type { IPropertyTemplate } from '@packages/databases/board';
-import type { CardFields } from '@packages/databases/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 
+import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
 
 import { generatePageContentWithInlineDatabaseRefs } from './pageWithInlinestub';
-
-type Fixtures = {
-  document: DocumentPage;
-  databasePage: DatabasePage;
-};
-
-const test = base.extend<Fixtures>({
-  document: ({ page }, use) => use(new DocumentPage(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page))
-});
 
 // Will be set by the first test
 let spaceUser: User;

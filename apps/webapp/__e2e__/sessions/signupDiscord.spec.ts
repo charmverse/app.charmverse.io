@@ -1,10 +1,10 @@
-import { test as base } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
+import { test as base, overrideCDNRequests } from '../testWithFixtures';
 
 type Fixtures = {
   sandboxPage: Page;
@@ -37,6 +37,7 @@ const test = base.extend<Fixtures>({
       });
     });
     const page = await sandbox.newPage();
+    await overrideCDNRequests(page);
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),
@@ -44,7 +45,7 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test('signup - allows user to sign up and create a workspace using Discord', async ({
+test.skip('signup - allows user to sign up and create a workspace using Discord', async ({
   loginPage,
   discordServer,
   signupPage

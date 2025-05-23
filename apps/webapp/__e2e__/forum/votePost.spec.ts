@@ -1,21 +1,13 @@
 import type { Post, PostCategory } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum } from '@charmverse/core/test';
-import { test as base, expect } from '@playwright/test';
-
 import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
+import { expect } from '@playwright/test';
 
 import { ForumHomePage } from '../po/forumHome.po';
+import { test } from '../testWithFixtures';
 import { createUserAndSpace, generateSpaceRole, generateUser } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumHomePage: ForumHomePage;
-};
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page))
-});
 
 let postCategory: PostCategory;
 let post: Post;

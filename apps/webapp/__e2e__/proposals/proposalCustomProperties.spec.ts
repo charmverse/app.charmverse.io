@@ -2,10 +2,9 @@ import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma-clie
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsSpaces } from '@charmverse/core/test';
+import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
-
-import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
@@ -63,22 +62,22 @@ test.describe.serial('Proposal custom properties', () => {
     });
   });
   test('An admin can create new custom properties', async ({
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalPage,
     databasePage
   }) => {
     // Initial setup
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: admin.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.createProposalButton.click();
+    await proposalListPage.createProposalButton.click();
 
     await expect(documentPage.charmEditor).toBeVisible();
 
@@ -180,7 +179,7 @@ test.describe.serial('Proposal custom properties', () => {
   });
 
   test('A member can set values in their proposal for custom properties created by the admin', async ({
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalPage,
     databasePage,
@@ -188,15 +187,15 @@ test.describe.serial('Proposal custom properties', () => {
   }) => {
     // Initial setup
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: member.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.createProposalButton.click();
+    await proposalListPage.createProposalButton.click();
 
     await expect(documentPage.charmEditor).toBeVisible();
 

@@ -2,16 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
-import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import { expect, test } from '__e2e__/testWithFixtures';
-import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
-import { v4 } from 'uuid';
-
 import { createDefaultProject, defaultProjectMember } from '@packages/lib/projects/constants';
 import { createProject } from '@packages/lib/projects/createProject';
 import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from '@packages/lib/proposals/workflows/defaultWorkflows';
+import { randomETHWalletAddress } from '@packages/utils/blockchain';
+import { expect, test } from '__e2e__/testWithFixtures';
+import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
+import { v4 } from 'uuid';
 
 let space: Space;
 let spaceAdmin: User;
@@ -77,25 +76,25 @@ test.describe.serial('Structured proposal template with project', () => {
     proposalFormFieldPage,
     documentPage,
     databasePage,
-    proposalsListPage,
+    proposalListPage,
     proposalPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 
-    await proposalsListPage.goToHomePage();
+    await proposalListPage.goToHomePage();
 
-    await proposalsListPage.getSidebarLink('proposals').click();
+    await proposalListPage.getSidebarLink('proposals').click();
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.proposalTemplateSelect.click();
 
     await databasePage.getNewTemplateButton().click();
 
-    await proposalsListPage.structuredProposalTemplateMenu.click();
+    await proposalListPage.structuredProposalTemplateMenu.click();
 
     await proposalPage.waitForNewProposalPage();
 
@@ -181,16 +180,16 @@ test.describe.serial('Structured proposal template with project', () => {
     proposalPage,
     documentPage,
     proposalFormFieldPage,
-    proposalsListPage
+    proposalListPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
-    await proposalsListPage.waitForProposalsList();
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.goToProposals(space.domain);
+    await proposalListPage.waitForProposalsList();
+    await proposalListPage.proposalTemplateSelect.click();
 
     await proposalPage.getSelectOption(proposalTemplateId).click();
     await proposalPage.waitForNewProposalPage();
@@ -292,16 +291,16 @@ test.describe.serial('Structured proposal template with project', () => {
     proposalPage,
     documentPage,
     proposalFormFieldPage,
-    proposalsListPage
+    proposalListPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
-    await proposalsListPage.waitForProposalsList();
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.goToProposals(space.domain);
+    await proposalListPage.waitForProposalsList();
+    await proposalListPage.proposalTemplateSelect.click();
 
     const projectWalletAddress = randomETHWalletAddress().toLowerCase();
 
@@ -401,18 +400,18 @@ test.describe.serial('Structured proposal template with project', () => {
     projectSettings,
     documentPage,
     proposalPage,
-    proposalsListPage
+    proposalListPage
   }) => {
     const spaceMember = await generateUser({
       space: { id: space.id }
     });
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceMember.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.goToProposals(space.domain);
+    await proposalListPage.waitForProposalsList();
 
     const proposal = await prisma.proposal.findFirstOrThrow({
       where: {

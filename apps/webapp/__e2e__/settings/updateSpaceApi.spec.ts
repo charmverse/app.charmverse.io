@@ -1,19 +1,11 @@
-import { test as base, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { ApiSettings } from '../po/settings/spaceApiSettings.po';
+import { test } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
-type Fixtures = {
-  spaceSettings: ApiSettings;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new ApiSettings(page))
-});
-
-test('Space settings - add a webhook and event namespace options', async ({ page, spaceSettings }) => {
+test('Space settings - add a webhook and event namespace options', async ({ page, apiSettings: spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
   // go to a page to which we don't have access
 

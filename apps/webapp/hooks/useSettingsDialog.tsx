@@ -1,3 +1,4 @@
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -5,7 +6,6 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import { SPACE_SETTINGS_TABS } from 'components/settings/config';
 import type { ACCOUNT_TABS } from 'components/settings/config';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 
 export type SettingsPath = (typeof SPACE_SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 

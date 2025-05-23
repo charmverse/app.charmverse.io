@@ -1,8 +1,8 @@
 import type { Page } from '@playwright/test';
-import { test as base } from '@playwright/test';
 
 import { LoginPage } from '../po/login.po';
 import { SpacesDropdown } from '../po/spacesDropdown.po';
+import { test as base, overrideCDNRequests } from '../testWithFixtures';
 import { createUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
@@ -16,6 +16,7 @@ const test = base.extend<Fixtures>({
   sandboxPage: async ({ browser: _browser }, use) => {
     const sandbox = await _browser.newContext();
     const page = await sandbox.newPage();
+    await overrideCDNRequests(page);
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),

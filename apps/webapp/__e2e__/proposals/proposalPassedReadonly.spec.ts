@@ -5,11 +5,10 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { addSpaceOperations } from '@packages/lib/permissions/spaces';
 import { createProposal } from '@packages/lib/proposals/createProposal';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
+import { defaultWorkflowTitle } from '@packages/lib/proposals/workflows/defaultWorkflows';
 import { test, expect } from '__e2e__/testWithFixtures';
 import { generateUser, loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 as uuid } from 'uuid';
-
-import { defaultWorkflowTitle } from '@packages/lib/proposals/workflows/defaultWorkflows';
 
 let space: Space;
 let spaceAdmin: User;
@@ -114,19 +113,19 @@ test('Prevent editing the proposal once it has passed, but allow author to conti
   proposalPage,
   documentPage,
   proposalFormFieldPage,
-  proposalsListPage,
+  proposalListPage,
   dialogDocumentPage,
   dialogRewardPage,
   databasePage
 }) => {
   await loginBrowserUser({
-    browserPage: proposalsListPage.page,
+    browserPage: proposalListPage.page,
     userId: proposalAuthor.id
   });
 
-  await proposalsListPage.goToProposals(space.domain);
-  await proposalsListPage.waitForProposalsList();
-  await proposalsListPage.proposalTemplateSelect.click();
+  await proposalListPage.goToProposals(space.domain);
+  await proposalListPage.waitForProposalsList();
+  await proposalListPage.proposalTemplateSelect.click();
 
   await proposalPage.getSelectOption(proposalTemplateId).click();
 

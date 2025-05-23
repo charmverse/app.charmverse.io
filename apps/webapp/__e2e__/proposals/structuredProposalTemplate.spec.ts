@@ -2,14 +2,13 @@ import type { FormFieldType, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
-import { expect, test } from '__e2e__/testWithFixtures';
-import { v4 as uuid } from 'uuid';
-
 import {
   getDefaultEvaluation,
   getDefaultFeedbackEvaluation
 } from '@packages/lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from '@packages/lib/proposals/workflows/defaultWorkflows';
+import { expect, test } from '__e2e__/testWithFixtures';
+import { v4 as uuid } from 'uuid';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -115,27 +114,27 @@ test.describe.serial('Structured proposal template', () => {
   test('User creates a structured proposal template with required, non-required and private fields', async ({
     databasePage,
     proposalPage,
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalFormFieldPage,
     page
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
     // Initial test setup
-    await proposalsListPage.goToHomePage();
+    await proposalListPage.goToHomePage();
 
-    await proposalsListPage.getSidebarLink('proposals').click();
+    await proposalListPage.getSidebarLink('proposals').click();
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.proposalTemplateSelect.click();
 
     await databasePage.getNewTemplateButton().click();
 
-    await proposalsListPage.structuredProposalTemplateMenu.click();
+    await proposalListPage.structuredProposalTemplateMenu.click();
 
     await proposalPage.waitForNewProposalPage();
 
@@ -192,13 +191,13 @@ test.describe.serial('Structured proposal template', () => {
   test('Visit structured proposal template and edit/add fields', async ({
     databasePage,
     proposalPage,
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalFormFieldPage,
     page
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 
@@ -216,11 +215,11 @@ test.describe.serial('Structured proposal template', () => {
       }
     });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.proposalTemplateSelect.click();
 
     await databasePage.getTemplateMenu({ pageId: proposalTemplate.page!.id }).click();
 
@@ -262,13 +261,13 @@ test.describe.serial('Structured proposal template', () => {
 
   test('Create proposal from structure template after providing required fields', async ({
     proposalPage,
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     page,
     proposalFormFieldPage
   }) => {
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: spaceAdmin.id
     });
 
@@ -301,11 +300,11 @@ test.describe.serial('Structured proposal template', () => {
 
     const formFields = proposalTemplate.form!.formFields;
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.proposalTemplateSelect.click();
+    await proposalListPage.proposalTemplateSelect.click();
 
     await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
 
@@ -336,9 +335,9 @@ test.describe.serial('Structured proposal template', () => {
 
   test.fixme(
     'Visit structured proposal and edit form field answers as an author',
-    async ({ proposalPage, proposalsListPage, documentPage, proposalFormFieldPage, page }) => {
+    async ({ proposalPage, proposalListPage, documentPage, proposalFormFieldPage, page }) => {
       await loginBrowserUser({
-        browserPage: proposalsListPage.page,
+        browserPage: proposalListPage.page,
         userId: spaceAdmin.id
       });
 
@@ -413,9 +412,9 @@ test.describe.serial('Structured proposal template', () => {
 
   test.fixme(
     'Visit structured proposal and view only public form fields as a space member',
-    async ({ proposalsListPage, documentPage, proposalFormFieldPage }) => {
+    async ({ proposalListPage, documentPage, proposalFormFieldPage }) => {
       await loginBrowserUser({
-        browserPage: proposalsListPage.page,
+        browserPage: proposalListPage.page,
         userId: spaceMember.id
       });
 

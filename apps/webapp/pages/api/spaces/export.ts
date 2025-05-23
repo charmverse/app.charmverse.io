@@ -1,9 +1,9 @@
 import type { Space } from '@charmverse/core/prisma';
+import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -2,7 +2,7 @@
 
 // import type { Bounty, Space, User } from '@charmverse/core/prisma';
 // import { prisma } from '@charmverse/core/prisma-client';
-// import { test as base, expect } from '@playwright/test';
+// import { expect } from '@playwright/test';
 // import { BountyBoardPage } from '__e2e__/po/bountyBoard.po';
 // import { BountyPage } from '__e2e__/po/bountyPage.po';
 // import type { PageHeader } from '__e2e__/po/pageHeader.po';

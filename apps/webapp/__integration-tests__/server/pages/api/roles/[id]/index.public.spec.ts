@@ -2,11 +2,10 @@
 import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { RoleAssignment } from '@packages/lib/roles';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 import { v4 as uuid, v4 } from 'uuid';
-
-import type { RoleAssignment } from '@packages/lib/roles';
 
 describe('PUT /api/roles/[id] - Update a role in free spaces', () => {
   let space: Space;

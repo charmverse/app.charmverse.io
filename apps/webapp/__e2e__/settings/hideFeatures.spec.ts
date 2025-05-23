@@ -1,18 +1,10 @@
 import { STATIC_PAGES } from '@packages/features/constants';
-import { expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
-import { SpaceProfileSettings } from '../po/settings/spaceProfileSettings.po';
+import { test } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  spaceSettings: SpaceProfileSettings;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new SpaceProfileSettings(page))
-});
 
 test('Space settings - toggle feature visibility', async ({ spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
