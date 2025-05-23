@@ -87,6 +87,9 @@ const API_ACCESS_TIERS: SpaceSubscriptionTier[] = ['gold', 'grant'];
 // Guest access tiers
 const GUEST_ACCESS_TIERS: SpaceSubscriptionTier[] = ['bronze', 'silver', 'gold', 'grant'];
 
+// Primary member identity tiers
+const PRIMARY_MEMBER_IDENTITY_TIERS: SpaceSubscriptionTier[] = ['gold', 'grant'];
+
 export function getApiAccessStringifiedTiers() {
   return `${API_ACCESS_TIERS.slice(0, -1)
     .map((tier) => capitalize(tier))
@@ -103,6 +106,10 @@ export function hasApiAccess(subscriptionTier?: SpaceSubscriptionTier | null): b
 
 export function hasGuestAccess(subscriptionTier?: SpaceSubscriptionTier | null): boolean {
   return subscriptionTier ? GUEST_ACCESS_TIERS.includes(subscriptionTier) : false;
+}
+
+export function hasPrimaryMemberIdentityAccess(subscriptionTier?: SpaceSubscriptionTier | null): boolean {
+  return subscriptionTier ? PRIMARY_MEMBER_IDENTITY_TIERS.includes(subscriptionTier) : false;
 }
 
 const WORKFLOW_LIMITS: Record<SpaceSubscriptionTier, number> = {
