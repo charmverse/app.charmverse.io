@@ -2,6 +2,7 @@
   "name": "@packages/databases",
   "version": "0.0.0",
   "description": "",
+  "type": "module",
   "private": true,
   "scripts": {
     "test": ""
@@ -12,6 +13,7 @@
     "./i18n/en.json": "./src/i18n/en.json"
   },
   "dependencies": {
+    "@packages/pages": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@reduxjs/toolkit": "2.2"
   }

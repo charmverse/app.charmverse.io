@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { requireKeys } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireKeys } from '@packages/lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 import type { PublicApiProposalComment } from '../index';
 

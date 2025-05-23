@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from '@packages/lib/middleware';
 import { getRequestLanguage } from '@packages/lib/middleware/getRequestLanguage';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -15,7 +16,6 @@ import nc from 'next-connect';
 import { v4 } from 'uuid';
 
 import { getPagePath } from 'lib/pages';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 
 export const config = {
   api: {

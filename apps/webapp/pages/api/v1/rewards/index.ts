@@ -1,11 +1,11 @@
 import type { BountyStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { resolveENSName } from '@packages/blockchain/getENSName';
 import { isTruthy } from '@packages/utils/types';
 import { ethers } from 'ethers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 
 const handler = apiHandler();

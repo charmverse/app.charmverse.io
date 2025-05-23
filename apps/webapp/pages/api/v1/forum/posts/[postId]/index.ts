@@ -1,15 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidStateError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { getForumPost } from '@packages/lib/forums/posts/getForumPost';
 import { getPostVoteSummary } from '@packages/lib/forums/posts/getPostMeta';
 import { updateForumPost } from '@packages/lib/forums/posts/updateForumPost';
 import { requireSuperApiKey } from '@packages/lib/middleware/requireSuperApiKey';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 import type { PublicApiForumPost } from '../index';
 import { getPublicForumPost } from '../index';

@@ -6,8 +6,8 @@ import type { ExportedPermissions } from './exportSpacePermissions';
 import { exportSpacePermissions } from './exportSpacePermissions';
 import { exportSpacePostCategories } from './exportSpacePostCategories';
 import { exportSpaceSettings, type SpaceSettingsExport } from './exportSpaceSettings';
-import type { ExportedPage } from './exportWorkspacePages';
 import { exportWorkspacePages } from './exportWorkspacePages';
+import type { ExportedPage } from './exportWorkspacePages';
 
 export type SpaceDataExport = {
   pages: ExportedPage[];

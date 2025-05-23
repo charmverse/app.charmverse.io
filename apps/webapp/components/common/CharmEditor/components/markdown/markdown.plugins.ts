@@ -1,9 +1,8 @@
+import { charmParser } from '@packages/bangleeditor/markdown/parseMarkdown';
 import markdownit from 'markdown-it';
 import { DOMParser, Fragment, Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-
-import { charmParser } from 'lib/prosemirror/markdown/parseMarkdown';
 
 const md = markdownit({
   html: true,

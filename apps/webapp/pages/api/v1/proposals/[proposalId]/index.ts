@@ -1,12 +1,12 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 import type { PublicApiProposal } from '../index';
 

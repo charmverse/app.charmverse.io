@@ -1,11 +1,9 @@
 import type {
-  FarcasterUser,
   MemberProperty,
   MemberPropertyPermission,
   MemberPropertyType,
   MemberPropertyValue,
   Role,
-  Space,
   User,
   UserDetails,
   VisibilityView

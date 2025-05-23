@@ -7,7 +7,6 @@ import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
-import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
 import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
@@ -100,8 +99,8 @@ export class SpacesApi {
     return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
   }
 
-  exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
-    return http.POST(`/api/spaces/${spaceId}/export-data`, data);
+  exportSpaceData({ spaceId }: { spaceId: string }) {
+    return http.POST<{ downloadLink: string }>(`/api/spaces/${spaceId}/export-data`);
   }
 
   connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {

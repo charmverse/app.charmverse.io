@@ -1,6 +1,8 @@
 import { Writable } from 'stream';
 
 import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { ResizeType } from '@packages/utils/constants';
 import {
   DEFAULT_MAX_FILE_SIZE_MB,
@@ -12,9 +14,6 @@ import formidable from 'formidable';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import sharp from 'sharp';
-
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

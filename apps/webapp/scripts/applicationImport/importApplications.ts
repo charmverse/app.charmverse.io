@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import { upsertProposalFormAnswers } from '@packages/lib/proposals/forms/upsertProposalFormAnswers';
 import { ProposalEvaluationInput, createProposal } from '@packages/lib/proposals/createProposal';
 import { ProposalPendingReward } from '@packages/lib/proposals/interfaces';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import _uniqBy from 'lodash/uniqBy';
 import Papa from 'papaparse';
 import * as path from 'path';

@@ -1,12 +1,14 @@
+import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
+import type { ProposalFields } from '@packages/lib/proposals/interfaces';
+import { mapProposalToCard } from '@packages/lib/proposals/mapProposalToCard';
+
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
-import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 
 import { usePropertiesMutator } from '../hooks/usePropertiesMutator';
-import { useProposalsBoardAdapter, mapProposalToCard } from '../hooks/useProposalsBoardAdapter';
+import { useProposalsBoardAdapter } from '../hooks/useProposalsBoardAdapter';
 
 type Props = {
   proposalForm: { createdAt: string; fields: ProposalFields | null; id?: string };

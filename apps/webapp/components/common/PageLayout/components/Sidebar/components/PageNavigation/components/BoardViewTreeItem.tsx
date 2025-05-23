@@ -1,7 +1,7 @@
+import type { IViewType } from '@packages/databases/boardView';
 import { forwardRef, memo } from 'react';
 
 import { iconForViewType } from 'components/common/DatabaseEditor/components/viewMenu';
-import type { IViewType } from '@packages/databases/boardView';
 
 import { StyledTreeItem, PageLink } from './PageTreeItem';
 

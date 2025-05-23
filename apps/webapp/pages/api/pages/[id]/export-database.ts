@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import type { FilterGroup } from '@packages/databases/filterGroup';
 import { loadAndGenerateCsv } from '@packages/databases/generateCsv';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
@@ -10,8 +11,6 @@ import { paginatedPrismaTask } from '@packages/lib/utils/paginatedPrismaTask';
 import { DataNotFoundError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

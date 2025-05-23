@@ -1,4 +1,4 @@
-import { upperFirst } from 'lodash';
+import { upperFirst } from 'lodash-es';
 
 import type { UIBlockWithDetails } from './block';
 import { createBlock } from './block';
