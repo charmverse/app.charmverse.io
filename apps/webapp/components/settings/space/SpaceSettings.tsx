@@ -469,12 +469,17 @@ export function SpaceSettings({
           <Grid item>
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
-          <Grid item>
+          <Grid item sx={{ flexDirection: 'column', display: 'flex' }}>
             <Legend>Export</Legend>
-            Download all pages and databases (CSV and Markdown format). We will email you a link when it is ready.
-            <Button disabledTooltip='Only admins can export' disabled={!isAdmin} onClick={exportSpaceContent}>
-              Export
-            </Button>
+            <Typography variant='caption' sx={{ mb: 2 }}>
+              Admins can download proposals, pages, and databases (TSV and Markdown format). We will email you a link
+              when it is ready.
+            </Typography>
+            <span>
+              <Button disabledTooltip='Only admins can export' disabled={!isAdmin} onClick={exportSpaceContent}>
+                Request export
+              </Button>
+            </span>
           </Grid>
           <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
