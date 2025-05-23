@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { processDataExport } from '@packages/spaces/export/processDataExport';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -27,9 +26,7 @@ async function requestZip(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  const updatedJob = await processDataExport(exportJob);
-
-  return res.status(200).send({ downloadLink: updatedJob.downloadLink });
+  return res.status(200).send({ success: true });
 }
 
 export default withSessionRoute(handler);
