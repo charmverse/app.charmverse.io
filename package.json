@@ -125,7 +125,6 @@
     "@ethersproject/wallet": "^5.7.0",
     "@farcaster/auth-client": "^0.3.0",
     "@farcaster/auth-kit": "^0.6.0",
-    "@farcaster/core": "^0.13.7",
     "@fullcalendar/common": "^5.11.5",
     "@fullcalendar/core": "^6.1.9",
     "@fullcalendar/daygrid": "^6.1.9",

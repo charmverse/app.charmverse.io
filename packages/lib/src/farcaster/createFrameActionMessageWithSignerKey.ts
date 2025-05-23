@@ -29,7 +29,11 @@ export async function createFrameActionMessageWithSignerKey(
       url,
       buttonIndex,
       castId,
-      inputText
+      inputText,
+      // upgraded farcaster core. let's add dummy empty data for the following...
+      state: new Uint8Array(),
+      transactionId: new Uint8Array(),
+      address: new Uint8Array()
     },
     messageDataOptions,
     signer

@@ -18,6 +18,7 @@
     "debug:e2e": "NODE_OPTIONS=--experimental-require-module npx playwright test --headed --timeout=0"
   },
   "dependencies": {
+    "@farcaster/core": "^0.16.4",
     "@fontsource/ia-writer-mono": "^5.2.5",
     "@packages/aws": "^0.0.0",
     "@packages/bangleeditor": "^0.0.0",
