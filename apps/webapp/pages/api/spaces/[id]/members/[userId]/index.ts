@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError } from '@packages/errors';
 import { removeMember } from '@packages/lib/members/removeMember';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '@packages/users/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
