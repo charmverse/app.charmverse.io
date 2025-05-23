@@ -100,8 +100,8 @@ export class SpacesApi {
     return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
   }
 
-  exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
-    return http.POST(`/api/spaces/${spaceId}/export-data`, data);
+  exportSpaceData({ spaceId }: { spaceId: string }) {
+    return http.POST(`/api/spaces/${spaceId}/export-data`);
   }
 
   connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {
