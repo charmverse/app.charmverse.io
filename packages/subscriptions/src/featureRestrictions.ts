@@ -97,3 +97,16 @@ export function hasCustomDomainAccess(subscriptionTier: string | null | undefine
 export function hasApiAccess(subscriptionTier: string | null | undefined): boolean {
   return API_ACCESS_TIERS.includes(subscriptionTier as any);
 }
+
+const WORKFLOW_LIMITS: Record<SpaceSubscriptionTier, number> = {
+  readonly: 0,
+  free: 1,
+  bronze: 2,
+  silver: 3,
+  gold: 5,
+  grant: Infinity
+} as const;
+
+export function getWorkflowLimits(subscriptionTier?: SpaceSubscriptionTier | null) {
+  return subscriptionTier ? WORKFLOW_LIMITS[subscriptionTier] : WORKFLOW_LIMITS.readonly;
+}

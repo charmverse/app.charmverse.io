@@ -1,12 +1,12 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Divider, Tooltip, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import {
+  useDeleteProposalWorkflow,
   useGetProposalWorkflows,
-  useUpsertProposalWorkflow,
-  useDeleteProposalWorkflow
+  useUpsertProposalWorkflow
 } from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
@@ -14,6 +14,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { useWorkflowAccess } from 'hooks/useWorkflowAccess';
 
 import Legend from '../components/Legend';
 
@@ -30,6 +31,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
   const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
   const { showMessage } = useSnackbar();
+  const { canCreateWorkflow } = useWorkflowAccess();
 
   useTrackPageView({ type: 'settings/proposals' });
 
@@ -109,7 +111,15 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
         <Tooltip title={!isAdmin ? 'Only space admins can create workflows' : ''} arrow>
           {/* Tooltip on disabled button requires one block element below wrapper */}
           <span>
-            <Button size='small' id='new-workflow-btn' onClick={() => addNewWorkflow()} disabled={!isAdmin}>
+            <Button
+              size='small'
+              id='new-workflow-btn'
+              onClick={() => addNewWorkflow()}
+              disabled={!isAdmin || !canCreateWorkflow}
+              disabledTooltip={
+                !canCreateWorkflow ? 'You have reached the maximum number of workflows for your subscription tier' : ''
+              }
+            >
               New
             </Button>
           </span>
