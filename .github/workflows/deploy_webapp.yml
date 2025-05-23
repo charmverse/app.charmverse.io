@@ -281,6 +281,16 @@ jobs:
         with:
           app_name: webapp
 
+      - name: Install websocket dependencies
+        uses: ./.github/actions/install
+        with:
+          app_name: webapp
+
+      - name: Install websocket service
+        uses: ./.github/actions/build_app
+        with:
+          app_name: websockets
+
       # unbuffer insures that we print to the log in realtime
       - name: Install unbuffer
         run: sudo apt-get update && sudo apt-get install -y expect-dev
