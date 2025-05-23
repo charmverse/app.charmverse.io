@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Block, Page, PagePermission } from '@charmverse/core/prisma';
@@ -78,9 +79,20 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
   /**
    * Mutates the given node to provision its block data
    */
-  async function recursiveResolveBlocks({ node }: { node: PageNodeWithChildren<ExportedPage> }): Promise<void> {
+  async function recursiveResolveBlocks({
+    node
+  }: {
+    node: PageNodeWithChildren<{ id: string; content: any }>;
+  }): Promise<void> {
     // Generate markdown for the page
-    const markdown = node.content ? await generateMarkdown({ content: node.content as PageContent }) : undefined;
+    let markdown: string | undefined;
+    if (node.content) {
+      try {
+        markdown = await generateMarkdown({ content: node.content as PageContent });
+      } catch (error) {
+        log.error('Error generating markdown for page', { pageId: node.id, error });
+      }
+    }
 
     if (isBoardPageType(node.type)) {
       const boardblocks = await prisma.block.findMany({
@@ -92,10 +104,10 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
         }
       });
 
-      node.blocks = {
-        board: boardblocks.find((block) => block.type === 'board') as Block,
-        views: boardblocks.filter((block) => block.type === 'view') as Block[]
-      };
+      // node.blocks = {
+      //   board: boardblocks.find((block) => block.type === 'board') as Block,
+      //   views: boardblocks.filter((block) => block.type === 'view') as Block[]
+      // };
     }
 
     await Promise.all(
@@ -118,10 +130,14 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
     });
   }
 
-  await Promise.all(mappedTrees.map((tree) => recursiveResolveBlocks({ node: tree.targetPage })));
+  await Promise.all(
+    mappedTrees.map((tree) =>
+      recursiveResolveBlocks({ node: tree.targetPage as unknown as PageNodeWithChildren<{ id: string; content: any }> })
+    )
+  );
 
   mappedTrees.forEach((t) => {
-    exportData.push(t.targetPage);
+    exportData.push(t.targetPage as unknown as ZipFileNode);
   });
 
   return exportData;
