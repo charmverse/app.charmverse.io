@@ -1,5 +1,5 @@
-import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -12,15 +12,18 @@ export function useCustomDomain() {
 
   useEffect(() => {
     const domain = getCustomDomainFromHost() || '';
-    setCustomDomain(domain);
 
     // If we're on a custom domain and the space doesn't have access to custom domains
-    if (domain && space && !hasCustomDomainAccess(space.subscriptionTier)) {
-      const spaceDomain = space.domain;
-      const redirectUrl = `https://app.charmverse.io/${spaceDomain}`;
+    if (domain && space) {
+      if (!hasCustomDomainAccess(space.subscriptionTier)) {
+        const spaceDomain = space.domain;
+        const redirectUrl = `https://app.charmverse.io/${spaceDomain}`;
 
-      // Redirect to the space domain
-      window.location.href = redirectUrl;
+        // Redirect to the space domain
+        window.location.href = redirectUrl;
+      } else {
+        setCustomDomain(domain);
+      }
     }
   }, [space, router.asPath]);
 

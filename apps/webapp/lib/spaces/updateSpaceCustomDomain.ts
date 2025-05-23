@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { updateAllowedPlaybackDomains } from '@packages/lib/mux/updateAllowedPlaybackDomains';
-import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
 import { isValidDomainName } from '@packages/lib/utils/domains/isValidDomainName';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isUniqueConstraintError } from '@packages/utils/errors/prisma';
 

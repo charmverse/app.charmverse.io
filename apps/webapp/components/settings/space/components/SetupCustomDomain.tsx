@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import type { UseFormRegister } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';

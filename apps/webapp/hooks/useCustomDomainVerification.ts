@@ -1,4 +1,4 @@
-import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 

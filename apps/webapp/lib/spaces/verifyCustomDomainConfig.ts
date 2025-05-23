@@ -4,7 +4,7 @@ import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCertificateDetails, requestCertificateForDomain } from '@packages/lib/aws/ACM';
 import { addCertificateToListener, hasCertificateAdded } from '@packages/lib/aws/ELB';
-import { hasCustomDomainAccess } from '@packages/lib/subscription/constants';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import { Agent, request } from 'undici';
 
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
