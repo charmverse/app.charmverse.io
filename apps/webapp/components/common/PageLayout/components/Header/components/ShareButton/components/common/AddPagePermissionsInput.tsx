@@ -2,6 +2,9 @@ import styled from '@emotion/styled';
 import { Button } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
+import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';
+
+import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 
 const StyledInput = styled(Input)`
   padding-right: 0;
@@ -27,9 +30,12 @@ type Props = {
 };
 
 export function AddPagePermissionsInput({ onClick }: Props) {
+  const { subscriptionTier } = useSpaceSubscription();
+  const canAddGuests = hasGuestAccess(subscriptionTier);
+
   return (
     <StyledInput
-      placeholder='Add people, roles or emails'
+      placeholder={canAddGuests ? 'Add people, roles or emails' : 'Add people or roles'}
       onClick={onClick}
       sx={{
         height: '35px',

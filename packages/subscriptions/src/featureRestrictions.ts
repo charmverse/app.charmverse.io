@@ -79,10 +79,13 @@ export async function validateTokenGateRestrictions(payload: TokenGatePayload) {
 }
 
 // Custom domain access tiers
-const CUSTOM_DOMAIN_TIERS = ['silver', 'gold', 'grant'] as const;
+const CUSTOM_DOMAIN_TIERS: SpaceSubscriptionTier[] = ['silver', 'gold', 'grant'];
 
 // API access tiers
-const API_ACCESS_TIERS = ['gold', 'grant'] as const;
+const API_ACCESS_TIERS: SpaceSubscriptionTier[] = ['gold', 'grant'];
+
+// Guest access tiers
+const GUEST_ACCESS_TIERS: SpaceSubscriptionTier[] = ['bronze', 'silver', 'gold', 'grant'];
 
 export function getApiAccessStringifiedTiers() {
   return `${API_ACCESS_TIERS.slice(0, -1)
@@ -90,12 +93,16 @@ export function getApiAccessStringifiedTiers() {
     .join(', ')} or ${capitalize(API_ACCESS_TIERS.at(-1))}`;
 }
 
-export function hasCustomDomainAccess(subscriptionTier: string | null | undefined): boolean {
-  return CUSTOM_DOMAIN_TIERS.includes(subscriptionTier as any);
+export function hasCustomDomainAccess(subscriptionTier?: SpaceSubscriptionTier | null): boolean {
+  return subscriptionTier ? CUSTOM_DOMAIN_TIERS.includes(subscriptionTier) : false;
 }
 
-export function hasApiAccess(subscriptionTier: string | null | undefined): boolean {
-  return API_ACCESS_TIERS.includes(subscriptionTier as any);
+export function hasApiAccess(subscriptionTier?: SpaceSubscriptionTier | null): boolean {
+  return subscriptionTier ? API_ACCESS_TIERS.includes(subscriptionTier) : false;
+}
+
+export function hasGuestAccess(subscriptionTier?: SpaceSubscriptionTier | null): boolean {
+  return subscriptionTier ? GUEST_ACCESS_TIERS.includes(subscriptionTier) : false;
 }
 
 const WORKFLOW_LIMITS: Record<SpaceSubscriptionTier, number> = {

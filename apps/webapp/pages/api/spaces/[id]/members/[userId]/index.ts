@@ -1,11 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/errors';
+import { removeMember } from '@packages/lib/members/removeMember';
+import { onError, onNoMatch, requireKeys, requireSpaceMembership } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '@packages/users/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { removeMember } from '@packages/lib/members/removeMember';
-import { onError, onNoMatch, requireKeys, requireSpaceMembership } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 import { MinimumOneSpaceAdminRequiredError } from 'lib/spaces/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -22,6 +24,19 @@ async function updateMember(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
 
   const newAdminStatus = req.body.isAdmin;
+  const newGuestStatus = req.body.isGuest;
+
+  // Check guest access if trying to set isGuest to true
+  if (newGuestStatus === true) {
+    const space = await prisma.space.findUnique({
+      where: { id: spaceId },
+      select: { subscriptionTier: true }
+    });
+
+    if (!hasGuestAccess(space?.subscriptionTier)) {
+      throw new InvalidInputError('Guest access is not available for your subscription tier');
+    }
+  }
 
   // Check the space won't end up with 0 admins
   if (newAdminStatus === false) {
