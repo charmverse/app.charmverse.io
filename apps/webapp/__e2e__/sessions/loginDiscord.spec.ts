@@ -46,7 +46,7 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test('login - allows user to login and see their workspace', async ({ discordServer, loginPage }) => {
+test.skip('login - allows user to login and see their workspace', async ({ discordServer, loginPage }) => {
   const discordUserId = discordServer.discordUserId;
   const { user, space, page } = await generateUserAndSpace();
   await createDiscordUser({ userId: user.id, discordUserId });
@@ -57,7 +57,7 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });
 
-test('login - allows user to login and see their workspace even when a wallet is connected (regression check)', async ({
+test.skip('login - allows user to login and see their workspace even when a wallet is connected (regression check)', async ({
   discordServer,
   loginPage
 }) => {

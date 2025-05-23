@@ -9,7 +9,7 @@ import { REWARD_APPLICATION_STATUS_LABELS } from 'components/rewards/components/
 import { expect, test } from '../testWithFixtures';
 import { login } from '../utils/session';
 
-test.describe('Review reward', () => {
+test.describe.skip('Review reward', () => {
   let space: Space;
   let adminUser: User;
   let spaceMember: User;

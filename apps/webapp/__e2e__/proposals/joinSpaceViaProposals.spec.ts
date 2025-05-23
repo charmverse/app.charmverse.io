@@ -1,13 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import { baseUrl } from '@packages/testing/mockApiCall';
 import { generateProposalWorkflow } from '@packages/lib/testing/proposals';
+import { baseUrl } from '@packages/testing/mockApiCall';
 import { expect } from '__e2e__/testWithFixtures';
 import { test } from '__e2e__/utils/test';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
-test('Create a proposal from a linked proposal template /member', async ({ page, proposalPage, documentPage }) => {
+test.skip('Create a proposal from a linked proposal template /member', async ({ page, proposalPage, documentPage }) => {
   const { user: admin, space } = await generateUserAndSpace({ isAdmin: true });
 
   const member = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });

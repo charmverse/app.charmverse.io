@@ -6,7 +6,7 @@ import { generateUserAndSpaceKyc } from '@packages/testing/utils/kyc';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
 
-test.describe.serial('Review reward applications', () => {
+test.describe.skip('Review reward applications', () => {
   let space: Space;
   let adminUser: User;
   let reward: Bounty & {

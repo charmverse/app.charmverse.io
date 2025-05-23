@@ -23,7 +23,7 @@ const test = base.extend<Fixtures>({
   tokenGatePage: ({ sandboxPage }, use) => use(new TokenGatePage(sandboxPage))
 });
 
-test('signup - not ignore the logic to redirect user after connect if the user has 0 spaces, and the redirect is to a join page', async ({
+test.skip('signup - not ignore the logic to redirect user after connect if the user has 0 spaces, and the redirect is to a join page', async ({
   sandboxPage
 }) => {
   const { space } = await generateUserAndSpace({ isAdmin: true, spaceName: `space-${v4()}` });

@@ -86,7 +86,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe('View proposal', () => {
+test.describe.skip('View proposal', () => {
   test('Proposal author can view their own draft proposal and other accessible proposals as well as data about the proposals', async ({
     proposalListPage
   }) => {

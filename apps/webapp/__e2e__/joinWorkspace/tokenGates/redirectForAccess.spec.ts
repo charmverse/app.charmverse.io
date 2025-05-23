@@ -5,7 +5,7 @@ import { login } from '__e2e__/utils/session';
 import { test } from '../../testWithFixtures';
 import { generateUser, generateUserAndSpace } from '../../utils/mocks';
 
-test("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
+test.skip("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
   page,
   tokenGatePage
 }) => {

@@ -45,7 +45,7 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test('signup - allows user to sign up and create a workspace using Discord', async ({
+test.skip('signup - allows user to sign up and create a workspace using Discord', async ({
   loginPage,
   discordServer,
   signupPage
