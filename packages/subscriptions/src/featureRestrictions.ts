@@ -1,11 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
+import { capitalize } from 'lodash';
 
 const KB = 1024;
 const MB = 1024 * KB;
 const GB = 1024 * MB;
 
-export const VIDEO_SIZE_LIMITS: Record<SpaceSubscriptionTier, number> = {
+const VIDEO_SIZE_LIMITS: Record<SpaceSubscriptionTier, number> = {
   readonly: 0,
   free: 20 * MB,
   bronze: 1 * GB,
@@ -27,7 +28,7 @@ export function getVideoSizeLimit(subscriptionTier?: SpaceSubscriptionTier | nul
   return subscriptionTier ? VIDEO_SIZE_LIMITS[subscriptionTier] : VIDEO_SIZE_LIMITS.readonly;
 }
 
-export const TOKEN_GATE_LIMITS: Record<SpaceSubscriptionTier, { count: number; restrictedChains: boolean }> = {
+const TOKEN_GATE_LIMITS: Record<SpaceSubscriptionTier, { count: number; restrictedChains: boolean }> = {
   readonly: { count: 0, restrictedChains: false },
   free: { count: 1, restrictedChains: true },
   bronze: { count: 1, restrictedChains: true },
@@ -43,6 +44,10 @@ type TokenGatePayload = {
   conditions?: { chain: string }[];
   existingTokenGates: number;
 };
+
+export function getTokenGateLimits(subscriptionTier: SpaceSubscriptionTier | null) {
+  return subscriptionTier ? TOKEN_GATE_LIMITS[subscriptionTier] : TOKEN_GATE_LIMITS.readonly;
+}
 
 export async function validateTokenGateRestrictions(payload: TokenGatePayload) {
   const { subscriptionTier, conditions = [], existingTokenGates } = payload;
@@ -74,10 +79,16 @@ export async function validateTokenGateRestrictions(payload: TokenGatePayload) {
 }
 
 // Custom domain access tiers
-export const CUSTOM_DOMAIN_TIERS = ['silver', 'gold', 'grant'] as const;
+const CUSTOM_DOMAIN_TIERS = ['silver', 'gold', 'grant'] as const;
 
 // API access tiers
-export const API_ACCESS_TIERS = ['gold', 'grant'] as const;
+const API_ACCESS_TIERS = ['gold', 'grant'] as const;
+
+export function getApiAccessStringifiedTiers() {
+  return `${API_ACCESS_TIERS.slice(0, -1)
+    .map((tier) => capitalize(tier))
+    .join(', ')} or ${capitalize(API_ACCESS_TIERS.at(-1))}`;
+}
 
 export function hasCustomDomainAccess(subscriptionTier: string | null | undefined): boolean {
   return CUSTOM_DOMAIN_TIERS.includes(subscriptionTier as any);

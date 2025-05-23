@@ -1,15 +1,15 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import type { IChainDetails } from '@packages/blockchain/connectors/chains';
 import { getChainList } from '@packages/blockchain/connectors/chains';
-import { RESTRICTED_TOKEN_GATE_CHAINS, TOKEN_GATE_LIMITS } from '@packages/subscriptions/featureRestrictions';
+import { getTokenGateLimits, RESTRICTED_TOKEN_GATE_CHAINS } from '@packages/subscriptions/featureRestrictions';
 
 import { useGetTokenGates } from 'charmClient/hooks/tokenGates';
 
 export function useTokenGateAccess({ space, chains }: { space: Space; chains?: IChainDetails[] }) {
   const { data: tokenGates = [] } = useGetTokenGates(space.id);
 
-  const tier = space?.subscriptionTier || 'public';
-  const limits = TOKEN_GATE_LIMITS[tier as keyof typeof TOKEN_GATE_LIMITS];
+  const tier = space?.subscriptionTier || 'readonly';
+  const limits = getTokenGateLimits(tier);
 
   const hasReachedLimit = tokenGates.length >= limits.count;
   const hasRestrictedChains = limits.restrictedChains;
