@@ -20,8 +20,9 @@ export function zipFiles(files: ZipFileNode[]) {
         const folder = currentFolder.folder(file.title);
         if (folder) {
           // Add content and tsv files to the main folder
-          if (file.markdown) {
-            folder.file(`${file.title}.md`, file.markdown);
+          // If there is no tsv, we assume the page is an empty markdown page
+          if (file.markdown || !file.tsv) {
+            folder.file(`${file.title}.md`, file.markdown || '');
           }
           if (file.tsv) {
             folder.file(`${file.title}.tsv`, file.tsv);
@@ -35,8 +36,9 @@ export function zipFiles(files: ZipFileNode[]) {
         }
       } else {
         // Add files directly to current folder if no children
-        if (file.markdown) {
-          currentFolder.file(`${file.title}.md`, file.markdown);
+        // If there is no tsv, we assume the page is an empty markdown page
+        if (file.markdown || !file.tsv) {
+          currentFolder.file(`${file.title}.md`, file.markdown || '');
         }
         if (file.tsv) {
           currentFolder.file(`${file.title}.tsv`, file.tsv);

@@ -1,31 +1,18 @@
 import { log } from '@charmverse/core/log';
 import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { resolvePageTree } from '@charmverse/core/pages';
-import type { Block, Page, PagePermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import type { PageContent, TextContent } from '@packages/charmeditor/interfaces';
+import { loadAndGenerateCsv } from '@packages/databases/generateCsv';
 import type { RelatedPageData } from '@packages/pages/interfaces';
 import { isBoardPageType } from '@packages/pages/isBoardPageType';
 
 import type { ZipFileNode } from './zipFiles';
 
-function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
-  if (node?.content) {
-    node?.content.forEach((childNode) => {
-      recurse(childNode, cb);
-    });
-  }
-  if (node) {
-    cb(node);
-  }
-}
+const zipFields: (keyof ZipFileNode)[] = ['markdown', 'tsv', 'children', 'title'];
 
-export type ExportedPage = PageNodeWithChildren<
-  Page & Partial<RelatedPageData> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
->;
-
-export async function exportPages({ spaceId }: { spaceId: string }): Promise<ZipFileNode[]> {
+export async function exportPages({ spaceId, userId }: { spaceId: string; userId: string }): Promise<ZipFileNode[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: { id: spaceId }
   });
@@ -91,23 +78,19 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
         markdown = await generateMarkdown({ content: node.content as PageContent });
       } catch (error) {
         log.error('Error generating markdown for page', { pageId: node.id, error });
+        markdown = 'There was an error generating markdown for this page';
       }
     }
 
     if (isBoardPageType(node.type)) {
-      const boardblocks = await prisma.block.findMany({
-        where: {
-          rootId: node.id as string,
-          type: {
-            in: ['board', 'view']
-          }
-        }
+      const { csvData } = await loadAndGenerateCsv({
+        userId,
+        databaseId: node.id
       });
 
-      // node.blocks = {
-      //   board: boardblocks.find((block) => block.type === 'board') as Block,
-      //   views: boardblocks.filter((block) => block.type === 'view') as Block[]
-      // };
+      Object.assign(node as unknown as ZipFileNode, {
+        tsv: csvData
+      });
     }
 
     await Promise.all(
@@ -120,11 +103,9 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
       markdown
     });
 
-    const zipFields = ['markdown', 'tsv', 'children', 'title'];
-
     // Save memory: clear out node and replace with zip file node contents
     Object.keys(node).forEach((key) => {
-      if (node.hasOwnProperty(key) && !zipFields.includes(key)) {
+      if (node.hasOwnProperty(key) && !zipFields.includes(key as keyof ZipFileNode)) {
         delete node[key as keyof typeof node];
       }
     });

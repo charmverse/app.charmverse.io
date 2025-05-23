@@ -35,18 +35,15 @@ export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: stri
 //     }
 //   }
 // });
-export async function createDataExport({ userId, spaceId }: { userId: string; spaceId: string }) {
-  const pages = await exportPages({ spaceId });
+export async function createDataExport({ spaceId, userId }: { spaceId: string; userId: string }) {
+  const pages = await exportPages({ spaceId, userId });
   const proposalsTsv = await exportProposals({ spaceId, userId });
   const compressed = await zipFiles([
     {
       title: 'Proposals',
       tsv: proposalsTsv
     },
-    {
-      title: 'pages',
-      children: pages
-    }
+    ...pages
   ]);
 
   return compressed;

@@ -18,7 +18,7 @@ export async function uploadDataExport({
       domain: true
     }
   });
-  const filename = `space-export-${space.domain}-${new Date().toISOString().split('.')[0]}.zip`;
+  const filename = `CharmVerse-export-${space.domain}-${new Date().toISOString().split('.')[0]}.zip`;
   const { fileUrl: url } = await uploadFileToS3({
     pathInS3: getUserS3FilePath({ userId, url: filename }),
     content: compressed,

@@ -42,6 +42,8 @@ processSynapsWebhookMessages();
 // Start processing mailgun webhook messages
 processMailgunWebhookMessages();
 
+processDataExports();
+
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
 
