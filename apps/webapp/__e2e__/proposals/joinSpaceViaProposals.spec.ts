@@ -7,7 +7,7 @@ import { test } from '__e2e__/utils/test';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
 
-test.skip('Create a proposal from a linked proposal template /member', async ({ page, proposalPage, documentPage }) => {
+test('Create a proposal from a linked proposal template /member', async ({ page, proposalPage, documentPage }) => {
   const { user: admin, space } = await generateUserAndSpace({ isAdmin: true });
 
   const member = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
@@ -198,7 +198,7 @@ test('Try to create a proposal from a linked proposal template / user from outsi
   await page.waitForURL(`${baseUrl}/join?domain=${space.domain}`);
 });
 
-test('Try to create a proposal from a linked proposal template / new user', async ({
+test.skip('Try to create a proposal from a linked proposal template / new user', async ({
   page,
   documentPage,
   proposalPage

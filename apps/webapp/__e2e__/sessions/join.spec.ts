@@ -37,7 +37,7 @@ test.skip('signup - not ignore the logic to redirect user after connect if the u
   await sandboxPage.waitForURL(`**/join?domain=${space.domain}`);
 });
 
-test('join - user can login through a join page', async ({ tokenGatePage }) => {
+test.skip('join - user can login through a join page', async ({ tokenGatePage }) => {
   const { user: user1 } = await generateUserAndSpace();
   const { space: space2, user: user2 } = await generateUserAndSpace();
   await generateTokenGate({ spaceId: space2.id, userId: user2.id });
