@@ -6,9 +6,9 @@ import requireValidation from '@packages/lib/middleware/requireValidation';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { processTokenGateConditions } from '@packages/lib/tokenGates/processTokenGateConditions';
-import { validateTokenGateRestrictions } from '@packages/lib/tokenGates/validateTokenGateRestrictions';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
+import { validateTokenGateRestrictions } from '@packages/subscriptions/featureRestrictions';
+import { DataNotFoundError, InvalidInputError, SystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -25,9 +25,26 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
+  if (!spaceId) {
+    throw new SystemError({
+      message: 'Space ID is required',
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+
+  const [{ subscriptionTier }, existingTokenGates] = await Promise.all([
+    prisma.space.findUniqueOrThrow({
+      where: { id: spaceId },
+      select: { subscriptionTier: true }
+    }),
+    prisma.tokenGate.count({ where: { spaceId } })
+  ]);
+
   // Check token gate access restrictions
   await validateTokenGateRestrictions({
-    spaceId,
+    subscriptionTier,
+    existingTokenGates,
     conditions: req.body.conditions
   });
 

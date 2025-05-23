@@ -1,4 +1,5 @@
-import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
+import { InvalidInputError } from '@charmverse/core/errors';
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 
 const KB = 1024;
 const MB = 1024 * KB;
@@ -24,4 +25,50 @@ export const VIDEO_SIZE_LIMITS_LABELS: Record<SpaceSubscriptionTier, string> = {
 
 export function getVideoSizeLimit(subscriptionTier?: SpaceSubscriptionTier | null) {
   return subscriptionTier ? VIDEO_SIZE_LIMITS[subscriptionTier] : VIDEO_SIZE_LIMITS.readonly;
+}
+
+export const TOKEN_GATE_LIMITS: Record<SpaceSubscriptionTier, { count: number; restrictedChains: boolean }> = {
+  readonly: { count: 0, restrictedChains: false },
+  free: { count: 1, restrictedChains: true },
+  bronze: { count: 1, restrictedChains: true },
+  silver: { count: 3, restrictedChains: false },
+  gold: { count: Infinity, restrictedChains: false },
+  grant: { count: Infinity, restrictedChains: false }
+} as const;
+
+export const RESTRICTED_TOKEN_GATE_CHAINS = ['ethereum'] as const;
+
+type TokenGatePayload = {
+  subscriptionTier: SpaceSubscriptionTier | null;
+  conditions?: { chain: string }[];
+  existingTokenGates: number;
+};
+
+export async function validateTokenGateRestrictions(payload: TokenGatePayload) {
+  const { subscriptionTier, conditions = [], existingTokenGates } = payload;
+
+  const limits = subscriptionTier ? TOKEN_GATE_LIMITS[subscriptionTier] : TOKEN_GATE_LIMITS.readonly;
+
+  if (existingTokenGates >= limits.count) {
+    throw new InvalidInputError(
+      `You have reached the maximum number of token gates (${limits.count}) for your subscription tier`
+    );
+  }
+
+  // Check chain restrictions only for public and bronze tiers
+  if (limits.restrictedChains) {
+    const unsupportedChains = conditions
+      .map((condition) => condition.chain)
+      .filter(
+        (chain) => !RESTRICTED_TOKEN_GATE_CHAINS.includes(chain as (typeof RESTRICTED_TOKEN_GATE_CHAINS)[number])
+      );
+
+    if (unsupportedChains.length > 0) {
+      throw new InvalidInputError(
+        `Your subscription tier only supports the following chains: ${RESTRICTED_TOKEN_GATE_CHAINS.join(', ')}`
+      );
+    }
+  }
+
+  return true;
 }
