@@ -21,7 +21,7 @@ export async function processDataExport(job: SpaceExportJob) {
     });
 
     // Update the job with the download URL
-    await prisma.spaceExportJob.update({
+    const result = await prisma.spaceExportJob.update({
       where: { id: job.id },
       data: {
         status: 'completed',
@@ -35,11 +35,12 @@ export async function processDataExport(job: SpaceExportJob) {
       jobId: job.id,
       downloadLink
     });
+    return result;
   } catch (error) {
     log.error('Error processing space export', { error, userId: job.createdBy, spaceId: job.spaceId, jobId: job.id });
 
     // Update job with error status
-    await prisma.spaceExportJob.update({
+    return prisma.spaceExportJob.update({
       where: { id: job.id },
       data: {
         status: 'failed',

@@ -36,7 +36,7 @@ export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: stri
 //   }
 // });
 export async function createDataExport({ userId, spaceId }: { userId: string; spaceId: string }) {
-  const pages = []; // await exportPages({ spaceId });
+  const pages = await exportPages({ spaceId });
   const proposalsTsv = await exportProposals({ spaceId, userId });
   const compressed = await zipFiles([
     {
@@ -45,10 +45,7 @@ export async function createDataExport({ userId, spaceId }: { userId: string; sp
     },
     {
       title: 'pages',
-      children: pages.map((page) => ({
-        title: page.title,
-        content: page.content
-      }))
+      children: pages
     }
   ]);
 

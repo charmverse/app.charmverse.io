@@ -2,6 +2,7 @@ import type { PageNodeWithChildren } from '@charmverse/core/pages';
 import { resolvePageTree } from '@charmverse/core/pages';
 import type { Block, Page, PagePermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import type { PageContent, TextContent } from '@packages/charmeditor/interfaces';
 import type { RelatedPageData } from '@packages/pages/interfaces';
 import { isBoardPageType } from '@packages/pages/isBoardPageType';
@@ -44,7 +45,21 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
     rootPages.map(async (page) => {
-      return resolvePageTree({ pageId: page.id, flattenChildren: true, fullPage: true });
+      return resolvePageTree({
+        pageId: page.id,
+        findManyArgs: {
+          select: {
+            id: true,
+            parentId: true,
+            content: true,
+            boardId: true,
+            cardId: true,
+            index: true,
+            type: true,
+            title: true
+          }
+        }
+      });
     })
   );
 
@@ -64,8 +79,8 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
    * Mutates the given node to provision its block data
    */
   async function recursiveResolveBlocks({ node }: { node: PageNodeWithChildren<ExportedPage> }): Promise<void> {
-    // eslint-disable-next-line no-console
-    // console.log('Processing page ', pageIndexes[node.id], ' / ', totalPages);
+    // Generate markdown for the page
+    const markdown = node.content ? await generateMarkdown({ content: node.content as PageContent }) : undefined;
 
     if (isBoardPageType(node.type)) {
       const boardblocks = await prisma.block.findMany({
@@ -81,26 +96,26 @@ export async function exportPages({ spaceId }: { spaceId: string }): Promise<Zip
         board: boardblocks.find((block) => block.type === 'board') as Block,
         views: boardblocks.filter((block) => block.type === 'view') as Block[]
       };
-    } else if (node.type.match('card')) {
-      const cardBlock = await prisma.block.findFirst({
-        where: {
-          id: node.id as string,
-          type: 'card'
-        }
-      });
-
-      node.blocks = {
-        card: cardBlock as Block
-      };
     }
-
-    // node.children = node.children?.filter((child) => !excludedPageTypes.includes(child.type)) ?? [];
 
     await Promise.all(
       (node.children ?? []).map(async (child) => {
         await recursiveResolveBlocks({ node: child });
       })
     );
+
+    Object.assign(node as unknown as ZipFileNode, {
+      markdown
+    });
+
+    const zipFields = ['markdown', 'tsv', 'children', 'title'];
+
+    // Save memory: clear out node and replace with zip file node contents
+    Object.keys(node).forEach((key) => {
+      if (node.hasOwnProperty(key) && !zipFields.includes(key)) {
+        delete node[key as keyof typeof node];
+      }
+    });
   }
 
   await Promise.all(mappedTrees.map((tree) => recursiveResolveBlocks({ node: tree.targetPage })));

@@ -2,7 +2,7 @@ import JSZip from 'jszip';
 
 export type ZipFileNode = {
   title: string;
-  content?: string;
+  markdown?: string;
   tsv?: string;
   children?: ZipFileNode[];
 };
@@ -20,8 +20,8 @@ export function zipFiles(files: ZipFileNode[]) {
         const folder = currentFolder.folder(file.title);
         if (folder) {
           // Add content and tsv files to the main folder
-          if (file.content) {
-            folder.file(`${file.title}.md`, file.content);
+          if (file.markdown) {
+            folder.file(`${file.title}.md`, file.markdown);
           }
           if (file.tsv) {
             folder.file(`${file.title}.tsv`, file.tsv);
@@ -35,8 +35,8 @@ export function zipFiles(files: ZipFileNode[]) {
         }
       } else {
         // Add files directly to current folder if no children
-        if (file.content) {
-          currentFolder.file(`${file.title}.md`, file.content);
+        if (file.markdown) {
+          currentFolder.file(`${file.title}.md`, file.markdown);
         }
         if (file.tsv) {
           currentFolder.file(`${file.title}.tsv`, file.tsv);
