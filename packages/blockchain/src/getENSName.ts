@@ -1,11 +1,10 @@
 import { log } from '@charmverse/core/log';
+import { isTestEnv } from '@packages/config/constants';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
 
 import { getAlchemyBaseUrl } from './getAlchemyBaseUrl';
 import { getPublicClient } from './getPublicClient';
-
-const isTestEnv = process.env.NODE_ENV === 'test';
 
 export async function getENSName(_address: string) {
   if (isTestEnv) {
