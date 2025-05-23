@@ -1,6 +1,6 @@
 import { SystemError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { hasApiAccess } from '@packages/lib/subscription/constants';
+import { hasApiAccess } from '@packages/subscriptions/featureRestrictions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

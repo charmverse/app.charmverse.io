@@ -4,7 +4,9 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, FormControlLabel, FormGroup, Grid, InputLabel, Stack, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { API_ACCESS_TIERS, hasApiAccess } from '@packages/subscriptions/featureRestrictions';
 import { isUrl } from '@packages/utils/strings';
+import { capitalize } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -14,6 +16,7 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
 
@@ -38,6 +41,8 @@ export function ApiSettings({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { updateSpaceWebhook, spaceWebhook, isLoading } = useWebhookSubscription(space.id);
   const { showMessage } = useSnackbar();
+  const apiAccess = hasApiAccess(space.subscriptionTier);
+  const { openUpgradeSubscription } = useSettingsDialog();
   const [isTestingWebhook, setIsTestingWebhook] = useState(false);
 
   useTrackPageView({ type: 'settings/api' });
@@ -131,10 +136,23 @@ export function ApiSettings({ space }: { space: Space }) {
         to see what is currently supported.
         <br />
         <br />
-        Get started by requesting an API key in our{' '}
-        <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
-          Discord Channel <LaunchIcon fontSize='small' />
-        </Link>
+        {apiAccess ? (
+          <>
+            Get started by requesting an API key in our{' '}
+            <Link href='https://discord.gg/ACYCzBGC2M' external target='_blank'>
+              Discord Channel <LaunchIcon fontSize='small' />
+            </Link>
+          </>
+        ) : (
+          <Alert severity='warning'>
+            You need to upgrade your subscription to {API_ACCESS_TIERS.slice(0, -1).map(capitalize).join(', ')} or{' '}
+            {capitalize(API_ACCESS_TIERS.at(-1))} tier to use the API. Click{' '}
+            <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={openUpgradeSubscription}>
+              here
+            </span>{' '}
+            to upgrade.
+          </Alert>
+        )}
       </Typography>
       <br />
       <Typography variant='h6'>Webhook (beta)</Typography>
