@@ -2,8 +2,8 @@ import { baseUrl } from '@packages/config/constants';
 import { expect } from '@playwright/test';
 import { login } from '__e2e__/utils/session';
 
+import { test } from '../../testWithFixtures';
 import { generateUser, generateUserAndSpace } from '../../utils/mocks';
-import { test } from '../testWithFixtures';
 
 test("tokenGates - redirect user to join page if they don't have access to workspace (shows alert if no token gate is found)", async ({
   page,

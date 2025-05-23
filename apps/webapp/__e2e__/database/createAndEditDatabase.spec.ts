@@ -3,9 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { baseUrl } from '@packages/config/constants';
 import { expect } from '@playwright/test';
-import type { DatabasePage } from '__e2e__/po/databasePage.po';
-import type { DocumentPage } from '__e2e__/po/document.po';
-import type { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
 import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
@@ -67,14 +64,14 @@ test.describe.serial('Edit database select properties', async () => {
       .then((p) => p.id);
   });
 
-  test('edit a board', async ({ page, document, databasePage }) => {
+  test('edit a board', async ({ page, documentPage, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
       userId: spaceUser.id
     });
 
-    await document.goToPage({
+    await documentPage.goToPage({
       domain: space.domain,
       path: databasePagePath
     });

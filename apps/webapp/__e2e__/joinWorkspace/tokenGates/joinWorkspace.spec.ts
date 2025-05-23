@@ -1,13 +1,12 @@
 import { baseUrl } from '@packages/config/constants';
 import { expect } from '@playwright/test';
-import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 import { login } from '__e2e__/utils/session';
 import { generateAndMockTokenGateRequests } from '__e2e__/utils/tokenGates';
 import { mockWeb3 } from '__e2e__/utils/web3';
 import { v4 } from 'uuid';
 
+import { test } from '../../testWithFixtures';
 import { generateSpaceRole, generateUserAndSpace } from '../../utils/mocks';
-import { test } from '../testWithFixtures';
 
 test.skip('joinWorkspace - search for a workspace and join a token gated workspace after meeting conditions', async ({
   page,

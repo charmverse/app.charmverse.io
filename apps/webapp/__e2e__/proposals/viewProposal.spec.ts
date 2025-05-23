@@ -3,9 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { baseUrl } from '@packages/testing/mockApiCall';
 import { expect } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
-import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
 
 import { test } from '../testWithFixtures';
 import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
@@ -142,7 +139,7 @@ test.describe('View proposal', () => {
     page,
     proposalListPage,
     documentPage,
-    pagePermissions
+    pagePermissionsDialog
   }) => {
     // Initial setup
     await loginBrowserUser({
@@ -176,11 +173,11 @@ test.describe('View proposal', () => {
     await expect(isEditable).toBe(true);
 
     // Start sharing flow
-    await pagePermissions.permissionDialog.click();
+    await pagePermissionsDialog.permissionDialog.click();
 
-    await pagePermissions.publishTab.click();
+    await pagePermissionsDialog.publishTab.click();
 
-    await expect(pagePermissions.publicShareToggle).toBeDisabled();
+    await expect(pagePermissionsDialog.publicShareToggle).toBeDisabled();
   });
 
   test('Public proposal can be seen by people outside the space', async ({ page, proposalListPage, documentPage }) => {

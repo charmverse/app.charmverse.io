@@ -5,9 +5,6 @@ import type { IPropertyTemplate } from '@packages/databases/board';
 import { Constants } from '@packages/databases/constants';
 import { generateBoard } from '@packages/testing/setupDatabase';
 import { expect } from '@playwright/test';
-import { DatabasePage } from '__e2e__/po/databasePage.po';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
 import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
@@ -22,7 +19,7 @@ test.beforeAll(async () => {
   }));
 });
 
-test('create and edit relation property values', async ({ page, document, databasePage }) => {
+test('create and edit relation property values', async ({ page, documentPage, databasePage }) => {
   // Arrange ------------------
   const sourceBoardPage = await generateBoard({
     createdBy: spaceUser.id,

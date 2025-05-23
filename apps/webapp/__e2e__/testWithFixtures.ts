@@ -1,6 +1,5 @@
 import type { Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import type { IntegrationsSettings } from '__e2e__/po/settings/integrationsSettings.po';
 
 import { BountyBoardPage } from './po/bountyBoard.po';
 import { BountyPage } from './po/bountyPage.po';
@@ -20,6 +19,7 @@ import { ProposalPage } from './po/proposalPage.po';
 import { ProposalsListPage } from './po/proposalsList.po';
 import { RewardPage } from './po/rewardPage.po';
 import { AccountTwoFactorAuth } from './po/settings/accountTwoFactorAuth.po';
+import { IntegrationsSettings } from './po/settings/integrationsSettings.po';
 import { ProjectSettings } from './po/settings/projectSettings.po';
 import { SettingsModal } from './po/settings/settings.po';
 import { ApiSettings } from './po/settings/spaceApiSettings.po';
