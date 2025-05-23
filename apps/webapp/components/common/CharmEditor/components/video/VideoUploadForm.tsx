@@ -3,7 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
-import { getVideoSizeLimit } from '@packages/lib/mux/constants';
+import { getVideoSizeLimit, VIDEO_SIZE_LIMITS_LABELS } from '@packages/subscriptions/featureRestrictions';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
@@ -15,18 +15,6 @@ type Props = {
   onComplete: (upload: { assetId: string; playbackId: string }) => void;
   pageId: string | null;
 };
-
-function formatFileSize(bytes: number): string {
-  if (bytes === Infinity) return 'Unlimited';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  let size = bytes;
-  let unitIndex = 0;
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex += 1;
-  }
-  return `${Math.round(size)} ${units[unitIndex]}`;
-}
 
 export function VideoUploadForm(props: Props) {
   const [isUploading, setIsUploading] = useState(false);
@@ -73,15 +61,22 @@ export function VideoUploadForm(props: Props) {
   }
 
   function startUpload(file: File) {
+    if (!space || !space.subscriptionTier) {
+      return;
+    }
+
     if (file.size > sizeLimit) {
-      setErrorMessage(`Video size exceeds the limit of ${formatFileSize(sizeLimit)} for your subscription tier`);
+      setErrorMessage(
+        `Video size exceeds the limit of ${VIDEO_SIZE_LIMITS_LABELS[space.subscriptionTier]} for your subscription tier`
+      );
       return;
     }
 
     setIsUploading(true);
     const req = UpChunk.createUpload({
       endpoint: () => createUpload(file.size),
-      file
+      file,
+      maxFileSize: sizeLimit
     });
 
     req.on('error', (err) => {

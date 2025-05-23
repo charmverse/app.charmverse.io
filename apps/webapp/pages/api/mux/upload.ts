@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { getVideoSizeLimit } from '@packages/lib/mux/constants';
 import { createUpload } from '@packages/lib/mux/createUpload';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import { getVideoSizeLimit } from '@packages/subscriptions/featureRestrictions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
