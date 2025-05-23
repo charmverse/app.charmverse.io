@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { baseUrl } from '@packages/config/constants';
 import { createVote, generateBoard } from '@packages/testing/setupDatabase';
 import { expect } from '@playwright/test';
-import { baseUrl } from '@packages/config/constants';
 
 import { DatabasePage } from './po/databasePage.po';
 import { test } from './testWithFixtures';

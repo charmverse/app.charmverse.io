@@ -341,7 +341,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright
+          name: 'Playwright results: ${{matrix.test_name}}'
           path: |
             apps/webapp/playwright-report/
             apps/webapp/test-results/

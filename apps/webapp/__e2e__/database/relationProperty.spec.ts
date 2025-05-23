@@ -106,7 +106,7 @@ test('create and edit relation property values', async ({ page, documentPage, da
     userId: spaceUser.id
   });
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });
@@ -150,7 +150,7 @@ test('create and edit relation property values', async ({ page, documentPage, da
   await databasePage.waitForBlockRelationsUpdate();
 
   // This is a workaround for the fact that the relation property is not receiving socket events
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });
@@ -223,7 +223,7 @@ test('create and edit relation property values', async ({ page, documentPage, da
     }
   });
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: targetBoardPage.path
   });
@@ -251,7 +251,7 @@ test('create and edit relation property values', async ({ page, documentPage, da
 
   await databasePage.page.locator(`data-test=page-option-${sourceBoardCards[0].id}`).getByTestId('RemoveIcon').click();
 
-  await document.goToPage({
+  await documentPage.goToPage({
     domain: space.domain,
     path: sourceBoardPage.path
   });
