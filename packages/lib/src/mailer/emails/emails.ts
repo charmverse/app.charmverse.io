@@ -14,6 +14,8 @@ import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
 import { emailSubject, PageInviteTemplate } from './templates/PageInviteTemplate';
 import { emailSubject as emailPlainSubject, PlainTemplate } from './templates/PlainTemplate';
+import type { PricingChangeEmailProps } from './templates/PricingChangeTemplate';
+import { emailPricingChangeSubject, PricingChangeTemplate } from './templates/PricingChangeTemplate';
 
 export async function getPendingNotificationEmail({
   notification,
@@ -84,6 +86,13 @@ export async function getMagicLinkEmail(props: MagicLinkProps) {
 export async function getPlainEmail() {
   const html = await render(PlainTemplate());
   const subject = emailPlainSubject();
+
+  return { html, subject };
+}
+
+export async function getPricingChangeEmail(props: PricingChangeEmailProps) {
+  const html = await render(PricingChangeTemplate(props));
+  const subject = emailPricingChangeSubject(props);
 
   return { html, subject };
 }

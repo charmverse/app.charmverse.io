@@ -1,7 +1,9 @@
+import { charmBlue as blueColor } from '@packages/config/colors';
 import type { TextProps } from '@react-email/text';
 import { Text as ReactEmailText } from '@react-email/text';
-import { charmBlue as blueColor } from '@packages/config/colors';
 import type { CSSProperties, ReactNode } from 'react';
+import * as React from 'react';
+
 // taken from theme/colors.ts
 const primaryTextColor = '#37352f';
 const secondaryTextColor = '#888';
