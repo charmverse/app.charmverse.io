@@ -1,13 +1,13 @@
 import type { Post, PostCategory, Role } from '@charmverse/core/prisma';
 import { writeToSameFolder } from '@packages/lib/utils/file';
+import type { ExportedPage } from '@packages/spaces/export/exportWorkspacePages';
+import { exportWorkspacePages } from '@packages/spaces/export/exportWorkspacePages';
 
 import { exportForumPosts } from './exportForumPosts';
 import type { ExportedPermissions } from './exportSpacePermissions';
 import { exportSpacePermissions } from './exportSpacePermissions';
 import { exportSpacePostCategories } from './exportSpacePostCategories';
 import { exportSpaceSettings, type SpaceSettingsExport } from './exportSpaceSettings';
-import type { ExportedPage } from './exportWorkspacePages';
-import { exportWorkspacePages } from './exportWorkspacePages';
 
 export type SpaceDataExport = {
   pages: ExportedPage[];

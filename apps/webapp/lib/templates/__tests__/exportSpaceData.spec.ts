@@ -20,10 +20,10 @@ import {
   mapSpacePermissionToAssignee,
   type AssignedSpacePermission
 } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
+import type { ExportedPage } from '@packages/spaces/export/exportWorkspacePages';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import { exportSpaceData } from '../exportSpaceData';
-import type { ExportedPage } from '../exportWorkspacePages';
 
 describe.skip('exportSpaceData', () => {
   let space: Space;
