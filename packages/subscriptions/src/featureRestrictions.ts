@@ -117,3 +117,32 @@ const WORKFLOW_LIMITS: Record<SpaceSubscriptionTier, number> = {
 export function getWorkflowLimits(subscriptionTier?: SpaceSubscriptionTier | null) {
   return subscriptionTier ? WORKFLOW_LIMITS[subscriptionTier] : WORKFLOW_LIMITS.readonly;
 }
+
+// Block quota limits per tier (in thousands)
+const BLOCK_QUOTA_LIMITS: Record<SpaceSubscriptionTier, number> = {
+  readonly: 0,
+  free: Infinity,
+  bronze: 5,
+  silver: 10,
+  gold: 100,
+  grant: Infinity
+} as const;
+
+export const BLOCK_QUOTA_LIMITS_LABELS: Record<SpaceSubscriptionTier, string> = {
+  readonly: '0K',
+  free: `Unlimited`,
+  bronze: '5K',
+  silver: '10K',
+  gold: '100K',
+  grant: 'Unlimited'
+};
+
+export function getBlockQuotaLimit(subscriptionTier?: SpaceSubscriptionTier | null) {
+  const blockQuotaLimit = subscriptionTier ? BLOCK_QUOTA_LIMITS[subscriptionTier] : BLOCK_QUOTA_LIMITS.readonly;
+  return blockQuotaLimit === Infinity ? Infinity : blockQuotaLimit * 1000;
+}
+
+export function hasExceededBlockQuota(subscriptionTier: SpaceSubscriptionTier | null, currentBlockCount: number) {
+  const totalQuota = getBlockQuotaLimit(subscriptionTier);
+  return currentBlockCount > totalQuota;
+}
