@@ -66,25 +66,28 @@ export type E2EFixtures = {
 // Example case: Dealing with main document page and popup document page
 const dialogSelector = `data-test=dialog`;
 
+export async function overrideCDNRequests(page: Page) {
+  // Set up routing for all requests
+  return page.route('**/*', async (route) => {
+    const url = route.request().url();
+    if (url.startsWith('https://cdn.charmverse.io/')) {
+      const newUrl = url.replace('https://cdn.charmverse.io/', 'http://localhost:3335/');
+      // console.log(`Redirecting ${url} to ${newUrl}`);
+      await route.fulfill({
+        status: 301,
+        headers: {
+          Location: newUrl
+        }
+      });
+    } else {
+      await route.continue();
+    }
+  });
+}
+
 export const test = base.extend<E2EFixtures>({
   page: async ({ page }, use) => {
-    // Set up routing for all requests
-    await page.route('**/*', async (route) => {
-      const url = route.request().url();
-      if (url.startsWith('https://cdn.charmverse.io/')) {
-        const newUrl = url.replace('https://cdn.charmverse.io/', 'http://localhost:3335/');
-        // console.log(`Redirecting ${url} to ${newUrl}`);
-        await route.fulfill({
-          status: 301,
-          headers: {
-            Location: newUrl
-          }
-        });
-      } else {
-        await route.continue();
-      }
-    });
-
+    await overrideCDNRequests(page);
     // Use the page with the custom routing
     await use(page);
   },

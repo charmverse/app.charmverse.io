@@ -4,7 +4,7 @@ import type { Page } from '@playwright/test';
 import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
-import { test as base } from '../testWithFixtures';
+import { test as base, overrideCDNRequests } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
@@ -39,6 +39,7 @@ const test = base.extend<Fixtures>({
       });
     });
     const page = await sandbox.newPage();
+    await overrideCDNRequests(page);
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),

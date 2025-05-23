@@ -4,7 +4,7 @@ import { createVote, generateBoard } from '@packages/testing/setupDatabase';
 import { expect } from '@playwright/test';
 
 import { DatabasePage } from './po/databasePage.po';
-import { test } from './testWithFixtures';
+import { overrideCDNRequests, test } from './testWithFixtures';
 import { generateUserAndSpace, generateUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
@@ -64,6 +64,7 @@ test.describe('Public pages', async () => {
 
     const anonContext = await browser.newContext();
     const anonPage = await anonContext.newPage();
+    await overrideCDNRequests(anonPage);
 
     // 1. Visit the page
     await anonPage.goto(shareUrl);

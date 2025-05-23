@@ -4,7 +4,7 @@ import type { DiscordServerDetails } from '../fixtures/discordServer';
 import { discordServer as discordServerFixture } from '../fixtures/discordServer';
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
-import { test as base } from '../testWithFixtures';
+import { test as base, overrideCDNRequests } from '../testWithFixtures';
 
 type Fixtures = {
   sandboxPage: Page;
@@ -37,6 +37,7 @@ const test = base.extend<Fixtures>({
       });
     });
     const page = await sandbox.newPage();
+    await overrideCDNRequests(page);
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),

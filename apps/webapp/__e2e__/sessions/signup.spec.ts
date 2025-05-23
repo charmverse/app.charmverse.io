@@ -4,7 +4,7 @@ import { TokenGatePage } from '__e2e__/po/tokenGate.po';
 
 import { LoginPage } from '../po/login.po';
 import { SignUpPage } from '../po/signup.po';
-import { test as base } from '../testWithFixtures';
+import { test as base, overrideCDNRequests } from '../testWithFixtures';
 import { createUser } from '../utils/mocks';
 import { mockWeb3 } from '../utils/web3';
 
@@ -19,6 +19,7 @@ const test = base.extend<Fixtures>({
   sandboxPage: async ({ browser: _browser }, use) => {
     const sandbox = await _browser.newContext();
     const page = await sandbox.newPage();
+    await overrideCDNRequests(page);
     await use(page);
   },
   loginPage: ({ sandboxPage }, use) => use(new LoginPage(sandboxPage)),

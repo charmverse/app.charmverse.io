@@ -6,6 +6,7 @@ import { RewardPage } from '__e2e__/po/rewardPage.po';
 
 import { BountyBoardPage } from '../po/bountyBoard.po';
 import { DocumentPage } from '../po/document.po';
+import { overrideCDNRequests } from '../testWithFixtures';
 
 type Fixtures = {
   globalPage: GlobalPage;
@@ -18,22 +19,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   page: async ({ page }, use) => {
-    // Set up routing for all requests
-    await page.route('**/*', async (route) => {
-      const url = route.request().url();
-      if (url.startsWith('https://cdn.charmverse.io/')) {
-        const newUrl = url.replace('https://cdn.charmverse.io/', 'http://localhost:3335/');
-        // console.log(`Redirecting ${url} to ${newUrl}`);
-        await route.fulfill({
-          status: 301,
-          headers: {
-            Location: newUrl
-          }
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    await overrideCDNRequests(page);
 
     // Use the page with the custom routing
     await use(page);
