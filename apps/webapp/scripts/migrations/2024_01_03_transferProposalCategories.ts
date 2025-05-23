@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
-import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
+import { getDefaultBoard, getDefaultTableView } from '@packages/lib/proposals/blocks/boardData';
 import { Block, blockToPrisma } from '@packages/databases/block';
 import { IPropertyTemplate } from '@packages/databases/board';
 import { BoardView } from '@packages/databases/boardView';

@@ -1,6 +1,7 @@
 import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { getDefaultBoard } from '@packages/lib/proposals/blocks/boardData';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import { generateProposalSourceDb } from '@packages/lib/testing/proposals';
 import { generateBoard, generateProposal, generateUserAndSpace } from '@packages/testing/setupDatabase';
@@ -8,8 +9,6 @@ import { addUserToSpace } from '@packages/testing/utils/spaces';
 import { generateUser } from '@packages/testing/utils/users';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
 import { v4 } from 'uuid';
-
-import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 
 import { prismaToBlock } from '../../block';
 import type { Board, IPropertyTemplate } from '../../board';

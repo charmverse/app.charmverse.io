@@ -4,7 +4,6 @@ import fs from 'node:fs/promises';
 
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
-import { exportWorkspacePages, exportWorkspacePagesToDisk } from '@packages/spaces/export/exportWorkspacePages';
 import {
   createPage,
   generateBounty,
@@ -13,6 +12,8 @@ import {
   generateUserAndSpace
 } from '@packages/testing/setupDatabase';
 import { vi } from 'vitest';
+
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
 
 vi.mock('node:fs/promises');
 

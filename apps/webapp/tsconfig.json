@@ -46,5 +46,5 @@
     "types": ["vitest/globals"]
   },
   "exclude": ["node_modules", "scripts"],
-  "include": ["**/*.ts", "**/*.tsx", "../../packages/spaces/src/export/exportWorkspacePages.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

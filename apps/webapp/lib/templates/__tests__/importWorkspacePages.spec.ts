@@ -21,8 +21,6 @@ import { blockToPrisma, prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
 import type { RelatedPageData } from '@packages/pages/interfaces';
-import type { ExportedPage, WorkspacePagesExport } from '@packages/spaces/export/exportWorkspacePages';
-import { exportWorkspacePages, exportWorkspacePagesToDisk } from '@packages/spaces/export/exportWorkspacePages';
 import { createMockBoard, createMockView } from '@packages/testing/mocks/block';
 import type { MockPageInput } from '@packages/testing/mocks/page';
 import { createMockPage } from '@packages/testing/mocks/page';
@@ -30,6 +28,8 @@ import { createMockSpace } from '@packages/testing/mocks/space';
 import { createPage, generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
 
+import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
+import type { ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { importWorkspacePages, _generateNewPages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');

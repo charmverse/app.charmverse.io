@@ -9,14 +9,14 @@ import { PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
 import { sortCards } from '@packages/databases/store/cards';
 import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { getDefaultBoard, getDefaultTableView } from '@packages/lib/proposals/blocks/boardData';
 import { CREATED_AT_ID, PROPOSAL_EVALUATION_TYPE_ID } from '@packages/lib/proposals/blocks/constants';
 import type { ProposalBoardBlock } from '@packages/lib/proposals/blocks/interfaces';
 import { getProposals } from '@packages/lib/proposals/getProposals';
 import { formatDate, formatDateTime } from '@packages/lib/utils/dates';
 import { stringify } from 'csv-stringify/sync';
 
-import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { mapProposalToCard } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import { mapProposalToCard } from './mapProposalToCard';
 
 export async function exportProposals({ spaceId, userId }: { spaceId: string; userId: string }) {
   const space = await prisma.space.findUniqueOrThrow({ where: { id: spaceId }, select: { domain: true } });
@@ -77,12 +77,12 @@ export async function exportProposals({ spaceId, userId }: { spaceId: string; us
     evaluationStepTitles: Array.from(evaluationStepTitles)
   });
 
-  let viewBlock = proposalViewBlock ? (blockToFBBlock(proposalViewBlock as ProposalBoardBlock) as BoardView) : null;
+  const defaultViewBlock = getDefaultTableView({ board });
+  defaultViewBlock.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
 
-  if (!viewBlock) {
-    viewBlock = getDefaultTableView({ board });
-    viewBlock.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-  }
+  const viewBlock = proposalViewBlock
+    ? (blockToFBBlock(proposalViewBlock as ProposalBoardBlock) as BoardView)
+    : defaultViewBlock;
 
   let cards = proposals.map((p) => mapProposalToCard({ proposal: p, spaceId }));
 
