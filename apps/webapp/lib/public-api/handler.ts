@@ -1,13 +1,14 @@
 import { log } from '@charmverse/core/log';
-import { count } from '@packages/metrics';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { onError, onNoMatch } from '@packages/lib/middleware';
+import { requireApiAccess } from '@packages/lib/middleware/requireApiAccess';
 import { requireApiKey } from '@packages/lib/middleware/requireApiKey';
 import type { NextApiRequestWithApiPageKey } from '@packages/lib/middleware/requireApiPageKey';
 import { requireApiPageKey } from '@packages/lib/middleware/requireApiPageKey';
 import { requireSuperApiKey } from '@packages/lib/middleware/requireSuperApiKey';
-import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { count } from '@packages/metrics';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 export function defaultHandler() {
@@ -17,6 +18,7 @@ export function defaultHandler() {
 export function apiHandler() {
   return nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch })
     .use(requireApiKey)
+    .use(requireApiAccess)
     .use(secureSpaceApiRequest)
     .use(logApiRequest);
 }
@@ -31,6 +33,7 @@ export function superApiHandler() {
     .use(securePartnerSpaceApiRequest)
     .use(logApiRequest);
 }
+
 export async function logApiRequest(req: NextApiRequestWithApiPageKey, res: NextApiResponse, next: VoidFunction) {
   // Get a sanitised url to avoid leaking keys
   let path = req.url?.split('?')[0] ?? '';

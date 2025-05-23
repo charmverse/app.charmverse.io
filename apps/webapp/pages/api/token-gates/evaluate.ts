@@ -1,6 +1,3 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type {
@@ -8,6 +5,8 @@ import type {
   TokenGateEvaluationResult
 } from '@packages/lib/tokenGates/evaluateEligibility';
 import { evaluateTokenGateEligibility } from '@packages/lib/tokenGates/evaluateEligibility';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

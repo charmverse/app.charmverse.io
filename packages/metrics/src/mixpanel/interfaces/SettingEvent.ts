@@ -8,7 +8,7 @@ export type AddInviteLink = BaseEvent & {
 export type AddAGate = BaseEvent & {
   numberOfConditions: number;
   chainType: string | string[];
-  accesType: string | string[];
+  accessType: string | string[];
   gateType: string | string[];
 };
 

@@ -1,9 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError } from '@packages/utils/errors';
-import { isUniqueConstraintError } from '@packages/utils/errors/prisma';
 import { updateAllowedPlaybackDomains } from '@packages/lib/mux/updateAllowedPlaybackDomains';
 import { isValidDomainName } from '@packages/lib/utils/domains/isValidDomainName';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
+import { InvalidInputError } from '@packages/utils/errors';
+import { isUniqueConstraintError } from '@packages/utils/errors/prisma';
 
 export type UpdateCustomDomainInput = {
   customDomain: string | null;
@@ -17,6 +18,21 @@ export async function updateSpaceCustomDomain(
 ): Promise<UpdateCustomDomainResponse> {
   if (!spaceId) {
     throw new InvalidInputError('A space ID is required');
+  }
+
+  // Get space subscription tier
+  const space = await prisma.space.findUnique({
+    where: { id: spaceId },
+    select: { subscriptionTier: true }
+  });
+
+  if (!space) {
+    throw new InvalidInputError('Space not found');
+  }
+
+  // Check if space has access to custom domains
+  if (data.customDomain && !hasCustomDomainAccess(space.subscriptionTier)) {
+    throw new InvalidInputError('Custom domains are only available for Silver tier and above');
   }
 
   if (data.customDomain && !isValidDomainName(data.customDomain)) {

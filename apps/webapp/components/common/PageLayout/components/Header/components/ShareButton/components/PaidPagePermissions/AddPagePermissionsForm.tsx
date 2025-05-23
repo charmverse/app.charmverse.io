@@ -6,6 +6,9 @@ import type {
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
+import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
+import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
+import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -16,10 +19,9 @@ import InputEnumToOptions from 'components/common/form/InputEnumToOptions';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { InputSearchRoleMultiple } from 'components/common/form/InputSearchRole';
 import Loader from 'components/common/Loader';
+import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
-import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 export const schema = yup.object({
@@ -45,6 +47,8 @@ export default function AddPagePermissionsForm({
   permissionsAdded = () => {}
 }: Props) {
   const { roles } = useRoles();
+  const { subscriptionTier } = useSpaceSubscription();
+  const canAddGuests = hasGuestAccess(subscriptionTier);
 
   const [availableRoles, setAvailableRoles] = useState<ListSpaceRolesResponse[]>([]);
   const { showMessage } = useSnackbar();
@@ -195,14 +199,19 @@ export default function AddPagePermissionsForm({
           <Grid item>
             <InputLabel>Users</InputLabel>
             <InputSearchMemberMultiple
-              allowEmail
+              allowEmail={canAddGuests}
               onChange={setSelectedUserIds}
-              placeholder='Search for user or invite guests by email'
+              placeholder={canAddGuests ? 'Search for user or invite guests by email' : 'Search for users'}
               filter={{
                 mode: 'exclude',
                 userIds: userIdsToHide
               }}
             />
+            {!canAddGuests && (
+              <Alert severity='warning' sx={{ mt: 1 }}>
+                Guest access is not available for your subscription tier
+              </Alert>
+            )}
           </Grid>
 
           {roleIdsToHide.length < availableRoles.length && (
