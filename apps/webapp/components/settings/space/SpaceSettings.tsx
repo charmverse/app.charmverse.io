@@ -470,14 +470,14 @@ export function SpaceSettings({
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item sx={{ flexDirection: 'column', display: 'flex' }}>
-            <Legend>Export</Legend>
+            <Legend>Export Data</Legend>
             <Typography variant='caption' sx={{ mb: 2 }}>
               Admins can download proposals, pages, and databases (TSV and Markdown format). We will email you a link
               when it is ready.
             </Typography>
             <span>
               <Button disabledTooltip='Only admins can export' disabled={!isAdmin} onClick={exportSpaceContent}>
-                Request export
+                Export
               </Button>
             </span>
           </Grid>

@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { exportProposals } from '@packages/lib/proposals/exportProposals';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -40,9 +41,17 @@ export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: stri
 //   }
 // });
 export async function createDataExport({ userId, spaceId }: { userId: string; spaceId: string }) {
-  const pages = await exportPages({ spaceId });
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      domain: true
+    }
+  });
+  const pages = []; // await exportPages({ spaceId });
   const proposalsTsv = await exportProposals({ spaceId, userId });
-  return zipFiles([
+  const compressed = await zipFiles([
     {
       title: 'Proposals',
       tsv: proposalsTsv
@@ -55,4 +64,13 @@ export async function createDataExport({ userId, spaceId }: { userId: string; sp
       }))
     }
   ]);
+
+  const filename = `space-export-${space.domain}-${new Date().toISOString().split('.')[0]}.zip`;
+  const { fileUrl: url } = await uploadFileToS3({
+    pathInS3: getUserS3FilePath({ userId, url: filename }),
+    content: compressed,
+    contentType: 'application/zip'
+  });
+
+  return url;
 }

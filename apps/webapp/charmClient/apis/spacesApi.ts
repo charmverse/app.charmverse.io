@@ -101,7 +101,7 @@ export class SpacesApi {
   }
 
   exportSpaceData({ spaceId }: { spaceId: string }) {
-    return http.POST(`/api/spaces/${spaceId}/export-data`);
+    return http.POST<{ downloadLink: string }>(`/api/spaces/${spaceId}/export-data`);
   }
 
   connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {

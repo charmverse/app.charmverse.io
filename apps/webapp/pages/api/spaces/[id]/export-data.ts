@@ -1,25 +1,17 @@
-import { log } from '@charmverse/core/log';
-import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import { zipContent } from '@packages/lib/utils/file';
-import { paginatedPrismaTask } from '@packages/lib/utils/paginatedPrismaTask';
+import { createDataExport } from '@packages/spaces/export/createDataExport';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { exportSpaceData } from 'lib/templates/exportSpaceData';
-
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(requireSpaceMembership({ adminOnly: true }), requestZip);
+handler.post(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }), requestZip);
 
 async function requestZip(req: NextApiRequest, res: NextApiResponse) {
-  const exportedData = await exportSpaceData({ spaceIdOrDomain: req.query.id as string });
+  const downloadLink = await createDataExport({ spaceId: req.query.id as string, userId: req.session.user?.id });
 
-  const compressed = await zipContent({ csv: exportedData.csv, pages: exportedData.pages });
-
-  return res.status(200).setHeader('Content-Type', 'application/octet-stream').send(compressed);
+  return res.status(200).send({ downloadLink });
 }
 
 export default withSessionRoute(handler);
