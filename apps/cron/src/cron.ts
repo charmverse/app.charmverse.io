@@ -8,6 +8,7 @@ import app from './healthCheck/app';
 import { task as chargeSpacesSubscriptionTask } from './tasks/chargeSpacesSubscription';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
+import { task as pollForDataExports } from './tasks/exportSpaceData';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
 import { task as processCollablandWebhookMessages } from './tasks/processCollablandWebhookMessages';
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
@@ -42,7 +43,8 @@ processSynapsWebhookMessages();
 // Start processing mailgun webhook messages
 processMailgunWebhookMessages();
 
-processDataExports();
+// Start polling for data exports
+pollForDataExports();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);

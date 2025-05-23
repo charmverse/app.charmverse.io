@@ -149,7 +149,7 @@ export async function exportPages({
   const exportData: ZipFileNode[] = [];
   for (const tree of mappedTrees) {
     const page = tree.targetPage as unknown as ZipFileNode;
-    await recursiveResolveBlocks({ node: page });
+    await recursiveResolveBlocks({ node: page as unknown as PageNodeWithChildren<{ id: string; content: any }> });
     exportData.push(page);
     // update status
     await prisma.spaceExportJob.update({

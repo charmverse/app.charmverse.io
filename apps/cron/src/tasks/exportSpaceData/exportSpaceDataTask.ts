@@ -95,7 +95,7 @@ export async function checkStaleExportJobs() {
           userId: job.author.id
         },
         subject: `Space Export Timed Out - ${job.space.name}`,
-        text: `Your space export for ${job.space.name} has timed out after 1 hour. Please try again.`
+        html: `<p>Your space export for ${job.space.name} has timed out after 1 hour. Please try again.</p>`
       });
     }
   }
