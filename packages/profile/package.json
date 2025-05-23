@@ -2,6 +2,7 @@
   "name": "@packages/profile",
   "version": "0.0.0",
   "description": "",
+  "type": "module",
   "private": true,
   "scripts": {
     "test": ""

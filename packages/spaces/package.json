@@ -13,6 +13,7 @@
   "dependencies": {
     "@packages/databases": "^0.0.0",
     "@packages/lib": "^0.0.0",
+    "@packages/pages": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "viem": "^2.29.2"
   }

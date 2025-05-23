@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createCardPage } from 'lib/pages/createCardPage';
+import { createCardPage } from '@packages/pages/createCardPage';
 
 import type { BlockWithDetails } from '../block';
 import { applyPageToBlock } from '../block';

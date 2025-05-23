@@ -1,6 +1,5 @@
+import { getTwitterEmoji } from '@packages/utils/emoji';
 import { memo } from 'react';
-
-import { getTwitterEmoji } from '@packages/lib/utils/emoji';
 
 function Favicon({ pageIcon }: { pageIcon?: string | null }) {
   const favicon = {

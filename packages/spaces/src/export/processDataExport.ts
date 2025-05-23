@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { SpaceExportJob } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import * as mailer from '@packages/lib/mailer';
 
 import { createDataExport } from './createDataExport';
 import { uploadDataExport } from './uploadDataExport';
@@ -13,7 +14,8 @@ export async function processDataExport(
     // Create the export data
     const compressed = await createDataExport({
       spaceId: job.spaceId,
-      userId: job.createdBy
+      userId: job.createdBy,
+      jobId: job.id
     });
     // Upload to s3
     const downloadLink = await uploadDataExport({
@@ -22,7 +24,7 @@ export async function processDataExport(
       userId: job.createdBy
     });
 
-    const { status: latestJobStatus } = await prisma.spaceExportJob.findUnique({
+    const { status: latestJobStatus } = await prisma.spaceExportJob.findUniqueOrThrow({
       where: { id: job.id },
       select: {
         status: true
@@ -46,6 +48,8 @@ export async function processDataExport(
       select: {
         author: {
           select: {
+            id: true,
+            username: true,
             email: true
           }
         },
@@ -72,8 +76,8 @@ export async function processDataExport(
           email: result.author.email,
           userId: result.author.id
         },
-        subject: `Data Export Complete - ${result.space.name}`,
-        text: `Your export for ${result.space.name} is ready. You can download it here: ${s3Url}`
+        subject: `Data Export complete for ${result.space.name}`,
+        html: `<p>Your export for ${result.space.name} is ready. You can download it here: <a href="${downloadLink}">${downloadLink}</a></p>`
       });
     }
     return { result: 'completed', status: 'completed' };
@@ -81,7 +85,7 @@ export async function processDataExport(
     log.error('Error processing space export', { error, userId: job.createdBy, spaceId: job.spaceId, jobId: job.id });
 
     // Double check job is still pending before processing
-    const { status: latestJobStatus } = await prisma.spaceExportJob.findUnique({
+    const { status: latestJobStatus } = await prisma.spaceExportJob.findUniqueOrThrow({
       where: { id: job.id },
       select: {
         status: true
@@ -92,23 +96,37 @@ export async function processDataExport(
       return { result: 'already_processed', status: latestJobStatus };
     }
     // Update job with error status
-    await prisma.spaceExportJob.update({
+    const result = await prisma.spaceExportJob.update({
       where: { id: job.id },
       data: {
         status: 'failed',
         error: error instanceof Error ? error.message : 'Unknown error occurred'
+      },
+      select: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            email: true
+          }
+        },
+        space: {
+          select: {
+            name: true
+          }
+        }
       }
     });
     // Send error notification
-    if (pendingJob.author.email) {
+    if (result.author.email) {
       await mailer.sendEmail({
         to: {
-          displayName: pendingJob.author.username,
-          email: pendingJob.author.email,
-          userId: pendingJob.author.id
+          displayName: result.author.username,
+          email: result.author.email,
+          userId: result.author.id
         },
-        subject: `Space Export Failed - ${pendingJob.space.name}`,
-        text: `There was an error exporting your space ${pendingJob.space.name}. Please try again later.`
+        subject: `Space Export failed for ${result.space.name}`,
+        html: `<p>There was an error exporting your space ${result.space.name}. Please try again later.</p>`
       });
     }
     return { result: 'failed', status: 'failed', error };

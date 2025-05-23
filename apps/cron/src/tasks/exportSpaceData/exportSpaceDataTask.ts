@@ -8,8 +8,6 @@ import { DateTime } from 'luxon';
 const ONE_HOUR = 60 * 60 * 1000; // 1 hour in milliseconds
 
 export async function exportSpaceDataTask() {
-  log.debug('Running export space data task');
-
   // Find a pending export job
   const pendingJob = await prisma.spaceExportJob.findFirst({
     where: {

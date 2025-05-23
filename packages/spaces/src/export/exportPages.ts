@@ -12,9 +12,30 @@ import type { ZipFileNode } from './zipFiles';
 
 const zipFields: (keyof ZipFileNode)[] = ['markdown', 'tsv', 'children', 'title'];
 
-export async function exportPages({ spaceId, userId }: { spaceId: string; userId: string }): Promise<ZipFileNode[]> {
+export async function exportPages({
+  spaceId,
+  userId,
+  jobId
+}: {
+  spaceId: string;
+  userId: string;
+  jobId: string;
+}): Promise<ZipFileNode[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: { id: spaceId }
+  });
+  const members = await prisma.user.findMany({
+    where: {
+      spaceRoles: {
+        some: {
+          spaceId
+        }
+      }
+    },
+    select: {
+      username: true,
+      id: true
+    }
   });
 
   const rootPages = await prisma.page.findMany({
@@ -27,8 +48,6 @@ export async function exportPages({ spaceId, userId }: { spaceId: string; userId
       }
     }
   });
-
-  const exportData: ZipFileNode[] = [];
 
   // Replace by multi resolve page tree in future
   const mappedTrees = await Promise.all(
@@ -50,6 +69,16 @@ export async function exportPages({ spaceId, userId }: { spaceId: string; userId
       });
     })
   );
+
+  // keep track of how many pages have been processed
+  const totalPages = mappedTrees.reduce((acc, tree) => {
+    function countPages(node: PageNodeWithChildren): number {
+      return 1 + (node.children?.reduce((childAcc, child) => childAcc + countPages(child), 0) ?? 0);
+    }
+    return acc + countPages(tree.targetPage);
+  }, 0);
+
+  let processedPages = 0;
 
   // Console reporting for manual exports
   // const pageIndexes = mappedTrees.reduce((acc, val) => {
@@ -75,7 +104,12 @@ export async function exportPages({ spaceId, userId }: { spaceId: string; userId
     let markdown: string | undefined;
     if (node.content) {
       try {
-        markdown = await generateMarkdown({ content: node.content as PageContent });
+        markdown = await generateMarkdown({
+          content: node.content as PageContent,
+          generatorOptions: {
+            members
+          }
+        });
       } catch (error) {
         log.error('Error generating markdown for page', { pageId: node.id, error });
         markdown = 'There was an error generating markdown for this page';
@@ -92,6 +126,7 @@ export async function exportPages({ spaceId, userId }: { spaceId: string; userId
         tsv: csvData
       });
     }
+    processedPages += 1;
 
     await Promise.all(
       (node.children ?? []).map(async (child) => {
@@ -111,15 +146,22 @@ export async function exportPages({ spaceId, userId }: { spaceId: string; userId
     });
   }
 
-  await Promise.all(
-    mappedTrees.map((tree) =>
-      recursiveResolveBlocks({ node: tree.targetPage as unknown as PageNodeWithChildren<{ id: string; content: any }> })
-    )
-  );
-
-  mappedTrees.forEach((t) => {
-    exportData.push(t.targetPage as unknown as ZipFileNode);
-  });
+  const exportData: ZipFileNode[] = [];
+  for (const tree of mappedTrees) {
+    const page = tree.targetPage as unknown as ZipFileNode;
+    await recursiveResolveBlocks({ node: page });
+    exportData.push(page);
+    // update status
+    await prisma.spaceExportJob.update({
+      where: { id: jobId },
+      data: {
+        metrics: {
+          processedPages,
+          totalPages
+        }
+      }
+    });
+  }
 
   return exportData;
 }
