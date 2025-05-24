@@ -54,8 +54,8 @@ export async function sendPlainEmail({
   attachment,
   senderAddress
 }: EmailProps & { text: string | string[] }) {
-  const template = await getPlainEmail({ html, subject });
-  return sendEmail({ client, template, subject, to, senderAddress });
+  const rendered = await getPlainEmail({ html, subject });
+  return sendEmail({ client, html: rendered, subject, to, senderAddress });
 }
 export async function sendTemplateEmail({
   client,

@@ -77,7 +77,10 @@ export async function processDataExport(
           userId: result.author.id
         },
         subject: `Data Export complete for ${result.space.name}`,
-        text: `Your export for ${result.space.name} is ready. You can download it here: <a href="${downloadLink}">${downloadLink}</a>`
+        html: [
+          `Your export for ${result.space.name} is ready.`,
+          `You can download it here: <a href="${downloadLink}">Click to download</a>`
+        ]
       });
     }
     return { result: 'completed', status: 'completed' };
