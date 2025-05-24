@@ -30,7 +30,7 @@ export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin:
       message: `This may take a few minutes.${user?.email ? ` When it is complete, a link will be sent to ${user.email}.` : ''}`
     });
     if (confirmed) {
-      await exportSpaceData({ spaceId });
+      await exportSpaceData(null);
     }
   }
 
