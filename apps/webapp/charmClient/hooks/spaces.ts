@@ -63,6 +63,6 @@ export function useRequestExportData(spaceId: string) {
   return usePOST<null, { jobId: string }>(`/api/spaces/${spaceId}/export-data`);
 }
 
-export function useGetExportJobStatus(jobId: MaybeString) {
-  return useGET<SpaceExportJob>(jobId ? `/api/spaces/${jobId}/export-data` : null);
+export function useGetExportJobStatus(spaceId: string, jobId: MaybeString) {
+  return useGET<SpaceExportJob>(spaceId && jobId ? `/api/spaces/${spaceId}/export-data` : null, { jobId });
 }

@@ -1,7 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { useEffect, useRef } from 'react';
 
-import charmClient from 'charmClient';
 import { useGetExportJobStatus, useRequestExportData } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import Legend from 'components/settings/components/Legend';
@@ -11,18 +10,17 @@ import { useUser } from 'hooks/useUser';
 export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin: boolean }) {
   const { user } = useUser();
   const { showConfirmation } = useConfirmationModal();
-  const { data: exportData, isMutating: isExportDataLoading } = useRequestExportData(spaceId);
-  const { data: job, mutate: refreshJob, isLoading: isJobLoading } = useGetExportJobStatus(exportData?.jobId);
+  const { data: exportData, isMutating: isExportDataLoading, trigger: exportSpaceData } = useRequestExportData(spaceId);
+  const { data: job, mutate: refreshJob, isLoading: isJobLoading } = useGetExportJobStatus(spaceId, exportData?.jobId);
   const intervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     clearInterval(intervalRef.current);
+    refreshJob();
     if (job?.status === 'pending') {
       intervalRef.current = setInterval(() => {
         refreshJob();
       }, 1000);
-    } else {
-      clearInterval(intervalRef.current);
     }
     return () => clearInterval(intervalRef.current);
   }, [job, refreshJob]);
@@ -32,7 +30,7 @@ export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin:
       message: `This may take a few minutes.${user?.email ? ` When it is complete, a link will be sent to ${user.email}.` : ''}`
     });
     if (confirmed) {
-      await charmClient.spaces.exportSpaceData({ spaceId });
+      await exportSpaceData({ spaceId });
     }
   }
 
@@ -43,12 +41,12 @@ export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin:
         Admins can download proposals, pages, and databases (TSV and Markdown format). We will email you a link when it
         is ready.
       </Typography>
-      <Box display='flex' gap={1} flexDirection='column'>
+      <Box display='flex' gap={1} flexDirection='row' alignItems='center'>
         <Button
           disabledTooltip='Only admins can export'
           disabled={!isAdmin}
           onClick={clickExportData}
-          isLoading={isExportDataLoading || job?.status === 'pending'}
+          loading={isExportDataLoading || job?.status === 'pending'}
         >
           Export
         </Button>
@@ -58,8 +56,8 @@ export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin:
           </Typography>
         )}
         {job?.status === 'completed' && (
-          <Typography variant='caption' component='em'>
-            Export complete: <a href={job.downloadLink!}>{job.downloadLink}</a>
+          <Typography variant='caption'>
+            Export complete: <a href={job.downloadLink!}>Click to download</a>
           </Typography>
         )}
       </Box>
