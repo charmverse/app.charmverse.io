@@ -1,11 +1,11 @@
 import type { TokenGateToRole } from '@charmverse/core/prisma-client';
-
 import type { TokenGateVerificationRequest } from '@packages/lib/tokenGates/applyTokenGates';
 import type {
   TokenGateEvaluationAttempt,
   TokenGateEvaluationResult
 } from '@packages/lib/tokenGates/evaluateEligibility';
 import type { TokenGate, TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
+
 import type { TokenGateTestRequest, TokenGateTestResponse } from 'pages/api/token-gates/test';
 
 import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';

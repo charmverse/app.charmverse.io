@@ -111,20 +111,27 @@ export async function exportPages({
           }
         });
       } catch (error) {
-        log.error('Error generating markdown for page', { pageId: node.id, error });
+        log.error('Error generating markdown for page', { userId, pageId: node.id, error });
         markdown = 'There was an error generating markdown for this page';
       }
     }
 
     if (isBoardPageType(node.type)) {
-      const { csvData } = await loadAndGenerateCsv({
-        userId,
-        databaseId: node.id
-      });
+      try {
+        const { csvData } = await loadAndGenerateCsv({
+          userId,
+          databaseId: node.id
+        });
 
-      Object.assign(node as unknown as ZipFileNode, {
-        tsv: csvData
-      });
+        Object.assign(node as unknown as ZipFileNode, {
+          tsv: csvData
+        });
+      } catch (error) {
+        log.error('Error generating CSV for board page', { userId, pageId: node.id, error });
+        Object.assign(node as unknown as ZipFileNode, {
+          tsv: 'There was an error generating an export for this board'
+        });
+      }
     }
     processedPages += 1;
 

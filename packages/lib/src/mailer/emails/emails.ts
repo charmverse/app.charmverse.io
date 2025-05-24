@@ -13,7 +13,7 @@ import { NotificationTemplate } from './templates/NotificationTemplate';
 import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteTemplate';
 import { emailSubject, PageInviteTemplate } from './templates/PageInviteTemplate';
-import { emailSubject as emailPlainSubject, PlainTemplate } from './templates/PlainTemplate';
+import { PlainTemplate } from './templates/PlainTemplate';
 import type { PricingChangeEmailProps } from './templates/PricingChangeTemplate';
 import { emailPricingChangeSubject, PricingChangeTemplate } from './templates/PricingChangeTemplate';
 
@@ -83,11 +83,8 @@ export async function getMagicLinkEmail(props: MagicLinkProps) {
   return { html, subject };
 }
 
-export async function getPlainEmail() {
-  const html = await render(PlainTemplate());
-  const subject = emailPlainSubject();
-
-  return { html, subject };
+export function getPlainEmail({ html, subject }: { html: string | string[]; subject: string }) {
+  return render(PlainTemplate({ html, subject }));
 }
 
 export async function getPricingChangeEmail(props: PricingChangeEmailProps) {

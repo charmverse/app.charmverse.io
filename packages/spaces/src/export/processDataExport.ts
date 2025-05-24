@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { SpaceExportJob } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import * as mailer from '@packages/lib/mailer';
+import { sendPlainEmail } from '@packages/lib/mailer';
 
 import { createDataExport } from './createDataExport';
 import { uploadDataExport } from './uploadDataExport';
@@ -70,14 +70,17 @@ export async function processDataExport(
 
     // Send email notification
     if (result.author.email) {
-      await mailer.sendEmail({
+      await sendPlainEmail({
         to: {
           displayName: result.author.username,
           email: result.author.email,
           userId: result.author.id
         },
         subject: `Data Export complete for ${result.space.name}`,
-        html: `<p>Your export for ${result.space.name} is ready. You can download it here: <a href="${downloadLink}">${downloadLink}</a></p>`
+        html: [
+          `Your export for ${result.space.name} is ready.`,
+          `You can download it here: <a href="${downloadLink}">Click to download</a>`
+        ]
       });
     }
     return { result: 'completed', status: 'completed' };
@@ -119,14 +122,14 @@ export async function processDataExport(
     });
     // Send error notification
     if (result.author.email) {
-      await mailer.sendEmail({
+      await sendPlainEmail({
         to: {
           displayName: result.author.username,
           email: result.author.email,
           userId: result.author.id
         },
         subject: `Space Export failed for ${result.space.name}`,
-        html: `<p>There was an error exporting your space ${result.space.name}. Please try again later.</p>`
+        html: `Unfortunately, there was an error exporting your space ${result.space.name}. Please contact support at hello@charmverse.io.`
       });
     }
     return { result: 'failed', status: 'failed', error };

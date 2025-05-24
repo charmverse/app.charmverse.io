@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import * as mailer from '@packages/lib/mailer';
+import { sendPlainEmail } from '@packages/lib/mailer';
 import { zipContent } from '@packages/lib/utils/file';
 import { processDataExport } from '@packages/spaces/export/processDataExport';
 import { DateTime } from 'luxon';
@@ -88,14 +89,14 @@ export async function checkStaleExportJobs() {
 
     // Send timeout notification
     if (job.author.email) {
-      await mailer.sendEmail({
+      await sendPlainEmail({
         to: {
           displayName: job.author.username,
           email: job.author.email,
           userId: job.author.id
         },
         subject: `Space Export Timed Out - ${job.space.name}`,
-        html: `<p>Your space export for ${job.space.name} has timed out after 1 hour. Please try again.</p>`
+        html: `Your space export for ${job.space.name} has timed out after 1 hour. Please try again.`
       });
     }
   }

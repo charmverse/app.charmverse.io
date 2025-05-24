@@ -55,7 +55,7 @@ export default function Text({
   variant?: TextVariant;
   bold?: boolean;
   primary?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
 } & TextProps) {
   return (
     <ReactEmailText
