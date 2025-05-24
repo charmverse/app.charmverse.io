@@ -128,7 +128,9 @@ export async function exportPages({
         });
       } catch (error) {
         log.error('Error generating CSV for board page', { userId, pageId: node.id, error });
-        node.tsv = 'There was an error generating an export for this board';
+        Object.assign(node as unknown as ZipFileNode, {
+          tsv: 'There was an error generating an export for this board'
+        });
       }
     }
     processedPages += 1;

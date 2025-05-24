@@ -53,7 +53,7 @@ export async function sendPlainEmail({
   to,
   attachment,
   senderAddress
-}: EmailProps & { text: string | string[] }) {
+}: EmailProps & { html: string | string[] }) {
   const rendered = await getPlainEmail({ html, subject });
   return sendEmail({ client, html: rendered, subject, to, senderAddress });
 }
