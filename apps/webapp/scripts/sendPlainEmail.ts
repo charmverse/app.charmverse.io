@@ -8,15 +8,15 @@ import { prisma } from '@charmverse/core/prisma-client';
       email: 'matt.casey@charmverse.io'
     }
   });
-  const template = await getPlainEmail();
+  const template = await getPlainEmail({ text: 'Test email', subject: 'Test' });
 
   // return;
   // for (const user of usersToSend) {
   try {
     await sendEmail({
       to: { userId: user.id, displayName: user.username, email: user.email! },
-      subject: template.subject,
-      html: template.html
+      subject: 'Test',
+      html: template
     });
   } catch (e) {
     console.error('Error sending email to user', user, e);

@@ -1,5 +1,5 @@
-import { Row } from '@react-email/row';
 import { baseUrl } from '@packages/config/constants';
+import { Row } from '@react-email/row';
 
 import { Button, EmailWrapper, Text } from './components';
 

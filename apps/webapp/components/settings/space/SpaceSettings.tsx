@@ -25,7 +25,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
 import Legend from 'components/settings/components/Legend';
-import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -35,6 +34,7 @@ import { useUser } from 'hooks/useUser';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
+import { ExportDataForm } from './components/ExportDataForm';
 import Avatar from './components/LargeAvatar';
 import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
 import { SettingsItem } from './components/SettingsItem';
@@ -81,7 +81,6 @@ export function SpaceSettings({
   setUnsavedChanges: (value: boolean) => void;
 }) {
   const { user } = useUser();
-  const { showConfirmation } = useConfirmationModal();
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
@@ -208,15 +207,6 @@ export function SpaceSettings({
     const droppedOnIndex = newOrder.findIndex((_feat) => _feat.id === droppedOnProperty); // find the index of the space that was dropped on
     newOrder.splice(droppedOnIndex, 0, deletedElements[0]); // add the property to the new index
     setMemberProfileProperties(newOrder);
-  }
-
-  async function exportSpaceContent() {
-    const { confirmed } = await showConfirmation({
-      message: `This may take a few minutes.${user?.email ? ` When it is complete, a link will be sent to ${user.email}.` : ''}`
-    });
-    if (confirmed) {
-      await charmClient.spaces.exportSpaceData({ spaceId: space.id });
-    }
   }
 
   const dataChanged =
@@ -470,16 +460,7 @@ export function SpaceSettings({
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item sx={{ flexDirection: 'column', display: 'flex' }}>
-            <Legend>Export Data</Legend>
-            <Typography variant='caption' sx={{ mb: 2 }}>
-              Admins can download proposals, pages, and databases (TSV and Markdown format). We will email you a link
-              when it is ready.
-            </Typography>
-            <span>
-              <Button disabledTooltip='Only admins can export' disabled={!isAdmin} onClick={exportSpaceContent}>
-                Export
-              </Button>
-            </span>
+            <ExportDataForm spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { htmlToText } from 'html-to-text';
 import type { IMailgunClient } from 'mailgun.js/Interfaces';
 
+import { getPlainEmail } from './emails/emails';
 import mailgunClient, { DOMAIN, SENDER_ADDRESS } from './mailgunClient';
 
 export interface EmailRecipient {
@@ -45,6 +46,17 @@ export async function sendEmail({
   });
 }
 
+export async function sendPlainEmail({
+  client,
+  html,
+  subject,
+  to,
+  attachment,
+  senderAddress
+}: EmailProps & { text: string | string[] }) {
+  const template = await getPlainEmail({ html, subject });
+  return sendEmail({ client, template, subject, to, senderAddress });
+}
 export async function sendTemplateEmail({
   client,
   template,
