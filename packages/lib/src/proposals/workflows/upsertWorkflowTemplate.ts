@@ -35,6 +35,11 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
     }
   });
 
+  // Double check if the workflow is archived
+  if (originalWorkflow?.archived && workflow.archived !== false) {
+    throw new InvalidInputError('Cannot modify archived workflows. Unarchive the workflow first.');
+  }
+
   const originalEvaluations = (originalWorkflow ? originalWorkflow.evaluations : []) as WorkflowEvaluationJson[];
 
   const hasChangedActionButtonLabels = workflow.evaluations.some((evaluation) => {

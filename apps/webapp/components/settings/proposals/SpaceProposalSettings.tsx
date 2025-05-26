@@ -157,6 +157,10 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             <Typography variant='h6' color='textSecondary' sx={{ mt: 2 }}>
               Archived Workflows
             </Typography>
+            <Typography variant='body1' gutterBottom>
+              Archived workflows can't be used for a proposal and all the proposal templates using them will also be
+              archived and unusable.
+            </Typography>
           </Box>
           <Box mb={2}>
             {archivedWorkflows.map((workflow) => (

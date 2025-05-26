@@ -67,6 +67,9 @@ export function ProposalWorkflowItem({
   const { trigger: archiveWorkflow } = useArchiveProposalWorkflow(workflow.spaceId);
   const { trigger: unarchiveWorkflow } = useUnarchiveProposalWorkflow(workflow.spaceId);
 
+  // Make workflow readonly if it's archived or if readOnly prop is true
+  const isReadOnly = !!(readOnly || workflow.archived);
+
   function duplicateWorkflow() {
     onDuplicate(workflow);
   }
@@ -189,7 +192,7 @@ export function ProposalWorkflowItem({
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box display='flex' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
-          {isExpanded && !readOnly ? (
+          {isExpanded && !isReadOnly ? (
             <TextField
               onClick={(e) => e.stopPropagation()}
               placeholder='Title (required)'
@@ -201,7 +204,14 @@ export function ProposalWorkflowItem({
               onChange={(e) => updateWorkflowTitle(e.target.value)}
             />
           ) : (
-            <Typography color={!workflow.title ? 'secondary' : 'inherit'}>{workflow.title || 'Untitled'}</Typography>
+            <Typography color={!workflow.title ? 'secondary' : 'inherit'}>
+              {workflow.title || 'Untitled'}
+              {workflow.archived && (
+                <Typography component='span' color='textSecondary' sx={{ ml: 1 }}>
+                  (Archived)
+                </Typography>
+              )}
+            </Typography>
           )}
 
           <Box display='flex' justifyContent='flex-end' alignItems='center'>
@@ -211,7 +221,7 @@ export function ProposalWorkflowItem({
             {!readOnly && (
               <span onClick={(e) => e.stopPropagation()}>
                 <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-                  <MenuItem onClick={duplicateWorkflow}>
+                  <MenuItem onClick={duplicateWorkflow} disabled={!!workflow.archived}>
                     <ListItemIcon>
                       <ContentCopyOutlined fontSize='small' />
                     </ListItemIcon>
@@ -245,6 +255,7 @@ export function ProposalWorkflowItem({
                         onClick={() => {
                           updatePrivateEvaluations(!workflow.privateEvaluations);
                         }}
+                        disabled={!!workflow.archived}
                       >
                         <ListItemIcon>
                           <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
@@ -279,7 +290,7 @@ export function ProposalWorkflowItem({
                     onDuplicate={duplicateEvaluationStep}
                     onEdit={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
-                    readOnly={readOnly}
+                    readOnly={isReadOnly}
                     privateEvaluationsEnabled={!!workflow.privateEvaluations}
                   />
                 ))}
@@ -293,7 +304,7 @@ export function ProposalWorkflowItem({
                     onDuplicate={duplicateEvaluationStep}
                     onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
-                    readOnly={readOnly}
+                    readOnly={isReadOnly}
                   />
                 ))}
 
@@ -311,7 +322,7 @@ export function ProposalWorkflowItem({
                         <Switch
                           checked={!!workflow.draftReminder}
                           onChange={(e) => updateDraftReminder(e.target.checked)}
-                          disabled={readOnly}
+                          disabled={isReadOnly}
                         />
                       </Stack>
                     </Stack>
@@ -320,7 +331,7 @@ export function ProposalWorkflowItem({
                     <EvaluationNotificationsRow
                       key={evaluation.id}
                       evaluation={evaluation}
-                      readOnly={readOnly}
+                      readOnly={isReadOnly}
                       onChange={updateEvaluationStep}
                       nextEvaluationTitle={
                         workflow.evaluations.length > index + 1 ? workflow.evaluations[index + 1].title : undefined
@@ -331,7 +342,7 @@ export function ProposalWorkflowItem({
               )}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
-                <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
+                <Button disabled={isReadOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
                   + Add step
                 </Button>
                 <Stack flexDirection='row' gap={1}>
@@ -341,7 +352,7 @@ export function ProposalWorkflowItem({
                     </Button>
                   )}
                   <Button
-                    disabled={readOnly || !!disabledTooltip}
+                    disabled={isReadOnly || !!disabledTooltip}
                     disabledTooltip={disabledTooltip}
                     onClick={saveWorkflow}
                     sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}
