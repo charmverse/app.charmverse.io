@@ -13,7 +13,7 @@ export function getPagePath({
   hostName?: string;
   spaceDomain: string;
   path: string;
-  query?: URLSearchParams | Record<string, string | null>;
+  query?: URLSearchParams | Record<string, string | null | undefined>;
 }) {
   const isDomainInPath = !getCustomDomainFromHost(hostName) && !getSpaceDomainFromHost(hostName);
   const pathWithDomain = `/${isDomainInPath ? `${spaceDomain}/` : ''}${path}`;

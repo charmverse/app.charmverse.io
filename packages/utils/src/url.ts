@@ -35,7 +35,7 @@ export function addQueryToUrl({
   url: string;
   urlBase?: string;
   replace?: boolean;
-  query?: URLSearchParams | Record<string, string | null>;
+  query?: URLSearchParams | Record<string, string | null | undefined>;
 }) {
   const result = new URL(url, url.trim().startsWith('http') ? undefined : urlBase);
   const queryParams = new URLSearchParams(result.search);

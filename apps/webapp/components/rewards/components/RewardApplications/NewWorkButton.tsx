@@ -1,5 +1,7 @@
 import type { ButtonProps } from '@mui/material';
 import { Box, Tooltip } from '@mui/material';
+import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
+import { statusesAcceptingNewWork } from '@packages/lib/rewards/shared';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 
@@ -9,8 +11,6 @@ import { AddIcon } from 'components/common/Icons/AddIcon';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
-import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
-import { statusesAcceptingNewWork } from '@packages/lib/rewards/shared';
 
 type Props = {
   rewardId?: string;

@@ -10,7 +10,7 @@ export function useCharmRouter() {
     () => ({
       router,
       // automatically adds the space domain prefix to the pathname
-      navigateToSpacePath(pathname: string, query: Record<string, string | null> = {}) {
+      navigateToSpacePath(pathname: string, query: Record<string, string | null | undefined> = {}) {
         return router.push({
           pathname: `/[domain]${pathname}`,
           query: { ...query, domain: router.query.domain }
