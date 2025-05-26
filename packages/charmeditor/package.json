@@ -9,7 +9,6 @@
   "dependencies": {
     "@nytimes/react-prosemirror": "^0.6.2",
     "@packages/utils": "^1.0.0",
-    "prosemirror": "^0.11.1",
     "prosemirror-commands": "^1.6.0",
     "prosemirror-inputrules": "^1.4.0",
     "prosemirror-keymap": "^1.2.2",

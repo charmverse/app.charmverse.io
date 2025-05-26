@@ -2,7 +2,7 @@ import type { Space, SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { randomETHWalletAddress } from '@packages/utils/blockchain';
-import fetchMock from 'fetch-mock-jest';
+import fetchMock from 'vitest-fetch-mock';
 
 import { getAggregatedData } from '../getAggregatedData';
 import type { LoggedInUser } from '../getUser';

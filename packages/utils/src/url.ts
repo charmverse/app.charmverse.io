@@ -1,6 +1,3 @@
-// logic to easily replace our S3 domain to a new location
-import type { ParsedUrlQuery } from 'querystring';
-
 export function replaceS3Domain<T extends string | undefined | null>(url: T) {
   if (!url) return url;
   return url.replace('https://s3.amazonaws.com/charm.public/', 'https://cdn.charmverse.io/');
@@ -38,13 +35,13 @@ export function addQueryToUrl({
   url: string;
   urlBase?: string;
   replace?: boolean;
-  query?: ParsedUrlQuery | Record<string, string | null>;
+  query?: URLSearchParams | Record<string, string | null>;
 }) {
   const result = new URL(url, url.trim().startsWith('http') ? undefined : urlBase);
   const queryParams = new URLSearchParams(result.search);
   for (const key in query) {
     if (query.hasOwnProperty(key)) {
-      const value = query[key];
+      const value = query instanceof URLSearchParams ? query.get(key) : query[key];
       if (typeof value === 'string') {
         queryParams.set(key, value);
       } else if (replace) {

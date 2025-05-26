@@ -1,5 +1,3 @@
-import type { ParsedUrlQueryInput } from 'node:querystring';
-
 import { useRouter } from 'next/router';
 import { useMemo } from 'react';
 
@@ -11,11 +9,8 @@ export function useCharmRouter() {
   return useMemo(
     () => ({
       router,
-      navigateToPath(pathname: string, query?: ParsedUrlQueryInput) {
-        return router.push({ pathname, query });
-      },
       // automatically adds the space domain prefix to the pathname
-      navigateToSpacePath(pathname: string, query: ParsedUrlQueryInput = {}) {
+      navigateToSpacePath(pathname: string, query: Record<string, string | null> = {}) {
         return router.push({
           pathname: `/[domain]${pathname}`,
           query: { ...query, domain: router.query.domain }
@@ -29,7 +24,7 @@ export function useCharmRouter() {
         });
       },
       // update the URL, trigger a digest but do not re-run SSR
-      updateURLQuery(query: ParsedUrlQueryInput) {
+      updateURLQuery(query: Record<string, string | null>) {
         // filter empty query params
         const updatedQuery = Object.fromEntries(
           Object.entries({ ...router.query, ...query }).filter(([_, v]) => v != null)
