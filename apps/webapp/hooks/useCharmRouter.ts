@@ -24,7 +24,7 @@ export function useCharmRouter() {
         });
       },
       // update the URL, trigger a digest but do not re-run SSR
-      updateURLQuery(query: Record<string, string | null>) {
+      updateURLQuery(query: Record<string, string | null | undefined>) {
         // filter empty query params
         const updatedQuery = Object.fromEntries(
           Object.entries({ ...router.query, ...query }).filter(([_, v]) => v != null)
