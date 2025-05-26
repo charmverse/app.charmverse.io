@@ -1,12 +1,11 @@
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz } from '@mui/icons-material';
+import { Archive, ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz, Unarchive } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
   Card,
-  Checkbox,
   Chip,
   IconButton,
   ListItemIcon,
@@ -19,15 +18,16 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import { useArchiveProposalWorkflow, useUnarchiveProposalWorkflow } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
@@ -64,6 +64,8 @@ export function ProposalWorkflowItem({
   const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
+  const { trigger: archiveWorkflow } = useArchiveProposalWorkflow(workflow.spaceId);
+  const { trigger: unarchiveWorkflow } = useUnarchiveProposalWorkflow(workflow.spaceId);
 
   function duplicateWorkflow() {
     onDuplicate(workflow);
@@ -71,6 +73,20 @@ export function ProposalWorkflowItem({
 
   function deleteWorkflow() {
     onDelete(workflow.id);
+  }
+
+  async function toggleArchiveWorkflow() {
+    try {
+      if (workflow.archived) {
+        await unarchiveWorkflow({ workflowId: workflow.id });
+      } else {
+        await archiveWorkflow({ workflowId: workflow.id });
+      }
+      onUpdate({ ...workflow, archived: !workflow.archived });
+      showMessage(`Workflow ${workflow.archived ? 'unarchived' : 'archived'} successfully`);
+    } catch (error) {
+      showMessage(`Failed to ${workflow.archived ? 'unarchive' : 'archive'} workflow`, 'error');
+    }
   }
 
   function cancelChanges() {
@@ -211,6 +227,12 @@ export function ProposalWorkflowItem({
                       </MenuItem>
                     </span>
                   </Tooltip>
+                  <MenuItem onClick={toggleArchiveWorkflow}>
+                    <ListItemIcon>
+                      {workflow.archived ? <Unarchive fontSize='small' /> : <Archive fontSize='small' />}
+                    </ListItemIcon>
+                    <ListItemText>{workflow.archived ? 'Unarchive' : 'Archive'}</ListItemText>
+                  </MenuItem>
                   <Tooltip
                     title={
                       workflow.privateEvaluations

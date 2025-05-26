@@ -1,4 +1,4 @@
-import type { PaymentMethod, Space, RewardsGithubRepo, SynapsUserKyc, PersonaUserKyc } from '@charmverse/core/prisma';
+import type { PaymentMethod, RewardsGithubRepo, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
@@ -18,6 +18,14 @@ export function useGetPaymentMethods(spaceId: MaybeString) {
   return useGETImmutable<PaymentMethod[]>(spaceId ? `/api/payment-methods` : null, {
     spaceId
   });
+}
+
+export function useArchiveProposalWorkflow(spaceId: string) {
+  return usePUT<{ workflowId: string }>(`/api/spaces/${spaceId}/proposals/workflows/archive`);
+}
+
+export function useUnarchiveProposalWorkflow(spaceId: string) {
+  return usePUT<{ workflowId: string }>(`/api/spaces/${spaceId}/proposals/workflows/unarchive`);
 }
 
 export function useGetProposalWorkflows(spaceId: MaybeString) {

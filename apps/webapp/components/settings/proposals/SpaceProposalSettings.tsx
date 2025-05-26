@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -48,7 +48,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       id: uuid(),
       index: lowestIndex - 1,
       privateEvaluations: false,
-      draftReminder: false
+      draftReminder: false,
+      archived: false
     };
     // insert the new evaluation after the existing one
     if (existingIndex > -1) {
@@ -72,8 +73,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   }
 
   async function handleDeleteWorkflow(id: string) {
-    if (workflows.length === 1) {
-      showMessage('You must have at least one workflow', 'error');
+    if (workflows.filter((w) => !w.archived).length === 1) {
+      showMessage('You must have at least one active workflow', 'error');
       return;
     }
     await deleteWorkflow({ workflowId: id });
@@ -89,16 +90,21 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       setWorkflows((_workflows) => _workflows.filter((workflow) => workflow.id !== id));
     }
   }
+
   function duplicateWorkflow(workflow: WorkflowTemplateFormItem) {
-    addNewWorkflow({ ...workflow, title: `${workflow.title} (copy)` });
+    addNewWorkflow({ ...workflow, title: `${workflow.title} (copy)`, archived: false });
   }
 
   // set the workflow state on load - but from here on out the UI will maintain the latest 'state' since each row can be in an edited state at any given time
   useEffect(() => {
     if (currentWorkflowTemplates) {
-      setWorkflows([...currentWorkflowTemplates] ?? []);
+      setWorkflows([...currentWorkflowTemplates]);
     }
   }, [!!currentWorkflowTemplates]);
+
+  // Separate active and archived workflows
+  const activeWorkflows = workflows.filter((workflow) => !workflow.archived);
+  const archivedWorkflows = workflows.filter((workflow) => workflow.archived);
 
   return (
     <>
@@ -127,7 +133,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       </Box>
       {loadingWorkflows && <LoadingComponent minHeight={200} />}
       <Box mb={2}>
-        {workflows.map((workflow) => (
+        {activeWorkflows.map((workflow) => (
           <ProposalWorkflowItem
             key={workflow.id}
             workflow={workflow}
@@ -139,10 +145,39 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             onCancelChanges={handleCancelWorkflowChanges}
             onDuplicate={duplicateWorkflow}
             readOnly={!isAdmin}
-            preventDelete={workflows.length === 1}
+            preventDelete={activeWorkflows.length === 1}
           />
         ))}
       </Box>
+
+      {archivedWorkflows.length > 0 && (
+        <>
+          <Box mt={4} mb={2}>
+            <Divider />
+            <Typography variant='h6' color='textSecondary' sx={{ mt: 2 }}>
+              Archived Workflows
+            </Typography>
+          </Box>
+          <Box mb={2}>
+            {archivedWorkflows.map((workflow) => (
+              <ProposalWorkflowItem
+                key={workflow.id}
+                workflow={workflow}
+                isExpanded={expanded === workflow.id}
+                toggleRow={setExpanded}
+                onSave={handleSaveWorkflow}
+                onUpdate={handleUpdateWorkflow}
+                onDelete={handleDeleteWorkflow}
+                onCancelChanges={handleCancelWorkflowChanges}
+                onDuplicate={duplicateWorkflow}
+                readOnly={!isAdmin}
+                preventDelete={false}
+              />
+            ))}
+          </Box>
+        </>
+      )}
+
       <Typography variant='h6'>Templates</Typography>
       <RequireTemplatesForm />
     </>
