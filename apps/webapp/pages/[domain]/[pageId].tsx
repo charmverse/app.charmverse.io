@@ -83,7 +83,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         const destination = getPagePath({
           hostName: ctx.req.headers.host,
           path: page.path,
-          query: sanitizedQuery,
+          query: sanitizedQuery as Record<string, string | null | undefined>,
           spaceDomain: domain
         });
         log.info('Redirecting to latest page path', {

@@ -1,5 +1,3 @@
-import type { ParsedUrlQuery } from 'querystring';
-
 import { addQueryToUrl } from '@packages/utils/url';
 
 import { getCustomDomainFromHost } from './getCustomDomainFromHost';
@@ -15,7 +13,7 @@ export function getPagePath({
   hostName?: string;
   spaceDomain: string;
   path: string;
-  query?: ParsedUrlQuery;
+  query?: URLSearchParams | Record<string, string | null | undefined>;
 }) {
   const isDomainInPath = !getCustomDomainFromHost(hostName) && !getSpaceDomainFromHost(hostName);
   const pathWithDomain = `/${isDomainInPath ? `${spaceDomain}/` : ''}${path}`;

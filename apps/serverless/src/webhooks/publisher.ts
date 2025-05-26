@@ -16,7 +16,6 @@ export async function publishToWebhook({ webhookURL, signingSecret, ...webhookDa
     const secret = Buffer.from(signingSecret, 'hex');
 
     const signedJWT = await signJwt('webhook', webhookData, secret);
-
     try {
       // Call their endpoint with the event's data
       const response = await fetch(webhookURL, {
