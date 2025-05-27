@@ -10,8 +10,6 @@ import { NextResponse } from 'next/server';
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
-const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
-
 export function middleware(req: NextRequest) {
   // Clone the URL
   const url = req.nextUrl.clone();
@@ -31,16 +29,6 @@ export function middleware(req: NextRequest) {
   const subdomain = customDomain ? null : getSpaceDomainFromHost(host);
   const spaceDomainFromPath = getSpaceDomainFromUrlPath(url.pathname);
 
-  if (FORCE_SUBDOMAINS && !subdomain && !customDomain && spaceDomainFromPath) {
-    // We are on url without subdomain AND domain in path - redirect to subdomain url
-    const subdomainHost = `${spaceDomainFromPath}.${getAppApexDomain()}`;
-    const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
-    const port = isDevEnv ? `:${url.port}` : '';
-    const baseUrl = `${url.protocol}//${subdomainHost}${port}`;
-    const redirectUrl = new URL(pathWithoutSpaceDomain, baseUrl);
-
-    return NextResponse.redirect(redirectUrl);
-  }
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
     const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
