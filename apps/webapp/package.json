@@ -3,7 +3,7 @@
   "version": "0..0",
   "private": true,
   "scripts": {
-    "start": "dotenv -e .env.local -- npx next dev",
+    "start": "npx dotenv -e .env.local -- npx next dev",
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint",
@@ -12,9 +12,13 @@
     "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
     "test:integration": "",
     "test:browser": "npx vitest --globals --update --project=browser",
-    "test:lib": "npx vitest --globals --update --project=lib"
+    "test:lib": "npx vitest --globals --update --project=lib",
+    "test:e2e": "NODE_OPTIONS=--experimental-require-module npx playwright test --timeout=0",
+    "test:e2e:ci": "NODE_OPTIONS=\"--max_old_space_size=4096 --experimental-require-module\" npx playwright test",
+    "debug:e2e": "NODE_OPTIONS=--experimental-require-module npx playwright test --headed --timeout=0"
   },
   "dependencies": {
+    "@farcaster/core": "^0.16.4",
     "@fontsource/ia-writer-mono": "^5.2.5",
     "@packages/aws": "^0.0.0",
     "@packages/bangleeditor": "^0.0.0",

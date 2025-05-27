@@ -1,5 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { withSessionSsr } from '@packages/lib/session/withSession';
+import { getPagePath } from '@packages/lib/utils/domains/getPagePath';
 import type { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { validate } from 'uuid';
@@ -8,9 +11,6 @@ import { getLayout as getBaseLayout } from 'components/common/BaseLayout/getLayo
 import { useMagicLink } from 'components/invite/page/hooks/useMagicLink';
 import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteLink';
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import { withSessionSsr } from '@packages/lib/session/withSession';
-import { getPagePath } from '@packages/lib/utils/domains/getPagePath';
 
 type Props = { email?: string; error?: Extract<MagicLinkResponseStatus, 'error_invalid_page_id'> };
 
@@ -58,7 +58,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr<Props>(asyn
           destination: getPagePath({
             hostName: context.req.headers.host,
             path: page.path,
-            query: context.query,
+            query: context.query as Record<string, string | null | undefined>,
             spaceDomain: page.space.domain
           }),
           permanent: false

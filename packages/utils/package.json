@@ -6,27 +6,8 @@
     "test": ""
   },
   "exports": {
-    "./array": "./src/array.ts",
-    "./blockchain": "./src/blockchain.ts",
-    "./browser": "./src/browser.ts",
-    "./constants": "./src/constants.ts",
-    "./dataEncryption": "./src/dataEncryption.ts",
-    "./dates": "./src/dates.ts",
-    "./encodeFilename": "./src/encodeFilename.ts",
-    "./env": "./src/env.ts",
-    "./errors": "./src/errors/index.ts",
-    "./errors/*": "./src/errors/*.ts",
-    "./file": "./src/file.ts",
-    "./http": "./src/http.ts",
-    "./numbers": "./src/numbers.ts",
-    "./random": "./src/random.ts",
-    "./randomName": "./src/randomName.ts",
-    "./react": "./src/react.ts",
-    "./sleep": "./src/sleep.ts",
-    "./strings": "./src/strings.ts",
-    "./types": "./src/types.ts",
-    "./uuid": "./src/uuid.ts",
-    "./url": "./src/url.ts"
+    "./*": "./src/*.ts",
+    "./errors": "./src/errors/index.ts"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2"

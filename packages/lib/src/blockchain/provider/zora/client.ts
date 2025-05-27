@@ -16,8 +16,7 @@ const API_ENDPOINT = 'https://api.zora.co/graphql';
 export const rateLimiter = RateLimit(0.5);
 
 export function getClient() {
-  if (isTestEnv) {
-    // zora api doesn't require an api key, so don't use it in test mode
+  if (isTestEnv || !process.env.ZORA_API_KEY) {
     return null;
   }
   return new ZDK({

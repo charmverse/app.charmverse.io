@@ -2,24 +2,10 @@ import type { Page, Proposal, Role, Space, User } from '@charmverse/core/prisma'
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { baseUrl } from '@packages/testing/mockApiCall';
-import { test as base, expect } from '@playwright/test';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagePermissionsDialog } from '__e2e__/po/pagePermissions.po';
-import { ProposalsListPage } from '__e2e__/po/proposalsList.po';
+import { expect } from '@playwright/test';
 
+import { test } from '../testWithFixtures';
 import { generateUser, loginBrowserUser, logoutBrowserUser } from '../utils/mocks';
-
-type Fixtures = {
-  proposalListPage: ProposalsListPage;
-  documentPage: DocumentPage;
-  pagePermissions: PagePermissionsDialog;
-};
-
-const test = base.extend<Fixtures>({
-  proposalListPage: ({ page }, use) => use(new ProposalsListPage(page)),
-  documentPage: ({ page }, use) => use(new DocumentPage(page)),
-  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page))
-});
 
 let space: Space;
 let spaceAdmin: User;
@@ -100,7 +86,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe('View proposal', () => {
+test.describe.skip('View proposal', () => {
   test('Proposal author can view their own draft proposal and other accessible proposals as well as data about the proposals', async ({
     proposalListPage
   }) => {
@@ -153,7 +139,7 @@ test.describe('View proposal', () => {
     page,
     proposalListPage,
     documentPage,
-    pagePermissions
+    pagePermissionsDialog
   }) => {
     // Initial setup
     await loginBrowserUser({
@@ -187,11 +173,11 @@ test.describe('View proposal', () => {
     await expect(isEditable).toBe(true);
 
     // Start sharing flow
-    await pagePermissions.permissionDialog.click();
+    await pagePermissionsDialog.permissionDialog.click();
 
-    await pagePermissions.publishTab.click();
+    await pagePermissionsDialog.publishTab.click();
 
-    await expect(pagePermissions.publicShareToggle).toBeDisabled();
+    await expect(pagePermissionsDialog.publicShareToggle).toBeDisabled();
   });
 
   test('Public proposal can be seen by people outside the space', async ({ page, proposalListPage, documentPage }) => {

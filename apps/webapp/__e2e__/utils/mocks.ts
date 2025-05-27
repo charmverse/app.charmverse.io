@@ -279,6 +279,7 @@ type UserAndSpaceInput = {
   memberSpacePermissions?: SpaceOperation[];
   pageContent?: PageContent;
   paidTier?: Space['paidTier'];
+  subscriptionTier?: Space['subscriptionTier'];
 };
 
 export async function generateUserAndSpace({
@@ -290,7 +291,8 @@ export async function generateUserAndSpace({
   email = `${uuid()}@gmail.com`,
   memberSpacePermissions,
   pageContent,
-  paidTier
+  paidTier,
+  subscriptionTier = 'grant'
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -338,7 +340,8 @@ export async function generateUserAndSpace({
             spaceId
           }
         },
-        paidTier
+        paidTier,
+        subscriptionTier
       }
     });
   }

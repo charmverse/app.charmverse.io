@@ -1,8 +1,9 @@
+import { charmverseDiscordInvite } from '@packages/config/constants';
 import { Column } from '@react-email/column';
 import { Container } from '@react-email/container';
 import { Img } from '@react-email/img';
 import { Row } from '@react-email/row';
-import { charmverseDiscordInvite } from '@packages/config/constants';
+import * as React from 'react';
 
 import Link from './Link';
 import Text from './Text';

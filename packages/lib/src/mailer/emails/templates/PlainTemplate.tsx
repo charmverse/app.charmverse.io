@@ -1,17 +1,13 @@
 import { EmailWrapper, Text } from './components';
 
-export function PlainTemplate() {
+export function PlainTemplate({ subject, html }: { subject: string; html: string | string[] }) {
+  const htmlArray = Array.isArray(html) ? html : [html];
   return (
-    <EmailWrapper title='Please ignore our previous email'>
-      <Text>
-        Hello from CharmVerse. We apologize about a notification and email we sent earlier that said "The application
-        has been appealed and requires your review".
-      </Text>
-      <Text>This was a mistake we made in testing. There is no application that requires your review. </Text>
+    <EmailWrapper title={subject}>
+      {htmlArray.map((t) => (
+        // use dangerouslySetInnerHTML so that we can pass in HTML (ex: for space data export links)
+        <Text key={t} dangerouslySetInnerHTML={{ __html: t }} />
+      ))}
     </EmailWrapper>
   );
-}
-
-export function emailSubject() {
-  return `Please ignore our previous email`;
 }

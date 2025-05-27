@@ -2,18 +2,11 @@ import { test as base, expect } from '@playwright/test';
 import { IntegrationsSettings } from '__e2e__/po/settings/integrationsSettings.po';
 import { v4 } from 'uuid';
 
+import { test } from '../testWithFixtures';
 import { generateUserAndSpace } from '../utils/mocks';
 import { login } from '../utils/session';
 
-type Fixtures = {
-  spaceSettings: IntegrationsSettings;
-};
-
-const test = base.extend<Fixtures>({
-  spaceSettings: ({ page }, use) => use(new IntegrationsSettings(page))
-});
-
-test('Space settings - add kyc integrations', async ({ page, spaceSettings }) => {
+test('Space settings - add kyc integrations', async ({ page, spaceIntegrationsSettings: spaceSettings }) => {
   const { space, user: spaceUser } = await generateUserAndSpace({ spaceName: v4(), isAdmin: true, onboarded: true });
 
   await spaceSettings.page.route(`**/api/spaces/${space.id}/kyc-credentials/synaps`, async (route) => {

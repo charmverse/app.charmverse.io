@@ -1,8 +1,8 @@
 import type { Page, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { PageNotFoundError } from '@packages/pages/errors';
 
-import type { PageLink } from '../interfaces';
+import { PageNotFoundError } from './errors';
+import type { PageLink } from './interfaces';
 
 export async function generatePageLink(pageIdOrPageWithSpaceId: string | (Page & { space: Space })): Promise<PageLink> {
   const pageWithSpace =

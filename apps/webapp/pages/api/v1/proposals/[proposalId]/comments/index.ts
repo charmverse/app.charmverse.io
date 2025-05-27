@@ -1,19 +1,19 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { requireApiKey, requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { requireApiKey, requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = defaultHandler();
 

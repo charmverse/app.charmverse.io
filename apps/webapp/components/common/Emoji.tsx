@@ -1,8 +1,7 @@
 import styled from '@emotion/styled';
+import { getTwitterEmoji } from '@packages/utils/emoji';
 import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';
-
-import { getTwitterEmoji } from '@packages/lib/utils/emoji';
 
 type ImgSize = 'large' | 'small';
 export const Emoji = styled.div<{ size?: ImgSize }>`

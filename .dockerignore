@@ -6,8 +6,8 @@
 .ebextensions/*
 .cdk
 .vscode
-__e2e__
-__integration-tests__
+apps/webapp/__e2e__
+apps/webapp/__integration-tests__
 cdk.json
 docker-compose.yml
 Dockerfile

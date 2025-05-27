@@ -1,15 +1,15 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { deleteProSubscription } from '@packages/lib/subscription/deleteProSubscription';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { SpaceNotFoundError } from 'lib/public-api';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 import { updateSpace } from 'lib/spaces/updateSpace';
-import { deleteProSubscription } from '@packages/lib/subscription/deleteProSubscription';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

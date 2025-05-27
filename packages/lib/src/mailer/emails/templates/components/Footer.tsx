@@ -1,8 +1,9 @@
+import { baseUrl } from '@packages/config/constants';
 import { Column } from '@react-email/column';
 import { Container } from '@react-email/container';
 import { Img } from '@react-email/img';
-import { baseUrl } from '@packages/config/constants';
 import type { ReactNode } from 'react';
+import * as React from 'react';
 
 import Link from './Link';
 import Text from './Text';

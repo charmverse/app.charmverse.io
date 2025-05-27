@@ -91,16 +91,16 @@ test.describe.serial('Create and use Proposal Template', async () => {
     });
   });
 
-  test('Create a free form proposal template', async ({ proposalPage, page, proposalsListPage, documentPage }) => {
+  test('Create a free form proposal template', async ({ proposalPage, page, proposalListPage, documentPage }) => {
     // Log in the browser admin
     await loginBrowserUser({ browserPage: page, userId: admin.id });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
     // Go to create proposal template page (Assuming the URL or navigation step to reach there)
-    await proposalsListPage.proposalTemplateSelect.click();
-    await proposalsListPage.addNewTemplate.click();
-    await proposalsListPage.proposalTemplateFreeFormOption.click();
+    await proposalListPage.proposalTemplateSelect.click();
+    await proposalListPage.addNewTemplate.click();
+    await proposalListPage.proposalTemplateFreeFormOption.click();
 
     await proposalPage.workflowSelect.isVisible();
 
@@ -269,17 +269,17 @@ test.describe.serial('Create and use Proposal Template', async () => {
     );
   });
 
-  test('Create a proposal from a template', async ({ proposalsListPage, documentPage, proposalPage, page }) => {
+  test('Create a proposal from a template', async ({ proposalListPage, documentPage, proposalPage, page }) => {
     const userProposalConfig = {
       title: 'User created proposal',
       content: 'This is what I am proposing'
     };
 
     await loginBrowserUser({ browserPage: page, userId: member.id });
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.proposalTemplateSelect.click();
-    await proposalsListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
+    await proposalListPage.proposalTemplateSelect.click();
+    await proposalListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
     await proposalPage.waitForNewProposalPage();
 
     await expect(proposalPage.templateSelect).toHaveText(savedProposalTemplate.title);

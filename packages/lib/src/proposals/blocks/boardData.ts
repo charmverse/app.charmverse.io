@@ -9,6 +9,10 @@ import {
 } from '@packages/databases/proposalDbProperties';
 import { createTableView } from '@packages/databases/tableView';
 import { blockToFBBlock } from '@packages/databases/utils/blockUtils';
+import { v4 } from 'uuid';
+
+import type { ProposalEvaluationStatus } from '../interfaces';
+
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -18,10 +22,8 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
-} from '@packages/lib/proposals/blocks/constants';
-import type { ProposalBoardBlock } from '@packages/lib/proposals/blocks/interfaces';
-import type { ProposalEvaluationStatus } from '@packages/lib/proposals/interfaces';
-import { v4 } from 'uuid';
+} from './constants';
+import type { ProposalBoardBlock } from './interfaces';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 

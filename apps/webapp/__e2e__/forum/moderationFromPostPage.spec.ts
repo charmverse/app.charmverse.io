@@ -1,24 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { generatePostCategory, generateForumPost } from '@packages/testing/utils/forums';
-import { expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { ForumHomePage } from '__e2e__/po/forumHome.po';
 import { ForumPostPage } from '__e2e__/po/forumPost.po';
 import { PageHeader } from '__e2e__/po/pageHeader.po';
 import { generateUserAndSpace, generateUser, grantForumModeratorAccess } from '__e2e__/utils/mocks';
 
+import { test } from '../testWithFixtures';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  pageHeader: PageHeader;
-  forumPostPage: ForumPostPage;
-  forumHomePage: ForumHomePage;
-};
-
-const test = base.extend<Fixtures>({
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page)),
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
-  pageHeader: ({ page }, use) => use(new PageHeader(page))
-});
 
 test.describe('Moderate forum posts', () => {
   test('moderator can delete an unwanted comment', async ({ forumPostPage, page }) => {

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Box, Menu } from '@mui/material';
-import { getTwitterEmoji } from '@packages/lib/utils/emoji';
+import { getTwitterEmoji } from '@packages/utils/emoji';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
 

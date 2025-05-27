@@ -1,14 +1,14 @@
+import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
+import type { BoardView } from '@packages/databases/boardView';
+import { createCard } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import type { Member } from '@packages/lib/members/interfaces';
 import { chunk } from 'lodash';
 import unionBy from 'lodash/unionBy';
 import type { ParseResult } from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
-import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
-import type { BoardView } from '@packages/databases/boardView';
-import { createCard } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-import type { Member } from '@packages/lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
 export type MappedProperties = {

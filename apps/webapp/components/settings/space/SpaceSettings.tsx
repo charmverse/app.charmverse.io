@@ -30,9 +30,11 @@ import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
+import { ExportDataForm } from './components/ExportDataForm';
 import Avatar from './components/LargeAvatar';
 import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
 import { SettingsItem } from './components/SettingsItem';
@@ -78,6 +80,7 @@ export function SpaceSettings({
   space: Space;
   setUnsavedChanges: (value: boolean) => void;
 }) {
+  const { user } = useUser();
   const router = useRouter();
   const { spaces, setSpace, setSpaces } = useSpaces();
   const isAdmin = useIsAdmin();
@@ -455,6 +458,9 @@ export function SpaceSettings({
           </Grid>
           <Grid item>
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
+          </Grid>
+          <Grid item sx={{ flexDirection: 'column', display: 'flex' }}>
+            <ExportDataForm spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>

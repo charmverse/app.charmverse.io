@@ -28,8 +28,8 @@ import { createMockSpace } from '@packages/testing/mocks/space';
 import { createPage, generateBoard, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';
 
-import type { ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
+import type { ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { importWorkspacePages, _generateNewPages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');

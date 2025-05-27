@@ -2,6 +2,7 @@
   "name": "@packages/lib",
   "version": "0.0.0",
   "description": "",
+  "type": "module",
   "private": true,
   "scripts": {
     "test": ""
@@ -28,6 +29,7 @@
   "dependencies": {
     "@packages/adapters": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
+    "@packages/credentials": "^0.0.0",
     "@packages/databases": "^0.0.0",
     "@packages/metrics": "^0.0.0",
     "@packages/nextjs": "^0.0.0",

@@ -68,24 +68,24 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     });
   });
   test('An admin user creates a proposal for community votes', async ({
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalPage,
     page
   }) => {
     // Initial setup
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: admin.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.waitForProposalsList();
+    await proposalListPage.waitForProposalsList();
 
-    await proposalsListPage.proposalTemplateSelect.click();
-    await proposalsListPage.addNewTemplate.click();
-    await proposalsListPage.proposalTemplateFreeFormOption.click();
+    await proposalListPage.proposalTemplateSelect.click();
+    await proposalListPage.addNewTemplate.click();
+    await proposalListPage.proposalTemplateFreeFormOption.click();
 
     await expect(documentPage.charmEditor).toBeVisible();
 
@@ -172,21 +172,21 @@ test.describe.serial('Proposal Evaluation Votes', () => {
   });
 
   test('A member creates a vote proposal from the template', async ({
-    proposalsListPage,
+    proposalListPage,
     documentPage,
     proposalPage,
     page
   }) => {
     // Initial setup
     await loginBrowserUser({
-      browserPage: proposalsListPage.page,
+      browserPage: proposalListPage.page,
       userId: member.id
     });
 
-    await proposalsListPage.goToProposals(space.domain);
+    await proposalListPage.goToProposals(space.domain);
 
-    await proposalsListPage.proposalTemplateSelect.click();
-    await proposalsListPage.getTemplateOptionLocator(voteProposalTemplateId).click();
+    await proposalListPage.proposalTemplateSelect.click();
+    await proposalListPage.getTemplateOptionLocator(voteProposalTemplateId).click();
     await proposalPage.waitForNewProposalPage();
 
     await expect(documentPage.charmEditor).toBeVisible();

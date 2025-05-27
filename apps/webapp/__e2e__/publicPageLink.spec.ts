@@ -1,19 +1,12 @@
-import { expect, test } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
+import { expect } from '@playwright/test';
 import { v4 } from 'uuid';
 
+import { test } from './testWithFixtures';
 import { createUserAndSpace } from './utils/mocks';
 import { generatePageWithLinkedPage } from './utils/pages';
 
-test('click on link for another public page in same workspace and make sure that page renders', async ({
-  browser,
-  page
-}) => {
-  // Arrange ------------------
-
-  const publicContext = await browser.newContext();
-  const publicPage = await publicContext.newPage();
-
+test('click on link for another public page in same workspace and make sure that page renders', async ({ page }) => {
   const { space } = await createUserAndSpace({ browserPage: page, permissionConfigurationMode: 'open' });
 
   const firstPageId = v4();

@@ -6,6 +6,7 @@ import { RewardPage } from '__e2e__/po/rewardPage.po';
 
 import { BountyBoardPage } from '../po/bountyBoard.po';
 import { DocumentPage } from '../po/document.po';
+import { overrideCDNRequests } from '../testWithFixtures';
 
 type Fixtures = {
   globalPage: GlobalPage;
@@ -17,6 +18,12 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
+  page: async ({ page }, use) => {
+    await overrideCDNRequests(page);
+
+    // Use the page with the custom routing
+    await use(page);
+  },
   globalPage: ({ page }, use) => use(new GlobalPage(page)),
   bountyBoardPage: ({ page }, use) => use(new BountyBoardPage(page)),
   documentPage: ({ page }, use) => use(new DocumentPage(page)),

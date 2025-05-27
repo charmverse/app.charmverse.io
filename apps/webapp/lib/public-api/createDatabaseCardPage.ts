@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import { prismaToUIBlock } from '@packages/databases/block';
 import { createPage } from '@packages/pages/createPage';
@@ -10,7 +11,6 @@ import { relay } from '@packages/websockets/relay';
 import { v4 as uuid } from 'uuid';
 
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
-import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';
 import { handleMappedPropertyEdgeCases } from './handleMappedPropertyEdgeCases';

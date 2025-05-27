@@ -7,7 +7,7 @@ import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
 test.describe('Archive Proposal', () => {
   test('Archive proposal and assert all actions are disabled, and proposal is not visible in the proposals list', async ({
-    proposalsListPage: proposalListPage,
+    proposalListPage,
     documentPage,
     proposalPage,
     page

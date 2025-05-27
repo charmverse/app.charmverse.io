@@ -4,22 +4,13 @@ import { builders as _, jsonDoc } from '@packages/bangleeditor/builders';
 import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
 import { randomETHWalletAddress } from '@packages/testing/generateStubs';
 import { generateForumPost, generatePostCategory } from '@packages/testing/utils/forums';
-import { expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { ForumHomePage } from '../po/forumHome.po';
 import { ForumPostPage } from '../po/forumPost.po';
+import { test } from '../testWithFixtures';
 import { createUser, createUserAndSpace, generateSpaceRole } from '../utils/mocks';
 import { login } from '../utils/session';
-
-type Fixtures = {
-  forumHomePage: ForumHomePage;
-  forumPostPage: ForumPostPage;
-};
-
-const test = base.extend<Fixtures>({
-  forumHomePage: ({ page }, use) => use(new ForumHomePage(page)),
-  forumPostPage: ({ page }, use) => use(new ForumPostPage(page))
-});
 
 let memberUser: User;
 let authorUser: User;

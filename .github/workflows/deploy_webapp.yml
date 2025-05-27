@@ -217,11 +217,11 @@ jobs:
       matrix:
         include:
           - test_name: 'Browser e2e test #1'
-            test_command: 'npm run test:e2e:ci -- --shard=1/3'
+            test_command: 'npx dotenv -e .env.test.local -- npm run test:e2e:ci -w apps/webapp -- --shard=1/3'
           - test_name: 'Browser e2e test #2'
-            test_command: 'npm run test:e2e:ci -- --shard=2/3'
+            test_command: 'npx dotenv -e .env.test.local -- npm run test:e2e:ci -w apps/webapp -- --shard=2/3'
           - test_name: 'Browser e2e test #3'
-            test_command: 'npm run test:e2e:ci -- --shard=3/3'
+            test_command: 'npx dotenv -e .env.test.local -- npm run test:e2e:ci -w apps/webapp -- --shard=3/3'
 
     steps:
       - uses: actions/checkout@v4
@@ -281,9 +281,23 @@ jobs:
         with:
           app_name: webapp
 
+      - name: Install websocket dependencies
+        uses: ./.github/actions/install
+        with:
+          app_name: websockets
+
+      - name: Install websocket service
+        uses: ./.github/actions/build_app
+        with:
+          app_name: websockets
+
+      # unbuffer insures that we print to the log in realtime
+      - name: Install unbuffer
+        run: sudo apt-get update && sudo apt-get install -y expect-dev
+
       - name: Start services
         run: |
-          npm run start:test:ci &> connect.log &
+          unbuffer npm run start:test:ci 2>&1 | tee server.log &
           sleep_loop_ct=0
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
@@ -302,7 +316,6 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         # we have to run docker command ourselves to set network=host so that playwright can access the server
         run: |
-          [[ "${{ runner.debug }}" = "1" ]] && tail -f connect.log &
           docker run --name  mcrmicrosoftcomplaywrightv1343jammy_68c205 \
                       --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
@@ -314,10 +327,25 @@ jobs:
                       --network "host"  \
                       --ipc=host \
                       mcr.microsoft.com/playwright:v1.47.1-jammy \
-                      ${{matrix.test_command}}
+                      ${{matrix.test_command}} || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
         # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
         # with:
         #   args: ${{matrix.test_command}}
+
+      # Upload reports for Github Actions
+      # Sources:
+      #   https://playwright.dev/docs/ci-intro
+      #   https://playwright.dev/docs/trace-viewer#opening-the-trace
+      # To view playwright-report: download the zip, unpack and run "npx playwright show-report path/to/folder"
+      # To view test-results: download the zip, run "npx playwright show-trace path/to/trace.zip"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: 'Playwright results ${{matrix.test_name}}'
+          path: |
+            apps/webapp/playwright-report/
+            apps/webapp/test-results/
+          retention-days: 5
 
   deploy-docker:
     name: Upload Docker image and assets

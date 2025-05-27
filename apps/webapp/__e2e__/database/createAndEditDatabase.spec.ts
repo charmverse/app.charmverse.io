@@ -1,25 +1,11 @@
 import type { User, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
-import { test as base, expect } from '@playwright/test';
 import { baseUrl } from '@packages/config/constants';
-import { DatabasePage } from '__e2e__/po/databasePage.po';
-import { DocumentPage } from '__e2e__/po/document.po';
-import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
+import { expect } from '@playwright/test';
 
+import { test } from '../testWithFixtures';
 import { loginBrowserUser } from '../utils/mocks';
-
-type Fixtures = {
-  pagesSidebar: PagesSidebarPage;
-  document: DocumentPage;
-  databasePage: DatabasePage;
-};
-
-const test = base.extend<Fixtures>({
-  pagesSidebar: ({ page }, use) => use(new PagesSidebarPage(page)),
-  document: ({ page }, use) => use(new DocumentPage(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page))
-});
 
 // Will be set by the first test
 let spaceUser: User;
@@ -78,14 +64,14 @@ test.describe.serial('Edit database select properties', async () => {
       .then((p) => p.id);
   });
 
-  test('edit a board', async ({ page, document, databasePage }) => {
+  test('edit a board', async ({ page, documentPage, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
       browserPage: page,
       userId: spaceUser.id
     });
 
-    await document.goToPage({
+    await documentPage.goToPage({
       domain: space.domain,
       path: databasePagePath
     });
