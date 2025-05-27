@@ -18,6 +18,7 @@
     "debug:e2e": "NODE_OPTIONS=--experimental-require-module npx playwright test --headed --timeout=0"
   },
   "dependencies": {
+    "@emotion/server": "^11.11.0",
     "@farcaster/core": "^0.16.4",
     "@fontsource/ia-writer-mono": "^5.2.5",
     "@fullcalendar/react": "^6.1.17",
