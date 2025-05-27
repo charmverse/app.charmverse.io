@@ -135,7 +135,7 @@
     "@metamask/onboarding": "^1.0.1",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
-    "@mui/system": "^6.1.4",
+    "@mui/system": "^7.1.0",
     "@mui/x-date-pickers": "^8.4.0",
     "@mui/x-tree-view": "^8.4.0",
     "@mux/mux-node": "^8.0.0",

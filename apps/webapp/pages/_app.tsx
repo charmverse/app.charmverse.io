@@ -1,6 +1,5 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import type { EmotionCache } from '@emotion/utils';
 import type { LensConfig } from '@lens-protocol/react-web';
 import { development, LensProvider, production } from '@lens-protocol/react-web';
 import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
@@ -113,7 +112,6 @@ export type GlobalPageProps = {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-  emotionCache?: EmotionCache;
 };
 export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
