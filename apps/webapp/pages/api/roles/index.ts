@@ -38,7 +38,7 @@ export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source' | 'arch
 };
 
 async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpaceRolesResponse[]>) {
-  const { spaceId } = req.query;
+  const { spaceId, includeArchived = false } = req.query;
 
   if (!spaceId || typeof spaceId !== 'string') {
     throw new ApiError({
@@ -50,7 +50,8 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
   const roles = await prisma.role.findMany({
     orderBy: { createdAt: 'asc' },
     where: {
-      spaceId
+      spaceId,
+      archived: includeArchived ? undefined : false
     },
     select: {
       id: true,

@@ -17,8 +17,8 @@ export class RolesApi {
     return http.DELETE(`/api/roles/${roleId}`);
   }
 
-  listRoles(spaceId: string): Promise<ListSpaceRolesResponse[]> {
-    return http.GET('/api/roles', { spaceId });
+  listRoles(spaceId: string, includeArchived = false): Promise<ListSpaceRolesResponse[]> {
+    return http.GET('/api/roles', { spaceId, includeArchived });
   }
 
   assignRole(data: { spaceId: string; roleId: string; userId: string }) {
