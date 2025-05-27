@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma';
-import { Box, Divider, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, Tooltip, Typography, Alert } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
@@ -157,10 +157,12 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             <Typography variant='h6' color='textSecondary' sx={{ mt: 2 }}>
               Archived Workflows
             </Typography>
-            <Typography variant='body1' gutterBottom>
-              Archived workflows can't be used for a proposal and all the proposal templates using them will also be
-              archived and unusable.
-            </Typography>
+            {isAdmin && (
+              <Alert severity='info' sx={{ my: 1 }}>
+                After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or
+                workflows that you want to keep using.
+              </Alert>
+            )}
           </Box>
           <Box mb={2}>
             {archivedWorkflows.map((workflow) => (

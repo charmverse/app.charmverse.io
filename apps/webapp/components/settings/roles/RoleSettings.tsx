@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
+import { Box, CircularProgress, Divider, Menu, Typography, Alert } from '@mui/material';
 import { scrollIntoView } from '@packages/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
@@ -85,6 +85,7 @@ export function RoleSettings({ space }: { space: Space }) {
         Roles & Permissions
         <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
       </Legend>
+
       <DefaultPagePermissions />
       <Divider sx={{ my: 2 }} />
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
@@ -139,7 +140,12 @@ export function RoleSettings({ space }: { space: Space }) {
               </Typography>
             )}
           </Typography>
-
+          {isAdmin && roles?.some((role) => role.archived) && (
+            <Alert severity='info' sx={{ mt: 1 }}>
+              After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or workflows
+              that you want to keep using.
+            </Alert>
+          )}
           <Typography variant='caption'>Custom role permissions override Default.</Typography>
           {roles?.map((role) => (
             <RoleRow

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -138,18 +139,24 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
         </Table>
 
         {isAdmin && archivedTokenGates.length > 0 && (
-          <Table size='small' sx={{ mt: 4 }} aria-label='Archived token gates table'>
-            <TableHeader isMobile={isMobile} tokenGatesAvailable={false} isArchived />
-            <TokenGatesList
-              gates={archivedTokenGates}
-              isLoading={isLoading}
-              isAdmin={isAdmin}
-              spaceId={space?.id}
-              account={account}
-              refreshTokenGates={refreshTokenGates}
-              onTestConnect={setTokenGateIdToTest}
-            />
-          </Table>
+          <>
+            <Alert severity='info' sx={{ mb: 1, mt: 4 }}>
+              After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or workflows
+              that you want to keep using.
+            </Alert>
+            <Table size='small' aria-label='Archived token gates table'>
+              <TableHeader isMobile={isMobile} tokenGatesAvailable={false} isArchived />
+              <TokenGatesList
+                gates={archivedTokenGates}
+                isLoading={isLoading}
+                isAdmin={isAdmin}
+                spaceId={space?.id}
+                account={account}
+                refreshTokenGates={refreshTokenGates}
+                onTestConnect={setTokenGateIdToTest}
+              />
+            </Table>
+          </>
         )}
       </Box>
       <TestConnectionModal
