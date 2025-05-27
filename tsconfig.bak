@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    // declarationMap seems necessary for "Go to definition" to work in VS Code
+    "declarationMap": true,
+    "declaration": true,
+    "sourceMap": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "module": "preserve",
+    // https://www.typescriptlang.org/tsconfig/#moduleResolution
+    // Use "bundler" which supports imports and exports, but does not require file extensions
+    "moduleResolution": "bundler",
+    "removeComments": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext",
+    "types": ["vitest/globals"]
+  }
+}

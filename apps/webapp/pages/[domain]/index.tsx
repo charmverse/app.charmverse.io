@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getDefaultPageForSpace } from '@packages/lib/session/getDefaultPageForSpace';
+import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';
 
 import { LoginPageView } from 'components/login/LoginPage';
-import { getDefaultPageForSpace } from '@packages/lib/session/getDefaultPageForSpace';
-import { withSessionSsr } from '@packages/lib/session/withSession';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
   const sessionUserId = context.req.session?.user?.id;

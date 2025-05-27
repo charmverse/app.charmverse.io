@@ -1,7 +1,7 @@
 import type { BaseEmoji } from 'emoji-mart';
 import dynamic from 'next/dynamic';
 
-import 'emoji-mart/css/emoji-mart.css';
+// import 'emoji-mart/css/emoji-mart.css';
 
 const Picker = dynamic(() => import('emoji-mart').then((r) => r.Picker), { ssr: false });
 
