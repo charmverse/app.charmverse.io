@@ -1,11 +1,11 @@
 import type { TokenGateToRole } from '@charmverse/core/prisma-client';
-
 import type { TokenGateVerificationRequest } from '@packages/lib/tokenGates/applyTokenGates';
 import type {
   TokenGateEvaluationAttempt,
   TokenGateEvaluationResult
 } from '@packages/lib/tokenGates/evaluateEligibility';
 import type { TokenGate, TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
+
 import type { TokenGateTestRequest, TokenGateTestResponse } from 'pages/api/token-gates/test';
 
 import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
@@ -26,6 +26,14 @@ export function useUpdateTokenGateRoles(tokenGateId?: string) {
   return usePUT<{ spaceId: string; roleIds: string[]; tokenGateId: string }, TokenGateToRole[]>(
     `/api/token-gates/${tokenGateId}/roles`
   );
+}
+
+export function useArchiveTokenGate(id: string) {
+  return usePUT<void>(`/api/token-gates/${id}/archive`);
+}
+
+export function useUnarchiveTokenGate(id: string) {
+  return usePUT<void>(`/api/token-gates/${id}/unarchive`);
 }
 
 export function useReviewTokenGate<T = Pick<TokenGate, 'conditions'>>() {

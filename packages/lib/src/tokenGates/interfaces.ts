@@ -2,7 +2,7 @@ import type { TokenGate as PrismaTokenGate, Role } from '@charmverse/core/prisma
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
-type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId'>;
+type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId' | 'archived'>;
 
 export type ConditionType = 'sol' | 'evm' | 'cosmos';
 export type AccessType =
