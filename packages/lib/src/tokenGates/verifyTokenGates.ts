@@ -18,7 +18,14 @@ export async function verifyTokenGates({ spaceId, userId, tokenGateIds }: Props)
   const tokenGates = await prisma.tokenGate.findMany({
     where: {
       spaceId,
-      archived: false
+      OR: [
+        {
+          archived: false
+        },
+        {
+          archived: null
+        }
+      ]
     },
     include: {
       tokenGateToRoles: {

@@ -64,7 +64,14 @@ async function validateSpaceWithTokenGates(spaceIdOrDomain: string) {
     include: {
       tokenGates: {
         where: {
-          archived: false
+          OR: [
+            {
+              archived: false
+            },
+            {
+              archived: null
+            }
+          ]
         }
       }
     }

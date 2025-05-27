@@ -22,7 +22,14 @@ async function testTokenGate(req: NextApiRequest, res: NextApiResponse<TokenGate
   const tokenGate = await prisma.tokenGate.findUniqueOrThrow({
     where: {
       id: tokenGateId,
-      archived: false
+      OR: [
+        {
+          archived: false
+        },
+        {
+          archived: null
+        }
+      ]
     }
   });
 
