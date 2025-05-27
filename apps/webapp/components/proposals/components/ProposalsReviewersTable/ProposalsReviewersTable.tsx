@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import {
   Accordion,

@@ -1,6 +1,6 @@
 import type { UserVote } from '@charmverse/core/prisma';
 import { VoteType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {

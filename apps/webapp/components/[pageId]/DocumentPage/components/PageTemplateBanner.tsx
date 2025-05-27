@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
 

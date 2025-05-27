@@ -1,5 +1,5 @@
 import type { Page, PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListItemButton from '@mui/material/ListItemButton';

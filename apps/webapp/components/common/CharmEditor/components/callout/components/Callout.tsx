@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Menu } from '@mui/material';
 import { getTwitterEmoji } from '@packages/utils/emoji';
 import type { MouseEvent, ReactNode } from 'react';

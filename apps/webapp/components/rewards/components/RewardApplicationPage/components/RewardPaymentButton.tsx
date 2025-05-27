@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { Application } from '@charmverse/core/prisma';
-import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
@@ -127,7 +126,7 @@ export function RewardPaymentButton({
         // get allowance
         const allowance = await tokenContract.allowance(account, receiverAddress);
 
-        if (BigNumber.from(allowance).lt(parsedTokenAmount)) {
+        if (BigInt(allowance) < parsedTokenAmount) {
           // approve if the allowance is small
           await tokenContract.approve(receiverAddress, parsedTokenAmount);
         }

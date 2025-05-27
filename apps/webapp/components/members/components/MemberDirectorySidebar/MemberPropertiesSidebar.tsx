@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ClickAwayListener, Collapse, Stack } from '@mui/material';
 
 import { DatabaseSidebarHeader } from 'components/common/DatabaseEditor/components/viewSidebar/databaseSidebarHeader';

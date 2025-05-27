@@ -1,6 +1,6 @@
 // import './Component.scss';
 
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Typography } from '@mui/material';
 import { NodeSelection } from 'prosemirror-state';
 import { useCallback, useEffect, useState } from 'react';

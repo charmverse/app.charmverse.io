@@ -1,5 +1,5 @@
 import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';

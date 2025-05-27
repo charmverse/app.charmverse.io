@@ -1,6 +1,6 @@
 'use client';
 
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Tooltip } from '@mui/material';
 import MaterialButton from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';

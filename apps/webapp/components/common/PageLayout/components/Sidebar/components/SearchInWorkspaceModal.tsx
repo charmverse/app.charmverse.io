@@ -1,5 +1,5 @@
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { ListItem, ListItemText, ListItemIcon, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';

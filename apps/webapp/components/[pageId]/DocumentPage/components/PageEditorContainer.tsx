@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box } from '@mui/material';
 
 export const PageEditorContainer = styled(({ fullWidth, top, ...props }: any) => <Box {...props} />)<{

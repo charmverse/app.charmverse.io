@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import type { MentionSpecSchemaAttrs } from '@packages/bangleeditor/components/mention/mention.specs';
 import { isUUID } from '@packages/utils/strings';

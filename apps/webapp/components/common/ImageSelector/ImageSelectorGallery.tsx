@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { grey } from '@mui/material/colors';
 
 interface ImageSelectorGalleryProps {

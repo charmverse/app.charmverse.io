@@ -1,5 +1,5 @@
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { isTruthy } from '@packages/utils/types';

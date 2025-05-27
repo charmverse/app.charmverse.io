@@ -1,5 +1,5 @@
 import type { MemberProperty } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,

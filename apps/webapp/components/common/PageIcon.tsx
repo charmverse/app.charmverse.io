@@ -1,5 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MembersIcon from '@mui/icons-material/AccountCircle';
 import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
 import EmptyPageIcon from '@mui/icons-material/InsertDriveFileOutlined';

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material';
 import { InputLabel, Stack } from '@mui/material';
 import type { ReactNode } from 'react';

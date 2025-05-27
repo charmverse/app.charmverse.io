@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Divider, MenuItem, MenuList, Stack, Switch, TextField, Typography } from '@mui/material';
 import type { Board, IPropertyTemplate, RelationPropertyData } from '@packages/databases/board';

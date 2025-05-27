@@ -1,5 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
 import { Box, Typography, CircularProgress, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';

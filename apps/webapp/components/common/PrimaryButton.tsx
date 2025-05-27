@@ -1,6 +1,6 @@
 /* deprecated  use import { Button } from 'components/common/Button'; */
 
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
 import { charmBlue as blueColor } from '@packages/config/colors';
 import type { ElementType } from 'react';

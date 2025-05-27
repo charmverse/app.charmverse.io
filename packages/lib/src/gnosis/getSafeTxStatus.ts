@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import { ApplicationStatus } from '@charmverse/core/prisma';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
 import type { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
-import { BigNumber } from 'ethers';
 
 import { getAllMantleSafeTransactions, getMantleSafeTransaction } from './mantleClient';
 
@@ -31,7 +30,7 @@ export async function getSafeTxStatus({
 
       if (txStatus === 'SUCCESS') {
         // 0 is for single safe payment, 1 is for multisig payment
-        const status = (txData.operation === 0 ? BigNumber.from(txData.value).gt(0) : txData.operation === 1)
+        const status = (txData.operation === 0 ? BigInt(txData.value) > 0 : txData.operation === 1)
           ? ApplicationStatus.paid
           : ApplicationStatus.cancelled;
 
@@ -90,7 +89,7 @@ export async function getSafeTxStatus({
 }
 
 function hasValue(safeTx: SafeMultisigTransactionResponse): boolean {
-  return BigNumber.from(safeTx.value || '0').gt(0) || !!safeTx.data;
+  return BigInt(safeTx.value || '0') > 0 || !!safeTx.data;
 }
 
 // {

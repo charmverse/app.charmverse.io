@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { LoginOutlined, FlagOutlined } from '@mui/icons-material';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import { baseUrl } from '@packages/config/constants';

@@ -1,5 +1,5 @@
 import type { ProposalRubricCriteria } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ArrowForwardIosSharp, Check } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AccordionProps, AccordionSummaryProps } from '@mui/material';

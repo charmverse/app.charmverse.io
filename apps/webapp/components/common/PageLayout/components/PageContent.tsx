@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { CSSProperties, ReactNode } from 'react';
 
 import ScrollableWindow from './ScrollableWindow';

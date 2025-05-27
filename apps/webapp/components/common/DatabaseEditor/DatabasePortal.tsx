@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 const StyledRoot = styled.div`
   position: relative;

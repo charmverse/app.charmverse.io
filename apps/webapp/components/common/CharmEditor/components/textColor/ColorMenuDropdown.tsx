@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { capitalize } from '@packages/utils/strings';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';

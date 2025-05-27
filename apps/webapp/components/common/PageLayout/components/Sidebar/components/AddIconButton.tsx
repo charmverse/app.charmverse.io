@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Tooltip } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';

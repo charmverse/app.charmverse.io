@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { shortenHex } from '@packages/utils/blockchain';
 import { useState } from 'react';

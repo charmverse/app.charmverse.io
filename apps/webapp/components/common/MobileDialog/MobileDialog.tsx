@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { DialogProps, SxProps, Theme } from '@mui/material';
 import { DialogContent, Dialog, Slide, DialogActions } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';

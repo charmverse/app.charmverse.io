@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Typography, Checkbox, FormControlLabel } from '@mui/material';
 import clsx from 'clsx';
 import React from 'react';

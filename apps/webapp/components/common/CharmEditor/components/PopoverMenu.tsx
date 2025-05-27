@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ClickAwayListener, Grow, MenuItem, Paper } from '@mui/material';
 import Portal from '@mui/material/Portal';
 import type { ReactNode } from 'react';

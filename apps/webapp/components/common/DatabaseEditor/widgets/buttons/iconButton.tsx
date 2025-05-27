@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Tooltip } from '@mui/material';
 import React from 'react';
 

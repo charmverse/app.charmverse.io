@@ -1,6 +1,6 @@
 // The following was pulled from https://github.com/mui/material-ui/blob/master/packages/mui-lab/src/TreeItem/TreeItemContent.js because there's no way to import from the module
 
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import type { TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
 import { useTreeItemState, treeItemClasses } from '@mui/x-tree-view/TreeItem';

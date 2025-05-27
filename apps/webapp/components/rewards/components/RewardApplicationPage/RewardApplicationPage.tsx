@@ -1,5 +1,5 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import { Box, Divider, FormLabel, Grid, Tab, Tabs } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';

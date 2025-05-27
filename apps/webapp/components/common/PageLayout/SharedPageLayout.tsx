@@ -1,5 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Box } from '@mui/material';
 import Head from 'next/head';

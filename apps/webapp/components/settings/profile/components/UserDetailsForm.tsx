@@ -1,5 +1,5 @@
 import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
 import { Box, Stack, Typography } from '@mui/material';

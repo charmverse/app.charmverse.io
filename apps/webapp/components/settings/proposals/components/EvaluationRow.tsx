@@ -1,6 +1,6 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { DragIndicator } from '@mui/icons-material';
 import { Box, Card, Chip, Tooltip, Typography } from '@mui/material';
 

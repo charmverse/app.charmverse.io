@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { staticSpaceTemplates } from '@packages/spaces/config';

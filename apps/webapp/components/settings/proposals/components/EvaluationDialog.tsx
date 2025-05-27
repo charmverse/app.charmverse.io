@@ -1,5 +1,5 @@
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';

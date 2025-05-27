@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import React from 'react';
 
 const StyledMenuGroup = styled.div<{ keepBorder: boolean }>`

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Checkbox, FormLabel, Stack, Typography } from '@mui/material';
 import { DateTime } from 'luxon';
 

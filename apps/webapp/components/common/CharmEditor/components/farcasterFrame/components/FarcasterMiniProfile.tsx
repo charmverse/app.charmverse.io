@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Button, Stack, Tooltip, Typography } from '@mui/material';
 import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';

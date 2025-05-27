@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { getTwitterEmoji } from '@packages/utils/emoji';
 import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';

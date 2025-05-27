@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 export const CenteredBox = styled.div`
   position: absolute;

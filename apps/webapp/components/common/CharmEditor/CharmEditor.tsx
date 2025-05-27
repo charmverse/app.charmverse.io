@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Divider } from '@mui/material';
 import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { CryptoCurrency, FiatCurrency } from '@packages/blockchain/connectors/chains';

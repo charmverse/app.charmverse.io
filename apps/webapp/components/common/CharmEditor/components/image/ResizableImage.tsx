@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';

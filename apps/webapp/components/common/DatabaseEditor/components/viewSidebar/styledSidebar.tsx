@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 export const StyledSidebar = styled.div`
   background-color: ${({ theme }) => theme.palette.background.paper};

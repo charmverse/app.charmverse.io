@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 /**
  * Components for a document page layout with sidebars. Example:
