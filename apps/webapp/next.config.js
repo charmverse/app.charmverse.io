@@ -3,7 +3,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-const BundleAnalyzer = require('next-bundle-analyzer');
+// const BundleAnalyzer = require('next-bundle-analyzer');
 
 const esmModules = [
   '@bangle.dev/base-components',
@@ -210,7 +210,8 @@ const removeUndefined = (obj) => {
   return newObj;
 };
 
-const withBundleAnalyzer = BundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true'
-});
-module.exports = withBundleAnalyzer(config);
+// const withBundleAnalyzer = BundleAnalyzer({
+//   enabled: process.env.ANALYZE === 'true'
+// });
+
+module.exports = config;
