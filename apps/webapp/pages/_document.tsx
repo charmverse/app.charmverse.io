@@ -22,6 +22,7 @@ class MyDocument extends Document {
   }
 }
 
+// ref: https://mui.com/material-ui/integrations/nextjs/#pages-router
 MyDocument.getInitialProps = async (ctx) => {
   const finalProps = await documentGetInitialProps(ctx);
   return finalProps;
