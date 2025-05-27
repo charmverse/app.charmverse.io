@@ -1,6 +1,7 @@
 import type { Bounty } from '@charmverse/core/prisma';
 import { Interface } from '@ethersproject/abi';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { eToNumber } from '@packages/lib/utils/numbers';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { ethers } from 'ethers';
 import { useCallback } from 'react';
@@ -8,7 +9,6 @@ import { getAddress, parseUnits } from 'viem';
 
 import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { eToNumber } from '@packages/lib/utils/numbers';
 
 import { usePages } from './usePages';
 
@@ -45,10 +45,9 @@ export function useMultiRewardPayment() {
       applicationId: string;
       title?: string;
     }) => {
-      const resolvedRecipientAddress =
-        recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
-          ? await charmClient.resolveEnsName(recipientAddress)
-          : getAddress(recipientAddress);
+      const resolvedRecipientAddress = recipientAddress.endsWith('.eth')
+        ? await charmClient.resolveEnsName(recipientAddress)
+        : getAddress(recipientAddress);
 
       if (!resolvedRecipientAddress) {
         return null;

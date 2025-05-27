@@ -88,7 +88,7 @@ export function RewardPaymentButton({
 
       let receiverAddress = receiver;
 
-      if (receiver.endsWith('.eth') && ethers.utils.isValidName(receiver)) {
+      if (receiver.endsWith('.eth')) {
         const resolvedWalletAddress = await charmClient.resolveEnsName(receiver);
         if (resolvedWalletAddress === null) {
           onError(`Could not resolve ENS name ${receiver}`);

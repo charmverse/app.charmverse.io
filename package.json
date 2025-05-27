@@ -137,7 +137,6 @@
     "@mui/material": "^7.1.0",
     "@mui/system": "^7.1.0",
     "@mui/x-date-pickers": "^8.4.0",
-    "@mui/x-tree-view": "^8.4.0",
     "@mux/mux-node": "^8.0.0",
     "@mux/mux-video-react": "^0.25.2",
     "@mux/upchunk": "^3.0.0",
