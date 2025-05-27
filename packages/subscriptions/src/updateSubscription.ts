@@ -1,8 +1,6 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { downgradeableTiers } from './constants';
-
 export async function updateSubscription({
   spaceId,
   newTier,
@@ -11,12 +9,8 @@ export async function updateSubscription({
   spaceId: string;
   newTier: SpaceSubscriptionTier;
   currentTier?: SpaceSubscriptionTier;
+  subscriptionCancelledAt?: Date | null;
 }) {
-  const previousTierIndex = currentTier ? downgradeableTiers.indexOf(currentTier) : 0;
-  const currentTierIndex = downgradeableTiers.indexOf(newTier);
-
-  const isDowngrading = currentTierIndex < previousTierIndex;
-
   await prisma.$transaction([
     prisma.space.update({
       where: { id: spaceId },
@@ -27,37 +21,33 @@ export async function updateSubscription({
     prisma.spaceSubscriptionTierChangeEvent.create({
       data: {
         spaceId,
-        newTier: 'readonly',
-        previousTier: newTier
+        newTier,
+        previousTier: currentTier ?? 'readonly'
       }
     }),
-    ...(isDowngrading
-      ? [
-          prisma.proposalWorkflow.updateMany({
-            where: {
-              spaceId
-            },
-            data: {
-              archived: true
-            }
-          }),
-          prisma.tokenGate.updateMany({
-            where: {
-              spaceId
-            },
-            data: {
-              archived: true
-            }
-          }),
-          prisma.role.updateMany({
-            where: {
-              spaceId
-            },
-            data: {
-              archived: true
-            }
-          })
-        ]
-      : [])
+    prisma.proposalWorkflow.updateMany({
+      where: {
+        spaceId
+      },
+      data: {
+        archived: true
+      }
+    }),
+    prisma.tokenGate.updateMany({
+      where: {
+        spaceId
+      },
+      data: {
+        archived: true
+      }
+    }),
+    prisma.role.updateMany({
+      where: {
+        spaceId
+      },
+      data: {
+        archived: true
+      }
+    })
   ]);
 }

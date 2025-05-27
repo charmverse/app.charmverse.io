@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
-import { tierConfig } from '@packages/subscriptions/constants';
+import { downgradeableTiers, tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
@@ -17,6 +17,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     },
     select: {
       subscriptionTier: true,
+      subscriptionCancelledAt: true,
       subscriptionTierChangeEvents: {
         take: 1,
         orderBy: {
@@ -62,7 +63,17 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
         }
       });
 
-      await updateSubscription({ spaceId, newTier: subscriptionTier });
+      const previousTierIndex = space.subscriptionTier ? downgradeableTiers.indexOf(space.subscriptionTier) : 0;
+      const currentTierIndex = downgradeableTiers.indexOf(subscriptionTier);
+
+      const isDowngrading = currentTierIndex < previousTierIndex;
+
+      if (isDowngrading) {
+        await updateSubscription({
+          spaceId,
+          newTier: space.subscriptionCancelledAt ? 'readonly' : subscriptionTier
+        });
+      }
     });
   }
 }
