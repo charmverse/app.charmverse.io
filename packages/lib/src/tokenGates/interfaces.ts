@@ -59,7 +59,7 @@ export type TokenGateConditions = {
 export type TokenGate = { conditions: TokenGateConditions } & TokenGateFields;
 
 type WithRoles = {
-  tokenGateToRoles: { role: Pick<Role, 'id' | 'name'> }[];
+  tokenGateToRoles: { role: Pick<Role, 'id' | 'name' | 'archived'> }[];
 };
 
 export type TokenGateWithRoles = TokenGate & WithRoles;

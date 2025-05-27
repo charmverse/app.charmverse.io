@@ -160,7 +160,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             {isAdmin && (
               <Alert severity='info' sx={{ my: 1 }}>
                 After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or
-                workflows that you want to keep using.
+                workflows that you want to keep using. Any proposal templates using an archived workflow will be hidden
+                until the workflow is unarchived or deleted.
               </Alert>
             )}
           </Box>

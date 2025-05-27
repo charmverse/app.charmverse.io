@@ -142,7 +142,8 @@ export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refres
           <>
             <Alert severity='info' sx={{ mb: 1, mt: 4 }}>
               After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or workflows
-              that you want to keep using.
+              that you want to keep using. If a token gate has an archived role, you will need to unarchive or delete
+              the role in order to view it.
             </Alert>
             <Table size='small' aria-label='Archived token gates table'>
               <TableHeader isMobile={isMobile} tokenGatesAvailable={false} isArchived />
