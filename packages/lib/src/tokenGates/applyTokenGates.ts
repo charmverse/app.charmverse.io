@@ -59,14 +59,7 @@ export async function applyTokenGates({
       roles: true,
       tokenGates: {
         where: {
-          OR: [
-            {
-              archived: false
-            },
-            {
-              archived: null
-            }
-          ]
+          archived: false
         },
         include: {
           tokenGateToRoles: {

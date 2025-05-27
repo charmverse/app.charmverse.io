@@ -27,14 +27,7 @@ async function updateTokenGateRolesHandler(req: NextApiRequest, res: NextApiResp
   const tokenGate = await prisma.tokenGate.findUnique({
     where: {
       id: tokenGateId,
-      OR: [
-        {
-          archived: false
-        },
-        {
-          archived: null
-        }
-      ]
+      archived: false
     }
   });
 
