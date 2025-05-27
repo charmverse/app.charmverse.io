@@ -1,12 +1,34 @@
 import type { SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { InvalidInputError, MissingDataError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
 import type { SpacePermissions } from './listPermissions';
 
 export async function saveRoleAndSpacePermissions(spaceId: string, permissions: SpacePermissions) {
   const memberPermissions = permissions.space.filter((p) => p.assignee.group === 'space');
+
+  const roleIds = Array.from(
+    new Set(
+      [...memberPermissions.map((p) => p.assignee.id), ...permissions.forumCategories.map((p) => p.assignee.id)].filter(
+        isTruthy
+      )
+    )
+  );
+
+  if (roleIds.length > 0) {
+    const roles = await prisma.role.findMany({
+      where: {
+        archived: false,
+        id: { in: roleIds }
+      }
+    });
+
+    if (roles.length !== roleIds.length) {
+      throw new InvalidInputError('Archived roles are not allowed to be used in permissions');
+    }
+  }
 
   // make sure we always define member/default permissions
   if (memberPermissions.length > 1) {
