@@ -19,7 +19,7 @@ export function useRoleAccess({ space }: { space?: Space | null } = {}) {
   }
 
   const tier = targetSpace.subscriptionTier;
-  const currentRoleCount = roles?.length || 0;
+  const currentRoleCount = roles?.filter((role) => !role.archived).length || 0;
 
   // Get max roles based on tier
   const maxRoles = getMaxRolesCount(tier);

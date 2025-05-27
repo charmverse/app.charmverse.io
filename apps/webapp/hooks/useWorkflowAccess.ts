@@ -9,7 +9,9 @@ export function useWorkflowAccess() {
   const limits = getWorkflowLimits(space?.subscriptionTier);
   const { data: workflows = [] } = useGetProposalWorkflows(space?.id);
 
-  const canCreateWorkflow = workflows.length < limits;
+  const filteredWorkflows = workflows.filter((workflow) => !workflow.archived);
+
+  const canCreateWorkflow = filteredWorkflows.length < limits;
 
   return {
     canCreateWorkflow

@@ -89,7 +89,7 @@ async function createRole(req: NextApiRequest, res: NextApiResponse<Role>) {
 
   // Count existing roles
   const existingRolesCount = await prisma.role.count({
-    where: { spaceId: data.spaceId }
+    where: { spaceId: data.spaceId, archived: false }
   });
 
   if (existingRolesCount >= maxRoles) {

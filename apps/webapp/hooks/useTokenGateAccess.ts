@@ -8,10 +8,14 @@ import { useGetTokenGates } from 'charmClient/hooks/tokenGates';
 export function useTokenGateAccess({ space, chains }: { space: Space; chains?: IChainDetails[] }) {
   const { data: tokenGates = [] } = useGetTokenGates(space.id);
 
+  const filteredTokenGates = tokenGates.filter(
+    (tokenGate) => !tokenGate.archived && tokenGate.tokenGateToRoles.every((role) => !role.role.archived)
+  );
+
   const tier = space?.subscriptionTier || 'readonly';
   const limits = getTokenGateLimits(tier);
 
-  const hasReachedLimit = tokenGates.length >= limits.count;
+  const hasReachedLimit = filteredTokenGates.length >= limits.count;
   const hasRestrictedChains = limits.restrictedChains;
 
   const canCreateTokenGate = !hasReachedLimit;
@@ -28,7 +32,7 @@ export function useTokenGateAccess({ space, chains }: { space: Space; chains?: I
     canCreateTokenGate,
     allowedChains: filteredChainList,
     hasReachedLimit,
-    currentCount: tokenGates.length,
+    currentCount: filteredTokenGates.length,
     maxCount: limits.count
   };
 }

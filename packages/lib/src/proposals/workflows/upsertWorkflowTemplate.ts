@@ -14,6 +14,9 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
       select: {
         subscriptionTier: true,
         proposalWorkflows: {
+          where: {
+            archived: false
+          },
           select: {
             id: true
           }

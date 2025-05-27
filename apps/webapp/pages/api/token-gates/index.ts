@@ -38,7 +38,9 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
       where: { id: spaceId },
       select: { subscriptionTier: true }
     }),
-    prisma.tokenGate.count({ where: { spaceId } })
+    prisma.tokenGate.count({
+      where: { spaceId, archived: false }
+    })
   ]);
 
   // Check token gate access restrictions
