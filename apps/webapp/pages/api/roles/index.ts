@@ -32,7 +32,7 @@ handler
   .use(requireKeys<Role>([{ key: 'spaceId', valueType: 'uuid' }, 'name'], 'body'))
   .post(createRole);
 
-export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source'> & {
+export type ListSpaceRolesResponse = Pick<Role, 'id' | 'name' | 'source' | 'archived'> & {
   spacePermissions: SpacePermission[];
   isMemberLevel?: boolean;
 };
@@ -56,6 +56,7 @@ async function listSpaceRoles(req: NextApiRequest, res: NextApiResponse<ListSpac
       id: true,
       name: true,
       source: true,
+      archived: true,
       spacePermissions: {
         where: {
           forSpaceId: spaceId

@@ -31,7 +31,7 @@ import { CustomRolesInfoModal } from './CustomRolesInfoModal';
 const formAnchorId = 'new-role-form-anchor';
 
 export function RoleSettings({ space }: { space: Space }) {
-  const { assignRoles, createRole, deleteRole, refreshRoles, roles } = useRoles();
+  const { assignRoles, createRole, deleteRole, refreshRoles, roles, archiveRole, unarchiveRole } = useRoles();
   const isAdmin = useIsAdmin();
   const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'roles-info-popup' });
   const { isFreeSpace } = useIsFreeSpace();
@@ -147,6 +147,8 @@ export function RoleSettings({ space }: { space: Space }) {
               refreshRoles={refreshRoles}
               role={role}
               key={role.id}
+              archiveRole={archiveRole}
+              unarchiveRole={unarchiveRole}
             />
           ))}
           {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (

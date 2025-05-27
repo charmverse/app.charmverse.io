@@ -70,6 +70,16 @@ export function useRoles() {
     return mutate((key) => typeof key === 'string' && key.startsWith(`roles/${space?.id || ''}`));
   }
 
+  async function archiveRole(roleId: string) {
+    await charmClient.roles.archiveRole(roleId);
+    refreshRoles();
+  }
+
+  async function unarchiveRole(roleId: string) {
+    await charmClient.roles.unarchiveRole(roleId);
+    refreshRoles();
+  }
+
   return {
     createRole,
     updateRole,
@@ -77,6 +87,8 @@ export function useRoles() {
     assignRoles,
     unassignRole,
     refreshRoles,
+    archiveRole,
+    unarchiveRole,
     roles
   };
 }

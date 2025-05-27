@@ -28,4 +28,12 @@ export class RolesApi {
   unassignRole(data: { spaceId: string; roleId: string; userId: string }) {
     return http.DELETE('/api/roles/assignment', data);
   }
+
+  archiveRole(roleId: string) {
+    return http.PUT(`/api/roles/${roleId}/archive`);
+  }
+
+  unarchiveRole(roleId: string) {
+    return http.PUT(`/api/roles/${roleId}/unarchive`);
+  }
 }
