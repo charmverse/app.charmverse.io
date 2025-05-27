@@ -1,10 +1,10 @@
+import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '@packages/lib/members/interfaces';
+import type { ProposalTemplateMeta } from '@packages/lib/proposals/getProposalTemplates';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { createMemberProperty, createMemberPropertyValue } from '@packages/testing/mocks/memberProperty';
 import { createMockSpace } from '@packages/testing/mocks/space';
 import { createMockSpaceMember } from '@packages/testing/mocks/spaceMember';
 import { createMockUser } from '@packages/testing/mocks/user';
-import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from '@packages/lib/members/interfaces';
-import type { ProposalTemplateMeta } from '@packages/lib/proposals/getProposalTemplates';
 
 import type { ListSpaceRolesResponse } from '../../pages/api/roles/index';
 
@@ -91,8 +91,8 @@ export const members: Member[] = seeds.map((seed) => {
 });
 
 export const spaceRoles: ListSpaceRolesResponse[] = [
-  { id: '1', name: 'Moderator', spacePermissions: [], source: null },
-  { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null }
+  { id: '1', name: 'Moderator', spacePermissions: [], source: null, archived: false },
+  { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null, archived: false }
 ];
 
 export const proposalTemplates: ProposalTemplateMeta[] = [];
