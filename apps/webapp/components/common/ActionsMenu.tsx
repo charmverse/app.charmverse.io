@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';

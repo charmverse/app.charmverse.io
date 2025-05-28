@@ -1,6 +1,6 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {

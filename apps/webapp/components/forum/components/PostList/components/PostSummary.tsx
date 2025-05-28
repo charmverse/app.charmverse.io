@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 
 import { CharmEditor } from 'components/common/CharmEditor';

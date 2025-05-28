@@ -62,7 +62,7 @@ export function handleServerErrorLog(err: any, utils: ServerErrorFunctionUtils<M
   };
   const userId = context?.session?.user?.id;
 
-  const headersList = headers();
+  const headersList = await headers();
   const fullUrl = headersList.get('referer') || '';
 
   const isValidSystemError = isSystemError(err);

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Typography } from '@mui/material';
 import type { StaticPage } from '@packages/features/constants';
 import { STATIC_PAGES } from '@packages/features/constants';

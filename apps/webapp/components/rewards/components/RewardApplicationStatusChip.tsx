@@ -1,5 +1,5 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';

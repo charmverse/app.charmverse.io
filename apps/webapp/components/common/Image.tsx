@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import NextImage from 'next/image';
 import type { ComponentProps } from 'react';

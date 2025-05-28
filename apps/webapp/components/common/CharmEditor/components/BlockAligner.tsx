@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { ListItemButton, Tooltip } from '@mui/material';

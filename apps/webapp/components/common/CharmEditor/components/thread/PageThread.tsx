@@ -1,5 +1,5 @@
 import type { Comment } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Check } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';

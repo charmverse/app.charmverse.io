@@ -1,5 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';

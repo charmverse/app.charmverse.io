@@ -1,6 +1,6 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { MouseEvent, ReactNode } from 'react';

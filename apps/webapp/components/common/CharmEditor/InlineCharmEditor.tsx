@@ -1,5 +1,5 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import { pluginKeyName as emojiSuggestKeyName } from '@packages/bangleeditor/components/emojiSuggest/emojiSuggest.constants';
 import * as emoji from '@packages/bangleeditor/components/emojiSuggest/emojiSuggest.specs';

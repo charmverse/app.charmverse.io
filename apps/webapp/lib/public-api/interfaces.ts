@@ -2,7 +2,6 @@ import type { Page as PrismaPage } from '@charmverse/core/prisma';
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { APISpaceTemplateType } from '@packages/spaces/config';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
-import type { TypedDataField } from 'ethers/lib/ethers';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
 
@@ -557,4 +556,4 @@ export interface SnapshotProposalVoteMessage {
  *              type:
  *                type: string
  */
-export type SnapshotProposalVoteType = Record<string, TypedDataField[]>;
+export type SnapshotProposalVoteType = Record<string, any[]>;

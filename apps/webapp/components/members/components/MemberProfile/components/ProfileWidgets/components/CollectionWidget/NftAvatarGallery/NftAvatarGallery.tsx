@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, CircularProgress, Grid } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';

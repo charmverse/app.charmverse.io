@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Menu, MenuItem, Typography } from '@mui/material';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';

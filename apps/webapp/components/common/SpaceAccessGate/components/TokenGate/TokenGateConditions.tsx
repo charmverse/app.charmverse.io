@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/DeleteOutline';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';

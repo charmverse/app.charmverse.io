@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import { Box, Typography } from '@mui/material';
 

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { Card, CardContent, CardHeader, Collapse, Divider, Typography } from '@mui/material';
 import type { ReactNode } from 'react';

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
 import InboxIcon from '@mui/icons-material/Inbox';
 import PersonIcon from '@mui/icons-material/Person';

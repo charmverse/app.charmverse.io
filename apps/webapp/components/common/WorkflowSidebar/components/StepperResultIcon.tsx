@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
 import { Typography } from '@mui/material';
 

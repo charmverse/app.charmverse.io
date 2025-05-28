@@ -8,7 +8,7 @@ import type { SessionData } from './interfaces';
 export async function getSession<T extends object = SessionData>(cookieOptions?: SessionOptions['cookieOptions']) {
   const options = getIronOptions({ ...cookieOptions });
 
-  const session = await getIronSession<T>(cookies(), options);
+  const session = await getIronSession<T>(await cookies(), options);
 
   // allow for a user override in development
   const userOverride = process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined;

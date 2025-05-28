@@ -1,7 +1,7 @@
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { className as editorClassName } from '@packages/charmeditor/ui';
 import { undo } from 'prosemirror-history';
 import { EditorState } from 'prosemirror-state';

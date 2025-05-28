@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 
 export const VotesWrapper = styled.div<{ detailed?: boolean }>`

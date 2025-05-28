@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 // this component can be used to replicate the appearance of an MUI TextFIeld
 // Check the element with class .MuiOutlinedInput-root for reference

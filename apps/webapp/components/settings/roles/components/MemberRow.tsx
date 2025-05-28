@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Typography } from '@mui/material';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 

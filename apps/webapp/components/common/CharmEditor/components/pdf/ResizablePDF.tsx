@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';

@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box } from '@mui/material';
 import type { TweetNodeAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';

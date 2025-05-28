@@ -12,7 +12,6 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@mui/material-nextjs": "^6.4.3",
     "@packages/credentials": "^0.0.0",
     "@packages/farcaster": "^0.0.0",
     "@packages/metrics": "^0.0.0",

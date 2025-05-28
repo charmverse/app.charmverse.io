@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Divider, MenuItem, Select, Typography, Stack } from '@mui/material';
 import Box from '@mui/material/Box';

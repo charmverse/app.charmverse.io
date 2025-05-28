@@ -4,6 +4,7 @@ import { Global } from '@emotion/react';
 import type { PaletteMode } from '@mui/material';
 import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from '@mui/material/styles';
+import { AppCacheProvider } from '@mui/material-nextjs/v15-pagesRouter';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ColorModeProvider } from 'hooks/useDarkMode';
@@ -46,6 +47,7 @@ export function AppThemeProvider({ children, forceTheme }: { children: React.Rea
   }, [savedDarkMode]);
 
   return (
+    // <AppCacheProvider>
     <ColorModeProvider toggleColorMode={toggleColorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme={true} />
@@ -54,5 +56,6 @@ export function AppThemeProvider({ children, forceTheme }: { children: React.Rea
         <span className={`${serifFont.variable} ${monoFont.variable}`}>{children}</span>
       </ThemeProvider>
     </ColorModeProvider>
+    // </AppCacheProvider>
   );
 }

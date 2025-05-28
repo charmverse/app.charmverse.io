@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
 import type { FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
 import { useState } from 'react';

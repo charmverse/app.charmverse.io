@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Menu, Stack, Tooltip } from '@mui/material';
 import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from '@packages/databases/board';

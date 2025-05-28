@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 export const AlertContainer = styled.div(
   ({ theme }) => `

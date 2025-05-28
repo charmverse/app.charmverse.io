@@ -1,5 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CircleIcon from '@mui/icons-material/Circle';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';

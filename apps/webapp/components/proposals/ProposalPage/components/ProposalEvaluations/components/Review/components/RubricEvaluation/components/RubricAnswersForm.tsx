@@ -4,7 +4,7 @@ import type {
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { DeleteOutlined } from '@mui/icons-material';
 import {
   Alert,

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {

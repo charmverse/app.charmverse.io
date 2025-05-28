@@ -1,5 +1,5 @@
 import type { FormField } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
 import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';

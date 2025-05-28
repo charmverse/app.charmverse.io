@@ -1,5 +1,5 @@
 import type { IdentityType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
 import { Box, Chip, Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';

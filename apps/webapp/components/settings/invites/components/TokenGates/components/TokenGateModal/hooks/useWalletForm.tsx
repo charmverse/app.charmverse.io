@@ -1,24 +1,18 @@
 import { wagmiConfig } from '@packages/blockchain/connectors/config';
+import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import type { GetEnsAddressReturnType } from '@wagmi/core';
 import { getEnsAddress } from '@wagmi/core';
-import { isValidName } from 'ethers/lib/utils';
 import { useCallback } from 'react';
 import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
-import { isValidChainAddress } from '@packages/lib/tokens/validation';
-
 const schema = yup.object({
   contract: yup
     .string()
     .required('Contract is required')
-    .test(
-      'isAddress',
-      'Invalid address',
-      (value) => isValidChainAddress(value) || (value.endsWith('.eth') && isValidName(value))
-    ),
+    .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value) || value.endsWith('.eth')),
   ensWallet: yup
     .string()
     .test('isAddress', 'Invalid ens wallet address', (value) => isValidChainAddress(value) || !value)
@@ -52,7 +46,7 @@ function customResolver(
 ): Resolver<FormValues> {
   return async (data: FormValues) => {
     try {
-      if (data.contract.endsWith('.eth') && isValidName(data.contract)) {
+      if (data.contract.endsWith('.eth')) {
         const address = await resolveEnsAddress(data.contract);
 
         if (address) {

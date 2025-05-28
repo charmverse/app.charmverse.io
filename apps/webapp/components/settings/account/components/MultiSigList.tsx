@@ -1,5 +1,5 @@
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import KeyIcon from '@mui/icons-material/Key';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';

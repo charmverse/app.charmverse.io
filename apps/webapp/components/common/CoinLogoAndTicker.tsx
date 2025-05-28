@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Stack } from '@mui/material';
 
 import type { TokenInfo } from '@packages/lib/tokens/tokenData';

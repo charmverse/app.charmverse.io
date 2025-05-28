@@ -1,5 +1,5 @@
 import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import debounce from 'lodash/debounce';

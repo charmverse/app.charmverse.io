@@ -1,5 +1,5 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { Theme } from '@mui/material';
 import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';

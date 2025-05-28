@@ -1,5 +1,5 @@
 import type { FormField } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Chip, Stack } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';

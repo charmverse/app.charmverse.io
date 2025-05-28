@@ -1,6 +1,6 @@
 import { type FormFieldType } from '@charmverse/core/prisma-client';
 import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Edit, EditOff, MoreHoriz, Close as CloseIcon } from '@mui/icons-material';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';

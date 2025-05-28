@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { TypographyProps } from '@mui/material/Typography';
 import Typography from '@mui/material/Typography';

@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Autocomplete, IconButton, Popper, Stack, TextField, Typography, Box } from '@mui/material';
 import debounce from 'lodash/debounce';

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Stack } from '@mui/material';
 import type { OpProjectFieldValue } from '@packages/lib/proposals/forms/interfaces';

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { AutocompleteRenderGetTagProps } from '@mui/material';
 import { IconButton, Box, Stack, TextField } from '@mui/material';

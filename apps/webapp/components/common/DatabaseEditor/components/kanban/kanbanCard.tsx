@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, Stack } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useState, useCallback } from 'react';

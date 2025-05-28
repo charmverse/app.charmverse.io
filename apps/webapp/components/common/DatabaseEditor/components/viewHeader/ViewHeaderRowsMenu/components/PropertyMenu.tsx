@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Menu, ListItemText, ListItemIcon, MenuItem, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';

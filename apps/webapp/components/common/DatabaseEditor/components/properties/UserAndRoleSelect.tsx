@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import { isTruthy } from '@packages/utils/types';

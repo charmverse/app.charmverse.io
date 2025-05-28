@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import PaidIcon from '@mui/icons-material/Paid';

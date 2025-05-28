@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box } from '@mui/material';

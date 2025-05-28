@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 export const IframeContainer = styled.div`
   line-height: 0; // hide margin that appears underneath

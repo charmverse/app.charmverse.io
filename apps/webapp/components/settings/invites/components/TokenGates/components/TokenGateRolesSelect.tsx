@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { InfoOutlined as InfoOutlinedIcon } from '@mui/icons-material';
 import { Box, Chip, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';

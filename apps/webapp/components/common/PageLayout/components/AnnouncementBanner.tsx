@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import EastIcon from '@mui/icons-material/East';
 import { Box, IconButton, Stack, Typography } from '@mui/material';
