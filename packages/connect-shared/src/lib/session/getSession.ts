@@ -5,5 +5,5 @@ import type { SessionData } from './config';
 import { getIronOptions } from './config';
 
 export async function getSession<T extends object = SessionData>() {
-  return getIronSession<T>(cookies(), getIronOptions());
+  return getIronSession<T>(await cookies(), getIronOptions());
 }

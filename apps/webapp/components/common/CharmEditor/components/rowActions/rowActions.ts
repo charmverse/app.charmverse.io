@@ -3,8 +3,6 @@ import throttle from 'lodash/throttle';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin, NodeSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-// @ts-ignore
-import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
 import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
@@ -113,7 +111,7 @@ export function plugins({ key }: { key: PluginKey }) {
       );
 
       const slice = view.state.selection.content();
-      const { dom, text } = serializeForClipboard(view, slice);
+      const { dom, text } = view.serializeForClipboard(slice);
 
       e.dataTransfer.clearData();
       e.dataTransfer.setData(brokenClipboardAPI ? 'Text' : 'text/html', dom.innerHTML);

@@ -41,6 +41,7 @@ const esmModules = [
   'jose',
   'nanoid',
   '@lens-protocol',
+  '@mui/material-nextjs',
   'wagmi' // compile wagmi to avoid error: QueryClientProvider must be used as a child of ReactQueryClientProvider when running app
 ];
 
@@ -81,34 +82,35 @@ const config = {
     ignoreBuildErrors: true,
     tsconfigPath: 'tsconfig.next.json'
   },
-  compiler: {
-    styledComponents: true
-  },
   experimental: {
-    esmExternals: false,
     webpackBuildWorker: true
-    // turbo: {
-    //   resolveAlias: {
-    //     fs: false
-    //   },
-    //   rules: {
-    //     '*.svg': {
-    //       loaders: ['@svgr/webpack'],
-    //       as: '*.js'
-    //     }
-    //   }
-    // }
   },
-  images: {
-    // next image is broken in staging/production as of 14.0.1
-    unoptimized: true
-  },
+  // compiler: {
+  //   styledComponents: true
+  // },
+  // experimental: {
+  //   // turbo: {
+  //   //   resolveAlias: {
+  //   //     fs: false
+  //   //   },
+  //   //   rules: {
+  //   //     '*.svg': {
+  //   //       loaders: ['@svgr/webpack'],
+  //   //       as: '*.js'
+  //   //     }
+  //   //   }
+  //   // }
+  // },
+  // images: {
+  //   // next image is broken in staging/production as of 14.0.1
+  //   unoptimized: true
+  // },
   transpilePackages: esmModules,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}'
-    }
-  },
+  // modularizeImports: {
+  //   lodash: {
+  //     transform: 'lodash/{{member}}'
+  //   }
+  // },
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {

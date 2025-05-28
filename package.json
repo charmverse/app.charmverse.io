@@ -295,7 +295,7 @@
   "devDependencies": {
     "@depay/web3-mock": "^14.19.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
-    "@next/eslint-plugin-next": "^14.2.15",
+    "@next/eslint-plugin-next": "^15.3.2",
     "@octokit/plugin-throttling": "^9.3.2",
     "@playwright/test": "1.47",
     "@spruceid/siwe-parser": "^2.0.2",
@@ -355,7 +355,7 @@
     "esbuild": "^0.19.5",
     "eslint": "^8.57.1",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-next": "^14.2.15",
+    "eslint-config-next": "^15.3.2",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.3",
     "eslint-plugin-jsx-a11y": "^6.10.0",
@@ -391,6 +391,7 @@
   "overrides": {
     "react": "19.1",
     "react-dom": "19.1",
+    "next": "^15.3.2",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
     "viem": "^2.22.17"

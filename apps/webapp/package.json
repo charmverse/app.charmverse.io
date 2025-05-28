@@ -64,5 +64,8 @@
     "@storybook/icons": "^1.4.0",
     "@storybook/test": "^8.6.12",
     "storybook": "^8.3.7"
+  },
+  "overrides": {
+    "next": "^15.3.2"
   }
 }
