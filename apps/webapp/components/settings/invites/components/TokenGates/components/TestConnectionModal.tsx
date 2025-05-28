@@ -61,11 +61,11 @@ export function TestConnectionModal({ tokenGateId, ...props }: Props) {
         tokenGateId
       },
       {
-        // unexepcted error, maybe
+        // unexpected error, maybe
         onError: (error) => {
           log.warn('Unexpected error when testing token gate', error);
           // error.error gives us the actual error, not "Something went wrong!"
-          setTestResult({ status: 'token_gate_error', error: (error as any).error });
+          setTestResult({ status: 'token_gate_error', error: error.message || 'Unknown error' });
         },
         onSuccess: (result) => {
           if (result.success) {

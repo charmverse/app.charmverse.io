@@ -1,12 +1,11 @@
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz } from '@mui/icons-material';
+import { Archive, ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz, Unarchive } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
   Card,
-  Checkbox,
   Chip,
   IconButton,
   ListItemIcon,
@@ -19,15 +18,16 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
-import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
+import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
+import { useArchiveProposalWorkflow, useUnarchiveProposalWorkflow } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
@@ -64,6 +64,11 @@ export function ProposalWorkflowItem({
   const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
+  const { trigger: archiveWorkflow } = useArchiveProposalWorkflow(workflow.spaceId);
+  const { trigger: unarchiveWorkflow } = useUnarchiveProposalWorkflow(workflow.spaceId);
+
+  // Make workflow readonly if it's archived or if readOnly prop is true
+  const isReadOnly = !!(readOnly || workflow.archived);
 
   function duplicateWorkflow() {
     onDuplicate(workflow);
@@ -71,6 +76,20 @@ export function ProposalWorkflowItem({
 
   function deleteWorkflow() {
     onDelete(workflow.id);
+  }
+
+  async function toggleArchiveWorkflow() {
+    try {
+      if (workflow.archived) {
+        await unarchiveWorkflow({ workflowId: workflow.id });
+      } else {
+        await archiveWorkflow({ workflowId: workflow.id });
+      }
+      onUpdate({ ...workflow, archived: !workflow.archived });
+      showMessage(`Workflow ${workflow.archived ? 'unarchived' : 'archived'} successfully`);
+    } catch (error) {
+      showMessage(`Failed to ${workflow.archived ? 'unarchive' : 'archive'} workflow`, 'error');
+    }
   }
 
   function cancelChanges() {
@@ -173,7 +192,7 @@ export function ProposalWorkflowItem({
     >
       <AccordionSummary expandIcon={<ExpandMore />}>
         <Box display='flex' alignItems='center' justifyContent='space-between' width='100%' gap={2}>
-          {isExpanded && !readOnly ? (
+          {isExpanded && !isReadOnly ? (
             <TextField
               onClick={(e) => e.stopPropagation()}
               placeholder='Title (required)'
@@ -185,7 +204,14 @@ export function ProposalWorkflowItem({
               onChange={(e) => updateWorkflowTitle(e.target.value)}
             />
           ) : (
-            <Typography color={!workflow.title ? 'secondary' : 'inherit'}>{workflow.title || 'Untitled'}</Typography>
+            <Typography color={!workflow.title ? 'secondary' : 'inherit'}>
+              {workflow.title || 'Untitled'}
+              {workflow.archived && (
+                <Typography component='span' color='textSecondary' sx={{ ml: 1 }}>
+                  (Archived)
+                </Typography>
+              )}
+            </Typography>
           )}
 
           <Box display='flex' justifyContent='flex-end' alignItems='center'>
@@ -195,7 +221,7 @@ export function ProposalWorkflowItem({
             {!readOnly && (
               <span onClick={(e) => e.stopPropagation()}>
                 <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-                  <MenuItem onClick={duplicateWorkflow}>
+                  <MenuItem onClick={duplicateWorkflow} disabled={!!workflow.archived}>
                     <ListItemIcon>
                       <ContentCopyOutlined fontSize='small' />
                     </ListItemIcon>
@@ -211,6 +237,12 @@ export function ProposalWorkflowItem({
                       </MenuItem>
                     </span>
                   </Tooltip>
+                  <MenuItem onClick={toggleArchiveWorkflow}>
+                    <ListItemIcon>
+                      {workflow.archived ? <Unarchive fontSize='small' /> : <Archive fontSize='small' />}
+                    </ListItemIcon>
+                    <ListItemText>{workflow.archived ? 'Unarchive' : 'Archive'}</ListItemText>
+                  </MenuItem>
                   <Tooltip
                     title={
                       workflow.privateEvaluations
@@ -223,6 +255,7 @@ export function ProposalWorkflowItem({
                         onClick={() => {
                           updatePrivateEvaluations(!workflow.privateEvaluations);
                         }}
+                        disabled={!!workflow.archived}
                       >
                         <ListItemIcon>
                           <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
@@ -257,7 +290,7 @@ export function ProposalWorkflowItem({
                     onDuplicate={duplicateEvaluationStep}
                     onEdit={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
-                    readOnly={readOnly}
+                    readOnly={isReadOnly}
                     privateEvaluationsEnabled={!!workflow.privateEvaluations}
                   />
                 ))}
@@ -271,7 +304,7 @@ export function ProposalWorkflowItem({
                     onDuplicate={duplicateEvaluationStep}
                     onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
-                    readOnly={readOnly}
+                    readOnly={isReadOnly}
                   />
                 ))}
 
@@ -289,7 +322,7 @@ export function ProposalWorkflowItem({
                         <Switch
                           checked={!!workflow.draftReminder}
                           onChange={(e) => updateDraftReminder(e.target.checked)}
-                          disabled={readOnly}
+                          disabled={isReadOnly}
                         />
                       </Stack>
                     </Stack>
@@ -298,7 +331,7 @@ export function ProposalWorkflowItem({
                     <EvaluationNotificationsRow
                       key={evaluation.id}
                       evaluation={evaluation}
-                      readOnly={readOnly}
+                      readOnly={isReadOnly}
                       onChange={updateEvaluationStep}
                       nextEvaluationTitle={
                         workflow.evaluations.length > index + 1 ? workflow.evaluations[index + 1].title : undefined
@@ -309,7 +342,7 @@ export function ProposalWorkflowItem({
               )}
 
               <Box display='flex' justifyContent='space-between' alignItems='center'>
-                <Button disabled={readOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
+                <Button disabled={isReadOnly} variant='text' onClick={() => openNewEvaluationStepModal()} height='1px'>
                   + Add step
                 </Button>
                 <Stack flexDirection='row' gap={1}>
@@ -319,7 +352,7 @@ export function ProposalWorkflowItem({
                     </Button>
                   )}
                   <Button
-                    disabled={readOnly || !!disabledTooltip}
+                    disabled={isReadOnly || !!disabledTooltip}
                     disabledTooltip={disabledTooltip}
                     onClick={saveWorkflow}
                     sx={{ opacity: hasUnsavedChanges ? 1 : 0 }}

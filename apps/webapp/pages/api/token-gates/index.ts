@@ -7,7 +7,8 @@ import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { processTokenGateConditions } from '@packages/lib/tokenGates/processTokenGateConditions';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { DataNotFoundError, InvalidInputError } from '@packages/utils/errors';
+import { validateTokenGateRestrictions } from '@packages/subscriptions/featureRestrictions';
+import { DataNotFoundError, InvalidInputError, SystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -24,7 +25,32 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
-  const { numberOfConditions, chainType, accesType, gateType } = processTokenGateConditions(req.body);
+  if (!spaceId) {
+    throw new SystemError({
+      message: 'Space ID is required',
+      errorType: 'Invalid input',
+      severity: 'warning'
+    });
+  }
+
+  const [{ subscriptionTier }, existingTokenGates] = await Promise.all([
+    prisma.space.findUniqueOrThrow({
+      where: { id: spaceId },
+      select: { subscriptionTier: true }
+    }),
+    prisma.tokenGate.count({
+      where: { spaceId, archived: false }
+    })
+  ]);
+
+  // Check token gate access restrictions
+  await validateTokenGateRestrictions({
+    subscriptionTier,
+    existingTokenGates,
+    conditions: req.body.conditions
+  });
+
+  const { numberOfConditions, chainType, accessType, gateType } = processTokenGateConditions(req.body);
 
   await prisma.tokenGate.create({
     data: {
@@ -37,7 +63,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   trackUserAction('add_a_gate', {
     userId,
     spaceId,
-    accesType,
+    accessType,
     chainType,
     gateType,
     numberOfConditions

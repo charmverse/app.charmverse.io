@@ -1,4 +1,6 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
+import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
+import { getAbsolutePath } from '@packages/lib/utils/browser';
 import { capitalize } from '@packages/utils/strings';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,8 +20,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
 
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
@@ -111,6 +111,7 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { proposalTemplates } = useProposalTemplates();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
+  const filteredWorkflowOptions = workflowOptions.filter((w) => !w.archived);
 
   const templatePageOptions = useMemo(
     () =>
@@ -207,7 +208,7 @@ export function EvaluationsReview({
         </Tooltip>
         <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
-            <WorkflowSelect options={workflowOptions} value={proposal?.workflowId} readOnly />
+            <WorkflowSelect options={filteredWorkflowOptions} value={proposal?.workflowId} readOnly />
           </span>
         </Tooltip>
       </Collapse>

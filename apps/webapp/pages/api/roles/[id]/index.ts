@@ -1,15 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
+import { updateRole } from '@packages/lib/roles/updateRole';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { ApiError } from '@packages/nextjs/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { DataNotFoundError, UnauthorisedActionError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
-import { updateRole } from '@packages/lib/roles/updateRole';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -76,7 +75,8 @@ async function updateRoleController(req: NextApiRequest, res: NextApiResponse) {
 
   const roleWithSpaceId = await prisma.role.findUnique({
     where: {
-      id: roleId as string
+      id: roleId as string,
+      archived: false
     },
     select: {
       spaceId: true

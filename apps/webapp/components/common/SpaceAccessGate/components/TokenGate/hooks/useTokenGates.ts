@@ -1,12 +1,12 @@
 import type { Space } from '@charmverse/core/prisma-client';
+import type { TokenGateEvaluationResult } from '@packages/lib/tokenGates/evaluateEligibility';
+import type { TokenGateJoinType, TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { useEffect, useState } from 'react';
 
 import { useEvaluateTokenGateEligibility, useGetTokenGates, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { TokenGateEvaluationResult } from '@packages/lib/tokenGates/evaluateEligibility';
-import type { TokenGateJoinType, TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 
 type Props = {
   account?: string | null;

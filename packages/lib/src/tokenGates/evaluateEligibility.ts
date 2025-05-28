@@ -62,7 +62,11 @@ async function validateSpaceWithTokenGates(spaceIdOrDomain: string) {
   const space = await prisma.space.findFirst({
     where,
     include: {
-      tokenGates: true
+      tokenGates: {
+        where: {
+          archived: false
+        }
+      }
     }
   });
 

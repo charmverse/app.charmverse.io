@@ -13,6 +13,7 @@ export function createMockTokenGate(gate: Partial<TokenGateWithRoles>): TokenGat
       accessControlConditions: [],
       operator: 'OR'
     },
+    archived: false,
     ...gate
   };
 }

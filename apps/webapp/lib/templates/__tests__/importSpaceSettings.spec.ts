@@ -263,6 +263,7 @@ describe('importSpaceSettings', () => {
       index: 0,
       spaceId: sourceSpace.id,
       title: `Unique - ${uuid()}`,
+      archived: false,
       evaluations: [
         {
           title: 'Community',
@@ -740,7 +741,8 @@ describe('importSpaceSettings', () => {
               ]
             }
           ],
-          draftReminder: false
+          draftReminder: false,
+          archived: false
         },
         {
           ...existingProposalWorkflow

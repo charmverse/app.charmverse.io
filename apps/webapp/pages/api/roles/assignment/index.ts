@@ -1,16 +1,15 @@
 import type { SpaceRole, SpaceRoleToRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
 import type { RoleAssignment, RoleWithMembers } from '@packages/lib/roles';
 import { assignRole, unassignRole } from '@packages/lib/roles';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import { DataNotFoundError } from '@packages/utils/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -33,7 +32,8 @@ async function unassignRoleController(req: NextApiRequest, res: NextApiResponse<
 
   const roleSpaceId = await prisma.role.findUnique({
     where: {
-      id: roleId
+      id: roleId,
+      archived: false
     },
     select: {
       spaceId: true
@@ -74,7 +74,8 @@ async function assignRoleController(req: NextApiRequest, res: NextApiResponse<Ro
 
   const role = await prisma.role.findUnique({
     where: {
-      id: roleId
+      id: roleId,
+      archived: false
     },
     select: {
       spaceId: true,

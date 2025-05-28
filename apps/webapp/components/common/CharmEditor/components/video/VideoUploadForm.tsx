@@ -3,6 +3,7 @@
 import { log } from '@charmverse/core/log';
 import { Alert, CircularProgress, Stack, Typography } from '@mui/material';
 import * as UpChunk from '@mux/upchunk';
+import { getVideoSizeLimit, VIDEO_SIZE_LIMITS_LABELS } from '@packages/subscriptions/featureRestrictions';
 import { useEffect, useState } from 'react';
 import useSwr from 'swr';
 
@@ -22,6 +23,7 @@ export function VideoUploadForm(props: Props) {
   const [progress, setProgress] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const { space } = useCurrentSpace();
+  const sizeLimit = getVideoSizeLimit(space?.subscriptionTier);
 
   // poll endpoint until video is ready
   const { data: upload, error } = useSwr(
@@ -46,9 +48,9 @@ export function VideoUploadForm(props: Props) {
 
   if (error) return <Alert severity='error'>Error fetching api</Alert>;
 
-  async function createUpload() {
+  async function createUpload(fileSize: number) {
     try {
-      const result = await charmClient.mux.createUpload();
+      const result = await charmClient.mux.createUpload(fileSize, space!.id);
       setUploadId(result.id);
       return result.url;
     } catch (e) {
@@ -59,10 +61,22 @@ export function VideoUploadForm(props: Props) {
   }
 
   function startUpload(file: File) {
+    if (!space || !space.subscriptionTier) {
+      return;
+    }
+
+    if (file.size > sizeLimit) {
+      setErrorMessage(
+        `Video size exceeds the limit of ${VIDEO_SIZE_LIMITS_LABELS[space.subscriptionTier]} for your subscription tier`
+      );
+      return;
+    }
+
     setIsUploading(true);
     const req = UpChunk.createUpload({
-      endpoint: createUpload,
-      file
+      endpoint: () => createUpload(file.size),
+      file,
+      maxFileSize: sizeLimit
     });
 
     req.on('error', (err) => {

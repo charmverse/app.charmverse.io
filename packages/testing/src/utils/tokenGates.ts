@@ -54,23 +54,6 @@ export async function clearTokenGateData() {
   }
 }
 
-export async function addRoleToTokenGate({ tokenGateId, roleId }: { tokenGateId: string; roleId: string }) {
-  return prisma.tokenGateToRole.create({
-    data: {
-      tokenGate: {
-        connect: {
-          id: tokenGateId
-        }
-      },
-      role: {
-        connect: {
-          id: roleId
-        }
-      }
-    }
-  });
-}
-
 export function addUserTokenGate({
   tokenGateId,
   grantedRoles,

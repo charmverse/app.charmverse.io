@@ -1,15 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { onError, onNoMatch } from '@packages/lib/middleware';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import type { UpdateWorkflowRequest } from '@packages/lib/proposals/applyProposalWorkflow';
+import { applyProposalWorkflow } from '@packages/lib/proposals/applyProposalWorkflow';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { AdministratorOnlyError } from '@packages/users/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
-import { applyProposalWorkflow } from '@packages/lib/proposals/applyProposalWorkflow';
-import type { UpdateWorkflowRequest } from '@packages/lib/proposals/applyProposalWorkflow';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -60,6 +59,19 @@ async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse)
 
   if (!proposalPermissions.edit) {
     throw new ActionNotPermittedError(`You can't update this proposal.`);
+  }
+
+  const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
+    where: {
+      id: workflowId
+    },
+    select: {
+      archived: true
+    }
+  });
+
+  if (workflow.archived) {
+    throw new ActionNotPermittedError(`You can't apply this workflow to this proposal.`);
   }
 
   await applyProposalWorkflow({

@@ -1,9 +1,10 @@
 import { useTheme } from '@emotion/react';
+import { ArchiveOutlined, UnarchiveOutlined } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { IconButton, ListItemIcon, Menu, MenuItem, SvgIcon, Typography } from '@mui/material';
-import { bindMenu, bindTrigger, usePopupState, bindPopover } from 'material-ui-popup-state/hooks';
+import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import Modal from 'components/common/Modal';
@@ -25,9 +26,19 @@ type RoleRowProps = {
   assignRoles: (roleId: string, userIds: string[]) => void;
   deleteRole: (roleId: string) => void;
   refreshRoles: () => void;
+  archiveRole: (roleId: string) => void;
+  unarchiveRole: (roleId: string) => void;
 };
 
-export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles }: RoleRowProps) {
+export function RoleRow({
+  readOnly,
+  role,
+  assignRoles,
+  deleteRole,
+  refreshRoles,
+  archiveRole,
+  unarchiveRole
+}: RoleRowProps) {
   const menuState = usePopupState({ variant: 'popover', popupId: `role-${role.id}` });
   const confirmDeletePopupState = usePopupState({ variant: 'popover', popupId: 'role-delete' });
   const { members } = useMembers();
@@ -64,13 +75,15 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
       eligibleMembers={eligibleMembers}
       readOnlyMembers={readOnly}
       memberRoleId={role.id}
-      title={role.name}
+      archived={role.archived}
+      title={`${role.name} ${role.archived ? '(Archived)' : ''}`}
       description={description}
       descriptionIcon={descriptionIcon}
       permissions={
         <RolePermissions
           targetGroup='role'
           id={role.id}
+          disabled={role.archived}
           callback={() => {
             refreshRoles();
           }}
@@ -94,6 +107,7 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
               }}
             >
               <MenuItem
+                disabled={role.archived}
                 sx={{ padding: '3px 12px' }}
                 onClick={() => {
                   popupState.open();
@@ -104,6 +118,24 @@ export function RoleRow({ readOnly, role, assignRoles, deleteRole, refreshRoles 
                   <EditOutlinedIcon fontSize='small' />
                 </ListItemIcon>
                 <Typography sx={{ fontSize: 15, fontWeight: 600 }}>Rename</Typography>
+              </MenuItem>
+              <MenuItem
+                sx={{ padding: '3px 12px' }}
+                onClick={() => {
+                  if (role.archived) {
+                    unarchiveRole(role.id);
+                  } else {
+                    archiveRole(role.id);
+                  }
+                  menuState.close();
+                }}
+              >
+                <ListItemIcon>
+                  {role.archived ? <UnarchiveOutlined fontSize='small' /> : <ArchiveOutlined fontSize='small' />}
+                </ListItemIcon>
+                <Typography sx={{ fontSize: 15, fontWeight: 600 }}>
+                  {role.archived ? 'Unarchive' : 'Archive'}
+                </Typography>
               </MenuItem>
               <MenuItem
                 sx={{ padding: '3px 12px' }}

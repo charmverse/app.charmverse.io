@@ -1,5 +1,8 @@
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { applyDiscordGate } from '@packages/lib/discord/collabland/applyDiscordGate';
+import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
+import { updateUserTokenGates } from '@packages/lib/tokenGates/updateUserTokenGates';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfileById } from '@packages/metrics/mixpanel/updateTrackUserProfileById';
 import {
@@ -9,9 +12,6 @@ import {
   UnauthorisedActionError
 } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
-import { applyDiscordGate } from '@packages/lib/discord/collabland/applyDiscordGate';
-import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
-import { updateUserTokenGates } from '@packages/lib/tokenGates/updateUserTokenGates';
 import { v4 } from 'uuid';
 
 import type { TokenGateJoinType } from './interfaces';
@@ -58,6 +58,9 @@ export async function applyTokenGates({
     include: {
       roles: true,
       tokenGates: {
+        where: {
+          archived: false
+        },
         include: {
           tokenGateToRoles: {
             include: {

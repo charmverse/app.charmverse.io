@@ -31,6 +31,20 @@ export type CreateDraftProposalInput = {
 };
 
 export async function createDraftProposal(input: CreateDraftProposalInput) {
+  const { templateId } = input;
+
+  if (templateId) {
+    // Make sure that the template doesn't belong to an archived workflow
+    await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: templateId,
+        workflow: {
+          archived: false
+        }
+      }
+    });
+  }
+
   // get source data
   const [template, sourcePage, sourcePost, proposalBoardBlock] = await Promise.all([
     input.templateId

@@ -19,6 +19,7 @@ import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { createPage } from '@packages/pages/createPage';
 import { generatePagePathFromPathAndTitle } from '@packages/pages/utils';
+import { isTruthy } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -131,6 +132,30 @@ export async function createProposal({
 
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
+  }
+
+  const roleIds = Array.from(
+    new Set(
+      evaluations.flatMap(({ reviewers, appealReviewers, evaluationApprovers }) => [
+        ...reviewers.map((reviewer) => reviewer.roleId),
+        ...(appealReviewers?.map((reviewer) => reviewer.roleId) ?? []),
+        ...(evaluationApprovers?.map((approver) => approver.roleId) ?? [])
+      ])
+    )
+  ).filter(isTruthy);
+
+  const roles = await prisma.role.findMany({
+    where: {
+      spaceId,
+      archived: false,
+      id: {
+        in: roleIds
+      }
+    }
+  });
+
+  if (roles.length !== roleIds.length) {
+    throw new Error('Archived roles are not allowed to be used in proposals');
   }
 
   // retrieve permissions and apply evaluation ids to reviewers

@@ -1,6 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, CircularProgress, Divider, Menu, Typography } from '@mui/material';
+import { Box, CircularProgress, Divider, Menu, Typography, Alert } from '@mui/material';
+import { scrollIntoView } from '@packages/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 
@@ -12,8 +13,8 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
+import { useRoleAccess } from 'hooks/useRoleAccess';
 import { useRoles } from 'hooks/useRoles';
-import { scrollIntoView } from '@packages/lib/utils/browser';
 
 import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
 
@@ -30,13 +31,16 @@ import { CustomRolesInfoModal } from './CustomRolesInfoModal';
 const formAnchorId = 'new-role-form-anchor';
 
 export function RoleSettings({ space }: { space: Space }) {
-  const { assignRoles, createRole, deleteRole, refreshRoles, roles } = useRoles();
+  const { assignRoles, createRole, deleteRole, refreshRoles, roles, archiveRole, unarchiveRole } = useRoles({
+    includeArchived: true
+  });
   const isAdmin = useIsAdmin();
   const rolesInfoPopup = usePopupState({ variant: 'popover', popupId: 'roles-info-popup' });
   const { isFreeSpace } = useIsFreeSpace();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [isCreateFormVisible, setIsCreateFormVisible] = useState(false);
   const { mutateMembers } = useMembers();
+  const { canCreateRole, hasReachedLimit, currentCount, maxCount } = useRoleAccess({ space });
 
   useTrackPageView({ type: 'settings/roles-and-permissions' });
 
@@ -69,12 +73,19 @@ export function RoleSettings({ space }: { space: Space }) {
     });
   }
 
+  const roleLimitTooltip = !isAdmin
+    ? 'Only space admins can create roles'
+    : !canCreateRole
+      ? `You have reached the maximum number of custom roles (${currentCount}/${maxCount}) for your subscription tier`
+      : '';
+
   return (
     <>
       <Legend sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
         Roles & Permissions
         <UpgradeChip upgradeContext='custom_roles' onClick={rolesInfoPopup.open} />
       </Legend>
+
       <DefaultPagePermissions />
       <Divider sx={{ my: 2 }} />
       <Legend noBorder display='flex' justifyContent='space-between' mt={4} mb={0}>
@@ -98,7 +109,11 @@ export function RoleSettings({ space }: { space: Space }) {
               </Button>
             </UpgradeWrapper>
             <UpgradeWrapper upgradeContext='custom_roles' onClick={rolesInfoPopup.open}>
-              <Button onClick={showCreateRoleForm} disabled={isValidating || isFreeSpace}>
+              <Button
+                onClick={showCreateRoleForm}
+                disabled={isValidating || isFreeSpace || !canCreateRole}
+                title={roleLimitTooltip}
+              >
                 Add a role
               </Button>
             </UpgradeWrapper>
@@ -119,8 +134,18 @@ export function RoleSettings({ space }: { space: Space }) {
 
           <Typography variant='body2' fontWeight='bold' color='secondary' gap={1} display='flex' alignItems='center'>
             Custom roles
+            {hasReachedLimit && (
+              <Typography variant='caption' color='error'>
+                (Limit reached: {currentCount}/{maxCount})
+              </Typography>
+            )}
           </Typography>
-
+          {isAdmin && roles?.some((role) => role.archived) && (
+            <Alert severity='info' sx={{ mt: 1 }}>
+              After upgrading your subscription, you'll need to manually unarchive any token gates, roles, or workflows
+              that you want to keep using.
+            </Alert>
+          )}
           <Typography variant='caption'>Custom role permissions override Default.</Typography>
           {roles?.map((role) => (
             <RoleRow
@@ -130,6 +155,8 @@ export function RoleSettings({ space }: { space: Space }) {
               refreshRoles={refreshRoles}
               role={role}
               key={role.id}
+              archiveRole={archiveRole}
+              unarchiveRole={unarchiveRole}
             />
           ))}
           {roles?.length === 0 && !isCreateFormVisible && !isFreeSpace && (
@@ -138,7 +165,13 @@ export function RoleSettings({ space }: { space: Space }) {
                 No roles have been created yet.
               </Typography>
               {isAdmin && (
-                <Button sx={{ mt: 2 }} onClick={showCreateRoleForm} disabled={isValidating} variant='outlined'>
+                <Button
+                  sx={{ mt: 2 }}
+                  onClick={showCreateRoleForm}
+                  disabled={isValidating || !canCreateRole}
+                  title={roleLimitTooltip}
+                  variant='outlined'
+                >
                   Add a role
                 </Button>
               )}

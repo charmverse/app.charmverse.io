@@ -1,14 +1,47 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { getWorkflowLimits } from '@packages/subscriptions/featureRestrictions';
 
 export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
+  if (!workflow.id) {
+    const space = await prisma.space.findUniqueOrThrow({
+      where: {
+        id: workflow.spaceId
+      },
+      select: {
+        subscriptionTier: true,
+        proposalWorkflows: {
+          where: {
+            archived: false
+          },
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+    const workflowLimits = getWorkflowLimits(space.subscriptionTier);
+
+    if (space.proposalWorkflows.length >= workflowLimits) {
+      throw new InvalidInputError(
+        `You have reached the maximum number of workflows (${workflowLimits}) for your subscription tier`
+      );
+    }
+  }
+
   const originalWorkflow = await prisma.proposalWorkflow.findUnique({
     where: {
       id: workflow.id
     }
   });
+
+  // Double check if the workflow is archived
+  if (originalWorkflow?.archived && workflow.archived !== false) {
+    throw new InvalidInputError('Cannot modify archived workflows. Unarchive the workflow first.');
+  }
 
   const originalEvaluations = (originalWorkflow ? originalWorkflow.evaluations : []) as WorkflowEvaluationJson[];
 

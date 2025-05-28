@@ -1,10 +1,10 @@
 import { Box } from '@mui/material';
+import type { IPropertyOption } from '@packages/databases/board';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyOption } from '@packages/databases/board';
 
 type Props<Option extends { id: string; title: string }> = {
   onChange?: (value: Option) => void;

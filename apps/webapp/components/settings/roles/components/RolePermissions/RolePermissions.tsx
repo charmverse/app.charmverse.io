@@ -1,6 +1,8 @@
 import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
 import type { SpaceOperation } from '@charmverse/core/prisma';
 import { Box, Divider, Grid, Typography } from '@mui/material';
+import type { AssignablePermissionGroups } from '@packages/lib/permissions/interfaces';
+import type { SpacePermissions } from '@packages/lib/permissions/spaces/listPermissions';
 import { useEffect, useReducer, useState } from 'react';
 import useSWR from 'swr/immutable';
 import { v4 as uuid } from 'uuid';
@@ -16,8 +18,6 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { AssignablePermissionGroups } from '@packages/lib/permissions/interfaces';
-import type { SpacePermissions } from '@packages/lib/permissions/spaces/listPermissions';
 
 import { PermissionToggle } from './components/PermissionToggle';
 
@@ -25,6 +25,7 @@ import { PermissionToggle } from './components/PermissionToggle';
  * @param callback Used to tell the parent the operation is complete. Useful for triggering refreshes
  */
 interface Props {
+  disabled?: boolean;
   targetGroup: Extract<AssignablePermissionGroups, 'space' | 'role'>;
   id: string;
   callback?: () => void;
@@ -108,7 +109,7 @@ function reducerWithContext({ id }: { id: string }) {
   };
 }
 
-export function RolePermissions({ targetGroup, id, callback = () => null }: Props) {
+export function RolePermissions({ disabled, targetGroup, id, callback = () => null }: Props) {
   const { space } = useCurrentSpace();
   const { isFreeSpace } = useIsFreeSpace();
   const { categories: forumCategories = [], isLoading: forumCategoriesLoading } = useForumCategories();
@@ -201,7 +202,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               data-test='space-operation-createPage'
               label='Create new pages'
               defaultChecked={isFreeSpace ? true : rolePermissions?.createPage}
-              disabled={disableModifications}
+              disabled={disableModifications || !!disabled}
               memberChecked={targetGroup !== 'space' ? spacePermissions?.createPage : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -214,7 +215,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 data-test='space-operation-deleteAnyPage'
                 label='Delete any page'
                 defaultChecked={!isFreeSpace && !!rolePermissions?.deleteAnyPage}
-                disabled={disableModifications}
+                disabled={disableModifications || !!disabled}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
                   setSpacePermission('deleteAnyPage', nowHasAccess);
@@ -231,7 +232,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               data-test='space-operation-createBounty'
               label={`Create new ${getFeatureTitle('rewards')}`}
               defaultChecked={isFreeSpace ? true : rolePermissions?.createBounty}
-              disabled={disableModifications}
+              disabled={disableModifications || !!disabled}
               memberChecked={targetGroup !== 'space' ? spacePermissions?.createBounty : undefined}
               onChange={(ev) => {
                 const { checked: nowHasAccess } = ev.target;
@@ -244,7 +245,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 data-test='space-operation-deleteAnyBounty'
                 label='Delete any reward'
                 defaultChecked={!isFreeSpace && !!rolePermissions?.deleteAnyBounty}
-                disabled={disableModifications}
+                disabled={disableModifications || !!disabled}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
                   setSpacePermission('deleteAnyBounty', nowHasAccess);
@@ -261,7 +262,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
               label='Create proposals'
               defaultChecked={isFreeSpace ? true : rolePermissions?.createProposals}
               memberChecked={targetGroup !== 'space' ? spacePermissions?.createProposals : undefined}
-              disabled={disableModifications}
+              disabled={disableModifications || !!disabled}
               onChange={(ev) => {
                 setSpacePermission('createProposals', ev.target.checked);
               }}
@@ -272,7 +273,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 data-test='space-operation-deleteAnyProposal'
                 label='Delete and archive any proposal'
                 defaultChecked={!!rolePermissions?.deleteAnyProposal && !isFreeSpace}
-                disabled={disableModifications}
+                disabled={disableModifications || !!disabled}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
                   setSpacePermission('deleteAnyProposal', nowHasAccess);
@@ -291,7 +292,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 label='Moderate and access all forum categories'
                 defaultChecked={rolePermissions?.moderateForums && !isFreeSpace}
                 memberChecked={spacePermissions?.moderateForums}
-                disabled={disableModifications}
+                disabled={disableModifications || !!disabled}
                 onChange={(ev) => {
                   const { checked: nowHasAccess } = ev.target;
                   setSpacePermission('moderateForums', nowHasAccess);
@@ -316,7 +317,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                   return (
                     <PostCategoryRolePermissionRow
                       key={category.id}
-                      canEdit={category.permissions.manage_permissions && !isFreeSpace}
+                      canEdit={category.permissions.manage_permissions && !isFreeSpace && !disabled}
                       label={category.name}
                       deletePermission={deletePostCategoryPermission}
                       updatePermission={updatePostCategoryPermission}
@@ -337,7 +338,7 @@ export function RolePermissions({ targetGroup, id, callback = () => null }: Prop
                 <Button
                   size='small'
                   data-test='submit-space-permission-settings'
-                  disabled={!touched}
+                  disabled={!touched || !!disabled}
                   onClick={handleSubmit}
                   variant='contained'
                   color='primary'

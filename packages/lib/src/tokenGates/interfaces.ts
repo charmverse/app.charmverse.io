@@ -2,7 +2,7 @@ import type { TokenGate as PrismaTokenGate, Role } from '@charmverse/core/prisma
 
 export type TokenGateJoinType = 'public_bounty_token_gate' | 'token_gate';
 
-type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId'>;
+type TokenGateFields = Pick<PrismaTokenGate, 'createdAt' | 'id' | 'spaceId' | 'archived'>;
 
 export type ConditionType = 'sol' | 'evm' | 'cosmos';
 export type AccessType =
@@ -59,7 +59,7 @@ export type TokenGateConditions = {
 export type TokenGate = { conditions: TokenGateConditions } & TokenGateFields;
 
 type WithRoles = {
-  tokenGateToRoles: { role: Pick<Role, 'id' | 'name'> }[];
+  tokenGateToRoles: { role: Pick<Role, 'id' | 'name' | 'archived'> }[];
 };
 
 export type TokenGateWithRoles = TokenGate & WithRoles;

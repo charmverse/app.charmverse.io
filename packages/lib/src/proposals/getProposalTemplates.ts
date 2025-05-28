@@ -46,6 +46,12 @@ export async function getProposalTemplates({
       id: true,
       title: true,
       proposal: {
+        // Filter out archived workflows
+        where: {
+          workflow: {
+            archived: false
+          }
+        },
         select: {
           id: true,
           archived: true,
@@ -84,16 +90,18 @@ export async function getProposalTemplates({
     }
   });
 
-  const res: ProposalTemplateMeta[] = templates.map((page) => ({
-    pageId: page.id,
-    proposalId: page.proposal!.id,
-    contentType: page.proposal!.formId ? 'structured' : 'free_form',
-    title: page.title,
-    archived: page.proposal?.archived || undefined,
-    draft: page.proposal?.status === 'draft',
-    evaluations: page.proposal?.evaluations ?? [],
-    formFields: (page.proposal?.form as { formFields?: Pick<FormField, 'type' | 'id' | 'name'>[] })?.formFields ?? []
-  }));
+  const res: ProposalTemplateMeta[] = templates
+    .filter((page) => page.proposal)
+    .map((page) => ({
+      pageId: page.id,
+      proposalId: page.proposal!.id,
+      contentType: page.proposal!.formId ? 'structured' : 'free_form',
+      title: page.title,
+      archived: page.proposal!.archived || undefined,
+      draft: page.proposal!.status === 'draft',
+      evaluations: page.proposal!.evaluations ?? [],
+      formFields: (page.proposal!.form as { formFields?: Pick<FormField, 'type' | 'id' | 'name'>[] })?.formFields ?? []
+    }));
 
   if (!isAdmin) {
     return res.filter((template) => !template.archived && !template.draft);

@@ -21,7 +21,8 @@ export function TokenGates({ isAdmin, space, popupState }: TokenGatesProps) {
     <>
       <TokenGatesTable
         isAdmin={isAdmin}
-        tokenGates={data}
+        // Remove token gates that have archived roles
+        tokenGates={data.filter((tokenGate) => !tokenGate.tokenGateToRoles.some((role) => role.role.archived))}
         isLoading={isLoading}
         refreshTokenGates={async () => {
           await mutate();

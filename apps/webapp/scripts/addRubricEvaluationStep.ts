@@ -22,13 +22,15 @@ async function addRubricEvaluationStep() {
   const reviewerRole = await prisma.role.findFirstOrThrow({
     where: {
       name: reviewerRoleTitle,
-      spaceId: space.id
+      spaceId: space.id,
+      archived: false
     }
   });
   const approverRole = await prisma.role.findFirstOrThrow({
     where: {
       name: approverRoleTitle,
-      spaceId: space.id
+      spaceId: space.id,
+      archived: false
     }
   });
 

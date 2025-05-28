@@ -7,6 +7,7 @@ import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction'
 import { NotFoundError } from '@packages/nextjs/errors';
 import { generatePagePathFromPathAndTitle } from '@packages/pages/utils';
 import { InvalidInputError } from '@packages/utils/errors';
+import { isTruthy } from '@packages/utils/types';
 import { v4 } from 'uuid';
 
 import { getRewardOrThrow } from './getReward';
@@ -61,6 +62,29 @@ export async function createReward({
   isDraft,
   isPublic
 }: RewardCreationData) {
+  const roleIds = Array.from(
+    new Set(
+      [
+        ...(allowedSubmitterRoles ?? []),
+        ...(assignedSubmitters ?? []),
+        ...(reviewers?.map((reviewer) => reviewer.roleId) ?? [])
+      ].filter(isTruthy)
+    )
+  );
+
+  if (roleIds.length > 0) {
+    const roles = await prisma.role.findMany({
+      where: {
+        archived: false,
+        id: { in: roleIds }
+      }
+    });
+
+    if (roles.length !== roleIds.length) {
+      throw new InvalidInputError('Archived roles are not allowed to be used in rewards');
+    }
+  }
+
   const errors = getRewardErrors({
     page: pageProps || null,
     linkedPageId,

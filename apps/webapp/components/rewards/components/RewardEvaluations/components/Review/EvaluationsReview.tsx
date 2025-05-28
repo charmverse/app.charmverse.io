@@ -1,5 +1,13 @@
 import type { KycOption, PersonaUserKycStatus, SynapsUserKycStatus } from '@charmverse/core/prisma-client';
 import { Collapse, Divider, Tooltip } from '@mui/material';
+import type { RewardFields } from '@packages/lib/rewards/blocks/interfaces';
+import { getCurrentRewardEvaluation } from '@packages/lib/rewards/getCurrentRewardEvaluation';
+import type { RewardEvaluation } from '@packages/lib/rewards/getRewardWorkflows';
+import { getRewardWorkflowWithApplication } from '@packages/lib/rewards/getRewardWorkflowWithApplication';
+import { inferRewardWorkflow } from '@packages/lib/rewards/inferRewardWorkflow';
+import type { ApplicationWithTransactions, RewardWithUsers } from '@packages/lib/rewards/interfaces';
+import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
+import { getAbsolutePath } from '@packages/lib/utils/browser';
 import cloneDeep from 'lodash/cloneDeep';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -12,14 +20,6 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
-import type { RewardFields } from '@packages/lib/rewards/blocks/interfaces';
-import { getCurrentRewardEvaluation } from '@packages/lib/rewards/getCurrentRewardEvaluation';
-import type { RewardEvaluation } from '@packages/lib/rewards/getRewardWorkflows';
-import { getRewardWorkflowWithApplication } from '@packages/lib/rewards/getRewardWorkflowWithApplication';
-import { inferRewardWorkflow } from '@packages/lib/rewards/inferRewardWorkflow';
-import type { ApplicationWithTransactions, RewardWithUsers } from '@packages/lib/rewards/interfaces';
-import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
 
 import { KycStepSettings } from '../Settings/components/KycStepSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';

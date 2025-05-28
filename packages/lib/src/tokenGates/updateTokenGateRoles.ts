@@ -5,7 +5,10 @@ export async function updateTokenGateRoles(roleIds: string[], tokenGateId: strin
 
   const tokenGateRoles = await prisma.tokenGateToRole.findMany({
     where: {
-      tokenGateId
+      tokenGateId,
+      role: {
+        archived: false
+      }
     },
     select: {
       roleId: true

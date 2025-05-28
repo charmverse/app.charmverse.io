@@ -1,10 +1,11 @@
 import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 import { sessionUserRelations } from '@packages/profile/constants';
+import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';
 import { postUserCreate } from '@packages/users/postUserCreate';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@packages/utils/errors';
 import { isUUID, isValidEmail, uid } from '@packages/utils/strings';
-import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 
 type GuestToAdd = {
   userIdOrEmail: string;
@@ -37,6 +38,23 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
     throw new InvalidInputError(`Invalid userIdOrEmail: ${userIdOrEmail}`);
   }
 
+  const spaceWithDomain = await prisma.space.findUnique({
+    where: {
+      id: spaceId
+    },
+    select: {
+      subscriptionTier: true
+    }
+  });
+
+  if (!spaceWithDomain) {
+    throw new DataNotFoundError(`Space not found: ${spaceId}`);
+  }
+
+  if (!hasGuestAccess(spaceWithDomain.subscriptionTier)) {
+    throw new InvalidInputError('Guest access is not available for your subscription tier');
+  }
+
   const isUserBannedFromSpace = await checkUserSpaceBanStatus({
     spaceIds: [spaceId],
     userId: userIdIsUuid ? userIdOrEmail : undefined,
@@ -45,16 +63,6 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
 
   if (isUserBannedFromSpace) {
     throw new UnauthorisedActionError(`User with that ${userIdIsUuid ? 'id' : 'email'} has been banned from space`);
-  }
-
-  const spaceWithDomain = await prisma.space.findUnique({
-    where: {
-      id: spaceId
-    }
-  });
-
-  if (!spaceWithDomain) {
-    throw new DataNotFoundError(`Space not found: ${spaceId}`);
   }
 
   const query: Prisma.UserWhereInput = userIdIsUuid
