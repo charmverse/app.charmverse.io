@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import { LoginOutlined, FlagOutlined } from '@mui/icons-material';
 import { Box, Divider, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import { baseUrl } from '@packages/config/constants';
+import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 
@@ -15,6 +16,7 @@ const LogoImage = styled(Image)`
   filter: ${({ theme }) => (theme.palette.mode === 'dark' ? 'brightness(0) invert(1)' : 'brightness(0)')};
 `;
 export function LoggedOutButtons() {
+  const isCustomDomain = getCustomDomainFromHost();
   const logo = darkLogoImage;
   const router = useRouter();
   return (
@@ -34,7 +36,7 @@ export function LoggedOutButtons() {
         <MenuItem
           component={Link}
           color='inherit'
-          href={`${baseUrl || ''}/?returnUrl=${router.asPath}`}
+          href={`${baseUrl || ''}/${isCustomDomain ? 'login' : ''}?returnUrl=${router.asPath}`}
           external // avoid space domain being added
         >
           <ListItemIcon>
