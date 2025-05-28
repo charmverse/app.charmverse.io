@@ -11,9 +11,14 @@ export async function saveRoleAndSpacePermissions(spaceId: string, permissions: 
 
   const roleIds = Array.from(
     new Set(
-      [...memberPermissions.map((p) => p.assignee.id), ...permissions.forumCategories.map((p) => p.assignee.id)].filter(
-        isTruthy
-      )
+      [
+        ...memberPermissions.map((p) => p.assignee.id),
+        ...permissions.forumCategories
+          .filter((p) => p.assignee.group === 'role' || p.assignee.group === 'space')
+          .map((p) =>
+            p.assignee.group === 'role' ? p.assignee.id : p.assignee.group === 'space' ? p.assignee.id : undefined
+          )
+      ].filter(isTruthy)
     )
   );
 

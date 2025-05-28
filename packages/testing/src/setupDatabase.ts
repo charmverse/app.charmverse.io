@@ -18,7 +18,8 @@ import type {
   Transaction,
   User,
   Vote,
-  SpaceOperation
+  SpaceOperation,
+  SpaceSubscriptionTier
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
@@ -198,6 +199,7 @@ type CreateUserAndSpaceInput = {
   spaceCustomDomain?: string;
   publicBountyBoard?: boolean;
   paidTier?: SubscriptionTier;
+  subscriptionTier?: SpaceSubscriptionTier;
   superApiTokenId?: string;
   walletAddress?: string;
   spaceNotificationToggles?: NotificationToggles;
@@ -218,6 +220,7 @@ export async function generateUserAndSpace({
   superApiTokenId,
   walletAddress,
   paidTier,
+  subscriptionTier,
   spaceNotificationToggles,
   xpsEngineId,
   snapshotDomain,
@@ -265,7 +268,8 @@ export async function generateUserAndSpace({
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined),
               ...(apiToken ? { apiToken: { create: { token: apiToken } } } : undefined),
               xpsEngineId,
-              snapshotDomain
+              snapshotDomain,
+              subscriptionTier
             }
           }
         }

@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
-import { downgradeableTiers, tierConfig } from '@packages/subscriptions/constants';
+import { tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';
 import { parseUnits } from 'viem';
 
@@ -43,7 +43,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
 
   const subscriptionTierAmountInWei = parseUnits(subscriptionTierAmount.toString(), 18);
 
-  if (spaceTokenBalance < subscriptionTierAmountInWei) {
+  if (spaceTokenBalance < subscriptionTierAmountInWei || space.subscriptionCancelledAt) {
     await updateSubscription({ spaceId, newTier: 'readonly' });
 
     log.warn(`Insufficient space token balance, space downgraded to readonly tier`, {
@@ -63,12 +63,8 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
         }
       });
 
-      const previousTierIndex = space.subscriptionTier ? downgradeableTiers.indexOf(space.subscriptionTier) : 0;
-      const currentTierIndex = downgradeableTiers.indexOf(subscriptionTier);
-
-      const isDowngrading = currentTierIndex < previousTierIndex;
-
-      if (isDowngrading) {
+      // the sub is being downgraded because upgrades happen immediately
+      if (space.subscriptionTier !== subscriptionTier) {
         await updateSubscription({
           spaceId,
           newTier: space.subscriptionCancelledAt ? 'readonly' : subscriptionTier
