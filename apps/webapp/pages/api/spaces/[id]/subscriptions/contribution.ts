@@ -22,13 +22,7 @@ async function recordSubscriptionContributionEndpoint(req: NextApiRequest, res: 
 
   const payload = req.body as CreateSubscriptionContributionRequest;
 
-  if (payload.signature && payload.message) {
-    await verifyDevTokenTransfer({
-      ...payload,
-      signature: payload.signature,
-      message: payload.message
-    });
-  }
+  await verifyDevTokenTransfer(payload);
 
   const spaceContribution = await recordSubscriptionContribution({
     ...payload,

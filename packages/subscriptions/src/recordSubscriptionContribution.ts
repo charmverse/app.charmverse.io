@@ -5,8 +5,8 @@ export type CreateSubscriptionContributionRequest = {
   hash: string;
   walletAddress: string;
   paidTokenAmount: string;
-  signature?: string;
-  message?: string;
+  decentPayload?: Record<string, unknown>;
+  chainId?: number;
 };
 
 export async function recordSubscriptionContribution(
