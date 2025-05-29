@@ -59,3 +59,4 @@ export function isDowngrade(oldTier: DowngradeableTier, newTier: DowngradeableTi
 }
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
+export const devTokenDecimals = 18;
