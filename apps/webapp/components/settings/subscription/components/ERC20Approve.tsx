@@ -81,7 +81,7 @@ export function ERC20ApproveButton({
       </Button>
       {!hideWarning && (
         <Typography sx={{ mb: 1 }} variant='caption'>
-          You must approve the {currency} spend before you can {actionType} an NFT
+          You must approve the {currency} spend before you can send tokens to the space
         </Typography>
       )}
     </Stack>

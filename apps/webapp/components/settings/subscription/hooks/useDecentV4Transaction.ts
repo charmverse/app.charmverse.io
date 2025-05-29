@@ -94,7 +94,7 @@ export function useDecentV4Transaction({
     data: decentTransactionInfo
   } = useSWR(
     // Skip Decent SDK call if using DEV tokens or no address
-    enabled && address ? `swap-token-${receiverAddress}-${sourceChainId}-${sourceToken}` : null,
+    enabled && address ? `swap-token-${receiverAddress}-${sourceChainId}-${sourceToken}-${amount}` : null,
     () =>
       prepareDecentV4Transaction({
         txConfig: decentAPIParams

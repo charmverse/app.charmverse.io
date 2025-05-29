@@ -1,11 +1,15 @@
 import { Box, MenuItem, Select, Stack, Typography } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
+import { getChainById } from '@packages/blockchain/connectors/chains';
 import { NULL_EVM_ADDRESS, devTokenAddress } from '@packages/subscriptions/constants';
 import Image from 'next/image';
 import type { ReactNode, Ref } from 'react';
 import { forwardRef } from 'react';
 import type { Address } from 'viem';
-import { base } from 'viem/chains';
+import { base, optimism } from 'viem/chains';
+
+import { BASE_USDC_ADDRESS, OPTIMISM_USDC_ADDRESS } from '../hooks/useGetTokenBalances';
+import type { PaymentOption } from '../hooks/useTokenPayment';
 
 export type AvailableCurrency = 'ETH' | 'USDC' | 'DEV';
 
@@ -17,8 +21,8 @@ export type SelectedPaymentOption = {
 };
 
 export const TOKEN_LOGO_RECORD = {
-  ETH: '/images/crypto/ethereum-eth-logo.png',
-  USDC: '/images/crypto/usdc.png',
+  ETH: '/images/cryptoLogos/ethereum-circle.png',
+  USDC: '/images/cryptoLogos/usdc.png',
   DEV: '/images/logos/dev-token-logo.png'
 };
 
@@ -29,13 +33,33 @@ export const DEV_PAYMENT_OPTION: SelectedPaymentOption = {
   decimals: 18
 };
 
-const paymentOptions: SelectedPaymentOption[] = [
+export const BASE_USDC_PAYMENT_OPTION: PaymentOption = {
+  chainId: base.id,
+  address: BASE_USDC_ADDRESS,
+  currency: 'USDC' as const,
+  decimals: 6
+};
+
+const paymentOptions: PaymentOption[] = [
   DEV_PAYMENT_OPTION,
   {
     chainId: base.id,
     address: NULL_EVM_ADDRESS,
-    currency: 'ETH',
+    currency: 'ETH' as const,
     decimals: 18
+  },
+  BASE_USDC_PAYMENT_OPTION,
+  {
+    chainId: optimism.id,
+    address: NULL_EVM_ADDRESS,
+    currency: 'ETH' as const,
+    decimals: 18
+  },
+  {
+    chainId: optimism.id,
+    address: OPTIMISM_USDC_ADDRESS,
+    currency: 'USDC' as const,
+    decimals: 6
   }
 ];
 
@@ -146,7 +170,12 @@ function PaymentOptionSelector(
                   height={30}
                 />
                 <Stack>
-                  <Typography>{paymentOption.currency}</Typography>
+                  <Typography>
+                    {paymentOption.currency} on{' '}
+                    <span style={{ fontWeight: 500 }}>
+                      {getChainById(paymentOption.chainId)?.chainName ?? 'Unknown'}
+                    </span>
+                  </Typography>
                   <Typography variant='caption'>
                     Balance:{' '}
                     {tokensWithBalances?.find(

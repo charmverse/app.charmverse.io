@@ -1,14 +1,12 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { ChainId } from '@decent.xyz/box-common';
-import { NULL_EVM_ADDRESS } from '@packages/subscriptions/constants';
+import { devTokenAddress, NULL_EVM_ADDRESS } from '@packages/subscriptions/constants';
 import { useEffect, useState } from 'react';
 import type { Address } from 'viem';
 
-const optimismTokenDecimals = 18;
-const optimismTokenAddress = '0x4200000000000000000000000000000000000042';
-const OPTIMISM_USDC_ADDRESS = '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85';
-const BASE_USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+export const OPTIMISM_USDC_ADDRESS = '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85';
+export const BASE_USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 
 type TokenBalance = {
   address: Address;
@@ -97,7 +95,7 @@ export function useGetTokenBalances({ address }: { address: Address }) {
           fetchTokenBalances({
             address,
             chainId: ChainId.BASE,
-            additionalTokens: [NULL_EVM_ADDRESS, BASE_USDC_ADDRESS, devTokenContractAddress]
+            additionalTokens: [NULL_EVM_ADDRESS, BASE_USDC_ADDRESS, devTokenAddress]
           }),
           fetchTokenBalances({
             address,

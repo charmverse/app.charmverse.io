@@ -6,13 +6,15 @@ import type { Address } from 'viem';
 import { parseUnits, formatUnits } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
+import type { AvailableCurrency } from '../components/PaymentTokenSelector';
+
 import { useDecentV4Transaction } from './useDecentV4Transaction';
 import { useGetERC20Allowance } from './useGetERC20Allowance';
 
 export type PaymentOption = {
   chainId: number;
   address: Address;
-  currency: string;
+  currency: AvailableCurrency;
   decimals: number;
 };
 

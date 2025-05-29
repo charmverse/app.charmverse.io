@@ -5,8 +5,8 @@ export type CreateSubscriptionContributionRequest = {
   hash: string;
   walletAddress: string;
   paidTokenAmount: string;
-  signature: string;
-  message: string;
+  signature?: string;
+  message?: string;
 };
 
 export async function recordSubscriptionContribution(
