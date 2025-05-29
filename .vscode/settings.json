@@ -45,4 +45,7 @@
   "typescript.preferences.autoImportFileExcludePatterns": [
     "**/node_modules/@mui/system/*"
   ],
+  "cSpell.words": [
+    "downgradeable"
+  ],
 }

@@ -1,10 +1,9 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { Launch as LaunchIcon } from '@mui/icons-material';
-import { Box, Stack, TextField, Typography, Link, Divider } from '@mui/material';
+import { Box, Divider, Link, Stack, TextField, Typography } from '@mui/material';
 import { uniswapSwapUrl } from '@packages/subscriptions/constants';
 import { getExpiresAt } from '@packages/subscriptions/getExpiresAt';
 import { shortenHex } from '@packages/utils/blockchain';
-import { DateTime } from 'luxon';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';

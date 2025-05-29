@@ -1,3 +1,4 @@
+import env from '@beam-australia/react-env';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 
 export const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
@@ -56,3 +57,5 @@ export const tierConfig: Record<SpaceSubscriptionTier, { name: string; iconPath:
 export function isDowngrade(oldTier: DowngradeableTier, newTier: DowngradeableTier) {
   return subscriptionTierOrder.indexOf(oldTier) > subscriptionTierOrder.indexOf(newTier);
 }
+
+export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
