@@ -1,85 +1,126 @@
-import { arrayUtils } from '@charmverse/core/utilities';
-import type { UserTokenInfo } from '@decent.xyz/box-common';
-import type { UserBalanceArgs } from '@decent.xyz/box-hooks';
-import { useUsersBalances } from '@decent.xyz/box-hooks';
-import { devTokenAddress, NULL_EVM_ADDRESS } from '@packages/subscriptions/constants';
-import { useEffect, useRef, useState } from 'react';
+import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
+import { ChainId } from '@decent.xyz/box-common';
+import { NULL_EVM_ADDRESS } from '@packages/subscriptions/constants';
+import { useEffect, useState } from 'react';
 import type { Address } from 'viem';
-import { createPublicClient, erc20Abi, http } from 'viem';
-import { base } from 'viem/chains';
 
-import { chainOptionsMainnet, getChainOptions } from '../components/ChainSelector/chains';
+const optimismTokenDecimals = 18;
+const optimismTokenAddress = '0x4200000000000000000000000000000000000042';
+const OPTIMISM_USDC_ADDRESS = '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85';
+const BASE_USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 
-export type { UserTokenInfo };
+type TokenBalance = {
+  address: Address;
+  chainId: number;
+  balance: number;
+  symbol: string;
+  name: string;
+  decimals: number;
+};
+
+type DecentTokenResponse = {
+  address: string;
+  chainId: number;
+  name: string;
+  symbol: string;
+  decimals: number;
+  isNative: boolean;
+  logo?: string;
+  balanceFloat: number;
+  balance: string;
+};
+
+const DECENT_API_BASE_URL = 'https://box-v4.api.decent.xyz/api';
+
+async function fetchTokenBalances(params: {
+  address: Address;
+  chainId: number;
+  additionalTokens: Address[];
+}): Promise<DecentTokenResponse[]> {
+  const apiKey = env('DECENT_API_KEY') || process.env.REACT_APP_DECENT_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('Decent API key not found');
+  }
+
+  const queryParams = new URLSearchParams({
+    address: params.address,
+    additionalTokens: params.additionalTokens.join(','),
+    chainId: params.chainId.toString()
+  });
+
+  const response = await fetch(`${DECENT_API_BASE_URL}/getTokens?${queryParams}`, {
+    headers: {
+      'x-api-key': apiKey
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch token balances: ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+function filterAndMapTokens(tokens: DecentTokenResponse[]): TokenBalance[] {
+  const TRACKED_TOKENS = [
+    NULL_EVM_ADDRESS.toLowerCase(),
+    BASE_USDC_ADDRESS.toLowerCase(),
+    OPTIMISM_USDC_ADDRESS.toLowerCase(),
+    devTokenAddress.toLowerCase()
+  ];
+
+  return tokens
+    .filter((token) => TRACKED_TOKENS.includes(token.address.toLowerCase()))
+    .map((token) => ({
+      address: token.address as Address,
+      chainId: token.chainId,
+      balance: token.balanceFloat,
+      symbol: token.symbol,
+      name: token.name,
+      decimals: token.decimals
+    }));
+}
 
 export function useGetTokenBalances({ address }: { address: Address }) {
-  const [scoutTokenInfo, setScoutTokenInfo] = useState<UserTokenInfo | null>(null);
-  const fetchDevTokenInfoRef = useRef(false);
-
-  // Regular token fetching logic
-  const args: UserBalanceArgs = {
-    chainId: base.id,
-    selectChains: arrayUtils.uniqueValues([base.id, ...getChainOptions().map((opt) => opt.id)]),
-    address,
-    enable: !!address,
-    selectTokens: arrayUtils.uniqueValues(
-      chainOptionsMainnet
-        .map((opt) => {
-          if (opt.usdcAddress) {
-            return [NULL_EVM_ADDRESS, opt.usdcAddress];
-          }
-          return [NULL_EVM_ADDRESS];
-        })
-        .flat()
-    )
-  };
-
-  const result = useUsersBalances(args);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tokens, setTokens] = useState<TokenBalance[]>([]);
 
   useEffect(() => {
-    async function fetchDevTokenInfo() {
+    async function fetchBalances() {
+      if (!address) return;
+
+      setIsLoading(true);
       try {
-        // Create a public client for Base chain
-        const client = createPublicClient({
-          chain: base,
-          transport: http()
-        });
+        const [baseTokens, optimismTokens] = await Promise.all([
+          fetchTokenBalances({
+            address,
+            chainId: ChainId.BASE,
+            additionalTokens: [NULL_EVM_ADDRESS, BASE_USDC_ADDRESS, devTokenContractAddress]
+          }),
+          fetchTokenBalances({
+            address,
+            chainId: ChainId.OPTIMISM,
+            additionalTokens: [NULL_EVM_ADDRESS, OPTIMISM_USDC_ADDRESS]
+          })
+        ]);
 
-        // Fetch token information from the contract
-        const balance = await client.readContract({
-          address: devTokenAddress,
-          abi: erc20Abi,
-          functionName: 'balanceOf',
-          args: [address]
-        });
-
-        // Calculate the human-readable balance
-        const balanceFloat = Number(balance) / 10 ** 18;
-
-        setScoutTokenInfo({
-          address: devTokenAddress,
-          chainId: base.id,
-          name: 'Scout Protocol Token',
-          symbol: 'DEV',
-          decimals: 18,
-          balance: BigInt(balance.toString()),
-          balanceFloat,
-          isNative: false,
-          logo: '/images/crypto/base64.png'
-        });
-        fetchDevTokenInfoRef.current = true;
+        const allTokens = filterAndMapTokens([...baseTokens, ...optimismTokens]);
+        setTokens(allTokens);
       } catch (error) {
-        return null;
+        log.error('Error fetching token balances:', { error });
+        setTokens([]);
+      } finally {
+        setIsLoading(false);
       }
     }
 
-    if (!fetchDevTokenInfoRef.current) {
-      fetchDevTokenInfo();
-    }
+    fetchBalances();
   }, [address]);
 
   return {
-    ...result,
-    tokens: [...(result.tokens ?? []), ...(scoutTokenInfo ? [scoutTokenInfo] : [])]
+    tokens,
+    isLoading
   };
 }

@@ -125,6 +125,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
       </Stack>
       <BoxHooksContextProvider apiKey={decentApiKey}>
         <SendDevToSpaceForm
+          spaceId={spaceId}
           spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
           spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
           isOpen={isSendDevModalOpen}
