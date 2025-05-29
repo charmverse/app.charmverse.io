@@ -5,8 +5,10 @@ import { uniswapSwapUrl } from '@packages/subscriptions/constants';
 import { getExpiresAt } from '@packages/subscriptions/getExpiresAt';
 import { shortenHex } from '@packages/utils/blockchain';
 import Image from 'next/image';
-import { useState } from 'react';
-import { useAccount } from 'wagmi';
+import { useState, useMemo } from 'react';
+import { formatUnits, parseUnits } from 'viem';
+import type { Address } from 'viem';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
@@ -14,8 +16,14 @@ import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 
+import { useDecentV4Transaction } from '../hooks/useDecentV4Transaction';
 import { useDevTokenBalance } from '../hooks/useDevTokenBalance';
+import { useGetTokenBalances } from '../hooks/useGetTokenBalances';
 import { useTransferDevToken } from '../hooks/useTransferDevToken';
+
+import { ERC20ApproveButton } from './ERC20Approve';
+import { DEV_PAYMENT_OPTION } from './PaymentTokenSelector';
+import type { SelectedPaymentOption } from './PaymentTokenSelector';
 
 export function SendDevToSpaceForm({
   spaceTokenBalance,
@@ -35,11 +43,48 @@ export function SendDevToSpaceForm({
   const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { balance, formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
+  const { switchChainAsync } = useSwitchChain();
+
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState<SelectedPaymentOption>({
+    ...DEV_PAYMENT_OPTION
+  });
+
+  const { tokens, isLoading: isLoadingTokenBalances } = useGetTokenBalances({
+    address: address as Address
+  });
+
+  const { selectedTokenBalance } = useMemo(() => {
+    const _selectedPaymentOption = tokens?.find(
+      (token) =>
+        token.address.toLowerCase() === selectedPaymentOption.address.toLowerCase() &&
+        token.chainId === selectedPaymentOption.chainId
+    );
+
+    return {
+      selectedTokenBalance: _selectedPaymentOption?.balance
+    };
+  }, [tokens, selectedPaymentOption]);
 
   const { transferDevToken } = useTransferDevToken();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const newExpiresAt = getExpiresAt(spaceTier, spaceTokenBalance + amount);
+
+  const { decentSdkError, isLoadingDecentSdk, decentTransactionInfo } = useDecentV4Transaction({
+    address: address as Address,
+    receiverAddress: space?.id as Address,
+    sourceChainId: selectedPaymentOption.chainId,
+    sourceToken: selectedPaymentOption.address,
+    enabled: !!(selectedPaymentOption.currency !== 'DEV' && selectedTokenBalance),
+    amount: parseUnits(amount.toString(), 18)
+  });
+
+  const tokenPaymentValue =
+    decentTransactionInfo && 'tokenPayment' in decentTransactionInfo
+      ? BigInt((decentTransactionInfo.tokenPayment?.amount?.toString() ?? '0').replace('n', ''))
+      : BigInt(0);
+
+  const exchangeRate = Number(formatUnits(tokenPaymentValue, selectedPaymentOption.decimals)) / Number(amount);
 
   async function onDevTransfer() {
     setIsProcessing(true);

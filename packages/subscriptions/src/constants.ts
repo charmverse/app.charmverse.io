@@ -60,3 +60,5 @@ export function isDowngrade(oldTier: DowngradeableTier, newTier: DowngradeableTi
 
 export const decentApiKey = env('DECENT_API_KEY') || (process.env.REACT_APP_DECENT_API_KEY as string);
 export const devTokenDecimals = 18;
+
+export const NULL_EVM_ADDRESS = '0x0000000000000000000000000000000000000000';

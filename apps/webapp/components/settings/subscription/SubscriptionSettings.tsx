@@ -1,7 +1,8 @@
 import type { Space } from '@charmverse/core/prisma';
+import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { Box, Divider, Link, Stack, Typography } from '@mui/material';
 import type { DowngradeableTier, UpgradableTier } from '@packages/subscriptions/constants';
-import { downgradeableTiers } from '@packages/subscriptions/constants';
+import { decentApiKey, downgradeableTiers } from '@packages/subscriptions/constants';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -122,16 +123,18 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
           </Typography>
         </Box>
       </Stack>
-      <SendDevToSpaceForm
-        spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
-        spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
-        isOpen={isSendDevModalOpen}
-        onClose={() => setIsSendDevModalOpen(false)}
-        onSuccess={() => {
-          refreshSubscriptionEvents();
-          refreshSubscriptionStatus();
-        }}
-      />
+      <BoxHooksContextProvider apiKey={decentApiKey}>
+        <SendDevToSpaceForm
+          spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
+          spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
+          isOpen={isSendDevModalOpen}
+          onClose={() => setIsSendDevModalOpen(false)}
+          onSuccess={() => {
+            refreshSubscriptionEvents();
+            refreshSubscriptionStatus();
+          }}
+        />
+      </BoxHooksContextProvider>
       <UpgradeSubscriptionModal
         spaceId={spaceId}
         currentTier={subscriptionStatus.tier}
