@@ -55,7 +55,7 @@ export function SendDevToSpaceForm({
     ...DEV_PAYMENT_OPTION
   });
 
-  const { tokens, isLoading: isLoadingTokenBalances } = useGetTokenBalances({
+  const { tokens } = useGetTokenBalances({
     address: address as Address
   });
 

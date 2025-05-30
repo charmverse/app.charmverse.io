@@ -14,16 +14,15 @@ import type { Address } from 'viem';
 import { formatUnits, parseUnits } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
-import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import { useDecentV4Transaction } from '../../hooks/useDecentV4Transaction';
+import { useDevTokenBalance } from '../../hooks/useDevTokenBalance';
 import { useGetERC20Allowance } from '../../hooks/useGetERC20Allowance';
 import { useGetTokenBalances } from '../../hooks/useGetTokenBalances';
 import { useSpaceSubscriptionTransaction } from '../../hooks/useSpaceSubscriptionTransaction';
-import { useTransferDevToken } from '../../hooks/useTransferDevToken';
 import { ERC20ApproveButton } from '../ERC20Approve';
 import type { SelectedPaymentOption } from '../PaymentTokenSelector';
 import { DEV_PAYMENT_OPTION, PaymentTokenSelector, TOKEN_LOGO_RECORD } from '../PaymentTokenSelector';
@@ -49,6 +48,7 @@ export function UpgradeSubscriptionModal({
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
   const [isProcessing, setIsProcessing] = useState(false);
+  const { formattedBalance, isLoading: isBalanceLoading } = useDevTokenBalance({ address });
 
   const [selectedPaymentOption, setSelectedPaymentOption] = useState<SelectedPaymentOption>({
     ...DEV_PAYMENT_OPTION
@@ -82,9 +82,7 @@ export function UpgradeSubscriptionModal({
     setPaymentMonths(1);
   }
 
-  const { isTransferring, address: devAddress, formattedBalance } = useTransferDevToken();
-
-  const isLoading = isTransferring || isProcessing;
+  const isLoading = isProcessing || isBalanceLoading;
 
   const { decentSdkError, decentTransactionInfo } = useDecentV4Transaction({
     address: address as Address,
@@ -200,7 +198,7 @@ export function UpgradeSubscriptionModal({
           <Divider />
           <Box>
             <Typography variant='body2' color='text.secondary' gutterBottom>
-              Connected wallet: {shortenHex(devAddress, 4)}
+              Connected wallet: {shortenHex(address, 4)}
             </Typography>
             <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
               <Stack flexDirection='row' alignItems='center' gap={0.5}>
