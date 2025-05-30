@@ -82,7 +82,7 @@ export async function createWorkspace({
 
   const { immediatePayment, priceForMonths } = calculateSubscriptionCost({
     paymentMonths: 2,
-    newTier: 'bronze',
+    newTier: 'gold',
     currentTier: null
   });
 
@@ -107,7 +107,7 @@ export async function createWorkspace({
       blockQuota: defaultFreeBlockQuota,
       memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
       features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
-      subscriptionTier: 'bronze',
+      subscriptionTier: 'gold',
       spaceRoles: {
         createMany: {
           data: userList.map((_userId) => ({
@@ -128,13 +128,13 @@ export async function createWorkspace({
         create: {
           paidTokenAmount: parseUnits(immediatePayment.toString(), 18).toString(),
           subscriptionPeriodStart: new Date(),
-          subscriptionPrice: parseUnits(tierConfig.bronze.tokenPrice.toString(), 18).toString(),
-          subscriptionTier: 'bronze'
+          subscriptionPrice: parseUnits(tierConfig.gold.tokenPrice.toString(), 18).toString(),
+          subscriptionTier: 'gold'
         }
       },
       subscriptionTierChangeEvents: {
         create: {
-          newTier: 'bronze',
+          newTier: 'gold',
           previousTier: 'readonly'
         }
       }

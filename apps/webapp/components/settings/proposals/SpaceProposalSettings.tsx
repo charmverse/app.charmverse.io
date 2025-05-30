@@ -46,7 +46,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       id: uuid(),
       index: lowestIndex - 1,
       privateEvaluations: false,
-      draftReminder: false
+      draftReminder: false,
+      archived: false
     };
     // insert the new evaluation after the existing one
     if (existingIndex > -1) {
@@ -94,7 +95,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   // set the workflow state on load - but from here on out the UI will maintain the latest 'state' since each row can be in an edited state at any given time
   useEffect(() => {
     if (currentWorkflowTemplates) {
-      setWorkflows([...currentWorkflowTemplates] ?? []);
+      setWorkflows([...currentWorkflowTemplates]);
     }
   }, [!!currentWorkflowTemplates]);
 

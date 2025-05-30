@@ -26,7 +26,8 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     ],
     index: 0,
     spaceId,
-    draftReminder: false
+    draftReminder: false,
+    archived: false
   },
   {
     id: uuid(),
@@ -45,7 +46,8 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     ],
     index: 1,
     spaceId,
-    draftReminder: false
+    draftReminder: false,
+    archived: false
   },
   {
     id: uuid(),
@@ -60,6 +62,7 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     ],
     index: 2,
     spaceId,
-    draftReminder: false
+    draftReminder: false,
+    archived: false
   }
 ];
