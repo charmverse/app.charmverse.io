@@ -3,7 +3,7 @@ import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { Launch as LaunchIcon } from '@mui/icons-material';
-import { Box, capitalize, Card, Divider, Link, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Alert, Box, capitalize, Card, Divider, Link, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
 import type { UpgradableTier } from '@packages/subscriptions/constants';
 import { charmVerseBankAddress, uniswapSwapUrl } from '@packages/subscriptions/constants';
@@ -46,15 +46,15 @@ export function UpgradeSubscriptionModal({
   const [paymentPeriod, setPaymentPeriod] = useState<'month' | 'year' | 'custom'>('month');
   const [paymentMonths, setPaymentMonths] = useState<number>(1);
   const { showMessage } = useSnackbar();
-  const [isUpgrading, setIsUpgrading] = useState(false);
   const { address, chainId } = useAccount();
   const { switchChainAsync } = useSwitchChain();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [selectedPaymentOption, setSelectedPaymentOption] = useState<SelectedPaymentOption>({
     ...DEV_PAYMENT_OPTION
   });
 
-  const { tokens, isLoading: isLoadingTokenBalances } = useGetTokenBalances({
+  const { tokens } = useGetTokenBalances({
     address: address as Address
   });
 
@@ -82,9 +82,9 @@ export function UpgradeSubscriptionModal({
     setPaymentMonths(1);
   }
 
-  const { isTransferring, transferDevToken, address: devAddress, formattedBalance } = useTransferDevToken();
+  const { isTransferring, address: devAddress, formattedBalance } = useTransferDevToken();
 
-  const isLoading = isTransferring || isUpgrading;
+  const isLoading = isTransferring || isProcessing;
 
   const { decentSdkError, decentTransactionInfo } = useDecentV4Transaction({
     address: address as Address,
@@ -143,20 +143,16 @@ export function UpgradeSubscriptionModal({
 
   const { sendDevTransaction, sendOtherTokenTransaction } = useSpaceSubscriptionTransaction();
 
-  const [isProcessing, setIsProcessing] = useState(false);
-
   async function onUpgrade() {
-    setIsUpgrading(true);
+    setIsProcessing(true);
 
     try {
       if (selectedPaymentOption.currency === 'DEV') {
         if (devTokensToSend > 0) {
-          const result = await transferDevToken(devTokensToSend);
-          if (!result) return;
-          await charmClient.subscription.recordSubscriptionContribution(spaceId, {
-            hash: result.hash,
-            walletAddress: result.address,
-            paidTokenAmount: result.transferredAmount.toString()
+          sendDevTransaction({
+            spaceId,
+            amount: devTokensToSend,
+            fromAddress: address as Address
           });
         }
       } else if (decentTransactionInfo && 'tx' in decentTransactionInfo) {
@@ -184,23 +180,13 @@ export function UpgradeSubscriptionModal({
         });
       }
 
-      await charmClient.subscription
-        .upgradeSubscription(spaceId, {
-          tier: newTier,
-          paymentMonths
-        })
-        .catch((err) => {
-          showMessage(err?.message ?? 'Failed to upgrade space subscription. Please try again later.', 'error');
-        })
-        .then(() => {
-          showMessage('Space subscription upgraded successfully', 'success');
-          onSuccess();
-          onClose();
-        });
+      showMessage('Space subscription upgraded successfully', 'success');
+      onSuccess();
+      onClose();
     } catch (error) {
       showMessage('Failed to upgrade space subscription. Please try again later.', 'error');
     } finally {
-      setIsUpgrading(false);
+      setIsProcessing(false);
     }
   }
 
@@ -391,6 +377,11 @@ export function UpgradeSubscriptionModal({
             ) : null}
           </Stack>
         </Stack>
+        <Alert severity='warning' sx={{ mt: 2 }}>
+          <Typography variant='body2'>
+            Please do not close your browser while the transaction is processing. It may take a few minutes to complete.
+          </Typography>
+        </Alert>
       </Modal>
     </BoxHooksContextProvider>
   );

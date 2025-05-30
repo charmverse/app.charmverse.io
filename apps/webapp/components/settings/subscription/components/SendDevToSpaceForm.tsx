@@ -3,7 +3,7 @@ import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { Launch as LaunchIcon } from '@mui/icons-material';
-import { Box, Divider, Link, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Divider, Link, Stack, TextField, Typography } from '@mui/material';
 import { charmVerseBankAddress, uniswapSwapUrl } from '@packages/subscriptions/constants';
 import { getExpiresAt } from '@packages/subscriptions/getExpiresAt';
 import { shortenHex } from '@packages/utils/blockchain';
@@ -290,6 +290,11 @@ export function SendDevToSpaceForm({
             />
           ) : null}
         </Box>
+        <Alert severity='warning' sx={{ mt: 2 }}>
+          <Typography variant='body2'>
+            Please do not close your browser while the transaction is processing. It may take a few minutes to complete.
+          </Typography>
+        </Alert>
       </Modal>
     </BoxHooksContextProvider>
   );
