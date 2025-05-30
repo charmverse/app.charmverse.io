@@ -19,6 +19,7 @@ const publicPages = [
   'api-docs',
   'u',
   'join',
+  'login',
   'invite',
   'authenticate',
   'test',
