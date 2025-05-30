@@ -11,11 +11,15 @@ export async function removeOldCookieFromResponse(req: NextApiRequest, res: Next
   const cookiesHeader = res.getHeader('Set-Cookie') || [];
   const setCookiesArray = Array.isArray(cookiesHeader) ? cookiesHeader : [String(cookiesHeader)];
 
-  res.setHeader('Set-Cookie', [
-    ...setCookiesArray,
-    // remove old cross-domain cookie
-    `${cookieName}=; Domain=${getAppApexDomain()}; Max-Age=0; Path=/; HttpOnly;`
-  ]);
+  try {
+    res.setHeader('Set-Cookie', [
+      ...setCookiesArray,
+      // remove old cross-domain cookie
+      `${cookieName}=; Domain=${getAppApexDomain()}; Max-Age=0; Path=/; HttpOnly;`
+    ]);
+  } catch (e) {
+    // fails on custom domain spaces
+  }
 
   if (keepSession) {
     await req.session.save();
