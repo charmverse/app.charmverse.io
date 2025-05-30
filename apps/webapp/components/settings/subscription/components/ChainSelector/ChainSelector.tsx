@@ -6,7 +6,7 @@ import { forwardRef } from 'react';
 import type { Address } from 'viem';
 import { base } from 'viem/chains';
 
-import type { UserTokenInfo } from '../../hooks/useGetTokenBalances';
+import type { TokenBalance } from '../../hooks/useGetTokenBalances';
 
 import { ChainComponent } from './ChainComponent';
 import type { ChainWithCurrency } from './chains';
@@ -32,7 +32,7 @@ function SelectField(
     value: SelectedPaymentOption;
     balance?: string;
     address?: Address;
-    userTokenBalances?: UserTokenInfo[];
+    userTokenBalances?: TokenBalance[];
   },
   ref: Ref<unknown>
 ) {

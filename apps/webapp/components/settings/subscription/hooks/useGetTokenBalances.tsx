@@ -8,7 +8,7 @@ import type { Address } from 'viem';
 export const OPTIMISM_USDC_ADDRESS = '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85';
 export const BASE_USDC_ADDRESS = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
 
-type TokenBalance = {
+export type TokenBalance = {
   address: Address;
   chainId: number;
   balance: number;
