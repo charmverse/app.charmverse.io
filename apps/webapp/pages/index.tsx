@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
+import { getDefaultPage, getLastViewedSpaceId } from '@packages/lib/session/getDefaultPage';
+import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';
 
 import { LoginPageView } from 'components/login/LoginPage';
-import { getDefaultPage, getLastViewedSpaceId } from '@packages/lib/session/getDefaultPage';
-import { withSessionSsr } from '@packages/lib/session/withSession';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
