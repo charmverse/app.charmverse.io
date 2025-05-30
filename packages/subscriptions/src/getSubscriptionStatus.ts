@@ -39,7 +39,7 @@ export async function getSubscriptionStatus(spaceId: string): Promise<SpaceSubsc
   ]);
 
   const currentTier = space.subscriptionTier || 'gold';
-  const nextTier = subscriptionEvents[0].newTier;
+  const nextTier = subscriptionEvents[0]?.newTier;
   const expiresAt = getExpiresAt(currentTier, tokenBalance.formatted);
   // determine if there is not enough balance to cover the next tier, the user will be downgraded to readonly
   const finalExpiresAt = getExpiresAt(nextTier, tokenBalance.formatted);

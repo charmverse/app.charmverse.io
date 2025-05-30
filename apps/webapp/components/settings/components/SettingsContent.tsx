@@ -1,4 +1,3 @@
-import ChangeCircleIcon from '@mui/icons-material/ChangeCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import type { BoxProps } from '@mui/material/Box';
@@ -8,7 +7,6 @@ import IconButton from '@mui/material/IconButton';
 import type { ReactNode, SyntheticEvent } from 'react';
 
 import { Button } from 'components/common/Button';
-import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { type SettingsPath } from 'hooks/useSettingsDialog';
@@ -106,13 +104,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         {ACCOUNT_TABS.map((tab) => {
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-              {tab.path === 'account' ? (
-                <AccountSettings />
-              ) : tab.path === 'charms' ? (
-                <CharmsSettings />
-              ) : tab.path === 'projects' ? (
-                <ProjectsSettings />
-              ) : null}
+              {tab.path === 'account' ? <AccountSettings /> : tab.path === 'projects' ? <ProjectsSettings /> : null}
             </TabPanel>
           );
         })}

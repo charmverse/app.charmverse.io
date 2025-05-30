@@ -1,8 +1,7 @@
 import type { Space } from '@charmverse/core/prisma';
-import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { Box, Divider, Link, Stack, Typography } from '@mui/material';
 import type { DowngradeableTier, UpgradableTier } from '@packages/subscriptions/constants';
-import { decentApiKey, downgradeableTiers } from '@packages/subscriptions/constants';
+import { downgradeableTiers } from '@packages/subscriptions/constants';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -45,7 +44,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
     open: openConfirmFreeTierDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
-  const { data: subscriptionStatus, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
+  const { data: subscriptionStatus, error, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
   const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSwitchToFreeTier(spaceId, {
     onSuccess: () => {
       refreshSubscriptionStatus();
@@ -71,7 +70,11 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
   }
 
   if (!subscriptionStatus) {
-    return <>&nbsp;</>;
+    return error ? (
+      <Typography color='danger'>There was an error loading your subscription status</Typography>
+    ) : (
+      <>&nbsp;</>
+    );
   }
 
   if (paidTier === 'enterprise' || subscriptionStatus.tier === 'grant') {
@@ -123,20 +126,18 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
           </Typography>
         </Box>
       </Stack>
-      <BoxHooksContextProvider apiKey={decentApiKey}>
-        <SendDevToSpaceForm
-          spaceId={spaceId}
-          spaceName={name}
-          spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
-          spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
-          isOpen={isSendDevModalOpen}
-          onClose={() => setIsSendDevModalOpen(false)}
-          onSuccess={() => {
-            refreshSubscriptionEvents();
-            refreshSubscriptionStatus();
-          }}
-        />
-      </BoxHooksContextProvider>
+      <SendDevToSpaceForm
+        spaceId={spaceId}
+        spaceName={name}
+        spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
+        spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
+        isOpen={isSendDevModalOpen}
+        onClose={() => setIsSendDevModalOpen(false)}
+        onSuccess={() => {
+          refreshSubscriptionEvents();
+          refreshSubscriptionStatus();
+        }}
+      />
       <UpgradeSubscriptionModal
         spaceId={spaceId}
         currentTier={subscriptionStatus.tier}

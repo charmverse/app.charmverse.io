@@ -14,6 +14,7 @@ import { formatUnits, parseUnits } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
 import { Button } from 'components/common/Button';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -184,118 +185,123 @@ export function SendDevToSpaceForm({
   }
 
   return (
-    <BoxHooksContextProvider apiKey={env('DECENT_API_KEY')}>
-      <Modal open={isOpen} onClose={onClose}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant='h6'>Send DEV to {spaceName}</Typography>
-          <Typography>Your contribution will be used to pay for the subscription.</Typography>
-          <Divider />
-          <Box>
-            <Typography variant='body2' color='text.secondary' gutterBottom>
-              Connected wallet: {shortenHex(address, 4)}
-            </Typography>
-            <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
-              <Stack flexDirection='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>
-                  Balance: <b>{formattedBalance.toLocaleString()}</b>
+    <ErrorBoundary>
+      <BoxHooksContextProvider apiKey={env('DECENT_API_KEY')}>
+        <Modal open={isOpen} onClose={onClose}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Typography variant='h6'>Send DEV to {spaceName}</Typography>
+            <Typography>Your contribution will be used to pay for the subscription.</Typography>
+            <Divider />
+            <Box>
+              <Typography variant='body2' color='text.secondary' gutterBottom>
+                Connected wallet: {shortenHex(address, 4)}
+              </Typography>
+              <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
+                <Stack flexDirection='row' alignItems='center' gap={0.5}>
+                  <Typography variant='body2'>
+                    Balance: <b>{formattedBalance.toLocaleString()}</b>
+                  </Typography>
+                  <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+                </Stack>
+                <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
+                  Buy DEV on Uniswap
+                  <LaunchIcon fontSize='inherit' />
                 </Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
               </Stack>
-              <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
-                Buy DEV on Uniswap
-                <LaunchIcon fontSize='inherit' />
-              </Typography>
-            </Stack>
-          </Box>
-          <PaymentTokenSelector
-            selectedPaymentOption={selectedPaymentOption}
-            onSelectPaymentOption={(option) => {
-              setAmount(0);
-              setSelectedPaymentOption(option);
-            }}
-            selectedTokenBalance={selectedTokenBalance}
-            disabled={isProcessing}
-            tokensWithBalances={tokens}
-          />
-          <Stack gap={1}>
-            <TextField
-              fullWidth
-              type='number'
-              error={amount > balance}
-              value={amount}
-              inputProps={{
-                min: 1,
-                max: balance
+            </Box>
+            <PaymentTokenSelector
+              selectedPaymentOption={selectedPaymentOption}
+              onSelectPaymentOption={(option) => {
+                setAmount(0);
+                setSelectedPaymentOption(option);
               }}
-              disabled={!address || isBalanceLoading}
-              onChange={(e) => setAmount(Number(e.target.value))}
+              selectedTokenBalance={selectedTokenBalance}
+              disabled={isProcessing}
+              tokensWithBalances={tokens}
             />
-          </Stack>
-          <Stack gap={1}>
-            <Typography variant='body2'>
-              New expiration:{' '}
-              <strong>
-                {newExpiresAt ? newExpiresAt.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' }) : 'N/A'}
-              </strong>
-            </Typography>
-          </Stack>
-          {decentSdkError?.error && (
-            <Typography variant='caption' color='error' align='center'>
-              {decentSdkError.error.message?.includes('route')
-                ? `Could not find a route between DEV and ${selectedPaymentOption.currency}. Please try a different payment option.`
-                : 'There was an error communicating with Decent API'}
-            </Typography>
-          )}
-          {selectedPaymentOption.currency !== 'DEV' && paymentOptionBidAmount ? (
-            <Stack gap={0.5} alignItems='center' flexDirection='row'>
-              <Typography variant='caption' align='center'>
-                ≈ {paymentOptionBidAmount} {selectedPaymentOption.currency}
-              </Typography>
-              <Image
-                src={TOKEN_LOGO_RECORD[selectedPaymentOption.currency]}
-                alt={selectedPaymentOption.currency}
-                width={14}
-                height={14}
+            <Stack gap={1}>
+              <TextField
+                fullWidth
+                type='number'
+                error={amount > balance}
+                value={amount}
+                inputProps={{
+                  min: 1,
+                  max: balance
+                }}
+                disabled={!address || isBalanceLoading}
+                onChange={(e) => setAmount(Number(e.target.value))}
               />
             </Stack>
-          ) : null}
-          {!approvalRequired || isProcessing ? (
-            <Stack flexDirection='row' justifyContent='flex-end'>
-              <Button
-                loading={isProcessing}
-                variant='contained'
-                onClick={onDevTransfer}
-                sx={{ width: 'fit-content' }}
-                disabled={
-                  amount === 0 ||
-                  balance < amount ||
-                  isBalanceLoading ||
-                  (selectedPaymentOption.currency !== 'DEV' && exchangeRate === 0)
-                }
-              >
-                Send
-              </Button>
+            <Stack gap={1}>
+              <Typography variant='body2'>
+                New expiration:{' '}
+                <strong>
+                  {newExpiresAt
+                    ? newExpiresAt.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })
+                    : 'N/A'}
+                </strong>
+              </Typography>
             </Stack>
-          ) : decentTransactionInfo && 'tx' in decentTransactionInfo ? (
-            <ERC20ApproveButton
-              spender={decentTransactionInfo?.tx.to as Address}
-              chainId={selectedPaymentOption.chainId}
-              erc20Address={selectedPaymentOption.address}
-              amount={amountToApprove}
-              onSuccess={refreshAllowance}
-              decimals={selectedPaymentOption.decimals}
-              currency={selectedPaymentOption.currency}
-              actionType='purchase'
-              color='primary'
-            />
-          ) : null}
-        </Box>
-        <Alert severity='warning' sx={{ mt: 2 }}>
-          <Typography variant='body2'>
-            Please do not close your browser while the transaction is processing. It may take a few minutes to complete.
-          </Typography>
-        </Alert>
-      </Modal>
-    </BoxHooksContextProvider>
+            {decentSdkError?.error && (
+              <Typography variant='caption' color='error' align='center'>
+                {decentSdkError.error.message?.includes('route')
+                  ? `Could not find a route between DEV and ${selectedPaymentOption.currency}. Please try a different payment option.`
+                  : 'There was an error communicating with Decent API'}
+              </Typography>
+            )}
+            {selectedPaymentOption.currency !== 'DEV' && paymentOptionBidAmount ? (
+              <Stack gap={0.5} alignItems='center' flexDirection='row'>
+                <Typography variant='caption' align='center'>
+                  ≈ {paymentOptionBidAmount} {selectedPaymentOption.currency}
+                </Typography>
+                <Image
+                  src={TOKEN_LOGO_RECORD[selectedPaymentOption.currency]}
+                  alt={selectedPaymentOption.currency}
+                  width={14}
+                  height={14}
+                />
+              </Stack>
+            ) : null}
+            {!approvalRequired || isProcessing ? (
+              <Stack flexDirection='row' justifyContent='flex-end'>
+                <Button
+                  loading={isProcessing}
+                  variant='contained'
+                  onClick={onDevTransfer}
+                  sx={{ width: 'fit-content' }}
+                  disabled={
+                    amount === 0 ||
+                    balance < amount ||
+                    isBalanceLoading ||
+                    (selectedPaymentOption.currency !== 'DEV' && exchangeRate === 0)
+                  }
+                >
+                  Send
+                </Button>
+              </Stack>
+            ) : decentTransactionInfo && 'tx' in decentTransactionInfo ? (
+              <ERC20ApproveButton
+                spender={decentTransactionInfo?.tx.to as Address}
+                chainId={selectedPaymentOption.chainId}
+                erc20Address={selectedPaymentOption.address}
+                amount={amountToApprove}
+                onSuccess={refreshAllowance}
+                decimals={selectedPaymentOption.decimals}
+                currency={selectedPaymentOption.currency}
+                actionType='purchase'
+                color='primary'
+              />
+            ) : null}
+          </Box>
+          <Alert severity='warning' sx={{ mt: 2 }}>
+            <Typography variant='body2'>
+              Please do not close your browser while the transaction is processing. It may take a few minutes to
+              complete.
+            </Typography>
+          </Alert>
+        </Modal>
+      </BoxHooksContextProvider>
+    </ErrorBoundary>
   );
 }

@@ -11,7 +11,7 @@ export function EnterpriseBillingScreen() {
     <Box>
       <Legend>Billing</Legend>
       <Typography variant='h6' mb={2}>
-        Enterprise Edition
+        Grant Edition
       </Typography>
       <Stack display='flex' flexDirection='row' alignItems='center' gap={5}>
         <Stack>
