@@ -15,6 +15,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
       id: spaceId
     },
     select: {
+      subscriptionMonthlyPrice: true,
       subscriptionTier: true,
       subscriptionTierChangeEvents: {
         take: 1,
@@ -38,10 +39,11 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
   const { value: spaceTokenBalance } = await getSpaceTokenBalance({ spaceId });
 
   const subscriptionTierAmount = tierConfig[subscriptionTier].tokenPrice;
+  const amountToCharge = space.subscriptionMonthlyPrice ?? subscriptionTierAmount;
 
-  const subscriptionTierAmountInWei = parseUnits(subscriptionTierAmount.toString(), 18);
+  const amountToChargeInWei = parseUnits(amountToCharge.toString(), 18);
 
-  if (spaceTokenBalance < subscriptionTierAmountInWei) {
+  if (spaceTokenBalance < amountToChargeInWei) {
     await prisma.$transaction([
       prisma.space.update({
         where: { id: spaceId },
@@ -67,7 +69,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     await prisma.$transaction(async () => {
       await prisma.spaceSubscriptionPayment.create({
         data: {
-          paidTokenAmount: subscriptionTierAmount.toString(),
+          paidTokenAmount: amountToCharge.toString(),
           spaceId,
           subscriptionTier,
           subscriptionPeriodStart: startOfMonth.toJSDate(),
