@@ -157,7 +157,7 @@ export function SendDevToSpaceForm({
           },
           txMetadata: {
             fromAddress: address as Address,
-            sourceChainId: selectedPaymentOption.chainId,
+            decentChainId: selectedPaymentOption.chainId,
             spaceId,
             amount
           }
