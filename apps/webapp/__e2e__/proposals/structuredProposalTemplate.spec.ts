@@ -102,7 +102,8 @@ test.beforeAll(async () => {
       ],
       index: 0,
       spaceId: space.id,
-      draftReminder: false
+      draftReminder: false,
+      archived: false
     }
   ];
   await prisma.proposalWorkflow.createMany({

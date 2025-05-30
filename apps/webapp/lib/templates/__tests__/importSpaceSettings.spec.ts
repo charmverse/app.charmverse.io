@@ -263,6 +263,7 @@ describe('importSpaceSettings', () => {
       index: 0,
       spaceId: sourceSpace.id,
       title: `Unique - ${uuid()}`,
+      archived: false,
       evaluations: [
         {
           title: 'Community',
@@ -713,6 +714,7 @@ describe('importSpaceSettings', () => {
           index: proposalWorkflow.index,
           title: proposalWorkflow.title,
           spaceId: targetSpace.id,
+          archived: false,
           privateEvaluations: proposalWorkflow.privateEvaluations,
           // id: expect.stringMatching(existingProposalWorkflow.id),
           createdAt: expect.any(Date),

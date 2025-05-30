@@ -53,7 +53,8 @@ describe('importRoles', () => {
           spaceId: newSpace.id,
           externalId: null,
           source: null,
-          sourceId: null
+          sourceId: null,
+          archived: false
         },
         {
           createdAt: expect.any(Date),
@@ -63,7 +64,8 @@ describe('importRoles', () => {
           spaceId: newSpace.id,
           externalId: null,
           source: null,
-          sourceId: null
+          sourceId: null,
+          archived: false
         }
       ])
     );
