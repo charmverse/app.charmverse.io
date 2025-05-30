@@ -16,7 +16,7 @@ type SpaceTransactionInput = {
   };
   txMetadata: {
     fromAddress: Address;
-    sourceChainId: number;
+    decentChainId: number;
     spaceId: string;
     amount: number;
   };
@@ -68,7 +68,7 @@ export function useSpaceSubscriptionTransaction() {
 
     const {
       txData: { to, data, value },
-      txMetadata: { sourceChainId, spaceId, amount, fromAddress }
+      txMetadata: { decentChainId, spaceId, amount, fromAddress }
     } = input;
 
     try {
@@ -85,6 +85,12 @@ export function useSpaceSubscriptionTransaction() {
       const result = await charmClient.subscription.recordSubscriptionContribution(spaceId, {
         hash: txHash,
         walletAddress: fromAddress,
+        decentChainId,
+        decentPayload: {
+          to,
+          data,
+          value: value.toString()
+        },
         paidTokenAmount: transferredAmount.toString()
       });
 
@@ -98,7 +104,7 @@ export function useSpaceSubscriptionTransaction() {
         spaceId,
         amount,
         fromAddress,
-        sourceChainId
+        decentChainId
       });
       throw error;
     }

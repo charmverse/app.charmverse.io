@@ -14,6 +14,7 @@ import type { Address } from 'viem';
 import { formatUnits, parseUnits } from 'viem';
 import { useAccount, useSwitchChain } from 'wagmi';
 
+import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -147,10 +148,14 @@ export function UpgradeSubscriptionModal({
     try {
       if (selectedPaymentOption.currency === 'DEV') {
         if (devTokensToSend > 0) {
-          sendDevTransaction({
+          await sendDevTransaction({
             spaceId,
             amount: devTokensToSend,
             fromAddress: address as Address
+          });
+          await charmClient.subscription.upgradeSubscription(spaceId, {
+            tier: newTier,
+            paymentMonths
           });
         }
       } else if (decentTransactionInfo && 'tx' in decentTransactionInfo) {
@@ -171,10 +176,15 @@ export function UpgradeSubscriptionModal({
           },
           txMetadata: {
             fromAddress: address as Address,
-            sourceChainId: selectedPaymentOption.chainId,
+            decentChainId: selectedPaymentOption.chainId,
             spaceId,
             amount: devTokensToSend
           }
+        });
+
+        await charmClient.subscription.upgradeSubscription(spaceId, {
+          tier: newTier,
+          paymentMonths
         });
       }
 
