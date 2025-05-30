@@ -16,6 +16,7 @@ import { useAccount, useSwitchChain } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
@@ -199,198 +200,201 @@ export function UpgradeSubscriptionModal({
   }
 
   return (
-    <BoxHooksContextProvider apiKey={env('DECENT_API_KEY')}>
-      <Modal open={isOpen} onClose={onClose}>
-        <Stack gap={2}>
-          <Typography variant='h6'>
-            Switch to <strong>{capitalize(newTier)}</strong>
-          </Typography>
-          <Divider />
-          <Box>
-            <Typography variant='body2' color='text.secondary' gutterBottom>
-              Connected wallet: {shortenHex(address, 4)}
+    <ErrorBoundary>
+      <BoxHooksContextProvider apiKey={env('DECENT_API_KEY')}>
+        <Modal open={isOpen} onClose={onClose}>
+          <Stack gap={2}>
+            <Typography variant='h6'>
+              Switch to <strong>{capitalize(newTier)}</strong>
             </Typography>
-            <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
-              <Stack flexDirection='row' alignItems='center' gap={0.5}>
-                <Typography variant='body2'>
-                  Balance: <b>{formattedBalance.toLocaleString()}</b>
-                </Typography>
-                <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
-              </Stack>
-              <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
-                Buy DEV on Uniswap
-                <LaunchIcon fontSize='inherit' />
+            <Divider />
+            <Box>
+              <Typography variant='body2' color='text.secondary' gutterBottom>
+                Connected wallet: {shortenHex(address, 4)}
               </Typography>
-            </Stack>
-          </Box>
-          <Divider />
-          <Stack gap={1}>
-            <Typography variant='subtitle2'>Select a period</Typography>
-            <Stack direction='row' spacing={1}>
-              <Button
-                disabled={isLoading}
-                sx={{ flex: 1 }}
-                variant={paymentPeriod === 'month' ? 'contained' : 'outlined'}
-                onClick={() => {
-                  setPaymentPeriod('month');
-                  setPaymentMonths(1);
-                }}
-              >
-                1 month
-              </Button>
-              <Button
-                disabled={isLoading}
-                sx={{ flex: 1 }}
-                variant={paymentPeriod === 'year' ? 'contained' : 'outlined'}
-                onClick={() => {
-                  setPaymentPeriod('year');
-                  setPaymentMonths(12);
-                }}
-              >
-                1 year
-              </Button>
-              <Button
-                disabled={isLoading}
-                sx={{ flex: 1 }}
-                variant={paymentPeriod === 'custom' ? 'contained' : 'outlined'}
-                onClick={() => {
-                  setPaymentPeriod('custom');
-                  setPaymentMonths(4);
-                }}
-              >
-                Custom
-              </Button>
-            </Stack>
-            {paymentPeriod === 'custom' && (
-              <Stack my={1}>
-                <Typography variant='body2' color='text.secondary'>
-                  Months
-                </Typography>
-                <TextField
-                  disabled={isLoading}
-                  variant='outlined'
-                  type='number'
-                  value={paymentMonths}
-                  inputProps={{ min: 1, max: 12 }}
-                  onChange={(e) => setPaymentMonths(Number(e.target.value))}
-                  sx={{ mt: 1 }}
-                />
-              </Stack>
-            )}
-          </Stack>
-          <PaymentTokenSelector
-            selectedPaymentOption={selectedPaymentOption}
-            onSelectPaymentOption={(option) => {
-              setSelectedPaymentOption(option);
-            }}
-            selectedTokenBalance={selectedTokenBalance}
-            disabled={isProcessing}
-            tokensWithBalances={tokens}
-          />
-          <Card variant='outlined' sx={{ p: 2, bgcolor: 'grey.50' }}>
-            <Stack gap={1}>
-              <Stack direction='row' justifyContent='space-between'>
-                <Typography variant='body2'>
-                  {paymentMonths} months x {newTierPrice}
-                </Typography>
-                <Stack direction='row' alignItems='center' gap={0.5}>
-                  <Typography variant='body2'>{priceForMonths}</Typography>
+              <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
+                <Stack flexDirection='row' alignItems='center' gap={0.5}>
+                  <Typography variant='body2'>
+                    Balance: <b>{formattedBalance.toLocaleString()}</b>
+                  </Typography>
                   <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
                 </Stack>
+                <Typography component={Link} variant='caption' href={uniswapSwapUrl} target='_blank'>
+                  Buy DEV on Uniswap
+                  <LaunchIcon fontSize='inherit' />
+                </Typography>
               </Stack>
-              {amountToProrate ? (
+            </Box>
+            <Divider />
+            <Stack gap={1}>
+              <Typography variant='subtitle2'>Select a period</Typography>
+              <Stack direction='row' spacing={1}>
+                <Button
+                  disabled={isLoading}
+                  sx={{ flex: 1 }}
+                  variant={paymentPeriod === 'month' ? 'contained' : 'outlined'}
+                  onClick={() => {
+                    setPaymentPeriod('month');
+                    setPaymentMonths(1);
+                  }}
+                >
+                  1 month
+                </Button>
+                <Button
+                  disabled={isLoading}
+                  sx={{ flex: 1 }}
+                  variant={paymentPeriod === 'year' ? 'contained' : 'outlined'}
+                  onClick={() => {
+                    setPaymentPeriod('year');
+                    setPaymentMonths(12);
+                  }}
+                >
+                  1 year
+                </Button>
+                <Button
+                  disabled={isLoading}
+                  sx={{ flex: 1 }}
+                  variant={paymentPeriod === 'custom' ? 'contained' : 'outlined'}
+                  onClick={() => {
+                    setPaymentPeriod('custom');
+                    setPaymentMonths(4);
+                  }}
+                >
+                  Custom
+                </Button>
+              </Stack>
+              {paymentPeriod === 'custom' && (
+                <Stack my={1}>
+                  <Typography variant='body2' color='text.secondary'>
+                    Months
+                  </Typography>
+                  <TextField
+                    disabled={isLoading}
+                    variant='outlined'
+                    type='number'
+                    value={paymentMonths}
+                    inputProps={{ min: 1, max: 12 }}
+                    onChange={(e) => setPaymentMonths(Number(e.target.value))}
+                    sx={{ mt: 1 }}
+                  />
+                </Stack>
+              )}
+            </Stack>
+            <PaymentTokenSelector
+              selectedPaymentOption={selectedPaymentOption}
+              onSelectPaymentOption={(option) => {
+                setSelectedPaymentOption(option);
+              }}
+              selectedTokenBalance={selectedTokenBalance}
+              disabled={isProcessing}
+              tokensWithBalances={tokens}
+            />
+            <Card variant='outlined' sx={{ p: 2, bgcolor: 'grey.50' }}>
+              <Stack gap={1}>
                 <Stack direction='row' justifyContent='space-between'>
-                  <Typography variant='body2'>Prorated discount</Typography>
+                  <Typography variant='body2'>
+                    {paymentMonths} months x {newTierPrice}
+                  </Typography>
                   <Stack direction='row' alignItems='center' gap={0.5}>
-                    <Typography variant='body2'>- {amountToProrate}</Typography>
+                    <Typography variant='body2'>{priceForMonths}</Typography>
                     <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
                   </Stack>
                 </Stack>
-              ) : null}
-              <Divider />
-              <Stack direction='row' justifyContent='space-between'>
-                <Typography variant='subtitle2' fontWeight={600}>
-                  Total payment
-                </Typography>
-                <Stack direction='row' alignItems='center' gap={0.5}>
+                {amountToProrate ? (
+                  <Stack direction='row' justifyContent='space-between'>
+                    <Typography variant='body2'>Prorated discount</Typography>
+                    <Stack direction='row' alignItems='center' gap={0.5}>
+                      <Typography variant='body2'>- {amountToProrate}</Typography>
+                      <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
+                    </Stack>
+                  </Stack>
+                ) : null}
+                <Divider />
+                <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='subtitle2' fontWeight={600}>
-                    {devTokensToSend}
+                    Total payment
                   </Typography>
-                  <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
+                  <Stack direction='row' alignItems='center' gap={0.5}>
+                    <Typography variant='subtitle2' fontWeight={600}>
+                      {devTokensToSend}
+                    </Typography>
+                    <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={16} height={16} />
+                  </Stack>
                 </Stack>
+                {selectedPaymentOption.currency !== 'DEV' && paymentOptionBidAmount ? (
+                  <Stack direction='row' justifyContent='flex-end' alignItems='center' gap={0.5}>
+                    <Typography variant='caption' align='center'>
+                      ≈ {paymentOptionBidAmount} {selectedPaymentOption.currency}
+                    </Typography>
+                    <Image
+                      src={TOKEN_LOGO_RECORD[selectedPaymentOption.currency]}
+                      alt={selectedPaymentOption.currency}
+                      width={14}
+                      height={14}
+                    />
+                  </Stack>
+                ) : null}
               </Stack>
-              {selectedPaymentOption.currency !== 'DEV' && paymentOptionBidAmount ? (
-                <Stack direction='row' justifyContent='flex-end' alignItems='center' gap={0.5}>
-                  <Typography variant='caption' align='center'>
-                    ≈ {paymentOptionBidAmount} {selectedPaymentOption.currency}
-                  </Typography>
-                  <Image
-                    src={TOKEN_LOGO_RECORD[selectedPaymentOption.currency]}
-                    alt={selectedPaymentOption.currency}
-                    width={14}
-                    height={14}
-                  />
-                </Stack>
+            </Card>
+            {decentSdkError?.error && (
+              <Typography variant='caption' color='error' align='center'>
+                {decentSdkError.error.message?.includes('route')
+                  ? `Could not find a route between DEV and ${selectedPaymentOption.currency}. Please try a different payment option.`
+                  : 'There was an error communicating with Decent API'}
+              </Typography>
+            )}
+            {formattedBalance < devTokensToSend && selectedPaymentOption.currency === 'DEV' && (
+              <Typography variant='body2' color='error'>
+                You do not have enough DEV tokens.
+              </Typography>
+            )}
+            <Stack direction='row' spacing={2} justifyContent='flex-end'>
+              {!approvalRequired || isProcessing ? (
+                <>
+                  <Button variant='outlined' onClick={onClose} color='secondary' disabled={isLoading}>
+                    Cancel
+                  </Button>
+                  <Tooltip title={!paymentPeriod ? 'Select a period' : ''}>
+                    <span>
+                      <Button
+                        variant='contained'
+                        disabled={
+                          paymentMonths === 0 ||
+                          !paymentPeriod ||
+                          (selectedPaymentOption.currency === 'DEV' && formattedBalance < devTokensToSend) ||
+                          (selectedPaymentOption.currency !== 'DEV' && exchangeRate === 0)
+                        }
+                        loading={isLoading}
+                        onClick={onUpgrade}
+                      >
+                        Upgrade
+                      </Button>
+                    </span>
+                  </Tooltip>
+                </>
+              ) : decentTransactionInfo && 'tx' in decentTransactionInfo ? (
+                <ERC20ApproveButton
+                  spender={decentTransactionInfo?.tx.to as Address}
+                  chainId={selectedPaymentOption.chainId}
+                  erc20Address={selectedPaymentOption.address}
+                  amount={amountToApprove}
+                  onSuccess={refreshAllowance}
+                  decimals={selectedPaymentOption.decimals}
+                  currency={selectedPaymentOption.currency}
+                  actionType='purchase'
+                  color='primary'
+                />
               ) : null}
             </Stack>
-          </Card>
-          {decentSdkError?.error && (
-            <Typography variant='caption' color='error' align='center'>
-              {decentSdkError.error.message?.includes('route')
-                ? `Could not find a route between DEV and ${selectedPaymentOption.currency}. Please try a different payment option.`
-                : 'There was an error communicating with Decent API'}
-            </Typography>
-          )}
-          {formattedBalance < devTokensToSend && selectedPaymentOption.currency === 'DEV' && (
-            <Typography variant='body2' color='error'>
-              You do not have enough DEV tokens.
-            </Typography>
-          )}
-          <Stack direction='row' spacing={2} justifyContent='flex-end'>
-            {!approvalRequired || isProcessing ? (
-              <>
-                <Button variant='outlined' onClick={onClose} color='secondary' disabled={isLoading}>
-                  Cancel
-                </Button>
-                <Tooltip title={!paymentPeriod ? 'Select a period' : ''}>
-                  <span>
-                    <Button
-                      variant='contained'
-                      disabled={
-                        paymentMonths === 0 ||
-                        !paymentPeriod ||
-                        (selectedPaymentOption.currency === 'DEV' && formattedBalance < devTokensToSend) ||
-                        (selectedPaymentOption.currency !== 'DEV' && exchangeRate === 0)
-                      }
-                      loading={isLoading}
-                      onClick={onUpgrade}
-                    >
-                      Upgrade
-                    </Button>
-                  </span>
-                </Tooltip>
-              </>
-            ) : decentTransactionInfo && 'tx' in decentTransactionInfo ? (
-              <ERC20ApproveButton
-                spender={decentTransactionInfo?.tx.to as Address}
-                chainId={selectedPaymentOption.chainId}
-                erc20Address={selectedPaymentOption.address}
-                amount={amountToApprove}
-                onSuccess={refreshAllowance}
-                decimals={selectedPaymentOption.decimals}
-                currency={selectedPaymentOption.currency}
-                actionType='purchase'
-                color='primary'
-              />
-            ) : null}
           </Stack>
-        </Stack>
-        <Alert severity='warning' sx={{ mt: 2 }}>
-          <Typography variant='body2'>
-            Please do not close your browser while the transaction is processing. It may take a few minutes to complete.
-          </Typography>
-        </Alert>
-      </Modal>
-    </BoxHooksContextProvider>
+          <Alert severity='warning' sx={{ mt: 2 }}>
+            <Typography variant='body2'>
+              Please do not close your browser while the transaction is processing. It may take a few minutes to
+              complete.
+            </Typography>
+          </Alert>
+        </Modal>
+      </BoxHooksContextProvider>
+    </ErrorBoundary>
   );
 }

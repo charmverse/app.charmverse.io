@@ -50,8 +50,7 @@ export const accountSettingsSections: UserSettingsSection[] = ['account', 'profi
 export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
-  { icon: <FaBriefcase fontSize='small' />, path: 'projects', label: 'My Projects' },
-  { icon: <CharmsLogo />, path: 'charms', label: 'Charms' }
+  { icon: <FaBriefcase fontSize='small' />, path: 'projects', label: 'My Projects' }
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];

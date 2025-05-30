@@ -11,6 +11,7 @@ export function calculateSubscriptionCost({
 }: {
   currentTier?: SpaceSubscriptionTier | null;
   newTier: UpgradableTier;
+  overridenTierPrice?: number;
   paymentMonths: number;
 }) {
   const currentTierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;

@@ -77,7 +77,7 @@
     "webapp": "npx react-env --path .env.local --dest ./apps/webapp/public -- npm run start --workspace=apps/webapp",
     "webapp:build": "npm run build --w=apps/webapp",
     "webapp:build:analyze": "ANALYZE=true npm run build --w=apps/webapp -- --experimental-debug-memory-usage",
-    "webapp:remote": "dotenv -e .env.production -- npm run start --w=apps/webapp",
+    "webapp:remote": "npx react-env --path .env.production --dest ./apps/webapp/public -- npm run start --w=apps/webapp",
     "webapp:start:prod": "npm run start:prod --workspace=apps/webapp",
     "webapp:start:test": "npm run start:test -w=apps/webapp",
     "webapp:start:test:ci": "npx react-env --path .env.test.local --dest ./apps/webapp/public -- npm run start:test:ci -w=apps/webapp",
