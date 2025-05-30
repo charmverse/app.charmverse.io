@@ -7,7 +7,6 @@ import { tierConfig } from './constants';
 export function calculateSubscriptionCost({
   currentTier,
   newTier,
-  overridenTierPrice,
   paymentMonths
 }: {
   currentTier?: SpaceSubscriptionTier | null;
@@ -15,8 +14,8 @@ export function calculateSubscriptionCost({
   overridenTierPrice?: number;
   paymentMonths: number;
 }) {
-  const currentTierPrice = overridenTierPrice || (currentTier ? tierConfig[currentTier].tokenPrice : 0);
-  const newTierPrice = overridenTierPrice || tierConfig[newTier].tokenPrice;
+  const currentTierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
+  const newTierPrice = tierConfig[newTier].tokenPrice;
 
   const now = DateTime.now();
   const monthEnd = now.endOf('month');

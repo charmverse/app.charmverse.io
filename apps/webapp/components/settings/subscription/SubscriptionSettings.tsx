@@ -129,6 +129,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
       <SendDevToSpaceForm
         spaceId={spaceId}
         spaceName={name}
+        monthlyPrice={subscriptionStatus.monthlyPrice}
         spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
         spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
         isOpen={isSendDevModalOpen}

@@ -30,6 +30,7 @@ import { DEV_PAYMENT_OPTION, PaymentTokenSelector, TOKEN_LOGO_RECORD } from './P
 
 export function SendDevToSpaceForm({
   spaceTokenBalance,
+  monthlyPrice,
   spaceTier,
   isOpen,
   onClose,
@@ -38,6 +39,7 @@ export function SendDevToSpaceForm({
   spaceName
 }: {
   spaceTokenBalance: number;
+  monthlyPrice?: number;
   spaceTier: SpaceSubscriptionTier | null;
   isOpen: boolean;
   onClose: VoidFunction;
@@ -72,7 +74,11 @@ export function SendDevToSpaceForm({
     };
   }, [tokens, selectedPaymentOption]);
 
-  const newExpiresAt = getExpiresAt(spaceTier, spaceTokenBalance + amount);
+  const newExpiresAt = getExpiresAt({
+    tier: spaceTier,
+    spaceTokenBalance: spaceTokenBalance + amount,
+    tierPrice: monthlyPrice
+  });
 
   const { decentSdkError, decentTransactionInfo } = useDecentV4Transaction({
     address: address as Address,
@@ -199,7 +205,7 @@ export function SendDevToSpaceForm({
               <Stack flexDirection='row' alignItems='center' justifyContent='space-between'>
                 <Stack flexDirection='row' alignItems='center' gap={0.5}>
                   <Typography variant='body2'>
-                    Balance: <b>{formattedBalance.toLocaleString()}</b>
+                    Your balance: <b>{formattedBalance.toLocaleString()}</b>
                   </Typography>
                   <Image src='/images/logos/dev-token-logo.png' alt='DEV' width={14} height={14} />
                 </Stack>
@@ -235,7 +241,7 @@ export function SendDevToSpaceForm({
             </Stack>
             <Stack gap={1}>
               <Typography variant='body2'>
-                New expiration:{' '}
+                New expiration at {monthlyPrice} DEV/mo:{' '}
                 <strong>
                   {newExpiresAt
                     ? newExpiresAt.toLocaleString({ month: 'long', day: 'numeric', year: 'numeric' })

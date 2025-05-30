@@ -8,26 +8,27 @@ const goldTierPrice = 10_000;
 const silverTierPrice = 2_500;
 
 const newTier = 'gold' as const;
-const discount = 0.5;
+const discount = 0.9;
 const tierPrice = newTier === 'gold' ? goldTierPrice : silverTierPrice;
 
 async function query() {
   const space = await prisma.space.findFirstOrThrow({
     where: {
-      domain: 'prezenti-grants'
+      domain: 'scout-game'
     }
   });
   const newPrice = Math.round(tierPrice * (1 - discount));
 
-  prisma.space.update({
+  await prisma.space.update({
     where: {
       id: space.id
     },
     data: {
-      subscriptionTier: newTier
+      subscriptionTier: newTier,
+      subscriptionMonthlyPrice: newPrice
     }
   });
-  console.log(space.name, '(' + newTier + ')', '-', newPrice);
+  console.log(space.name, space.id, '(' + newTier + ')', '-', newPrice);
 }
 
 query();
