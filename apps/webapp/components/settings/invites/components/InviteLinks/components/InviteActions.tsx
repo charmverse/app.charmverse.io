@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { Box, ListItemText, Tooltip } from '@mui/material';
@@ -9,6 +10,7 @@ import type { MouseEvent } from 'react';
 import { memo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { useTokenGateAccess } from 'hooks/useTokenGateAccess';
 
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -53,11 +55,13 @@ interface InviteActionsProps {
   isAdmin: boolean;
   onOpenInvitesClick: () => void;
   onOpenTokenGateClick: () => void;
+  space: Space;
 }
 
-function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick }: InviteActionsProps) {
+function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick, space }: InviteActionsProps) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const { canCreateTokenGate, hasReachedLimit, currentCount, maxCount } = useTokenGateAccess({ space });
 
   const handleAddClick = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -66,9 +70,15 @@ function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick }: In
     setAnchorEl(null);
   };
 
+  const tokenGateTooltip = !isAdmin
+    ? 'Only space admins can create invite links'
+    : !canCreateTokenGate
+      ? `You have reached the maximum number of token gates (${currentCount}/${maxCount}) for your subscription tier`
+      : '';
+
   return (
     <>
-      <Tooltip title={!isAdmin ? 'Only space admins can create invite links' : ''} arrow>
+      <Tooltip title={tokenGateTooltip} arrow>
         {/* Tooltip on disabled button requires one block element below wrapper */}
         <span>
           <Button
@@ -106,12 +116,16 @@ function InviteActions({ isAdmin, onOpenInvitesClick, onOpenTokenGateClick }: In
             />
           </Box>
         </MenuItem>
-        <MenuItem onClick={onOpenTokenGateClick} disableRipple dense>
+        <MenuItem onClick={onOpenTokenGateClick} disableRipple dense disabled={!canCreateTokenGate}>
           <AddIcon fontSize='small' />
           <Box>
             <ListItemText
               primary='Add a Token Gate'
-              secondary='Control access to your space with tokens & NFTS (Wallet Required)'
+              secondary={
+                hasReachedLimit
+                  ? `You have reached the maximum number of token gates (${currentCount}/${maxCount}) for your subscription tier`
+                  : 'Control access to your space with tokens & NFTS (Wallet Required)'
+              }
               primaryTypographyProps={{ fontWeight: 600 }}
               secondaryTypographyProps={{ variant: 'caption', color: 'secondary' }}
             />

@@ -1,5 +1,3 @@
-import { log } from '@charmverse/core/log';
-import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 

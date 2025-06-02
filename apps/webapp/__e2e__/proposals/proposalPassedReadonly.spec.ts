@@ -60,7 +60,8 @@ test.beforeAll(async () => {
       index: 0,
       spaceId: space.id,
       privateEvaluations: false,
-      draftReminder: false
+      draftReminder: false,
+      archived: false
     }
   ];
 

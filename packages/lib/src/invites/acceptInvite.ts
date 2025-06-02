@@ -5,6 +5,7 @@ import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction'
 import { updateTrackOpUserProfile } from '@packages/metrics/mixpanel/updateTrackOpUserProfile';
 import { logInviteAccepted } from '@packages/metrics/postToDiscord';
 import { getUserProfile } from '@packages/profile/getUser';
+
 import { joinSpace } from 'lib/spaces/joinSpace';
 
 import { validateInviteLink } from './validateInviteLink';
@@ -48,7 +49,10 @@ export async function acceptInvite({ inviteLinkId, userId }: InviteLinkAcceptanc
   const roleIdsToAssign: string[] = (
     await prisma.inviteLinkToRole.findMany({
       where: {
-        inviteLinkId: invite.id
+        inviteLinkId: invite.id,
+        role: {
+          archived: false
+        }
       },
       select: {
         roleId: true

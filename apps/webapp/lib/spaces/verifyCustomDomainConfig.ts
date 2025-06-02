@@ -4,15 +4,25 @@ import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCertificateDetails, requestCertificateForDomain } from '@packages/lib/aws/ACM';
 import { addCertificateToListener, hasCertificateAdded } from '@packages/lib/aws/ELB';
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
+import { Agent, request } from 'undici';
+
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';
-import { request, Agent } from 'undici';
 
 const log = getLogger('ELB');
 
 export async function verifyCustomDomainConfig(spaceId: string): Promise<CustomDomainVerification> {
-  const space = await prisma.space.findUnique({ where: { id: spaceId } });
+  const space = await prisma.space.findUnique({
+    where: { id: spaceId },
+    select: {
+      customDomain: true,
+      domain: true,
+      subscriptionTier: true,
+      isCustomDomainVerified: true
+    }
+  });
 
-  if (!space || !space.customDomain) {
+  if (!space || !space.customDomain || !hasCustomDomainAccess(space.subscriptionTier)) {
     return {
       isRedirectVerified: false,
       isCertificateVerified: false,

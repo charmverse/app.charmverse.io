@@ -27,7 +27,7 @@ import { SubscriptionTiers } from './components/SubscriptionTiers';
 
 import '@rainbow-me/rainbowkit/styles.css';
 
-export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { space: Space }) {
+export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }: { space: Space }) {
   const { data: subscriptionEvents = [], mutate: refreshSubscriptionEvents } = useSWR(
     spaceId ? `space-subscription-events/${spaceId}` : null,
     () => (spaceId ? charmClient.subscription.getSubscriptionEvents(spaceId) : [])
@@ -44,7 +44,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
     open: openConfirmFreeTierDialog
   } = usePopupState({ variant: 'popover', popupId: 'susbcription-actions' });
 
-  const { data: subscriptionStatus, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
+  const { data: subscriptionStatus, error, mutate: refreshSubscriptionStatus } = useGetSubscriptionStatus(spaceId);
   const { trigger: switchToFreeTier, isMutating: isSwitchingToFreeTier } = useSwitchToFreeTier(spaceId, {
     onSuccess: () => {
       refreshSubscriptionStatus();
@@ -70,7 +70,11 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
   }
 
   if (!subscriptionStatus) {
-    return <>&nbsp;</>;
+    return error ? (
+      <Typography color='danger'>There was an error loading your subscription status</Typography>
+    ) : (
+      <>&nbsp;</>
+    );
   }
 
   if (paidTier === 'enterprise' || subscriptionStatus.tier === 'grant') {
@@ -123,6 +127,9 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier } }: { spa
         </Box>
       </Stack>
       <SendDevToSpaceForm
+        spaceId={spaceId}
+        spaceName={name}
+        monthlyPrice={subscriptionStatus.monthlyPrice}
         spaceTokenBalance={subscriptionStatus.tokenBalance.formatted}
         spaceTier={subscriptionStatus.pendingTier || subscriptionStatus.tier}
         isOpen={isSendDevModalOpen}
