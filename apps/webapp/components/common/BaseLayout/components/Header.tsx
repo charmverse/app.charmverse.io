@@ -1,5 +1,4 @@
-import { useTheme } from '@emotion/react';
-import { styled, Box, Menu, MenuItem, Typography } from '@mui/material';
+import { useTheme, styled, Box, Menu, MenuItem, Typography } from '@mui/material';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';

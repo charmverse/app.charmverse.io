@@ -1,5 +1,4 @@
-import { useTheme } from '@emotion/react';
-import { styled } from '@mui/material';
+import { useTheme, styled } from '@mui/material';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Popper from '@mui/material/Popper';
 import type { BaseEmoji } from 'emoji-mart';

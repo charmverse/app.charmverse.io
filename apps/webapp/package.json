@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "npx next dev",
+    "start": "npx next dev --turbopack",
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint",

@@ -1,6 +1,5 @@
-import { useTheme } from '@emotion/react';
-import { styled } from '@mui/material';
-import { Box, useMediaQuery } from '@mui/material';
+import { useTheme, styled, Box, useMediaQuery } from '@mui/material';
+import type { UpdateMemberPropertyValuePayload } from '@packages/lib/members/interfaces';
 import type { FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
@@ -11,7 +10,6 @@ import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/components/Legend';
-import type { UpdateMemberPropertyValuePayload } from '@packages/lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';
 

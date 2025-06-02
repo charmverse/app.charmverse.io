@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+import { useTheme } from '@mui/material';
 import type { SimpleTreeViewProps } from '@mui/x-tree-view/SimpleTreeView';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { useRouter } from 'next/router';

@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useTheme } from '@emotion/react';
-import { styled, Box } from '@mui/material';
+import { useTheme, styled, Box } from '@mui/material';
 import type { TweetNodeAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { randomIntFromInterval } from '@packages/utils/random';

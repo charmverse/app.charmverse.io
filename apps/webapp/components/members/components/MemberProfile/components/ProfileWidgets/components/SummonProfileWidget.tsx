@@ -1,8 +1,7 @@
-import { useTheme } from '@emotion/react';
-import { Stack, Typography } from '@mui/material';
+import { useTheme, Stack, Typography } from '@mui/material';
+import type { SummonUserProfile } from '@packages/lib/summon/interfaces';
 
 import Avatar from 'components/common/Avatar';
-import type { SummonUserProfile } from '@packages/lib/summon/interfaces';
 
 import { ProfileWidget } from './ProfileWidget';
 

@@ -32,6 +32,7 @@ const esmModules = [
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
+  '@charmverse/core',
   // 'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
@@ -85,6 +86,14 @@ const config = {
     webpackBuildWorker: true
   },
   transpilePackages: ['@packages/adapters', '@charmverse/core'],
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js'
+      }
+    }
+  },
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
@@ -186,4 +195,7 @@ const removeUndefined = (obj) => {
   return newObj;
 };
 
+// const withBundleAnalyzer = BundleAnalyzer({
+//   enabled: process.env.ANALYZE === 'true'
+// });
 export default config;

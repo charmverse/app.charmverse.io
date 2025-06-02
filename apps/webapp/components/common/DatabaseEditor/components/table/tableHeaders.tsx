@@ -1,9 +1,8 @@
-import { useTheme } from '@emotion/react';
 import AddIcon from '@mui/icons-material/Add';
 import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlineBlankOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import IndeterminateCheckBoxOutlinedIcon from '@mui/icons-material/IndeterminateCheckBoxOutlined';
-import { Box, Menu } from '@mui/material';
+import { useTheme, Box, Menu } from '@mui/material';
 import type { Board, IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView, ISortOption } from '@packages/databases/boardView';
 import { createBoardView } from '@packages/databases/boardView';

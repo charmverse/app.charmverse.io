@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+import { useTheme } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 
 import { CharmEditor } from 'components/common/CharmEditor';

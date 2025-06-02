@@ -1,6 +1,5 @@
-import { useTheme } from '@emotion/react';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import { styled, Box, Card, CardActionArea, Typography } from '@mui/material';
+import { useTheme, styled, Box, Card, CardActionArea, Typography } from '@mui/material';
 import type { BookmarkNodeAttrs } from '@packages/bangleeditor/components/bookmark/bookmarkSpec';
 import Script from 'next/script';
 import useSWRImmutable from 'swr/immutable';

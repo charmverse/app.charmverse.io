@@ -1,13 +1,22 @@
-import { useTheme } from '@emotion/react';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Divider, IconButton, ListItemIcon, MenuItem, MenuList, Stack, TextField, Typography } from '@mui/material';
+import {
+  useTheme,
+  Divider,
+  IconButton,
+  ListItemIcon,
+  MenuItem,
+  MenuList,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
+import { isReturnKey } from '@packages/lib/utils/react';
 import { useEffect, useMemo, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import PopperPopup from 'components/common/PopperPopup';
-import { isReturnKey } from '@packages/lib/utils/react';
 import type { BrandColor } from 'theme/colors';
 
 import { ColorSelectMenu } from '../../ColorSelectMenu';

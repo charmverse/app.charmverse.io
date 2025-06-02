@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+import { useTheme } from '@mui/material';
 import type { RefObject } from 'react';
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 

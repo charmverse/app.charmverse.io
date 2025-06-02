@@ -1,5 +1,4 @@
-import { useTheme } from '@emotion/react';
-import { Box, Menu } from '@mui/material';
+import { useTheme, Box, Menu } from '@mui/material';
 import {
   type RelationPropertyData,
   type Board,
