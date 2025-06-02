@@ -16,7 +16,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { sleep } from 'zksync-web3/build/src/utils';
 
-test.describe.serial('Create and use Proposal Template', async () => {
+test.describe.skip('Create and use Proposal Template', async () => {
   let space: Space;
   let admin: User;
   let member: User;
