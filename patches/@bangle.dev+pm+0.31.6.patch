@@ -194,14 +194,23 @@ index 5c04248..c92d709 100644
  import { EditorView } from 'prosemirror-view';
  export { Decoration, DecorationAttrs, DecorationSet, DirectEditorProps, EditorProps, EditorView, NodeView } from 'prosemirror-view';
 diff --git a/node_modules/@bangle.dev/pm/dist/index.js b/node_modules/@bangle.dev/pm/dist/index.js
-index 4963e59..7d282a9 100644
+index 4963e59..5c80841 100644
 --- a/node_modules/@bangle.dev/pm/dist/index.js
 +++ b/node_modules/@bangle.dev/pm/dist/index.js
-@@ -7,7 +7,6 @@ export { keydownHandler, keymap } from 'prosemirror-keymap';
+@@ -7,16 +7,5 @@ export { keydownHandler, keymap } from 'prosemirror-keymap';
  export { ContentMatch, DOMParser, DOMSerializer, Fragment, Mark, MarkType, Node, NodeRange, NodeType, ReplaceError, ResolvedPos, Schema, Slice } from 'prosemirror-model';
  export { addListNodes, bulletList, liftListItem, listItem, orderedList, sinkListItem, splitListItem, wrapInList } from 'prosemirror-schema-list';
  export { AllSelection, EditorState, NodeSelection, Plugin, PluginKey, Selection, SelectionRange, TextSelection, Transaction } from 'prosemirror-state';
 -export { CellSelection, TableMap, addColSpan, addColumn, addColumnAfter, addColumnBefore, addRow, addRowAfter, addRowBefore, cellAround, colCount, columnIsHeader, columnResizing, deleteColumn, deleteRow, deleteTable, findCell, fixTables, fixTablesKey, goToNextCell, inSameTable, isInTable, mergeCells, moveCellForward, nextCell, removeColSpan, rowIsHeader, selectedRect, selectionCell, setCellAttr, splitCell, splitCellWithType, tableEditing, tableEditingKey, tableNodeTypes, tableNodes, toggleHeader, toggleHeaderCell, toggleHeaderColumn, toggleHeaderRow, updateColumnsOnResize } from 'prosemirror-tables';
  export { AddMarkStep, MapResult, Mapping, RemoveMarkStep, ReplaceAroundStep, ReplaceStep, Step, StepMap, StepResult, Transform, canJoin, canSplit, dropPoint, findWrapping, insertPoint, joinPoint, liftTarget, replaceStep } from 'prosemirror-transform';
- import { __parseFromClipboard, __serializeForClipboard } from 'prosemirror-view';
+-import { __parseFromClipboard, __serializeForClipboard } from 'prosemirror-view';
  export { Decoration, DecorationSet, EditorView } from 'prosemirror-view';
+-
+-function parseFromClipboard(view, text, html, plainText, $context) {
+-    return __parseFromClipboard(view, text, html, plainText, $context);
+-}
+-function serializeForClipboard(view, slice) {
+-    return __serializeForClipboard(view, slice);
+-}
+-
+-export { parseFromClipboard, serializeForClipboard };
