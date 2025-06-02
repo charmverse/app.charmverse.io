@@ -2,8 +2,11 @@ import type { SpaceResult, GetSpacesFilter } from 'lib/admin/getSpaces';
 
 import { useGET, useGETImmutable } from './helpers';
 
-export function useAdminSpaces({ name }: GetSpacesFilter) {
+export function useAdminSpaces({ name, sortField, sortDirection, subscriptionTier }: GetSpacesFilter) {
   return useGETImmutable<SpaceResult[]>('/api/admin/spaces', {
-    name
+    name,
+    sortField,
+    sortDirection,
+    subscriptionTier
   });
 }

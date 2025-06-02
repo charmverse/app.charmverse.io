@@ -8,21 +8,20 @@ export type SpaceResult = Pick<
 
 export type GetSpacesFilter = {
   subscriptionTier?: SpaceSubscriptionTier;
-  hasSubscriptionMonthlyPrice?: boolean;
   name?: string;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 };
 
-export async function getSpaces(filter?: GetSpacesFilter): Promise<SpaceResult[]> {
+export async function getSpaces(filter?: GetSpacesFilter): Promise<{
+  spaces: SpaceResult[];
+  totalCount: number;
+}> {
   const where: any = {};
+  const orderBy: any = {};
 
   if (filter?.subscriptionTier) {
     where.subscriptionTier = filter.subscriptionTier;
-  }
-
-  if (filter?.hasSubscriptionMonthlyPrice) {
-    where.subscriptionMonthlyPrice = {
-      not: null
-    };
   }
 
   if (filter?.name) {
@@ -30,6 +29,15 @@ export async function getSpaces(filter?: GetSpacesFilter): Promise<SpaceResult[]
       contains: filter.name,
       mode: 'insensitive'
     };
+  } else if (filter?.sortField) {
+    orderBy[filter.sortField] = filter.sortDirection;
+    if (filter.sortField === 'subscriptionMonthlyPrice') {
+      where.subscriptionMonthlyPrice = {
+        not: null
+      };
+    }
+  } else {
+    orderBy.createdAt = 'desc';
   }
 
   const spaces = await prisma.space.findMany({
@@ -44,9 +52,7 @@ export async function getSpaces(filter?: GetSpacesFilter): Promise<SpaceResult[]
       createdAt: true,
       updatedAt: true
     },
-    orderBy: {
-      createdAt: 'desc'
-    },
+    orderBy,
     take: 100
   });
 

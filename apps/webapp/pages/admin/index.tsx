@@ -4,10 +4,9 @@ import { isProdEnv } from '@packages/config/constants';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';
 
+import { AdminSpacesTable } from 'components/admin/components/AdminSpacesTable';
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { whitelist } from 'lib/admin/users';
-
-import { AdminSpacesTable } from './components/AdminSpacesTable';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
   const sessionUserId = context.req.session?.user?.id;
