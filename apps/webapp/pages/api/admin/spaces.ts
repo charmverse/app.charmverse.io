@@ -19,10 +19,7 @@ async function getSpacesEndpoint(req: NextApiRequest, res: NextApiResponse<Space
   if (!whitelist.includes(userId)) {
     throw new UnauthorisedActionError('You do not have permission to access this api');
   }
-  const result = await getSpaces({
-    ...req.query,
-    hasSubscriptionMonthlyPrice: req.query.hasSubscriptionMonthlyPrice === 'true'
-  });
+  const result = await getSpaces(query);
 
   return res.status(200).json(result);
 }

@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import {
   Box,
   Table,
@@ -58,9 +59,9 @@ export function AdminSpacesTable() {
     isValidating
   } = useAdminSpaces({
     name: searchDebounced,
-    sortField,
-    sortDirection,
-    subscriptionTier
+    sortField: sortField || undefined,
+    sortDirection: sortDirection || undefined,
+    subscriptionTier: subscriptionTier || undefined
   });
 
   const handleSort = (field: string) => {
@@ -87,7 +88,7 @@ export function AdminSpacesTable() {
           <Select
             value={subscriptionTier || ''}
             sx={{ width: 150 }}
-            onChange={(e) => setSubscriptionTier(e.target.value as SpaceSubscriptionTier)}
+            onChange={(e) => setSubscriptionTier(e.target.value as SpaceSubscriptionTier | null)}
             displayEmpty
           >
             <MenuItem value=''>All</MenuItem>

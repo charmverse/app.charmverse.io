@@ -13,10 +13,7 @@ export type GetSpacesFilter = {
   sortDirection?: 'asc' | 'desc';
 };
 
-export async function getSpaces(filter?: GetSpacesFilter): Promise<{
-  spaces: SpaceResult[];
-  totalCount: number;
-}> {
+export async function getSpaces(filter?: GetSpacesFilter): Promise<SpaceResult[]> {
   const where: any = {};
   const orderBy: any = {};
 
