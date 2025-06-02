@@ -84,7 +84,7 @@ export function AdminSpacesTable() {
             onChange={(e) => setSearchInputValue(e.target.value)}
           />
         </Box>
-        <FieldWrapper label='Subscription tier' size='small' sx={{ minWidth: 120 }}>
+        <FieldWrapper label='Subscription tier' sx={{ minWidth: 120 }}>
           <Select
             value={subscriptionTier || ''}
             sx={{ width: 150 }}
