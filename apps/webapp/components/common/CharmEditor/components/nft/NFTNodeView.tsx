@@ -1,5 +1,5 @@
-import { styled } from '@mui/material';
 import {
+  styled,
   Box,
   Card,
   CardMedia,
@@ -219,7 +219,7 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
           <Box display='flex' gap={4} alignItems='center' flexDirection={{ xs: 'column', md: 'row' }}>
             <Box maxWidth={400} flexDirection='column' alignItems='center' gap={2}>
               <Grid container spacing={2}>
-                <Grid item xs={9}>
+                <Grid size={9}>
                   <InputLabel>Contract address</InputLabel>
                   <TextField
                     fullWidth
@@ -230,7 +230,7 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
                     placeholder='0x...'
                   />
                 </Grid>
-                <Grid item xs={3}>
+                <Grid size={3}>
                   <InputLabel>Token id</InputLabel>
                   <TextField {...register('token', { required: true })} placeholder='1' />
                 </Grid>

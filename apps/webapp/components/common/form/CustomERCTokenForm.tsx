@@ -5,6 +5,9 @@ import Progress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import TextField from '@mui/material/TextField';
+import type { SupportedChainId } from '@packages/lib/blockchain/provider/alchemy/config';
+import type { ITokenMetadataRequest } from '@packages/lib/tokens/tokenData';
+import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import type { ISystemError } from '@packages/utils/errors';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -16,9 +19,6 @@ import { FormError } from 'components/common/form/FormError.class';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { SupportedChainId } from '@packages/lib/blockchain/provider/alchemy/config';
-import type { ITokenMetadataRequest } from '@packages/lib/tokens/tokenData';
-import { isValidChainAddress } from '@packages/lib/tokens/validation';
 
 export type FormMode = 'create' | 'update';
 
@@ -161,7 +161,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
         style={{ margin: 'auto' }}
       >
         <Grid container direction='column' spacing={3}>
-          <Grid item xs>
+          <Grid size='grow'>
             <InputLabel>Blockchain</InputLabel>
             <InputSearchBlockchain
               defaultChainId={defaultChainId}
@@ -171,7 +171,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             />
           </Grid>
 
-          <Grid item xs>
+          <Grid size='grow'>
             <InputLabel>Contract address</InputLabel>
             <TextField
               {...register('contractAddress')}
@@ -194,8 +194,8 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
 
           {values.contractAddress && !errors.contractAddress && !loadingToken && (
             <>
-              <Grid item container xs>
-                <Grid item xs={6} sx={{ pr: 2 }}>
+              <Grid container size='grow'>
+                <Grid size={6} sx={{ pr: 2 }}>
                   <InputLabel>Token symbol</InputLabel>
                   <TextField
                     data-test='custom-token-symbol'
@@ -210,7 +210,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                   />
                 </Grid>
 
-                <Grid item xs={6} sx={{ pl: 2 }}>
+                <Grid size={6} sx={{ pl: 2 }}>
                   <InputLabel>Token decimals</InputLabel>
                   <TextField
                     {...register('tokenDecimals', {
@@ -229,7 +229,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                   />
                 </Grid>
               </Grid>
-              <Grid item xs>
+              <Grid size='grow'>
                 <InputLabel>Token name</InputLabel>
                 <TextField
                   {...register('tokenName')}
@@ -245,8 +245,8 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 />
               </Grid>
 
-              <Grid item container xs>
-                <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
+              <Grid container size='grow'>
+                <Grid size={validTokenLogoAddressFormat ? 8 : 12}>
                   <InputLabel>Token logo URL</InputLabel>
                   <TextField
                     data-test='custom-token-logo-url'
@@ -264,8 +264,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 </Grid>
                 {validTokenLogoAddressFormat && (
                   <Grid
-                    item
-                    xs={4}
+                    size={4}
                     sx={{ display: 'flex', justifyContent: 'center', alignContent: 'center', verticalAlign: 'center' }}
                   >
                     <img
@@ -285,11 +284,11 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             </>
           )}
           {formError && (
-            <Grid item xs>
+            <Grid size='grow'>
               <Alert severity={formError.severity}>{formError.message}</Alert>
             </Grid>
           )}
-          <Grid item sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Grid sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               data-test='create-token-payment-method'
               type='submit'

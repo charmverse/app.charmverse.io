@@ -82,7 +82,7 @@ export function PaidPostCategoryPermissions({ postCategoryId }: Props) {
       ))}
 
       {addRolesDialog.isOpen && (
-        <Grid item xs>
+        <Grid size='grow'>
           <Divider sx={{ my: 2 }} />
           <PostCategoryPermissionsAddRoles
             onSave={(value) => addRolePermissions({ input: value, targetPostCategoryId: postCategoryId })}

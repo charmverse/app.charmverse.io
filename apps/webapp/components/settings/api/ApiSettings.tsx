@@ -168,7 +168,7 @@ export function ApiSettings({ space }: { space: Space }) {
           }}
           style={{ margin: 'auto' }}
         >
-          <Grid item container xs mt={2}>
+          <Grid container size='grow' mt={2}>
             <Grid item xs={10}>
               <InputLabel>Events Webhook</InputLabel>
               <Stack flexDirection='row' gap={1}>
@@ -209,7 +209,7 @@ export function ApiSettings({ space }: { space: Space }) {
             )}
           </Grid>
           {webhookUrl && (
-            <Grid item container xs mt={2}>
+            <Grid container size='grow' mt={2}>
               <FormGroup>
                 <FormControlLabel
                   control={
@@ -259,7 +259,7 @@ export function ApiSettings({ space }: { space: Space }) {
             </Grid>
           )}
           {isAdmin && (
-            <Grid item container xs mt={2}>
+            <Grid container size='grow' mt={2}>
               <Grid item xs mt={2}>
                 <Grid item mt={2}>
                   <Button

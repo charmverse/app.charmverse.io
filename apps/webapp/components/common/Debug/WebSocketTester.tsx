@@ -11,7 +11,7 @@ export function WebSocketTester() {
   // --------------------
   return (
     <Grid container width='100%' flexDirection='row' height='300px' style={{ overflowY: 'auto' }}>
-      <Grid item xs={12} spacing={2}>
+      <Grid size={12} spacing={2}>
         Web socket connection test ({messageLog.length})
         <Button onClick={() => sendMessage({ type: 'ping', content: 'Here is the update' } as any)}>Send ping</Button>
         <Button css={{ backgroundColor: 'red' }} onClick={clearLog}>
@@ -21,7 +21,7 @@ export function WebSocketTester() {
       {messageLog.map((message) => {
         const msgString = typeof message === 'object' ? JSON.stringify(message) : message;
         return (
-          <Grid key={msgString} item xs={12}>
+          <Grid key={msgString} size={12}>
             <p>{msgString}</p>
           </Grid>
         );

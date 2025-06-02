@@ -59,7 +59,7 @@ export function WalletSelector() {
     <div>
       <ErrorComponent error={error || undefined} processError={processConnectionError} />
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <ConnectorButton
             name={label}
             onClick={connectMetamask}
@@ -70,7 +70,7 @@ export function WalletSelector() {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid size={12}>
           <ConnectorButton
             name='WalletConnect'
             onClick={() => {
@@ -86,7 +86,7 @@ export function WalletSelector() {
             isLoading={!!isLoadingConnectorId && isLoadingConnectorId === walletConnectConnector?.id}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <ConnectorButton
             name='Coinbase Wallet'
             onClick={() => {
@@ -103,7 +103,7 @@ export function WalletSelector() {
           />
         </Grid>
 
-        <Grid item>
+        <Grid size={12}>
           <Typography variant='caption' align='center'>
             New to Ethereum wallets?{' '}
             <Link color='primay' href='https://ethereum.org/en/wallets/' external target='_blank'>
