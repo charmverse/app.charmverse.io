@@ -49,10 +49,6 @@ export function useTransferDevToken() {
 
       const transferredAmount = parseUnits(amount.toString(), 18);
 
-      // Sign a message to verify ownership
-      const message = `I authorize this DEV token transfer of ${amount} DEV to the ${space.name} charmverse space`;
-      const signature = await walletClient.signMessage({ message });
-
       const transferTxHash = await walletClient.writeContract({
         address: devTokenAddress,
         abi: erc20Abi,
@@ -66,7 +62,7 @@ export function useTransferDevToken() {
 
       if (receipt.status === 'success') {
         refreshBalance();
-        return { hash: transferTxHash, signature, message, address, transferredAmount };
+        return { hash: transferTxHash, address, transferredAmount };
       } else {
         showMessage('Transaction failed', 'error');
       }

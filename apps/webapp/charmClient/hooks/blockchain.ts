@@ -1,6 +1,5 @@
-import type { LoggedInUser } from '@packages/profile/getUser';
-
 import type { NFTData, NFTRequest } from '@packages/lib/blockchain/getNFTs';
+import type { LoggedInUser } from '@packages/profile/getUser';
 
 import { useGETImmutable, usePOST } from './helpers';
 

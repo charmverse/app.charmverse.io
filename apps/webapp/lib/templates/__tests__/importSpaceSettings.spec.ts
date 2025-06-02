@@ -714,6 +714,7 @@ describe('importSpaceSettings', () => {
           index: proposalWorkflow.index,
           title: proposalWorkflow.title,
           spaceId: targetSpace.id,
+          archived: false,
           privateEvaluations: proposalWorkflow.privateEvaluations,
           // id: expect.stringMatching(existingProposalWorkflow.id),
           createdAt: expect.any(Date),
