@@ -27,7 +27,7 @@ const publicPages = [
   '/[domain]/proposals/new'
 ];
 // pages that should be always available to logged in users
-const publicLoggedInPages = ['createSpace'];
+const publicLoggedInPages = ['createSpace', 'admin'];
 
 export default function RouteGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
