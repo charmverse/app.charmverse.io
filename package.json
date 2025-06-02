@@ -115,6 +115,7 @@
     "@delegatexyz/sdk": "^0.5.2",
     "@emotion/babel-preset-css-prop": "^11.12.0",
     "@emotion/react": "^11.13.3",
+    "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.14.0",
     "@ethereum-attestation-service/eas-sdk": "^0.29.1",
     "@ethersproject/abi": "^5.7.0",
@@ -398,6 +399,6 @@
     "viem": "^2.22.17"
   },
   "msw": {
-    "workerDirectory": "public"
+    "workerDirectory": "apps/webapp/public"
   }
 }
