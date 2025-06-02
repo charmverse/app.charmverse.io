@@ -45,7 +45,7 @@ describe('updateSpace', () => {
   it('should update the space name, domain and logo', async () => {
     const update: UpdateableSpaceFields = {
       name: 'New Space Name',
-      domain: 'new-space-name',
+      domain: `new-space-${v4()}`,
       spaceImage: 'https://new-space-logo.png'
     };
 
@@ -99,7 +99,9 @@ describe('updateSpace', () => {
       primaryMemberIdentity: 'Discord'
     };
 
-    const { space, user } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace({
+      subscriptionTier: 'gold'
+    });
     await prisma.memberProperty.createMany({
       data: generateDefaultPropertiesInput({
         userId: user.id,
@@ -137,10 +139,12 @@ describe('updateSpace', () => {
   });
 
   it('should update the snapshot and customDomain', async () => {
-    const { space } = await generateUserAndSpace();
+    const { space } = await generateUserAndSpace({
+      subscriptionTier: 'gold'
+    });
 
     const update: UpdateableSpaceFields = {
-      customDomain: 'test.charmverse.fyi',
+      customDomain: `test-${v4()}.charmverse.fyi`,
       snapshotDomain: 'snapshot-domain'
     };
 

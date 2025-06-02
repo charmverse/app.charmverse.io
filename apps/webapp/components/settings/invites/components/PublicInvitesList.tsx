@@ -9,6 +9,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { InviteLinkWithRoles } from '@packages/lib/invites/getSpaceInviteLinks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -19,7 +20,6 @@ import { ConfirmInviteLinkDeletion } from 'components/settings/invites/component
 import TokenGateRolesSelect from 'components/settings/invites/components/TokenGates/components/TokenGateRolesSelect';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import type { InviteLinkWithRoles } from '@packages/lib/invites/getSpaceInviteLinks';
 import type { BrandColor } from 'theme/colors';
 
 const colorMapping: Record<PublicInviteLinkContext, BrandColor> = {

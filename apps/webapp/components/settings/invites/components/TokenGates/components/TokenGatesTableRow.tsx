@@ -1,17 +1,24 @@
+import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
+import UnarchiveOutlinedIcon from '@mui/icons-material/UnarchiveOutlined';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import TableCell from '@mui/material/TableCell';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { humanizeConditions, humanizeConditionsData } from '@packages/lib/tokenGates/humanizeConditions';
+import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
-import { useDeleteTokenGate, useUpdateTokenGateRoles } from 'charmClient/hooks/tokenGates';
+import {
+  useArchiveTokenGate,
+  useDeleteTokenGate,
+  useUnarchiveTokenGate,
+  useUpdateTokenGateRoles
+} from 'charmClient/hooks/tokenGates';
 import ButtonChip from 'components/common/ButtonChip';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import TableRow from 'components/common/Table/TableRow';
-import { humanizeConditions, humanizeConditionsData } from '@packages/lib/tokenGates/humanizeConditions';
-import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -28,6 +35,8 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const { trigger: deleteTokenGate, isMutating: isLoadingDeleteTokenGate } = useDeleteTokenGate(tokenGate.id);
   const { trigger: updateTokenGates, isMutating: isLoadingUpdateTokenGates } = useUpdateTokenGateRoles(tokenGate.id);
+  const { trigger: archiveTokenGate, isMutating: isLoadingArchive } = useArchiveTokenGate(tokenGate.id);
+  const { trigger: unarchiveTokenGate, isMutating: isLoadingUnarchive } = useUnarchiveTokenGate(tokenGate.id);
 
   const createDescription = () => {
     const conditionsData = humanizeConditionsData(tokenGate.conditions);
@@ -54,61 +63,88 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
 
   const description = createDescription();
 
+  const isLoading = isLoadingUpdateTokenGates || isLoadingDeleteTokenGate || isLoadingArchive || isLoadingUnarchive;
+
   return (
     <>
       <TableRow sx={{ '&:not(:last-child) td': { border: 0 }, marginBottom: 20 }}>
         <TableCell>
-          <Typography variant='body2' my={1}>
+          <Typography variant='body2' my={1} sx={{ color: tokenGate.archived ? 'text.disabled' : 'inherit' }}>
             {description}
           </Typography>
         </TableCell>
         <TableCell>
-          <TokenGateRolesSelect
-            disabled={isLoadingUpdateTokenGates || isLoadingDeleteTokenGate}
-            isAdmin={isAdmin}
-            selectedRoleIds={tokenGate.tokenGateToRoles.map(({ role }) => role.id)}
-            onChange={(roleIds) => {
-              updateTokenGateRoles([...roleIds]);
-            }}
-            onDelete={(roleId) => {
-              deleteRoleFromTokenGate(roleId);
-            }}
-          />
+          {tokenGate.archived ? null : (
+            <TokenGateRolesSelect
+              disabled={isLoading}
+              isAdmin={isAdmin}
+              selectedRoleIds={tokenGate.tokenGateToRoles.map(({ role }) => role.id)}
+              onChange={(roleIds) => {
+                updateTokenGateRoles([...roleIds]);
+              }}
+              onDelete={(roleId) => {
+                deleteRoleFromTokenGate(roleId);
+              }}
+            />
+          )}
         </TableCell>
         <TableCell align='center'>
-          <Tooltip
-            arrow
-            placement='top'
-            title={account ? 'Connect your wallet to test' : 'Test this gate using your own wallet'}
-          >
-            <Box component='span'>
-              <Chip
-                onClick={() => testConnect(tokenGate)}
-                sx={{ width: 90 }}
-                clickable={!!account && !isLoadingUpdateTokenGates && !isLoadingDeleteTokenGate}
-                color='secondary'
-                size='small'
-                variant='outlined'
-                disabled={isLoadingUpdateTokenGates || isLoadingDeleteTokenGate}
-                label='Test'
-              />
-            </Box>
-          </Tooltip>
+          {tokenGate.archived ? null : (
+            <Tooltip
+              arrow
+              placement='top'
+              title={account ? 'Connect your wallet to test' : 'Test this gate using your own wallet'}
+            >
+              <Box component='span'>
+                <Chip
+                  onClick={() => !tokenGate.archived && testConnect(tokenGate)}
+                  sx={{ width: 90 }}
+                  clickable={!!account && !isLoading && !tokenGate.archived}
+                  color='secondary'
+                  size='small'
+                  variant='outlined'
+                  disabled={isLoading || !!tokenGate.archived}
+                  label='Test'
+                />
+              </Box>
+            </Tooltip>
+          )}
         </TableCell>
         <TableCell width={30}>
           {isAdmin && (
-            <Tooltip arrow placement='top' title='Delete'>
-              <ButtonChip
-                className='row-actions'
-                icon={<DeleteOutlinedIcon />}
-                clickable
-                color='secondary'
-                size='small'
-                variant='outlined'
-                disabled={isLoadingUpdateTokenGates || isLoadingDeleteTokenGate}
-                onClick={deletePopupState.open}
-              />
-            </Tooltip>
+            <Box display='flex' gap={1}>
+              <Tooltip arrow placement='top' title={tokenGate.archived ? 'Unarchive' : 'Archive'}>
+                <ButtonChip
+                  className='row-actions'
+                  icon={tokenGate.archived ? <UnarchiveOutlinedIcon /> : <ArchiveOutlinedIcon />}
+                  clickable
+                  color='secondary'
+                  size='small'
+                  variant='outlined'
+                  disabled={isLoading}
+                  onClick={async () => {
+                    if (tokenGate.archived) {
+                      await unarchiveTokenGate();
+                    } else {
+                      await archiveTokenGate();
+                    }
+                    await refreshTokenGates();
+                  }}
+                />
+              </Tooltip>
+              <Tooltip arrow placement='top' title='Delete'>
+                <ButtonChip
+                  className='row-actions'
+                  icon={<DeleteOutlinedIcon />}
+                  clickable
+                  color='secondary'
+                  size='small'
+                  variant='outlined'
+                  disabled={isLoading}
+                  onClick={deletePopupState.open}
+                />
+              </Tooltip>
+            </Box>
           )}
         </TableCell>
       </TableRow>

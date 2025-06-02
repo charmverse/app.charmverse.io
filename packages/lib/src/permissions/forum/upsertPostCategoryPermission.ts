@@ -41,6 +41,15 @@ export async function upsertPostCategoryPermission<
     throw new InvalidInputError('Valid post category ID is required');
   }
 
+  if (assignee.group === 'role') {
+    await prisma.role.findUniqueOrThrow({
+      where: {
+        id: assignee.id,
+        archived: false
+      }
+    });
+  }
+
   if (!permissionLevel || !PostCategoryPermissionLevel[permissionLevel]) {
     throw new InvalidInputError('Invalid permission level');
   } else if (permissionLevel === 'category_admin' || permissionLevel === 'moderator') {

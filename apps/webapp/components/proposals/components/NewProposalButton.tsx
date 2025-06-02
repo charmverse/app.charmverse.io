@@ -1,12 +1,20 @@
-import { styled } from '@mui/material';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, ListItemText } from '@mui/material';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
+import {
+  styled,
+  Box,
+  ButtonGroup,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Stack,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import type { ProposalContentType } from '@packages/lib/proposals/createDraftProposal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { useRef } from 'react';
 
 import charmClient from 'charmClient/charmClient';
@@ -19,14 +27,13 @@ import Modal from 'components/common/Modal';
 import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { PublishProposalAction } from 'components/common/PageActions/components/PublishProposalAction';
-import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalContentType } from '@packages/lib/proposals/createDraftProposal';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 

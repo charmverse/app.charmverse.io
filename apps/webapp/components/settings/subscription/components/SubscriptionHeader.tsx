@@ -1,6 +1,5 @@
-import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import { EditOff as EditOffIcon } from '@mui/icons-material';
-import { Alert, Stack, Typography } from '@mui/material';
+import { Alert, Typography } from '@mui/material';
 import { subscriptionTierOrder, tierConfig } from '@packages/subscriptions/constants';
 import type { SpaceSubscriptionStatus } from '@packages/subscriptions/getSubscriptionStatus';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
@@ -38,7 +37,6 @@ export function SubscriptionHeader({
 
   // Calculate how many months the current tier will last
   const newTierAfterDowngrade = isDowngraded && pendingTier;
-  const firstOfNextMonth = DateTime.utc().endOf('month').plus({ months: 1 }).startOf('month');
   const currentTierName = currentTier ? tierConfig[currentTier]?.name : '';
   const isReadonly = currentTier === 'readonly';
   // hide the send dev button if the space is expired (requiring an upgrade), is free, or has chosen to downgrade to free

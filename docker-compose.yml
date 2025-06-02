@@ -45,8 +45,6 @@ services:
         '-c',
         'npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
       ]
-    # environment:
-    #   - FORCE_SUBDOMAINS=true
     profiles:
       - prd-webapp
 

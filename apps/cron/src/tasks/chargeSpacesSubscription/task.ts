@@ -4,8 +4,6 @@ import { chargeSpaceSubscription } from '@packages/subscriptions/chargeSpaceSubs
 import { DateTime } from 'luxon';
 
 export async function task() {
-  log.debug('Running charge spaces subscription cron job');
-
   const startOfMonth = DateTime.now().startOf('month');
   const endOfMonth = DateTime.now().endOf('month');
 
@@ -29,15 +27,20 @@ export async function task() {
         id: true
       }
     });
+    log.info('[cron-subscriptions] Found', spaces.length, 'spaces to charge', { startOfMonth, endOfMonth });
 
     for (const space of spaces) {
       try {
         await chargeSpaceSubscription({ spaceId: space.id });
       } catch (error: any) {
-        log.error(`Error charging space subscription: ${error.stack || error.message || error}`, { error });
+        log.error(`[cron-subscriptions] Error charging space subscription: ${error.stack || error.message || error}`, {
+          error
+        });
       }
     }
   } catch (error: any) {
-    log.error(`Error verifying token gate memberships: ${error.stack || error.message || error}`, { error });
+    log.error(`[cron-subscriptions] Error verifying token gate memberships: ${error.stack || error.message || error}`, {
+      error
+    });
   }
 }

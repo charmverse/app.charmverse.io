@@ -1,5 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { deleteBeehiivSubscription } from '@packages/lib/beehiiv/deleteBeehiivSubscription';
+import { registerBeehiivSubscription } from '@packages/lib/beehiiv/registerBeehiivSubscription';
+import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
+import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
+import { deleteLoopsContact } from '@packages/lib/loopsEmail/deleteLoopsContact';
+import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { requireWalletSignature } from '@packages/lib/middleware/requireWalletSignature';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
 import type { SignupCookieType } from '@packages/metrics/userAcquisition/interfaces';
@@ -12,17 +21,6 @@ import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { v4 } from 'uuid';
-
-import { deleteBeehiivSubscription } from '@packages/lib/beehiiv/deleteBeehiivSubscription';
-import { registerBeehiivSubscription } from '@packages/lib/beehiiv/registerBeehiivSubscription';
-import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
-import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
-import { deleteLoopsContact } from '@packages/lib/loopsEmail/deleteLoopsContact';
-import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { requireWalletSignature } from '@packages/lib/middleware/requireWalletSignature';
-import { removeOldCookieFromResponse } from '@packages/lib/session/removeOldCookie';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -68,8 +66,6 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
     await req.session.save();
   }
 
-  await removeOldCookieFromResponse(req, res, false);
-
   return res.status(404).json({ error: 'No user found' });
 }
 
@@ -89,7 +85,6 @@ async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) 
   }
 
   res.setHeader('Cache-Control', 'no-store');
-  await removeOldCookieFromResponse(req, res, true);
 
   return res.status(200).json(profile);
 }

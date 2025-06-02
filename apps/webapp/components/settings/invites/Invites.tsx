@@ -40,6 +40,7 @@ export function Invites({ space }: { space: Space }) {
           Invite Links
         </Typography>
         <InviteActions
+          space={space}
           onOpenInvitesClick={popupInvitesState.open}
           onOpenTokenGateClick={popupTokenGateState.open}
           isAdmin={isAdmin}

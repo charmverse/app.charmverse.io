@@ -1,13 +1,15 @@
+import type { Space } from '@charmverse/core/prisma';
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
-import { getChainById, getChainList } from '@packages/blockchain/connectors/chains';
 import type { IChainDetails } from '@packages/blockchain/connectors/chains';
+import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { ReactNode, Ref } from 'react';
 import { forwardRef } from 'react';
-import type { Ref, ReactNode } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useTokenGateAccess } from 'hooks/useTokenGateAccess';
 
 function SelectField(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
@@ -16,7 +18,7 @@ function SelectField(
   const { helperMessage, chains: chainsProp, ...restProps } = props;
 
   const { space } = useCurrentSpace();
-  const chainList = chainsProp || getChainList({ enableTestnets: !!space?.enableTestnets });
+  const { allowedChains } = useTokenGateAccess({ space: space as Space });
 
   return (
     <FieldWrapper label='Blockchain'>
@@ -27,7 +29,7 @@ function SelectField(
         ref={ref}
         {...restProps}
       >
-        {chainList.map((_chain, _index, _arr) => {
+        {allowedChains.map((_chain, _index, _arr) => {
           // We add a divider to separate mainnets from testnets
           const isFirstTestnet = _arr.findIndex((c) => !!c.testnet) === _index;
 

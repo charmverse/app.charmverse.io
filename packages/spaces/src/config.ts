@@ -4,7 +4,7 @@ export const DOMAIN_BLACKLIST = [
   'authenticate',
   'createSpace',
   'invite',
-  'login',
+  // 'login', login is not part of this list, since it is used on custom domains and lives at [domain]/login
   'images',
   'join',
   'share',

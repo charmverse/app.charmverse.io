@@ -1,8 +1,6 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
+import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { InvalidInputError } from '@packages/utils/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-
 import { requireSpaceMembership } from '@packages/lib/middleware';
 import { defaultHandler } from '@packages/lib/middleware/handler';
 import { deleteWorkflowTemplate } from '@packages/lib/proposals/workflows/deleteWorkflowTemplate';
@@ -10,6 +8,8 @@ import { getWorkflowTemplates } from '@packages/lib/proposals/workflows/getWorkf
 import { obfuscateWorkflow } from '@packages/lib/proposals/workflows/obfuscateWorkflow';
 import { upsertWorkflowTemplate } from '@packages/lib/proposals/workflows/upsertWorkflowTemplate';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { InvalidInputError } from '@packages/utils/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = defaultHandler();
 
@@ -56,6 +56,20 @@ async function upsertWorkflowController(req: NextApiRequest, res: NextApiRespons
   }
   if (workflow?.spaceId !== req.query.id) {
     throw new InvalidInputError(`spaceId is missing or invalid`);
+  }
+
+  // Check if the workflow exists and is archived
+  const existingWorkflow = await prisma.proposalWorkflow.findUnique({
+    where: {
+      id: workflow.id
+    },
+    select: {
+      archived: true
+    }
+  });
+
+  if (existingWorkflow?.archived && workflow.archived !== false) {
+    throw new InvalidInputError('Cannot modify archived workflows. Unarchive the workflow first.');
   }
 
   await upsertWorkflowTemplate(workflow);

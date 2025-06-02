@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
-import { styled } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
+  styled,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -17,6 +17,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import type { Member } from '@packages/lib/members/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
@@ -27,7 +28,6 @@ import Modal from 'components/common/Modal';
 import type { Props as UpgradeProps } from 'components/settings/subscription/UpgradeWrapper';
 import { UpgradeChip } from 'components/settings/subscription/UpgradeWrapper';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Member } from '@packages/lib/members/interfaces';
 
 import { MemberRow } from './MemberRow';
 
@@ -42,6 +42,7 @@ type RoleRowProps = {
   roleActions?: ReactNode;
   memberRoleId?: string;
   upgradeProps?: UpgradeProps;
+  archived?: boolean;
   descriptionIcon?: any;
 };
 
@@ -52,6 +53,7 @@ const ScrollableBox = styled.div<{ rows: number }>`
 `;
 
 export function RoleRowBase({
+  archived,
   description,
   roleActions,
   eligibleMembers,
@@ -109,7 +111,11 @@ export function RoleRowBase({
               </Typography>
             )}
             {onAddMembers && (
-              <AddMembersButton eligibleMemberIds={eligibleMembers.map((m) => m.id)} onAddMembers={onAddMembers} />
+              <AddMembersButton
+                archived={archived}
+                eligibleMemberIds={eligibleMembers.map((m) => m.id)}
+                onAddMembers={onAddMembers}
+              />
             )}
           </TabPanel>
           <TabPanel value={openTab} index={1}>
@@ -147,9 +153,10 @@ function TabPanel(props: TabPanelProps) {
 type ButtonProps = {
   onAddMembers: (memberIds: string[]) => Promise<void>;
   eligibleMemberIds: string[];
+  archived?: boolean;
 };
 
-function AddMembersButton({ onAddMembers, eligibleMemberIds }: ButtonProps) {
+function AddMembersButton({ onAddMembers, eligibleMemberIds, archived }: ButtonProps) {
   const [newMembers, setNewMembers] = useState<string[]>([]);
   const { showMessage } = useSnackbar();
 
@@ -174,7 +181,7 @@ function AddMembersButton({ onAddMembers, eligibleMemberIds }: ButtonProps) {
 
   return (
     <Box mt={2}>
-      <Button onClick={showMembersPopup} variant='text' color='secondary'>
+      <Button onClick={showMembersPopup} variant='text' color='secondary' disabled={archived}>
         + Add members
       </Button>
       <Modal open={userPopupState.isOpen} onClose={userPopupState.close} title='Add members'>

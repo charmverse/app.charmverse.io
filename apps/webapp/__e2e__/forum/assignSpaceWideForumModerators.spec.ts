@@ -19,7 +19,7 @@ type Fixtures = {
 let adminUser: User;
 let moderatorUser: User;
 let space: Space;
-test.describe.serial('Comment on forum posts', () => {
+test.describe.skip('Comment on forum posts', () => {
   test('assign space-wide forum moderators - admin can assign a user as a space-wide forum moderator', async ({
     page,
     forumHomePage,

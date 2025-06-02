@@ -6,12 +6,12 @@ import type { CreateRoleInput } from 'components/settings/roles/components/Creat
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 
-export function useRoles() {
+export function useRoles({ includeArchived = false }: { includeArchived?: boolean } = {}) {
   const { space } = useCurrentSpace();
   const { mutateMembers } = useMembers();
 
-  const { data: roles } = useSWR(space ? `roles/${space.id}` : null, () =>
-    space ? charmClient.roles.listRoles(space.id) : null
+  const { data: roles } = useSWR(space ? `roles/${space.id}?includeArchived=${includeArchived}` : null, () =>
+    space ? charmClient.roles.listRoles(space.id, includeArchived) : null
   );
 
   async function createRole(role: CreateRoleInput): Promise<Role> {
@@ -70,6 +70,16 @@ export function useRoles() {
     return mutate((key) => typeof key === 'string' && key.startsWith(`roles/${space?.id || ''}`));
   }
 
+  async function archiveRole(roleId: string) {
+    await charmClient.roles.archiveRole(roleId);
+    refreshRoles();
+  }
+
+  async function unarchiveRole(roleId: string) {
+    await charmClient.roles.unarchiveRole(roleId);
+    refreshRoles();
+  }
+
   return {
     createRole,
     updateRole,
@@ -77,6 +87,8 @@ export function useRoles() {
     assignRoles,
     unassignRole,
     refreshRoles,
+    archiveRole,
+    unarchiveRole,
     roles
   };
 }
