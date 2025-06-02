@@ -46,21 +46,10 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
   const amountToChargeInWei = parseUnits(amountToCharge.toString(), 18);
 
   if (spaceTokenBalance < amountToChargeInWei) {
-    await prisma.$transaction([
-      prisma.space.update({
-        where: { id: spaceId },
-        data: {
-          subscriptionTier: 'readonly'
-        }
-      }),
-      prisma.spaceSubscriptionTierChangeEvent.create({
-        data: {
-          spaceId,
-          newTier: 'readonly',
-          previousTier: subscriptionTier
-        }
-      })
-    ]);
+    await updateSubscription({
+      spaceId,
+      newTier: 'readonly'
+    });
 
     log.warn(`Insufficient space token balance, space downgraded to readonly tier`, {
       spaceId,

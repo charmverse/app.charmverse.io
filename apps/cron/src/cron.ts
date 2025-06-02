@@ -52,7 +52,7 @@ cron.schedule('0 * * * *', archiveTask);
 // Send notification to draft proposal authors once an hour
 cron.schedule('0 * * * *', sendDraftProposalNotificationTask);
 
-// cron.schedule('0 * * * *', chargeSpacesSubscriptionTask);
+cron.schedule('0 * * * *', chargeSpacesSubscriptionTask);
 
 // Index pending gnosis safe credentials every 30 minutes
 cron.schedule('*/30 * * * *', indexPendingCredentialsTask);

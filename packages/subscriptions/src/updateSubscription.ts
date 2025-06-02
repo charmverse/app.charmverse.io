@@ -3,14 +3,21 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateSubscription({
   spaceId,
-  newTier,
-  currentTier
+  newTier
 }: {
   spaceId: string;
   newTier: SpaceSubscriptionTier;
-  currentTier?: SpaceSubscriptionTier;
   subscriptionCancelledAt?: Date | null;
 }) {
+  const { subscriptionTier } = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: spaceId
+    },
+    select: {
+      subscriptionTier: true
+    }
+  });
+
   await prisma.$transaction([
     prisma.space.update({
       where: { id: spaceId },
@@ -22,7 +29,7 @@ export async function updateSubscription({
       data: {
         spaceId,
         newTier,
-        previousTier: currentTier ?? 'readonly'
+        previousTier: subscriptionTier ?? 'readonly'
       }
     }),
     prisma.proposalWorkflow.updateMany({
