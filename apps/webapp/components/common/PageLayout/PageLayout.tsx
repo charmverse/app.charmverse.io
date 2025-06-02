@@ -105,29 +105,6 @@ function PageLayout({ children }: PageLayoutProps) {
             <AppBar open={leftSidebarOpen} sidebarWidth={sidebarWidth} position='fixed'>
               <Header open={leftSidebarOpen} openSidebar={openLeftSidebar} />
               <BlocksExceededBanner />
-              {!isEnterpriseTierSpace ? (
-                <AnnouncementBanner
-                  errorBackground
-                  actionLabel='Billing'
-                  onActionClick={() => {
-                    openSettings('subscription');
-                  }}
-                  bannerId='subscription-pricing-change-banner'
-                >
-                  Introducing Our New Community-Based Pricing Model
-                </AnnouncementBanner>
-              ) : null}
-              {space?.domain === 'sporkdao---ethdenver' && (
-                <AnnouncementBanner
-                  errorBackground={true}
-                  forceShow={true}
-                  spaceId={space?.id}
-                  actionLabel='Contact'
-                  actionHref='https://discord.gg/ACYCzBGC2M'
-                >
-                  Your subscription has expired. Please contact your admin for renewal
-                </AnnouncementBanner>
-              )}
             </AppBar>
             <NavigationSidebarDrawer
               enabled={enableSidebar}
