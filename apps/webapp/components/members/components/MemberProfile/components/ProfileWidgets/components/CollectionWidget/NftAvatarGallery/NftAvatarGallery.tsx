@@ -1,15 +1,14 @@
-import { styled } from '@mui/material';
-import { Box, CircularProgress, Grid } from '@mui/material';
+import { styled, Box, CircularProgress, Grid } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+import type { NFTData } from '@packages/lib/blockchain/getNFTs';
 
 import { useUser } from 'hooks/useUser';
-import type { NFTData } from '@packages/lib/blockchain/getNFTs';
 
 import { EmptyAvatarGallery } from './EmptyAvatarGallery';
 import { NftGalleryItem } from './NftGalleryItem';
 
-const ProgressContainer = styled.div`
+const ProgressContainer = styled('div')`
   position: absolute;
   top: 0;
   right: 0;

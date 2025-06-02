@@ -32,6 +32,7 @@ const esmModules = [
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
+  '@charmverse/core',
   // 'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
@@ -214,5 +215,4 @@ const removeUndefined = (obj) => {
 // const withBundleAnalyzer = BundleAnalyzer({
 //   enabled: process.env.ANALYZE === 'true'
 // });
-
-module.exports = config;
+export default config;

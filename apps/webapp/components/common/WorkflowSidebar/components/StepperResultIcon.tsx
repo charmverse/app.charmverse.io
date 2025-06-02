@@ -1,10 +1,9 @@
-import { styled } from '@mui/material';
 import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
-import { Typography } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 
 const stepperSize = 25;
 
-const StyledIconContainer = styled.div<{
+const StyledIconContainer = styled('div')<{
   isCurrent?: boolean;
   isAppealActive?: boolean;
   result: 'pass' | 'fail' | null;

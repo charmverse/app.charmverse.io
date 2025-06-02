@@ -1,8 +1,22 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { styled } from '@mui/material';
 import { ThumbUpOutlined as ApprovedIcon, HighlightOff as RejectedIcon } from '@mui/icons-material';
 import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
-import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import {
+  styled,
+  Box,
+  Card,
+  Chip,
+  FormLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography
+} from '@mui/material';
+import { getActionButtonLabels } from '@packages/lib/proposals/getActionButtonLabels';
+import type { PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
+import { getRelativeTimeInThePast } from '@packages/lib/utils/dates';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -13,9 +27,6 @@ import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useUser } from 'hooks/useUser';
-import { getActionButtonLabels } from '@packages/lib/proposals/getActionButtonLabels';
-import type { PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
-import { getRelativeTimeInThePast } from '@packages/lib/utils/dates';
 
 export type PassFailEvaluationProps = {
   isAppealProcess?: boolean;
@@ -57,7 +68,7 @@ export type PassFailEvaluationProps = {
   actionLabels?: PopulatedEvaluation['actionLabels'];
 };
 
-const ResultsContainer = styled.div`
+const ResultsContainer = styled('div')`
   display: flex;
   flex-direction: row;
   gap: ${({ theme }) => theme.spacing(1)};

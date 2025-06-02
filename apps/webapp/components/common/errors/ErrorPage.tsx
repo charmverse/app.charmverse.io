@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 
 import Bolt from 'public/images/lightning_bolt.svg';
 
-const Container = styled.div`
+const Container = styled('div')`
   height: 100%;
   display: flex;
   align-items: center;

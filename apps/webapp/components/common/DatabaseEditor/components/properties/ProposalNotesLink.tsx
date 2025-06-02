@@ -7,7 +7,7 @@ import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog'
 import { PageIcon } from 'components/common/PageIcon';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-const StyledPageLink = styled.div`
+const StyledPageLink = styled('div')`
   display: flex;
   width: 100%;
   overflow: hidden;

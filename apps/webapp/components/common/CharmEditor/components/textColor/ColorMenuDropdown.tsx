@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import { styled, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { capitalize } from '@packages/utils/strings';
 import { usePopupState, bindTrigger, bindMenu } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
@@ -15,7 +14,7 @@ import { getCSSColor } from './textColorUtils';
 
 type Props = { children: ReactNode };
 
-const LetterIcon = styled.div`
+const LetterIcon = styled('div')`
   display: flex;
   align-items: center;
   justify-content: center;

@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
-import { styled } from '@mui/material';
 import ImageIcon from '@mui/icons-material/Image';
-import { Box, ListItemButton, Typography } from '@mui/material';
+import { styled, Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
 import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
@@ -56,13 +55,13 @@ function EmptyImageContainer({
   );
 }
 
-const StyledImageContainer = styled.div<{ size: number }>`
+const StyledImageContainer = styled('div')<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
   margin: ${({ theme }) => theme.spacing(0.5)} auto;
 `;
 
-const StyledImage = styled.img`
+const StyledImage = styled('img')`
   object-fit: contain;
   max-width: 100%;
   width: 100%;

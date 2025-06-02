@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';
 
 type ImgSize = 'large' | 'small';
-export const Emoji = styled.div<{ size?: ImgSize }>`
+export const Emoji = styled('div')<{ size?: ImgSize }>`
   font-size: ${({ size }) => (size === 'large' ? '78px' : 'inherit')};
   overflow: hidden;
   white-space: nowrap;

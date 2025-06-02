@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { TextField } from '@mui/material';
+import { styled, TextField } from '@mui/material';
 import { isTruthy } from '@packages/utils/types';
 import { useMemo, useState } from 'react';
 
@@ -9,7 +8,7 @@ import { usePages } from 'hooks/usePages';
 
 import { allowedSourceDatabasePageTypes } from '../useSourceOptions';
 
-const SidebarContent = styled.div`
+const SidebarContent = styled('div')`
   flex-grow: 1;
   overflow-y: auto;
   border-bottom: 1px solid rgb(var(--center-channel-color-rgb), 0.12);

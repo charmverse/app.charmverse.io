@@ -1,7 +1,7 @@
 import { styled } from '@mui/material';
 import { memo } from 'react';
 
-const ResizerContainer = styled.div`
+const ResizerContainer = styled('div')`
   max-width: 100%;
   &:hover .react-resizable-handle {
     opacity: 1;

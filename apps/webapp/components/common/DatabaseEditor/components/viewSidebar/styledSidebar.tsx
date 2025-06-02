@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 
-export const StyledSidebar = styled.div`
+export const StyledSidebar = styled('div')`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;

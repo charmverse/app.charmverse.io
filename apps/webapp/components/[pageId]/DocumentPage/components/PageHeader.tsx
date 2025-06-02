@@ -1,12 +1,11 @@
 import type { Page } from '@charmverse/core/prisma';
-import { styled } from '@mui/material';
 import ArrowDropDownOutlinedIcon from '@mui/icons-material/ArrowDropDownOutlined';
 import CasinoOutlinedIcon from '@mui/icons-material/CasinoOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import ImageIcon from '@mui/icons-material/Image';
 import type { ListItemButtonProps } from '@mui/material';
-import { ListItemButton, Menu } from '@mui/material';
+import { styled, ListItemButton, Menu } from '@mui/material';
 import Box from '@mui/material/Box';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -37,7 +36,7 @@ const Controls = styled(Box)`
   gap: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const EditorHeader = styled.div<{ pageType: 'page' | 'board' }>`
+const EditorHeader = styled('div')<{ pageType: 'page' | 'board' }>`
   ${({ pageType }) =>
     pageType === 'page'
       ? `

@@ -1,6 +1,5 @@
-import { styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, DialogActions, Divider, Stack } from '@mui/material';
+import { styled, Box, DialogActions, Divider, Stack } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import Modal from '@mui/material/Modal';
 import clsx from 'clsx';
@@ -26,7 +25,7 @@ const Toolbar = styled(Box)`
   }
 `;
 
-const Content = styled.div`
+const Content = styled('div')`
   overflow-x: hidden;
   flex-grow: 1;
   -webkit-overflow-scrolling: touch;

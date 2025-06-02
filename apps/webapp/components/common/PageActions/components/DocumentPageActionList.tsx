@@ -1,12 +1,11 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
-import { styled } from '@mui/material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
+import { styled, List, ListItemButton, ListItemIcon, ListItemText, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -80,7 +79,7 @@ const StyledFontButton = styled(Button)`
   display: block;
 `;
 
-const FontFamilyExample = styled.div`
+const FontFamilyExample = styled('div')`
   font-size: 24px;
   height: 24px;
   line-height: 24px;

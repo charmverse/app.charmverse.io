@@ -2,7 +2,6 @@ import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { wagmiConfig } from '@packages/blockchain/connectors/config';
 import { isDevEnv, isProdEnv } from '@packages/config/constants';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -199,11 +198,6 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
     </AppThemeProvider>
   );
 }
-
-const lensConfig: LensConfig = {
-  bindings: wagmiBindings(wagmiConfig),
-  environment: isProdEnv ? production : development
-};
 
 function DataProviders({ children }: { children: ReactNode }) {
   return (

@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 
-const StyledRoot = styled.div`
+const StyledRoot = styled('div')`
   position: relative;
   z-index: var(--z-index-modal);
 `;

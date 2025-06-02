@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 
-export const MenuInput = styled.input`
+export const MenuInput = styled('input')`
   background: ${({ theme }) => theme.palette.background.default};
   outline: none;
   border: none;

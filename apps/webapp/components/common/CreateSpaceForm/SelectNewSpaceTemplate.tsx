@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { Divider, Typography } from '@mui/material';
+import { styled, Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { staticSpaceTemplates } from '@packages/spaces/config';
 import type { SpaceTemplateType } from '@packages/spaces/config';
@@ -13,7 +12,7 @@ type SelectNewSpaceTemplateProps = {
   onSelect: (value: SpaceTemplateType) => void;
 };
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled('div')`
   overflow: auto;
   max-height: 40vh;
 

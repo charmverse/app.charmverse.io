@@ -1,10 +1,10 @@
 import type { Page } from '@charmverse/core/prisma';
-import { styled } from '@mui/material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsIcon from '@mui/icons-material/SettingsOutlined';
+import { styled } from '@mui/material';
 import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -45,7 +45,7 @@ const SpaceSettingsDialog = dynamic(() =>
   import('components/settings/SettingsDialog').then((mod) => mod.SpaceSettingsDialog)
 );
 
-const WorkspaceLabel = styled.div`
+const WorkspaceLabel = styled('div')`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -59,7 +59,7 @@ const WorkspaceLabel = styled.div`
   padding: 4px 0;
 `;
 
-const SidebarContainer = styled.div`
+const SidebarContainer = styled('div')`
   display: flex;
   background-color: ${({ theme }) => theme.palette.sidebar.background};
   min-height: 100vh;
@@ -102,7 +102,7 @@ const StyledSidebarBox = styled(Box)`
   ${sidebarItemStyles}
 `;
 
-const ScrollingContainer = styled.div<{ isScrolled: boolean }>`
+const ScrollingContainer = styled('div')<{ isScrolled: boolean }>`
   flex-grow: 1;
   overflow-y: auto;
   transition: border-color 0.2s ease-out;

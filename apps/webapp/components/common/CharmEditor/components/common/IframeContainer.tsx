@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 
-export const IframeContainer = styled.div`
+export const IframeContainer = styled('div')`
   line-height: 0; // hide margin that appears underneath
   object-fit: contain;
   width: 100%;

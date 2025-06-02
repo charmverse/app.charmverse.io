@@ -118,7 +118,7 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
   }
 }));
 
-const AdjacentDropZone = styled.div`
+const AdjacentDropZone = styled('div')`
   position: absolute;
   top: -2px;
   left: 0;

@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { ClickAwayListener } from '@mui/material';
+import { styled, ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
@@ -62,7 +61,7 @@ function getItemsAndHints(
   return { items };
 }
 
-const InlinePaletteGroup = styled.div`
+const InlinePaletteGroup = styled('div')`
   margin: ${({ theme }) => theme.spacing(1, 0)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

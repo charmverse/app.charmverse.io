@@ -1,7 +1,6 @@
 // import './Component.scss';
 
-import { styled } from '@mui/material';
-import { Typography } from '@mui/material';
+import { styled, Typography } from '@mui/material';
 import { NodeSelection } from 'prosemirror-state';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -18,7 +17,7 @@ type HeadingItem = {
   level: number;
 };
 
-const StyledComponent = styled.div`
+const StyledComponent = styled('div')`
   opacity: 0.75;
   font-size: 0.9rem;
 

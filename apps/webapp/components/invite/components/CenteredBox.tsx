@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
 
-export const CenteredBox = styled.div`
+export const CenteredBox = styled('div')`
   position: absolute;
   top: 50%;
   left: 50%;

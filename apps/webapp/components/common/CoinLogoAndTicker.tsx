@@ -1,9 +1,7 @@
-import { styled } from '@mui/material';
-import { Stack } from '@mui/material';
-
+import { styled, Stack } from '@mui/material';
 import type { TokenInfo } from '@packages/lib/tokens/tokenData';
 
-const StyledImg = styled.img`
+const StyledImg = styled('img')`
   width: 1em;
 `;
 

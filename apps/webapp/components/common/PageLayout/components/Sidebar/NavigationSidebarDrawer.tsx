@@ -50,7 +50,7 @@ const Drawer = styled(MuiDrawer, {
   }),
   paddingRight: 3
 }));
-const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
+const DraggableHandle = styled('div')<{ isActive?: boolean; disabled?: boolean }>`
   position: absolute;
   width: 5px;
   bottom: 0;

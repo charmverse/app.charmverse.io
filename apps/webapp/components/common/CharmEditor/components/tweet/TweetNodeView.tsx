@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
-import { styled } from '@mui/material';
-import { Box } from '@mui/material';
+import { styled, Box } from '@mui/material';
 import type { TweetNodeAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
 import { randomIntFromInterval } from '@packages/utils/random';
@@ -32,7 +31,7 @@ declare global {
   }
 }
 
-const StyledTweet = styled.div`
+const StyledTweet = styled('div')`
   // fix for twitter iframe which has color-scheme: auto, and otherwise makes the background white in dark mode
   // @ref: https://bugs.chromium.org/p/chromium/issues/detail?id=1150352
   iframe {

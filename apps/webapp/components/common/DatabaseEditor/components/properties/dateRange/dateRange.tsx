@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { Box, Divider, Popover, TextField } from '@mui/material';
+import { styled, Box, Divider, Popover, TextField } from '@mui/material';
 import type { PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
@@ -16,7 +15,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import Checkbox from '../../../widgets/checkbox';
 import { EmptyPlaceholder } from '../EmptyPlaceholder';
 
-const PickersDayContainer = styled.div`
+const PickersDayContainer = styled('div')`
   &.highlighted {
     background-color: var(--charmeditor-active);
     border-radius: 0;

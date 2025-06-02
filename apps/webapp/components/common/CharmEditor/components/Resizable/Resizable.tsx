@@ -21,7 +21,7 @@ interface ResizableProps {
   onDragStart?: () => void;
 }
 
-const StaticContainer = styled.div<{ size: number }>`
+const StaticContainer = styled('div')<{ size: number }>`
   max-width: 100%;
   width: ${({ size }) => size}px;
   margin: ${({ theme }) => theme.spacing(0.5)} auto;

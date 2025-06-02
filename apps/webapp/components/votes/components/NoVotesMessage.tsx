@@ -1,6 +1,5 @@
-import { styled } from '@mui/material';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import { Box, Typography } from '@mui/material';
+import { styled, Box, Typography } from '@mui/material';
 
 const EmptyVoteContainerBox = styled(Box)`
   position: relative;
@@ -9,7 +8,7 @@ const EmptyVoteContainerBox = styled(Box)`
   background-color: ${({ theme }) => theme.palette.background.light};
 `;
 
-const Center = styled.div`
+const Center = styled('div')`
   position: absolute;
   top: 50%;
   left: 50%;

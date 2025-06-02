@@ -8,7 +8,7 @@ export const LoadingIcon = styled(CircularProgress)`
 
 type CSSValue = number | string;
 
-export const LoadingCard = styled.div<{ height?: CSSValue; minHeight?: CSSValue }>`
+export const LoadingCard = styled('div')<{ height?: CSSValue; minHeight?: CSSValue }>`
   align-items: center;
   display: flex;
   justify-content: center;

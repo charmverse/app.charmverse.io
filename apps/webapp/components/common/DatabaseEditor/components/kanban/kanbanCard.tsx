@@ -1,5 +1,7 @@
-import { styled } from '@mui/material';
-import { Box, Stack } from '@mui/material';
+import { styled, Box, Stack } from '@mui/material';
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { Card } from '@packages/databases/card';
+import { isTouchScreen } from '@packages/lib/utils/browser';
 import { useRouter } from 'next/router';
 import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
@@ -11,9 +13,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { Card } from '@packages/databases/card';
-import { isTouchScreen } from '@packages/lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import PropertyValueElement from '../propertyValueElement';
@@ -34,7 +33,7 @@ type Props = {
   isApplication?: boolean;
 };
 
-const BountyFooter = styled.div`
+const BountyFooter = styled('div')`
   border-top: 1px solid ${({ theme }) => theme.palette.divider};
   display: flex;
   justify-content: space-between;

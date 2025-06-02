@@ -4,9 +4,9 @@ import type {
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma-client';
-import { styled } from '@mui/material';
 import { DeleteOutlined } from '@mui/icons-material';
 import {
+  styled,
   Alert,
   Box,
   FormGroup,
@@ -18,6 +18,8 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import type { RubricAnswerData } from '@packages/lib/proposals/rubric/upsertRubricAnswers';
+import { getNumberFromString } from '@packages/lib/utils/numbers';
 import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
@@ -31,8 +33,6 @@ import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { usePersistentFormValues } from 'components/common/form/hooks/usePersistantFormValues';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import type { RubricAnswerData } from '@packages/lib/proposals/rubric/upsertRubricAnswers';
-import { getNumberFromString } from '@packages/lib/utils/numbers';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
@@ -94,7 +94,7 @@ const CriteriaRow = styled(Box)`
   }
 `;
 
-const StyledIcon = styled.div`
+const StyledIcon = styled('div')`
   align-items: center;
   border-radius: 50%;
   display: flex;
