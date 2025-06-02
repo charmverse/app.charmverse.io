@@ -32,7 +32,6 @@ const esmModules = [
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
-  '@charmverse/core',
   // 'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
@@ -79,38 +78,13 @@ const config = {
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: true,
-    tsconfigPath: 'tsconfig.next.json'
+    ignoreBuildErrors: true
+    // tsconfigPath: 'tsconfig.next.json'
   },
   experimental: {
     webpackBuildWorker: true
   },
-  // compiler: {
-  //   styledComponents: true
-  // },
-  // experimental: {
-  //   // turbo: {
-  //   //   resolveAlias: {
-  //   //     fs: false
-  //   //   },
-  //   //   rules: {
-  //   //     '*.svg': {
-  //   //       loaders: ['@svgr/webpack'],
-  //   //       as: '*.js'
-  //   //     }
-  //   //   }
-  //   // }
-  // },
-  // images: {
-  //   // next image is broken in staging/production as of 14.0.1
-  //   unoptimized: true
-  // },
-  transpilePackages: esmModules,
-  // modularizeImports: {
-  //   lodash: {
-  //     transform: 'lodash/{{member}}'
-  //   }
-  // },
+  transpilePackages: ['@packages/adapters', '@charmverse/core'],
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
   productionBrowserSourceMaps: true,
   async redirects() {
@@ -212,7 +186,4 @@ const removeUndefined = (obj) => {
   return newObj;
 };
 
-// const withBundleAnalyzer = BundleAnalyzer({
-//   enabled: process.env.ANALYZE === 'true'
-// });
 export default config;

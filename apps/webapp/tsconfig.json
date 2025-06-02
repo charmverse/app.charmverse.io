@@ -2,9 +2,14 @@
   "compilerOptions": {
     "importHelpers": true,
     "baseUrl": ".",
+    "rootDir": "../../",
     "strict": true,
     "target": "es2019",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -12,25 +17,45 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "jsxImportSource": "@emotion/react",
     "allowJs": true,
     "incremental": true,
     "isolatedModules": true,
     "paths": {
-      "scripts/*": ["./scripts/*"],
-      "lib/*": ["./lib/*"],
-      "components/*": ["./components/*"],
-      "hooks/*": ["./hooks/*"],
-      "pages/*": ["./pages/*"],
-      "public/*": ["./public/*"],
-      "theme/*": ["./theme/*"],
-      "testing/*": ["./testing/*"],
-      "__e2e__/*": ["./__e2e__/*"],
+      "scripts/*": [
+        "./scripts/*"
+      ],
+      "lib/*": [
+        "./lib/*"
+      ],
+      "components/*": [
+        "./components/*"
+      ],
+      "hooks/*": [
+        "./hooks/*"
+      ],
+      "pages/*": [
+        "./pages/*"
+      ],
+      "public/*": [
+        "./public/*"
+      ],
+      "theme/*": [
+        "./theme/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ],
+      "__e2e__/*": [
+        "./__e2e__/*"
+      ],
       // "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       // "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
       // "@charmverse/core/shared": ["../../node_modules/@charmverse/core/dist/cjs/shared"],
-      "@charmverse/core/log": ["../../../node_modules/@charmverse/core/dist/cjs/lib/log"],
+      // "@charmverse/core/log": [
+      //   "../../../node_modules/@charmverse/core/dist/cjs/lib/log"
+      // ]
       // "@charmverse/core/http": ["../../node_modules/@charmverse/core/dist/cjs/http"],
       // "@charmverse/core/test": ["../../node_modules/@charmverse/core/dist/cjs/test"],
       // "@charmverse/core/permissions": ["../../node_modules/@charmverse/core/dist/cjs/permissions"],
@@ -43,12 +68,17 @@
       // "@charmverse/core/protocol": ["../../node_modules/@charmverse/core/dist/cjs/protocol"],
       // "@charmverse/core/errors": ["../../node_modules/@charmverse/core/dist/cjs/errors"]
     },
-    "types": ["vitest/globals"]
+    "types": [
+      "vitest/globals"
+    ]
   },
-  "exclude": ["node_modules", "scripts"],
+  "exclude": [
+    "node_modules",
+    "scripts"
+  ],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+  ]
 }
