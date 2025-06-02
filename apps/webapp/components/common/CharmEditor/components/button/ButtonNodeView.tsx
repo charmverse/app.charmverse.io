@@ -137,7 +137,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
         </Box>
         {requestMethod === 'POST' && (
           <Grid container>
-            <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
               <InputLabel>Request Body (optional)</InputLabel>
             </Grid>
             <Grid size='grow'>
@@ -185,7 +185,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           </Select>
         </Box>
         <Grid container>
-          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
             <InputLabel>Button label</InputLabel>
           </Grid>
           <Grid size='grow'>
@@ -193,7 +193,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
             <InputLabel>Success message (optional)</InputLabel>
           </Grid>
           <Grid size='grow'>
