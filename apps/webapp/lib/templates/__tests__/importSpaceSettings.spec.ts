@@ -742,8 +742,7 @@ describe('importSpaceSettings', () => {
               ]
             }
           ],
-          draftReminder: false,
-          archived: false
+          draftReminder: false
         },
         {
           ...existingProposalWorkflow
