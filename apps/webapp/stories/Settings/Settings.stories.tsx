@@ -1,5 +1,3 @@
-import { development, LensProvider } from '@lens-protocol/react-web';
-import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Box, Paper } from '@mui/material';
 import { wagmiConfig } from '@packages/blockchain/connectors/config';
 import { http, HttpResponse } from 'msw';
@@ -26,30 +24,23 @@ function ShowSettingsProfile({ path }: { path: SettingsPath }) {
   function setUnsavedChanges() {}
   return (
     <GlobalContext currentSpace={space}>
-      <LensProvider
-        config={{
-          bindings: wagmiBindings(wagmiConfig),
-          environment: development
-        }}
-      >
-        <VerifyLoginOtpProvider>
-          <Box maxWidth='lg'>
-            <Paper
-              sx={{
-                maxHeight: 800,
-                height: { md: '90vh' }
-              }}
-            >
-              <SettingsContent
-                activePath={activePath}
-                onSelectPath={setActivePath}
-                onClose={onClose}
-                setUnsavedChanges={setUnsavedChanges}
-              />
-            </Paper>
-          </Box>
-        </VerifyLoginOtpProvider>
-      </LensProvider>
+      <VerifyLoginOtpProvider>
+        <Box maxWidth='lg'>
+          <Paper
+            sx={{
+              maxHeight: 800,
+              height: { md: '90vh' }
+            }}
+          >
+            <SettingsContent
+              activePath={activePath}
+              onSelectPath={setActivePath}
+              onClose={onClose}
+              setUnsavedChanges={setUnsavedChanges}
+            />
+          </Paper>
+        </Box>
+      </VerifyLoginOtpProvider>
     </GlobalContext>
   );
 }

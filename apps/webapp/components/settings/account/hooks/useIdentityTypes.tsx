@@ -1,4 +1,6 @@
 import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
+import type { DiscordAccount } from '@packages/lib/discord/client/getDiscordAccount';
+import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 import { matchWalletAddress, shortWalletAddress } from '@packages/utils/blockchain';
 import { randomName } from '@packages/utils/randomName';
 import { useMemo } from 'react';
@@ -7,10 +9,6 @@ import type { IdentityIconSize } from 'components/settings/profile/components/Id
 import { IdentityIcon } from 'components/settings/profile/components/IdentityIcon';
 import type { IntegrationModel } from 'components/settings/profile/components/IdentityModal';
 import { useUser } from 'hooks/useUser';
-import type { DiscordAccount } from '@packages/lib/discord/client/getDiscordAccount';
-import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
-
-import { useLensProfile } from './useLensProfile';
 
 export function useIdentityTypes(
   {
@@ -22,7 +20,6 @@ export function useIdentityTypes(
   }
 ) {
   const { user } = useUser();
-  const { lensProfile } = useLensProfile();
 
   const identityTypes: IntegrationModel[] = useMemo(() => {
     if (!user) {
@@ -84,15 +81,6 @@ export function useIdentityTypes(
       });
     });
 
-    if (lensProfile) {
-      types.push({
-        type: 'Lens',
-        username: lensProfile.metadata?.displayName ?? (lensProfile.handle?.fullHandle ?? '').split('/')[1] ?? '',
-        isInUse: user.identityType === 'Lens',
-        icon: <IdentityIcon size={size} type='Lens' />
-      });
-    }
-
     if (user.farcasterUser?.account) {
       const farcasterAccount = user.farcasterUser.account as Partial<FarcasterAccount>;
       types.push({
@@ -111,7 +99,7 @@ export function useIdentityTypes(
     });
 
     return types;
-  }, [user, lensProfile, size]);
+  }, [user, size]);
 
   return identityTypes;
 }

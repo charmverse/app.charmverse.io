@@ -14,7 +14,6 @@ import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValu
 import { CollectionWidget } from './components/CollectionWidget/CollectionWidget';
 import { CredentialsWidget } from './components/CredentialsWidget';
 import { EnsWidget } from './components/EnsWidget';
-import { LensProfileWidget } from './components/LensProfileWidget';
 import { MemberPropertiesWidget } from './components/MemberPropertiesWidget/MemberPropertiesWidget';
 import { SummonProfileWidget } from './components/SummonProfileWidget';
 
@@ -130,15 +129,6 @@ export function ProfileWidgets({
                 )
               );
             }
-
-            case 'lens':
-              return (
-                lensProfile && (
-                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
-                    <LensProfileWidget lensProfile={lensProfile} />
-                  </Grid>
-                )
-              );
 
             default:
               return null;

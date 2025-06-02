@@ -60,10 +60,6 @@ export class PagesApi {
     return http.PUT(`/api/pages/${pageId}/comments/${commentId}/vote`, { upvoted });
   }
 
-  syncPageCommentsWithLensPost({ pageId }: { pageId: string }): Promise<PageCommentWithVote[]> {
-    return http.POST(`/api/pages/${pageId}/sync-page-comments`);
-  }
-
   exportZippedDatabasePage({
     databaseId,
     filter,

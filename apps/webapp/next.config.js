@@ -40,7 +40,6 @@ const esmModules = [
   'formdata-polyfill',
   'jose',
   'nanoid',
-  '@lens-protocol',
   '@mui/material-nextjs',
   'wagmi' // compile wagmi to avoid error: QueryClientProvider must be used as a child of ReactQueryClientProvider when running app
 ];

@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@decent.xyz/box-common": "^5.1.8",
+    "@emotion/styled": "^11.14.0",
     "@farcaster/core": "^0.16.4",
     "@fontsource/ia-writer-mono": "^5.2.5",
     "@fullcalendar/react": "^6.1.17",

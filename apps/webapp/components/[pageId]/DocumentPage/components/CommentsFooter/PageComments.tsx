@@ -1,5 +1,7 @@
 import CommentIcon from '@mui/icons-material/Comment';
 import { Box, Divider, Card, Stack, Typography } from '@mui/material';
+import type { CommentContent, CommentPermissions } from '@packages/lib/comments';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
@@ -12,10 +14,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { LoginButton } from 'components/login/components/LoginButton';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { CommentContent, CommentPermissions } from '@packages/lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 
 type Props = {
   page: PageWithContent;
@@ -33,8 +33,7 @@ export function PageComments({ page, canComment }: Props) {
     addComment,
     updateComment,
     deleteComment,
-    voteComment,
-    syncPageCommentsWithLensPost
+    voteComment
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
@@ -51,12 +50,6 @@ export function PageComments({ page, canComment }: Props) {
     const _createdComment = await addComment(comment);
     setCreatedComment(_createdComment);
   }
-
-  useEffect(() => {
-    if (page.type === 'proposal' && page?.lensPostLink) {
-      syncPageCommentsWithLensPost();
-    }
-  }, [page.id, page?.lensPostLink, page.type]);
 
   useEffect(() => {
     const commentId = router.query.commentId;
