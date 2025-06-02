@@ -24,6 +24,8 @@ export const communityProduct = {
   }
 } as const;
 
+export type SubscriptionProductId = typeof communityProduct.id;
+
 // Loop constants
 
 export const loopCheckoutUrl = isProdEnv ? 'https://checkout.loopcrypto.xyz' : 'https://demo.checkout.loopcrypto.xyz';

@@ -1,9 +1,9 @@
-import { log } from '@charmverse/core/log';
 import type { MemberPropertyType, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from '@packages/spaces/utils';
+import { hasPrimaryMemberIdentityAccess } from '@packages/subscriptions/featureRestrictions';
 import { DataNotFoundError, DuplicateDataError, InvalidInputError } from '@packages/utils/errors';
 
 import { updateSnapshotDomain } from './updateSnapshotDomain';
@@ -50,12 +50,18 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       domain: true,
       customDomain: true,
       snapshotDomain: true,
-      primaryMemberIdentity: true
+      primaryMemberIdentity: true,
+      subscriptionTier: true
     }
   });
 
   if (!existingSpace) {
     throw new DataNotFoundError(`Space with id ${spaceId} not found`);
+  }
+
+  // Check if trying to set primary member identity without proper tier
+  if (updates.primaryMemberIdentity && !hasPrimaryMemberIdentityAccess(existingSpace.subscriptionTier)) {
+    throw new InvalidInputError('Primary member identity is only available for Gold tier and above');
   }
 
   const domain = updates.domain ? getSpaceDomainFromName(updates.domain) : undefined;

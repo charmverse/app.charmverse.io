@@ -1,14 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
 import type { SpacePermissions } from '@packages/lib/permissions/spaces/listPermissions';
 import { listPermissions } from '@packages/lib/permissions/spaces/listPermissions';
 import { saveRoleAndSpacePermissions } from '@packages/lib/permissions/spaces/saveRoleAndSpacePermissions';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -37,6 +36,15 @@ async function updateSpacePermissionsController(req: NextApiRequest, res: NextAp
   const { spaceId } = req.query as { spaceId: string };
   const { roleIdToTrack, ...permissions } = req.body as SpacePermissions & { roleIdToTrack?: string };
 
+  if (roleIdToTrack) {
+    await prisma.role.findFirstOrThrow({
+      where: {
+        id: roleIdToTrack,
+        archived: false
+      }
+    });
+  }
+
   await saveRoleAndSpacePermissions(spaceId, permissions);
 
   // tracking
@@ -46,6 +54,7 @@ async function updateSpacePermissionsController(req: NextApiRequest, res: NextAp
         id: roleIdToTrack
       }
     });
+
     // TODO: we are not tracking if user removes permissions to rely on defaults
     const spacePermissions = permissions.space.find((p) => p.assignee.id === roleIdToTrack);
     if (role && spacePermissions) {

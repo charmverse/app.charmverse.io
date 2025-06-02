@@ -1,13 +1,11 @@
 import crypto from 'node:crypto';
 
-import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getVerifiedSuperApiToken } from '@packages/lib/middleware/requireSuperApiKey';
 import { ApiError, InvalidApiKeyError } from '@packages/nextjs/errors';
 import { uid } from '@packages/utils/strings';
-import { getVerifiedSuperApiToken } from '@packages/lib/middleware/requireSuperApiKey';
-import { getPermissionsClient } from '@packages/lib/permissions/api';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
@@ -147,15 +145,6 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
  */
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
-    const apiKeyCheck = await setRequestSpaceFromApiKey(req);
-    if (apiKeyCheck.apiKey.type === 'space') {
-      const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
-
-      if (client.type === 'free') {
-        throw new SubscriptionRequiredError();
-      }
-    }
-
     const querySpaceId = req.query?.spaceId;
 
     if (querySpaceId && querySpaceId !== req.authorizedSpaceId) {
@@ -178,10 +167,6 @@ export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, n
 
     req.botUser = botUser;
   } catch (error) {
-    if (error instanceof SubscriptionRequiredError) {
-      throw error;
-    }
-
     log.warn('Found error', error);
     throw new InvalidApiKeyError();
   }

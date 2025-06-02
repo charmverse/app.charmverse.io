@@ -24,10 +24,10 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
         type: 'vote'
       })
     ],
+    archived: false,
     index: 0,
     spaceId,
-    draftReminder: false,
-    archived: false
+    draftReminder: false
   },
   {
     id: uuid(),

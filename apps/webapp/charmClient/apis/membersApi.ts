@@ -1,7 +1,5 @@
 import type { MemberProperty } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
-
-import type { IUser } from 'components/common/DatabaseEditor/user';
 import type {
   CreateMemberPropertyPermissionInput,
   Member,
@@ -13,6 +11,8 @@ import type {
   UpdateMemberPropertyVisibilityPayload
 } from '@packages/lib/members/interfaces';
 import type { RemoveMemberInput } from '@packages/lib/members/removeMember';
+
+import type { IUser } from 'components/common/DatabaseEditor/user';
 
 export class MembersApi {
   getMembers(spaceId: string, search?: string) {

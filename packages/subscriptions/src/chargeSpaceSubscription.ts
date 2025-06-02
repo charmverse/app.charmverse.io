@@ -7,6 +7,7 @@ import { parseUnits } from 'viem';
 
 import type { UpgradableTier } from './constants';
 import { upgradableTiers } from './constants';
+import { updateSubscription } from './updateSubscription';
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
   const startOfMonth = DateTime.now().startOf('month');
@@ -17,6 +18,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     select: {
       subscriptionMonthlyPrice: true,
       subscriptionTier: true,
+      subscriptionCancelledAt: true,
       subscriptionTierChangeEvents: {
         take: 1,
         orderBy: {
@@ -44,21 +46,10 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
   const amountToChargeInWei = parseUnits(amountToCharge.toString(), 18);
 
   if (spaceTokenBalance < amountToChargeInWei) {
-    await prisma.$transaction([
-      prisma.space.update({
-        where: { id: spaceId },
-        data: {
-          subscriptionTier: 'readonly'
-        }
-      }),
-      prisma.spaceSubscriptionTierChangeEvent.create({
-        data: {
-          spaceId,
-          newTier: 'readonly',
-          previousTier: subscriptionTier
-        }
-      })
-    ]);
+    await updateSubscription({
+      spaceId,
+      newTier: 'readonly'
+    });
 
     log.warn(`Insufficient space token balance, space downgraded to readonly tier`, {
       spaceId,
@@ -77,17 +68,11 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
         }
       });
 
-      if (subscriptionTier !== space.subscriptionTier) {
-        await prisma.space.update({
-          where: { id: spaceId },
-          data: { subscriptionTier }
-        });
-        await prisma.spaceSubscriptionTierChangeEvent.create({
-          data: {
-            spaceId,
-            newTier: subscriptionTier,
-            previousTier: space.subscriptionTier!
-          }
+      // the sub is being downgraded because upgrades happen immediately
+      if (space.subscriptionTier !== subscriptionTier) {
+        await updateSubscription({
+          spaceId,
+          newTier: space.subscriptionCancelledAt ? 'readonly' : subscriptionTier
         });
       }
     });

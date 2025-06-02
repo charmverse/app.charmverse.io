@@ -5,8 +5,11 @@ import type { CreateUploadResponse } from 'pages/api/mux/upload';
 import type { UploadRequest, UploadResponse } from 'pages/api/mux/upload/[id]';
 
 export class MuxApi {
-  createUpload() {
-    return http.POST<CreateUploadResponse>('/api/mux/upload');
+  createUpload(fileSize: number, spaceId: string) {
+    return http.POST<CreateUploadResponse>('/api/mux/upload', {
+      fileSize,
+      spaceId
+    });
   }
 
   getAsset(params: AssetRequest) {

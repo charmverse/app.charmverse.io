@@ -8,7 +8,7 @@ import { getAccessTypes, getGateTypes } from './utils';
 export function processTokenGateConditions(tokenGate: TokenGate): {
   numberOfConditions: number;
   chainType: string | string[];
-  accesType: string | string[];
+  accessType: string | string[];
   gateType: string | string[];
 } {
   // Flatten to get all nested conditions in the same flat array
@@ -28,10 +28,10 @@ export function processTokenGateConditions(tokenGate: TokenGate): {
     throw new InvalidInputError('Your token gate must contain at least one condition.');
   }
 
-  const accesType = accessTypes.length === 1 ? accessTypes[0] : accessTypes;
+  const accessType = accessTypes.length === 1 ? accessTypes[0] : accessTypes;
   const gateType = gateTypes.length === 1 ? gateTypes[0] : gateTypes;
 
   const chainType = chains.length === 1 ? chains[0] : chains;
 
-  return { numberOfConditions, chainType, accesType, gateType };
+  return { numberOfConditions, chainType, accessType, gateType };
 }

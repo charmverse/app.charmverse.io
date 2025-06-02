@@ -16,8 +16,6 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
-import { useSummonGate } from './components/SummonGate/hooks/useSummonGate';
-import { SummonGate } from './components/SummonGate/SummonGate';
 import { useTokenGates } from './components/TokenGate/hooks/useTokenGates';
 import { TokenGate } from './components/TokenGate/TokenGate';
 import { SpaceBanModal } from './SpaceBanModal';
@@ -158,7 +156,9 @@ export function SpaceAccessGate({
         </Typography>
       )} */}
 
-      {tokenGate.isEnabled && <TokenGate {...tokenGate} displayAccordion={discordGate.isEnabled} />}
+      {tokenGate.isEnabled && (
+        <TokenGate {...tokenGate} tokenGates={tokenGate.tokenGates?.filter((tk) => !tk.archived) ?? null} />
+      )}
 
       {walletGateEnabled &&
         tokenGate.tokenGateResult &&

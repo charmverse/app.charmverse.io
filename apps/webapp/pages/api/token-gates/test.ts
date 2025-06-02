@@ -1,11 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { TokenGate } from '@packages/lib/tokenGates/interfaces';
 import { validateTokenGate } from '@packages/lib/tokenGates/validateTokenGate';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -22,7 +21,8 @@ async function testTokenGate(req: NextApiRequest, res: NextApiResponse<TokenGate
 
   const tokenGate = await prisma.tokenGate.findUniqueOrThrow({
     where: {
-      id: tokenGateId
+      id: tokenGateId,
+      archived: false
     }
   });
 

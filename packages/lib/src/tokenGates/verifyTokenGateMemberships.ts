@@ -31,6 +31,9 @@ export async function verifyTokenGateMemberships() {
   const userTokenGates = await prisma.userTokenGate.findMany({
     include: {
       tokenGate: {
+        where: {
+          archived: false
+        },
         include: {
           tokenGateToRoles: {
             include: {
@@ -60,6 +63,9 @@ export async function verifyTokenGateMemberships() {
           userTokenGates: {
             include: {
               tokenGate: {
+                where: {
+                  archived: false
+                },
                 include: {
                   tokenGateToRoles: true
                 }

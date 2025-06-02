@@ -1,3 +1,4 @@
+import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
@@ -11,8 +12,11 @@ export function useCustomDomainVerification() {
   const { isFreeSpace } = useIsFreeSpace();
   const { space } = useCurrentSpace();
   const { setSpace } = useSpaces();
-  const hasCustomDomain = !!space?.customDomain && !isFreeSpace;
   const isAdmin = useIsAdmin();
+  const hasAccess = hasCustomDomainAccess(space?.subscriptionTier);
+
+  // Only consider custom domain if space has access to it
+  const hasCustomDomain = !!space?.customDomain && !isFreeSpace && hasAccess;
 
   const [isCustomDomainVerified, setIsCustomDomainVerified] = useState(true);
   const [showCustomDomainVerification, setShowCustomDomainVerification] = useState(!space?.isCustomDomainVerified);
@@ -52,6 +56,7 @@ export function useCustomDomainVerification() {
     isLoading,
     isRefreshing,
     showCustomDomainVerification,
-    setShowCustomDomainVerification
+    setShowCustomDomainVerification,
+    hasAccess
   };
 }

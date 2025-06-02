@@ -1,28 +1,16 @@
-import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
-import { useCallback } from 'react';
-import useSWR from 'swr';
-import useSWRMutation from 'swr/mutation';
+import { getBlockQuotaLimit, hasExceededBlockQuota } from '@packages/subscriptions/featureRestrictions';
 
-import charmClient from 'charmClient';
 import { useBlockCount } from 'components/settings/subscription/hooks/useBlockCount';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useUser } from 'hooks/useUser';
 
 export function useSpaceSubscription() {
-  const { space: currentSpace, refreshCurrentSpace } = useCurrentSpace();
-  const { user } = useUser();
-  const { count, additionalQuota } = useBlockCount();
-
-  const { data: spaceSubscription } = useSWR(
-    !!currentSpace?.id && !!user?.id ? `/spaces/${currentSpace.id}/subscription` : null,
-    () => charmClient.subscription.getSpaceSubscription({ spaceId: currentSpace!.id }),
-    { shouldRetryOnError: false }
-  );
+  const { space: currentSpace } = useCurrentSpace();
+  const { count } = useBlockCount();
 
   const isSpaceReadonly = currentSpace?.subscriptionTier === 'readonly';
 
-  const spaceBlockQuota = defaultFreeBlockQuota * 1000 + (spaceSubscription?.blockQuota || 0) * 1000 + additionalQuota;
-  const hasPassedBlockQuota = (count || 0) > spaceBlockQuota;
+  const spaceBlockQuota = getBlockQuotaLimit(currentSpace?.subscriptionTier);
+  const hasPassedBlockQuota = hasExceededBlockQuota(currentSpace?.subscriptionTier || null, count || 0);
 
   return {
     isSpaceReadonly,
