@@ -75,7 +75,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
     const [isOpened, setIsOpened] = useState(false);
     const focusScheduledRef = useRef(autoOpen);
 
-    const inputRef = useRef<HTMLInputElement>();
+    const inputRef = useRef<HTMLInputElement>(undefined);
 
     function toggleOptionEdit(opened: boolean) {
       if (!opened) {

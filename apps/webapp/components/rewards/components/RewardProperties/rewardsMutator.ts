@@ -122,7 +122,7 @@ export class RewardsMutator extends Mutator {
 
     // reward fields are saved in Reward entity so we don't need to update the block
     // that is why we use external onChange callback
-    const properties = { ...card.fields.properties } || {};
+    const properties = { ...card.fields.properties };
 
     if (value) {
       properties[propertyId] = value;

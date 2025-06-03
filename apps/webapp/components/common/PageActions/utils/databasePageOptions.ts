@@ -230,12 +230,19 @@ export function createCardFieldProperties(
       };
     }
 
-    if (
-      (mappedBoardProperties[key]?.type !== 'select' ||
-        mappedBoardProperties[key]?.type !== 'multiSelect' ||
-        mappedBoardProperties[key]?.type !== 'person') &&
-      propId
-    ) {
+    if (mappedBoardProperties[key]?.type !== 'multiSelect' && propId) {
+      return {
+        ...acc,
+        [propId]: value
+      };
+    }
+    if (mappedBoardProperties[key]?.type !== 'select' && propId) {
+      return {
+        ...acc,
+        [propId]: value
+      };
+    }
+    if (mappedBoardProperties[key]?.type !== 'person' && propId) {
       return {
         ...acc,
         [propId]: value

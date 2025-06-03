@@ -122,7 +122,7 @@ export class ProposalsMutator extends Mutator {
 
     // proposal fields are saved in Proposal entity so we don't need to update the block
     // that is why we use external onChange callback
-    const properties = { ...card.fields.properties } || {};
+    const properties = { ...card.fields.properties };
 
     if (value) {
       properties[propertyId] = value;

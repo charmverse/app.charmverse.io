@@ -1,10 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { getCurrentGasPrice } from '@packages/blockchain/getCurrentGasPrice';
 import { credentialsWalletPrivateKey } from '@packages/utils/constants';
-import { Wallet } from 'ethers';
-
-import { getCurrentGasPrice } from '../../../lib/blockchain/getCurrentGasPrice';
-import { getEthersProvider } from '../../../lib/blockchain/getEthersProvider';
+import { JsonRpcProvider, Wallet } from 'ethers';
 
 import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './getEasInstance';
@@ -18,7 +16,8 @@ export async function revokeAttestation({
 }): Promise<void> {
   const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
-  const provider = getEthersProvider({ rpcUrl });
+  const provider = new JsonRpcProvider(rpcUrl);
+  const gasPrice = await getCurrentGasPrice({ chainId });
 
   const wallet = new Wallet(credentialsWalletPrivateKey as string, provider);
 

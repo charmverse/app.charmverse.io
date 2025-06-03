@@ -134,9 +134,6 @@ export async function applyTokenGates({
     return returnValue;
   }
 
-  // Try to apply discord gate first
-  await applyDiscordGate({ spaceId, userId });
-
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 
   if (spaceMembership && roleIdsToAssign.length === 0) {

@@ -19,7 +19,7 @@ export function plugins() {
         handlePaste: (view: EditorView, rawEvent: ClipboardEvent, slice: Slice) => {
           // @ts-ignore
           const contentRow = slice.content.content?.[0]?.content.content;
-          const tweetParams = extractTweetAttrs(contentRow?.[0]?.text);
+          const tweetParams = extractTweetAttrs(contentRow?.[0]?.text ?? '');
           if (tweetParams) {
             insertNode(name, view.state, view.dispatch, view, tweetParams);
             return true;

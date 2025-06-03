@@ -16,6 +16,7 @@ import {
 import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { isReturnKey } from '@packages/lib/utils/react';
 import type { PluginKey } from 'prosemirror-state';
+import type { ViewDesc } from 'prosemirror-view';
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -25,6 +26,12 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 import type { LinkPluginState } from './link.plugins';
 
+declare global {
+  interface Node {
+    pmViewDesc?: ViewDesc;
+  }
+}
+
 export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkPluginState>; readOnly: boolean }) {
   const { showMessage } = useSnackbar();
   const view = useEditorViewContext();
@@ -32,7 +39,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   const { tooltipContentDOM, show: isVisible, href, ref } = usePluginState(pluginKey) as LinkPluginState;
   const [linkHref, setLinkHref] = useState(href);
   const [linkText, setLinkText] = useState('');
-  const [editAnchor, setEditAnchor] = useState<HTMLElement>(undefined);
+  const [editAnchor, setEditAnchor] = useState<HTMLElement>();
 
   useEffect(() => {
     if (linkView === 'link_form' && ref) {
