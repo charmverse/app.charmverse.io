@@ -5,7 +5,6 @@ import { getCookie, deleteCookie } from '@packages/lib/utils/browser';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useImportDiscordRolesFromServer } from 'charmClient/hooks/discord';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -48,7 +47,6 @@ export function DiscordProvider({ children }: Props) {
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
   const { open: openVerifyOtpModal } = useVerifyLoginOtp();
   const { refreshRoles } = useRoles();
-  const { trigger: importRolesFromDiscordServer, isMutating: isLoadingImportRoles } = useImportDiscordRolesFromServer();
 
   async function disconnect() {
     if (!isConnectDiscordLoading && connectedWithDiscord) {
@@ -110,19 +108,7 @@ export function DiscordProvider({ children }: Props) {
       authFlowType: 'popup'
     });
 
-    const serverCallback = async ({ code, guildId }: { code: string | null; guildId?: string | null }) => {
-      if (!code || !guildId) {
-        return;
-      }
-
-      await importRolesFromDiscordServer(
-        { guildId, spaceId },
-        {
-          onError: () => refreshRoles(),
-          onSuccess: () => refreshRoles()
-        }
-      );
-    };
+    const serverCallback = async ({ code, guildId }: { code: string | null; guildId?: string | null }) => {};
 
     openPopupLogin(discordLoginPath, serverCallback);
   }
