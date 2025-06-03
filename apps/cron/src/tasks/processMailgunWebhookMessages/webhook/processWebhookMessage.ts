@@ -7,7 +7,11 @@ import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@packages/lib/webhookPublisher/publishEvent';
 import { createPageComment } from '@packages/pages/comments/createPageComment';
 
-import type { WebhookMessageProcessResult } from '../../processCollablandWebhookMessages/webhook/interfaces';
+type WebhookMessageProcessResult = {
+  success: boolean;
+  message?: string;
+  spaceIds?: string[];
+};
 
 type WebhookPayload = {
   body: string;
