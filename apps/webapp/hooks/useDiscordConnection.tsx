@@ -153,8 +153,7 @@ export function DiscordProvider({ children }: Props) {
   }, [user, authCode]);
 
   const isConnected = connectedWithDiscord;
-  const isLoading =
-    !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading || isLoadingImportRoles);
+  const isLoading = !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading);
   const error = authError;
 
   const value = useMemo<IDiscordConnectionContext>(
