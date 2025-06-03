@@ -10,6 +10,7 @@ import Input from '@mui/material/OutlinedInput';
 import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { Stack } from '@mui/system';
+import { getAbsolutePath } from '@packages/lib/utils/browser';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -22,7 +23,6 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
-import { getAbsolutePath } from '@packages/lib/utils/browser';
 
 import { TogglePublicProposalTemplates } from './TogglePublicProposalTemplates';
 
@@ -114,11 +114,11 @@ export default function ShareProposals({ padding = 1 }: Props) {
 
   return (
     <Grid container padding={padding} flexDirection='column' display='flex' justifyContent='space-between'>
-      <Grid container item justifyContent='space-between' alignItems='center'>
-        <Grid item>
+      <Grid container justifyContent='space-between' alignItems='center'>
+        <Grid>
           <Typography>Make proposals public</Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <Switch
             checked={proposalsArePublic || isFreeSpace}
             disabled={!isAdmin || isFreeSpace}
@@ -126,7 +126,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
           />
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         {!isFreeSpace && (
           <Stack gap={2}>
             <Typography variant='body2' color='secondary'>
@@ -141,7 +141,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
         )}
         {isFreeSpace && <Alert severity='info'>All proposals in free spaces are publicly visible, except drafts</Alert>}
       </Grid>
-      <Grid item>
+      <Grid>
         <Collapse in={proposalsArePublic}>
           {shareLink && (
             <Box sx={{ mt: 1 }}>

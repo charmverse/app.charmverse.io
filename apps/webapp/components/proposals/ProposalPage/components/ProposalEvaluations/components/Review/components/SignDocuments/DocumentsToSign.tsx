@@ -2,6 +2,8 @@ import type { DocumentSigner } from '@charmverse/core/prisma';
 import { Check as CheckIcon } from '@mui/icons-material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import type { DocumentWithSigners } from '@packages/lib/proposals/documentsToSign/getProposalDocumentsToSign';
+import { getFormattedDateTime } from '@packages/lib/utils/dates';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { useRouter } from 'next/router';
 
@@ -11,8 +13,6 @@ import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { DocumentWithSigners } from '@packages/lib/proposals/documentsToSign/getProposalDocumentsToSign';
-import { getFormattedDateTime } from '@packages/lib/utils/dates';
 
 export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSigner; envelopeId: string }) {
   const { user } = useUser();
@@ -25,11 +25,11 @@ export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSign
 
   return (
     <Grid container>
-      <Grid item xs={8}>
+      <Grid size={8}>
         <Typography>{signer.name}</Typography>
         <Typography variant='caption'>{signer.email}</Typography>
       </Grid>
-      <Grid item xs={4} display='flex' flexDirection='row' justifyContent='flex-end' alignItems='center'>
+      <Grid size={4} display='flex' flexDirection='row' justifyContent='flex-end' alignItems='center'>
         {signer.completedAt && (
           <Tooltip title={`Signature time: ${getFormattedDateTime(signer.completedAt)}`}>
             <Typography variant='caption' display='flex' alignItems='center'>

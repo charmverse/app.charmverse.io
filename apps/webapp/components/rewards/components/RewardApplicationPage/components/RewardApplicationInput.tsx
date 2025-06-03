@@ -105,7 +105,7 @@ export function ApplicationInput({
           style={{ margin: 'auto', width: '100%' }}
         >
           <Grid container direction='column' spacing={1}>
-            <Grid item data-test='application-input'>
+            <Grid data-test='application-input'>
               <CharmEditor
                 content={application?.messageNodes as PageContent}
                 onContentChange={(content) => {
@@ -134,7 +134,7 @@ export function ApplicationInput({
             </Grid>
 
             {!readOnly && (
-              <Grid item display='flex' gap={1} justifyContent='flex-end'>
+              <Grid display='flex' gap={1} justifyContent='flex-end'>
                 {onCancel && (
                   <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
                     Cancel

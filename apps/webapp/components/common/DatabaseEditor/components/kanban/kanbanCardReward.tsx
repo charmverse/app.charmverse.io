@@ -12,7 +12,7 @@ type Props = {
 export function KanbanRewardStatus({ reward }: Props) {
   return (
     <Grid container direction='column' alignItems='center'>
-      <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
+      <Grid size='grow' width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
         <Box
           sx={{
             display: 'flex',

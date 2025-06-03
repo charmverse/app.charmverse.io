@@ -29,7 +29,7 @@ export function DiscordGate({
       >
         <CardContent>
           <Grid container direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <Grid item xs={12} sm={8}>
+            <Grid size={{ xs: 12, sm: 8 }}>
               {isConnectedToDiscord && isVerified && (
                 <Typography>You are a part of this Discord community and you can join it</Typography>
               )}
@@ -44,7 +44,7 @@ export function DiscordGate({
                 </Stack>
               )}
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <Stack justifyContent='center' alignItems='center' height='100%'>
                 {isConnectedToDiscord ? (
                   <Stack justifyContent='end' direction='row' alignSelf='stretch' pr={3}>

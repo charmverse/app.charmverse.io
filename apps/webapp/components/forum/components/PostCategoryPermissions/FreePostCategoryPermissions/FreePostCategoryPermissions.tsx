@@ -20,7 +20,7 @@ export function FreePostCategoryPermissions({ postCategoryId }: Props) {
 
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <PostCategoryRolePermissionRow
           canEdit={false}
           deletePermission={() => null}
@@ -32,7 +32,7 @@ export function FreePostCategoryPermissions({ postCategoryId }: Props) {
         />
       </Grid>
 
-      <Grid item xs={12}>
+      <Grid size={12}>
         <UpgradeWrapper upgradeContext='forum_permissions'>
           <AddRolesRow disabled />
         </UpgradeWrapper>

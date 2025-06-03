@@ -1,6 +1,9 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { submissionStatuses } from '@packages/lib/rewards/constants';
+import type { ApplicationMeta, RewardWithUsers } from '@packages/lib/rewards/interfaces';
+import { formatDate, formatDateTime } from '@packages/lib/utils/dates';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { useMemo } from 'react';
 
@@ -9,9 +12,6 @@ import { NewWorkButton } from 'components/rewards/components/RewardApplications/
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import { submissionStatuses } from '@packages/lib/rewards/constants';
-import type { ApplicationMeta, RewardWithUsers } from '@packages/lib/rewards/interfaces';
-import { formatDate, formatDateTime } from '@packages/lib/utils/dates';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
@@ -68,7 +68,7 @@ function ApplicationRows({
           }
           return (
             <Grid container display='flex' gap={2} key={application.id} alignItems='center' minWidth={500}>
-              <Grid item xs={4} display='flex' flexDirection='row' gap={1}>
+              <Grid size={4} display='flex' flexDirection='row' gap={1}>
                 <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
                 <Typography
                   sx={{
@@ -81,7 +81,7 @@ function ApplicationRows({
                 </Typography>
               </Grid>
 
-              <Grid item xs={2}>
+              <Grid size={2}>
                 <Tooltip title={`Updated at ${formatDateTime(application.updatedAt)}`}>
                   <Typography whiteSpace='nowrap' variant='subtitle2' width='fit-content'>
                     {formatDate(application.updatedAt, { withYear: true })}
@@ -89,7 +89,7 @@ function ApplicationRows({
                 </Tooltip>
               </Grid>
 
-              <Grid item xs={3}>
+              <Grid size={3}>
                 <RewardApplicationStatusChip
                   sx={{
                     width: 'fit-content'
@@ -98,7 +98,7 @@ function ApplicationRows({
                 />
               </Grid>
 
-              <Grid item xs={1}>
+              <Grid size={1}>
                 <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
                   <IconButton
                     size='small'

@@ -1,6 +1,6 @@
-import { styled } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import IconButton from '@mui/material/IconButton';
@@ -57,7 +57,7 @@ export default function Footer() {
       ) : customDomain === null ? (
         <Container pt={5} pb={9} px={3}>
           <Grid container spacing={6}>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <LinkHeader>Links</LinkHeader>
               <StyledLink href='https://charmverse.io' target='_blank'>
                 What is CharmVerse?
@@ -69,12 +69,12 @@ export default function Footer() {
                 Terms
               </StyledLink>
             </Grid>
-            <Grid item xs={12} sm={4}>
+            <Grid size={{ xs: 12, sm: 4 }}>
               <LinkHeader>About</LinkHeader>
               <StyledLink href='mailto:hello@charmverse.io'>hello@charmverse.io</StyledLink>
               <Typography color='secondary'>New York, NY</Typography>
             </Grid>
-            <Grid item xs={12} sm={4} alignItems='center'>
+            <Grid size={{ xs: 12, sm: 4 }} alignItems='center'>
               <LinkHeader>Social</LinkHeader>
               <Box display='flex' alignItems='center' sx={{ justifyContent: { xs: 'center', sm: 'left' } }}>
                 <StyledIconButton href='https://www.linkedin.com/company/charmverse' target='_blank'>

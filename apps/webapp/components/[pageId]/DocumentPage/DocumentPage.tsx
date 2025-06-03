@@ -249,7 +249,7 @@ function DocumentPageComponent({
   }, [printRef, _printRef]);
 
   const containerWidthRef = useRef<HTMLDivElement>(null);
-  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef as RefObject<HTMLElement> });
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead

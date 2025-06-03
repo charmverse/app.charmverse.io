@@ -55,7 +55,7 @@ export function PaidPostCategoryPermissions({ postCategoryId }: Props) {
 
   return (
     <Grid container>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <PostCategoryRolePermissionRow
           canEdit={!!currentUserPermissions?.manage_permissions}
           postCategoryId={postCategoryId}
@@ -67,7 +67,7 @@ export function PaidPostCategoryPermissions({ postCategoryId }: Props) {
         />
       </Grid>
       {rolePermissions.map((rolePermission) => (
-        <Grid item key={rolePermission.id} xs={12}>
+        <Grid key={rolePermission.id} size={12}>
           <PostCategoryRolePermissionRow
             canEdit={!!currentUserPermissions?.manage_permissions}
             postCategoryId={postCategoryId}
@@ -91,7 +91,7 @@ export function PaidPostCategoryPermissions({ postCategoryId }: Props) {
           />
         </Grid>
       )}
-      <Grid item xs={12} display='flex' justifyContent='flex-start'>
+      <Grid size={12} display='flex' justifyContent='flex-start'>
         {!addRolesDialog.isOpen ? (
           <AddRolesRow
             disabled={!canAddRoles}

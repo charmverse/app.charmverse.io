@@ -18,7 +18,7 @@ export function UserProposalsTables() {
   return (
     <Stack gap={2} mt={2} minWidth={1000}>
       {isLoading || !proposals ? (
-        <Grid item xs={12} sx={{ mt: 12 }}>
+        <Grid size={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (

@@ -1,13 +1,13 @@
 import CircleIcon from '@mui/icons-material/Circle';
 import { Box, Checkbox, FormControlLabel, Grid, Stack, Switch, Typography } from '@mui/material';
+import type { NotificationGroup } from '@packages/lib/notifications/interfaces';
+import type { NotificationToggleOption, NotificationToggles } from '@packages/lib/notifications/notificationToggles';
 import type { ReactNode } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { NotificationGroup } from '@packages/lib/notifications/interfaces';
-import type { NotificationToggleOption, NotificationToggles } from '@packages/lib/notifications/notificationToggles';
 
 import type { FormValues } from '../NotificationSettings';
 
@@ -252,7 +252,7 @@ export function SpaceNotificationSettings() {
   const isAdmin = useIsAdmin();
 
   return (
-    <Grid item>
+    <Grid>
       <FieldLabel>Enabled Notifications</FieldLabel>
       <Typography variant='caption' mb={1} component='p'>
         Control notifications for your members.

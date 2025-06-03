@@ -163,7 +163,7 @@ export function GithubSettingsForm({
 
   return (
     <Grid container direction='row' gap={1} justifyContent='space-between' alignItems='center'>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Stack gap={2}>
           <Typography>
             Connected to <strong>{githubAppName}</strong>

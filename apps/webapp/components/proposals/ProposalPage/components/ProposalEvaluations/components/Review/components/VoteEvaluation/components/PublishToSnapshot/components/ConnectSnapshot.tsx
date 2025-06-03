@@ -3,6 +3,7 @@ import { Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 import type { SystemError } from '@packages/utils/errors';
 import { isTruthy } from '@packages/utils/types';
 import { useState } from 'react';
@@ -16,7 +17,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaces } from 'hooks/useSpaces';
-import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 
 export const schema = yup.object({
   snapshotDomain: yup
@@ -75,7 +75,7 @@ export default function ConnectSnapshot() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container direction='column' spacing={1}>
-        <Grid item>
+        <Grid>
           <FieldLabel>Snapshot domain</FieldLabel>
 
           {!space?.snapshotDomain && !isAdmin ? (
@@ -96,13 +96,13 @@ export default function ConnectSnapshot() {
         </Grid>
 
         {formError && (
-          <Grid item>
+          <Grid>
             <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
           </Grid>
         )}
 
         {isAdmin && (
-          <Grid item display='flex' justifyContent='flex-end'>
+          <Grid display='flex' justifyContent='flex-end'>
             <Button size='large' disabled={!isValid || snapshotDomainUnchanged} type='submit'>
               Save
             </Button>

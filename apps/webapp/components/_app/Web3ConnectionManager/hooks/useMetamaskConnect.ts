@@ -1,7 +1,6 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
-import { useRef } from 'react';
-
 import { getBrowserPath, isTouchScreen } from '@packages/lib/utils/browser';
+import { useRef } from 'react';
 
 const MM_DEEPLINK_SCHEMA = 'https://metamask.app.link/dapp/';
 
@@ -10,7 +9,7 @@ export function useMetamaskConnect(handleConnect: () => void) {
   const hasMMInjected = typeof window !== 'undefined' && MetaMaskOnboarding.isMetaMaskInstalled();
 
   // initialize metamask onboarding
-  const onboarding = useRef<MetaMaskOnboarding>();
+  const onboarding = useRef<MetaMaskOnboarding | null>(null);
   if (typeof window !== 'undefined') {
     onboarding.current = new MetaMaskOnboarding();
   }

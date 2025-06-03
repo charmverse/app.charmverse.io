@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import { styled } from '@mui/material';
 import { className as editorClassName } from '@packages/charmeditor/ui';
+import { isTouchScreen } from '@packages/lib/utils/browser';
 import { undo } from 'prosemirror-history';
 import { EditorState } from 'prosemirror-state';
 import type { Plugin, PluginKey } from 'prosemirror-state';
@@ -23,7 +24,6 @@ import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
-import { isTouchScreen } from '@packages/lib/utils/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
@@ -122,7 +122,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   });
   const [editor, setEditor] = useState<CoreBangleEditor>();
   const [showLoader, setShowLoader] = useState(false);
-  const nodeViews = useNodeViews(renderRef);
+  const nodeViews = useNodeViews(renderRef as RefObject<HTMLElement>);
   const { showMessage } = useSnackbar();
   if (enableSuggestions && !trackChanges) {
     log.error('CharmEditor: Suggestions require trackChanges to be enabled');

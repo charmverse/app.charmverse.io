@@ -11,7 +11,7 @@ type Props = {
 
 export function VerifyCheckmark({ isLoading, isVerified }: Props) {
   return (
-    <Grid item xs={2} display='flex' justifyContent='center' alignItems='center'>
+    <Grid size={2} display='flex' justifyContent='center' alignItems='center'>
       {isLoading && <LoadingComponent isLoading height='20px' size={25} />}
       {!isLoading && isVerified && <CheckCircleIcon color='success' />}
       {!isLoading && isVerified === false && <CancelIcon color='error' />}

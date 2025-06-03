@@ -2,6 +2,10 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { getWagmiConfig } from '@packages/blockchain/connectors/config';
+import type {
+  SignatureVerificationPayload,
+  SignatureVerificationPayloadWithAddress
+} from '@packages/lib/blockchain/signAndVerify';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { SystemError } from '@packages/utils/errors';
 import { MissingWeb3AccountError } from '@packages/utils/errors';
@@ -18,10 +22,6 @@ import { getAddress } from 'viem';
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { useAccount, useConnect, useSignMessage } from 'hooks/wagmi';
-import type {
-  SignatureVerificationPayload,
-  SignatureVerificationPayloadWithAddress
-} from '@packages/lib/blockchain/signAndVerify';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
@@ -38,7 +38,7 @@ type IContext = {
   resetSigning: () => void;
   loginFromWeb3Account: (payload?: SignatureVerificationPayload) => Promise<LoggedInUser | undefined>;
   setAccountUpdatePaused: (paused: boolean) => void;
-  signer: Signer | undefined;
+  // signer: Signer | undefined;
   provider: Web3Provider | undefined;
 };
 
@@ -52,7 +52,7 @@ export const Web3Context = createContext<Readonly<IContext>>({
   resetSigning: () => null,
   loginFromWeb3Account: () => Promise.resolve(null as any),
   setAccountUpdatePaused: () => null,
-  signer: undefined,
+  // signer: undefined,
   provider: undefined
 });
 
@@ -238,7 +238,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       resetSigning: () => setIsSigning(false),
       loginFromWeb3Account,
       setAccountUpdatePaused,
-      signer,
+      // signer,
       provider
     }),
     [
@@ -251,7 +251,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setAccountUpdatePaused,
       disconnectWallet,
       loginFromWeb3Account,
-      signer,
+      // signer,
       provider
     ]
   );

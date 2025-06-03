@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import type { ErrorType } from '@packages/utils/errors';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -11,7 +12,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import splashImage from 'public/images/artwork/world.png';
 
 import { LoginButton } from './components/LoginButton';
@@ -138,7 +138,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
             {children}
           </Box>
         </Grid>
-        <Grid item md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
+        <Grid md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
           {image}
         </Grid>
       </Grid>

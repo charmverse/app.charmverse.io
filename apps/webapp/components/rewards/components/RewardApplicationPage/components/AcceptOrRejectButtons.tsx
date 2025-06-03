@@ -1,11 +1,11 @@
 import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import type { ReviewDecision } from '@packages/lib/rewards/reviewApplication';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ReviewDecision } from '@packages/lib/rewards/reviewApplication';
 
 /**
  * @expandedOnLoad Use this to expand the application initially
@@ -49,7 +49,7 @@ export function AcceptOrRejectButtons({
 
   return (
     <Box my={1} gap={1}>
-      <Grid item display='flex' gap={1}>
+      <Grid display='flex' gap={1}>
         <Button
           color={usePaleColor ? 'successPale' : 'success'}
           variant={usePaleColor ? 'contained' : 'outlined'}

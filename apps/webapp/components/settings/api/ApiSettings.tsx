@@ -169,7 +169,7 @@ export function ApiSettings({ space }: { space: Space }) {
           style={{ margin: 'auto' }}
         >
           <Grid container size='grow' mt={2}>
-            <Grid item xs={10}>
+            <Grid size={10}>
               <InputLabel>Events Webhook</InputLabel>
               <Stack flexDirection='row' gap={1}>
                 <TextField
@@ -195,7 +195,7 @@ export function ApiSettings({ space }: { space: Space }) {
               {errors?.webhookUrl && <Alert severity='error'>Invalid webhook url</Alert>}
             </Grid>
             {spaceWebhook?.webhookSigningSecret && isAdmin && (
-              <Grid item xs={10} mt={2}>
+              <Grid size={10} mt={2}>
                 <InputLabel>Webhook Signature Secret</InputLabel>
                 <TextField
                   data-test='webhook-signing-secret'
@@ -260,8 +260,8 @@ export function ApiSettings({ space }: { space: Space }) {
           )}
           {isAdmin && (
             <Grid container size='grow' mt={2}>
-              <Grid item xs mt={2}>
-                <Grid item mt={2}>
+              <Grid size='grow' mt={2}>
+                <Grid mt={2}>
                   <Button
                     type='submit'
                     data-test='submit'

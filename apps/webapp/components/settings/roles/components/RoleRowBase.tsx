@@ -189,13 +189,13 @@ function AddMembersButton({ onAddMembers, eligibleMemberIds, archived }: ButtonP
           <Typography variant='body2'>All eligible members have been added to this role</Typography>
         ) : (
           <Grid container direction='column' spacing={3}>
-            <Grid item>
+            <Grid>
               <InputSearchMemberMultiple
                 filter={{ mode: 'include', userIds: eligibleMemberIds }}
                 onChange={onChangeNewMembers}
               />
             </Grid>
-            <Grid item>
+            <Grid>
               <Button disabled={newMembers.length === 0} onClick={addMembers}>
                 Add
               </Button>

@@ -4,7 +4,7 @@ type Callback = (args?: []) => void;
 
 // https://overreacted.io/making-setinterval-declarative-with-react-hooks/
 export const useInterval = (callback: Callback, delay: number) => {
-  const savedCallback = useRef<Callback>();
+  const savedCallback = useRef<Callback | null>(null);
 
   // Remember the latest callback.
   useEffect(() => {

@@ -79,13 +79,13 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
 
   return (
     <Grid container direction='column' xs spacing={1}>
-      <Grid item>
+      <Grid>
         <FieldLabel>{title}</FieldLabel>
       </Grid>
 
       {keys.map((key) => {
         return (
-          <Grid key={key} item display='flex' alignItems='center' gap={1}>
+          <Grid key={key} display='flex' alignItems='center' gap={1}>
             <TextField
               defaultValue={options[key]}
               fullWidth
@@ -103,7 +103,7 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
         );
       })}
 
-      <Grid item>
+      <Grid>
         <Typography display='flex' alignItems='center' gap={0.5}>
           Add row{' '}
           <IconButton size='small' onClick={addRow}>
@@ -113,7 +113,7 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
       </Grid>
 
       {!hasEnoughOptions && (
-        <Grid item>
+        <Grid>
           <Alert severity='info'>
             Please at least {minimumOptions} non empty option{minimumOptions !== 1 ? 's' : ''}
           </Alert>

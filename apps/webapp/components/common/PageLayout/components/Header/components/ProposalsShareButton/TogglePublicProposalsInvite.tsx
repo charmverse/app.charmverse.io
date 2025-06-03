@@ -50,8 +50,8 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
 
   return (
     <Grid container>
-      <Grid container item justifyContent='space-between' alignItems='center'>
-        <Grid item>
+      <Grid container justifyContent='space-between' alignItems='center'>
+        <Grid>
           <Typography display='flex' justifyContent='center'>
             Show public invite link{' '}
             {publicInviteExists && showOpenSettingsLink && (
@@ -61,11 +61,11 @@ export function TogglePublicProposalsInvite({ showOpenSettingsLink }: Props) {
             )}
           </Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <Switch checked={publicInviteExists} disabled={!isAdmin} onChange={togglePublicInvite} />
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         <Typography variant='body2' color='secondary'>
           {publicInviteExists
             ? 'Anyone can join your space from the proposals page via a public invite link'

@@ -1,9 +1,9 @@
 import { Alert, Grid, Link, Stack, Tooltip, Typography } from '@mui/material';
+import type { ExtendedPoap } from '@packages/lib/blockchain/interfaces';
+import { transformPoap } from '@packages/lib/blockchain/transformPoap';
 
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { ExtendedPoap } from '@packages/lib/blockchain/interfaces';
-import { transformPoap } from '@packages/lib/blockchain/transformPoap';
 
 export function PoapsList({
   poapsError,
@@ -20,7 +20,7 @@ export function PoapsList({
     <Stack gap={1} data-test='member-profile-poap-list'>
       <Typography variant='h6'>Recent POAPs</Typography>
       {poapsError && (
-        <Grid item>
+        <Grid>
           <Alert severity='error'>Failed to fetch your poaps</Alert>
         </Grid>
       )}

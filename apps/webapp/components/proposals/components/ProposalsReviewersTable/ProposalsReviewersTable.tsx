@@ -1,6 +1,6 @@
-import { styled } from '@mui/material';
 import ProposalIcon from '@mui/icons-material/TaskOutlined';
 import {
+  styled,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -58,7 +58,7 @@ export function ProposalsReviewersTable() {
   return (
     <Stack gap={2} mt={2} minWidth={1000}>
       {isLoading || !proposalsReviewers ? (
-        <Grid item xs={12} sx={{ mt: 12 }}>
+        <Grid size={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (

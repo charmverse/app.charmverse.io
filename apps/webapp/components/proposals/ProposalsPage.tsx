@@ -1,10 +1,9 @@
-import { styled } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
 import InboxIcon from '@mui/icons-material/Inbox';
 import PersonIcon from '@mui/icons-material/Person';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { styled, Box, Grid, Stack, Typography } from '@mui/material';
 import Tabs from '@mui/material/Tabs';
 import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
@@ -328,7 +327,7 @@ export function ProposalsPage({ title }: { title: string }) {
       </DatabaseStickyHeader>
 
       {isLoading ? (
-        <Grid item xs={12} sx={{ mt: 12 }}>
+        <Grid size={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (

@@ -35,9 +35,6 @@ export function ProfileWidgets({
     canEditSpaceProfile
   } = useMemberPropertyValues(userId);
   const { memberProfileTypes } = useMemberProfileTypes();
-  const { data: lensProfile = null, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
-    charmClient.publicProfile.getLensProfile(userId)
-  );
   const { isLoading: isLoadingUserCredentials, data: userCredentials } = useGetUserCredentials({ userId });
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
     charmClient.publicProfile.getEnsProfile(userId)
@@ -62,7 +59,6 @@ export function ProfileWidgets({
     isFetchingPoaps &&
     isFetchingNfts &&
     isLoadingMemberPropertiesValues &&
-    isLoadingLensProfile &&
     isLoadingUserCredentials;
 
   if (isLoading) {
@@ -77,7 +73,7 @@ export function ProfileWidgets({
             case 'ens':
               return (
                 ensProfile && (
-                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                  <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                     <EnsWidget ensProfile={ensProfile} />
                   </Grid>
                 )
@@ -87,7 +83,7 @@ export function ProfileWidgets({
               return (
                 userCredentials &&
                 userCredentials?.length !== 0 && (
-                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                  <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                     <CredentialsWidget setActiveTab={setActiveTab} credentials={userCredentials ?? []} />
                   </Grid>
                 )
@@ -97,7 +93,7 @@ export function ProfileWidgets({
               return (
                 !hideCollections &&
                 (!nftsError || !poapsError) && (
-                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                  <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                     <CollectionWidget
                       mutateNfts={mutateNfts}
                       nfts={nfts}
@@ -111,7 +107,7 @@ export function ProfileWidgets({
 
             case 'charmverse':
               return space ? (
-                <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                   <MemberPropertiesWidget
                     memberPropertyValues={memberPropertyValues}
                     readOnly={readOnlyMemberProperties}
@@ -123,7 +119,7 @@ export function ProfileWidgets({
             case 'summon': {
               return (
                 summonProfile && (
-                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                  <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
                     <SummonProfileWidget summonProfile={summonProfile} />
                   </Grid>
                 )

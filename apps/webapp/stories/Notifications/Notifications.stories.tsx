@@ -194,7 +194,7 @@ export function NotificationTypes() {
           </Typography>
           <Grid container columnSpacing={4}>
             {notifications.map((notification) => (
-              <Grid item xs={12} md={6} key={notification.id}>
+              <Grid size={{ xs: 12, md: 6 }} key={notification.id}>
                 <NotificationContent
                   notification={notification}
                   markNotifications={noop}
