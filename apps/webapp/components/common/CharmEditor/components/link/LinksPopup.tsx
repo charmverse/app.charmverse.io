@@ -16,7 +16,6 @@ import {
 import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { isReturnKey } from '@packages/lib/utils/react';
 import type { PluginKey } from 'prosemirror-state';
-import type { ViewDesc } from 'prosemirror-view';
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -25,12 +24,6 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 import type { LinkPluginState } from './link.plugins';
-
-declare global {
-  interface Node {
-    pmViewDesc?: ViewDesc;
-  }
-}
 
 export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkPluginState>; readOnly: boolean }) {
   const { showMessage } = useSnackbar();

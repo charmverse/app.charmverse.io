@@ -111,6 +111,7 @@
     "@decent.xyz/the-box": "^3.1.15",
     "@delegatexyz/sdk": "^0.5.2",
     "@emotion/babel-preset-css-prop": "^11.12.0",
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.13.3",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.14.0",
