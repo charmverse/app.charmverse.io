@@ -4,7 +4,7 @@ import { getChainById } from '@packages/blockchain/connectors/chains';
 import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from '@packages/lib/gnosis/mantleClient';
 import { isTruthy } from '@packages/utils/types';
-import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import type { MetaTransactionData } from '@safe-global/types-kit';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
@@ -87,7 +87,7 @@ export function useMultiGnosisPayment({
     });
 
     const EthersAdapter = (await import('@safe-global/safe-ethers-lib')).default;
-    const SafeServiceClient = (await import('@safe-global/safe-service-client')).default;
+    const SafeServiceClient = (await import('@safe-global/api-kit')).default;
 
     const txHash = await safe.getTransactionHash(safeTransaction);
     const senderSignature = await safe.signTransactionHash(txHash);

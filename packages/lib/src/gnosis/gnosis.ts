@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { getChainById, getChainList } from '@packages/blockchain/connectors/chains';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
-import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
+import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/api-kit';
 import { RateLimit } from 'async-sema';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';

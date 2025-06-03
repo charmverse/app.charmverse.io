@@ -2,6 +2,7 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import { prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 import { updateBoardProperties } from '@packages/databases/proposalsSource/updateBoardProperties';
 import { updateViews } from '@packages/databases/proposalsSource/updateViews';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
@@ -11,8 +12,6 @@ import { ActionNotPermittedError, NotFoundError } from '@packages/nextjs/errors'
 import { relay } from '@packages/websockets/relay';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

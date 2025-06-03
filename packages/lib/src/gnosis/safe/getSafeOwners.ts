@@ -1,6 +1,7 @@
 import { getPublicClient } from '@packages/lib/blockchain/publicClient';
-import { SafeAbi } from '@packages/lib/gnosis/safe/abi/SafeAbi';
 import { getAddress } from 'viem';
+
+import { SafeAbi } from './abi/SafeAbi';
 
 export async function getSafeOwners({
   address,

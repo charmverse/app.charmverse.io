@@ -1,13 +1,13 @@
 import { log } from '@charmverse/core/log';
 import { ApplicationStatus } from '@charmverse/core/prisma';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
-import type { SafeMultisigTransactionResponse } from '@safe-global/safe-core-sdk-types';
+import type { SafeMultisigTransactionResponse } from '@safe-global/types-kit';
 
 import { getAllMantleSafeTransactions, getMantleSafeTransaction } from './mantleClient';
 
 export type SafeTxStatusDetails = {
   status: ApplicationStatus;
-  chainTxHash?: string;
+  chainTxHash: string | null;
   safeTxHash: string;
 };
 
@@ -70,12 +70,12 @@ export async function getSafeTxStatus({
         return { status, chainTxHash, safeTxHash };
       }
       // check if tx was replaced with other tx with the same nonce
-      const executedTxs = await safeApiClient.getAllTransactions(safeTx.safe, { executed: true });
+      const executedTxs = await safeApiClient.getAllTransactions(safeTx.safe, { executed: true } as any);
       const replacedTx = executedTxs.results.find((tx) => 'nonce' in tx && tx.nonce === nonce);
 
       // orginal tx was replaced with other tx
       if (replacedTx) {
-        const replacedChainTxHash = 'transactionHash' in replacedTx ? replacedTx.transactionHash : undefined;
+        const replacedChainTxHash = 'transactionHash' in replacedTx ? replacedTx.transactionHash! : null;
         return { status: ApplicationStatus.cancelled, chainTxHash: replacedChainTxHash, safeTxHash };
       }
 

@@ -4,12 +4,11 @@ import { projectFieldProperties, projectMemberFieldProperties } from '@packages/
 import type { FormFieldInput, SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
-
 import type { IPropertyTemplate } from '../board';
 import { proposalDbProperties } from '../proposalDbProperties';
 
 import { filterBoardProperties } from './filterBoardProperties';
+import type { SelectedProposalProperties } from './interfaces';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label', 'optimism_project_profile'];

@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { AttestationType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uniqueValues } from '@packages/utils/array';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { uniqueValues } from '@packages/utils/array';
 
 import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
@@ -114,7 +114,7 @@ export async function indexGnosisSafeCredentialTransaction({
   if (!onchainTxHash) {
     const safeInfo = await apiClient.getSafeInfo(pendingSafeTransaction.safe);
 
-    const safeNonce = safeInfo.nonce;
+    const safeNonce = Number(safeInfo.nonce);
 
     if (safeNonce > pendingSafeTransaction.nonce) {
       log.info(`Safe transaction ${safeTxHash} on chain ${chainId} has been replaced by another transaction`);

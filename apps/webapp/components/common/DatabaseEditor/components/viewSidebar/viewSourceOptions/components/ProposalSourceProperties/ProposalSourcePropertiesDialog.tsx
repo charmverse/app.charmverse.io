@@ -2,6 +2,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Dialog, Divider, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
+import { defaultProposalPropertyTypes } from '@packages/databases/proposalDbProperties';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 import { useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -9,11 +11,9 @@ import MultiTabs from 'components/common/MultiTabs';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { defaultProposalPropertyTypes } from '@packages/databases/proposalDbProperties';
 
 import { CustomPropertiesList, CustomPropertiesReadonlyList } from './CustomPropertiesList';
 import { FormFieldPropertiesList } from './FormFieldPropertiesList';
-import type { SelectedProposalProperties } from './interfaces';
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadonlyList } from './ProjectProfilePropertiesList';
 import { ProposalDefaultPropertiesList, ProposalDefaultPropertiesReadonlyList } from './ProposalDefaultPropertiesList';
 import { RubricEvaluationPropertiesList } from './RubricEvaluationPropertiesList';

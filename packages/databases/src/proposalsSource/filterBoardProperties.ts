@@ -1,11 +1,10 @@
 import { projectFieldProperties, projectMemberFieldProperties } from '@packages/lib/projects/formField';
 
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
-
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
 
 import type { EvaluationStep } from './getBoardProperties';
+import type { SelectedProposalProperties } from './interfaces';
 
 export function filterBoardProperties({
   boardProperties,

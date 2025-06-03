@@ -1,5 +1,5 @@
 import type { IChainDetails } from '@packages/blockchain/connectors/chains';
-import type SafeServiceClient from '@safe-global/safe-service-client';
+import type SafeApiKit from '@safe-global/api-kit';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
@@ -20,9 +20,9 @@ export function useSafeService({ network }: { network?: IChainDetails | null }) 
         signerOrProvider: provider
       });
 
-      import('@safe-global/safe-service-client').then((safeServiceClient) => {
+      import('@safe-global/api-kit').then((safeServiceClient) => {
         const SafeServiceClient = safeServiceClient.default;
-        setSafeService(new SafeServiceClient({ txServiceUrl: gnosisUrl, ethAdapter }));
+        setSafeService(new SafeApiKit({ txServiceUrl: gnosisUrl, ethAdapter }));
       });
     });
   }, [provider, network]);

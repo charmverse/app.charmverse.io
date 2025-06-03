@@ -1,10 +1,10 @@
 import { projectFieldProperties, projectMemberFieldProperties } from '@packages/lib/projects/formField';
-
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import type { ProposalTemplateMeta } from '@packages/lib/proposals/getProposalTemplates';
 
 import type { Board } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
+
+import type { SelectedProposalProperties } from './interfaces';
 
 export function createSelectedPropertiesStateFromBoardProperties({
   cardProperties,

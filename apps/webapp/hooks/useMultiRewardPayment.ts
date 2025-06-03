@@ -2,7 +2,7 @@ import type { Bounty } from '@charmverse/core/prisma';
 import { Interface } from '@ethersproject/abi';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { eToNumber } from '@packages/lib/utils/numbers';
-import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import type { MetaTransactionData } from '@safe-global/types-kit';
 import { ethers } from 'ethers';
 import { useCallback } from 'react';
 import { getAddress, parseUnits } from 'viem';

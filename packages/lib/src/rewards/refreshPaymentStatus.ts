@@ -1,10 +1,10 @@
 import type { Transaction } from '@charmverse/core/prisma';
 import { ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { DataNotFoundError } from '@packages/utils/errors';
 import type { SafeTxStatusDetails } from '@packages/lib/gnosis/getSafeTxStatus';
 import { getSafeTxStatus } from '@packages/lib/gnosis/getSafeTxStatus';
 import { rollupRewardStatus } from '@packages/lib/rewards/rollupRewardStatus';
+import { DataNotFoundError } from '@packages/utils/errors';
 
 export async function refreshPaymentStatus({ applicationId }: { applicationId: string }) {
   const application = await prisma.application.findUnique({
