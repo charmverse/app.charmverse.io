@@ -34,7 +34,7 @@ const Alert = forwardRef<HTMLDivElement, AlertProps>((props, ref) => {
 });
 
 export function ForumPostList({ search, categoryId, sort }: ForumPostsProps) {
-  const ref = useRef();
+  const ref = useRef(undefined);
   const { space: currentSpace } = useCurrentSpace();
   const bottomPostReached = useOnScreen(ref);
   const [morePostsAvailable, setMorePostsAvailable] = useState(false);

@@ -45,7 +45,7 @@ export function handleReturnedServerError(
   return withoutStack;
 }
 
-export function handleServerErrorLog(err: any, utils: ServerErrorFunctionUtils<MetadataSchema>): MaybePromise<void> {
+export async function handleServerErrorLog(err: any, utils: ServerErrorFunctionUtils<MetadataSchema>): Promise<void> {
   const clientInput = utils?.clientInput;
   const metadata = utils?.metadata;
   const ctx = utils?.ctx;

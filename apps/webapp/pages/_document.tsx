@@ -7,7 +7,7 @@ export default function MyDocument(props: any) {
   return (
     <Html lang='en'>
       <Head>
-        {/* <DocumentHeadTags {...props} /> */}
+        <DocumentHeadTags {...props} />
         <meta name='theme-color' content={blueColor} />
         <link rel='icon' href='/favicon.png' />
         <script src='/__ENV.js' />

@@ -32,7 +32,7 @@ export function LinksPopup({ pluginKey, readOnly }: { pluginKey: PluginKey<LinkP
   const { tooltipContentDOM, show: isVisible, href, ref } = usePluginState(pluginKey) as LinkPluginState;
   const [linkHref, setLinkHref] = useState(href);
   const [linkText, setLinkText] = useState('');
-  const [editAnchor, setEditAnchor] = useState<HTMLElement | null>(null);
+  const [editAnchor, setEditAnchor] = useState<HTMLElement>(undefined);
 
   useEffect(() => {
     if (linkView === 'link_form' && ref) {

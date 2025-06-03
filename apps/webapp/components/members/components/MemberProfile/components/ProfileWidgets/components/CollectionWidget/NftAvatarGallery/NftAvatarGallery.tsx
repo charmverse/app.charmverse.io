@@ -55,7 +55,7 @@ export default function NftAvatarGallery({
       <Grid container spacing={1}>
         {isLoading ? (
           [0, 1, 2].map((id) => (
-            <Grid key={id} item xs={6} sm={3} sx={{ minWidth: 110 }}>
+            <Grid key={id} size={{ xs: 6, sm: 3 }} sx={{ minWidth: 110 }}>
               <Stack spacing={1}>
                 <Skeleton variant='rectangular' width={100} height={80} />
                 <Skeleton variant='text' sx={{ fontSize: '1rem' }} />
@@ -64,7 +64,7 @@ export default function NftAvatarGallery({
           ))
         ) : nfts?.length ? (
           nfts.map((nft) => (
-            <Grid key={`${nft.contract}-${nft.tokenId}`} item xs={6} sm={3} sx={{ minWidth: 110 }}>
+            <Grid key={`${nft.contract}-${nft.tokenId}`} size={{ xs: 6, sm: 3 }} sx={{ minWidth: 110 }}>
               <NftGalleryItem nft={nft} onClick={() => onSelect?.(nft)} isSelected={getIsSelected(nft)} />
             </Grid>
           ))

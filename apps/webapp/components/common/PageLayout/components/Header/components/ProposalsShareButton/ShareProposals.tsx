@@ -161,7 +161,7 @@ export default function ShareProposals({ padding = 1 }: Props) {
           )}
         </Collapse>
       </Grid>
-      <Grid mt={2} item justifyContent='space-between' alignItems='center'>
+      <Grid mt={2} justifyContent='space-between' alignItems='center'>
         <TogglePublicProposalTemplates />
       </Grid>
 

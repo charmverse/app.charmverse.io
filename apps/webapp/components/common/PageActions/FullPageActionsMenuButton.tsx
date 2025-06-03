@@ -36,7 +36,7 @@ export function FullPageActionsMenuButton({
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const pageMenuAnchor = useRef();
+  const pageMenuAnchor = useRef(undefined);
   const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));

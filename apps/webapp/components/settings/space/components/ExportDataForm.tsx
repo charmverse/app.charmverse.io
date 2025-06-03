@@ -12,7 +12,7 @@ export function ExportDataForm({ spaceId, isAdmin }: { spaceId: string; isAdmin:
   const { showConfirmation } = useConfirmationModal();
   const { data: exportData, isMutating: isExportDataLoading, trigger: exportSpaceData } = useRequestExportData(spaceId);
   const { data: job, mutate: refreshJob, isLoading: isJobLoading } = useGetExportJobStatus(spaceId, exportData?.jobId);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
     clearInterval(intervalRef.current);

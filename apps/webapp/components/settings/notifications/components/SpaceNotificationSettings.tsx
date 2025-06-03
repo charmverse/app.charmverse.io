@@ -139,7 +139,7 @@ function NotificationRuleComponent({
       <Typography sx={{ my: 1 }}>{title}</Typography>
       <Grid container sx={{ mb: 2, maxWidth: 600 }}>
         {typeColumns.map((types) => (
-          <Grid xs={12} md={6} item key={types.map((e) => e.label).join()}>
+          <Grid size={{ xs: 12, md: 6 }} key={types.map((e) => e.label).join()}>
             <Typography variant='caption'>
               <Stack ml={1}>
                 {types.map((event) =>

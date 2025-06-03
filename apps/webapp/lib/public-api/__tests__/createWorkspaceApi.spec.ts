@@ -15,18 +15,6 @@ vi.mock('@packages/lib/blockchain/getNFTs', () => {
   };
 });
 
-vi.mock('@packages/lib/discord/collabland/upsertUserRolesFromDiscord', () => {
-  return {
-    upsertUserRolesFromDiscord: () => Promise.resolve()
-  };
-});
-
-vi.mock('@packages/lib/discord/collabland/upsertSpaceRolesFromDiscord', () => {
-  return {
-    upsertSpaceRolesFromDiscord: () => Promise.resolve()
-  };
-});
-
 afterAll(async () => {
   vi.resetModules();
 });

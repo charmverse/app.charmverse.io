@@ -64,7 +64,7 @@ export function PageTitleInput({
   // const view = useContext(EditorViewContext);
   const [title, setTitle] = useState(value);
   const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
-  const titleInput = useRef<HTMLTextAreaElement>(null);
+  const titleInput = useRef<HTMLTextAreaElement>(undefined);
   const { isOrWasComposing } = useIMEComposition(titleInput as RefObject<HTMLTextAreaElement>);
 
   function _onChange(event: ChangeEvent<HTMLInputElement>) {

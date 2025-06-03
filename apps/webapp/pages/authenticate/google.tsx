@@ -1,11 +1,11 @@
 import Box from '@mui/material/Box';
+import type { GooglePopupLoginState } from '@packages/lib/oauth/interfaces';
 import { useRouter } from 'next/router';
 import Script from 'next/script';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { googleSignInScript, useGoogleLogin } from 'hooks/useGoogleLogin';
-import type { GooglePopupLoginState } from '@packages/lib/oauth/interfaces';
 
 export default function Oauth() {
   const { onLoadScript, loginWithGoogleRedirect, isLoaded } = useGoogleLogin();

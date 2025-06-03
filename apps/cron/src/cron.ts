@@ -10,8 +10,6 @@ import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { task as pollForDataExports } from './tasks/exportSpaceData';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
-import { task as processCollablandWebhookMessages } from './tasks/processCollablandWebhookMessages';
-import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
 import { task as processMailgunWebhookMessages } from './tasks/processMailgunWebhookMessages';
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
@@ -30,12 +28,6 @@ import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateM
 // relay.bindServer(new Server());
 
 log.info('Starting cron jobs');
-
-// Start processing collabland webhook messages
-processCollablandWebhookMessages();
-
-// Start processing github webhook messages
-processGithubWebhookMessages();
 
 // Start processing synaps webhook messages
 processSynapsWebhookMessages();

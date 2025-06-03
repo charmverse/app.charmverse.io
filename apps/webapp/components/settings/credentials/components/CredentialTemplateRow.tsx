@@ -32,7 +32,7 @@ export function CredentialTemplateRow({
     open: openDeleteDialog
   } = usePopupState({ variant: 'popover', popupId: 'credential-delete-popup' });
 
-  const pageMenuAnchor = useRef();
+  const pageMenuAnchor = useRef(undefined);
 
   return (
     <Box display='flex' justifyContent='space-between'>

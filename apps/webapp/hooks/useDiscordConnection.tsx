@@ -1,4 +1,7 @@
 import { log } from '@charmverse/core/log';
+import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from '@packages/lib/discord/constants';
+import { getDiscordLoginPath } from '@packages/lib/discord/getDiscordLoginPath';
+import { getCookie, deleteCookie } from '@packages/lib/utils/browser';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -6,9 +9,6 @@ import { useImportDiscordRolesFromServer } from 'charmClient/hooks/discord';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from '@packages/lib/discord/constants';
-import { getDiscordLoginPath } from '@packages/lib/discord/getDiscordLoginPath';
-import { getCookie, deleteCookie } from '@packages/lib/utils/browser';
 
 import { useRoles } from './useRoles';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

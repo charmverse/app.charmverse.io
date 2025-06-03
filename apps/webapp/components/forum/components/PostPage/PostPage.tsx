@@ -132,7 +132,7 @@ export function PostPage({
   }, [post]);
 
   // keep a ref in sync for printing
-  const printRef = useRef(null);
+  const printRef = useRef(undefined);
   useEffect(() => {
     if (printRef?.current !== _printRef?.current) {
       setPageProps({

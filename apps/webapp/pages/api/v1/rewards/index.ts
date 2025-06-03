@@ -172,11 +172,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse) {
       .map(async (application) => {
         if (!application.walletAddress) {
           return null;
-        } else if (
-          application.walletAddress &&
-          application.walletAddress.endsWith('.eth') &&
-          ethers.utils.isValidName(application.walletAddress)
-        ) {
+        } else if (application.walletAddress && application.walletAddress.endsWith('.eth')) {
           const resolvedWalletAddress = await resolveENSName(application.walletAddress);
 
           if (!resolvedWalletAddress) {

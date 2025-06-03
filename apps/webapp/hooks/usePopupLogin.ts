@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-
 import type { OauthLoginState } from '@packages/lib/oauth/interfaces';
+import { useEffect, useRef, useState } from 'react';
 
 const windowParams = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=500,height=650,left=50%,top=50%`;
 
 export function usePopupLogin<T>() {
   const [popupWindow, setPopupWindow] = useState<Window | null>(null);
-  const loginCallbackRef = useRef<(data: OauthLoginState<T>) => void>();
+  const loginCallbackRef = useRef<(data: OauthLoginState<T>) => void>(undefined);
 
   useEffect(() => {
     if (popupWindow) {

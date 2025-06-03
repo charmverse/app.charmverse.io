@@ -36,7 +36,7 @@ export const pastePdfPlugin = new Plugin({
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content?.[0];
       if ((contentRow?.text as string)?.startsWith('http')) {
-        const embedUrl = contentRow.text.split('.');
+        const embedUrl = contentRow.text!.split('.');
         if (embedUrl[embedUrl.length - 1].match(/(pdf)/)) {
           insertPDFNode(view.state, view.dispatch, view, { src: contentRow.text });
           return true;

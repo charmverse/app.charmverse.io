@@ -47,15 +47,15 @@ export function AppThemeProvider({ children, forceTheme }: { children: React.Rea
   }, [savedDarkMode]);
 
   return (
-    // <AppCacheProvider>
-    <ColorModeProvider toggleColorMode={toggleColorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline enableColorScheme={true} />
-        <Global styles={cssVariables} />
+    <AppCacheProvider>
+      <ColorModeProvider toggleColorMode={toggleColorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline enableColorScheme={true} />
+          <Global styles={cssVariables} />
 
-        <span className={`${serifFont.variable} ${monoFont.variable}`}>{children}</span>
-      </ThemeProvider>
-    </ColorModeProvider>
-    // </AppCacheProvider>
+          <span className={`${serifFont.variable} ${monoFont.variable}`}>{children}</span>
+        </ThemeProvider>
+      </ColorModeProvider>
+    </AppCacheProvider>
   );
 }

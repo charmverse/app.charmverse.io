@@ -98,9 +98,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
     <Container px={3} data-test='login-page-content'>
       <Grid container>
         <Grid
-          item
-          xs={12}
-          md={6}
+          size={{ xs: 12, md: 6 }}
           sx={{
             display: 'flex',
             justifyContent: {
@@ -138,7 +136,7 @@ export function LoginPageContent({ hideLoginOptions, isLoggingIn, children }: Pr
             {children}
           </Box>
         </Grid>
-        <Grid md={6} display={{ xs: 'none', md: 'block' }} alignItems='center'>
+        <Grid size={{ md: 6 }} display={{ xs: 'none', md: 'block' }} alignItems='center'>
           {image}
         </Grid>
       </Grid>

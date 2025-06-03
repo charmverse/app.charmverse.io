@@ -14,8 +14,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 
-import { DiscordGate } from './components/DiscordGate/DiscordGate';
-import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
 import { useTokenGates } from './components/TokenGate/hooks/useTokenGates';
 import { TokenGate } from './components/TokenGate/TokenGate';
 import { SpaceBanModal } from './SpaceBanModal';
@@ -35,12 +33,6 @@ export function SpaceAccessGate({
   const { showMessage } = useSnackbar();
   const { user } = useUser();
   const { account, loginFromWeb3Account } = useWeb3Account();
-
-  const discordGate = useDiscordGate({
-    joinType,
-    spaceDomain: space.domain,
-    onSuccess: onJoinSpace
-  });
 
   // leaving this here for now in case we change our mind in the next few weeks - July 29/2024
   const summonGate: any = {};
@@ -145,8 +137,6 @@ export function SpaceAccessGate({
           The following criteria must be met to join:
         </Typography>
       )}
-
-      {discordGate.isEnabled && <DiscordGate {...discordGate} />}
 
       {/* {summonGate.isEnabled && <SummonGate {...summonGate} />}
 

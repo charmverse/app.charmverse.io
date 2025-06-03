@@ -2,7 +2,7 @@
 // source: https://docs.attest.org/docs/developer-tools/sdk-wagmi
 
 import type { JsonRpcProvider, JsonRpcSigner } from '@ethersproject/providers';
-import { providers } from 'ethers';
+import { FallbackProvider, Web3Provider } from 'ethers';
 import { useEffect, useState } from 'react';
 import { type HttpTransport, type PublicClient, type WalletClient } from 'viem';
 import { usePublicClient, useWalletClient } from 'wagmi';
@@ -15,12 +15,10 @@ export function publicClientToProvider(publicClient: PublicClient) {
     ensAddress: chain!.contracts?.ensRegistry?.address
   };
   if (transport.type === 'fallback')
-    return new providers.FallbackProvider(
-      (transport.transports as ReturnType<HttpTransport>[]).map(
-        ({ value }) => new providers.JsonRpcProvider(value?.url, network)
-      )
+    return new FallbackProvider(
+      (transport.transports as ReturnType<HttpTransport>[]).map(({ value }) => new JsonRpcProvider(value?.url, network))
     );
-  return new providers.JsonRpcProvider(transport.url, network);
+  return new JsonRpcProvider(transport.url, network);
 }
 
 export function walletClientToSigner(walletClient: WalletClient) {
@@ -30,7 +28,7 @@ export function walletClientToSigner(walletClient: WalletClient) {
     name: chain!.name,
     ensAddress: chain!.contracts?.ensRegistry?.address
   };
-  const provider = new providers.Web3Provider(transport, network);
+  const provider = new Web3Provider(transport, network);
   const signer = provider.getSigner(account!.address);
 
   return signer;

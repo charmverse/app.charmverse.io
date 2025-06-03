@@ -1,16 +1,15 @@
 import { log } from '@charmverse/core/log';
-import { trackOpSpaceSuccessfulSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
-import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
-import { InvalidStateError } from '@packages/nextjs/errors';
-import type { LoggedInUser } from '@packages/profile/getUser';
 import { isTestEnv } from '@packages/config/constants';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { loginByDiscord } from '@packages/lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
 import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { trackOpSpaceSuccessfulSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
+import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
+import { InvalidStateError } from '@packages/nextjs/errors';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -77,7 +77,7 @@ function TableHeader(props: Props): JSX.Element {
   const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
-  const toggleRef = useRef(null);
+  const toggleRef = useRef(undefined);
 
   const popover = bindPopover(popupState);
   const popoverProps: PopoverProps = {

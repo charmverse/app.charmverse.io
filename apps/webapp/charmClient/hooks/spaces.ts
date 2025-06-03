@@ -9,8 +9,6 @@ import type {
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
-import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
-import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGET, useGETImmutable, usePOST, usePUT } from './helpers';
@@ -57,14 +55,6 @@ export function useUpdateSpace(spaceId: MaybeString) {
 
 export function useDisconnectGithubApplication(spaceId: string) {
   return useDELETE(`/api/spaces/${spaceId}/github/disconnect`);
-}
-
-export function useGetGithubApplicationData(spaceId: string) {
-  return useGETImmutable<GithubApplicationData>(`/api/spaces/${spaceId}/github`);
-}
-
-export function useConnectGithubRepository(spaceId: string) {
-  return usePOST<ConnectRewardGithubRepoPayload, RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo`);
 }
 
 export function useRequestExportData(spaceId: string) {
