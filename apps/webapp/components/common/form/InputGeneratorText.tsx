@@ -78,7 +78,7 @@ export default function InputGeneratorText({ onChange, title = 'Options', minimu
   }
 
   return (
-    <Grid container direction='column' xs spacing={1}>
+    <Grid container direction='column' size='grow' spacing={1}>
       <Grid>
         <FieldLabel>{title}</FieldLabel>
       </Grid>

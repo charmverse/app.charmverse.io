@@ -1,16 +1,15 @@
 import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { createFrameActionMessageWithSignerKey } from '@packages/lib/farcaster/createFrameActionMessageWithSignerKey';
+import { onError, onNoMatch } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { isValidUrl } from '@packages/lib/utils/isValidUrl';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { decryptData } from '@packages/utils/dataEncryption';
 import type { ActionIndex, Frame, FrameButton } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { createFrameActionMessageWithSignerKey } from '@packages/lib/farcaster/createFrameActionMessageWithSignerKey';
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
-import { isValidUrl } from '@packages/lib/utils/isValidUrl';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -132,7 +131,7 @@ async function getNextFrame(req: NextApiRequest, res: NextApiResponse<FrameActio
 
   const htmlString = await response.text();
 
-  const { frame } = getFrame({ htmlString, url: postUrl });
+  const { frame } = await getFrame({ htmlString, frameUrl: postUrl, url: postUrl });
 
   if (!frame) {
     throw new InvalidInputError('Invalid Farcaster frame URL');

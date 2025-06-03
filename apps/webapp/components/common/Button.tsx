@@ -1,16 +1,15 @@
 'use client';
 
-import { styled } from '@mui/material';
-import { Tooltip } from '@mui/material';
+import { styled, Tooltip } from '@mui/material';
 import MaterialButton from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import MuiLink from '@mui/material/Link';
+import { getSubdomainPath } from '@packages/lib/utils/browser';
 import NextLink from 'next/link';
 import type { ComponentProps, ElementType, MouseEventHandler } from 'react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSubdomainPath } from '@packages/lib/utils/browser';
 
 const StyledButton = styled(MaterialButton)`
   white-space: nowrap;
@@ -35,7 +34,7 @@ export const CharmedButton = forwardRef<HTMLButtonElement, InputProps<ElementTyp
 
   // add a small delay so we dont show and hide loading immediately
   const [delayedLoading, setDelayedLoading] = useState(false);
-  const loadingTimeout = useRef<NodeJS.Timeout | undefined>();
+  const loadingTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
     clearTimeout(loadingTimeout.current);

@@ -54,11 +54,12 @@ export function useGetGnosisSafe({ address, chainId }: { chainId: number; addres
       const nonce = await safeApiClient.getNextNonce(gnosisSafe.address);
 
       const safeTransaction = await safeTransactionClient.createTransaction({
-        safeTransactionData: { ...safeTransactionData, nonce }
+        transactions: [{ ...safeTransactionData }],
+        options: { nonce: Number(nonce) }
       });
 
       const safeTxHash = await safeTransactionClient.getTransactionHash(safeTransaction);
-      const signature = await safeTransactionClient.signTransactionHash(safeTxHash);
+      const signature = await safeTransactionClient.signHash(safeTxHash);
       await safeApiClient.proposeTransaction({
         safeAddress: gnosisSafe.address,
         safeTransactionData: {

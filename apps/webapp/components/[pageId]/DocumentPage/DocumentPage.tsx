@@ -10,6 +10,7 @@ import { makeSelectSortedViews } from '@packages/databases/store/views';
 import { isTruthy } from '@packages/utils/types';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
+import type { RefObject } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';

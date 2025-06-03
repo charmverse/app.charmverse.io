@@ -1,11 +1,10 @@
-import { styled } from '@mui/material';
-import { TextField, Typography } from '@mui/material';
+import { styled, TextField, Typography } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
+import { isTouchScreen } from '@packages/lib/utils/browser';
 import { useEffect, useRef, useState } from 'react';
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, RefObject } from 'react';
 
 import { useIMEComposition } from 'hooks/useIMEComposition';
-import { isTouchScreen } from '@packages/lib/utils/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {
@@ -66,7 +65,7 @@ export function PageTitleInput({
   const [title, setTitle] = useState(value);
   const [updatedAt, setUpdatedAt] = useState(updatedAtExternal);
   const titleInput = useRef<HTMLTextAreaElement>(null);
-  const { isOrWasComposing } = useIMEComposition(titleInput);
+  const { isOrWasComposing } = useIMEComposition(titleInput as RefObject<HTMLTextAreaElement>);
 
   function _onChange(event: ChangeEvent<HTMLInputElement>) {
     const newTitle = event.target.value;
