@@ -73,8 +73,7 @@ const useCDN =
 const config = {
   poweredByHeader: false,
   eslint: {
-    // add background and serverless to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background', 'serverless', 'stories'],
+    dirs: ['pages', 'components', 'lib', 'stories'],
     ignoreDuringBuilds: true
   },
   // types are tested separately from the build
