@@ -22,7 +22,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -34,7 +34,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="SubjectIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -46,13 +46,13 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Title"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Title
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -75,7 +75,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -87,7 +87,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -99,19 +99,19 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 1"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 1
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowDownwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -140,7 +140,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -152,7 +152,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -164,19 +164,19 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 2"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 2
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowUpwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -205,7 +205,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -217,7 +217,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -229,13 +229,13 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 3"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 3
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -262,7 +262,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               <span>
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                   data-test="add-table-prop"
                   data-testid="AddIcon"
                   focusable="false"
@@ -286,7 +286,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -294,11 +294,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -311,7 +311,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -321,11 +321,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -342,11 +342,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -359,7 +359,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-1"
                     data-test-resolved="false"
                     href="/card-id-1"
@@ -389,23 +389,23 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -428,15 +428,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -456,15 +456,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -483,7 +483,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -491,11 +491,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -508,7 +508,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -518,11 +518,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -539,11 +539,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -556,7 +556,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-2"
                     data-test-resolved="false"
                     href="/card-id-2"
@@ -586,23 +586,23 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -625,15 +625,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -653,15 +653,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -683,11 +683,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             data-test="table-add-card"
           >
             <div
-              class="MuiBox-root css-1c1kq07"
+              class="MuiBox-root mui-1c1kq07"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -697,7 +697,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 />
               </svg>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 mui-14h3jui-MuiTypography-root"
                 id="TableComponent.plus-new"
               >
                 New
@@ -739,7 +739,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -762,7 +762,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -785,7 +785,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -824,7 +824,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -836,7 +836,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="SubjectIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -848,13 +848,13 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Title"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Title
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -877,7 +877,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -889,7 +889,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -901,19 +901,19 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 1"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 1
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowDownwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -942,7 +942,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -954,7 +954,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -966,19 +966,19 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 2"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 2
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowUpwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1007,7 +1007,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1019,7 +1019,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1031,13 +1031,13 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                     </div>
                     <span
                       aria-label="Property 3"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 3
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -1064,7 +1064,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               <span>
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                   data-test="add-table-prop"
                   data-testid="AddIcon"
                   focusable="false"
@@ -1088,7 +1088,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -1096,11 +1096,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1113,7 +1113,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -1123,11 +1123,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1144,11 +1144,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1161,7 +1161,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-1"
                     data-test-resolved="false"
                     href="/card-id-1"
@@ -1191,23 +1191,23 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -1230,15 +1230,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -1258,15 +1258,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -1285,7 +1285,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -1293,11 +1293,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1310,7 +1310,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -1320,11 +1320,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1341,11 +1341,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1358,7 +1358,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-2"
                     data-test-resolved="false"
                     href="/card-id-2"
@@ -1388,23 +1388,23 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -1427,15 +1427,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -1455,15 +1455,15 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -1485,11 +1485,11 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             data-test="table-add-card"
           >
             <div
-              class="MuiBox-root css-1c1kq07"
+              class="MuiBox-root mui-1c1kq07"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -1499,7 +1499,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
                 />
               </svg>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 mui-14h3jui-MuiTypography-root"
                 id="TableComponent.plus-new"
               >
                 New
@@ -1541,7 +1541,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -1564,7 +1564,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -1587,7 +1587,7 @@ exports[`components/table/Table extended > should match snapshot with CreatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -1626,7 +1626,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1638,7 +1638,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="SubjectIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1650,13 +1650,13 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     </div>
                     <span
                       aria-label="Title"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Title
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -1679,7 +1679,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1691,7 +1691,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1703,19 +1703,19 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     </div>
                     <span
                       aria-label="Property 1"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 1
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowDownwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1744,7 +1744,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1756,7 +1756,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1768,19 +1768,19 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     </div>
                     <span
                       aria-label="Property 2"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 2
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowUpwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1809,7 +1809,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -1821,7 +1821,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -1833,13 +1833,13 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                     </div>
                     <span
                       aria-label="Property 3"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 3
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -1866,7 +1866,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
               <span>
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                   data-test="add-table-prop"
                   data-testid="AddIcon"
                   focusable="false"
@@ -1890,7 +1890,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -1898,11 +1898,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -1915,7 +1915,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -1925,11 +1925,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -1946,11 +1946,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1963,7 +1963,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-1"
                     data-test-resolved="false"
                     href="/card-id-1"
@@ -1993,23 +1993,23 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -2032,15 +2032,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2060,15 +2060,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2087,7 +2087,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -2095,11 +2095,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2112,7 +2112,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -2122,11 +2122,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2143,11 +2143,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2160,7 +2160,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-2"
                     data-test-resolved="false"
                     href="/card-id-2"
@@ -2190,23 +2190,23 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -2229,15 +2229,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2257,15 +2257,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2287,11 +2287,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             data-test="table-add-card"
           >
             <div
-              class="MuiBox-root css-1c1kq07"
+              class="MuiBox-root mui-1c1kq07"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -2301,7 +2301,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
                 />
               </svg>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 mui-14h3jui-MuiTypography-root"
                 id="TableComponent.plus-new"
               >
                 New
@@ -2343,7 +2343,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -2366,7 +2366,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -2389,7 +2389,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedAt 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -2428,7 +2428,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2440,7 +2440,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="SubjectIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2452,13 +2452,13 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     </div>
                     <span
                       aria-label="Title"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Title
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -2481,7 +2481,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2493,7 +2493,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2505,19 +2505,19 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     </div>
                     <span
                       aria-label="Property 1"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 1
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowDownwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2546,7 +2546,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2558,7 +2558,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2570,19 +2570,19 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     </div>
                     <span
                       aria-label="Property 2"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 2
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                         data-testid="ArrowUpwardOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2611,7 +2611,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
             <div
-              class="MuiStack-root css-19zgtxi-MuiStack-root"
+              class="MuiStack-root mui-19zgtxi-MuiStack-root"
             >
               <div>
                 <div>
@@ -2623,7 +2623,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     >
                       <svg
                         aria-hidden="true"
-                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-15993tg-MuiSvgIcon-root"
+                        class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-15993tg-MuiSvgIcon-root"
                         data-testid="ArrowDropDownCircleOutlinedIcon"
                         focusable="false"
                         viewBox="0 0 24 24"
@@ -2635,13 +2635,13 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                     </div>
                     <span
                       aria-label="Property 3"
-                      class="MuiTypography-root MuiTypography-subtitle1 css-15td19e-MuiTypography-root"
+                      class="MuiTypography-root MuiTypography-subtitle1 mui-15td19e-MuiTypography-root"
                       data-mui-internal-clone-element="true"
                     >
                       Property 3
                     </span>
                     <button
-                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall css-1bzp2yd-MuiButtonBase-root-MuiIconButton-root"
+                      class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall mui-1vs5yv-MuiButtonBase-root-MuiIconButton-root"
                       tabindex="0"
                       type="button"
                     />
@@ -2668,7 +2668,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
               <span>
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                   data-test="add-table-prop"
                   data-testid="AddIcon"
                   focusable="false"
@@ -2692,7 +2692,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -2700,11 +2700,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2717,7 +2717,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -2727,11 +2727,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2748,11 +2748,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2765,7 +2765,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-1"
                     data-test-resolved="false"
                     href="/card-id-1"
@@ -2795,23 +2795,23 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -2834,15 +2834,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2862,15 +2862,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -2889,7 +2889,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
-              class="MuiStack-root css-1v111ru-MuiStack-root"
+              class="MuiStack-root mui-1v111ru-MuiStack-root"
             >
               <div
                 class="icons row-actions"
@@ -2897,11 +2897,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                 style="padding: 0px;"
               >
                 <div
-                  class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                  class="charm-drag-handle disable-drag-selection MuiBox-root mui-0"
                 >
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-3ahz9x-MuiSvgIcon-root"
+                    class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium mui-3ahz9x-MuiSvgIcon-root"
                     data-testid="DragIndicatorIcon"
                     focusable="false"
                     viewBox="0 0 24 24"
@@ -2914,7 +2914,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
               </div>
             </div>
             <div
-              class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+              class="octo-table-cell title-cell MuiBox-root mui-v7v99c"
             >
               <div
                 style="display: flex; width: 100%;"
@@ -2924,11 +2924,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="align-self: flex-start; align-items: flex-start;"
                 >
                   <div
-                    class="css-1s68mph"
+                    class="mui-1s68mph"
                   >
                     <svg
                       aria-hidden="true"
-                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-1c3c2wp-MuiSvgIcon-root"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-1c3c2wp-MuiSvgIcon-root"
                       data-testid="InsertDriveFileOutlinedIcon"
                       focusable="false"
                       viewBox="0 0 24 24"
@@ -2945,11 +2945,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-1j21k7w-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth mui-1j21k7w-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-1kqh1lf-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue mui-1kqh1lf-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2962,7 +2962,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   class="open-button"
                 >
                   <a
-                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-14kk260-MuiTypography-root-MuiLink-root"
+                    class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone mui-14kk260-MuiTypography-root-MuiLink-root"
                     data-test="database-open-button-card-id-2"
                     data-test-resolved="false"
                     href="/card-id-2"
@@ -2992,23 +2992,23 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       >
                         <div
-                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-13dnh03-MuiChip-root"
+                          class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise mui-13dnh03-MuiChip-root"
                           data-test="select-preview-value-value1"
                         >
                           <span
-                            class="MuiChip-label MuiChip-labelSmall css-eccknh-MuiChip-label"
+                            class="MuiChip-label MuiChip-labelSmall mui-eccknh-MuiChip-label"
                           >
                             value 1
                           </span>
@@ -3031,15 +3031,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -3059,15 +3059,15 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                   style="height: 100%;"
                 >
                   <div
-                    class="MuiStack-root css-1gl94ry-MuiStack-root"
+                    class="MuiStack-root mui-1gl94ry-MuiStack-root"
                     data-test="closed-select-input"
                   >
                     <div
-                      class="MuiStack-root css-1a59yxd-MuiStack-root"
+                      class="MuiStack-root mui-1a59yxd-MuiStack-root"
                       data-test="select-preview"
                     >
                       <div
-                        class="MuiStack-root css-b3ouwx-MuiStack-root"
+                        class="MuiStack-root mui-b3ouwx-MuiStack-root"
                         data-mui-internal-clone-element="true"
                       />
                     </div>
@@ -3089,11 +3089,11 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             data-test="table-add-card"
           >
             <div
-              class="MuiBox-root css-1c1kq07"
+              class="MuiBox-root mui-1c1kq07"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -3103,7 +3103,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
                 />
               </svg>
               <p
-                class="MuiTypography-root MuiTypography-body1 css-14h3jui-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-body1 mui-14h3jui-MuiTypography-root"
                 id="TableComponent.plus-new"
               >
                 New
@@ -3145,7 +3145,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -3168,7 +3168,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"
@@ -3191,7 +3191,7 @@ exports[`components/table/Table extended > should match snapshot with UpdatedBy 
             </span>
             <svg
               aria-hidden="true"
-              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+              class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
               data-testid="ExpandMoreIcon"
               focusable="false"
               viewBox="0 0 24 24"

@@ -252,11 +252,7 @@ export function rowNodeAtPos(
   //   }
   //   node = node.parentNode;
   // }
-  return {
-    ...dom,
-    node: dom.node as HTMLElement,
-    rowNode: rowNode as HTMLElement
-  };
+  return { ...dom, node: dom.node as HTMLElement, rowNode: rowNode as HTMLElement };
 }
 
 function blockPosAtCoords(view: EditorView, coords: { left: number; top: number }) {
@@ -334,20 +330,16 @@ export function getNodeForRowPosition({
     nodeEnd = view.state.doc.content.size;
   }
 
-  log.debug('Row meta', {
-    child: firstChild?.content.size,
-    nodeStart,
-    topPos: topPos.pos,
-    pmNode,
-    nodeEnd,
-    nodeSize
-  });
+  // log.debug('Row meta', {
+  //   child: firstChild?.content.size,
+  //   nodeStart,
+  //   topPos: topPos.pos,
+  //   pmNode,
+  //   nodeEnd,
+  //   nodeSize
+  // });
 
-  return {
-    node: pmNode,
-    nodeEnd,
-    nodeStart
-  };
+  return { node: pmNode, nodeEnd, nodeStart };
 }
 
 export function deleteRowNode({
