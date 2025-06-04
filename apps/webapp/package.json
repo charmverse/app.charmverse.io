@@ -70,6 +70,9 @@
   },
   "overrides": {
     "react": "19.1",
-    "next": "^15.3.2"
+    "next": "^15.3.2",
+    "@mui/x-tree-view": {
+      "react": "19.1"
+    }
   }
 }
