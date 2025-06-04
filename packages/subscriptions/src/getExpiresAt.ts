@@ -12,7 +12,8 @@ export function getExpiresAt({
   spaceTokenBalance: number;
   tierPrice?: number | null;
 }) {
-  if (!tier) {
+  // if the tier is null or the tier price is 0, return null
+  if (!tier || !tierConfig[tier].tokenPrice) {
     return null;
   }
   const tierPrice = overridenTierPrice || tierConfig[tier].tokenPrice;

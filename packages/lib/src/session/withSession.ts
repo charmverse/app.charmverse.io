@@ -1,4 +1,5 @@
-import { getIronOptions } from '@packages/nextjs/session/getIronOptions';
+import { getSession } from '@packages/nextjs/session/getSession';
+import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
 import type {
   GetServerSidePropsContext,
@@ -8,10 +9,12 @@ import type {
   NextApiResponse
 } from 'next';
 
+import type { SessionData } from './config';
+
 // For API requests
 export function withSessionRoute(handler: NextApiHandler) {
   return async (req: NextApiRequest, res: NextApiResponse) => {
-    req.session = await getIronSession(req, res, getIronOptions());
+    req.session = await getSession(req, res);
     return handler(req, res);
   };
 }
@@ -25,7 +28,7 @@ export function withSessionSsr<P extends { [key: string]: unknown } = { [key: st
   handler: (context: SSRContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
 ) {
   return async (context: SSRContext) => {
-    context.req.session = await getIronSession(context.req, context.res, getIronOptions());
+    context.req.session = await getSession(context.req, context.res);
     return handler(context);
   };
 }

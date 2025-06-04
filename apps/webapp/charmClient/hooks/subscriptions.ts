@@ -6,9 +6,7 @@ import type { MaybeString } from './helpers';
 import { useGET, usePOST } from './helpers';
 
 export function useGetSubscriptionStatus(spaceId: MaybeString) {
-  return useGET<SpaceSubscriptionStatus>(spaceId ? `/api/spaces/${spaceId}/subscriptions/status` : null, {
-    spaceId
-  });
+  return useGET<SpaceSubscriptionStatus>(spaceId ? `/api/spaces/${spaceId}/subscriptions/status` : null);
 }
 
 export function useSwitchToFreeTier(
