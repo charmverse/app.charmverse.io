@@ -1,4 +1,5 @@
 import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
@@ -147,6 +148,13 @@ export function UpgradeSubscriptionModal({
   const { sendDevTransaction, sendOtherTokenTransaction } = useSpaceSubscriptionTransaction();
 
   async function onUpgrade() {
+    log.info('User selected to upgrade subscription', {
+      spaceId,
+      newTier,
+      paymentMonths,
+      selectedPaymentOption,
+      devTokensToSend
+    });
     setIsProcessing(true);
 
     try {

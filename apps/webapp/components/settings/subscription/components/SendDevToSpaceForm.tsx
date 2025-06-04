@@ -1,4 +1,5 @@
 import env from '@beam-australia/react-env';
+import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
@@ -136,6 +137,11 @@ export function SendDevToSpaceForm({
   const { sendDevTransaction, sendOtherTokenTransaction } = useSpaceSubscriptionTransaction();
 
   async function onDevTransfer() {
+    log.info('User selected to send DEV to space', {
+      spaceId,
+      amount,
+      fromAddress: address as Address
+    });
     setIsProcessing(true);
     try {
       if (selectedPaymentOption.currency === 'DEV') {
