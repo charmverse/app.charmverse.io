@@ -12,7 +12,7 @@ import { useUser } from 'hooks/useUser';
 export function BlocksExceededBanner() {
   const { user } = useUser();
   const { space } = useCurrentSpace();
-  const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota } = useSpaceSubscription();
+  const { spaceBlockQuota, spaceBlockCount, hasPassedBlockQuota, isSpaceReadonly } = useSpaceSubscription();
   const { openSettings } = useSettingsDialog();
   const showUpgradeBanner = !!user && hasPassedBlockQuota && space?.paidTier !== 'enterprise';
 
@@ -25,10 +25,11 @@ export function BlocksExceededBanner() {
   return (
     <StyledBanner errorBackground top={20} data-test='subscription-banner'>
       <Box pr={3} display='flex' alignItems='center'>
-        <Typography>
-          This space has passed the block limit of{' '}
-          <Typography component='span'>{spaceBlockQuota.toLocaleString()}</Typography>
-        </Typography>
+        {isSpaceReadonly ? (
+          <Typography>This space subscription has expired</Typography>
+        ) : (
+          <Typography>This space has passed the block limit of {spaceBlockQuota.toLocaleString()}</Typography>
+        )}
 
         <Stack gap={0.5} flexDirection='row' alignItems='center' display='inline-flex'>
           <Button

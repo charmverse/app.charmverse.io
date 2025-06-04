@@ -1,11 +1,12 @@
+import type { IncomingMessage, ServerResponse } from 'http';
+
 import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIronOptions } from './getIronOptions';
 import type { SessionData } from './interfaces';
 
-export async function getSession(req: NextApiRequest, res: NextApiResponse): Promise<IronSession<SessionData>> {
+export async function getSession(req: IncomingMessage, res: ServerResponse): Promise<IronSession<SessionData>> {
   const session = await getIronSession<SessionData>(req, res, getIronOptions());
 
   // allow for a user override in development
