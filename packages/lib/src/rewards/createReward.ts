@@ -64,23 +64,21 @@ export async function createReward({
 }: RewardCreationData) {
   const roleIds = Array.from(
     new Set(
-      [
-        ...(allowedSubmitterRoles ?? []),
-        ...(assignedSubmitters ?? []),
-        ...(reviewers?.map((reviewer) => reviewer.roleId) ?? [])
-      ].filter(isTruthy)
+      [...(allowedSubmitterRoles ?? []), ...(reviewers?.map((reviewer) => reviewer.roleId) ?? [])].filter(isTruthy)
     )
   );
 
   if (roleIds.length > 0) {
     const roles = await prisma.role.findMany({
       where: {
-        archived: false,
         id: { in: roleIds }
+      },
+      select: {
+        archived: true
       }
     });
 
-    if (roles.length !== roleIds.length) {
+    if (roles.some((r) => r.archived)) {
       throw new InvalidInputError('Archived roles are not allowed to be used in rewards');
     }
   }

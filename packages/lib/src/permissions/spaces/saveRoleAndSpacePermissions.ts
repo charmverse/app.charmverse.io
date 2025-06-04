@@ -14,10 +14,8 @@ export async function saveRoleAndSpacePermissions(spaceId: string, permissions: 
       [
         ...memberPermissions.map((p) => p.assignee.id),
         ...permissions.forumCategories
-          .filter((p) => p.assignee.group === 'role' || p.assignee.group === 'space')
-          .map((p) =>
-            p.assignee.group === 'role' ? p.assignee.id : p.assignee.group === 'space' ? p.assignee.id : undefined
-          )
+          .filter((p) => p.assignee.group === 'role')
+          .map((p) => (p.assignee as { id: string }).id)
       ].filter(isTruthy)
     )
   );
@@ -25,12 +23,14 @@ export async function saveRoleAndSpacePermissions(spaceId: string, permissions: 
   if (roleIds.length > 0) {
     const roles = await prisma.role.findMany({
       where: {
-        archived: false,
         id: { in: roleIds }
+      },
+      select: {
+        archived: true
       }
     });
 
-    if (roles.length !== roleIds.length) {
+    if (roles.some((r) => r.archived)) {
       throw new InvalidInputError('Archived roles are not allowed to be used in permissions');
     }
   }
