@@ -2,17 +2,6 @@
 
 The all-in-one Space for DAOs
 
-## Contributing
-
-There are several ways you can contribute:
-
-- Tweet us: [@charmverse](https://x.com/charmverse)
-- Email us: [hello@charmverse.io](mailto:hello@charmverse.io)
-- Join Discord: [CharmVerse.io](https://discord.gg/ACYCzBGC2M)
-- Pull Requests are welcome! See developer setup below 🙌
-
-## Developer Docs
-
 ### Developer setup
 
 1. This application requires a PostgreSQL database while we figure out decentralized storage:
