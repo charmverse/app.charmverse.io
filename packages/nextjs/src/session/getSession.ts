@@ -1,14 +1,12 @@
-import type { SessionOptions, IronSession } from 'iron-session';
+import type { IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
-import { cookies } from 'next/headers';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { getIronOptions } from './getIronOptions';
 import type { SessionData } from './interfaces';
 
-export async function getSession<T extends object = SessionData>(cookieOptions?: SessionOptions['cookieOptions']) {
-  const options = getIronOptions({ ...cookieOptions });
-
-  const session = await getIronSession<T>(await cookies(), options);
+export async function getSession(req: NextApiRequest, res: NextApiResponse): Promise<IronSession<SessionData>> {
+  const session = await getIronSession<SessionData>(req, res, getIronOptions());
 
   // allow for a user override in development
   const userOverride = process.env.NODE_ENV === 'development' ? process.env.DEV_USER_ID : undefined;
@@ -16,8 +14,8 @@ export async function getSession<T extends object = SessionData>(cookieOptions?:
   if (userOverride) {
     // eslint-disable-next-line no-console
     console.log('Overriding session with user override', { userOverride });
-    return { scoutId: userOverride } as unknown as IronSession<T>;
+    session.user = { id: userOverride };
   }
 
-  return session;
+  return session as unknown as IronSession<SessionData>;
 }
