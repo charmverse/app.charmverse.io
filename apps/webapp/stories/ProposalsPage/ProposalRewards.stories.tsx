@@ -24,8 +24,8 @@ export default {
 };
 
 export function ProposalRewards() {
-  const containerWidthRef = useRef<HTMLDivElement>(undefined);
-  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef as any });
   const [pendingRewards, setPendingRewards] = useState<ProposalPendingReward[]>([]);
   const page = createMockPage({
     title: 'A simple proposition',

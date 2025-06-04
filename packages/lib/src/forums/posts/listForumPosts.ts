@@ -54,17 +54,17 @@ export async function listForumPosts(
   page = Math.abs(page);
   const toSkip = Math.max(page, page - 1) * count;
 
-  const orderByNewest: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByNewest: Prisma.PostFindManyArgs['orderBy'] = {
     createdAt: 'desc'
   };
 
-  const orderByMostCommented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostCommented: Prisma.PostFindManyArgs['orderBy'] = {
     comments: {
       _count: 'desc'
     }
   };
 
-  const orderByMostVoted: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostVoted: Prisma.PostFindManyArgs['orderBy'] = {
     upDownVotes: {
       _count: 'desc'
     }

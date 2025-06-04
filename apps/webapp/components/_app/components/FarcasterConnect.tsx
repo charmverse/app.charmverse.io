@@ -50,7 +50,12 @@ export function FarcasterConnectWithProvider({
   connectedFarcasterAccount?: LoggedInUser['farcasterUser'];
 }) {
   return (
-    <AuthKitProvider config={warpcastConfig}>
+    <AuthKitProvider
+      config={{
+        ...warpcastConfig,
+        provider: undefined
+      }}
+    >
       <FarcasterConnect
         isFarcasterRequired={isFarcasterRequired}
         connectedFarcasterAccount={connectedFarcasterAccount}
