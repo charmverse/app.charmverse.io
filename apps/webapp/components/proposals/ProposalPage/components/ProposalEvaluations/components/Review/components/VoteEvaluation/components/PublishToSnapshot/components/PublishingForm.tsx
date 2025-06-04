@@ -53,7 +53,7 @@ const MIN_VOTING_OPTIONS = 2;
  * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
  */
 export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: Props) {
-  const { account, provider: web3Provider } = useWeb3Account();
+  const { account, legacyProvider: web3Provider } = useWeb3Account();
   const { trigger: updateProposalEvaluation } = useUpdateSnapshotProposal({ proposalId });
 
   const { space } = useCurrentSpace();

@@ -1,4 +1,5 @@
 import type { UserWallet } from '@charmverse/core/prisma';
+import type { Web3Provider } from '@ethersproject/providers';
 import { getWagmiConfig } from '@packages/blockchain/connectors/config';
 import type {
   SignatureVerificationPayload,
@@ -38,6 +39,7 @@ type IContext = {
   setAccountUpdatePaused: (paused: boolean) => void;
   signer: Signer | undefined;
   provider: BrowserProvider | undefined;
+  legacyProvider: Web3Provider | undefined; // USE THIS FOR SNAPSHOT
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -51,7 +53,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   loginFromWeb3Account: () => Promise.resolve(null as any),
   setAccountUpdatePaused: () => null,
   signer: undefined,
-  provider: undefined
+  provider: undefined,
+  legacyProvider: undefined
 });
 
 // a wrapper around account and library from web3react
@@ -75,7 +78,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { connectors, connectAsync } = useConnect();
 
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
-  const { signer, provider } = useWeb3Signer({ chainId });
+  const { signer, provider, legacyProvider } = useWeb3Signer({ chainId });
 
   const requestSignature = useCallback(async () => {
     if (!account) {
@@ -237,7 +240,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       loginFromWeb3Account,
       setAccountUpdatePaused,
       signer,
-      provider
+      provider,
+      legacyProvider
     }),
     [
       chainId,
@@ -250,7 +254,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       disconnectWallet,
       loginFromWeb3Account,
       signer,
-      provider
+      provider,
+      legacyProvider
     ]
   );
 

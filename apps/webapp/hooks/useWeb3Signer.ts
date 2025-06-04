@@ -1,5 +1,6 @@
+import { Web3Provider } from '@ethersproject/providers';
 import { ethers, BrowserProvider } from 'ethers';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Account, Chain, Client, Transport } from 'viem';
 
 import { useWalletClient } from 'hooks/wagmi';
@@ -14,6 +15,19 @@ async function walletClientToSigner(walletClient: { account: Account; chain: Cha
   };
   const provider = new BrowserProvider(transport, network);
   const signer = await provider.getSigner(account.address);
+  return { provider, signer };
+}
+
+// adapter from viem to ethers https://wagmi.sh/react/ethers-adapters
+export function walletClientToLegacyProvider(walletClient: { account: Account; chain: Chain; transport: any }) {
+  const { account, chain, transport } = walletClient;
+  const network = {
+    chainId: chain.id,
+    name: chain.name,
+    ensAddress: chain.contracts?.ensRegistry?.address
+  };
+  const provider = new Web3Provider(transport, network);
+  const signer = provider.getSigner(account.address);
   return { provider, signer };
 }
 
@@ -38,6 +52,11 @@ export function useWeb3Signer({ chainId }: { chainId?: number } = {}) {
   const { data: walletClient } = useWalletClient({ chainId });
   const [web3Signer, setWeb3Signer] = useState<{ signer: any; provider: any } | undefined>(undefined);
 
+  const legacySigner = useMemo(() => {
+    if (!walletClient) return undefined;
+    return walletClientToLegacyProvider(walletClient);
+  }, [walletClient]);
+
   useEffect(() => {
     if (walletClient) {
       walletClientToSigner(walletClient).then(setWeb3Signer);
@@ -46,5 +65,9 @@ export function useWeb3Signer({ chainId }: { chainId?: number } = {}) {
     }
   }, [walletClient]);
 
-  return web3Signer ?? { signer: undefined, provider: undefined };
+  return {
+    signer: web3Signer?.signer,
+    provider: web3Signer?.provider,
+    legacyProvider: legacySigner?.provider
+  };
 }
