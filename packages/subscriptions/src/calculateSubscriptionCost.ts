@@ -7,15 +7,16 @@ import { tierConfig } from './constants';
 export function calculateSubscriptionCost({
   currentTier,
   newTier,
+  overridenTierPrice,
   paymentMonths
 }: {
   currentTier?: SpaceSubscriptionTier | null;
   newTier: UpgradableTier;
-  overridenTierPrice?: number;
+  overridenTierPrice?: number | null;
   paymentMonths: number;
 }) {
   const currentTierPrice = currentTier ? tierConfig[currentTier].tokenPrice : 0;
-  const newTierPrice = tierConfig[newTier].tokenPrice;
+  const newTierPrice = overridenTierPrice || tierConfig[newTier].tokenPrice;
 
   const now = DateTime.now();
   const monthEnd = now.endOf('month');
@@ -33,6 +34,7 @@ export function calculateSubscriptionCost({
   const immediatePayment = Math.max(immediatePaymentRaw, 0);
   return {
     newTierPrice,
+    actualTierPrice: tierConfig[newTier].tokenPrice,
     amountToProrate,
     immediatePayment,
     priceForMonths,

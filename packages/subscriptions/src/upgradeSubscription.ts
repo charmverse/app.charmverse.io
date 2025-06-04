@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
@@ -24,7 +25,8 @@ export async function upgradeSubscription(
     },
     select: {
       subscriptionTier: true,
-      subscriptionCancelledAt: true
+      subscriptionCancelledAt: true,
+      subscriptionMonthlyPrice: true
     }
   });
 
@@ -38,16 +40,23 @@ export async function upgradeSubscription(
 
   const { value: spaceTokenBalanceInWei } = await getSpaceTokenBalance({ spaceId });
 
-  const { newTierPrice, immediatePayment } = calculateSubscriptionCost({
+  const { newTierPrice, actualTierPrice, immediatePayment } = calculateSubscriptionCost({
     currentTier: space.subscriptionTier,
     newTier: tier,
-    paymentMonths: payload.paymentMonths
+    paymentMonths: payload.paymentMonths,
+    overridenTierPrice: space.subscriptionMonthlyPrice
   });
 
-  const subscriptionPriceInWei = parseUnits(newTierPrice.toString(), 18);
   const immediatePaymentInWei = parseUnits(immediatePayment.toString(), 18);
 
   if (spaceTokenBalanceInWei < immediatePaymentInWei) {
+    log.warn('Insufficient space token balance to upgrade subscription', {
+      spaceId,
+      userId: payload.userId,
+      spaceTokenBalanceInWei,
+      immediatePaymentInWei,
+      newTierPrice
+    });
     throw new Error('Insufficient space token balance');
   }
 
@@ -65,7 +74,7 @@ export async function upgradeSubscription(
         spaceId,
         subscriptionTier: tier,
         subscriptionPeriodStart: DateTime.now().toJSDate(),
-        subscriptionPrice: subscriptionPriceInWei.toString(),
+        subscriptionPrice: actualTierPrice.toString(),
         paidTokenAmount: immediatePaymentInWei.toString()
       }
     }),

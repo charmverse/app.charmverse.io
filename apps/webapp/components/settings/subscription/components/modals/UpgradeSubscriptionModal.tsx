@@ -31,6 +31,7 @@ import { DEV_PAYMENT_OPTION, PaymentTokenSelector, TOKEN_LOGO_RECORD } from '../
 
 export function UpgradeSubscriptionModal({
   spaceId,
+  monthlyPrice,
   isOpen,
   onClose: _onClose,
   onSuccess,
@@ -38,6 +39,7 @@ export function UpgradeSubscriptionModal({
   newTier
 }: {
   spaceId: string;
+  monthlyPrice?: number;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
@@ -75,7 +77,8 @@ export function UpgradeSubscriptionModal({
   const { newTierPrice, amountToProrate, priceForMonths, devTokensToSend } = calculateSubscriptionCost({
     currentTier,
     newTier,
-    paymentMonths
+    paymentMonths,
+    overridenTierPrice: monthlyPrice
   });
 
   function onClose() {
@@ -293,7 +296,7 @@ export function UpgradeSubscriptionModal({
               <Stack gap={1}>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>
-                    {paymentMonths} months x {newTierPrice}
+                    {paymentMonths} months x {newTierPrice.toLocaleString()}
                   </Typography>
                   <Stack direction='row' alignItems='center' gap={0.5}>
                     <Typography variant='body2'>{priceForMonths}</Typography>
@@ -364,7 +367,7 @@ export function UpgradeSubscriptionModal({
                           (selectedPaymentOption.currency === 'DEV' && formattedBalance < devTokensToSend) ||
                           (selectedPaymentOption.currency !== 'DEV' && exchangeRate === 0)
                         }
-                        loading={isLoading}
+                        loading={isProcessing}
                         onClick={onUpgrade}
                       >
                         Upgrade
