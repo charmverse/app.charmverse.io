@@ -1,4 +1,3 @@
-import { styled } from '@mui/material';
 import {
   Edit as EditIcon,
   Tune as TuneIcon,
@@ -7,7 +6,7 @@ import {
   Refresh as RefreshIcon
 } from '@mui/icons-material';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Typography, Box, Stack } from '@mui/material';
+import { styled, Typography, Box, Stack } from '@mui/material';
 import type { ButtonProps } from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';

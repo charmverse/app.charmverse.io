@@ -1,9 +1,8 @@
 import { Box, Divider, Menu, TextField } from '@mui/material';
+import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import { bindMenu } from 'material-ui-popup-state';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-
-import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 
 import { LinkCharmVerseDatabase } from '../../../viewSidebar/viewSourceOptions/components/LinkCharmVerseDatabase';
 
@@ -26,7 +25,7 @@ export function RelationPropertyMenu({
   const [relationPropertyData, setRelationPropertyData] = useState<IPropertyTemplate['relationData'] | null>(
     relationData ?? null
   );
-  const [propertyTitle, setPropertyTitle] = useState('Relation' || '');
+  const [propertyTitle, setPropertyTitle] = useState('Relation');
   const [showSelectDatabaseMenu, setShowSelectDatabaseMenu] = useState(true);
 
   function onClose() {

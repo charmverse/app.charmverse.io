@@ -38,7 +38,7 @@ function getItemsAndHints(
 ) {
   const invalidItem = editorItems.find((item) => !(item instanceof PaletteItem));
   if (invalidItem) {
-    throw new Error(`uid: "${invalidItem.uid}" must be an instance of PaletteItem`);
+    throw new Error(`uid: "${(invalidItem as any).uid}" must be an instance of PaletteItem`);
   }
 
   const items: PaletteItem[] = editorItems

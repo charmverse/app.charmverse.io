@@ -37,7 +37,7 @@ export default function PopperPopup(props: PopperPopupProps) {
   } = props;
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
-  const toggleRef = useRef<HTMLDivElement>(undefined);
+  const toggleRef = useRef<HTMLDivElement>(null);
 
   const popover = bindPopover(popupState);
   const popoverProps: PopoverProps = {

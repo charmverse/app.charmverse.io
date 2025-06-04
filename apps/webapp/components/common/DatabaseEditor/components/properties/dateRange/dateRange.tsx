@@ -4,7 +4,7 @@ import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Utils } from '@packages/databases/utils';
 import { DateTime } from 'luxon';
-import { bindPopover, bindTrigger } from 'material-ui-popup-state';
+import { bindPopover } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -321,7 +321,7 @@ function DateRangePicker(props: Props) {
 }
 
 function CalendarDaySlot(
-  props: PickersDayProps<DateTime> & {
+  props: PickersDayProps & {
     dateFrom?: DateTime;
     dateTo?: DateTime;
     onClick?: (date: DateTime) => void;

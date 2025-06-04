@@ -1,4 +1,4 @@
-import { getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
+import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
 import { zeroAddress } from 'viem';
 
 import { easConnectors } from './connectors';
@@ -13,6 +13,6 @@ export function getOnChainSchemaUrl({
   schema: string;
 }) {
   return `${easConnectors[chainId].attestationExplorerUrl}/schema/view/${
-    schema.startsWith('0x') ? schema : getSchemaUID(schema, zeroAddress, true)
+    schema.startsWith('0x') ? schema : SchemaRegistry.getSchemaUID(schema, zeroAddress, true)
   }`;
 }

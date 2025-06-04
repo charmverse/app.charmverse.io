@@ -1,7 +1,6 @@
-import { Contract } from '@ethersproject/contracts';
-import type { Provider } from '@ethersproject/providers';
 import { PROJECT_REGISTRY_ADDRESSES } from '@packages/lib/gitcoin/constants';
-import type { Signer } from 'ethers';
+import { Contract } from 'ethers';
+import type { Provider, Signer } from 'ethers';
 
 import { ProjectRegistryAbi } from './abi/ProjectRegistry';
 import type { ChainId } from './projectsCount';

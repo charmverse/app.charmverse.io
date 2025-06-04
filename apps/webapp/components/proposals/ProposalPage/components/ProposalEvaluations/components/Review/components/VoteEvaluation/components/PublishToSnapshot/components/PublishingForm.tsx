@@ -14,7 +14,7 @@ import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from '@pa
 import { SnapshotVotingMode } from '@packages/lib/snapshot/interfaces';
 import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from '@packages/utils/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
-import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/src/sign/types';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';

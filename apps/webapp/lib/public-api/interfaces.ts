@@ -1,7 +1,7 @@
 import type { Page as PrismaPage } from '@charmverse/core/prisma';
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { APISpaceTemplateType } from '@packages/spaces/config';
-import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/src/sign/types';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;
 

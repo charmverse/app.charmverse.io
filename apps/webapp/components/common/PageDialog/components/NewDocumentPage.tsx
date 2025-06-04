@@ -1,7 +1,7 @@
-import { styled } from '@mui/material';
 import type { Theme } from '@mui/material';
-import { Box, useMediaQuery } from '@mui/material';
+import { styled, Box, useMediaQuery } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import type { RefObject } from 'react';
 import { useRef } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
@@ -41,7 +41,7 @@ export function NewDocumentPage({
 }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
   const containerWidthRef = useRef<HTMLDivElement>(null);
-  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef as RefObject<HTMLElement> });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   function focusDocumentEditor() {

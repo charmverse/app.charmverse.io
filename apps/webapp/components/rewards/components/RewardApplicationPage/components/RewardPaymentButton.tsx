@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { Application } from '@charmverse/core/prisma';
-import { Contract } from '@ethersproject/contracts';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
@@ -11,7 +10,7 @@ import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
 import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import { shortenHex } from '@packages/utils/blockchain';
-import { ethers } from 'ethers';
+import { Contract } from 'ethers';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import { parseEther, parseUnits } from 'viem';

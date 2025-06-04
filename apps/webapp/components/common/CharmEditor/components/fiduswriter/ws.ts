@@ -350,7 +350,7 @@ export class WebSocketConnector {
 
       if (wrappedMessage.type === 'diff') {
         const historyPluginState = this.historyPlugin?.getState(this.editor.view.state);
-        wrappedMessage.undo = historyPluginState?.prevRanges === null ?? false;
+        wrappedMessage.undo = historyPluginState?.prevRanges === null;
       }
 
       this.messages.lastTen.push(wrappedMessage);

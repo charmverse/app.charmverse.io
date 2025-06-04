@@ -1,9 +1,9 @@
 import type { UserVote } from '@charmverse/core/prisma';
 import { VoteType } from '@charmverse/core/prisma';
-import { styled } from '@mui/material';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import {
+  styled,
   Box,
   Button,
   Card,
@@ -26,6 +26,7 @@ import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import millify from 'millify';
 import type { EditorView } from 'prosemirror-view';
+import type { RefObject } from 'react';
 import React, { useRef } from 'react';
 import useSWR from 'swr';
 
@@ -161,7 +162,7 @@ export function VoteDetail({
           {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
-          anchorRef={anchorRef}
+          anchorRef={anchorRef as RefObject<HTMLElement>}
           deleteVote={deleteVote}
           cancelVote={cancelVote}
           isProposalVote={!!isProposal}
