@@ -1,12 +1,11 @@
 import { DatePicker as MuiDatePicker } from '@mui/x-date-pickers/DatePicker';
 import type { DatePickerProps } from '@mui/x-date-pickers/DatePicker';
-import type { DateTime } from 'luxon';
 import { useState } from 'react';
 
 import { HiddenElement, TextFieldSlot } from './DateTimePicker';
 
 // customized date picker that opens when clicking the inpu
-export function DatePicker<T extends DateTime>(props: DatePickerProps<T>) {
+export function DatePicker(props: DatePickerProps) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>

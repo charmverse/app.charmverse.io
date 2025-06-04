@@ -1,6 +1,9 @@
 import type { ProposalEvaluation, ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, FormLabel, Switch, TextField, Typography } from '@mui/material';
+import type { ProposalEvaluationInput } from '@packages/lib/proposals/createProposal';
+import type { ConcealableEvaluationType, PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
 import { approvableEvaluationTypes } from '@packages/lib/proposals/workflows/constants';
+import type { RangeProposalCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
 import { DateTime } from 'luxon';
 import { useEffect } from 'react';
 
@@ -16,9 +19,6 @@ import {
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { ProposalEvaluationInput } from '@packages/lib/proposals/createProposal';
-import type { ConcealableEvaluationType, PopulatedEvaluation } from '@packages/lib/proposals/interfaces';
-import type { RangeProposalCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
 
 import { RubricCriteriaSettings } from './RubricCriteriaSettings';
 import { VoteSettings } from './VoteSettings';
@@ -276,7 +276,7 @@ export function EvaluationStepSettings({
             </FormLabel>
             <Typography variant='caption'>Send a reminder 24 hrs to reviewers before the date</Typography>
           </Box>
-          <DateTimePicker<DateTime>
+          <DateTimePicker
             onAccept={(date) => {
               onChange({
                 dueDate: date?.toJSDate() ?? null

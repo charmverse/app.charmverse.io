@@ -1,5 +1,5 @@
 import type { PageContent } from '@packages/charmeditor/interfaces';
-import markdownit from 'markdown-it/lib';
+import markdownit from 'markdown-it';
 import { MarkdownParser } from 'prosemirror-markdown';
 
 import { listIsTight } from '../components/listItem/listIsTight';

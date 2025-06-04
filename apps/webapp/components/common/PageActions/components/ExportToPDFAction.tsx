@@ -24,7 +24,7 @@ export function ExportToPDFAction({ pdfTitle, onComplete }: { pdfTitle?: string;
     <ReactToPrint
       onAfterPrint={onComplete}
       trigger={PrintButton}
-      content={() => printRef?.current}
+      content={() => printRef?.current || null}
       bodyClass={theme.palette.mode === 'dark' ? 'dark-mode' : ''}
       documentTitle={pdfTitle || 'Untitled'}
     />

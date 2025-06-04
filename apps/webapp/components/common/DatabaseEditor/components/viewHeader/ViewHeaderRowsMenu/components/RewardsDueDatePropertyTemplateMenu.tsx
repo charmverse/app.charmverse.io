@@ -1,8 +1,7 @@
 import { Box } from '@mui/material';
-import type { DateTime } from 'luxon';
-
 import type { IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
+import type { DateTime } from 'luxon';
 
 import { RewardsDueDatePicker } from '../../../properties/RewardsDueDatePicker';
 

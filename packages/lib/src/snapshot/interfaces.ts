@@ -1,4 +1,4 @@
-import type { ProposalType, Vote } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { ProposalType, Vote } from '@snapshot-labs/snapshot.js/src/sign/types';
 
 export interface SnapshotVotingStrategy {
   name: string;

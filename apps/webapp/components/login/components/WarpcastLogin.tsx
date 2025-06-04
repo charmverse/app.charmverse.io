@@ -44,7 +44,12 @@ function WarpcastLoginButton({
 
 export function WarpcastLogin({ size, type, label }: { size?: string; type: LoginType; label?: string }) {
   return (
-    <AuthKitProvider config={warpcastConfig}>
+    <AuthKitProvider
+      config={{
+        ...warpcastConfig,
+        provider: undefined
+      }}
+    >
       <WarpcastLoginButton size={size} type={type} label={label} />
     </AuthKitProvider>
   );

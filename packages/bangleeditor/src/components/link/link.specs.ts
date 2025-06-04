@@ -1,4 +1,4 @@
-import type Token from 'markdown-it/lib/token';
+import type Token from 'markdown-it/lib/token.mjs';
 import type { DOMOutputSpec, Mark, Node } from 'prosemirror-model';
 
 import type { BaseRawMarkSpec } from '../@bangle.dev/core/specRegistry';
