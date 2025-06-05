@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { defaultHandler } from '@packages/lib/middleware/handler';
 import { isSpaceAdmin } from '@packages/lib/permissions/isSpaceAdmin';
+import { unarchiveRole } from '@packages/lib/roles/unarchiveRole';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ApiError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -24,21 +25,17 @@ async function unarchiveRoleController(req: NextApiRequest, res: NextApiResponse
 
   if (!spaceAdmin) {
     throw new ApiError({
-      message: 'You are not authorized to archive this token gate',
+      message: 'You are not authorized to unarchive this role',
       errorType: 'Access denied'
     });
   }
 
-  await prisma.role.update({
-    where: {
-      id: roleId
-    },
-    data: {
-      archived: false
-    }
+  const updatedRole = await unarchiveRole({
+    roleId,
+    userId: req.session.user.id
   });
 
-  return res.status(200).end();
+  return res.status(200).json(updatedRole);
 }
 
 export default withSessionRoute(handler);

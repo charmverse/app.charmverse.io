@@ -674,7 +674,8 @@ export async function generateRole({
   createdBy,
   roleName = `role-${v4()}`,
   source,
-  assigneeUserIds
+  assigneeUserIds,
+  archived = false
 }: {
   externalId?: string;
   spaceId: string;
@@ -683,6 +684,7 @@ export async function generateRole({
   source?: RoleSource;
   id?: string;
   assigneeUserIds?: string[];
+  archived?: boolean;
 }): Promise<Role> {
   const assignUsers = assigneeUserIds && assigneeUserIds.length >= 1;
 
@@ -726,7 +728,8 @@ export async function generateRole({
                 data: roleAssignees
               }
             }
-          : undefined
+          : undefined,
+      archived
     }
   });
 
