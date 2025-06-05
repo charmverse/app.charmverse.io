@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/Close';
 import UnarchiveOutlinedIcon from '@mui/icons-material/UnarchiveOutlined';
@@ -9,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import { humanizeConditions, humanizeConditionsData } from '@packages/lib/tokenGates/humanizeConditions';
 import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useCallback } from 'react';
 
 import {
   useArchiveTokenGate,
@@ -19,6 +21,9 @@ import {
 import ButtonChip from 'components/common/ButtonChip';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import TableRow from 'components/common/Table/TableRow';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
+import { useTokenGateAccess } from 'hooks/useTokenGateAccess';
 
 import TokenGateRolesSelect from './TokenGateRolesSelect';
 
@@ -37,7 +42,9 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
   const { trigger: updateTokenGates, isMutating: isLoadingUpdateTokenGates } = useUpdateTokenGateRoles(tokenGate.id);
   const { trigger: archiveTokenGate, isMutating: isLoadingArchive } = useArchiveTokenGate(tokenGate.id);
   const { trigger: unarchiveTokenGate, isMutating: isLoadingUnarchive } = useUnarchiveTokenGate(tokenGate.id);
-
+  const { space } = useCurrentSpace();
+  const { hasReachedLimit } = useTokenGateAccess({ space: space as Space });
+  const { showMessage } = useSnackbar();
   const createDescription = () => {
     const conditionsData = humanizeConditionsData(tokenGate.conditions);
 
@@ -64,6 +71,19 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
   const description = createDescription();
 
   const isLoading = isLoadingUpdateTokenGates || isLoadingDeleteTokenGate || isLoadingArchive || isLoadingUnarchive;
+
+  const toggleTokenGateArchive = useCallback(async () => {
+    try {
+      if (tokenGate.archived) {
+        await unarchiveTokenGate();
+      } else {
+        await archiveTokenGate();
+      }
+      await refreshTokenGates();
+    } catch (error) {
+      showMessage((error as Error).message || 'Failed to archive token gate', 'error');
+    }
+  }, [tokenGate.archived, unarchiveTokenGate, archiveTokenGate, refreshTokenGates, showMessage]);
 
   return (
     <>
@@ -113,25 +133,20 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
         <TableCell width={30}>
           {isAdmin && (
             <Box display='flex' gap={1}>
-              <Tooltip arrow placement='top' title={tokenGate.archived ? 'Unarchive' : 'Archive'}>
-                <ButtonChip
-                  className='row-actions'
-                  icon={tokenGate.archived ? <UnarchiveOutlinedIcon /> : <ArchiveOutlinedIcon />}
-                  clickable
-                  color='secondary'
-                  size='small'
-                  variant='outlined'
-                  disabled={isLoading}
-                  onClick={async () => {
-                    if (tokenGate.archived) {
-                      await unarchiveTokenGate();
-                    } else {
-                      await archiveTokenGate();
-                    }
-                    await refreshTokenGates();
-                  }}
-                />
-              </Tooltip>
+              {(tokenGate.archived ? !hasReachedLimit : true) && (
+                <Tooltip arrow placement='top' title={tokenGate.archived ? 'Unarchive' : 'Archive'}>
+                  <ButtonChip
+                    className='row-actions'
+                    icon={tokenGate.archived ? <UnarchiveOutlinedIcon /> : <ArchiveOutlinedIcon />}
+                    clickable
+                    color='secondary'
+                    size='small'
+                    variant='outlined'
+                    disabled={isLoading}
+                    onClick={toggleTokenGateArchive}
+                  />
+                </Tooltip>
+              )}
               <Tooltip arrow placement='top' title='Delete'>
                 <ButtonChip
                   className='row-actions'
