@@ -77,7 +77,7 @@ const config = {
     ignoreDuringBuilds: true
   },
   images: {
-    unoptimized: true // required for images to load in production
+    unoptimized: true // required for images to load in production - this may be fixed if we can add sharp (which was failing in Github Actions)
   },
   // types are tested separately from the build
   typescript: {
