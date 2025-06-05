@@ -1,5 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
+import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { TokenGateConditions } from '@packages/lib/tokenGates/interfaces';
 import { capitalize } from 'lodash';
 
 const KB = 1024;
@@ -41,7 +43,7 @@ export const RESTRICTED_TOKEN_GATE_CHAINS = ['ethereum'] as const;
 
 type TokenGatePayload = {
   subscriptionTier: SpaceSubscriptionTier | null;
-  conditions?: { chain: string }[];
+  conditions?: TokenGateConditions['accessControlConditions'];
   existingTokenGates: number;
 };
 
@@ -63,7 +65,7 @@ export async function validateTokenGateRestrictions(payload: TokenGatePayload) {
   // Check chain restrictions only for public and bronze tiers
   if (limits.restrictedChains) {
     const unsupportedChains = conditions
-      .map((condition) => condition.chain)
+      .map((condition) => getChainById(condition.chain)?.chainName.toLowerCase())
       .filter(
         (chain) => !RESTRICTED_TOKEN_GATE_CHAINS.includes(chain as (typeof RESTRICTED_TOKEN_GATE_CHAINS)[number])
       );

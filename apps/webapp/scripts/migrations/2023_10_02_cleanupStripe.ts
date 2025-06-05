@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { stripeClient } from 'lib/subscription/stripe';
 import { writeToSameFolder } from 'lib/utils/file';

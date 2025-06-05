@@ -4,11 +4,13 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useTheme, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
+import { useCallback, type ReactNode } from 'react';
 
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useMembers } from 'hooks/useMembers';
+import { useRoleAccess } from 'hooks/useRoleAccess';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 import CollabLandIcon from 'public/images/logos/collabland_logo.svg';
 import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
@@ -45,6 +47,8 @@ export function RoleRow({
   async function addMembers(newMembers: string[]) {
     await assignRoles(role.id, newMembers);
   }
+  const { showMessage } = useSnackbar();
+  const { canCreateRole } = useRoleAccess();
 
   const theme = useTheme();
 
@@ -67,6 +71,22 @@ export function RoleRow({
   const eligibleMembers = members.filter(
     (member) => !member.isGuest && !member.isBot && !assignedMembers.some((m) => m.id === member.id)
   );
+
+  const toggleRoleArchive = useCallback(async () => {
+    try {
+      if (role.archived) {
+        await unarchiveRole(role.id);
+      } else {
+        await archiveRole(role.id);
+      }
+      refreshRoles();
+      showMessage(`Role ${role.archived ? 'unarchived' : 'archived'} successfully`);
+    } catch (error) {
+      showMessage((error as Error).message || `Failed to ${role.archived ? 'unarchive' : 'archive'} role`, 'error');
+    } finally {
+      menuState.close();
+    }
+  }, [role.archived, unarchiveRole, archiveRole, refreshRoles, showMessage, menuState, role.id]);
 
   return (
     <RoleRowBase
@@ -120,14 +140,8 @@ export function RoleRow({
               </MenuItem>
               <MenuItem
                 sx={{ padding: '3px 12px' }}
-                onClick={() => {
-                  if (role.archived) {
-                    unarchiveRole(role.id);
-                  } else {
-                    archiveRole(role.id);
-                  }
-                  menuState.close();
-                }}
+                onClick={toggleRoleArchive}
+                disabled={role.archived ? !canCreateRole : false}
               >
                 <ListItemIcon>
                   {role.archived ? <UnarchiveOutlined fontSize='small' /> : <ArchiveOutlined fontSize='small' />}

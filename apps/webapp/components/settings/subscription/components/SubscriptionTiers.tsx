@@ -1,9 +1,8 @@
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import CheckIcon from '@mui/icons-material/Check';
 import { Box, Chip, Divider, Grid, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { subscriptionDetails } from '@packages/lib/subscription/constants';
 import type { UpgradableTier } from '@packages/subscriptions/constants';
-import { tierConfig } from '@packages/subscriptions/constants';
+import { subscriptionDetails, tierConfig } from '@packages/subscriptions/constants';
 import Image from 'next/image';
 import type { ReactNode } from 'react';
 

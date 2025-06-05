@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';

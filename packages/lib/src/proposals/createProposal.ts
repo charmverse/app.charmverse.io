@@ -10,7 +10,6 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
-import { rewardCharmsForProposal } from '@packages/lib/charms/triggers/rewardCharmsForProposal';
 import { getProjectById } from '@packages/lib/projects/getProjectById';
 import { createForm } from '@packages/lib/proposals/forms/createForm';
 import type { FieldAnswerInput, FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
@@ -147,14 +146,16 @@ export async function createProposal({
   const roles = await prisma.role.findMany({
     where: {
       spaceId,
-      archived: false,
       id: {
         in: roleIds
       }
+    },
+    select: {
+      archived: true
     }
   });
 
-  if (roles.length !== roleIds.length) {
+  if (roles.some((r) => r.archived)) {
     throw new Error('Archived roles are not allowed to be used in proposals');
   }
 
@@ -353,10 +354,6 @@ export async function createProposal({
         proposalId
       }
     });
-  }
-
-  if (proposalStatus === 'published') {
-    rewardCharmsForProposal(userId);
   }
 
   return {

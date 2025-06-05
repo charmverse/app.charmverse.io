@@ -27,7 +27,11 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
   const { getFeatureTitle } = useSpaceFeatures();
   const [expanded, setExpanded] = useState<string | false>(false);
   const [workflows, setWorkflows] = useState<WorkflowTemplateFormItem[]>([]);
-  const { data: currentWorkflowTemplates, isLoading: loadingWorkflows } = useGetProposalWorkflows(space.id);
+  const {
+    data: currentWorkflowTemplates,
+    isLoading: loadingWorkflows,
+    mutate: refreshWorkflows
+  } = useGetProposalWorkflows(space.id);
   const { trigger: upsertWorkflow } = useUpsertProposalWorkflow(space.id);
   const { trigger: deleteWorkflow } = useDeleteProposalWorkflow(space.id);
   const { showMessage } = useSnackbar();
@@ -146,6 +150,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
             onDuplicate={duplicateWorkflow}
             readOnly={!isAdmin}
             preventDelete={activeWorkflows.length === 1}
+            refreshWorkflows={refreshWorkflows}
           />
         ))}
       </Box>
@@ -179,6 +184,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
                 onDuplicate={duplicateWorkflow}
                 readOnly={!isAdmin}
                 preventDelete={false}
+                refreshWorkflows={refreshWorkflows}
               />
             ))}
           </Box>
