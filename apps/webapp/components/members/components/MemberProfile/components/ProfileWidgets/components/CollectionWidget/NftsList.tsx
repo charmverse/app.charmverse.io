@@ -1,12 +1,12 @@
 import CancelIcon from '@mui/icons-material/Cancel';
 import { Alert, Grid, Link, Stack, Tooltip, Typography } from '@mui/material';
+import type { NFTData } from '@packages/lib/blockchain/getNFTs';
 import { useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
 import Avatar from 'components/common/Avatar';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useUser } from 'hooks/useUser';
-import type { NFTData } from '@packages/lib/blockchain/getNFTs';
 
 import { updateProfileItem } from '../../../../utils';
 import { NonPinnedItem, ProfileItemContainer } from '../../../ProfileItemContainer';
@@ -40,7 +40,7 @@ export function NftsList({ userId, readOnly = false, isFetchingNfts, mutateNfts,
     <Stack gap={1} data-test='member-profile-nft-list'>
       <Typography variant='h6'>NFTs</Typography>
       {nftsError && (
-        <Grid item>
+        <Grid>
           <Alert severity='error'>Failed to fetch your NFTs</Alert>
         </Grid>
       )}

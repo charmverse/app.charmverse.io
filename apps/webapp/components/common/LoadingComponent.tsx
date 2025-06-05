@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import React from 'react';
 
@@ -8,7 +8,7 @@ export const LoadingIcon = styled(CircularProgress)`
 
 type CSSValue = number | string;
 
-export const LoadingCard = styled.div<{ height?: CSSValue; minHeight?: CSSValue }>`
+export const LoadingCard = styled('div')<{ height?: CSSValue; minHeight?: CSSValue }>`
   align-items: center;
   display: flex;
   justify-content: center;

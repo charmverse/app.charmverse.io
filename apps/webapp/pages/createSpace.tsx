@@ -20,9 +20,7 @@ export default function CreateSpace() {
       <Container px={3} data-test='login-page-content'>
         <Grid container>
           <Grid
-            item
-            xs={12}
-            md={6}
+            size={{ xs: 12, md: 6 }}
             sx={{
               display: 'flex',
               justifyContent: 'center',
@@ -47,9 +45,7 @@ export default function CreateSpace() {
             </Box>
           </Grid>
           <Grid
-            item
-            xs={12}
-            md={6}
+            size={{ xs: 12, md: 6 }}
             sx={{
               display: 'flex',
               alignItems: 'center',

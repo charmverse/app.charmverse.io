@@ -35,17 +35,17 @@ export function TogglePublicProposalTemplates() {
 
   return (
     <Grid container>
-      <Grid container item justifyContent='space-between' alignItems='center'>
-        <Grid item>
+      <Grid container justifyContent='space-between' alignItems='center'>
+        <Grid>
           <Typography display='flex' justifyContent='center'>
             Public proposal templates
           </Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <Switch checked={publicProposalTemplates} disabled={!isAdmin} onChange={togglePublicProposalTemplates} />
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         <Typography variant='body2' color='secondary'>
           {publicProposalTemplates
             ? 'Anyone can view your proposal templates'

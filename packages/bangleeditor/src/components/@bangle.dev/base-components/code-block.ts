@@ -1,6 +1,6 @@
 import { moveNode } from '@bangle.dev/pm-commands';
 import { createObject, filter, findParentNodeOfType, insertEmpty } from '@bangle.dev/utils';
-import type Token from 'markdown-it/lib/token';
+import type Token from 'markdown-it/lib/token.mjs';
 import { setBlockType } from 'prosemirror-commands';
 import { textblockTypeInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';

@@ -6,24 +6,24 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
     class="mocked mocked"
   >
     <div
-      class="MuiStack-root css-1y52uev-MuiStack-root"
+      class="MuiStack-root mui-1y52uev-MuiStack-root"
     >
       <div
         class="ViewHeader  "
       >
         <div
-          class="MuiTabs-root css-exc2kq-MuiTabs-root"
+          class="MuiTabs-root mui-exc2kq-MuiTabs-root"
         >
           <div
-            class="MuiTabs-scroller MuiTabs-fixed css-s2t35c-MuiTabs-scroller"
+            class="MuiTabs-scroller MuiTabs-fixed mui-s2t35c-MuiTabs-scroller"
             style="overflow: hidden; margin-bottom: 0px;"
           >
             <div
-              class="MuiTabs-flexContainer css-1wxkzlj-MuiTabs-flexContainer"
+              class="MuiTabs-list MuiTabs-flexContainer mui-hzcega-MuiTabs-list"
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1ng3ej9-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection mui-1ng3ej9-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"
@@ -32,7 +32,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
                 variant="text"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body1 css-6mvy6w-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body1 mui-6mvy6w-MuiTypography-root"
                 >
                   <span>
                     <svg
@@ -60,26 +60,26 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
               </button>
             </div>
             <span
-              class="MuiTabs-indicator css-8tv5c8-MuiTabs-indicator"
+              class="MuiTabs-indicator mui-8tv5c8-MuiTabs-indicator"
               style="left: 0px; width: 0px;"
             />
           </div>
         </div>
         <div
-          class="view-actions MuiBox-root css-37urdo"
+          class="view-actions MuiBox-root mui-37urdo"
         >
           <span
             class=""
             data-mui-internal-clone-element="true"
           >
             <button
-              class="Button IconButton css-w119tu"
+              class="Button IconButton mui-w119tu"
               style="width: 28px; height: 28px;"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall mui-dak9ua-MuiSvgIcon-root"
                 data-testid="AddIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -95,7 +95,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
           class="octo-spacer"
         />
         <div
-          class="view-actions MuiBox-root css-0"
+          class="view-actions MuiBox-root mui-0"
         >
           <span
             aria-label="Filter"
@@ -103,13 +103,13 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
             data-mui-internal-clone-element="true"
           >
             <button
-              class="Button IconButton css-w119tu"
+              class="Button IconButton mui-w119tu"
               style="width: 32px;"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall css-4wc7uu-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-colorPrimary MuiSvgIcon-fontSizeSmall mui-4wc7uu-MuiSvgIcon-root"
                 data-test="view-filter-button"
                 data-testid="FilterListIcon"
                 focusable="false"
@@ -127,7 +127,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
             data-mui-internal-clone-element="true"
           >
             <button
-              class="Button IconButton css-w119tu"
+              class="Button IconButton mui-w119tu"
               style="width: 32px;"
               type="button"
             >
@@ -158,13 +158,13 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
             data-mui-internal-clone-element="true"
           >
             <button
-              class="Button IconButton css-w119tu"
+              class="Button IconButton mui-w119tu"
               style="width: 32px;"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall mui-dak9ua-MuiSvgIcon-root"
                 data-testid="SearchIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -176,7 +176,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
             </button>
           </span>
           <div
-            class="MuiBox-root css-jw1lpn"
+            class="MuiBox-root mui-jw1lpn"
             data-test="view-header-actions-menu"
           >
             <span
@@ -185,13 +185,13 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
               data-mui-internal-clone-element="true"
             >
               <button
-                class="Button IconButton css-w119tu"
+                class="Button IconButton mui-w119tu"
                 style="width: 32px;"
                 type="button"
               >
                 <svg
                   aria-hidden="true"
-                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                  class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                   data-testid="MoreHorizOutlinedIcon"
                   focusable="false"
                   viewBox="0 0 24 24"
@@ -204,28 +204,28 @@ exports[`components/viewHeader/viewHeader > return viewHeader 1`] = `
             </span>
           </div>
           <div
-            class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary css-1b8iy89-MuiButtonGroup-root"
+            class="MuiButtonGroup-root MuiButtonGroup-contained MuiButtonGroup-horizontal MuiButtonGroup-disableElevation MuiButtonGroup-colorPrimary mui-1b8iy89-MuiButtonGroup-root"
             role="group"
           >
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton css-2v0i9c-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-firstButton mui-1gh9g54-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <div
-                class="MuiTypography-root MuiTypography-subtitle1 css-1qweoyf-MuiTypography-root"
+                class="MuiTypography-root MuiTypography-subtitle1 mui-1qweoyf-MuiTypography-root"
               >
                 New
               </div>
             </button>
             <button
-              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton css-17mpc6t-MuiButtonBase-root-MuiButton-root"
+              class="MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-grouped MuiButtonGroup-groupedHorizontal MuiButtonGroup-groupedContained MuiButtonGroup-groupedContainedHorizontal MuiButtonGroup-groupedContainedPrimary MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeSmall MuiButton-containedSizeSmall MuiButton-colorPrimary MuiButton-disableElevation MuiButtonGroup-lastButton mui-1glktlf-MuiButtonBase-root-MuiButton-root"
               tabindex="0"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-x1y095-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-x1y095-MuiSvgIcon-root"
                 data-testid="KeyboardArrowDownIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -249,24 +249,24 @@ exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
     class="mocked mocked"
   >
     <div
-      class="MuiStack-root css-1y52uev-MuiStack-root"
+      class="MuiStack-root mui-1y52uev-MuiStack-root"
     >
       <div
         class="ViewHeader  "
       >
         <div
-          class="MuiTabs-root css-exc2kq-MuiTabs-root"
+          class="MuiTabs-root mui-exc2kq-MuiTabs-root"
         >
           <div
-            class="MuiTabs-scroller MuiTabs-fixed css-s2t35c-MuiTabs-scroller"
+            class="MuiTabs-scroller MuiTabs-fixed mui-s2t35c-MuiTabs-scroller"
             style="overflow: hidden; margin-bottom: 0px;"
           >
             <div
-              class="MuiTabs-flexContainer css-1wxkzlj-MuiTabs-flexContainer"
+              class="MuiTabs-list MuiTabs-flexContainer mui-hzcega-MuiTabs-list"
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1ng3ej9-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection mui-1ng3ej9-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"
@@ -275,7 +275,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
                 variant="text"
               >
                 <p
-                  class="MuiTypography-root MuiTypography-body1 css-6mvy6w-MuiTypography-root"
+                  class="MuiTypography-root MuiTypography-body1 mui-6mvy6w-MuiTypography-root"
                 >
                   <span>
                     <svg
@@ -303,7 +303,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
               </button>
             </div>
             <span
-              class="MuiTabs-indicator css-8tv5c8-MuiTabs-indicator"
+              class="MuiTabs-indicator mui-8tv5c8-MuiTabs-indicator"
               style="left: 0px; width: 0px;"
             />
           </div>
@@ -312,7 +312,7 @@ exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
           class="octo-spacer"
         />
         <div
-          class="view-actions MuiBox-root css-0"
+          class="view-actions MuiBox-root mui-0"
         >
           <span
             aria-label="Search"
@@ -320,13 +320,13 @@ exports[`components/viewHeader/viewHeader > return viewHeader readonly 1`] = `
             data-mui-internal-clone-element="true"
           >
             <button
-              class="Button IconButton css-w119tu"
+              class="Button IconButton mui-w119tu"
               style="width: 32px;"
               type="button"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall mui-dak9ua-MuiSvgIcon-root"
                 data-testid="SearchIcon"
                 focusable="false"
                 viewBox="0 0 24 24"

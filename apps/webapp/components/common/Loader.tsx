@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 const Container = styled(Box)`

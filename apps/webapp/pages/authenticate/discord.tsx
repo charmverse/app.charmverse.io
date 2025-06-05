@@ -1,9 +1,9 @@
 import Box from '@mui/material/Box';
+import type { OauthLoginState } from '@packages/lib/oauth/interfaces';
 import { useEffect } from 'react';
 
 import { getLayout } from 'components/common/BaseLayout/getLayout';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { OauthLoginState } from '@packages/lib/oauth/interfaces';
 
 export default function Oauth() {
   useEffect(() => {

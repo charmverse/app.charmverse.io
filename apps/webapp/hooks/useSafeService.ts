@@ -1,6 +1,5 @@
 import type { IChainDetails } from '@packages/blockchain/connectors/chains';
-import type SafeServiceClient from '@safe-global/safe-service-client';
-import { ethers } from 'ethers';
+import type SafeServiceClient from '@safe-global/api-kit';
 import { useEffect, useState } from 'react';
 
 import { useWeb3Account } from './useWeb3Account';
@@ -13,17 +12,9 @@ export function useSafeService({ network }: { network?: IChainDetails | null }) 
     const gnosisUrl = network?.gnosisUrl;
     if (!provider || !network || !gnosisUrl) return;
 
-    import('@safe-global/safe-ethers-lib').then((ethersAdapter) => {
-      const EthersAdapter = ethersAdapter.default;
-      const ethAdapter = new EthersAdapter({
-        ethers,
-        signerOrProvider: provider
-      });
-
-      import('@safe-global/safe-service-client').then((safeServiceClient) => {
-        const SafeServiceClient = safeServiceClient.default;
-        setSafeService(new SafeServiceClient({ txServiceUrl: gnosisUrl, ethAdapter }));
-      });
+    import('@safe-global/api-kit').then((safeServiceClient) => {
+      const SafeServiceClient = safeServiceClient.default;
+      setSafeService(new SafeServiceClient({ txServiceUrl: gnosisUrl, chainId: BigInt(network.chainId) }));
     });
   }, [provider, network]);
 

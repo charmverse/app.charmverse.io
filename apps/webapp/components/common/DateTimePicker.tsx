@@ -1,9 +1,7 @@
-import styled from '@emotion/styled';
-import { TextField } from '@mui/material';
+import { styled, TextField } from '@mui/material';
 import type { TextFieldProps } from '@mui/material';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { DateTime } from 'luxon';
 import { forwardRef, useState } from 'react';
 
 const StyledTextField = styled(TextField)`
@@ -35,11 +33,11 @@ export const TextFieldSlot = forwardRef<HTMLDivElement, TextFieldProps>((props: 
 });
 
 // customized date picker that opens when clicking the inpu
-export function DateTimePicker<T extends DateTime>({
+export function DateTimePicker({
   variant,
   placeholder,
   ...props
-}: DateTimePickerProps<T> & { variant?: 'card_property'; placeholder?: string | boolean }) {
+}: DateTimePickerProps & { variant?: 'card_property'; placeholder?: string | boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
@@ -51,6 +49,7 @@ export function DateTimePicker<T extends DateTime>({
         // disableOpenPicker - this optoin messes up the picker for some reason
         onClose={() => setOpen(false)}
         {...props}
+        enableAccessibleFieldDOMStructure={false}
         slots={{
           ...props.slots,
           // hide the calendar picker icon

@@ -58,7 +58,7 @@ export function RoleForm({ role, submitted }: Props) {
       style={{ margin: 'auto' }}
     >
       <Grid container direction='column' spacing={3}>
-        <Grid item>
+        <Grid>
           <InputLabel>Role name</InputLabel>
           <TextField
             {...register('name')}
@@ -72,11 +72,11 @@ export function RoleForm({ role, submitted }: Props) {
         </Grid>
 
         {formError && (
-          <Grid item>
+          <Grid>
             <Alert severity='error'>{formError.message ?? (formError as any).error}</Alert>
           </Grid>
         )}
-        <Grid item>
+        <Grid>
           <Button disabled={!isValid} type='submit'>
             Rename role
           </Button>

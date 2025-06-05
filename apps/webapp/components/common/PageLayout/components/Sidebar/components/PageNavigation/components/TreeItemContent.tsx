@@ -1,6 +1,6 @@
 // The following was pulled from https://github.com/mui/material-ui/blob/master/packages/mui-lab/src/TreeItem/TreeItemContent.js because there's no way to import from the module
 
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import type { TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
 import { useTreeItemState, treeItemClasses } from '@mui/x-tree-view/TreeItem';
@@ -9,7 +9,7 @@ import { forwardRef, useCallback, memo, useEffect, useMemo } from 'react';
 
 // Styles were copied from https://github.com/mui/mui-x/blob/803b14e6908c597f61d3a93618ae5bfa4f94b55f/packages/x-tree-view/src/TreeItem/TreeItem.tsx#L51
 // We needed to override so we could completely remove the :hover CSS for iOS
-const StyledTreeItemContent = styled.div(({ theme }) => ({
+const StyledTreeItemContent = styled('div')(({ theme }) => ({
   padding: '0 8px',
   width: '100%',
   boxSizing: 'border-box', // prevent width + padding to overflow

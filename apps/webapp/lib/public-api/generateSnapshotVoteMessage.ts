@@ -1,5 +1,5 @@
 import { getCurrentDate } from '@packages/lib/utils/dates';
-import type { Vote } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { Vote } from '@snapshot-labs/snapshot.js/src/sign/types';
 import { getAddress } from 'viem';
 
 import type { SnapshotProposalVoteMessage, SnapshotProposalVoteType } from './interfaces';

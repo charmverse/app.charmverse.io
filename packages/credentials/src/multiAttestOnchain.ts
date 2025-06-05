@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import type { AttestationType } from '@charmverse/core/prisma-client';
-import type { Transaction } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
-import type { PopulatedTransaction, Signer } from 'ethers';
+import type { Transaction, TransactionSigner } from '@ethereum-attestation-service/eas-sdk';
+import type { ContractTransaction } from 'ethers';
 import { getAddress } from 'viem/utils';
 
 import type { OnChainAttestationInput } from './attestOnchain';
@@ -27,7 +27,7 @@ export async function multiAttestOnchain({
   type,
   chainId,
   signer
-}: OnChainMultiAttestationInput & { signer: Signer }): Promise<Transaction<string[]>> {
+}: OnChainMultiAttestationInput & { signer: TransactionSigner }): Promise<Transaction<string[]>> {
   const schemaId = attestationSchemaIds[type];
 
   const eas = getEasInstance(chainId);
@@ -59,12 +59,12 @@ export async function populateOnChainAttestationTransaction({
   credentialInputs,
   type,
   chainId
-}: OnChainMultiAttestationInput): Promise<Required<PopulatedTransaction>> {
+}: OnChainMultiAttestationInput): Promise<Required<ContractTransaction>> {
   const schemaId = attestationSchemaIds[type];
 
   const eas = getEasInstance(chainId);
 
-  const populatedTransaction = await eas.contract.populateTransaction.multiAttest([
+  const populatedTransaction = await eas.contract.multiAttest.populateTransaction([
     {
       data: credentialInputs.map(({ data, recipient }) => ({
         recipient: getAddress(recipient),
@@ -79,7 +79,7 @@ export async function populateOnChainAttestationTransaction({
     }
   ]);
 
-  return { ...populatedTransaction, to: eas.contract.address } as Required<PopulatedTransaction>;
+  return { ...populatedTransaction, to: await eas.contract.getAddress() } as Required<ContractTransaction>;
 }
 
 // These code snippets provide a quick test to check we can issue credentials onchain ----------

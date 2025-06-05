@@ -159,7 +159,7 @@ export async function getTokenInfoOnMantle({
   walletId = null,
   tokenId
 }: RPCTokenInput): Promise<NFTData> {
-  const provider = new ethers.providers.JsonRpcProvider(getAnkrBaseUrl(chainId));
+  const provider = new ethers.JsonRpcProvider(getAnkrBaseUrl(chainId));
   const contract = new ethers.Contract(address, ERC721_ABI, provider);
 
   const [tokenUri] = await Promise.all([contract.tokenURI(tokenId)]);

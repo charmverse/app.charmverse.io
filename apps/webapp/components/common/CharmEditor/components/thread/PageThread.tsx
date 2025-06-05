@@ -1,5 +1,4 @@
 import type { Comment } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
 import { Check } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditIcon from '@mui/icons-material/Edit';
@@ -7,6 +6,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SettingsBackupRestoreIcon from '@mui/icons-material/SettingsBackupRestore';
 import type { BoxProps, ButtonProps, SxProps, Theme } from '@mui/material';
 import {
+  styled,
   Box,
   Collapse,
   IconButton,
@@ -38,7 +38,7 @@ import { useUser } from 'hooks/useUser';
 import { InlineCharmEditor } from '../../index';
 import { scrollToThread } from '../inlineComment/inlineComment.utils';
 
-const ContextBorder = styled.div`
+const ContextBorder = styled('div')`
   width: 3px;
   border-radius: 3px;
   margin-left: 2px;

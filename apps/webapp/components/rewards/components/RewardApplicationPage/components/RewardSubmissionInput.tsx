@@ -117,7 +117,7 @@ export function RewardSubmissionInput({
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
-          <Grid item data-test='submission-input'>
+          <Grid data-test='submission-input'>
             <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
@@ -146,7 +146,7 @@ export function RewardSubmissionInput({
           </Grid>
 
           {(currentUserIsAuthor || permissions?.review) && rewardType === 'token' && (
-            <Grid item>
+            <Grid>
               <InputLabel>Address/ENS to receive reward</InputLabel>
               <TextField
                 {...register('walletAddress')}
@@ -160,7 +160,7 @@ export function RewardSubmissionInput({
           )}
 
           {(currentUserIsAuthor || permissions?.review) && rewardType === 'custom' && (
-            <Grid item>
+            <Grid>
               <InputLabel>Information for custom reward</InputLabel>
               <TextField
                 multiline
@@ -176,7 +176,7 @@ export function RewardSubmissionInput({
           )}
 
           {!readOnly && (
-            <Grid item display='flex' gap={1} justifyContent='flex-end'>
+            <Grid display='flex' gap={1} justifyContent='flex-end'>
               {onCancel && (
                 <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
                   Cancel

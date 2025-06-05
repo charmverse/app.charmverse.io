@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MuiTypography from '@mui/material/Typography';
 
 export const Typography = styled(MuiTypography)<{ overflowEllipsis?: boolean }>`

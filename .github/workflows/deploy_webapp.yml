@@ -326,7 +326,7 @@ jobs:
                       -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
                       --network "host"  \
                       --ipc=host \
-                      mcr.microsoft.com/playwright:v1.47.1-jammy \
+                      mcr.microsoft.com/playwright:v1.52.0-jammy \
                       ${{matrix.test_command}} || { echo $'\n👉 Here\'s the server output for debugging:\n' && cat server.log & exit 1; }
         # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
         # with:
@@ -375,7 +375,6 @@ jobs:
         uses: ./.github/actions/build_app
         with:
           app_name: webapp
-          REACT_APP_APP_ENV: 'production'
 
       - name: Update Dockerfile
         run: rm Dockerfile && mv apps/webapp/Dockerfile Dockerfile

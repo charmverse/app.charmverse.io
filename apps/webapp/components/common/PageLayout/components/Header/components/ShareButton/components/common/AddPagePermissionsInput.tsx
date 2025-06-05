@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Button } from '@mui/material';
+import { styled, Button } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import Input from '@mui/material/OutlinedInput';
 import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';

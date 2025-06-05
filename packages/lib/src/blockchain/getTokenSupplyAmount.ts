@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { getTokenMetadata } from '@packages/lib/tokens/getTokenMetadata';
 import { ethers } from 'ethers';
+import { formatUnits } from 'viem';
 
 export async function getTokenSupplyAmount({
   chainId,
@@ -26,7 +27,7 @@ export async function getTokenSupplyAmount({
 
   const tokenDecimals = tokenMetadata.decimals;
   const rpcUrl = chain.rpcUrls[0];
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.JsonRpcProvider(rpcUrl);
   const tokenContract = new ethers.Contract(
     tokenContractAddress,
     ['function totalSupply() view returns (uint256)'],
@@ -34,5 +35,5 @@ export async function getTokenSupplyAmount({
   );
 
   const totalSupply = await tokenContract.totalSupply();
-  return Number(ethers.utils.formatUnits(totalSupply, tokenDecimals));
+  return Number(formatUnits(totalSupply, tokenDecimals));
 }

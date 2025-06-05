@@ -4,7 +4,7 @@ import { getChainById } from '@packages/blockchain/connectors/chains';
 import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from '@packages/lib/gnosis/mantleClient';
 import { isTruthy } from '@packages/utils/types';
-import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import type { MetaTransactionData } from '@safe-global/types-kit';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
@@ -35,7 +35,7 @@ export function useMultiGnosisPayment({
   transactionPromises,
   onSuccess
 }: GnosisPaymentProps) {
-  const { account, chainId: connectedChainId, signer } = useWeb3Account();
+  const { account, chainId: connectedChainId } = useWeb3Account();
   const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
   if (chainId && !network?.gnosisUrl) {
@@ -47,7 +47,7 @@ export function useMultiGnosisPayment({
       await switchActiveNetwork(chainId);
     }
 
-    if (!safe || !account || !network?.gnosisUrl || !signer || !chainId) {
+    if (!safe || !account || !network?.gnosisUrl || !chainId) {
       return;
     }
 
@@ -75,7 +75,7 @@ export function useMultiGnosisPayment({
     }
 
     const safeTransaction = await safe.createTransaction({
-      safeTransactionData: transactionsWithRecipients.map((transaction) => ({
+      transactions: transactionsWithRecipients.map((transaction) => ({
         data: transaction.data,
         to: transaction.to,
         value: transaction.value,
@@ -86,19 +86,14 @@ export function useMultiGnosisPayment({
       }
     });
 
-    const EthersAdapter = (await import('@safe-global/safe-ethers-lib')).default;
-    const SafeServiceClient = (await import('@safe-global/safe-service-client')).default;
+    const SafeServiceClient = (await import('@safe-global/api-kit')).default;
 
     const txHash = await safe.getTransactionHash(safeTransaction);
-    const senderSignature = await safe.signTransactionHash(txHash);
-    const ethAdapter = new EthersAdapter({
-      ethers,
-      signerOrProvider: signer
-    });
+    const senderSignature = await safe.signHash(txHash);
 
     const senderAddress = getAddress(account);
 
-    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
+    const safeService = new SafeServiceClient({ txServiceUrl: network.gnosisUrl, chainId: BigInt(chainId) });
     if (isMantleChain(chainId)) {
       await proposeMantleSafeTransaction({
         safeTransactionData: {

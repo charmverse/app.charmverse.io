@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Tooltip } from '@mui/material';
+import { styled, Tooltip } from '@mui/material';
 import React from 'react';
 
 type Props = {
@@ -12,7 +11,7 @@ type Props = {
   tooltip?: string;
 };
 
-const StyledButton = styled.button`
+const StyledButton = styled('button')`
   &:hover {
     background: var(--button-text-hover);
   }

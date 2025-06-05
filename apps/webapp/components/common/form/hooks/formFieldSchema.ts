@@ -3,7 +3,6 @@ import type { PageContent } from '@packages/charmeditor/interfaces';
 import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { FieldType, FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
 import { isUUID, isUrl, isValidEmail } from '@packages/utils/strings';
-import { isValidName } from 'ethers/lib/utils';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
@@ -104,7 +103,7 @@ export function getYupValidationSchema(fields: FormFieldInput[]) {
                 return false;
               }
 
-              return value ? value.endsWith('.eth') || isValidName(value) || isAddress(value) : true;
+              return value ? value.endsWith('.eth') || isAddress(value) : true;
             });
             break;
           }

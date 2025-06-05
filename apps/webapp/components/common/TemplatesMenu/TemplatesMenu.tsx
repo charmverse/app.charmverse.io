@@ -1,7 +1,6 @@
-import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, Divider, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { useTheme, Box, Divider, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { fancyTrim } from '@packages/utils/strings';

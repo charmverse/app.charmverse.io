@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Box, Tooltip } from '@mui/material';
+import { styled, Box, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import Button from '../../widgets/buttons/button';
@@ -22,7 +21,7 @@ const Wrapper = styled(({ highlighted, fullWidth, ...props }: any) => <Box {...p
   ${({ fullWidth }) => (fullWidth ? 'width: auto !important;' : '')}
 `;
 
-const Asterisk = styled.span`
+const Asterisk = styled('span')`
   color: var(--danger-text);
 `;
 

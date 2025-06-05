@@ -2,10 +2,9 @@ import { log } from '@charmverse/core/log';
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { getCurrentGasPrice } from '@packages/blockchain/getCurrentGasPrice';
 import { credentialsWalletPrivateKey } from '@packages/utils/constants';
-import { getCurrentGasPrice } from '@packages/lib/blockchain/getCurrentGasPrice';
-import { getEthersProvider } from '@packages/lib/blockchain/getEthersProvider';
-import { Wallet } from 'ethers';
+import { JsonRpcProvider, Wallet } from 'ethers';
 import { zeroAddress } from 'viem';
 
 import type { EasSchemaChain } from './connectors';
@@ -27,7 +26,7 @@ export async function attestOnchain<T extends ExtendedAttestationType = Extended
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
 
-  const provider = getEthersProvider({ rpcUrl });
+  const provider = new JsonRpcProvider(rpcUrl);
 
   if (!credentialsWalletPrivateKey) {
     throw new Error('Skip creating attestation. Missing env: CREDENTIAL_WALLET_KEY');

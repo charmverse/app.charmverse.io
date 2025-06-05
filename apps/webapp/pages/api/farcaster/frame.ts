@@ -1,14 +1,13 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import * as http from '@packages/adapters/http';
+import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { Frame } from 'frames.js';
 import { getFrame } from 'frames.js';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -26,8 +25,9 @@ async function extractFarcasterMetadataFromUrl(
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
   const unparsedFrameHtml = await http.GET<string>(frameUrl);
-  const { frame } = getFrame({
+  const { frame } = await getFrame({
     htmlString: unparsedFrameHtml,
+    frameUrl,
     url: frameUrl
   });
 
@@ -35,7 +35,7 @@ async function extractFarcasterMetadataFromUrl(
     throw new InvalidInputError('Invalid Farcaster frame URL');
   }
 
-  const frameImage = frame.image;
+  const frameImage = (frame as Frame).image;
 
   if (frameImage && frameImage.includes('svg')) {
     throw new InvalidInputError('Invalid Farcaster frame URL');

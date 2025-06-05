@@ -1,5 +1,4 @@
-import { useTheme } from '@emotion/react';
-import { Box, Typography } from '@mui/material';
+import { useTheme, Box, Typography } from '@mui/material';
 import Image from 'next/image';
 
 import { GateOption } from '../GateOption';

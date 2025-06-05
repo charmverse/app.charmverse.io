@@ -1,8 +1,7 @@
 import type { FormField } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
 import type { SelectProps } from '@mui/material';
-import { Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
+import { styled, Box, InputLabel, List, MenuItem, Select, Typography } from '@mui/material';
 import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
@@ -24,7 +23,7 @@ import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 
-const Center = styled.div`
+const Center = styled('div')`
   text-align: center;
   display: flex;
   align-items: center;

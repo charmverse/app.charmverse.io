@@ -1,9 +1,9 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
+  styled,
   Divider,
   FormControlLabel,
   FormLabel,
@@ -17,6 +17,7 @@ import {
   Typography
 } from '@mui/material';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { ProposalEvaluationInput } from '@packages/lib/proposals/createProposal';
 import { isTruthy } from '@packages/utils/types';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
@@ -25,7 +26,6 @@ import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import type { ProposalEvaluationInput } from '@packages/lib/proposals/createProposal';
 
 type CreateVoteModalProps = {
   readOnly?: boolean;
@@ -34,7 +34,7 @@ type CreateVoteModalProps = {
   isPublishedProposal?: boolean;
 };
 
-const StyledVoteSettings = styled.div`
+const StyledVoteSettings = styled('div')`
   & .MuiInputBase-input {
     box-sizing: content-box;
   }

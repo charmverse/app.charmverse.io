@@ -1,9 +1,9 @@
-import type { BaseEmoji } from 'emoji-mart';
+import data from '@emoji-mart/data';
 import dynamic from 'next/dynamic';
 
-import 'emoji-mart/css/emoji-mart.css';
+// import 'emoji-mart/css/emoji-mart.css';
 
-const Picker = dynamic(() => import('emoji-mart').then((r) => r.Picker), { ssr: false });
+const Picker = dynamic(() => import('@emoji-mart/react'), { ssr: false });
 
 type Props = {
   onSelect: (emoji: string) => void;
@@ -18,7 +18,7 @@ function EmojiPicker(props: Props): JSX.Element {
         e.preventDefault();
       }}
     >
-      <Picker onSelect={(emoji: BaseEmoji) => props.onSelect(emoji.native)} />
+      <Picker data={data} onSelect={(emoji: { native: string }) => props.onSelect(emoji.native)} />
     </div>
   );
 }

@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { styled, Box } from '@mui/material';
 import Head from 'next/head';
 import type { ReactNode } from 'react';
 
@@ -22,7 +21,7 @@ import { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSi
 import { NavigationSidebarDrawer } from './components/Sidebar/NavigationSidebarDrawer';
 import { SharedPageLayout } from './SharedPageLayout';
 
-const LayoutContainer = styled.div`
+const LayoutContainer = styled('div')`
   display: flex;
   height: 100%;
 `;

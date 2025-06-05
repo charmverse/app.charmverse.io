@@ -1,9 +1,9 @@
 import { AuthKitProvider } from '@farcaster/auth-kit';
+import { warpcastConfig } from '@packages/lib/farcaster/config';
+import type { LoginType } from '@packages/lib/farcaster/interfaces';
 
 import { ConnectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/components/ConnectorButton';
 import { Button } from 'components/common/Button';
-import { warpcastConfig } from '@packages/lib/farcaster/config';
-import type { LoginType } from '@packages/lib/farcaster/interfaces';
 
 import { useWarpcastLogin } from '../hooks/useWarpcastLogin';
 
@@ -44,7 +44,12 @@ function WarpcastLoginButton({
 
 export function WarpcastLogin({ size, type, label }: { size?: string; type: LoginType; label?: string }) {
   return (
-    <AuthKitProvider config={warpcastConfig}>
+    <AuthKitProvider
+      config={{
+        ...warpcastConfig,
+        provider: undefined
+      }}
+    >
       <WarpcastLoginButton size={size} type={type} label={label} />
     </AuthKitProvider>
   );

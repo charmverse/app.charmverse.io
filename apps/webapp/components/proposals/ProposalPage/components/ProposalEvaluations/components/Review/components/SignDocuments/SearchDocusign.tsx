@@ -13,12 +13,12 @@ import {
   TextField
 } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { DocusignEnvelope, DocusignEnvelopeLite } from '@packages/lib/docusign/api';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import IconButton from 'components/common/DatabaseEditor/widgets/buttons/iconButton';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
-import type { DocusignEnvelope, DocusignEnvelopeLite } from '@packages/lib/docusign/api';
 
 function DocusignSearchResult({
   onClick,
@@ -78,7 +78,7 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
 
   return (
     <Grid container gap={2}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <FormLabel>Search documents to add</FormLabel>
           <IconButton icon={<CloseIcon fontSize='small' />} onClick={() => setShowSearch(false)} />
@@ -91,14 +91,14 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
         />
       </Grid>
       {envelopeSearchError && (
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Alert sx={{ width: '100%' }} severity='error'>
             {envelopeSearchError.message}
           </Alert>
         </Grid>
       )}
 
-      <Grid item gap={1} width='100%'>
+      <Grid gap={1} width='100%'>
         {options?.map((e) => (
           <>
             <DocusignSearchResult

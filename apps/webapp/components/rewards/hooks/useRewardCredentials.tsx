@@ -93,7 +93,7 @@ export function useRewardCredentials() {
         });
         await charmClient.credentials.requestRewardCredentialIndexing({
           chainId: space.credentialsChainId as EasSchemaChain,
-          txHash: txOutput.tx.hash
+          txHash: txOutput.receipt?.hash || ''
         });
         return 'wallet';
       }

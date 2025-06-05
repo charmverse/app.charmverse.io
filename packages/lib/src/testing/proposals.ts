@@ -20,7 +20,7 @@ import { generateBoard } from '@packages/testing/setupDatabase';
 import { sortBy } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-// import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
+// import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];

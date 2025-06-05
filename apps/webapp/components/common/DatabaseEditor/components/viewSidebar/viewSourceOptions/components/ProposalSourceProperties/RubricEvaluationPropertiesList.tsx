@@ -1,9 +1,12 @@
 import { Stack, Typography } from '@mui/material';
+import type {
+  RubricEvaluationProperty,
+  SelectedProposalProperties
+} from '@packages/databases/proposalsSource/interfaces';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { RubricEvaluationProperty, SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
 
 export function RubricEvaluationPropertiesList({

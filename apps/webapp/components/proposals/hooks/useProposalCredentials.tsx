@@ -1,6 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
+import type { TransactionSigner } from '@ethereum-attestation-service/eas-sdk';
 import type { EasSchemaChain } from '@packages/credentials/connectors';
 import type {
   IssuableProposalCredentialContent,
@@ -108,7 +109,7 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
         });
         await charmClient.credentials.requestProposalCredentialIndexing({
           chainId: space.credentialsChainId as EasSchemaChain,
-          txHash: txOutput.tx.hash
+          txHash: txOutput.receipt?.hash ?? ''
         });
         await refreshIssuableCredentials();
         return 'wallet';

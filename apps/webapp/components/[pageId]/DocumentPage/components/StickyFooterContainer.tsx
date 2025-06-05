@@ -1,13 +1,12 @@
-import styled from '@emotion/styled';
-import { DialogActions, Divider } from '@mui/material';
+import { styled, DialogActions, Divider } from '@mui/material';
 import type { ReactNode } from 'react';
 
-const Wrapper = styled.div`
+const Wrapper = styled('div')`
   background: var(--background-default);
   z-index: var(--z-index-drawer);
 `;
 
-const Contents = styled.div`
+const Contents = styled('div')`
   width: 100%;
   max-width: 100%;
   margin: 0 auto;

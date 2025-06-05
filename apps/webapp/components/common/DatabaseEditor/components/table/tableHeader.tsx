@@ -33,7 +33,7 @@ import { Utils } from '@packages/databases/utils';
 import { isReturnKey } from '@packages/lib/utils/react';
 import { bindPopover, bindToggle, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
+import type { Dispatch, RefObject, SetStateAction } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
@@ -77,7 +77,7 @@ function TableHeader(props: Props): JSX.Element {
   const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
   const popupState = usePopupState({ variant: 'popper', popupId: 'iframe-selector' });
-  const toggleRef = useRef(null);
+  const toggleRef = useRef<HTMLDivElement>(null);
 
   const popover = bindPopover(popupState);
   const popoverProps: PopoverProps = {
@@ -373,7 +373,7 @@ function TableHeader(props: Props): JSX.Element {
         {readOnly ? (
           label
         ) : (
-          <div ref={toggleRef}>
+          <div ref={toggleRef as RefObject<HTMLDivElement>}>
             <div {...popoverToggleProps}>{label}</div>
             <Popover {...popoverProps}>
               <Paper>{popupContent}</Paper>

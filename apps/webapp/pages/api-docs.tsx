@@ -1,4 +1,4 @@
-import { useTheme } from '@emotion/react';
+import { useTheme } from '@mui/material';
 import { charmverseDiscordInvite, isProdEnv } from '@packages/config/constants';
 import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 import dynamic from 'next/dynamic';

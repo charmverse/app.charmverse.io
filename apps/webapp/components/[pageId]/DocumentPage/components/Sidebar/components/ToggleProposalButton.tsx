@@ -1,6 +1,5 @@
-import { useTheme } from '@emotion/react';
 import { ChevronRight } from '@mui/icons-material';
-import { SvgIcon, IconButton } from '@mui/material';
+import { useTheme, SvgIcon, IconButton } from '@mui/material';
 import { RiChatCheckLine } from 'react-icons/ri';
 
 export function ToggleProposalSidebarButton({ onClick, isOpen }: { onClick: VoidFunction; isOpen: boolean }) {

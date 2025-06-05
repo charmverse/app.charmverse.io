@@ -1,10 +1,9 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-
 import { isTouchDevice, safeScrollIntoViewIfNeeded } from '@packages/lib/utils/browser';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { InlinePaletteSize } from './InlineCommandPalette';
 
@@ -35,7 +34,7 @@ const IconContainer = styled(Paper)<{ size: InlinePaletteSize }>`
   margin-left: ${({ theme }) => theme.spacing(0.5)};
 `;
 
-const StyledInlinePaletteRow = styled.div<{ disabled: boolean; size: InlinePaletteSize }>`
+const StyledInlinePaletteRow = styled('div')<{ disabled: boolean; size: InlinePaletteSize }>`
   padding: 0.3rem 0;
   cursor: pointer;
   display: flex;

@@ -5,6 +5,7 @@ import type { PageContent } from '@packages/charmeditor/interfaces';
 import { checkIsContentEmpty } from '@packages/charmeditor/utils/checkIsContentEmpty';
 import type { PostCommentWithVoteAndChildren } from '@packages/lib/forums/comments/interface';
 import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
+import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 
@@ -132,7 +133,7 @@ export function PostPage({
   }, [post]);
 
   // keep a ref in sync for printing
-  const printRef = useRef(null);
+  const printRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (printRef?.current !== _printRef?.current) {
       setPageProps({

@@ -1,6 +1,6 @@
 import { redisClient } from '@packages/adapters/redis/redisClient';
 
-import { getPublicClient } from './publicClient';
+import { getPublicClient } from './getPublicClient';
 
 /**
  * Get the current gas price for a given chain, with at most 60 seconds of cache.

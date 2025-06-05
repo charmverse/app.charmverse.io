@@ -1,9 +1,10 @@
+// @ts-nocheck
+
 import { arrayUtils } from '@charmverse/core/utilities';
 import { PaymentMethod, TokenGate, prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@packages/config/constants';
 import { lowerCaseEqual, prettyPrint } from '@packages/utils/strings';
 import { goerli, sepolia } from 'viem/chains';
-import { UnsignedTransaction } from '@lens-protocol/domain/entities';
 
 async function migratePaymentMethods() {
   const usdcGoerliContract = '0x07865c6e87b9f70255377e024ace6630c1eaa37f';

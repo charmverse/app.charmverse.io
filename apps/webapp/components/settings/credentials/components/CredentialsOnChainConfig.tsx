@@ -31,7 +31,7 @@ export function CredentialsOnChainConfig({
 
   return (
     <Grid container display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
-      <Grid item>
+      <Grid>
         <FormControlLabel
           sx={{
             margin: 0,
@@ -57,8 +57,8 @@ export function CredentialsOnChainConfig({
       </Grid>
 
       {useOnchainCredentials && (
-        <Grid container item justifyContent='flex-start' alignItems='flex-start'>
-          <Grid item xs={4} style={{ minHeight: '72px' }}>
+        <Grid container justifyContent='flex-start' alignItems='flex-start'>
+          <Grid size={4} style={{ minHeight: '72px' }}>
             {/* Added a minimum height */}
             <InputSearchBlockchain
               chains={showTestnets ? [...easSchemaChains] : [...easSchemaMainnetChains.map((c) => c.id)]}
@@ -67,7 +67,7 @@ export function CredentialsOnChainConfig({
               disabled={readOnly}
             />
           </Grid>
-          <Grid item xs={6} px={2}>
+          <Grid size={6} px={2}>
             <Stack style={{ minHeight: '72px' }}>
               <TextField
                 value={credentialsWallet}

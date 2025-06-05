@@ -4,11 +4,11 @@ import type { CredentialEventType, IssuedCredential } from '@charmverse/core/pri
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
-import { JsonRpcProvider } from '@ethersproject/providers';
 import { getChainById } from '@packages/blockchain/connectors/chains';
-import { lowerCaseEqual } from '@packages/utils/strings';
 import { getPublicClient } from '@packages/lib/blockchain/publicClient';
+import { lowerCaseEqual } from '@packages/utils/strings';
 import { RateLimit } from 'async-sema';
+import { JsonRpcProvider } from 'ethers';
 
 import { getEasConnector, type EasSchemaChain } from './connectors';
 import { rewardSubmissionApprovedVerb } from './constants';

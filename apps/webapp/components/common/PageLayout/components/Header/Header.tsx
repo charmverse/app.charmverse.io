@@ -1,6 +1,5 @@
-import styled from '@emotion/styled';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Badge } from '@mui/material';
+import { styled, Badge } from '@mui/material';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Toolbar from '@mui/material/Toolbar';
@@ -27,7 +26,7 @@ export const StyledToolbar = styled(Toolbar)`
   min-height: ${headerHeight}px;
 `;
 
-export const HeaderSpacer = styled.div`
+export const HeaderSpacer = styled('div')`
   min-height: ${headerHeight}px;
 `;
 

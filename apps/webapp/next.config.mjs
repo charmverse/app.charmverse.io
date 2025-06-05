@@ -3,7 +3,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-const BundleAnalyzer = require('next-bundle-analyzer');
+// const BundleAnalyzer = require('next-bundle-analyzer');
 
 const esmModules = [
   '@bangle.dev/base-components',
@@ -32,6 +32,7 @@ const esmModules = [
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
+  '@charmverse/core',
   // 'uuid',
   'data-uri-to-buffer',
   'fetch-blob',
@@ -40,7 +41,7 @@ const esmModules = [
   'formdata-polyfill',
   'jose',
   'nanoid',
-  '@lens-protocol',
+  '@mui/material-nextjs',
   'wagmi' // compile wagmi to avoid error: QueryClientProvider must be used as a child of ReactQueryClientProvider when running app
 ];
 
@@ -72,41 +73,27 @@ const useCDN =
 const config = {
   poweredByHeader: false,
   eslint: {
-    // add background and serverless to the default list of pages for eslint
-    dirs: ['pages', 'components', 'lib', 'background', 'serverless', 'stories'],
+    dirs: ['pages', 'components', 'lib', 'stories'],
     ignoreDuringBuilds: true
+  },
+  images: {
+    unoptimized: true // required for images to load in production - this may be fixed if we can add sharp (which was failing in Github Actions)
   },
   // types are tested separately from the build
   typescript: {
-    ignoreBuildErrors: true,
-    tsconfigPath: 'tsconfig.next.json'
-  },
-  compiler: {
-    styledComponents: true
+    ignoreBuildErrors: true
+    // tsconfigPath: 'tsconfig.next.json'
   },
   experimental: {
-    esmExternals: false,
     webpackBuildWorker: true
-    // turbo: {
-    //   resolveAlias: {
-    //     fs: false
-    //   },
-    //   rules: {
-    //     '*.svg': {
-    //       loaders: ['@svgr/webpack'],
-    //       as: '*.js'
-    //     }
-    //   }
-    // }
   },
-  images: {
-    // next image is broken in staging/production as of 14.0.1
-    unoptimized: true
-  },
-  transpilePackages: esmModules,
-  modularizeImports: {
-    lodash: {
-      transform: 'lodash/{{member}}'
+  transpilePackages: ['@packages/adapters', '@charmverse/core'],
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js'
+      }
     }
   },
   assetPrefix: useCDN ? 'https://cdn.charmverse.io' : undefined,
@@ -210,7 +197,7 @@ const removeUndefined = (obj) => {
   return newObj;
 };
 
-const withBundleAnalyzer = BundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true'
-});
-module.exports = withBundleAnalyzer(config);
+// const withBundleAnalyzer = BundleAnalyzer({
+//   enabled: process.env.ANALYZE === 'true'
+// });
+export default config;

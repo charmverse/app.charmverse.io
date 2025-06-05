@@ -1,14 +1,14 @@
 import { InvalidInputError, MissingDataError } from '@charmverse/core/errors';
+import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { isSupportedSafeApiChain } from '@packages/lib/gnosis/safe/isSupportedSafeApiChain';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import type SafeApiKit from '@safe-global/api-kit';
-import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import type { MetaTransactionData } from '@safe-global/types-kit';
 import { useCallback, useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { getAddress } from 'viem';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
-import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
-import { isSupportedSafeApiChain } from '@packages/lib/gnosis/safe/isSupportedSafeApiChain';
 
 import { useCreateSafes } from './useCreateSafes';
 import { useWeb3Account } from './useWeb3Account';
@@ -54,11 +54,12 @@ export function useGetGnosisSafe({ address, chainId }: { chainId: number; addres
       const nonce = await safeApiClient.getNextNonce(gnosisSafe.address);
 
       const safeTransaction = await safeTransactionClient.createTransaction({
-        safeTransactionData: { ...safeTransactionData, nonce }
+        transactions: [{ ...safeTransactionData }],
+        options: { nonce: Number(nonce) }
       });
 
       const safeTxHash = await safeTransactionClient.getTransactionHash(safeTransaction);
-      const signature = await safeTransactionClient.signTransactionHash(safeTxHash);
+      const signature = await safeTransactionClient.signHash(safeTxHash);
       await safeApiClient.proposeTransaction({
         safeAddress: gnosisSafe.address,
         safeTransactionData: {

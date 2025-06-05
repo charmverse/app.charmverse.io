@@ -1,10 +1,9 @@
 import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import { IconButton, InputAdornment, Tooltip } from '@mui/material';
+import { styled, IconButton, InputAdornment, Tooltip } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -227,7 +226,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
       {step === 'create_space' && (
         <form data-test='create-space-form' onSubmit={handleSubmit(onSubmit)}>
           <Grid container direction='column' spacing={2}>
-            <Grid item display='flex' justifyContent='center'>
+            <Grid display='flex' justifyContent='center'>
               <Avatar
                 name={watchName}
                 variant='rounded'
@@ -237,7 +236,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
                 alwaysShowEdit={editableFields}
               />
             </Grid>
-            <Grid item>
+            <Grid>
               <FieldLabel>Name</FieldLabel>
               <TextField
                 data-test='workspace-name-input'
@@ -264,7 +263,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
                 }
               />
             </Grid>
-            <Grid item sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid sx={{ display: 'flex', justifyContent: 'center' }}>
               {watchSpaceTemplate !== 'importMarkdown' && (
                 <Button
                   size='large'
@@ -287,7 +286,7 @@ export function CreateSpaceForm({ className, defaultValues, onCancel, submitText
               )}
             </Grid>
             {saveError && (
-              <Grid item>
+              <Grid>
                 <Alert severity='error'>{errorText}</Alert>
               </Grid>
             )}

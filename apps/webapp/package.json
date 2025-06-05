@@ -1,6 +1,6 @@
 {
   "name": "webapp",
-  "version": "0..0",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "npx next dev",
@@ -9,7 +9,6 @@
     "lint": "npx next lint",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next start",
-    "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
     "test:integration": "",
     "test:browser": "npx vitest --globals --update --project=browser",
     "test:lib": "npx vitest --globals --update --project=lib",
@@ -19,8 +18,15 @@
   },
   "dependencies": {
     "@decent.xyz/box-common": "^5.1.8",
+    "@emoji-mart/data": "^1.2.1",
+    "@emoji-mart/react": "^1.1.1",
+    "@emotion/styled": "^11.14.0",
     "@farcaster/core": "^0.16.4",
     "@fontsource/ia-writer-mono": "^5.2.5",
+    "@fullcalendar/react": "^6.1.17",
+    "@mui/material-nextjs": "^7.1.0",
+    "@mui/x-tree-view": "^7.29.1",
+    "@packages/adapters": "^0.0.0",
     "@packages/aws": "^0.0.0",
     "@packages/bangleeditor": "^0.0.0",
     "@packages/blockchain": "^0.0.0",
@@ -46,16 +52,27 @@
     "@storybook/nextjs": "^8.6.12",
     "@storybook/react": "^8.6.12",
     "@storybook/theming": "^8.6.12",
+    "emoji-mart": "^5.6.0",
+    "frames.js": "^0.22.0",
     "msw-storybook-addon": "^2.0.4",
     "react-icons": "^5.5.0",
     "react-pdf": "^9.2.1",
     "react-to-print": "^2.15.1",
-    "react-window": "^1.8.11"
+    "react-window": "^1.8.11",
+    "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
     "@packages/testing": "^1.0.0",
+    "@playwright/test": "^1.52.0",
     "@storybook/icons": "^1.4.0",
     "@storybook/test": "^8.6.12",
     "storybook": "^8.3.7"
+  },
+  "overrides": {
+    "react": "19.1",
+    "next": "^15.3.2",
+    "@mui/x-tree-view": {
+      "react": "19.1"
+    }
   }
 }

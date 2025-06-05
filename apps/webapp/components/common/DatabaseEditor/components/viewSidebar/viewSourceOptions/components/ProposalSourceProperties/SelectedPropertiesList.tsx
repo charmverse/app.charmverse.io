@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { SxProps, TypographyProps } from '@mui/material';
 import { Divider, Stack, Typography } from '@mui/material';
 

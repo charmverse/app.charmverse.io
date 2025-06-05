@@ -1,3 +1,4 @@
+import type { CommentContent, UpdateCommentInput } from '@packages/lib/comments';
 import { useCallback, useMemo, useState } from 'react';
 import useSWR from 'swr';
 
@@ -5,7 +6,6 @@ import charmClient from 'charmClient';
 import type { CommentSortType } from 'components/common/comments/CommentSort';
 import { getUpdatedCommentVote, processComments, sortComments } from 'components/common/comments/utils';
 import { useMembers } from 'hooks/useMembers';
-import type { CommentContent, UpdateCommentInput } from '@packages/lib/comments';
 
 export function usePageComments(pageId: string) {
   const [commentSort, setCommentSort] = useState<CommentSortType>('latest');
@@ -72,17 +72,7 @@ export function usePageComments(pageId: string) {
     [mutate, pageId]
   );
 
-  const syncPageCommentsWithLensPost = useCallback(async () => {
-    const newComments = await charmClient.pages.syncPageCommentsWithLensPost({ pageId });
-    // Refetch newly created members
-    await mutateMembers();
-    mutate(() => newComments, {
-      revalidate: false
-    });
-  }, [mutate, pageId]);
-
   return {
-    syncPageCommentsWithLensPost,
     commentSort,
     setCommentSort,
     isLoadingComments,

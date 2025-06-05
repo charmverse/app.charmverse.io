@@ -7,7 +7,6 @@ import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
-import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
@@ -95,28 +94,8 @@ export class SpacesApi {
     return http.GET<CustomDomainVerification>(`/api/spaces/${spaceId}/custom-domain`);
   }
 
-  getCollablandCode(spaceId: string) {
-    return http.GET<{ code: string }>(`/api/spaces/${spaceId}/collabland/code`);
-  }
-
   exportSpaceData({ spaceId }: { spaceId: string }) {
     return http.POST<{ downloadLink: string }>(`/api/spaces/${spaceId}/export-data`);
-  }
-
-  connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {
-    return http.POST(`/api/spaces/${spaceId}/github/connect`, { installationId });
-  }
-
-  updateGithubRewardsRepo({
-    spaceId,
-    repoId,
-    payload
-  }: {
-    spaceId: string;
-    repoId: string;
-    payload: UpdateGithubRepoWithReward;
-  }) {
-    return http.PUT<RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
   }
 
   getSpaceTokenBalance(spaceId: string) {

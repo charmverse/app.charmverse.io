@@ -1,8 +1,6 @@
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { ListItemButton, Tooltip } from '@mui/material';
+import { useTheme, styled, ListItemButton, Tooltip } from '@mui/material';
 import type { ReactNode, MouseEvent } from 'react';
 import { memo, forwardRef } from 'react';
 
@@ -15,7 +13,7 @@ interface BlockAlignerProps {
   extraControls?: { showOnReadonly?: boolean; onClick?: VoidFunction; Icon: React.ElementType; tooltip?: string }[];
 }
 
-const StyledBlockAligner = styled.div`
+const StyledBlockAligner = styled('div')`
   line-height: 0; // hide margin that appears underneath iframe
   position: relative;
   max-width: 100%;
@@ -29,7 +27,7 @@ const StyledBlockAligner = styled.div`
   }
 `;
 
-const Controls = styled.div`
+const Controls = styled('div')`
   position: absolute;
   background: ${({ theme }) => theme.palette.background.light};
   display: flex;

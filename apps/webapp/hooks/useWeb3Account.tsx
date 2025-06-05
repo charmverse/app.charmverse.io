@@ -1,13 +1,16 @@
-import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { getWagmiConfig } from '@packages/blockchain/connectors/config';
+import type {
+  SignatureVerificationPayload,
+  SignatureVerificationPayloadWithAddress
+} from '@packages/lib/blockchain/signAndVerify';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { SystemError } from '@packages/utils/errors';
 import { MissingWeb3AccountError } from '@packages/utils/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { watchAccount } from '@wagmi/core';
-import type { Signer } from 'ethers';
+import type { BrowserProvider, Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -18,10 +21,6 @@ import { getAddress } from 'viem';
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { useAccount, useConnect, useSignMessage } from 'hooks/wagmi';
-import type {
-  SignatureVerificationPayload,
-  SignatureVerificationPayloadWithAddress
-} from '@packages/lib/blockchain/signAndVerify';
 
 import { useUser } from './useUser';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
@@ -39,7 +38,8 @@ type IContext = {
   loginFromWeb3Account: (payload?: SignatureVerificationPayload) => Promise<LoggedInUser | undefined>;
   setAccountUpdatePaused: (paused: boolean) => void;
   signer: Signer | undefined;
-  provider: Web3Provider | undefined;
+  provider: BrowserProvider | undefined;
+  legacyProvider: Web3Provider | undefined; // USE THIS FOR SNAPSHOT
 };
 
 export const Web3Context = createContext<Readonly<IContext>>({
@@ -53,7 +53,8 @@ export const Web3Context = createContext<Readonly<IContext>>({
   loginFromWeb3Account: () => Promise.resolve(null as any),
   setAccountUpdatePaused: () => null,
   signer: undefined,
-  provider: undefined
+  provider: undefined,
+  legacyProvider: undefined
 });
 
 // a wrapper around account and library from web3react
@@ -77,7 +78,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { connectors, connectAsync } = useConnect();
 
   const [accountUpdatePaused, setAccountUpdatePaused] = useState(false);
-  const { signer, provider } = useWeb3Signer({ chainId });
+  const { signer, provider, legacyProvider } = useWeb3Signer({ chainId });
 
   const requestSignature = useCallback(async () => {
     if (!account) {
@@ -239,7 +240,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       loginFromWeb3Account,
       setAccountUpdatePaused,
       signer,
-      provider
+      provider,
+      legacyProvider
     }),
     [
       chainId,
@@ -252,7 +254,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       disconnectWallet,
       loginFromWeb3Account,
       signer,
-      provider
+      provider,
+      legacyProvider
     ]
   );
 

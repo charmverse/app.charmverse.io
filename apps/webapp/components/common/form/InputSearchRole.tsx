@@ -76,8 +76,8 @@ function InputSearchRoleBase({
       // @ts-ignore - not sure why this fails
       options={filteredRoles}
       autoHighlight
-      getOptionLabel={(role) => role?.name}
-      renderOption={(_props, role) => <li {..._props}>{role.name}</li>}
+      getOptionLabel={(role) => (role as Role)?.name}
+      renderOption={(_props, role) => <li {..._props}>{(role as Role).name}</li>}
       renderInput={(params) => (
         <TextField
           {...params}

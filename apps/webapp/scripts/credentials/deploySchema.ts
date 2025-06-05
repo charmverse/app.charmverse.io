@@ -1,13 +1,13 @@
 import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
-import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
+import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
 import { optimismSepolia } from 'viem/chains';
 import { EasSchemaChain, easConnectors } from '@packages/credentials/connectors';
 import { getEasInstance } from '@packages/credentials/getEasInstance';
 import { zeroAddress } from 'viem';
 
-import { Wallet, providers } from 'ethers';
+import { Wallet, JsonRpcProvider } from 'ethers';
 import { http } from 'viem';
-import { publicClientToProvider } from 'lib/utils/ethers';
+// import { publicClientToProvider } from '@packages/lib/utils/ethers';
 import type { Chain } from 'viem/chains';
 import { createPublicClient, PublicClient } from 'viem';
 
@@ -30,7 +30,7 @@ async function deploy(chain: Chain, schema: string, resolverAddress: string = ze
   schemaRegistry.connect(_getSigner(privateKey, chain));
 
   // SchemaUID is deterministic
-  const schemaUid = getSchemaUID(schema, resolverAddress, true);
+  const schemaUid = SchemaRegistry.getSchemaUID(schema, resolverAddress, true);
   console.log('Deploying Schema', schema, 'UID:', schemaUid);
 
   const deployedSchema = await schemaRegistry.getSchema({ uid: schemaUid }).catch((err) => {
@@ -85,7 +85,7 @@ async function attest({
   // ]);
 
   // SchemaUID is deterministic
-  const schemaUid = getSchemaUID(schema, resolverAddress, true);
+  const schemaUid = SchemaRegistry.getSchemaUID(schema, resolverAddress, true);
 
   const response = await eas.attest(
     {
@@ -93,7 +93,7 @@ async function attest({
       data: {
         recipient,
         // recipient: '0xFD50b031E778fAb33DfD2Fc3Ca66a1EeF0652165',
-        expirationTime: 0,
+        // expirationTime: 0,
         revocable: true, // Be aware that if your schema is not revocable, this MUST be false
         data: encodedData,
         refUID: refUID
@@ -127,7 +127,8 @@ async function getAttest() {
     chain: chain,
     transport: http()
   }) as PublicClient;
-  eas.connect(publicClientToProvider(client));
+  // FIXME
+  // eas.connect(publicClientToProvider(client));
 
   const attestation = await eas.getAttestation(uid);
 
@@ -147,7 +148,7 @@ async function getAttest() {
 
 function _getSigner(_privateKey: PrivateKeyString, chain: Chain) {
   const rpc = chain.rpcUrls.default.http[0];
-  const provider = new providers.JsonRpcProvider(chain.rpcUrls.default.http[0], chain.id);
+  const provider = new JsonRpcProvider(chain.rpcUrls.default.http[0], chain.id);
   return new Wallet(_privateKey, provider);
 }
 

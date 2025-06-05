@@ -1,14 +1,13 @@
-import { v4 } from 'uuid';
-
-import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/interfaces';
 import {
   PROJECT_DESCRIPTION_ID,
   PROJECT_MEMBER_NAMES_ID,
   PROJECT_MEMBER_WALLETS_ID,
   PROJECT_NAME_ID
-} from 'lib/projects/formField';
+} from '@packages/lib/projects/formField';
+import { v4 } from 'uuid';
 
 import { createSelectedPropertiesStateFromBoardProperties } from '../createSelectedPropertiesFromBoardProperties';
+import type { SelectedProposalProperties } from '../interfaces';
 
 describe(`createSelectedPropertiesStateFromBoardProperties`, () => {
   it(`Should return recreated selected properties state from board properties`, async () => {

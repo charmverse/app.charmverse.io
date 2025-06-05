@@ -1,8 +1,8 @@
 import type { MemberProperty, MemberPropertyType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { styled, Box, Card, Chip, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
+import type { Member, Social } from '@packages/lib/members/interfaces';
 import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
 import type { MouseEvent } from 'react';
 
@@ -15,7 +15,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
-import type { Member, Social } from '@packages/lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -259,7 +258,7 @@ export function MemberDirectoryGalleryView({ members }: { members: Member[] }) {
   return (
     <Grid container gap={2.5}>
       {members.map((member) => (
-        <Grid item xs={12} sm={5} md={3.75} key={member.id}>
+        <Grid size={{ xs: 12, sm: 5, md: 3.75 }} key={member.id}>
           <MemberDirectoryGalleryCard
             member={member}
             visibleProperties={visibleProperties}

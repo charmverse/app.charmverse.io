@@ -3,8 +3,6 @@ import throttle from 'lodash/throttle';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin, NodeSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-// @ts-ignore
-import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
 import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 
@@ -113,7 +111,7 @@ export function plugins({ key }: { key: PluginKey }) {
       );
 
       const slice = view.state.selection.content();
-      const { dom, text } = serializeForClipboard(view, slice);
+      const { dom, text } = view.serializeForClipboard(slice);
 
       e.dataTransfer.clearData();
       e.dataTransfer.setData(brokenClipboardAPI ? 'Text' : 'text/html', dom.innerHTML);
@@ -254,11 +252,7 @@ export function rowNodeAtPos(
   //   }
   //   node = node.parentNode;
   // }
-  return {
-    ...dom,
-    node: dom.node as HTMLElement,
-    rowNode: rowNode as HTMLElement
-  };
+  return { ...dom, node: dom.node as HTMLElement, rowNode: rowNode as HTMLElement };
 }
 
 function blockPosAtCoords(view: EditorView, coords: { left: number; top: number }) {
@@ -336,20 +330,16 @@ export function getNodeForRowPosition({
     nodeEnd = view.state.doc.content.size;
   }
 
-  log.debug('Row meta', {
-    child: firstChild?.content.size,
-    nodeStart,
-    topPos: topPos.pos,
-    pmNode,
-    nodeEnd,
-    nodeSize
-  });
+  // log.debug('Row meta', {
+  //   child: firstChild?.content.size,
+  //   nodeStart,
+  //   topPos: topPos.pos,
+  //   pmNode,
+  //   nodeEnd,
+  //   nodeSize
+  // });
 
-  return {
-    node: pmNode,
-    nodeEnd,
-    nodeStart
-  };
+  return { node: pmNode, nodeEnd, nodeStart };
 }
 
 export function deleteRowNode({

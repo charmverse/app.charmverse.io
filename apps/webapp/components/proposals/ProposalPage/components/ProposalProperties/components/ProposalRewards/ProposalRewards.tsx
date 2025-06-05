@@ -1,10 +1,12 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Grid, IconButton, Stack, Tooltip, Typography } from '@mui/material';
+import type { ProposalPendingReward } from '@packages/lib/proposals/interfaces';
 import { isTruthy } from '@packages/utils/types';
 
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import { Hidden } from 'components/common/Hidden';
 import Link from 'components/common/Link';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
@@ -13,7 +15,6 @@ import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from '@packages/lib/proposals/interfaces';
 
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 
@@ -150,20 +151,20 @@ export function ProposalRewards({
                 <SelectPreviewContainer readOnly={readOnly} displayType='details'>
                   <Stack direction='row' justifyContent='space-between' alignItems='center' gap={1}>
                     <Grid container spacing={0.5}>
-                      <Grid item xs={8} lg={5}>
+                      <Grid size={{ xs: 8, lg: 5 }}>
                         <Typography component='span' variant='subtitle1' fontWeight='normal'>
                           {page?.title || 'Untitled'}
                         </Typography>
                       </Grid>
                       <Hidden lgDown>
-                        <Grid item xs={5}>
+                        <Grid size={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
                             <RewardAmount reward={reward} />
                           </Stack>
                         </Grid>
                       </Hidden>
 
-                      <Grid item xs={4} lg={2}>
+                      <Grid size={{ xs: 4, lg: 2 }}>
                         <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
                           <Tooltip title={readOnly ? 'View' : 'Edit'}>
                             <span>

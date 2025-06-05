@@ -3,14 +3,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@packages/config/constants';
+import { getCallbackDomain } from '@packages/lib/oauth/getCallbackDomain';
+import type { GooglePopupLoginState } from '@packages/lib/oauth/interfaces';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getCallbackDomain } from '@packages/lib/oauth/getCallbackDomain';
-import type { GooglePopupLoginState } from '@packages/lib/oauth/interfaces';
 
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 

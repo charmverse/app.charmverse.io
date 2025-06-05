@@ -6,7 +6,7 @@ exports[`src/components/gallery/GalleryCard > without block content > should mat
     class="mocked mocked"
   >
     <div
-      class="GalleryCard selected MuiBox-root css-1ck4zfx"
+      class="GalleryCard selected MuiBox-root mui-1ck4zfx"
       data-test="gallery-card-cardId"
       draggable="true"
       style="opacity: 1;"
@@ -15,13 +15,13 @@ exports[`src/components/gallery/GalleryCard > without block content > should mat
         data-testid="page-actions-context-menu"
       >
         <button
-          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-16j9mlo-MuiButtonBase-root-MuiIconButton-root"
+          class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons mui-ed6ycf-MuiButtonBase-root-MuiIconButton-root"
           tabindex="0"
           type="button"
         >
           <svg
             aria-hidden="true"
-            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-dak9ua-MuiSvgIcon-root"
+            class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall mui-dak9ua-MuiSvgIcon-root"
             data-testid="MoreHorizIcon"
             focusable="false"
             viewBox="0 0 24 24"

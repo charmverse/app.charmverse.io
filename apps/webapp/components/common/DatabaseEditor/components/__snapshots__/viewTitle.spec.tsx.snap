@@ -9,23 +9,23 @@ exports[`components/viewTitle > hide description 1`] = `
       class="ViewTitle"
     >
       <div
-        class="MuiBox-root css-1qm1lh"
+        class="MuiBox-root mui-1qm1lh"
         data-test="board-title"
       >
         <div
-          class="font-family-default css-1szvsd4"
+          class="font-family-default mui-1szvsd4"
         >
           <div
-            class="page-controls MuiBox-root css-yybuv3"
+            class="page-controls MuiBox-root mui-yybuv3"
           >
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="EmojiEmotionsOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -50,13 +50,13 @@ exports[`components/viewTitle > hide description 1`] = `
               Add icon
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="ImageIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -68,13 +68,13 @@ exports[`components/viewTitle > hide description 1`] = `
               Add cover
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-icf95v-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-icf95v-MuiSvgIcon-root"
                 data-testid="VisibilityOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -88,7 +88,7 @@ exports[`components/viewTitle > hide description 1`] = `
           </div>
         </div>
         <input
-          class="Editable css-unm2uj"
+          class="Editable mui-unm2uj"
           placeholder="Untitled board"
           spellcheck="true"
           title="Page title"
@@ -109,23 +109,23 @@ exports[`components/viewTitle > should match snapshot 1`] = `
       class="ViewTitle"
     >
       <div
-        class="MuiBox-root css-1qm1lh"
+        class="MuiBox-root mui-1qm1lh"
         data-test="board-title"
       >
         <div
-          class="font-family-default css-1szvsd4"
+          class="font-family-default mui-1szvsd4"
         >
           <div
-            class="page-controls MuiBox-root css-yybuv3"
+            class="page-controls MuiBox-root mui-yybuv3"
           >
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="EmojiEmotionsOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -150,13 +150,13 @@ exports[`components/viewTitle > should match snapshot 1`] = `
               Add icon
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="ImageIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -168,13 +168,13 @@ exports[`components/viewTitle > should match snapshot 1`] = `
               Add cover
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-icf95v-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-icf95v-MuiSvgIcon-root"
                 data-testid="VisibilityOffOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -188,7 +188,7 @@ exports[`components/viewTitle > should match snapshot 1`] = `
           </div>
         </div>
         <input
-          class="Editable css-unm2uj"
+          class="Editable mui-unm2uj"
           placeholder="Untitled board"
           spellcheck="true"
           title="Page title"
@@ -212,23 +212,23 @@ exports[`components/viewTitle > should match snapshot readonly 1`] = `
       class="ViewTitle"
     >
       <div
-        class="MuiBox-root css-1qm1lh"
+        class="MuiBox-root mui-1qm1lh"
         data-test="board-title"
       >
         <div
-          class="font-family-default css-1szvsd4"
+          class="font-family-default mui-1szvsd4"
         >
           <div
-            class="page-controls MuiBox-root css-yybuv3"
+            class="page-controls MuiBox-root mui-yybuv3"
           >
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-icf95v-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-icf95v-MuiSvgIcon-root"
                 data-testid="VisibilityOffOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -242,7 +242,7 @@ exports[`components/viewTitle > should match snapshot readonly 1`] = `
           </div>
         </div>
         <input
-          class="Editable readonly css-unm2uj"
+          class="Editable readonly mui-unm2uj"
           placeholder="Untitled board"
           readonly=""
           spellcheck="true"
@@ -267,23 +267,23 @@ exports[`components/viewTitle > show description 1`] = `
       class="ViewTitle"
     >
       <div
-        class="MuiBox-root css-1qm1lh"
+        class="MuiBox-root mui-1qm1lh"
         data-test="board-title"
       >
         <div
-          class="font-family-default css-1szvsd4"
+          class="font-family-default mui-1szvsd4"
         >
           <div
-            class="page-controls MuiBox-root css-yybuv3"
+            class="page-controls MuiBox-root mui-yybuv3"
           >
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="EmojiEmotionsOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -308,13 +308,13 @@ exports[`components/viewTitle > show description 1`] = `
               Add icon
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-i7wvoe-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall mui-i7wvoe-MuiSvgIcon-root"
                 data-testid="ImageIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -326,13 +326,13 @@ exports[`components/viewTitle > show description 1`] = `
               Add cover
             </div>
             <div
-              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters css-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
+              class="MuiButtonBase-root MuiListItemButton-root MuiListItemButton-gutters MuiListItemButton-root MuiListItemButton-gutters mui-1fkrnqp-MuiButtonBase-root-MuiListItemButton-root"
               role="button"
               tabindex="0"
             >
               <svg
                 aria-hidden="true"
-                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-icf95v-MuiSvgIcon-root"
+                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium mui-icf95v-MuiSvgIcon-root"
                 data-testid="VisibilityOffOutlinedIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
@@ -346,7 +346,7 @@ exports[`components/viewTitle > show description 1`] = `
           </div>
         </div>
         <input
-          class="Editable css-unm2uj"
+          class="Editable mui-unm2uj"
           placeholder="Untitled board"
           spellcheck="true"
           title="Page title"

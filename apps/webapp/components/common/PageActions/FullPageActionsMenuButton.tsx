@@ -1,8 +1,8 @@
 import type { PageType } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { Box, Tooltip, Popover, IconButton } from '@mui/material';
+import { useTheme, Box, Tooltip, Popover, IconButton } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
@@ -17,7 +17,6 @@ import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
-import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 
 type Props = {
   pageId?: string;
@@ -37,7 +36,7 @@ export function FullPageActionsMenuButton({
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
   const { page: pageFromId, refreshPage } = usePage({ pageIdOrPath: pageId });
-  const pageMenuAnchor = useRef();
+  const pageMenuAnchor = useRef(undefined);
   const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));

@@ -193,7 +193,7 @@ export function RolePermissions({ disabled, targetGroup, id, callback = () => nu
     <div data-test={`space-permissions-form-${targetGroup}`}>
       <form style={{ margin: 'auto' }}>
         <Grid container gap={2}>
-          <Grid item xs={12} md={12}>
+          <Grid size={{ xs: 12, md: 12 }}>
             <Typography variant='body2' fontWeight='bold' gap={1} display='flex' alignItems='center'>
               Pages
               <UpgradeChip upgradeContext='forum_permissions' />

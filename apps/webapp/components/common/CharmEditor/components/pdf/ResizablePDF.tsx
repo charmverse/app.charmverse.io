@@ -1,10 +1,8 @@
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import type { ListItemButtonProps } from '@mui/material';
-import { Box, ListItemButton, Typography } from '@mui/material';
+import { styled, useTheme, Box, ListItemButton, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { MIN_PDF_WIDTH } from '@packages/bangleeditor/components/image/constants';
 import dynamic from 'next/dynamic';
@@ -38,7 +36,7 @@ export const pastePdfPlugin = new Plugin({
       // @ts-ignore
       const contentRow = slice.content.content?.[0].content.content?.[0];
       if ((contentRow?.text as string)?.startsWith('http')) {
-        const embedUrl = contentRow.text.split('.');
+        const embedUrl = contentRow.text!.split('.');
         if (embedUrl[embedUrl.length - 1].match(/(pdf)/)) {
           insertPDFNode(view.state, view.dispatch, view, { src: contentRow.text });
           return true;

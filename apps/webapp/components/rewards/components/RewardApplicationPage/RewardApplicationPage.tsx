@@ -1,7 +1,6 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
-import { Box, Divider, FormLabel, Grid, Tab, Tabs } from '@mui/material';
+import { styled, Box, Divider, FormLabel, Grid, Tab, Tabs } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 import { useEffect, useState } from 'react';
@@ -230,7 +229,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                           <>
                             {application && (
                               <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
-                                <Grid item display='flex' alignItems='center' gap={2}>
+                                <Grid display='flex' alignItems='center' gap={2}>
                                   <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
                                     {application.status === 'rejected' || application.status === 'applied'
                                       ? 'Applicant'

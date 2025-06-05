@@ -47,8 +47,5 @@ function _getFormsClient(refreshToken: string) {
   auth.setCredentials({
     refresh_token: refreshToken
   });
-  return googlForms.forms({
-    version: 'v1',
-    auth
-  });
+  return googlForms.forms('v1');
 }

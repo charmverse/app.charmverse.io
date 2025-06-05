@@ -49,7 +49,7 @@ export const PagesContext = createContext<Readonly<PagesContext>>({
 
 export function PagesProvider({ children }: { children: ReactNode }) {
   const { space: currentSpace, spaceRole } = useCurrentSpace();
-  const currentSpaceId = useRef<undefined | string>();
+  const currentSpaceId = useRef<undefined | string>(undefined);
   const router = useRouter();
   const { user } = useUser();
   const { sendMessage, subscribe } = useWebSocketClient();

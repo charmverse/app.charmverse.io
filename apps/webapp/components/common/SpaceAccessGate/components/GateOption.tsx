@@ -30,9 +30,7 @@ export function GateOption({ children, isVerified, isVerifying }: Props) {
     >
       <CardContent>
         <Grid container spacing={2}>
-          <Grid item xs={10}>
-            {children}
-          </Grid>
+          <Grid size={10}>{children}</Grid>
           <VerifyCheckmark isLoading={isVerifying} isVerified={isVerified} />
         </Grid>
       </CardContent>

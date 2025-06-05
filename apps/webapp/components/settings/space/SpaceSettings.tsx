@@ -226,10 +226,10 @@ export function SpaceSettings({
     <>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container direction='column' spacing={3} p='20px 24px'>
-          <Grid item>
+          <Grid>
             <Legend>Overview</Legend>
           </Grid>
-          <Grid item>
+          <Grid>
             <Stack direction={['column', 'row']} gap={3}>
               <Stack pt={0.5}>
                 <Avatar
@@ -275,7 +275,7 @@ export function SpaceSettings({
               </Stack>
             </Stack>
           </Grid>
-          <Grid item>
+          <Grid>
             <FieldLabel>Sidebar Options</FieldLabel>
             <Typography mb={1} variant='caption' component='p'>
               Turn on and off the visibility of the following modules in the sidebar. The functionality will still
@@ -359,14 +359,14 @@ export function SpaceSettings({
               })}
             </Stack>
           </Grid>
-          <Grid item>
+          <Grid>
             <FieldLabel>Blockchain settings</FieldLabel>
             <BlockchainSettings isAdmin={isAdmin} control={control} />
           </Grid>
-          <Grid item>
+          <Grid>
             <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
           </Grid>
-          <Grid item>
+          <Grid>
             <FieldLabel>Login Page Artwork</FieldLabel>
             <Typography variant='caption' mb={2} component='p'>
               Customize the artwork when using a custom domain.
@@ -380,10 +380,10 @@ export function SpaceSettings({
             />
             <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
-          <Grid item>
+          <Grid>
             <Legend>Members</Legend>
           </Grid>
-          <Grid item>
+          <Grid>
             <FieldLabel>Member Profiles</FieldLabel>
             <Typography mb={1} variant='caption' component='p'>
               Set the order and turn on and off the visibility of certain onchain profiles for your members.
@@ -449,20 +449,20 @@ export function SpaceSettings({
               </Button>
             )}
           </Grid>
-          <Grid item>
+          <Grid>
             <PrimaryMemberIdentity
               primaryIdentity={watchPrimaryMemberIdentity}
               register={register}
               disabled={!isAdmin}
             />
           </Grid>
-          <Grid item>
+          <Grid>
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
-          <Grid item sx={{ flexDirection: 'column', display: 'flex' }}>
+          <Grid sx={{ flexDirection: 'column', display: 'flex' }}>
             <ExportDataForm spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
-          <Grid item>
+          <Grid>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
             {isAdmin ? (
               <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>

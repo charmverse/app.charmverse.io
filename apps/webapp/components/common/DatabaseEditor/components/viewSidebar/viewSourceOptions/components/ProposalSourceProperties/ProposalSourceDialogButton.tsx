@@ -1,6 +1,7 @@
 import { Stack } from '@mui/material';
 import type { Board } from '@packages/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from '@packages/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
 import { useAppDispatch } from '@packages/databases/store/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -13,7 +14,6 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 
-import type { SelectedProposalProperties } from './interfaces';
 import { ProposalSourcePropertiesDialog } from './ProposalSourcePropertiesDialog';
 
 export function ProposalSourceDialogButton({ board }: { board: Board }) {

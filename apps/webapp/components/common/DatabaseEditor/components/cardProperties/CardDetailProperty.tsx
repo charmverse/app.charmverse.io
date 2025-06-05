@@ -1,6 +1,5 @@
-import styled from '@emotion/styled';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import { Box, Menu, Stack, Tooltip } from '@mui/material';
+import { styled, Box, Menu, Stack, Tooltip } from '@mui/material';
 import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
 import type { Mutator } from '@packages/databases/mutator';

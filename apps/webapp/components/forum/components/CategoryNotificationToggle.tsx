@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { IconButton, Tooltip } from '@mui/material';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';
 

@@ -1,12 +1,11 @@
 import { v4 } from 'uuid';
 
-import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
-
 import type { IPropertyTemplate } from '../board';
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 import { createFilterClause } from '../filterClause';
 import { createFilterGroup } from '../filterGroup';
+import { TestBlockFactory } from '../test/testBlockFactory';
 import { Utils } from '../utils';
 
 jest.mock('./utils');

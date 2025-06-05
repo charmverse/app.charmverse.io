@@ -1,8 +1,7 @@
 import { Stack } from '@mui/material';
-
 import { defaultProposalProperties, defaultProposalPropertyTypes } from '@packages/databases/proposalDbProperties';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 
-import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 

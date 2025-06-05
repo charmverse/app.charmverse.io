@@ -27,7 +27,7 @@ class LineReader {
 
     fr.onload = async () => {
       const chunk = new Uint8Array(fr.result as ArrayBuffer);
-      buffer = LineReader.appendBuffer(buffer, chunk);
+      buffer = LineReader.appendBuffer(buffer, chunk) as Uint8Array<ArrayBuffer>;
 
       const newlineChar = 10; // '\n'
       let newlineIndex = LineReader.arrayBufferIndexOf(buffer, newlineChar);

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { memo } from 'react';
 import { ResizableBox } from 'react-resizable';
 

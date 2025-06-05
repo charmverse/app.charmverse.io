@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Box, Grid, Select, InputLabel, MenuItem, TextField } from '@mui/material';
+import { styled, Box, Grid, Select, InputLabel, MenuItem, TextField } from '@mui/material';
 import * as http from '@packages/adapters/http';
 import type { NodeAttrs } from '@packages/bangleeditor/components/button/button.specs';
 import { useState, useMemo, useEffect } from 'react';
@@ -138,10 +137,10 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
         </Box>
         {requestMethod === 'POST' && (
           <Grid container>
-            <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+            <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
               <InputLabel>Request Body (optional)</InputLabel>
             </Grid>
-            <Grid item xs>
+            <Grid size='grow'>
               <TextField
                 fullWidth
                 error={!!errors.body}
@@ -186,18 +185,18 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           </Select>
         </Box>
         <Grid container>
-          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
             <InputLabel>Button label</InputLabel>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <TextField {...register('label', { required: true })} placeholder='Submit' />
           </Grid>
         </Grid>
         <Grid container>
-          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+          <Grid size='grow' sx={{ display: 'flex', alignItems: 'center' }}>
             <InputLabel>Success message (optional)</InputLabel>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <TextField {...register('successMessage')} placeholder='Success!' />
           </Grid>
         </Grid>

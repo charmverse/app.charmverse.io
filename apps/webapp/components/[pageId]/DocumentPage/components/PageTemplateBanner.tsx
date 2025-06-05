@@ -1,7 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { useTheme, styled, Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
 import { BackIcon } from 'components/common/Icons/BackIcon';
@@ -44,7 +42,7 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle 
   if (customTitle) {
     return (
       <StyledPageTemplateBanner card={isShowingCard}>
-        <Grid item xs={8} display='flex' justifyContent='center'>
+        <Grid size={8} display='flex' justifyContent='center'>
           <span>{customTitle}</span>
         </Grid>
       </StyledPageTemplateBanner>
@@ -58,14 +56,14 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle 
   return (
     <StyledPageTemplateBanner card={isShowingCard} data-test='template-page-banner'>
       <Grid container display='flex' gap={1} alignItems='center' fontSize={theme.palette.templateBanner.fontSize}>
-        <Grid item xs={2}>
+        <Grid size={2}>
           {isShowingCard && (
             <Link href={boardPath as string} color={theme.palette.secondary.main}>
               <BackIcon label='Back' iconSize='small' fontSize='14px' />
             </Link>
           )}
         </Grid>
-        <Grid item xs={8} display='flex' justifyContent='center'>
+        <Grid size={8} display='flex' justifyContent='center'>
           {!isShowingCard ? (
             <span>You're {isNewPage ? 'creating' : 'editing'} a template</span>
           ) : (

@@ -1,6 +1,6 @@
 import type { Node } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
-import type { EditorView, NodeView } from 'prosemirror-view';
+import type { EditorView, NodeView, ViewMutationRecord } from 'prosemirror-view';
 
 import { LIST_ITEM } from '../../nodeNames';
 import { createElement } from '../../utils/domUtils';
@@ -51,7 +51,7 @@ export class ListItemNodeView implements NodeView {
   }
 
   // Disable mutation observer for all attributes except checked
-  ignoreMutation(mutation: MutationRecord) {
+  ignoreMutation(mutation: ViewMutationRecord) {
     if (mutation.type === 'attributes' && mutation.attributeName !== 'checked') {
       return true;
     }

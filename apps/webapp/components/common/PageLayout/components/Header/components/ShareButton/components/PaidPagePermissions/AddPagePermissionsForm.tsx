@@ -156,8 +156,8 @@ export default function AddPagePermissionsForm({
     <div>
       <form onSubmit={handleSubmit(createUserPermissions)} style={{ margin: 'auto' }}>
         <Grid container direction='column' spacing={3}>
-          <Grid container item direction='row' justifyContent='space-between' alignItems='center'>
-            <Grid item xs={8}>
+          <Grid container direction='row' justifyContent='space-between' alignItems='center'>
+            <Grid size={8}>
               <InputEnumToOptions
                 onChange={(newAccessLevel) =>
                   setPermissionLevelToAssign(newAccessLevel as ApplicablePagePermissionLevel)
@@ -166,7 +166,7 @@ export default function AddPagePermissionsForm({
                 defaultValue={permissionLevelToAssign}
               />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={4}>
               <Button
                 disableElevation
                 fullWidth
@@ -184,7 +184,7 @@ export default function AddPagePermissionsForm({
           </Grid>
 
           {permissionBeingAdded && (
-            <Grid item>
+            <Grid>
               <Alert severity='info' sx={{ '& .MuiAlert-message': { flex: 1 } }}>
                 <Loader
                   position='right'
@@ -196,7 +196,7 @@ export default function AddPagePermissionsForm({
             </Grid>
           )}
 
-          <Grid item>
+          <Grid>
             <InputLabel>Users</InputLabel>
             <InputSearchMemberMultiple
               allowEmail={canAddGuests}
@@ -215,7 +215,7 @@ export default function AddPagePermissionsForm({
           </Grid>
 
           {roleIdsToHide.length < availableRoles.length && (
-            <Grid item>
+            <Grid>
               <InputLabel>Roles</InputLabel>
               <InputSearchRoleMultiple
                 onChange={setSelectedRoleIds}

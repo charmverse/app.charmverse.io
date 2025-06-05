@@ -11,12 +11,8 @@ export default defineConfig({
     globals: true,
     // note: this file runs once before each test file
     setupFiles: ['./vite.setup.ts'],
-    server: {
-      deps: {
-        inline: ['@charmverse/core']
-      }
-    },
-    workspace: [
+    server: { deps: { inline: ['@charmverse/core'] } },
+    projects: [
       {
         // add "extends: true" to inherit the options from the root config
         extends: true,
@@ -37,11 +33,7 @@ export default defineConfig({
       {
         // add "extends: true" to inherit the options from the root config
         extends: true,
-        test: {
-          name: 'cron',
-          include: ['apps/cron/src/**/*.spec.ts'],
-          globalSetup: './vite.globalSetup.ts'
-        }
+        test: { name: 'cron', include: ['apps/cron/src/**/*.spec.ts'], globalSetup: './vite.globalSetup.ts' }
       },
       {
         // add "extends: true" to inherit the options from the root config
@@ -55,11 +47,7 @@ export default defineConfig({
       {
         // add "extends: true" to inherit the options from the root config
         extends: true,
-        test: {
-          name: 'packages',
-          include: ['packages/**/src/**/*.spec.ts'],
-          globalSetup: './vite.globalSetup.ts'
-        }
+        test: { name: 'packages', include: ['packages/**/src/**/*.spec.ts'], globalSetup: './vite.globalSetup.ts' }
       }
     ]
   }

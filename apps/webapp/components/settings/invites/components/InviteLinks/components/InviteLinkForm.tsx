@@ -79,7 +79,7 @@ export function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
       <Divider />
       <br />
       <Grid container direction='column' spacing={3}>
-        <Grid item>
+        <Grid>
           <FieldLabel>Expire after</FieldLabel>
           <Select {...register('maxAgeMinutes')} fullWidth defaultValue={defaultMaxAge}>
             {maxAgeOptions.map(({ value, label }) => (
@@ -89,7 +89,7 @@ export function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
             ))}
           </Select>
         </Grid>
-        <Grid item>
+        <Grid>
           <FieldLabel>Max number of uses</FieldLabel>
           <Select {...register('maxUses')} fullWidth defaultValue={defaultMaxUses}>
             {maxUsesOptions.map(({ value, label }) => (
@@ -99,14 +99,14 @@ export function WorkspaceSettings({ onSubmit: _onSubmit, onClose }: FormProps) {
             ))}
           </Select>
         </Grid>
-        <Grid item container justifyContent='space-between'>
+        <Grid container justifyContent='space-between'>
           <Button variant='outlined' color='secondary' onClick={onClose}>
             Cancel
           </Button>
           <PrimaryButton type='submit'>Generate a New Link</PrimaryButton>
         </Grid>
         {errors.apiError && (
-          <Grid item>
+          <Grid>
             <Typography color='danger'>{errors.apiError.message}</Typography>
           </Grid>
         )}

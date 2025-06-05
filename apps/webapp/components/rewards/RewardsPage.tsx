@@ -1,7 +1,6 @@
-import styled from '@emotion/styled';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { styled, Box, Grid, Stack, Typography } from '@mui/material';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import { createBoard } from '@packages/databases/board';
 import type { Card } from '@packages/databases/card';
@@ -342,7 +341,7 @@ export function RewardsPage({ title }: { title: string }) {
       </DatabaseStickyHeader>
 
       {loadingData ? (
-        <Grid item xs={12} sx={{ mt: 12 }}>
+        <Grid size={12} sx={{ mt: 12 }}>
           <LoadingComponent height={500} isLoading size={50} />
         </Grid>
       ) : (

@@ -1,7 +1,10 @@
 import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
-import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import { styled, Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@packages/lib/proposals/rubric/interfaces';
+import type { RangeProposalCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
+import { getNewCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
+import { getNumberFromString } from '@packages/lib/utils/numbers';
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -10,10 +13,6 @@ import { TextInput } from 'components/common/DatabaseEditor/components/propertie
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from '@packages/lib/proposals/rubric/interfaces';
-import type { RangeProposalCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
-import { getNewCriteria } from '@packages/lib/proposals/workflows/getNewCriteria';
-import { getNumberFromString } from '@packages/lib/utils/numbers';
 
 type Props = {
   readOnly?: boolean;
@@ -188,7 +187,7 @@ export function RubricCriteriaSettings({
               defaultValue={criteria.description ?? ''}
             />
             <Grid container spacing={4}>
-              <Grid xs item>
+              <Grid size='grow'>
                 <div>
                   <TextField
                     inputProps={{ type: 'number' }}
@@ -212,7 +211,7 @@ export function RubricCriteriaSettings({
                   </Typography>
                 </div>
               </Grid>
-              <Grid xs item>
+              <Grid size='grow'>
                 <div className='to-pseudo-element'>
                   <TextField
                     inputProps={{

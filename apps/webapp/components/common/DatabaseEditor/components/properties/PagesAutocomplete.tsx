@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
+  styled,
   Autocomplete,
   Box,
   IconButton,
@@ -14,14 +14,14 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import type { Board } from '@packages/databases/board';
+import type { Card } from '@packages/databases/card';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import type { Board } from '@packages/databases/board';
-import type { Card } from '@packages/databases/card';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 
@@ -260,6 +260,7 @@ function PagesAutocompleteBase({
                   <ListItemIcon>
                     <IconButton
                       size='small'
+                      data-test='remove-page-option'
                       onClick={(e) => {
                         e.stopPropagation();
                         onChange(selectedCardIds.filter((v) => v !== card.id));

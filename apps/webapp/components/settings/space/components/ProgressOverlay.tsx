@@ -1,7 +1,6 @@
-import styled from '@emotion/styled';
-import { CircularProgress } from '@mui/material';
+import { styled, CircularProgress } from '@mui/material';
 
-const IconOverlay = styled.div`
+const IconOverlay = styled('div')`
   position: absolute;
   top: 0;
   right: 0;

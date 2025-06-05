@@ -6,7 +6,6 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { LensSocialShare } from './LensSocialShare';
 import { SocialShareLink } from './SocialShareLink';
 
 export function SocialShareLinksStep({
@@ -45,14 +44,6 @@ export function SocialShareLinksStep({
       </Typography>
       <SocialShareLink site='x' link={link} text={text} />
       <SocialShareLink site='warpcast' link={link} text={text} />
-      <LensSocialShare
-        pageId={pageId}
-        onPublish={onPublish}
-        lensPostLink={lensPostLink}
-        content={content}
-        link={link}
-        canPublishToLens={!isDisabled}
-      />
       <SocialShareLink site='telegram' link={link} text={text} />
       <Tooltip title='Copy link'>
         <IconButton

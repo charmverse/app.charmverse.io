@@ -1,9 +1,7 @@
-import { useTheme } from '@emotion/react';
-import { IconButton, Tooltip, Typography, Box } from '@mui/material';
+import { useTheme, IconButton, Tooltip, Typography, Box } from '@mui/material';
+import type { CommentPermissions, GenericCommentVote } from '@packages/lib/comments';
 import type { MouseEvent } from 'react';
 import { ImArrowDown, ImArrowUp } from 'react-icons/im';
-
-import type { CommentPermissions, GenericCommentVote } from '@packages/lib/comments';
 
 type Props = {
   votes: GenericCommentVote;

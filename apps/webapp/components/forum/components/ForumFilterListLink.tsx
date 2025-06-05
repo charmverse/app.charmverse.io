@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 

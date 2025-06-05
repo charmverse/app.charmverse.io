@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { LinkProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiLink from '@mui/material/Link';

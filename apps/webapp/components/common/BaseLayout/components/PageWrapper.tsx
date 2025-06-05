@@ -1,8 +1,8 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 export type PageWrapperOptions = { bgcolor?: 'default' | 'light' };
 
-const PageWrapper = styled.div<PageWrapperOptions>`
+const PageWrapper = styled('div')<PageWrapperOptions>`
   display: flex;
   flex-direction: column;
   min-height: 100%;

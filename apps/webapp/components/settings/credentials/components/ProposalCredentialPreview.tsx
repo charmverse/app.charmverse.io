@@ -27,7 +27,7 @@ export function ProposalCredentialPreview({ credential, credentialTemplateType }
     <Card sx={{ minWidth: 275 }}>
       <CardContent>
         <Grid container display='flex' flexDirection='column' gap={1.5}>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography
               fontWeight='bold'
               display='flex'
@@ -40,22 +40,22 @@ export function ProposalCredentialPreview({ credential, credentialTemplateType }
               View Schema
             </Link>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography variant='body2'>
               <b>Organization:</b> {credential.organization}
             </Typography>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography variant='body2'>
               <b>Name:</b> {credential.name}
             </Typography>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography variant='body2'>
               <b>Description:</b> {credential.description}
             </Typography>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography variant='body2'>
               <b>Event:</b>{' '}
               {credentialTemplateType === 'proposal'
@@ -63,7 +63,7 @@ export function ProposalCredentialPreview({ credential, credentialTemplateType }
                 : credentialEventLabels.reward_submission_approved?.(getFeatureTitle)}
             </Typography>
           </Grid>
-          <Grid item xs>
+          <Grid size='grow'>
             <Typography variant='body2'>
               <b>URL:</b> [Link to {getFeatureTitle(credentialTemplateType === 'proposal' ? 'proposal' : 'reward')}]
             </Typography>

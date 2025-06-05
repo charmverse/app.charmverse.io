@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 
 export const AppBar = styled(MuiAppBar, {

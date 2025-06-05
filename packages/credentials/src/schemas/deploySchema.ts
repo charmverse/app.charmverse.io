@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
+import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { zeroAddress } from 'viem';
 import { optimism, optimismSepolia } from 'viem/chains';
@@ -41,7 +41,7 @@ async function deploySchema({
   schemaRegistry.connect(signer);
 
   // SchemaUID is deterministic
-  const schemaUid = getSchemaUID(schema, resolver, true);
+  const schemaUid = SchemaRegistry.getSchemaUID(schema, resolver, true);
 
   const deployedSchema = await schemaRegistry.getSchema({ uid: schemaUid }).catch((err) => {
     log.info(`Schema not found on ${fullChainName}`);

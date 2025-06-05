@@ -1,11 +1,12 @@
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
-import { isTruthy } from '@packages/utils/types';
 import { blockToPrisma } from '@packages/databases/block';
 import type { PrismaBlockSortOf } from '@packages/databases/block';
 import type { IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
 import { createCard } from '@packages/databases/card';
+import { isTruthy } from '@packages/utils/types';
+
 import { getPagePath } from 'lib/pages';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
@@ -186,7 +187,7 @@ export function getCardProperties(form: GoogleForm): IPropertyTemplate[] {
         const _questionId = question.questionId!;
         const prop: IPropertyTemplate = {
           id: _questionId,
-          name: `${item.title}: ${question.rowQuestion?.title}` ?? _questionId,
+          name: `${item.title}: ${question.rowQuestion?.title ?? _questionId}`,
           type: propertyType,
           options
         };

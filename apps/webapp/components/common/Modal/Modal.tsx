@@ -1,5 +1,5 @@
-import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiDialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
@@ -13,7 +13,7 @@ export type ModalSize = 'large' | 'fluid' | 'small' | string;
 
 const defaultSize = '400px';
 
-const ModalContainer = styled.div<{ padding?: string; size: ModalSize }>`
+const ModalContainer = styled('div')<{ padding?: string; size: ModalSize }>`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -53,7 +53,7 @@ const CloseButton = styled(IconButton)`
   padding: 0;
 `;
 
-const ScrollableContainer = styled.div`
+const ScrollableContainer = styled('div')`
   flex-grow: 1;
   overflow: auto;
 `;

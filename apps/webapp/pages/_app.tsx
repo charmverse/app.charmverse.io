@@ -1,12 +1,7 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
-import type { EmotionCache } from '@emotion/utils';
-import type { LensConfig } from '@lens-protocol/react-web';
-import { development, LensProvider, production } from '@lens-protocol/react-web';
-import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
-import { wagmiConfig } from '@packages/blockchain/connectors/config';
 import { isDevEnv, isProdEnv } from '@packages/config/constants';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
@@ -113,7 +108,6 @@ export type GlobalPageProps = {
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
-  emotionCache?: EmotionCache;
 };
 export default function App({ Component, pageProps, router }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
@@ -205,11 +199,6 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
   );
 }
 
-const lensConfig: LensConfig = {
-  bindings: wagmiBindings(wagmiConfig),
-  environment: isProdEnv ? production : development
-};
-
 function DataProviders({ children }: { children: ReactNode }) {
   return (
     <SWRConfig
@@ -237,13 +226,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                                   <PagesProvider>
                                     <RewardsProvider>
                                       <MemberPropertiesProvider>
-                                        <LensProvider config={lensConfig}>
-                                          <FarcasterUserProvider>
-                                            <UserProfileProvider>
-                                              <PageTitleProvider>{children}</PageTitleProvider>
-                                            </UserProfileProvider>
-                                          </FarcasterUserProvider>
-                                        </LensProvider>
+                                        <FarcasterUserProvider>
+                                          <UserProfileProvider>
+                                            <PageTitleProvider>{children}</PageTitleProvider>
+                                          </UserProfileProvider>
+                                        </FarcasterUserProvider>
                                       </MemberPropertiesProvider>
                                     </RewardsProvider>
                                   </PagesProvider>

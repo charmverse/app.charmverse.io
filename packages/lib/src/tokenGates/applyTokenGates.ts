@@ -1,6 +1,5 @@
 import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { applyDiscordGate } from '@packages/lib/discord/collabland/applyDiscordGate';
 import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 import { updateUserTokenGates } from '@packages/lib/tokenGates/updateUserTokenGates';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
@@ -134,9 +133,6 @@ export async function applyTokenGates({
   if (!commit) {
     return returnValue;
   }
-
-  // Try to apply discord gate first
-  await applyDiscordGate({ spaceId, userId });
 
   await updateUserTokenGates({ tokenGates: verifiedTokenGates, spaceId, userId });
 

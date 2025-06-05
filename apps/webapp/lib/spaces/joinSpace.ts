@@ -2,10 +2,10 @@ import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/err
 import type { SpaceRole } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 
 export type JoinSpaceSource = 'proposal_template' | 'invite_link';
 

@@ -1,9 +1,9 @@
 import { Stack, Typography } from '@mui/material';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
 
 export function FormFieldPropertiesList({

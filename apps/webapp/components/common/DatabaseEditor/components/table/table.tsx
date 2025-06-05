@@ -119,9 +119,9 @@ function Table(props: Props): JSX.Element {
   const columnRefs = React.useMemo(() => {
     const refs: Map<string, React.RefObject<HTMLDivElement>> = new Map();
     visiblePropertyTemplates.forEach((template) => {
-      refs.set(template.id, React.createRef());
+      refs.set(template.id, React.createRef() as React.RefObject<HTMLDivElement>);
     });
-    refs.set(Constants.titleColumnId, React.createRef());
+    refs.set(Constants.titleColumnId, React.createRef() as React.RefObject<HTMLDivElement>);
     return refs;
   }, [visiblePropertyTemplates]);
 

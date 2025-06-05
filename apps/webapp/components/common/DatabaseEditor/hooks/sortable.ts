@@ -49,7 +49,7 @@ export function useSortable<T, E = HTMLDivElement>(
   item: T,
   enabled: boolean,
   handler: (src: T, st: T) => void
-): [boolean, boolean, React.RefObject<E>, CSSProperties] {
+): [boolean, boolean, React.RefObject<E | null>, CSSProperties] {
   const ref = useRef<E>(null);
   const [isDragging, isOver, drag, drop] = useSortableBase(itemType, item, enabled, handler);
   drop(drag(ref));

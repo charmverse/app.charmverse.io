@@ -1,5 +1,5 @@
 import * as http from '@packages/adapters/http';
-import type { SafeTransactionData } from '@safe-global/safe-core-sdk-types';
+import type { SafeTransactionData } from '@safe-global/types-kit';
 import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';
 

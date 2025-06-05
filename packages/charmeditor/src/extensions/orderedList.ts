@@ -1,4 +1,4 @@
-import type Token from 'markdown-it/lib/token';
+import type Token from 'markdown-it/lib/token.mjs';
 import type { Node, NodeSpec } from 'prosemirror-model';
 
 import type { BaseRawNodeSpec } from '../buildSchema';

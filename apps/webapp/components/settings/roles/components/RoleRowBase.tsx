@@ -1,8 +1,8 @@
 import { log } from '@charmverse/core/log';
-import styled from '@emotion/styled';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
+  styled,
   Accordion,
   AccordionDetails,
   AccordionSummary,
@@ -46,7 +46,7 @@ type RoleRowProps = {
   descriptionIcon?: any;
 };
 
-const ScrollableBox = styled.div<{ rows: number }>`
+const ScrollableBox = styled('div')<{ rows: number }>`
   max-height: 300px; // about 5 rows * 60px
   overflow: auto;
   ${({ theme, rows }) => rows > 5 && `border-bottom: 1px solid ${theme.palette.divider}`};
@@ -189,13 +189,13 @@ function AddMembersButton({ onAddMembers, eligibleMemberIds, archived }: ButtonP
           <Typography variant='body2'>All eligible members have been added to this role</Typography>
         ) : (
           <Grid container direction='column' spacing={3}>
-            <Grid item>
+            <Grid>
               <InputSearchMemberMultiple
                 filter={{ mode: 'include', userIds: eligibleMemberIds }}
                 onChange={onChangeNewMembers}
               />
             </Grid>
-            <Grid item>
+            <Grid>
               <Button disabled={newMembers.length === 0} onClick={addMembers}>
                 Add
               </Button>

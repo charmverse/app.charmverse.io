@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
+import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
-import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
 
 import useMultiWalletSigs from './useMultiWalletSigs';
 import { useUser } from './useUser';
@@ -64,7 +64,7 @@ export function useGnosisSafes(chainIdToUse?: number) {
             chainId: _chainId,
             isHidden: false,
             owners: foundSafe.owners,
-            threshold: foundSafe.nonce
+            threshold: Number(foundSafe.nonce)
           });
         }
       }

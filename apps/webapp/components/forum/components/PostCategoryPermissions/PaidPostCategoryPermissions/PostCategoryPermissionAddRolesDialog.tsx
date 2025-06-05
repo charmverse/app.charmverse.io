@@ -31,8 +31,8 @@ export function PostCategoryPermissionsAddRoles({ onClose, onSave, roleIdsToHide
 
   return (
     <Grid container direction='column' spacing={3}>
-      <Grid container item xs={12} justifyContent='space-between'>
-        <Grid item xs={8}>
+      <Grid container size={12} justifyContent='space-between'>
+        <Grid size={8}>
           <SmallSelect
             sx={{
               textAlign: 'left'
@@ -46,13 +46,13 @@ export function PostCategoryPermissionsAddRoles({ onClose, onSave, roleIdsToHide
             defaultValue={newRolesPermissionLevel}
           />
         </Grid>
-        <Grid item xs={4} justifyContent='flex-end'>
+        <Grid size={4} justifyContent='flex-end'>
           <Button disableElevation fullWidth disabled={newRoleIds.length === 0} onClick={addRolePermissions}>
             Add roles
           </Button>
         </Grid>
       </Grid>
-      <Grid item>
+      <Grid>
         <InputSearchRoleMultiple
           filter={{ mode: 'exclude', userIds: roleIdsToHide }}
           onChange={(ids: string[]) => setNewRoleIds(ids)}

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { grey } from '@mui/material/colors';
 
 interface ImageSelectorGalleryProps {
@@ -6,27 +6,27 @@ interface ImageSelectorGalleryProps {
   onImageClick: (imageSrc: string) => void;
 }
 
-const GalleryGroup = styled.div`
+const GalleryGroup = styled('div')`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing(1)};
 `;
 
-const GalleryGroupName = styled.div`
+const GalleryGroupName = styled('div')`
   font-weight: bold;
   text-transform: uppercase;
   color: ${grey[500]};
   font-size: 14px;
 `;
 
-const GalleryGroupImages = styled.div`
+const GalleryGroupImages = styled('div')`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-gap: ${({ theme }) => theme.spacing(1)};
   cursor: pointer;
 `;
 
-const GalleryGroupImage = styled.div`
+const GalleryGroupImage = styled('div')`
   width: 100%;
   height: 75px;
 

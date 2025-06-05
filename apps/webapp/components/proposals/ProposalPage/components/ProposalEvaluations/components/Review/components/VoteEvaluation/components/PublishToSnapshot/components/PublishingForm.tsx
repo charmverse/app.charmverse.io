@@ -14,7 +14,7 @@ import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from '@pa
 import { SnapshotVotingMode } from '@packages/lib/snapshot/interfaces';
 import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from '@packages/utils/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
-import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
+import type { ProposalType } from '@snapshot-labs/snapshot.js/src/sign/types';
 import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
@@ -53,7 +53,7 @@ const MIN_VOTING_OPTIONS = 2;
  * https://github.com/snapshot-labs/snapshot-sequencer/blob/24fba742c89790c7d955c520b4d36c96e883a3e9/src/writer/proposal.ts#L83C29-L83C29
  */
 export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: Props) {
-  const { account, provider: web3Provider } = useWeb3Account();
+  const { account, legacyProvider: web3Provider } = useWeb3Account();
   const { trigger: updateProposalEvaluation } = useUpdateSnapshotProposal({ proposalId });
 
   const { space } = useCurrentSpace();
@@ -306,7 +306,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
       {checksComplete && snapshotSpace && (
         <form onSubmit={(ev) => ev.preventDefault()}>
           <Grid container direction='column' spacing={3}>
-            <Grid item>
+            <Grid>
               <FieldLabel>Voting type</FieldLabel>
               <Tooltip
                 title={
@@ -328,14 +328,14 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               </Tooltip>
             </Grid>
 
-            <Grid item>
+            <Grid>
               <InputVotingStrategies
                 strategies={snapshotSpace.strategies}
                 onChange={(selected) => setSelectedVotingStrategies(selected)}
               />
             </Grid>
 
-            <Grid item>
+            <Grid>
               <InputGeneratorText
                 defaultOptions={votingOptions}
                 title='Voting options'
@@ -344,7 +344,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               />
             </Grid>
 
-            <Grid item>
+            <Grid>
               <FieldLabel>Block number</FieldLabel>
               {snapshotBlockNumber == null ? (
                 <>
@@ -368,7 +368,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               )}
             </Grid>
 
-            <Grid item display='flex' gap={1} justifyContent='space-between'>
+            <Grid display='flex' gap={1} justifyContent='space-between'>
               <div
                 style={{
                   flexGrow: 1
@@ -422,7 +422,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
             </Grid>
 
             {endDateAfterStart && (
-              <Grid item>
+              <Grid>
                 <Typography>
                   Voting will last {voteDuration} day{voteDuration !== 1 ? 's' : ''}
                 </Typography>
@@ -430,7 +430,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
             )}
 
             {formError && (
-              <Grid item>
+              <Grid>
                 {formError instanceof MissingWeb3AccountError ? (
                   <Alert
                     sx={{ alignItems: 'center' }}
@@ -447,7 +447,7 @@ export function PublishingForm({ onSubmit, pageId, proposalId, evaluationId }: P
               </Grid>
             )}
 
-            <Grid item display='flex' justifyContent='flex-end'>
+            <Grid display='flex' justifyContent='flex-end'>
               <Button onClick={publish} disabled={!formValid() || publishing} type='submit'>
                 {publishing ? (
                   <>

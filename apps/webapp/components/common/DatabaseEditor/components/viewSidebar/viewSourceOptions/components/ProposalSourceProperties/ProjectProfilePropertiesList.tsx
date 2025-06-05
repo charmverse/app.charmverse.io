@@ -1,9 +1,8 @@
 import { Stack } from '@mui/material';
+import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
+import { projectFieldProperties, projectMemberFieldProperties } from '@packages/lib/projects/formField';
 import { useMemo } from 'react';
 
-import { projectFieldProperties, projectMemberFieldProperties } from '@packages/lib/projects/formField';
-
-import type { SelectedProposalProperties } from './interfaces';
 import { PropertySelector } from './PropertiesListSelector';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 

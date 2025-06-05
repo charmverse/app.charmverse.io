@@ -38,7 +38,7 @@ export function SubscriptionTiers({
   return (
     <>
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+        <Grid size={{ xs: 12, sm: 4.5 }} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
               <Box mt={-1}>
@@ -62,7 +62,7 @@ export function SubscriptionTiers({
             isAdmin={isAdmin}
           />
         </Grid>
-        <Grid item xs={12} sm={7.5}>
+        <Grid size={{ xs: 12, sm: 7.5 }}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.public.map((detail) => (
@@ -78,7 +78,7 @@ export function SubscriptionTiers({
       </Grid>
       <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+        <Grid size={{ xs: 12, sm: 4.5 }} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
               <Image width={100} height={100} src={tierConfig.bronze.iconPath} alt='Bronze' />
@@ -100,7 +100,7 @@ export function SubscriptionTiers({
             isAdmin={isAdmin}
           />
         </Grid>
-        <Grid item xs={12} sm={7.5}>
+        <Grid size={{ xs: 12, sm: 7.5 }}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.bronze.map((detail) => (
@@ -116,7 +116,7 @@ export function SubscriptionTiers({
       </Grid>
       <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+        <Grid size={{ xs: 12, sm: 4.5 }} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
               <Image width={100} height={100} src={tierConfig.silver.iconPath} alt='Silver' />
@@ -139,7 +139,7 @@ export function SubscriptionTiers({
           />
         </Grid>
         <Divider sx={{ my: 2 }} />
-        <Grid item xs={12} sm={7.5}>
+        <Grid size={{ xs: 12, sm: 7.5 }}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.silver.map((detail) => (
@@ -155,7 +155,7 @@ export function SubscriptionTiers({
       </Grid>
       <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+        <Grid size={{ xs: 12, sm: 4.5 }} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
               <Image width={95} height={95} src={tierConfig.gold.iconPath} alt='Gold' />
@@ -178,7 +178,7 @@ export function SubscriptionTiers({
           />
         </Grid>
         <Divider sx={{ my: 2 }} />
-        <Grid item xs={12} sm={7.5}>
+        <Grid size={{ xs: 12, sm: 7.5 }}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.gold.map((detail) => (
@@ -194,7 +194,7 @@ export function SubscriptionTiers({
       </Grid>
       <Divider sx={{ my: 2 }} />
       <Grid container spacing={5} sx={{ wrap: { sm: 'nowrap' } }}>
-        <Grid item xs={12} sm={4.5} display='flex' flexDirection='column' justifyContent='space-between'>
+        <Grid size={{ xs: 12, sm: 4.5 }} display='flex' flexDirection='column' justifyContent='space-between'>
           <div>
             <DesktopIconContainer>
               <Image width={95} height={95} src='/images/subscriptions/grant.webp' alt='Grants' />
@@ -219,7 +219,7 @@ export function SubscriptionTiers({
             Contact hello@charmverse.io
           </Button>
         </Grid>
-        <Grid item xs={12} sm={7.5}>
+        <Grid size={{ xs: 12, sm: 7.5 }}>
           <Typography fontWeight='bold'>Features included</Typography>
           <List dense sx={{ mt: -1 }}>
             {subscriptionDetails.grant.map((detail) => (

@@ -7,7 +7,7 @@ export function randomETHWalletAddress(privateKey?: ReturnType<typeof generatePr
 }
 
 export function randomETHWallet(privateKey = generatePrivateKey()): { address: `0x${string}` } {
-  return privateKeyToAccount(privateKey);
+  return privateKeyToAccount(privateKey) as { address: `0x${string}` };
 }
 
 export const shortenHex = (hex: string = '', length = 4): string => {

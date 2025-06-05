@@ -65,7 +65,7 @@ export function useProjectForm(options: { fieldConfig?: ProjectAndMembersFieldCo
 
 // wrap yupResolver so that it always updates with the schema
 function useYupValidationResolver(validationSchema: any) {
-  const schema = useRef();
+  const schema = useRef(undefined);
   schema.current = validationSchema;
 
   return useCallback<Resolver>(async (data, context, options) => {

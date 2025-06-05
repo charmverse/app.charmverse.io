@@ -17,7 +17,7 @@ export default function IntlProviderComponent({ children }: { children: ReactNod
 
   return (
     <IntlProvider locale={locale} messages={englishMessages}>
-      {children}
+      {children as any}
     </IntlProvider>
   );
 }

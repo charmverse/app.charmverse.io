@@ -1,7 +1,7 @@
 import type { Page, PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { styled } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -118,7 +118,7 @@ export const StyledTreeItem = styled(TreeItem, { shouldForwardProp: (prop) => pr
   }
 }));
 
-const AdjacentDropZone = styled.div`
+const AdjacentDropZone = styled('div')`
   position: absolute;
   top: -2px;
   left: 0;

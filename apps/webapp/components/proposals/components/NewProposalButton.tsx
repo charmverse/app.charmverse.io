@@ -1,9 +1,18 @@
-import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, ButtonGroup, ListItemIcon, ListItemText, MenuItem, Stack, Tooltip, Typography } from '@mui/material';
+import {
+  styled,
+  Box,
+  ButtonGroup,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Stack,
+  Tooltip,
+  Typography
+} from '@mui/material';
 import type { ProposalContentType } from '@packages/lib/proposals/createDraftProposal';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';

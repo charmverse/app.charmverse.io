@@ -7,11 +7,9 @@ import {
 } from '@bangle.dev/pm-commands';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import { slugify } from '@packages/utils/strings';
-import type Token from 'markdown-it/lib/token';
 import { setBlockType } from 'prosemirror-commands';
 import { textblockTypeInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
-import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Node, Schema } from 'prosemirror-model';
 import { NodeSelection } from 'prosemirror-state';
 import type { Command, EditorState, PluginKey } from 'prosemirror-state';

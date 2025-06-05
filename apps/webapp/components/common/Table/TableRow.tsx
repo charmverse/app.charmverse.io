@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import TableRow from '@mui/material/TableRow';
 
 const StyledRow = styled(TableRow)`

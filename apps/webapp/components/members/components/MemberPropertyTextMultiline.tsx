@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import { Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 

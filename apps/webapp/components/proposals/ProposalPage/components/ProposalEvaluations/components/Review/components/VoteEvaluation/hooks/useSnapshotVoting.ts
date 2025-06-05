@@ -1,8 +1,3 @@
-import useSWR from 'swr';
-import { getAddress } from 'viem';
-
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getSnapshotProposal } from '@packages/lib/snapshot/getProposal';
 import { getSnapshotClient } from '@packages/lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from '@packages/lib/snapshot/getVotes';
@@ -10,11 +5,16 @@ import { getVotingPower } from '@packages/lib/snapshot/getVotingPower';
 import type { SnapshotProposal, VoteChoice } from '@packages/lib/snapshot/interfaces';
 import { coerceToMilliseconds, relativeTime } from '@packages/lib/utils/dates';
 import { sleep } from '@packages/lib/utils/sleep';
+import useSWR from 'swr';
+import { getAddress } from 'viem';
+
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 
 export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: string }) {
-  const { account, provider } = useWeb3Account();
+  const { account, legacyProvider } = useWeb3Account();
   const { space } = useCurrentSpace();
   const snapshotSpaceDomain = space?.snapshotDomain;
 
@@ -44,7 +44,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
   const remainingTime = relativeTime(proposalEndDate);
 
   const castSnapshotVote: CastVote = async (choice: VoteChoice) => {
-    if (!snapshotProposal || !snapshotSpaceDomain || !account || !provider) {
+    if (!snapshotProposal || !snapshotSpaceDomain || !account || !legacyProvider) {
       return;
     }
 
@@ -58,7 +58,7 @@ export function useSnapshotVoting({ snapshotProposalId }: { snapshotProposalId: 
       app: 'my-app'
     };
 
-    await client.vote(provider, getAddress(account as string), vote);
+    await client.vote(legacyProvider, getAddress(account as string), vote);
     // we need this delay for vote to be propagated to the graph
     await sleep(5000);
     // workaround - fetch one more time with delay, sometimes it takes more time to get updated value

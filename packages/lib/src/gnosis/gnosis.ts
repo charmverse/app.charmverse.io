@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { getChainById, getChainList } from '@packages/blockchain/connectors/chains';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
-import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
+import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/api-kit';
 import { RateLimit } from 'async-sema';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';
@@ -21,7 +21,7 @@ interface GetSafesForAddressProps {
   chainId: number;
 }
 
-export type SafeData = { chainId: number } & Omit<SafeInfoResponse, 'masterCopy'>;
+export type SafeData = { chainId: number } & Omit<SafeInfoResponse, 'masterCopy' | 'guard' | 'singleton'>;
 
 export async function getSafesForAddress({ chainId, address }: GetSafesForAddressProps): Promise<SafeData[]> {
   const checksumAddress = getAddress(address); // convert to checksum address
@@ -48,7 +48,7 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
         return {
           chainId,
           address: safeAddr,
-          nonce: safeData.nonce,
+          nonce: safeData.nonce.toString(),
           threshold: safeData.threshold,
           masterCopy: safeData.implementation.value,
           owners: safeData.owners.map((owner) => owner.value),

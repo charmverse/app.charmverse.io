@@ -1,5 +1,5 @@
 import type { BountyStatus as RewardStatus } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';

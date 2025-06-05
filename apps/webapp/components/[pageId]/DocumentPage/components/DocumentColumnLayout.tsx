@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 
 /**
  * Components for a document page layout with sidebars. Example:
@@ -14,14 +14,14 @@ import styled from '@emotion/styled';
  * </ColumnContainer>
  */
 
-export const DocumentColumnLayout = styled.div`
+export const DocumentColumnLayout = styled('div')`
   display: flex;
   flex-direction: row;
   width: 100%;
 `;
 
 // overflow-x: hidden is required to shrink the main content less than the 860px width of charm editor
-export const DocumentColumn = styled.div`
+export const DocumentColumn = styled('div')`
   flex-grow: 1;
   overflow-x: hidden;
 `;

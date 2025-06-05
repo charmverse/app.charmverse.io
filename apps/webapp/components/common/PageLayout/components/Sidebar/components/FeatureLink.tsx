@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { MappedFeature } from '@packages/features/constants';
 import { useState } from 'react';
 import type { MouseEvent } from 'react';

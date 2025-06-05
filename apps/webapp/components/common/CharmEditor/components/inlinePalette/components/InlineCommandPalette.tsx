@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { ClickAwayListener } from '@mui/material';
+import { styled, ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
 import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
@@ -39,7 +38,7 @@ function getItemsAndHints(
 ) {
   const invalidItem = editorItems.find((item) => !(item instanceof PaletteItem));
   if (invalidItem) {
-    throw new Error(`uid: "${invalidItem.uid}" must be an instance of PaletteItem`);
+    throw new Error(`uid: "${(invalidItem as any).uid}" must be an instance of PaletteItem`);
   }
 
   const items: PaletteItem[] = editorItems
@@ -62,7 +61,7 @@ function getItemsAndHints(
   return { items };
 }
 
-const InlinePaletteGroup = styled.div`
+const InlinePaletteGroup = styled('div')`
   margin: ${({ theme }) => theme.spacing(1, 0)};
   padding-bottom: ${({ theme }) => theme.spacing(1)};
   border-bottom: 1px solid ${({ theme }) => theme.palette.divider};

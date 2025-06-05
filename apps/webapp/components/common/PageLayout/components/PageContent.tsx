@@ -1,9 +1,9 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { CSSProperties, ReactNode } from 'react';
 
 import ScrollableWindow from './ScrollableWindow';
 
-const StyledBox = styled.div(
+const StyledBox = styled('div')(
   ({ theme }) => `
   max-width: 100%;
   margin: ${theme.spacing(10, 'auto')};

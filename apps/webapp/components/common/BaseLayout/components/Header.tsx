@@ -1,6 +1,4 @@
-import { useTheme } from '@emotion/react';
-import styled from '@emotion/styled';
-import { Box, Menu, MenuItem, Typography } from '@mui/material';
+import { useTheme, styled, Box, Menu, MenuItem, Typography } from '@mui/material';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Image from 'next/image';
@@ -15,7 +13,7 @@ import { useUser } from 'hooks/useUser';
 import darkLogoImage from 'public/images/charmverse_logo_sm_black.png';
 import whiteLogoImage from 'public/images/charmverse_logo_sm_white.png';
 
-const HeaderBox = styled.div`
+const HeaderBox = styled('div')`
   margin: ${({ theme }) => theme.spacing(3)};
   display: flex;
   justify-content: space-between;

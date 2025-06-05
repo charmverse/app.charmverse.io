@@ -1,5 +1,6 @@
 import type { SxProps, Theme } from '@mui/material';
 import { Grid, Stack, Typography } from '@mui/material';
+import type { Member, Social } from '@packages/lib/members/interfaces';
 import { hasNftAvatar } from '@packages/users/hasNftAvatar';
 import useSWRImmutable from 'swr/immutable';
 
@@ -7,7 +8,6 @@ import charmClient from 'charmClient';
 import { TimezoneDisplay } from 'components/members/components/TimezoneDisplay';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { useUser } from 'hooks/useUser';
-import type { Member, Social } from '@packages/lib/members/interfaces';
 
 import { SocialIcons } from '../../SocialIcons';
 
@@ -43,11 +43,11 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
     <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} sx={sx}>
       <Avatar name={user.username} image={user.avatar} variant='circular' canSetNft isNft={hasNftAvatar(user)} />
       <Grid container direction='column' spacing={0.5}>
-        <Grid item>
+        <Grid>
           <Typography variant='h1'>{user.username}</Typography>
         </Grid>
         {!hideSocials && (
-          <Grid item mt={1} height={40}>
+          <Grid mt={1} height={40}>
             <SocialIcons
               social={{
                 ...socialDetails,
@@ -65,13 +65,13 @@ export function UserDetailsReadonly({ user, sx = {} }: UserDetailsMiniProps) {
         )}
         {userDetails && (
           <>
-            <Grid item container alignItems='center' width='fit-content'>
+            <Grid container alignItems='center' width='fit-content'>
               <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
                 {userDetails.description}
               </Typography>
             </Grid>
             {userDetails.timezone && (
-              <Grid item container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
+              <Grid container alignItems='center' sx={{ width: 'fit-content', flexWrap: 'initial' }}>
                 <TimezoneDisplay timezone={userDetails.timezone} defaultValue='N/A' />
               </Grid>
             )}

@@ -1,11 +1,10 @@
-import styled from '@emotion/styled';
-import { Box, Divider, Popover, TextField } from '@mui/material';
+import { styled, Box, Divider, Popover, TextField } from '@mui/material';
 import type { PickersDayProps } from '@mui/x-date-pickers/PickersDay';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Utils } from '@packages/databases/utils';
 import { DateTime } from 'luxon';
-import { bindPopover, bindTrigger } from 'material-ui-popup-state';
+import { bindPopover } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -16,7 +15,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import Checkbox from '../../../widgets/checkbox';
 import { EmptyPlaceholder } from '../EmptyPlaceholder';
 
-const PickersDayContainer = styled.div`
+const PickersDayContainer = styled('div')`
   &.highlighted {
     background-color: var(--charmeditor-active);
     border-radius: 0;
@@ -322,7 +321,7 @@ function DateRangePicker(props: Props) {
 }
 
 function CalendarDaySlot(
-  props: PickersDayProps<DateTime> & {
+  props: PickersDayProps & {
     dateFrom?: DateTime;
     dateTo?: DateTime;
     onClick?: (date: DateTime) => void;

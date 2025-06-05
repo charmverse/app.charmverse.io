@@ -1,6 +1,6 @@
-import styled from '@emotion/styled';
 import type { TextField } from '@mui/material';
-import { InputBase, Tooltip } from '@mui/material';
+import { styled, InputBase, Tooltip } from '@mui/material';
+import type { RefObject } from 'react';
 import React, { forwardRef, useRef } from 'react';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
@@ -66,7 +66,7 @@ function Editable(
 ): JSX.Element {
   _props.className = 'octo-propertyvalue';
   const elementRef = useRef<HTMLTextAreaElement>(null);
-  const { className, title, ...props } = useEditable(_props, ref, elementRef);
+  const { className, title, ...props } = useEditable(_props, ref, elementRef as RefObject<HTMLTextAreaElement>);
   const memoizedHeight = React.useMemo(() => {
     if (wrapColumn && columnRef?.current) {
       return `${columnRef?.current?.clientHeight}px`;

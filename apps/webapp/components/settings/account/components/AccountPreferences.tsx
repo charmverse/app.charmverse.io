@@ -1,7 +1,7 @@
 import type { User } from '@charmverse/core/prisma';
-import { useTheme } from '@emotion/react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
+  useTheme,
   InputLabel,
   MenuItem,
   Select,

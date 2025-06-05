@@ -1,7 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Box } from '@mui/material';
+import { styled, Box } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
@@ -25,7 +24,7 @@ import PageContainer from './components/PageContainer';
 import type { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSidebar';
 import { NavigationSidebarDrawer } from './components/Sidebar/NavigationSidebarDrawer';
 
-const LayoutContainer = styled.div`
+const LayoutContainer = styled('div')`
   display: flex;
   height: 100%;
 `;

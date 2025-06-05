@@ -1,14 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { wagmiConfig } from '@packages/blockchain/connectors/config';
-import { readContract } from '@wagmi/core';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
-
 import { ercAbi } from '@packages/lib/tokenGates/abis/abis';
 import { subscriptionTokenV1ABI } from '@packages/lib/tokenGates/hypersub/abi';
 import { PublicLockV13 } from '@packages/lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import { isBigInt } from '@packages/lib/utils/numbers';
+import { readContract } from '@wagmi/core';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 import { nftCheck, collectableOptions, poapNameMatch, poapTypes } from '../utils/utils';
 

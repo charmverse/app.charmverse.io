@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Divider, Typography } from '@mui/material';
+import { styled, Divider, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { staticSpaceTemplates } from '@packages/spaces/config';
 import type { SpaceTemplateType } from '@packages/spaces/config';
@@ -13,7 +12,7 @@ type SelectNewSpaceTemplateProps = {
   onSelect: (value: SpaceTemplateType) => void;
 };
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled('div')`
   overflow: auto;
   max-height: 40vh;
 
@@ -26,7 +25,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
   return (
     <ScrollContainer className='space-templates-container'>
       <Grid container spacing={2} flexDirection='column'>
-        <Grid item>
+        <Grid>
           <TemplateOption
             onClick={() => onSelect('default')}
             label='Create my own'
@@ -34,14 +33,14 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             icon={<CreateMyOwnIcon />}
           />
         </Grid>
-        <Grid item>
+        <Grid>
           <Typography variant='caption' color='secondary' textTransform='uppercase' fontWeight='bold'>
             Start from a template
           </Typography>
         </Grid>
 
         {staticSpaceTemplates.map((template) => (
-          <Grid item key={template.id}>
+          <Grid key={template.id}>
             <TemplateOption
               data-test={`space-template-${template}`}
               onClick={() => onSelect(template.id)}
@@ -50,13 +49,13 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
             />
           </Grid>
         ))}
-        <Grid item>
+        <Grid>
           <Divider flexItem sx={{ mb: 2 }} />
           <Typography variant='caption' color='secondary' textTransform='uppercase' fontWeight='bold'>
             Transfer from another platform
           </Typography>
         </Grid>
-        <Grid item>
+        <Grid>
           <TemplateOption
             data-test='space-template-importNotion'
             onClick={() => onSelect('importNotion')}
@@ -65,7 +64,7 @@ export function SelectNewSpaceTemplate({ onSelect }: SelectNewSpaceTemplateProps
           />
         </Grid>
 
-        <Grid item>
+        <Grid>
           <TemplateOption
             data-test='space-template-importMarkdown'
             onClick={() => onSelect('importMarkdown')}

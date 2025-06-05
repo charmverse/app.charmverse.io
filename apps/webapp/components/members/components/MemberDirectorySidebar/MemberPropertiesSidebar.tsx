@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { ClickAwayListener, Collapse, Stack } from '@mui/material';
+import { styled, ClickAwayListener, Collapse, Stack } from '@mui/material';
 
 import { DatabaseSidebarHeader } from 'components/common/DatabaseEditor/components/viewSidebar/databaseSidebarHeader';
 import { useMemberProperties } from 'hooks/useMemberProperties';
@@ -7,7 +6,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { AddMemberPropertyButton } from './AddMemberPropertyButton';
 import { MemberPropertySidebarItem } from './MemberPropertiesSidebarItem';
 
-const StyledSidebar = styled.div`
+const StyledSidebar = styled('div')`
   background-color: ${({ theme }) => theme.palette.background.paper};
   border-left: 1px solid rgb(var(--center-channel-color-rgb), 0.12);
   display: flex;

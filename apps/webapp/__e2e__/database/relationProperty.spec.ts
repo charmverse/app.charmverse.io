@@ -249,7 +249,10 @@ test('create and edit relation property values', async ({ page, documentPage, da
     })
     .click();
 
-  await databasePage.page.locator(`data-test=page-option-${sourceBoardCards[0].id}`).getByTestId('RemoveIcon').click();
+  await databasePage.page
+    .locator(`data-test=page-option-${sourceBoardCards[0].id}`)
+    .locator('data-test=remove-page-option')
+    .click();
 
   await documentPage.goToPage({
     domain: space.domain,

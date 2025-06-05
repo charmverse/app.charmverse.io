@@ -1,7 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
+import { styled, Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 import type { ICharmEditorOutput } from '@packages/bangleeditor/specRegistry';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import type {
@@ -14,6 +13,7 @@ import { getRewardErrors } from '@packages/lib/rewards/getRewardErrors';
 import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from '@packages/lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from '@packages/lib/rewards/inferRewardWorkflow';
+import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
@@ -70,8 +70,8 @@ export function NewRewardPage({
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
-  const containerWidthRef = useRef<HTMLDivElement>(null);
-  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
+  const containerWidthRef = useRef<HTMLDivElement>(undefined);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef as RefObject<HTMLElement> });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   const [pageData, setPageData] = useState<RewardPageProps>({

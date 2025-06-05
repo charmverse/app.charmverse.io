@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { Box, Menu } from '@mui/material';
+import { styled, Box, Menu } from '@mui/material';
 import { getTwitterEmoji } from '@packages/utils/emoji';
 import type { MouseEvent, ReactNode } from 'react';
 import { useState } from 'react';
@@ -8,7 +7,7 @@ import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
-const StyledCallout = styled.div`
+const StyledCallout = styled('div')`
   background-color: ${({ theme }) => theme.palette.background.light};
   padding: ${({ theme }) => theme.spacing(1)};
   border-radius: ${({ theme }) => theme.spacing(0.5)};
@@ -24,7 +23,7 @@ const StyledCallout = styled.div`
   }
 `;
 
-const CalloutEmoji = styled.div`
+const CalloutEmoji = styled('div')`
   cursor: pointer;
   display: flex;
   align-items: flex-start;
@@ -45,7 +44,7 @@ const CalloutEmoji = styled.div`
   }
 `;
 
-const StyledDiv = styled.div<{ readOnly: boolean }>`
+const StyledDiv = styled('div')<{ readOnly: boolean }>`
   width: 35px;
   height: 35px;
   font-size: 20px;

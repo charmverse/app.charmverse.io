@@ -14,8 +14,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 
-import { DiscordGate } from './components/DiscordGate/DiscordGate';
-import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
 import { useTokenGates } from './components/TokenGate/hooks/useTokenGates';
 import { TokenGate } from './components/TokenGate/TokenGate';
 import { SpaceBanModal } from './SpaceBanModal';
@@ -35,20 +33,6 @@ export function SpaceAccessGate({
   const { showMessage } = useSnackbar();
   const { user } = useUser();
   const { account, loginFromWeb3Account } = useWeb3Account();
-
-  const discordGate = useDiscordGate({
-    joinType,
-    spaceDomain: space.domain,
-    onSuccess: onJoinSpace
-  });
-
-  // leaving this here for now in case we change our mind in the next few weeks - July 29/2024
-  const summonGate: any = {};
-  // const summonGate = useSummonGate({
-  //   joinType,
-  //   space,
-  //   onSuccess: onJoinSpace
-  // });
 
   const tokenGate = useTokenGates({
     account,
@@ -88,25 +72,19 @@ export function SpaceAccessGate({
   }
 
   function joinSpace() {
-    // if (summonGate.isVerified) {
-    //   summonGate.joinSpace(onError);
-    // } else if (tokenGate.isVerified) {
     if (tokenGate.isVerified) {
       tokenGate.joinSpace(onError);
-    } else if (discordGate.isVerified) {
-      discordGate.joinSpace(onError);
     } else {
       showMessage('You are not eligible to join this space', 'error');
     }
   }
 
-  const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
-  const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
-  const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
-  const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
+  const walletGateEnabled = tokenGate.isEnabled;
+  const isVerified = tokenGate.isVerified;
+  const isVerifying = tokenGate.isVerifying;
+  const isJoiningSpace = tokenGate.joiningSpace;
 
-  const noGateConditions =
-    !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
+  const noGateConditions = !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
   const hasRoles = tokenGate.tokenGateResult?.eligibleGates.some((id) =>
     tokenGate.tokenGates?.find((tk) => {
@@ -146,23 +124,13 @@ export function SpaceAccessGate({
         </Typography>
       )}
 
-      {discordGate.isEnabled && <DiscordGate {...discordGate} />}
-
-      {/* {summonGate.isEnabled && <SummonGate {...summonGate} />}
-
-      {summonGate.isEnabled && tokenGate.isEnabled && (
-        <Typography color='secondary' align='center'>
-          OR
-        </Typography>
-      )} */}
-
       {tokenGate.isEnabled && (
         <TokenGate {...tokenGate} tokenGates={tokenGate.tokenGates?.filter((tk) => !tk.archived) ?? null} />
       )}
 
       {walletGateEnabled &&
         tokenGate.tokenGateResult &&
-        (!tokenGate.isVerified && !summonGate.isVerified ? (
+        (!tokenGate.isVerified ? (
           <Alert severity='warning' data-test='token-gate-failure-alert'>
             Your wallet does not meet any of the conditions to access this space. You can try with another wallet.
           </Alert>

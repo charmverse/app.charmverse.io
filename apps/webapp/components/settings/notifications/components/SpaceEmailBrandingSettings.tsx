@@ -1,6 +1,6 @@
 import { Box, Grid, Stack, TextField, Typography } from '@mui/material';
-import { isValidEmail } from '@packages/utils/strings';
 import { charmBlue as blueColor } from '@packages/config/colors';
+import { isValidEmail } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -48,7 +48,7 @@ export function SpaceEmailBrandingSettings() {
 
   return (
     <Stack gap={2}>
-      <Grid item>
+      <Grid>
         <FieldLabel>Email Logo</FieldLabel>
         <Typography variant='caption' mb={2} component='p'>
           Add a custom logo for your email notifications (recommended max height: 250px)
@@ -63,7 +63,7 @@ export function SpaceEmailBrandingSettings() {
         />
         <TextField {...register('emailBrandArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
       </Grid>
-      <Grid item>
+      <Grid>
         <FieldLabel>Email Color</FieldLabel>
         <Typography variant='caption' mb={1} component='p'>
           Select the primary color for your email notifications
@@ -89,7 +89,7 @@ export function SpaceEmailBrandingSettings() {
           />
         </Stack>
       </Grid>
-      <Grid item>
+      <Grid>
         <FieldLabel>Send a test email</FieldLabel>
         <Typography variant='caption' mb={1} component='p'>
           Preview your logo and color with a test email.

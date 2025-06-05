@@ -45,7 +45,7 @@ interface CustomColors extends Record<BrandColor, any> {
 }
 
 // define custom colors: https://material-ui.com/customization/palette/
-declare module '@mui/material/styles/createPalette' {
+declare module '@mui/material/styles' {
   interface PaletteOptions extends CustomColors {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];

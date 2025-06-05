@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
 import type { Theme } from '@mui/material/styles';
@@ -50,7 +50,7 @@ const Drawer = styled(MuiDrawer, {
   }),
   paddingRight: 3
 }));
-const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
+const DraggableHandle = styled('div')<{ isActive?: boolean; disabled?: boolean }>`
   position: absolute;
   width: 5px;
   bottom: 0;

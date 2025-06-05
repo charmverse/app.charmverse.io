@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
-import { Box, Divider } from '@mui/material';
+import { styled, Box, Divider } from '@mui/material';
 import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { CryptoCurrency, FiatCurrency } from '@packages/blockchain/connectors/chains';
 import type { PageContent } from '@packages/charmeditor/interfaces';
@@ -13,7 +12,7 @@ import { useRouter } from 'next/router';
 import { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, RefObject } from 'react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useSWRConfig } from 'swr';
 
@@ -408,7 +407,7 @@ function CharmEditor({
         width: '100%',
         height: '100%'
       }}
-      editorRef={editorRef}
+      editorRef={editorRef as RefObject<HTMLDivElement>}
       pmViewOpts={{
         editable: () => !readOnly,
         plugins: [],

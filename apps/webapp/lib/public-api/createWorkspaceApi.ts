@@ -1,9 +1,6 @@
 import type { SuperApiToken, Space as PrismaSpace } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@packages/config/constants';
-import { upsertSpaceRolesFromDiscord } from '@packages/lib/discord/collabland/upsertSpaceRolesFromDiscord';
-import { upsertUserRolesFromDiscord } from '@packages/lib/discord/collabland/upsertUserRolesFromDiscord';
-import { upsertUserForDiscordId } from '@packages/lib/discord/upsertUserForDiscordId';
 import { isValidUrl } from '@packages/lib/utils/isValidUrl';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@packages/lib/webhookPublisher/publishEvent';
@@ -24,8 +21,6 @@ import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from './
 
 export async function createWorkspaceApi({
   name,
-  discordServerId,
-  adminDiscordUserId,
   adminWalletAddress,
   adminUsername,
   adminAvatar,
@@ -36,12 +31,10 @@ export async function createWorkspaceApi({
   template
 }: CreateWorkspaceRequestBody & { superApiToken?: SuperApiToken | null }): Promise<CreateWorkspaceResponseBody> {
   // Retrieve an id for the admin user
-  const adminUserId = adminDiscordUserId
-    ? await upsertUserForDiscordId({ discordId: adminDiscordUserId, username: adminUsername, avatar: adminAvatar })
-    : await createOrGetUserFromWallet({
-        address: adminWalletAddress ?? randomETHWalletAddress(),
-        avatar: adminAvatar
-      }).then(({ user }) => user.id);
+  const adminUserId = await createOrGetUserFromWallet({
+    address: adminWalletAddress ?? randomETHWalletAddress(),
+    avatar: adminAvatar
+  }).then(({ user }) => user.id);
 
   if (!adminUserId) {
     throw new InvalidInputError('No admin user ID created.');
@@ -66,7 +59,6 @@ export async function createWorkspaceApi({
     updatedBy: botUser.id,
     domain: spaceDomain,
     spaceImage: avatar && isValidUrl(avatar) ? avatar : undefined,
-    discordServerId,
     xpsEngineId,
     superApiTokenId: superApiToken?.id
   };
@@ -80,16 +72,6 @@ export async function createWorkspaceApi({
     extraAdmins: [botUser.id],
     spaceTemplate: internalTemplate
   });
-
-  // create roles from discord
-  if (discordServerId) {
-    await upsertSpaceRolesFromDiscord({ spaceId: space.id, discordServerId, userId: botUser.id });
-  }
-
-  // assing roles to discord admin user
-  if (adminDiscordUserId) {
-    await upsertUserRolesFromDiscord({ space, userId: adminUserId });
-  }
 
   trackUserAction('join_a_workspace', { spaceId: space.id, userId: adminUserId, source: 'charmverse_api' });
   trackUserAction('create_new_workspace', {

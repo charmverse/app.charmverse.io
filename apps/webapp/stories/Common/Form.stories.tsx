@@ -1,4 +1,5 @@
 import { Box, Grid, Paper, Stack, Typography } from '@mui/material';
+import type { Social } from '@packages/lib/members/interfaces';
 import type { SelectOptionType } from '@packages/lib/proposals/forms/interfaces';
 import { useState } from 'react';
 
@@ -10,7 +11,6 @@ import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { SocialInputs } from 'components/settings/profile/components/SocialInputs';
 import { TimezoneAutocomplete } from 'components/settings/profile/components/TimezoneAutocomplete';
 import UserDescription from 'components/settings/profile/components/UserDescription';
-import type { Social } from '@packages/lib/members/interfaces';
 
 export default {
   title: 'common/Form',
@@ -38,10 +38,10 @@ export function FormComposition() {
   return (
     <Paper sx={{ p: 4 }}>
       <Grid container direction='column' spacing={2} mt={1} maxWidth={700} mx='auto'>
-        <Grid item>
+        <Grid>
           <UserDescription description={description} onChange={saveDescription} />
         </Grid>
-        <Grid item>
+        <Grid>
           <TimezoneAutocomplete
             userTimezone={newTimezone}
             onChange={(timezone) => setNewTimezone(timezone || 'America/New_York')}

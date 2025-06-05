@@ -203,7 +203,7 @@ function LayoutOption({
   children: React.ReactNode;
 }) {
   return (
-    <Grid item xs={6} onClick={onClick}>
+    <Grid size={6} onClick={onClick}>
       <Card
         variant='outlined'
         sx={{

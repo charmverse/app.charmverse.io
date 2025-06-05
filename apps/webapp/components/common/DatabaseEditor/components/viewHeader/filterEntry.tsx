@@ -1,9 +1,9 @@
-import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { SelectChangeEvent } from '@mui/material';
 import {
+  styled,
   Button,
   Checkbox,
   Chip,
@@ -16,6 +16,16 @@ import {
   Typography
 } from '@mui/material';
 import { getChainList, getChainById } from '@packages/blockchain/connectors/chains';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import { Constants } from '@packages/databases/constants';
+import type { FilterClause, FilterCondition } from '@packages/databases/filterClause';
+import { propertyConfigs } from '@packages/databases/filterClause';
+import type { FilterGroup } from '@packages/databases/filterGroup';
+import { createFilterGroup } from '@packages/databases/filterGroup';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
+import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
+import { REWARD_REVIEWERS_BLOCK_ID } from '@packages/lib/rewards/blocks/constants';
 import { slugify } from '@packages/utils/strings';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
@@ -28,16 +38,6 @@ import { DatePicker } from 'components/common/DatePicker';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import { Constants } from '@packages/databases/constants';
-import type { FilterClause, FilterCondition } from '@packages/databases/filterClause';
-import { propertyConfigs } from '@packages/databases/filterClause';
-import type { FilterGroup } from '@packages/databases/filterGroup';
-import { createFilterGroup } from '@packages/databases/filterGroup';
-import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from '@packages/databases/proposalDbProperties';
-import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from '@packages/lib/proposals/blocks/constants';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
-import { REWARD_REVIEWERS_BLOCK_ID } from '@packages/lib/rewards/blocks/constants';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';

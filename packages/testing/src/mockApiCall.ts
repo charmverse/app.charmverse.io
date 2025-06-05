@@ -5,7 +5,11 @@ import { serialize } from 'cookie';
 import { sealData } from 'iron-session';
 import request from 'supertest';
 
-import type { TestLoginRequest } from 'pages/api/session/login-testenv';
+type TestLoginRequest = {
+  anonymousUserId?: string;
+  userId?: string;
+  otpUser?: { id: string; method: IdentityType };
+};
 
 export const baseUrl = process.env.DOMAIN as string;
 

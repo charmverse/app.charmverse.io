@@ -1,5 +1,8 @@
-import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { styled, Box } from '@mui/material';
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { Card } from '@packages/databases/card';
+import { Constants } from '@packages/databases/constants';
+import { isTouchScreen } from '@packages/lib/utils/browser';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -8,10 +11,6 @@ import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { Card } from '@packages/databases/card';
-import { Constants } from '@packages/databases/constants';
-import { isTouchScreen } from '@packages/lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import PropertyValueElement from '../propertyValueElement';

@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material';
 import MuiAvatar from '@mui/material/Avatar';
 import { stringToColor } from '@packages/utils/strings';

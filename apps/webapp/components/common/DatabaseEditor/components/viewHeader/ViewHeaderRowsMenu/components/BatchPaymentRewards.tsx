@@ -2,6 +2,7 @@ import type { Application } from '@charmverse/core/prisma-client';
 import PaymentIcon from '@mui/icons-material/Payment';
 import { Tooltip } from '@mui/material';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { isTruthy } from '@packages/utils/types';
 import { useMemo, useState } from 'react';
 
@@ -13,7 +14,6 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -22,7 +22,7 @@ type ApplicationLite = Pick<Application, 'id' | 'walletAddress' | 'bountyId' | '
 export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
   const { pages } = usePages();
   const { rewards, mutateRewards } = useRewards();
-  const { account, chainId, signer } = useWeb3Account();
+  const { account, chainId } = useWeb3Account();
   const safesRecord = useGnosisSafes();
   const [isMutating, setIsMutating] = useState(false);
 
@@ -65,7 +65,7 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
     return _filteredRewards;
   }, [pages, rewards, checkedIds, chainId]);
 
-  if (!account || !chainId || !signer) {
+  if (!account || !chainId) {
     return (
       <Tooltip title='Your wallet must be unlocked to pay for rewards'>
         <OpenWalletSelectorButton

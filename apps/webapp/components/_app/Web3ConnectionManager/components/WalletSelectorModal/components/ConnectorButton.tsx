@@ -1,15 +1,15 @@
-import styled from '@emotion/styled';
+import { styled } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
 import { greyColor2 } from 'theme/colors';
 
-const ImageIcon = styled.img`
+const ImageIcon = styled('img')`
   width: 1.5rem;
   height: 1.5rem;
 `;
 
-const ButtonContent = styled.div`
+const ButtonContent = styled('div')`
   display: flex;
   align-items: center;
   justify-content: space-between;
