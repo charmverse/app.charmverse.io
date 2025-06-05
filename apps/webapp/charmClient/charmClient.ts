@@ -56,6 +56,7 @@ import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
+import { TokenGateApi } from './apis/tokenGateApi';
 import { TrackApi } from './apis/trackApi';
 import { VotesApi } from './apis/votesApi';
 
@@ -114,6 +115,8 @@ class CharmClient {
   credentials = new CredentialsApi();
 
   projects = new ProjectsApi();
+
+  tokenGates = new TokenGateApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');

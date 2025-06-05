@@ -28,14 +28,6 @@ export function useUpdateTokenGateRoles(tokenGateId?: string) {
   );
 }
 
-export function useArchiveTokenGate(id: string) {
-  return usePUT<void>(`/api/token-gates/${id}/archive`);
-}
-
-export function useUnarchiveTokenGate(id: string) {
-  return usePUT<void>(`/api/token-gates/${id}/unarchive`);
-}
-
 export function useReviewTokenGate<T = Pick<TokenGate, 'conditions'>>() {
   return usePOST<T, T>('/api/token-gates/review');
 }

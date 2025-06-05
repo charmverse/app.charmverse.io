@@ -10,10 +10,13 @@ export function useWorkflowAccess() {
   const { data: workflows = [] } = useGetProposalWorkflows(space?.id);
 
   const filteredWorkflows = workflows.filter((workflow) => !workflow.archived);
+  const currentCount = filteredWorkflows.length;
 
   const canCreateWorkflow = filteredWorkflows.length < limits;
 
   return {
-    canCreateWorkflow
+    canCreateWorkflow,
+    currentCount,
+    maxCount: limits
   };
 }

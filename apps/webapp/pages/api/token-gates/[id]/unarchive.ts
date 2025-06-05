@@ -2,14 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { defaultHandler } from '@packages/lib/middleware/handler';
 import { isSpaceAdmin } from '@packages/lib/permissions/isSpaceAdmin';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { unarchiveTokenGate } from '@packages/lib/tokenGates/unarchiveTokenGate';
 import { ApiError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const handler = defaultHandler();
 
-handler.put(unarchiveWorkflowController);
+handler.put(unarchiveTokenGateController);
 
-async function unarchiveWorkflowController(req: NextApiRequest, res: NextApiResponse) {
+async function unarchiveTokenGateController(req: NextApiRequest, res: NextApiResponse) {
   const tokenGateId = req.query.id as string;
 
   const tokenGate = await prisma.tokenGate.findUniqueOrThrow({
@@ -30,14 +31,7 @@ async function unarchiveWorkflowController(req: NextApiRequest, res: NextApiResp
     });
   }
 
-  await prisma.tokenGate.update({
-    where: {
-      id: tokenGateId
-    },
-    data: {
-      archived: false
-    }
-  });
+  await unarchiveTokenGate({ tokenGateId, spaceId: tokenGate.spaceId });
 
   return res.status(200).end();
 }

@@ -674,7 +674,8 @@ export async function generateRole({
   createdBy,
   roleName = `role-${v4()}`,
   source,
-  assigneeUserIds
+  assigneeUserIds,
+  archived = false
 }: {
   externalId?: string;
   spaceId: string;
@@ -683,6 +684,7 @@ export async function generateRole({
   source?: RoleSource;
   id?: string;
   assigneeUserIds?: string[];
+  archived?: boolean;
 }): Promise<Role> {
   const assignUsers = assigneeUserIds && assigneeUserIds.length >= 1;
 
@@ -726,7 +728,8 @@ export async function generateRole({
                 data: roleAssignees
               }
             }
-          : undefined
+          : undefined,
+      archived
     }
   });
 
@@ -1254,6 +1257,33 @@ export async function generateFarcasterUser({
       userId,
       fid,
       account: account as any
+    }
+  });
+}
+
+export async function generateTokenGate({
+  spaceId,
+  createdBy,
+  archived = false,
+  conditions
+}: {
+  spaceId: string;
+  createdBy: string;
+  archived?: boolean;
+  conditions?: Prisma.JsonValue;
+}) {
+  return prisma.tokenGate.create({
+    data: {
+      spaceId,
+      createdBy,
+      archived,
+      conditions: {
+        create: {
+          operator: 'and',
+          conditions: conditions ?? []
+        }
+      },
+      resourceId: v4()
     }
   });
 }

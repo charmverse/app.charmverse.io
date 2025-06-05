@@ -28,6 +28,7 @@ import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWorkflowAccess } from 'hooks/useWorkflowAccess';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
@@ -47,8 +48,10 @@ export function ProposalWorkflowItem({
   onDelete,
   onCancelChanges,
   readOnly,
-  preventDelete
+  preventDelete,
+  refreshWorkflows
 }: {
+  refreshWorkflows: () => void;
   isExpanded: boolean;
   toggleRow: (id: string | false) => void;
   workflow: WorkflowTemplateFormItem;
@@ -66,6 +69,7 @@ export function ProposalWorkflowItem({
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
   const { trigger: archiveWorkflow } = useArchiveProposalWorkflow(workflow.spaceId);
   const { trigger: unarchiveWorkflow } = useUnarchiveProposalWorkflow(workflow.spaceId);
+  const { canCreateWorkflow } = useWorkflowAccess();
 
   // Make workflow readonly if it's archived or if readOnly prop is true
   const isReadOnly = !!(readOnly || workflow.archived);
@@ -85,10 +89,14 @@ export function ProposalWorkflowItem({
       } else {
         await archiveWorkflow({ workflowId: workflow.id });
       }
+      refreshWorkflows();
       onUpdate({ ...workflow, archived: !workflow.archived });
       showMessage(`Workflow ${workflow.archived ? 'unarchived' : 'archived'} successfully`);
     } catch (error) {
-      showMessage(`Failed to ${workflow.archived ? 'unarchive' : 'archive'} workflow`, 'error');
+      showMessage(
+        (error as Error).message || `Failed to ${workflow.archived ? 'unarchive' : 'archive'} workflow`,
+        'error'
+      );
     }
   }
 
@@ -237,7 +245,7 @@ export function ProposalWorkflowItem({
                       </MenuItem>
                     </span>
                   </Tooltip>
-                  <MenuItem onClick={toggleArchiveWorkflow}>
+                  <MenuItem onClick={toggleArchiveWorkflow} disabled={workflow.archived ? !canCreateWorkflow : false}>
                     <ListItemIcon>
                       {workflow.archived ? <Unarchive fontSize='small' /> : <Archive fontSize='small' />}
                     </ListItemIcon>
