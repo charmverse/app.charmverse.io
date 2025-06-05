@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
+import * as http from '@packages/adapters/http';
 import type { MixpanelEventMap, MixpanelEventName } from '@packages/metrics/mixpanel/interfaces';
 import type { MixpanelOpEventMap, MixpanelOpEventName } from '@packages/metrics/mixpanel/opEvents';
-import * as http from '@packages/adapters/http';
 
 export class TrackApi {
   private lastEvent: { payload: string; timestamp: number } | null = null;

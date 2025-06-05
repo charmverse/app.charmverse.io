@@ -15,6 +15,42 @@ export const subscriptionTierOrder: SpaceSubscriptionTier[] = [
   'grant'
 ] as const;
 
+export const subscriptionDetails = {
+  public: [
+    'Community space with docs, databases, & forum',
+    'Unlimited blocks (100% public content)',
+    'Integrate with Discord, Snapshot, Safe, & NFTs/POAPs',
+    '1 token gate on Ethereum & 1 decision workflow',
+    'Upload limit/video: 20MB',
+    'No guest access'
+  ],
+  bronze: [
+    'All Public tier features with 5K blocks',
+    '1 custom role and 1 token gate (Ethereum blockchain only)',
+    '2 decision workflows',
+    'Guest access',
+    'Upload limit/video: 1GB'
+  ],
+  silver: [
+    'All Bronze tier features with 10K blocks',
+    '3 custom roles and 3 token gates (all supported chains)',
+    '3 decision workflows',
+    'Custom domain'
+  ],
+  gold: [
+    'All Silver tier features with 100K blocks',
+    'Unlimited custom roles and token gates (all supported chains)',
+    '5 decision workflows',
+    'Standardize user identity (require an identity to be part of the space)',
+    'API access'
+  ],
+  grant: [
+    'All Gold tier features with unlimited blocks',
+    'Unlimited decision workflows',
+    'White glove onboarding and setup audits'
+  ]
+};
+
 export const upgradableTiers = ['bronze', 'silver', 'gold'] as const;
 export type UpgradableTier = (typeof upgradableTiers)[number];
 
