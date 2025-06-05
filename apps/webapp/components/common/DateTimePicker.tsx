@@ -49,6 +49,7 @@ export function DateTimePicker({
         // disableOpenPicker - this optoin messes up the picker for some reason
         onClose={() => setOpen(false)}
         {...props}
+        enableAccessibleFieldDOMStructure={false}
         slots={{
           ...props.slots,
           // hide the calendar picker icon

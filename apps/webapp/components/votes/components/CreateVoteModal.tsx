@@ -192,6 +192,7 @@ export function CreateVoteModal({
                     setDeadline(value);
                   }
                 }}
+                enableAccessibleFieldDOMStructure={false}
                 slotProps={{
                   textField: {
                     inputProps: {
