@@ -265,6 +265,7 @@
     "redis": "^4.3.1",
     "rfc6902": "^5.0.1",
     "scroll-into-view-if-needed": "^2.2.29",
+    "sharp": "^0.34.2",
     "siwe": "^3.0.0",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
