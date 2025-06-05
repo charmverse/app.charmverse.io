@@ -375,7 +375,6 @@ jobs:
         uses: ./.github/actions/build_app
         with:
           app_name: webapp
-          REACT_APP_APP_ENV: 'production'
 
       - name: Update Dockerfile
         run: rm Dockerfile && mv apps/webapp/Dockerfile Dockerfile

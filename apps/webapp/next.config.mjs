@@ -76,6 +76,9 @@ const config = {
     dirs: ['pages', 'components', 'lib', 'stories'],
     ignoreDuringBuilds: true
   },
+  images: {
+    unoptimized: true // required for images to load in production
+  },
   // types are tested separately from the build
   typescript: {
     ignoreBuildErrors: true
