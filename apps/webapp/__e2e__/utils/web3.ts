@@ -101,7 +101,7 @@ export async function mockWeb3<T extends MockContext>({ page, context, init }: M
         }
 
       ` +
-      `(${init.toString()})({ ethers, Web3Mock, context: ${JSON.stringify(context)} });`
+      `(${init.toString()})({ Web3Mock, context: ${JSON.stringify(context)} });`
   });
 }
 
