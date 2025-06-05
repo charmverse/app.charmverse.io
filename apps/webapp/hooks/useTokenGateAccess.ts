@@ -24,7 +24,7 @@ export function useTokenGateAccess({ space, chains }: { space: Space; chains?: I
   const chainList = chains || getChainList({ enableTestnets: !!space?.enableTestnets });
   const filteredChainList = allowedChains
     ? chainList.filter((chain) =>
-        allowedChains.includes(chain.shortName.toLowerCase() as (typeof allowedChains)[number])
+        allowedChains.includes(chain.chainName.toLowerCase() as (typeof allowedChains)[number])
       )
     : chainList;
 

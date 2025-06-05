@@ -4,7 +4,7 @@ import { updateTokenGateDetails } from '@packages/lib/blockchain/updateTokenGate
 import { onError, onNoMatch, requireKeys, requireSpaceMembership } from '@packages/lib/middleware';
 import requireValidation from '@packages/lib/middleware/requireValidation';
 import { withSessionRoute } from '@packages/lib/session/withSession';
-import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
+import type { TokenGate, TokenGateConditions, TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { processTokenGateConditions } from '@packages/lib/tokenGates/processTokenGateConditions';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { validateTokenGateRestrictions } from '@packages/subscriptions/featureRestrictions';
@@ -24,6 +24,8 @@ handler
 async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
+
+  const conditions = req.body.conditions as TokenGateConditions;
 
   if (!spaceId) {
     throw new SystemError({
@@ -47,7 +49,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   await validateTokenGateRestrictions({
     subscriptionTier,
     existingTokenGates,
-    conditions: req.body.conditions
+    conditions: conditions.accessControlConditions
   });
 
   const { numberOfConditions, chainType, accessType, gateType } = processTokenGateConditions(req.body);
