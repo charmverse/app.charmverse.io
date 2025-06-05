@@ -12,12 +12,8 @@ import type { TokenGateWithRoles } from '@packages/lib/tokenGates/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 
-import {
-  useArchiveTokenGate,
-  useDeleteTokenGate,
-  useUnarchiveTokenGate,
-  useUpdateTokenGateRoles
-} from 'charmClient/hooks/tokenGates';
+import charmClient from 'charmClient';
+import { useDeleteTokenGate, useUpdateTokenGateRoles } from 'charmClient/hooks/tokenGates';
 import ButtonChip from 'components/common/ButtonChip';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import TableRow from 'components/common/Table/TableRow';
@@ -40,8 +36,6 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
   const deletePopupState = usePopupState({ variant: 'popover', popupId: 'token-gate-delete' });
   const { trigger: deleteTokenGate, isMutating: isLoadingDeleteTokenGate } = useDeleteTokenGate(tokenGate.id);
   const { trigger: updateTokenGates, isMutating: isLoadingUpdateTokenGates } = useUpdateTokenGateRoles(tokenGate.id);
-  const { trigger: archiveTokenGate, isMutating: isLoadingArchive } = useArchiveTokenGate(tokenGate.id);
-  const { trigger: unarchiveTokenGate, isMutating: isLoadingUnarchive } = useUnarchiveTokenGate(tokenGate.id);
   const { space } = useCurrentSpace();
   const { hasReachedLimit } = useTokenGateAccess({ space: space as Space });
   const { showMessage } = useSnackbar();
@@ -70,20 +64,23 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
 
   const description = createDescription();
 
-  const isLoading = isLoadingUpdateTokenGates || isLoadingDeleteTokenGate || isLoadingArchive || isLoadingUnarchive;
+  const isLoading = isLoadingUpdateTokenGates || isLoadingDeleteTokenGate;
 
   const toggleTokenGateArchive = useCallback(async () => {
     try {
       if (tokenGate.archived) {
-        await unarchiveTokenGate();
+        await charmClient.tokenGates.unarchiveTokenGate(tokenGate.id);
       } else {
-        await archiveTokenGate();
+        await charmClient.tokenGates.archiveTokenGate(tokenGate.id);
       }
       await refreshTokenGates();
     } catch (error) {
-      showMessage((error as Error).message || 'Failed to archive token gate', 'error');
+      showMessage(
+        (error as Error).message || `Failed to ${tokenGate.archived ? 'unarchive' : 'archive'} token gate`,
+        'error'
+      );
     }
-  }, [tokenGate.archived, unarchiveTokenGate, archiveTokenGate, refreshTokenGates, showMessage]);
+  }, [tokenGate.archived, refreshTokenGates, showMessage, tokenGate.id]);
 
   return (
     <>
