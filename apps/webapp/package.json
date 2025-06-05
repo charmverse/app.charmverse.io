@@ -1,6 +1,6 @@
 {
   "name": "webapp",
-  "version": "0..0",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "start": "npx next dev",
@@ -9,7 +9,6 @@
     "lint": "npx next lint",
     "typecheck": "../../node_modules/typescript/bin/tsc --project ./tsconfig.json  --noEmit",
     "start:test:ci": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next start",
-    "test:ci": "node --experimental-vm-modules ../../node_modules/.bin/jest --maxWorkers=2 --passWithNoTests",
     "test:integration": "",
     "test:browser": "npx vitest --globals --update --project=browser",
     "test:lib": "npx vitest --globals --update --project=lib",
@@ -42,7 +41,6 @@
     "@packages/profile": "^0.0.0",
     "@packages/spaces": "^0.0.0",
     "@packages/subscriptions": "^0.0.0",
-    "@packages/testing": "^1.0.0",
     "@packages/users": "^0.0.0",
     "@packages/utils": "^1.0.0",
     "@packages/websockets": "^0.0.0",
@@ -64,6 +62,8 @@
     "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
+    "@packages/testing": "^1.0.0",
+    "@playwright/test": "^1.52.0",
     "@storybook/icons": "^1.4.0",
     "@storybook/test": "^8.6.12",
     "storybook": "^8.3.7"
