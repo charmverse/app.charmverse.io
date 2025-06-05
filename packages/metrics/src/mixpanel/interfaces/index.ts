@@ -9,7 +9,6 @@ import type { PageEventMap } from './PageEvent';
 import type { ProjectEventMap } from './ProjectEvent';
 import type { ProposalEventMap } from './ProposalEvent';
 import type { SettingEventMap } from './SettingEvent';
-import type { SubscriptionEventMap } from './SubscriptionEvent';
 import type { UserEventMap } from './UserEvent';
 
 export interface MixpanelTrackBase {
@@ -32,7 +31,6 @@ export type MixpanelEventMap = UserEventMap &
   BountyEventMap &
   SettingEventMap &
   ForumEventMap &
-  SubscriptionEventMap &
   ApiEventMap &
   CredentialEventMap &
   FarcasterEventMap &

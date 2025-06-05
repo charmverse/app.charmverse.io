@@ -12,7 +12,6 @@ import { createDefaultProposal } from '@packages/lib/proposals/createDefaultProp
 import { getDefaultWorkflows } from '@packages/lib/proposals/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from '@packages/lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward, createDefaultRewardTemplate } from '@packages/lib/rewards/createDefaultReward';
-import { defaultFreeBlockQuota } from '@packages/lib/subscription/constants';
 import { createSigningSecret, subscribeToAllEvents } from '@packages/lib/webhookPublisher/subscribeToEvents';
 import { logSpaceCreation } from '@packages/metrics/postToDiscord';
 import { createPage } from '@packages/pages/createPage';
@@ -104,7 +103,7 @@ export async function createWorkspace({
       webhookSigningSecret: signingSecret,
       updatedBy: spaceData.updatedBy ?? userId,
       author: { connect: { id: userId } },
-      blockQuota: defaultFreeBlockQuota,
+      blockQuota: 0,
       memberProfiles: memberProfileNames.map((name) => ({ id: name, isHidden: false })),
       features: STATIC_PAGES.map((page) => ({ id: page.feature, isHidden: false })),
       subscriptionTier: 'gold',
