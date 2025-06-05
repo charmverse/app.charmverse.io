@@ -44,11 +44,12 @@
       "theme/*": [
         "./theme/*"
       ],
-      "testing/*": [
-        "./testing/*"
-      ],
       "__e2e__/*": [
         "./__e2e__/*"
+      ],
+      // not sure why we need this, required for playwright in CI to fix "module not found" error
+      "@packages/testing/*": [
+        "../../packages/testing/src/*"
       ],
       // "@charmverse/core/prisma": ["../../node_modules/@charmverse/core/dist/cjs/prisma"],
       // "@charmverse/core/prisma-client": ["../../node_modules/@charmverse/core/dist/cjs/prisma-client"],
