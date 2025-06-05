@@ -1,8 +1,7 @@
-import type { FarcasterEventMap } from '@packages/metrics/mixpanel/interfaces/FarcasterEvents';
-
 import type { ApiEventMap } from './ApiEvent';
 import type { BountyEventMap } from './BountyEvent';
 import type { CredentialEventMap } from './CredentialEvent';
+import type { FarcasterEventMap } from './FarcasterEvents';
 import type { ForumEventMap } from './ForumEvent';
 import type { GithubAppEventMap } from './GithubAppEvent';
 import type { PageEventMap } from './PageEvent';
