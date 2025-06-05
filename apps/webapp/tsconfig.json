@@ -79,6 +79,5 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "../../packages/databases/src/proposalsSource/interfaces.ts"  ]
+    "**/*.tsx"]
 }
