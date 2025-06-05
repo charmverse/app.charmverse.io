@@ -77,7 +77,7 @@ export async function mockWeb3<T extends MockContext>({ page, context, init }: M
   await page.addInitScript({
     content:
       `${readFileSync(require.resolve('@depay/web3-mock/dist/umd/index.bundle.js'), 'utf-8')}\n` +
-      `${readFileSync(require.resolve('ethers/dist/ethers.umd.js'), 'utf-8')}\n` +
+      // `${readFileSync(require.resolve('ethers/dist/ethers.umd.js'), 'utf-8')}\n` +
       `
 
         Web3Mock.mock('ethereum');
