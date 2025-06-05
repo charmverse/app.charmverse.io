@@ -1260,3 +1260,30 @@ export async function generateFarcasterUser({
     }
   });
 }
+
+export async function generateTokenGate({
+  spaceId,
+  createdBy,
+  archived = false,
+  conditions
+}: {
+  spaceId: string;
+  createdBy: string;
+  archived?: boolean;
+  conditions?: Prisma.JsonValue;
+}) {
+  return prisma.tokenGate.create({
+    data: {
+      spaceId,
+      createdBy,
+      archived,
+      conditions: {
+        create: {
+          operator: 'and',
+          conditions: conditions ?? []
+        }
+      },
+      resourceId: v4()
+    }
+  });
+}
