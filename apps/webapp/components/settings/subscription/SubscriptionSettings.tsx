@@ -14,6 +14,7 @@ import MultiTabs from 'components/common/MultiTabs';
 
 import Legend from '../components/Legend';
 
+import { ArchivedFeatures } from './components/ArchivedFeatures';
 import { EnterpriseBillingScreen } from './components/EnterpriseBillingScreen';
 import { CancelSubscriptionModal } from './components/modals/CancelSubscriptionModal';
 import { ConfirmFreeTierModal } from './components/modals/ConfirmFreeTierModal';
@@ -109,7 +110,8 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
               'Plan History',
               <SpaceSubscriptionEventsList key='payments' subscriptionEvents={subscriptionEvents} />,
               { sx: { px: 0, pb: 1 } }
-            ]
+            ],
+            ['Features', <ArchivedFeatures key='features' spaceId={spaceId} />, { sx: { px: 0, pb: 1 } }]
           ]}
         />
         <Divider />
