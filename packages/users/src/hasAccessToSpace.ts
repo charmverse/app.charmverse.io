@@ -21,25 +21,39 @@ interface Result {
   success?: boolean;
   isAdmin?: boolean;
   spaceRole?: SpaceRole;
+  isReadonlySpace: boolean;
 }
 
 export async function hasAccessToSpace({ userId, spaceId, adminOnly = false, disallowGuest }: Input): Promise<Result> {
   if (!spaceId || !userId) {
-    return { error: new InvalidInputError('User ID and space ID are required') };
+    return { error: new InvalidInputError('User ID and space ID are required'), isReadonlySpace: false };
   }
 
   const spaceRole = await prisma.spaceRole.findFirst({
     where: {
       spaceId,
       userId
+    },
+    include: {
+      space: {
+        select: {
+          subscriptionTier: true
+        }
+      }
     }
   });
+  const isReadonlySpace = spaceRole?.space.subscriptionTier === 'readonly';
   if (!spaceRole) {
-    return { error: new UserIsNotSpaceMemberError() };
+    return { error: new UserIsNotSpaceMemberError(), isReadonlySpace };
   } else if (adminOnly && spaceRole.isAdmin !== true) {
-    return { error: new AdministratorOnlyError() };
+    return { error: new AdministratorOnlyError(), isReadonlySpace };
   } else if (spaceRole.isGuest === true && disallowGuest) {
-    return { error: new UserIsGuestError() };
+    return { error: new UserIsGuestError(), isReadonlySpace };
   }
-  return { success: true, isAdmin: spaceRole.isAdmin, spaceRole };
+  return {
+    success: true,
+    isAdmin: spaceRole.isAdmin,
+    spaceRole,
+    isReadonlySpace
+  };
 }

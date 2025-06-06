@@ -2,8 +2,8 @@ import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
 import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, Space, User } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
-import { InvalidInputError } from '@packages/utils/errors';
 import { PostCategoryNotFoundError } from '@packages/lib/forums/categories/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
@@ -71,7 +71,9 @@ describe('computePostCategoryPermissions - public version', () => {
       userId: otherSpaceAdminUser.id
     });
 
-    const emptyPermissions: PostCategoryPermissionFlags = new AvailablePostCategoryPermissions().empty;
+    const emptyPermissions: PostCategoryPermissionFlags = new AvailablePostCategoryPermissions({
+      isReadonlySpace: false
+    }).empty;
 
     expect(publicPermissions).toEqual(emptyPermissions);
 

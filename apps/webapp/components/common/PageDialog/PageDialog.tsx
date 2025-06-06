@@ -3,6 +3,7 @@ import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
 import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import debouncePromise from '@packages/lib/utils/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useEffect, useRef } from 'react';
 
@@ -20,7 +21,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import debouncePromise from '@packages/lib/utils/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
@@ -59,7 +59,9 @@ function PageDialogBase(props: Props) {
     expandFieldsByDefault: proposalProps.proposal?.status === 'draft'
   });
 
-  const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
+  const pagePermissions =
+    page?.permissionFlags ||
+    new AvailablePagePermissions({ isReadonlySpace: space?.subscriptionTier === 'readonly' }).full;
   const fullPageUrl = page?.path ? `/${page?.path}` : null;
 
   const readOnlyPage = readOnly || !pagePermissions?.edit_content;

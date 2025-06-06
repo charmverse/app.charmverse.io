@@ -33,12 +33,12 @@ export async function baseComputePostPermissions({
     throw new PostNotFoundError(`${resourceId}`);
   }
 
-  const { isAdmin, spaceRole } = await hasAccessToSpace({
+  const { isAdmin, spaceRole, isReadonlySpace } = await hasAccessToSpace({
     spaceId: post.spaceId,
     userId
   });
 
-  const permissions = new AvailablePostPermissions();
+  const permissions = new AvailablePostPermissions({ isReadonlySpace });
 
   if (post.createdBy === userId) {
     permissions.addPermissions(['edit_post', 'delete_post', 'view_post']);
