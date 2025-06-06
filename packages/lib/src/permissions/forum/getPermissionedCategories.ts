@@ -20,12 +20,12 @@ export async function getPermissionedCategories({
 
   const spaceId = uniqueSpaceIds[0];
 
-  const { isAdmin, spaceRole } = await hasAccessToSpace({
+  const { isAdmin, spaceRole, isReadonlySpace } = await hasAccessToSpace({
     spaceId,
     userId
   });
 
-  const permissions = new AvailablePostCategoryPermissions();
+  const permissions = new AvailablePostCategoryPermissions({ isReadonlySpace });
 
   if (isAdmin) {
     return postCategories.map((c) => ({ ...c, permissions: permissions.full }));

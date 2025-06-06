@@ -30,7 +30,7 @@ jest.mock('charmClient');
 jest.mock('hooks/useCurrentSpace');
 jest.mock('hooks/usePagePermissions', () => ({
   usePagePermissions: jest.fn(() => ({
-    permissions: new AvailablePagePermissions().empty
+    permissions: new AvailablePagePermissions({ isReadonlySpace: false }).empty
   }))
 }));
 jest.mock('hooks/usePage', () => ({
@@ -53,7 +53,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
 
     const resultWithPermissions = render(
@@ -68,7 +68,7 @@ describe.skip('PaidShareToWeb', () => {
     expect(toggle).not.toBeDisabled();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
 
     // Re-render this with a public permission
@@ -99,7 +99,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
 
     const resultWithPermissions = render(
@@ -117,7 +117,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().empty
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).empty
     });
 
     const resultWithPermissions = render(
@@ -135,7 +135,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
     (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
       data: {
@@ -172,7 +172,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
     (useGetProposalDetails as jest.Mock<Partial<ReturnType<typeof useGetProposalDetails>>>).mockReturnValueOnce({
       data: {
@@ -210,7 +210,7 @@ describe.skip('PaidShareToWeb', () => {
     const pageId = uuid();
 
     (usePagePermissions as jest.Mock<Partial<ReturnType<typeof usePagePermissions>>>).mockReturnValueOnce({
-      permissions: new AvailablePagePermissions().full
+      permissions: new AvailablePagePermissions({ isReadonlySpace: false }).full
     });
 
     (usePage as jest.Mock).mockReturnValueOnce({

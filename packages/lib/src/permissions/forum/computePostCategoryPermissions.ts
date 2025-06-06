@@ -24,13 +24,13 @@ export async function computePostCategoryPermissions({
     throw new PostCategoryNotFoundError(`${resourceId}`);
   }
 
-  const { spaceRole } = await hasAccessToSpace({
+  const { spaceRole, isReadonlySpace } = await hasAccessToSpace({
     spaceId: postCategory.spaceId,
     userId,
     disallowGuest: true
   });
 
-  const permissions = new AvailablePostCategoryPermissions();
+  const permissions = new AvailablePostCategoryPermissions({ isReadonlySpace });
 
   // Space members can create and edit post categories, people outside the space cannot perform any actions
   if (spaceRole) {
