@@ -1,5 +1,6 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup } from '@mui/material';
+import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import { useEffect, useRef } from 'react';
@@ -11,7 +12,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
