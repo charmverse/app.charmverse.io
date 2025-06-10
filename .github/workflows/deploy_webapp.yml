@@ -6,12 +6,38 @@ name: Webapp CI
 on:
   push:
     branches: [main]
-    paths-ignore:
-      - 'apps/**'
+    paths:
+      - '.cdk/**'
+      - 'docker-compose.yml'
+      - '.ebextensions/websockets/**'
+      - '.ebstalk.apps.env/websockets.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_websockets.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'apps/webapp/**'
+      - 'apps/websockets/**'
+      - 'adapters/**'
+      - 'config/**'
+      - 'lib/**'
+      - 'packages/**'
   pull_request:
     branches: ['**']
-    paths-ignore:
-      - 'apps/**'
+    paths:
+      - '.cdk/**'
+      - 'docker-compose.yml'
+      - '.ebextensions/websockets/**'
+      - '.ebstalk.apps.env/websockets.env'
+      - '.github/actions/**'
+      - '.github/workflows/deploy_websockets.yml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'apps/webapp/**'
+      - 'apps/websockets/**'
+      - 'adapters/**'
+      - 'config/**'
+      - 'lib/**'
+      - 'packages/**'
 
 concurrency:
   group: webapp-${{ github.event_name }}-${{ github.ref }}

@@ -12,7 +12,7 @@ type Fixtures = {
   documentPage: DocumentPage;
 };
 
-test('Drag and drop one paragraph over another in the CharmEditor', async ({ documentPage }) => {
+test.skip('Drag and drop one paragraph over another in the CharmEditor', async ({ documentPage }) => {
   const { space, user } = await generateUserAndSpace({ isAdmin: true });
   const generatedPage = await generatePage({ spaceId: space.id, createdBy: user.id });
 

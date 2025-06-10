@@ -12,6 +12,7 @@ on:
       - '.github/workflows/deploy_websockets.yml'
       - 'package.json'
       - 'package-lock.json'
+      - 'apps/webapp/**'
       - 'apps/websockets/**'
       - 'adapters/**'
       - 'config/**'
@@ -29,14 +30,12 @@ on:
       - '.github/workflows/deploy_websockets.yml'
       - 'package.json'
       - 'package-lock.json'
+      - 'apps/webapp/**'
       - 'apps/websockets/**'
       - 'adapters/**'
       - 'config/**'
       - 'lib/**'
       - 'packages/**'
-      # include some paths so that we trigger deploy for web app staging
-      - 'components/**'
-      - 'pages/**'
 
 concurrency:
   group: ci-websockets-${{ github.event_name }}-${{ github.ref }}
