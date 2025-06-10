@@ -2,6 +2,7 @@ import type { UserDetails } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { DEFAULT_MEMBER_PROPERTIES, NON_DEFAULT_MEMBER_PROPERTIES } from '@packages/lib/members/constants';
 import type { Social } from '@packages/lib/members/interfaces';
+import { hasPrimaryMemberIdentityAccess } from '@packages/subscriptions/featureRestrictions';
 import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { mutate } from 'swr';
@@ -36,10 +37,13 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
   );
 
   const data = useMemo(() => {
+    const identityAccessEnabled = hasPrimaryMemberIdentityAccess(currentSpace?.subscriptionTier);
     const _memberProperties = memberPropertyValues
       ?.filter((mpv) => mpv.spaceId === currentSpace?.id)
       .map((mpv) => mpv.properties)
       .flat();
+
+    const primaryIdentity = identityAccessEnabled ? currentSpace?.primaryMemberIdentity : undefined;
 
     // Role and join date are non editable properties
     const _requiredProperties =
@@ -50,16 +54,13 @@ export function useRequiredMemberProperties({ userId }: { userId: string }) {
     const _isTwitterRequired = _requiredProperties.find((p) => p.type === 'twitter');
     const _isLinkedinRequired = _requiredProperties.find((p) => p.type === 'linked_in');
     const _isGithubRequired = _requiredProperties.find((p) => p.type === 'github');
-    const _isGoogleRequired =
-      _requiredProperties.find((p) => p.type === 'google') || currentSpace?.primaryMemberIdentity === 'Google';
-    const _isDiscordRequired =
-      _requiredProperties.find((p) => p.type === 'discord') || currentSpace?.primaryMemberIdentity === 'Discord';
-    const _isWalletRequired =
-      _requiredProperties.find((p) => p.type === 'wallet') || currentSpace?.primaryMemberIdentity === 'Wallet';
+    const _isGoogleRequired = _requiredProperties.find((p) => p.type === 'google') || primaryIdentity === 'Google';
+    const _isDiscordRequired = _requiredProperties.find((p) => p.type === 'discord') || primaryIdentity === 'Discord';
+    const _isWalletRequired = _requiredProperties.find((p) => p.type === 'wallet') || primaryIdentity === 'Wallet';
     const _isTelegramRequired =
-      _requiredProperties.find((p) => p.type === 'telegram') || currentSpace?.primaryMemberIdentity === 'Telegram';
+      _requiredProperties.find((p) => p.type === 'telegram') || primaryIdentity === 'Telegram';
     const _isFarcasterRequired =
-      _requiredProperties.find((p) => p.type === 'farcaster') || currentSpace?.primaryMemberIdentity === 'Farcaster';
+      _requiredProperties.find((p) => p.type === 'farcaster') || primaryIdentity === 'Farcaster';
 
     const userDetailsSocial = userDetails?.social as Social;
 
