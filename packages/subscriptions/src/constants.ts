@@ -4,7 +4,7 @@ import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 export const devTokenAddress = '0x047157cffb8841a64db93fd4e29fa3796b78466c';
 export const uniswapSwapUrl = `https://app.uniswap.org/explore/tokens/base/${devTokenAddress}`;
 
-export const charmVerseBankAddress = '0x84a94307CD0eE34C8037DfeC056b53D7004f04a0';
+export const charmVerseBankAddress = '0x1cD919942a8EF3e867Fe9C0813BC4851090cF037';
 
 export const subscriptionTierOrder: SpaceSubscriptionTier[] = [
   'readonly',
