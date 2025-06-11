@@ -1,6 +1,6 @@
 import type { User } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import ArrowForwardIcon from '@mui/icons-material/Launch';
+import LaunchIcon from '@mui/icons-material/Launch';
 import {
   useTheme,
   InputLabel,
@@ -146,7 +146,7 @@ export function AccountPreferences() {
             href='https://scoutgame.substack.com'
             external
             target='_blank'
-            endIcon={<ArrowForwardIcon />}
+            endIcon={<LaunchIcon />}
           >
             Subscribe to newsletter
           </Button>

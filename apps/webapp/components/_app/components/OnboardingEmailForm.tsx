@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import LaunchIcon from '@mui/icons-material/Launch';
 import { Checkbox, FormControlLabel, FormGroup, TextField, Typography, Stack, Tooltip } from '@mui/material';
 import type { ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
@@ -100,6 +101,17 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
             control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
             label='Receive tips and examples how to use CharmVerse.'
           />
+          <Button
+            variant='outlined'
+            color='inherit'
+            sx={{ mt: 1 }}
+            href='https://scoutgame.substack.com'
+            external
+            target='_blank'
+            endIcon={<LaunchIcon />}
+          >
+            Subscribe to newsletter
+          </Button>
           <FormControlLabel
             control={
               <Checkbox
