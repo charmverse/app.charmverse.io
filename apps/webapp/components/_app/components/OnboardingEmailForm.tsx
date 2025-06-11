@@ -98,7 +98,7 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
           />
           <FormControlLabel
             control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
-            label="Keep me up to date on what's new with CharmVerse."
+            label='Receive tips and examples how to use CharmVerse.'
           />
           <FormControlLabel
             control={

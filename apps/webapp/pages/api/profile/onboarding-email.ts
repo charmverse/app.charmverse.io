@@ -1,19 +1,18 @@
 import { log } from '@charmverse/core/log';
 import type { UserDetails } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { magicLinkEmailCookie } from '@packages/config/constants';
+import { sendMagicLink } from '@packages/lib/google/sendMagicLink';
+import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
+import { sendSignupEvent as sendLoopSignupEvent } from '@packages/lib/loopsEmail/sendSignupEvent';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { updateUserProfile } from '@packages/users/updateUserProfile';
 import Cookies from 'cookies';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { spaceTemplateCookie } from 'components/common/CreateSpaceForm/constants';
-import { magicLinkEmailCookie } from '@packages/config/constants';
-import { registerBeehiivSubscription } from '@packages/lib/beehiiv/registerBeehiivSubscription';
-import { sendMagicLink } from '@packages/lib/google/sendMagicLink';
-import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
-import { sendSignupEvent as sendLoopSignupEvent } from '@packages/lib/loopsEmail/sendSignupEvent';
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -45,7 +44,6 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
         }
       });
       const isAdmin = updatedUser.spaceRoles.some((role) => role.spaceId === payload.spaceId && role.isAdmin);
-      await registerBeehiivSubscription(updatedUser);
       const result = await registerLoopsContact(updatedUser);
       if (result.isNewContact) {
         await sendLoopSignupEvent({
