@@ -1,7 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { deleteBeehiivSubscription } from '@packages/lib/beehiiv/deleteBeehiivSubscription';
-import { registerBeehiivSubscription } from '@packages/lib/beehiiv/registerBeehiivSubscription';
 import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from '@packages/lib/loopsEmail/deleteLoopsContact';
@@ -105,15 +103,13 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
   if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
     try {
       if (!updatedUser.email) {
-        // remove from Loops and Beehiiv
+        // remove from Loops
         await deleteLoopsContact({ email: original.email! });
-        await deleteBeehiivSubscription({ email: original.email! });
       } else {
         await registerLoopsContact(updatedUser, original.email);
-        await registerBeehiivSubscription(updatedUser, original.email);
       }
     } catch (error) {
-      log.error('Error updating contact with Loop or Beehiiv', { error, userId });
+      log.error('Error updating contact with Loop', { error, userId });
     }
   }
 

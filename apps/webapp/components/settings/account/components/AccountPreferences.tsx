@@ -1,5 +1,6 @@
 import type { User } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
+import LaunchIcon from '@mui/icons-material/Launch';
 import {
   useTheme,
   InputLabel,
@@ -21,6 +22,7 @@ import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
 import charmClient from 'charmClient';
+import { Button } from 'components/common/Button';
 import { useColorMode } from 'hooks/useDarkMode';
 import { useUser } from 'hooks/useUser';
 import { useUserPreferences } from 'hooks/useUserPreferences';
@@ -134,9 +136,20 @@ export function AccountPreferences() {
               control={
                 <Checkbox {...register('emailNewsletter')} checked={!!user?.emailNewsletter} onChange={onChange} />
               }
-              label="Keep me up to date on what's new with CharmVerse."
+              label='Receive tips and examples how to use CharmVerse.'
             />
           </FormGroup>
+          <Button
+            variant='outlined'
+            color='inherit'
+            sx={{ mt: 1 }}
+            href='https://scoutgame.substack.com'
+            external
+            target='_blank'
+            endIcon={<LaunchIcon />}
+          >
+            Subscribe to newsletter
+          </Button>
         </Box>
         <Box>
           <InputLabel>Theme mode</InputLabel>

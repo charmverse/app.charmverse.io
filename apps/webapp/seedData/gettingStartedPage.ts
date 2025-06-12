@@ -772,23 +772,6 @@ export const gettingStartedPage: GettingStartedPage = {
         }
       },
       {
-        type: 'bookmark',
-        attrs: {
-          url: 'https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c',
-          track: []
-        }
-      },
-      {
-        type: 'iframe',
-        attrs: {
-          src: 'https://embeds.beehiiv.com/c66f66bc-09b6-4e40-b69a-243f5ce75c3c',
-          type: 'embed',
-          track: [],
-          width: 700,
-          height: 200
-        }
-      },
-      {
         type: 'paragraph',
         attrs: {
           track: []
