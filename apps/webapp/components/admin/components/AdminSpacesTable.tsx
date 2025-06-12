@@ -11,8 +11,6 @@ import {
   TableRow,
   Paper,
   Divider,
-  FormControl,
-  InputLabel,
   Select,
   MenuItem,
   IconButton,
@@ -27,7 +25,7 @@ import { capitalize } from '@packages/utils/strings';
 import type { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
 
-import { useAdminSpaces, useUpdateSpace } from 'charmClient/hooks/admin';
+import { useAdminSpaces, useGetSpaceTokenBalance, useUpdateSpace } from 'charmClient/hooks/admin';
 import { Avatar } from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -72,6 +70,7 @@ export function AdminSpacesTable() {
   const { showMessage } = useSnackbar();
   const { trigger: updateSpace } = useUpdateSpace();
   const searchDebounced = useDebouncedValue(searchInputValue, 200);
+  const { data: spaceTokenBalance, isLoading: isSpaceTokenBalanceLoading } = useGetSpaceTokenBalance(editingSpace?.id);
   const {
     data: spaces,
     isLoading,
@@ -226,6 +225,14 @@ export function AdminSpacesTable() {
             <Typography variant='h6'>Edit Space Subscription</Typography>
             <Typography variant='body2' color='text.secondary'>
               Update the subscription tier and price override for this space
+            </Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Space token balance:{' '}
+              {isSpaceTokenBalanceLoading ? (
+                'Loading...'
+              ) : (
+                <strong>{spaceTokenBalance?.formatted.toFixed(2)} DEV</strong>
+              )}
             </Typography>
           </Box>
           <Divider />

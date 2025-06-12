@@ -13,9 +13,9 @@ import { whitelist } from 'lib/admin/users';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).use(_requireAdmin).get(getSpacesEndpoint).put(updateSpaceController);
+handler.use(requireUser).use(requireAdmin).get(getSpacesEndpoint).put(updateSpaceController);
 
-function _requireAdmin(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
+export function requireAdmin(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const userId = req.session?.user?.id;
   if (!whitelist.includes(userId)) {
     throw new UnauthorisedActionError('You do not have permission to access this api');
