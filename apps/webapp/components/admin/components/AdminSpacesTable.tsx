@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
+import { Edit as EditIcon } from '@mui/icons-material';
 import {
   Box,
   Table,
@@ -13,7 +14,12 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
+  IconButton,
+  TextField,
+  Stack,
+  Typography,
+  InputAdornment
 } from '@mui/material';
 import { isProdEnv } from '@packages/config/constants';
 import { withSessionSsr } from '@packages/lib/session/withSession';
@@ -21,11 +27,15 @@ import { capitalize } from '@packages/utils/strings';
 import type { GetServerSideProps } from 'next';
 import { useState, useEffect } from 'react';
 
-import { useAdminSpaces } from 'charmClient/hooks/admin';
+import { useAdminSpaces, useUpdateSpace } from 'charmClient/hooks/admin';
 import { Avatar } from 'components/common/Avatar';
+import { Button } from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import Modal from 'components/common/Modal';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { whitelist } from 'lib/admin/users';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
@@ -52,11 +62,21 @@ export function AdminSpacesTable() {
   const [subscriptionTier, setSubscriptionTier] = useState<SpaceSubscriptionTier | null>(null);
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [editingSpace, setEditingSpace] = useState<{
+    id: string;
+    tier: SpaceSubscriptionTier;
+    price: number | null;
+  } | null>(null);
+  const [newTier, setNewTier] = useState<SpaceSubscriptionTier | null>(null);
+  const [newPrice, setNewPrice] = useState<string>('');
+  const { showMessage } = useSnackbar();
+  const { trigger: updateSpace } = useUpdateSpace();
   const searchDebounced = useDebouncedValue(searchInputValue, 200);
   const {
     data: spaces,
     isLoading,
-    isValidating
+    isValidating,
+    mutate: refreshSpaces
   } = useAdminSpaces({
     name: searchDebounced,
     sortField: sortField || undefined,
@@ -70,6 +90,53 @@ export function AdminSpacesTable() {
     } else {
       setSortField(field);
       setSortDirection('asc');
+    }
+  };
+
+  const handleEditClick = (space: {
+    id: string;
+    subscriptionTier: SpaceSubscriptionTier | null;
+    subscriptionMonthlyPrice: number | null;
+  }) => {
+    setEditingSpace({
+      id: space.id,
+      tier: space.subscriptionTier || 'free',
+      price: space.subscriptionMonthlyPrice
+    });
+    setNewTier(space.subscriptionTier || 'free');
+    setNewPrice(space.subscriptionMonthlyPrice?.toString() || '');
+  };
+
+  const handleSave = async () => {
+    if (!editingSpace || !newTier) return;
+
+    // Validate subscription tier
+    const validTiers = ['readonly', 'free', 'bronze', 'silver', 'gold', 'grant'] as const;
+    if (!validTiers.includes(newTier as any)) {
+      showMessage('Invalid subscription tier', 'error');
+      return;
+    }
+
+    // Validate price
+    if (newPrice !== null && newPrice !== undefined) {
+      const price = Number(newPrice);
+      if (Number.isNaN(price) || price < 0) {
+        showMessage('Invalid subscription price', 'error');
+        return;
+      }
+    }
+
+    try {
+      await updateSpace({
+        id: editingSpace.id,
+        subscriptionTier: newTier,
+        subscriptionMonthlyPrice: newPrice ? Number(newPrice) : null
+      });
+      showMessage('Space updated successfully', 'success');
+      refreshSpaces();
+      setEditingSpace(null);
+    } catch (error) {
+      showMessage('Failed to update space', 'error');
     }
   };
 
@@ -116,12 +183,13 @@ export function AdminSpacesTable() {
               <TableCell onClick={() => handleSort('subscriptionMonthlyPrice')} sx={{ cursor: 'pointer' }}>
                 Price Override {sortField === 'subscriptionMonthlyPrice' && (sortDirection === 'asc' ? '↑' : '↓')}
               </TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {isLoading || isValidating ? (
               <TableRow>
-                <TableCell colSpan={4}>Loading...</TableCell>
+                <TableCell colSpan={5}>Loading...</TableCell>
               </TableRow>
             ) : (
               spaces?.map((space) => (
@@ -129,18 +197,77 @@ export function AdminSpacesTable() {
                   <TableCell sx={{ width: '50%' }}>
                     <Box display='flex' alignItems='center' gap={1}>
                       <Avatar name={space.name} avatar={space.spaceImage} size='small' />
-                      {space.name}
+                      <Stack>
+                        <Typography>{space.name}</Typography>
+                        <Typography variant='caption' color='text.secondary'>
+                          {space.domain}
+                        </Typography>
+                      </Stack>
                     </Box>
                   </TableCell>
                   <TableCell>{new Date(space.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{capitalize(space.subscriptionTier || 'Free')}</TableCell>
                   <TableCell>{space.subscriptionMonthlyPrice}</TableCell>
+                  <TableCell>
+                    <IconButton size='small' onClick={() => handleEditClick(space)}>
+                      <EditIcon fontSize='small' />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
               ))
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Modal open={!!editingSpace} onClose={() => setEditingSpace(null)}>
+        <Stack gap={2}>
+          <Box>
+            <Typography variant='h6'>Edit Space Subscription</Typography>
+            <Typography variant='body2' color='text.secondary'>
+              Update the subscription tier and price override for this space
+            </Typography>
+          </Box>
+          <Divider />
+          <Box>
+            <FieldLabel>Subscription Tier</FieldLabel>
+            <Select
+              value={newTier || ''}
+              label='Subscription Tier'
+              onChange={(e) => setNewTier(e.target.value as SpaceSubscriptionTier)}
+            >
+              <MenuItem value='readonly'>Readonly</MenuItem>
+              <MenuItem value='free'>Free</MenuItem>
+              <MenuItem value='silver'>Silver</MenuItem>
+              <MenuItem value='gold'>Gold</MenuItem>
+              <MenuItem value='grant'>Grant</MenuItem>
+            </Select>
+          </Box>
+          <Box>
+            <FieldLabel>Price Override</FieldLabel>
+            <TextField
+              type='number'
+              fullWidth
+              slotProps={{
+                input: {
+                  endAdornment: <InputAdornment position='end'>DEV</InputAdornment>
+                }
+              }}
+              value={newPrice}
+              onChange={(e) => setNewPrice(e.target.value)}
+              helperText='Leave empty to use default tier price'
+            />
+          </Box>
+          <Box display='flex' justifyContent='flex-end' gap={2}>
+            <Button variant='outlined' onClick={() => setEditingSpace(null)}>
+              Cancel
+            </Button>
+            <Button variant='contained' onClick={handleSave}>
+              Save Changes
+            </Button>
+          </Box>
+        </Stack>
+      </Modal>
     </Paper>
   );
 }
