@@ -90,27 +90,6 @@ describe('unarchiveRole', () => {
     }
   });
 
-  it('should fail if trying to unarchive a role managed by summon', async () => {
-    const role = await generateRole({
-      spaceId: space.id,
-      createdBy: user.id,
-      source: 'summon',
-      archived: true
-    });
-
-    try {
-      await unarchiveRole({
-        roleId: role.id,
-        userId: user.id
-      });
-      throw new ExpectedAnError();
-    } catch (err) {
-      if (err instanceof Error) {
-        expect(err).toBeInstanceOf(UndesirableOperationError);
-      }
-    }
-  });
-
   it('should fail if unarchiving would exceed the space tier limit', async () => {
     // First create roles up to the limit
     const maxRoles = 3; // Assuming free tier limit

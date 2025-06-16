@@ -1,4 +1,5 @@
 import type { Space, User } from '@charmverse/core/prisma';
+import { assignRole, listRoleMembers } from '@packages/lib/roles';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { ExpectedAnError } from '@packages/testing/errors';
 import {
@@ -8,7 +9,6 @@ import {
   generateUserAndSpaceWithApiToken
 } from '@packages/testing/setupDatabase';
 import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '@packages/utils/errors';
-import { assignRole, listRoleMembers } from '@packages/lib/roles';
 import { v4 } from 'uuid';
 
 let user: User;
@@ -105,25 +105,6 @@ describe('assignRole', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(DataNotFoundError);
     }
-  });
-
-  it('should fail if the summon role is being assigned', async () => {
-    const { user: adminUser, space: spaceWithGuest } = await generateUserAndSpace({
-      isAdmin: true
-    });
-
-    const role = await generateRole({
-      spaceId: spaceWithGuest.id,
-      createdBy: adminUser.id,
-      source: 'summon'
-    });
-
-    await expect(
-      assignRole({
-        roleId: role.id,
-        userId: user.id
-      })
-    ).rejects.toThrow(UndesirableOperationError);
   });
 
   it('should fail if the user does not exist', async () => {

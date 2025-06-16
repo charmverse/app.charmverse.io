@@ -16,10 +16,6 @@ export async function unassignRole({ roleId, userId }: RoleAssignment) {
     throw new UndesirableOperationError('Cannot remove role as it is managed by Guild.xyz');
   }
 
-  if (role.source === 'summon') {
-    throw new UndesirableOperationError('Cannot remove role as it is managed by Summon');
-  }
-
   const targetSpaceRole = (await prisma.spaceRole.findFirst({
     where: {
       userId,

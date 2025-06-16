@@ -6,16 +6,14 @@ import charmClient from 'charmClient';
 import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMemberCollections } from 'hooks/useMemberCollections';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
-
-import { useMemberCollections } from '../../../../hooks/useMemberCollections';
-import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
+import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 
 import { CollectionWidget } from './components/CollectionWidget/CollectionWidget';
 import { CredentialsWidget } from './components/CredentialsWidget';
 import { EnsWidget } from './components/EnsWidget';
 import { MemberPropertiesWidget } from './components/MemberPropertiesWidget/MemberPropertiesWidget';
-import { SummonProfileWidget } from './components/SummonProfileWidget';
 
 export function ProfileWidgets({
   userId,
@@ -40,11 +38,6 @@ export function ProfileWidgets({
     charmClient.publicProfile.getEnsProfile(userId)
   );
 
-  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(
-    space && `public/profile/${userId}/summon`,
-    () => charmClient.publicProfile.getSummonProfile(userId, space!.id)
-  );
-
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
     memberId: userId
   });
@@ -54,7 +47,6 @@ export function ProfileWidgets({
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
   const hideCollections = pinnedNfts.length === 0 && poaps.length === 0 && readOnlyMemberProperties;
   const isLoading =
-    isLoadingSummonProfile &&
     isLoadingEnsProfile &&
     isFetchingPoaps &&
     isFetchingNfts &&
@@ -115,16 +107,6 @@ export function ProfileWidgets({
                   />
                 </Grid>
               ) : null;
-
-            case 'summon': {
-              return (
-                summonProfile && (
-                  <Grid size={{ xs: 12, md: 6 }} alignItems='stretch' key={id}>
-                    <SummonProfileWidget summonProfile={summonProfile} />
-                  </Grid>
-                )
-              );
-            }
 
             default:
               return null;

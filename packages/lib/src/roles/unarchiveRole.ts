@@ -29,7 +29,7 @@ export async function unarchiveRole({ roleId, userId }: UnarchiveRoleInput) {
   }
 
   // Don't allow unarchiving roles from external sources
-  if (role.source === 'guild_xyz' || role.source === 'summon') {
+  if (role.source === 'guild_xyz') {
     throw new UndesirableOperationError('Cannot unarchive roles managed by external sources');
   }
 

@@ -18,7 +18,6 @@ import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNoti
 import { sendProposalEvaluationNotifications } from './tasks/sendProposalEvaluationNotifications';
 import { task as storeOptimismProjectAttestations } from './tasks/storeOptimismProjectAttestations';
 import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
-import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { updateMixpanelProfilesTask } from './tasks/updateMixpanelProfilesTask';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -66,9 +65,6 @@ cron.schedule('*/30 * * * *', countAllSpacesBlocksTask);
 
 // Update space mixpanel profiles once a day at 1am
 cron.schedule('0 1 * * *', updateMixpanelProfilesTask);
-
-// Sync summon space roles every day at midnight
-cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Refresh docusign credentials every 6 hours
 cron.schedule('0 */6 * * *', refreshDocusignOAuthTask);
