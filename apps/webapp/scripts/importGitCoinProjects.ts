@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { AlchemyProvider } from '@ethersproject/providers';
 import { Space } from '@charmverse/core/prisma';
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
