@@ -14,7 +14,6 @@ export function useBlockCount() {
 
   return {
     data,
-    count: data?.count ?? 0,
-    additionalQuota: data?.additionalQuota ?? 0
+    count: data?.count ?? 0
   };
 }

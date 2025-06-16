@@ -34,11 +34,10 @@ describe('GET /api/spaces/[id]/block count - Get space block count', () => {
 
     const blockCount = (
       await request(baseUrl).get(`/api/spaces/${spaceOne.id}/block-count`).set('Cookie', memberCookie).expect(200)
-    ).body as { count: number; additionalQuota: number };
+    ).body as { count: number };
 
-    expect(blockCount).toMatchObject<{ count: number; additionalQuota: number }>({
-      count: expect.any(Number),
-      additionalQuota: expect.any(Number)
+    expect(blockCount).toMatchObject<{ count: number }>({
+      count: expect.any(Number)
     });
   });
 
