@@ -5,10 +5,10 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { useMemberCollections } from 'components/members/hooks/useMemberCollections';
+import { useMemberPropertyValues } from 'components/members/hooks/useMemberPropertyValues';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useMemberCollections } from 'hooks/useMemberCollections';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
-import { useMemberPropertyValues } from 'hooks/useMemberPropertyValues';
 
 import { CollectionWidget } from './components/CollectionWidget/CollectionWidget';
 import { CredentialsWidget } from './components/CredentialsWidget';
