@@ -86,7 +86,6 @@ export class SpacesApi {
   getBlockCount({ spaceId }: { spaceId: string }) {
     return http.GET<{
       count: number;
-      additionalQuota: number;
     }>(`/api/spaces/${spaceId}/block-count`);
   }
 

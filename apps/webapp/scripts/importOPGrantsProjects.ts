@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from '@packages/utils/strings';
