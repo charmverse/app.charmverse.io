@@ -55,7 +55,6 @@ import { RewardsApi } from './apis/rewardsApi';
 import { RolesApi } from './apis/rolesApi';
 import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
-import { SummonApi } from './apis/summonApi';
 import { TokenGateApi } from './apis/tokenGateApi';
 import { TrackApi } from './apis/trackApi';
 import { VotesApi } from './apis/votesApi';
@@ -95,8 +94,6 @@ class CharmClient {
   roles = new RolesApi();
 
   spaces = new SpacesApi();
-
-  summon = new SummonApi();
 
   notifications = new NotificationsApi();
 

@@ -60,18 +60,6 @@ describe('updateRole', () => {
     );
   });
 
-  it('should throw an error if updating a role imported from summon', async () => {
-    const role = await testUtilsMembers.generateRole({
-      createdBy: user.id,
-      spaceId: space.id,
-      source: 'summon'
-    });
-
-    await expect(updateRole({ id: role.id, update: { name: `New Name` } })).rejects.toBeInstanceOf(
-      UndesirableOperationError
-    );
-  });
-
   it('should throw an error if ID is invalid', async () => {
     await expect(updateRole({ id: 'invalid-id', update: { name: `New Name` } })).rejects.toBeInstanceOf(
       InvalidInputError

@@ -23,10 +23,6 @@ export async function assignRole({ roleId, userId }: RoleAssignment) {
 
   const role = await listRoleMembers({ roleId });
 
-  if (role?.source === 'summon') {
-    throw new UndesirableOperationError('Cannot assign role imported from summon');
-  }
-
   // User is already a member
   if (role.users.some((u) => u.id === userId)) {
     return;

@@ -63,10 +63,6 @@ export function getProfileWidgetLogo(name: MemberProfileName) {
       return '/images/template_icons/nft_ape_icon.svg';
     case 'ens':
       return '/images/logos/ens_logo.svg';
-    case 'lens':
-      return '/images/logos/lens_logo.png';
-    case 'summon':
-      return '/images/logos/summon_dark_mark.svg';
     case 'credentials':
       return <MedalIcon />;
     default:

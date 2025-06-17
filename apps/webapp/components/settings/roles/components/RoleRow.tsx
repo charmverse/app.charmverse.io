@@ -2,7 +2,7 @@ import { ArchiveOutlined, UnarchiveOutlined } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { useTheme, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { bindMenu, bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, type ReactNode } from 'react';
 
@@ -12,10 +12,6 @@ import { useMembers } from 'hooks/useMembers';
 import { useRoleAccess } from 'hooks/useRoleAccess';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
-import CollabLandIcon from 'public/images/logos/collabland_logo.svg';
-import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
-import SummonDarkIcon from 'public/images/logos/summon_dark_mark.svg';
-import SummonLightIcon from 'public/images/logos/summon_light_mark.svg';
 
 import { RoleForm } from './RoleForm';
 import { RolePermissions } from './RolePermissions/RolePermissions';
@@ -50,20 +46,8 @@ export function RoleRow({
   const { showMessage } = useSnackbar();
   const { canCreateRole } = useRoleAccess();
 
-  const theme = useTheme();
-
-  let descriptionIcon: ReactNode = null;
-  let description: ReactNode = null;
-  if (role.source === 'collabland') {
-    descriptionIcon = CollabLandIcon;
-    description = <>This role is managed by Collab.Land. Visit https://collab.land/ to modify this role</>;
-  } else if (role.source === 'guild_xyz') {
-    descriptionIcon = GuildXYZIcon;
-    description = <>This role is managed by Guild XYZ. Visit https://guild.xyz/ to modify this role</>;
-  } else if (role.source === 'summon') {
-    descriptionIcon = theme.palette.mode === 'dark' ? SummonLightIcon : SummonDarkIcon;
-    description = <>This role is managed by Summon</>;
-  }
+  const descriptionIcon: ReactNode = null;
+  const description: ReactNode = null;
 
   const assignedMembers = members.filter(
     (member) => !member.isBot && !member.isGuest && member.roles.some((r) => r.id === role.id)
@@ -109,9 +93,7 @@ export function RoleRow({
         />
       }
       roleActions={
-        !readOnly &&
-        role.source !== 'guild_xyz' &&
-        role.source !== 'summon' && (
+        !readOnly && (
           <>
             <IconButton size='small' {...bindTrigger(menuState)}>
               <MoreHorizIcon />

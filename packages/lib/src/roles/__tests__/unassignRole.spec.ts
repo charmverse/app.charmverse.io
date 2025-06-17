@@ -1,9 +1,9 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { assignRole } from '@packages/lib/roles';
 import { ExpectedAnError } from '@packages/testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from '@packages/utils/errors';
-import { assignRole } from '@packages/lib/roles';
 import { v4 } from 'uuid';
 
 import { listRoleMembers } from '../listRoleMembers';
@@ -90,33 +90,5 @@ describe('unassignRole', () => {
     } catch (err) {
       expect(err).toBeInstanceOf(UndesirableOperationError);
     }
-  });
-
-  it('should fail if trying to unassign a user from a role managed by summon', async () => {
-    const role = await generateRole({
-      spaceId: space.id,
-      createdBy: user.id
-    });
-
-    await assignRole({
-      roleId: role.id,
-      userId: user.id
-    });
-
-    await prisma.role.update({
-      where: {
-        id: role.id
-      },
-      data: {
-        source: 'summon'
-      }
-    });
-
-    await expect(() =>
-      unassignRole({
-        roleId: role.id,
-        userId: user.id
-      })
-    ).rejects.toThrow(UndesirableOperationError);
   });
 });
