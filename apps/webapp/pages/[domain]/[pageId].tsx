@@ -184,9 +184,6 @@ export default function PageView() {
   }, [router.query.reload, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
-    if (isSpaceReadonly) {
-      return <ErrorPage message='Sorry, looks like you do not have access to this page' />;
-    }
     return <SharedPage publicPage={publicPage} />;
   }
   if (!basePageId) {
