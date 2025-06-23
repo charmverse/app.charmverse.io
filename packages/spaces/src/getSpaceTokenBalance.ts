@@ -25,7 +25,19 @@ export async function getSpaceTokenBalance({ spaceId }: { spaceId: string }): Pr
           paidTokenAmount: true
         }
       },
-      subscriptionContributions: true
+      subscriptionContributions: {
+        select: {
+          createdAt: true,
+          devTokenAmount: true,
+          txHash: true,
+          user: {
+            select: {
+              avatar: true,
+              username: true
+            }
+          }
+        }
+      }
     }
   });
 
