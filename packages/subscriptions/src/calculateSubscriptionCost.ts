@@ -20,8 +20,8 @@ export function calculateSubscriptionCost({
 
   const now = DateTime.now();
   const monthEnd = now.endOf('month');
-  const daysRemaining = Math.floor(monthEnd.diff(now, 'days').days) + 1;
-  const daysInThisMonth = monthEnd.diff(now.startOf('month'), 'days').days + 1;
+  const daysRemaining = Math.ceil(monthEnd.diff(now, 'days').days);
+  const daysInThisMonth = Math.ceil(monthEnd.diff(now.startOf('month'), 'days').days);
 
   // calculate price for the number of months
   const priceForMonths = paymentMonths * newTierPrice;
