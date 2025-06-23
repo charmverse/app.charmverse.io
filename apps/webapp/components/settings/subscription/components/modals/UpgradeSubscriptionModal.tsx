@@ -304,7 +304,7 @@ export function UpgradeSubscriptionModal({
               <Stack gap={1}>
                 <Stack direction='row' justifyContent='space-between'>
                   <Typography variant='body2'>
-                    {paymentMonths} months x {newTierPrice.toLocaleString()}
+                    {paymentMonths} month{paymentMonths > 1 ? 's' : ''} x {newTierPrice.toLocaleString()}
                   </Typography>
                   <Stack direction='row' alignItems='center' gap={0.5}>
                     <Typography variant='body2'>{priceForMonths}</Typography>
