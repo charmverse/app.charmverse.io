@@ -26,7 +26,8 @@ export function calculateSubscriptionCost({
   // calculate price for the number of months
   const priceForMonths = paymentMonths * newTierPrice;
   // Value of unused days at the current tier rate
-  const amountToProrate = Math.ceil(daysRemaining * (currentTierPrice / daysInThisMonth));
+  const daysAlreadyPaid = daysInThisMonth - daysRemaining;
+  const amountToProrate = Math.ceil(daysAlreadyPaid * (currentTierPrice / daysInThisMonth));
   const priceForMonthsMinusProrated = priceForMonths - amountToProrate;
   // just in case the 'upgrade' is somehow more expensive than the prorated amount (happens in dev sometimes)
   const devTokensToSend = Math.max(priceForMonthsMinusProrated, priceForMonthsMinusProrated);
