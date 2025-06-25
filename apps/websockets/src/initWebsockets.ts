@@ -1,5 +1,3 @@
-// init app instrumentation
-import './app/datadog';
 import { log } from '@charmverse/core/log';
 import { appEnv } from '@packages/config/constants';
 

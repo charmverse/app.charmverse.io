@@ -20,7 +20,7 @@ services:
 
   stg-cron:
     extends:
-      service: defaults
+      service: defaultsout
     ports:
       - '80:3000'
     command: ['npm', 'run', 'cron:staging']
@@ -38,7 +38,7 @@ services:
       [
         'sh',
         '-c',
-        'npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
+        'npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=8192 node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
       ]
     profiles:
       - prd-webapp
@@ -52,7 +52,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=750 --require dd-trace/init node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env --dest ./apps/webapp/public -- node --max-old-space-size=750 node_modules/.bin/next start apps/webapp --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging

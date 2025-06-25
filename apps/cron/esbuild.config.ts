@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 
-import ddPlugin from 'dd-trace/esbuild';
 import * as esbuild from 'esbuild';
 
 esbuild
@@ -12,7 +11,6 @@ esbuild
     tsconfig: './tsconfig.json',
     // packages: 'external',
     external: ['@charmverse/core'],
-    plugins: [ddPlugin],
     platform: 'node',
     sourcemap: true,
     // this makes it so that we can use require in the built file https://github.com/evanw/esbuild/issues/946
