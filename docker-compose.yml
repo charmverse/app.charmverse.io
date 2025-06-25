@@ -1,11 +1,6 @@
 services:
   defaults:
     image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/${IMGNAME}:${IMGTAG}'
-    labels:
-      com.datadoghq.ad.logs: '[{"source": "nodejs", "service": "${SERVICE_NAME}", "version": "${IMGTAG}"}]'
-      com.datadoghq.tags.env: '${SERVICE_ENV:-tst}'
-      com.datadoghq.tags.service: '${SERVICE_NAME}'
-      com.datadoghq.tags.version: '${IMGTAG}'
     env_file:
       - '.env'
     environment:
@@ -121,35 +116,3 @@ services:
       - ${LOCAL_DATA_DIR:-/home/postgresql}:/var/lib/postgresql/
     profiles:
       - dev
-
-  datadog-agent:
-    image: public.ecr.aws/datadog/agent
-    hostname: datadog-agent
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc/:/host/proc/:ro
-      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/log:/host/var/log:ro
-    ports:
-      - '8125:8125/udp'
-      - '8126:8126/tcp'
-    env_file:
-      - '.env'
-    environment:
-      DD_LOGS_ENABLED: 'true'
-      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: 'true'
-      DD_CONTAINER_EXCLUDE: 'image:public.ecr.aws/datadog/agent'
-      DD_SITE: 'datadoghq.com'
-      DD_APM_ENABLED: 'true'
-      DD_APM_NON_LOCAL_TRAFFIC: 'true'
-      DD_ENV: '${SERVICE_ENV:-tst}'
-      DD_SERVICE: '${SERVICE_NAME}'
-      DD_USE_DOGSTATSD: 'true'
-      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
-      DD_EC2_PREFER_IMDSV2: 'true'
-    profiles:
-      - prd-cron
-      - prd-webapp
-      - prd-sockets
-      - ddtst
