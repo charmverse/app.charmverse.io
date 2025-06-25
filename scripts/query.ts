@@ -9,6 +9,15 @@ import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import fs from 'fs';
 
 async function query() {
-  console.log(await prisma.cardNotification.count({}));
+  console.log(
+    await prisma.spaceApiToken.findFirst({
+      where: {
+        token: 'a7d9294b78576e46406edb2c213b9bceda5384ab'
+      },
+      include: {
+        space: true
+      }
+    })
+  );
 }
 query();
