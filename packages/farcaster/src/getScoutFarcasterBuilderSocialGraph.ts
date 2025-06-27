@@ -1,6 +1,6 @@
 import { fetchQueryWithPagination, init } from '@airstack/node';
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 
 const apiKey = process.env.AIRSTACK_API_KEY;
 

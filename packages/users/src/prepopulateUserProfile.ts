@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getENSDetails } from '@packages/blockchain/getENSName';
+import { log } from '@packages/core/log';
 import { getUserNFTs } from '@packages/profile/getUserNFTs';
 import { updateProfileAvatar } from '@packages/profile/updateProfileAvatar';
 import { uniqBy } from 'lodash-es';

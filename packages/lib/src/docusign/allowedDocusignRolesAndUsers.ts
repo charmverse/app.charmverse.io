@@ -1,7 +1,7 @@
-import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { DocusignAllowedRoleOrUser } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InsecureOperationError, InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 
 export async function getAllowedDocusignRolesAndUsers({
   spaceId

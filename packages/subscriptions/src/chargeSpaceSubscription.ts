@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { tierConfig } from '@packages/subscriptions/constants';
 import { DateTime } from 'luxon';

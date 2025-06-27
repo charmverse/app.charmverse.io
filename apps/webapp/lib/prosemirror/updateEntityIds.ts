@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import type { PageContent, TextContent, TextMark } from '@packages/charmeditor/interfaces';
+import { log } from '@packages/core/log';
 import { v4 as uuid } from 'uuid';
 
 type UpdateRefs = {

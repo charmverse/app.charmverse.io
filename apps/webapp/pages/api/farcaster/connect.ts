@@ -1,13 +1,12 @@
-import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
-import type { LoggedInUser } from '@packages/profile/getUser';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { log } from '@packages/core/log';
 import { connectFarcaster } from '@packages/lib/farcaster/connectFarcaster';
 import { disconnectFarcaster } from '@packages/lib/farcaster/disconnectFarcaster';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

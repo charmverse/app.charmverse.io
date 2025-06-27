@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { UserDetails } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { magicLinkEmailCookie } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { sendMagicLink } from '@packages/lib/google/sendMagicLink';
 import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
 import { sendSignupEvent as sendLoopSignupEvent } from '@packages/lib/loopsEmail/sendSignupEvent';

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 import { validateAnswers } from '@packages/lib/proposals/forms/validateAnswers';
 import { isTruthy } from '@packages/utils/types';

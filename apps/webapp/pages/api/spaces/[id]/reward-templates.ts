@@ -1,11 +1,10 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { hasAccessToSpace } from '@packages/core/permissions';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import type { RewardTemplate } from '@packages/lib/rewards/getRewardTemplate';
 import { getRewardTemplates } from '@packages/lib/rewards/getRewardTemplates';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,4 +1,4 @@
-import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
 const ignoreDomains: string[] = [

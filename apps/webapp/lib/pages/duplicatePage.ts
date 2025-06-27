@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 
 import type { PageMeta } from 'lib/pages/interfaces';
 import { exportWorkspacePages } from 'lib/templates/exportWorkspacePages';

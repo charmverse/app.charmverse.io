@@ -1,11 +1,11 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import type {
   PermissionsClient,
   PermissionsEngine,
   PremiumPermissionsClient,
   ResourceIdEntity
-} from '@charmverse/core/permissions';
-import { stringUtils } from '@charmverse/core/utilities';
+} from '@packages/core/permissions';
+import { stringUtils } from '@packages/core/utilities';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 

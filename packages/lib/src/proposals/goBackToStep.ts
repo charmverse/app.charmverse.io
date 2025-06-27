@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { getDraftStep } from '@packages/lib/proposals/getCurrentStep';
 import { publishProposalEvent } from '@packages/lib/webhookPublisher/publishEvent';
 import { isTruthy } from '@packages/utils/types';

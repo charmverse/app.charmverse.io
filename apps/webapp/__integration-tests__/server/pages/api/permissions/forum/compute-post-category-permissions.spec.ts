@@ -1,6 +1,6 @@
-import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory, PostCategoryPermission, Space, User } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { PostCategoryPermissionFlags } from '@packages/core/permissions';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 

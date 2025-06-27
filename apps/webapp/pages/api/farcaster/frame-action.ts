@@ -1,5 +1,5 @@
-import { ExternalServiceError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { ExternalServiceError, InvalidInputError } from '@packages/core/errors';
 import { createFrameActionMessageWithSignerKey } from '@packages/lib/farcaster/createFrameActionMessageWithSignerKey';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';

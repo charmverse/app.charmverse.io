@@ -1,4 +1,4 @@
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
 import { ApiError } from '@packages/nextjs/errors';
 import type { ISystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';

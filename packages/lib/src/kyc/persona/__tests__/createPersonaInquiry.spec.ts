@@ -1,4 +1,4 @@
-import { DataNotFoundError, UnauthorisedActionError } from '@charmverse/core/errors';
+import { DataNotFoundError, UnauthorisedActionError } from '@packages/core/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generatePersonaCredential, generatePersonaUserKyc } from '@packages/testing/utils/kyc';
 import { v4 } from 'uuid';

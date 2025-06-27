@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { LoggedInUser } from '@packages/profile/getUser';
 
 import { mixpanelOp } from './mixpanel';

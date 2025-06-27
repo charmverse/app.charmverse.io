@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
@@ -10,6 +9,7 @@ import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { log } from '@packages/core/log';
 import { setCookie, getSpaceUrl } from '@packages/lib/utils/browser';
 import { spaceTemplateIds } from '@packages/spaces/config';
 import type { SpaceTemplateType } from '@packages/spaces/config';

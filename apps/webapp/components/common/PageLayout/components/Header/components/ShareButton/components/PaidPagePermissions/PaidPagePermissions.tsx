@@ -1,11 +1,11 @@
+import { Box } from '@mui/material';
+import Stack from '@mui/material/Stack';
 import type {
   AssignablePagePermissionGroups,
   AssignedPagePermission,
   PagePermissionAssignmentByValues,
   TargetPermissionGroup
-} from '@charmverse/core/permissions';
-import { Box } from '@mui/material';
-import Stack from '@mui/material/Stack';
+} from '@packages/core/permissions';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 

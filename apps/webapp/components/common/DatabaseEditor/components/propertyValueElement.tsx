@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import { log } from '@packages/core/log';
 import type { Board, IPropertyTemplate, PropertyType } from '@packages/databases/board';
 import type { CardWithRelations } from '@packages/databases/card';
 import type { Mutator } from '@packages/databases/mutator';

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { isTruthy } from '@packages/utils/types';
 
 // A utilitiy to recursively call and endpoint with paginated results

@@ -2,10 +2,10 @@
  * Below methods are the API reference links for the Docusign API
  */
 
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { GET } from '@packages/adapters/http';
 import { redisClient } from '@packages/adapters/redis/redisClient';
+import { log } from '@packages/core/log';
 
 import type { RequiredDocusignCredentials } from './constants';
 import { docusignPeriodBetweenRequestsInSeconds } from './constants';

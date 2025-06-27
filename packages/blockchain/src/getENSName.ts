@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { isTestEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
 

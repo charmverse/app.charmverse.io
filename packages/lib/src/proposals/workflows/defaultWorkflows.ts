@@ -1,4 +1,4 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from './defaultEvaluation';

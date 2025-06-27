@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import { getPagePath } from '@packages/lib/utils/domains/getPagePath';

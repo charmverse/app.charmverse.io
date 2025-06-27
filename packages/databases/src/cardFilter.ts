@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { getProposalEvaluationStatus } from '@packages/lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from '@packages/lib/proposals/interfaces';
 

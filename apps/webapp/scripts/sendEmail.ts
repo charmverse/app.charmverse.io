@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 
 import { sendEmail } from 'lib/mailer';
 import { v4 } from 'uuid';

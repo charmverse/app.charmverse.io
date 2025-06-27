@@ -1,6 +1,6 @@
-import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { PagePermission, Prisma } from '@charmverse/core/prisma';
 import type * as googlForms from '@googleapis/forms';
+import { copyAllPagePermissions } from '@packages/core/permissions';
 import { blockToPrisma } from '@packages/databases/block';
 import type { PrismaBlockSortOf } from '@packages/databases/block';
 import type { IPropertyOption, IPropertyTemplate } from '@packages/databases/board';

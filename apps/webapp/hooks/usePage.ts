@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
+import { log } from '@packages/core/log';
+import type { PageMeta } from '@packages/core/pages';
 import type { WebSocketPayload } from '@packages/websockets/interfaces';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';

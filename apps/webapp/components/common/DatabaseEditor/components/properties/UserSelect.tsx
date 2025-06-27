@@ -1,15 +1,14 @@
-import { log } from '@charmverse/core/log';
-import { styled } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import type { AutocompleteRenderGetTagProps } from '@mui/material';
-import { IconButton, Box, Stack, TextField } from '@mui/material';
+import { styled, IconButton, Box, Stack, TextField } from '@mui/material';
+import { log } from '@packages/core/log';
+import type { Member } from '@packages/lib/members/interfaces';
 import { isTruthy } from '@packages/utils/types';
 import { useCallback, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import type { Member } from '@packages/lib/members/interfaces';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 

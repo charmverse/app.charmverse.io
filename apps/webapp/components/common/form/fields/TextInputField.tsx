@@ -1,8 +1,7 @@
-import { log } from '@charmverse/core/log';
-import { styled } from '@mui/material';
 import LinkIcon from '@mui/icons-material/Link';
-import { Box, IconButton, Link, TextField } from '@mui/material';
+import { styled, Box, IconButton, Link, TextField } from '@mui/material';
 import type { TextFieldProps, InputProps, InputBaseComponentProps } from '@mui/material';
+import { log } from '@packages/core/log';
 import { forwardRef, useMemo } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';

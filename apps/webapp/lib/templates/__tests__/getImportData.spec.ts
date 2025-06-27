@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { InvalidInputError } from '@charmverse/core/errors';
 import { type Space } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import { getImportData } from '../getImportData';

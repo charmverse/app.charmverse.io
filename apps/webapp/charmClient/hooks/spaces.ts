@@ -6,7 +6,7 @@ import type {
   PersonaUserKyc,
   SpaceExportJob
 } from '@charmverse/core/prisma';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 

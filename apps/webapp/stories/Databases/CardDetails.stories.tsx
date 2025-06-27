@@ -1,5 +1,7 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
+import type { PageMeta } from '@packages/core/pages';
+import type { IPropertyTemplate } from '@packages/databases/board';
+import { createTableView } from '@packages/databases/tableView';
 import { createMockBoard, createMockCard } from '@packages/testing/mocks/block';
 import { createMockPage } from '@packages/testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from '@packages/testing/publicApi/schemas';
@@ -10,8 +12,6 @@ import { v4 as uuid } from 'uuid';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
-import type { IPropertyTemplate } from '@packages/databases/board';
-import { createTableView } from '@packages/databases/tableView';
 
 import { spaces } from '../lib/mockData';
 

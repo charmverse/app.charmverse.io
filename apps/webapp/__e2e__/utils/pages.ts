@@ -1,6 +1,6 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageWithPermissions } from '@packages/core/pages';
 import { generateFirstDiff } from '@packages/pages/generateFirstDiff';
 import { getPagePath } from '@packages/pages/utils';
 import { v4 } from 'uuid';

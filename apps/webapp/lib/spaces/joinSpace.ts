@@ -1,7 +1,7 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { SpaceRole } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from '@packages/lib/webhookPublisher/publishEvent';

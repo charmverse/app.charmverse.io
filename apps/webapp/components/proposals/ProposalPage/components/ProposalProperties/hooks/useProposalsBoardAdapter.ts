@@ -1,4 +1,4 @@
-import { objectUtils } from '@charmverse/core/utilities';
+import { objectUtils } from '@packages/core/utilities';
 import type { Board } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';
 import type { CardWithRelations } from '@packages/databases/card';

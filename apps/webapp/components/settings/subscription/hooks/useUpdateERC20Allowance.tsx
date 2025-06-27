@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { log } from '@packages/core/log';
 import useSWRMutation from 'swr/mutation';
 import { publicActions, type Address, type Chain } from 'viem';
 import { useWalletClient } from 'wagmi';

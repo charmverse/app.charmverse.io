@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma';
+import { InvalidInputError } from '@packages/core/errors';
 import { convertToProjectValues } from '@packages/lib/projects/convertToProjectValues';
 import { createProjectYupSchema } from '@packages/lib/projects/createProjectYupSchema';
 import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';

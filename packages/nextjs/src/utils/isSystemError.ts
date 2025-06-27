@@ -1,4 +1,4 @@
-import type { SystemError } from '@charmverse/core/errors';
+import type { SystemError } from '@packages/core/errors';
 
 const validationProps: (keyof SystemError)[] = ['errorType', 'message', 'severity', 'code'];
 

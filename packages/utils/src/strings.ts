@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { init } from '@paralleldrive/cuid2';
 import { validate } from 'uuid';
 

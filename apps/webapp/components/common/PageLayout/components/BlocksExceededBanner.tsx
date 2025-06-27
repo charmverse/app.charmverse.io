@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import EastIcon from '@mui/icons-material/East';
 import { Box, Stack, Typography } from '@mui/material';
+import { log } from '@packages/core/log';
 
 import { StyledBanner } from 'components/common/Banners/Banner';
 import { Button } from 'components/common/Button';

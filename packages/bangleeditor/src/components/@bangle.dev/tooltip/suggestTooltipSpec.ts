@@ -1,5 +1,5 @@
 import { findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { Fragment, Node } from 'prosemirror-model';
 import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 import { Selection } from 'prosemirror-state';

@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { baseUrl, docusignClientId, docusignOauthBaseUri } from '@packages/config/constants';
+import { InvalidInputError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 import type { Mock } from 'vitest';
 import { vi } from 'vitest';

@@ -1,7 +1,7 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { Post, PostCategory, PostComment, Space } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { PageMeta } from '@packages/core/pages';
+import type { PostCategoryWithPermissions } from '@packages/core/permissions';
 import type { CreatePostCategoryInput } from '@packages/lib/forums/categories/createPostCategory';
 import type { PostCategoryUpdate } from '@packages/lib/forums/categories/updatePostCategory';
 import type {

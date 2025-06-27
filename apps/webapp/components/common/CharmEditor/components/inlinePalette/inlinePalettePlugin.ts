@@ -1,10 +1,10 @@
 import { valuePlugin } from '@bangle.dev/utils';
-import { log } from '@charmverse/core/log';
 import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import {
   decrementSuggestTooltipCounter,
   incrementSuggestTooltipCounter
 } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import { log } from '@packages/core/log';
 import { keymap } from 'prosemirror-keymap';
 import type { Schema } from 'prosemirror-model';
 import type { Command } from 'prosemirror-state';

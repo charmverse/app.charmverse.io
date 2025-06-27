@@ -1,11 +1,11 @@
+import Alert from '@mui/material/Alert';
+import Grid from '@mui/material/Grid';
+import InputLabel from '@mui/material/InputLabel';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
   TargetPermissionGroup
-} from '@charmverse/core/permissions';
-import Alert from '@mui/material/Alert';
-import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
+} from '@packages/core/permissions';
 import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
 import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 import { hasGuestAccess } from '@packages/subscriptions/featureRestrictions';

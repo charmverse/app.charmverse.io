@@ -1,5 +1,5 @@
-import { DataNotFoundError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, UnauthorisedActionError } from '@packages/core/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { generateSynapsCredential, generateSynapsUserKyc } from '@packages/testing/utils/kyc';
 import { v4 } from 'uuid';

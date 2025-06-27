@@ -1,6 +1,6 @@
 import { createHash } from 'crypto';
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { v4 as uuid } from 'uuid';
 
 // Function to generate a deterministic UUID v4 based on an integer input

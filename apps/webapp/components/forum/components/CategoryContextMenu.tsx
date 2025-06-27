@@ -1,4 +1,3 @@
-import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
 import { Edit } from '@mui/icons-material';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -7,6 +6,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import TaskIcon from '@mui/icons-material/Task';
 import { IconButton, ListItemIcon, MenuItem, MenuList, Typography } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import type { PostCategoryPermissionFlags } from '@packages/core/permissions';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 import { MdOutlineNotificationsNone, MdOutlineNotificationsOff } from 'react-icons/md';

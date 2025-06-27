@@ -1,4 +1,4 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 
 import type { NodeViewProps } from '../@bangle.dev/core/node-view';
 

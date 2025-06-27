@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import * as http from '@packages/utils/http';
 
 import type { FarcasterUser } from './interfaces';

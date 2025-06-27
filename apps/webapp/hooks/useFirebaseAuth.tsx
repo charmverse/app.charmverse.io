@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { googleWebClientConfig, magicLinkEmailCookie } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { getCookie, getAppUrl } from '@packages/lib/utils/browser';
 import { InvalidInputError } from '@packages/utils/errors';
 import type { FirebaseApp } from 'firebase/app';

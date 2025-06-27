@@ -1,6 +1,6 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsMembers, testUtilsProposals } from '@charmverse/core/test';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
 import { updateAllowedDocusignRolesAndUsers } from '@packages/lib/docusign/allowedDocusignRolesAndUsers';
 import { canAccessDocusign } from '@packages/lib/docusign/canAccessDocusign';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';

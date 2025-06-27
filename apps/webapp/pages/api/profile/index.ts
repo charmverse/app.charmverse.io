@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from '@packages/lib/loopsEmail/deleteLoopsContact';

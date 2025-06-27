@@ -1,12 +1,12 @@
+import { PostOperation, prisma } from '@charmverse/core/prisma-client';
 import {
   defaultPostPolicies,
   hasAccessToSpace,
   postResolver,
   AvailablePostPermissions,
   buildComputePermissionsWithPermissionFilteringPolicies
-} from '@charmverse/core/permissions';
-import type { PostResource, PostPermissionFlags, PermissionCompute } from '@charmverse/core/permissions';
-import { PostOperation, prisma } from '@charmverse/core/prisma-client';
+} from '@packages/core/permissions';
+import type { PostResource, PostPermissionFlags, PermissionCompute } from '@packages/core/permissions';
 import { PostNotFoundError } from '@packages/lib/forums/posts/errors';
 import { InvalidInputError } from '@packages/utils/errors';
 import { isUUID } from '@packages/utils/strings';

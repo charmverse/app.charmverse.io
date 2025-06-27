@@ -1,11 +1,11 @@
-import { log } from '@charmverse/core/log';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import { log } from '@packages/core/log';
+import type { SnapshotVote } from '@packages/lib/snapshot/getVotes';
+import type { SnapshotProposal, VoteChoice } from '@packages/lib/snapshot/interfaces';
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { SnapshotVote } from '@packages/lib/snapshot/getVotes';
-import type { SnapshotProposal, VoteChoice } from '@packages/lib/snapshot/interfaces';
 
 import type { CastVote } from '../../hooks/useSnapshotVoting';
 

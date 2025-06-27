@@ -1,5 +1,3 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type {
   Prisma,
@@ -8,8 +6,10 @@ import type {
   ProposalEvaluationApprover
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { arrayUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import type { PageWithPermissions } from '@packages/core/pages';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@packages/core/proposals';
+import { arrayUtils } from '@packages/core/utilities';
 import { getProjectById } from '@packages/lib/projects/getProjectById';
 import { createForm } from '@packages/lib/proposals/forms/createForm';
 import type { FieldAnswerInput, FormFieldInput } from '@packages/lib/proposals/forms/interfaces';

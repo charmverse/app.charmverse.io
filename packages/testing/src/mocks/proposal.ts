@@ -1,7 +1,7 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { ProposalReviewer } from '@charmverse/core/prisma-client';
-import type { OptionalNullable } from '@packages/utils/types';
+import type { ProposalPermissionFlags } from '@packages/core/permissions';
 import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
+import type { OptionalNullable } from '@packages/utils/types';
 import { v4 as uuid } from 'uuid';
 
 type EvaluationInput = Omit<Partial<ProposalWithUsersAndRubric['evaluations'][number]>, 'reviewers'> & {

@@ -1,9 +1,9 @@
-import { log } from '@charmverse/core/log';
 import { yupResolver } from '@hookform/resolvers/yup';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { Box, Stack, TextField, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import { log } from '@packages/core/log';
 import { isValidChainAddress } from '@packages/lib/tokens/validation';
 import { fancyTrim } from '@packages/utils/strings';
 import type { ComponentProps } from 'react';

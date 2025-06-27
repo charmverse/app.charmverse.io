@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageType, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { PageMeta } from '@packages/core/pages';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals';
 import type { RewardBlockWithTypedFields } from '@packages/lib/rewards/blocks/interfaces';

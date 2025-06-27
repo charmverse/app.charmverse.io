@@ -1,5 +1,5 @@
-import { POST } from '@charmverse/core/http';
 import { isTestEnv } from '@packages/config/constants';
+import { POST } from '@packages/core/http';
 import { getAlchemyBaseUrl } from '@packages/lib/blockchain/provider/alchemy/client';
 
 import type { ITokenMetadata, ITokenMetadataRequest } from './tokenData';

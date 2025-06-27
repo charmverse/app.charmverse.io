@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
+import type { PageMeta } from '@packages/core/pages';
 import type { BoardViewFields } from '@packages/databases/boardView';
 import type { Reward } from '@packages/lib/rewards/interfaces';
 import { createPage } from '@packages/pages/createPage';

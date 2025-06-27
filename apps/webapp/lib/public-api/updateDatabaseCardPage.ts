@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 import { PageNotFoundError } from '@packages/pages/errors';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';

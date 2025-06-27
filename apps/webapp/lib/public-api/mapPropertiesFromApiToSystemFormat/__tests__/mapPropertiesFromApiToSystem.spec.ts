@@ -1,11 +1,12 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 import { generateSchema } from '@packages/testing/publicApi/schemas';
 import { generateBoard } from '@packages/testing/setupDatabase';
-import { DatabasePageNotFoundError, InvalidCustomPropertyKeyError } from 'lib/public-api/errors';
 import { v4 as uuid } from 'uuid';
+
+import { DatabasePageNotFoundError, InvalidCustomPropertyKeyError } from 'lib/public-api/errors';
 
 import type { UpdateableDatabaseFields } from '../index';
 import { mapPropertiesFromApiToSystem } from '../index';

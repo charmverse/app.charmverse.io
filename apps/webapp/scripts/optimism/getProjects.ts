@@ -1,4 +1,4 @@
-import * as http from '@charmverse/core/http';
+import * as http from '@packages/core/http';
 
 import { ProjectInputRow } from 'scripts/importOPGrantsProjects';
 

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { InvalidStateError } from '@packages/nextjs/errors';
 
 import type { GithubGraphQLQuery, GithubUserName } from './getMergedPullRequests';

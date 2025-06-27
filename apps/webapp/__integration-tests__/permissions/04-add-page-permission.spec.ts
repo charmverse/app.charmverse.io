@@ -1,18 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Space } from '@charmverse/core/prisma';
+import { testUtilsPages } from '@charmverse/core/test';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type {
   AssignedPagePermission,
   PagePermissionAssignment,
   TargetPermissionGroup
-} from '@charmverse/core/permissions';
-import type { Space } from '@charmverse/core/prisma';
-import { testUtilsPages } from '@charmverse/core/test';
-import { getPage } from 'lib/pages/server';
+} from '@packages/core/permissions';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { generatePageToCreateStub } from '@packages/testing/generateStubs';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import request from 'supertest';
+
+import { getPage } from 'lib/pages/server';
 
 let user: LoggedInUser;
 let space: Space;

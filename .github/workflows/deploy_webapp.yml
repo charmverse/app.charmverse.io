@@ -177,33 +177,6 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: true
-      - name: Run permissions api docker image
-        id: run_permissions_api
-        run: |
-          docker inspect postgres
-          docker network ls
-          cat /etc/hosts
-          echo "network ${{ job.services.postgres.network }}"
-          docker run -d --name permissions-api  \
-                     -h permissions-api \
-                     -p "3001:3001"     \
-                     -e HOST=0.0.0.0    \
-                     -e PORT=3001       \
-                     -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
-                     --network "${{ job.services.postgres.network }}"  \
-                     -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
-                     ${{ steps.login-ecr.outputs.registry }}/charmverse-permissions-api:${{ env.SELECTED_PERMISSION_API_TAG }} \
-                     node --experimental-specifier-resolution=node ./dist/main.js
-
-          sleep_loop_ct=0
-          until curl localhost:3001/api/health || [[ $sleep_loop_ct > 30 ]]; do
-            docker ps
-            docker logs permissions-api
-            docker inspect permissions-api
-            echo "permission api not up in loop $sleep_loop_ct ... sleeping"
-            sleep_loop_ct=$((sleep_loop_ct + 1))
-            sleep 10
-          done
 
       - name: Restore app from cache
         uses: ./.github/actions/build_app

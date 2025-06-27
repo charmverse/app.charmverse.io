@@ -3,8 +3,8 @@ import type {
   PermissionsClient,
   PermissionsEngine,
   PremiumPermissionsClient
-} from '@charmverse/core/permissions';
-import { getSpaceInfoViaResource } from '@charmverse/core/permissions';
+} from '@packages/core/permissions';
+import { getSpaceInfoViaResource } from '@packages/core/permissions';
 
 import { PublicPermissionsClient } from './freeClient';
 import { PermissionsApiClientWithPermissionsSwitch } from './overridenPermissionsApiClient';

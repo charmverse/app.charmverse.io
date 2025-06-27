@@ -1,5 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+
 import { joinSpace } from 'lib/spaces/joinSpace';
 
 export type CustomJoinParams = {

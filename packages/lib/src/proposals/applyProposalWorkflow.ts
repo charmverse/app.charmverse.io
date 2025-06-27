@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 import { getNewCriteria } from './workflows/getNewCriteria';

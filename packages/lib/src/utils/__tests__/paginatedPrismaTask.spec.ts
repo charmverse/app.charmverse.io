@@ -2,7 +2,7 @@ import { Prisma } from '@charmverse/core/prisma';
 import type { Post } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
-import { arrayUtils } from '@charmverse/core/utilities';
+import { arrayUtils } from '@packages/core/utilities';
 import { randomIntFromInterval } from '@packages/utils/random';
 
 import { paginatedPrismaTask } from '../paginatedPrismaTask';

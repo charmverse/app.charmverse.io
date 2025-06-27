@@ -1,6 +1,6 @@
-import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Prisma, Role, SpaceOperation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@packages/core/permissions';
 import { mapPostCategoryPermissionToAssignee } from '@packages/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,

@@ -1,4 +1,4 @@
-import type { SmallProposalPermissionFlags } from '@charmverse/core/permissions';
+import type { SmallProposalPermissionFlags } from '@packages/core/permissions';
 import { isTruthy } from '@packages/utils/types';
 
 import type { BlockWithDetails } from '../block';

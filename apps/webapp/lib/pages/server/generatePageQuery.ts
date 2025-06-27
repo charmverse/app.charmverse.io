@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 
 type PageQuery = {
   pageIdOrPath: string;

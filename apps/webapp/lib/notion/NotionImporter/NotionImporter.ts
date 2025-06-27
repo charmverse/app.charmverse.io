@@ -1,6 +1,6 @@
-import { getLogger } from '@charmverse/core/log';
 import { Client } from '@notionhq/client';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { getLogger } from '@packages/core/log';
 import { relay } from '@packages/websockets/relay';
 import { v4 } from 'uuid';
 

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from '@packages/lib/discord/constants';
 import { getDiscordLoginPath } from '@packages/lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from '@packages/lib/utils/browser';

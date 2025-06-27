@@ -1,8 +1,8 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { GitcoinProjectAttestation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { resolveENSName } from '@packages/blockchain/getENSName';
+import { DataNotFoundError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { attestOnchain } from '@packages/credentials/attestOnchain';
 import { gitcoinProjectCredentialSchemaId } from '@packages/credentials/schemas/gitcoinProjectSchema';
 import { storeProjectInS3 } from '@packages/credentials/storeProjectInS3';

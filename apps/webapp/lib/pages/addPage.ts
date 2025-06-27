@@ -1,5 +1,5 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type { Board } from '@packages/databases/board';
 import { createBoard } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';

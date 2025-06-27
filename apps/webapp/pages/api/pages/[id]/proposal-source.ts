@@ -1,5 +1,5 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/core/permissions';
 import { prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';

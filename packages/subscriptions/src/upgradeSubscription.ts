@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getSpaceTokenBalance } from '@packages/spaces/getSpaceTokenBalance';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
 import type { UpgradableTier } from '@packages/subscriptions/constants';

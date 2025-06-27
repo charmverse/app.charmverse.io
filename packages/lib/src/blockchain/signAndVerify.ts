@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { InvalidInputError } from '@packages/utils/errors';
 import { SiweMessage } from 'siwe';
 import { hashMessage, parseAbi } from 'viem';

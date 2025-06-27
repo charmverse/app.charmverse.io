@@ -1,5 +1,5 @@
-import { DisabledAccountError, InvalidInputError } from '@charmverse/core/errors';
 import { verifySignInMessage } from '@farcaster/auth-client';
+import { DisabledAccountError, InvalidInputError } from '@packages/core/errors';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { generateFarcasterUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { vi } from 'vitest';

@@ -1,15 +1,14 @@
-import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-kit';
 import type { LoginWithFarcasterParams } from '@packages/connect-shared/lib/session/loginWithFarcaster';
 import { loginWithFarcaster } from '@packages/connect-shared/lib/session/loginWithFarcaster';
+import { log } from '@packages/core/log';
+import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackOpSpaceSuccessfulSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
 import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

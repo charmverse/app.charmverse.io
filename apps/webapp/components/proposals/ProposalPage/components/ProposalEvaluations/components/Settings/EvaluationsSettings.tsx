@@ -1,5 +1,5 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Collapse } from '@mui/material';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { useMemo } from 'react';
 
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';

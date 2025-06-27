@@ -1,8 +1,4 @@
-import type { ListProposalsRequest } from '@charmverse/core/proposals';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import type { ListProposalsRequest } from '@packages/core/proposals';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { concealProposalSteps } from '@packages/lib/proposals/concealProposalSteps';
@@ -10,6 +6,9 @@ import type { ProposalWithUsersLite } from '@packages/lib/proposals/getProposals
 import { getProposals } from '@packages/lib/proposals/getProposals';
 import { getAssignedRoleIds } from '@packages/lib/roles/getAssignedRoleIds';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

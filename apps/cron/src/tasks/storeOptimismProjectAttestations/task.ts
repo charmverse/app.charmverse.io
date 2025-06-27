@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { storeOptimismProjectAttestations } from '@packages/lib/optimism/storeOptimismProjectAttestations';
 
 export async function task() {

@@ -6,7 +6,7 @@ import type {
   ProposalStatus
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
+import { getCurrentEvaluation, privateEvaluationSteps } from '@packages/core/proposals';
 
 import { permissionsApiClient } from '../permissions/api/client';
 

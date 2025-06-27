@@ -1,10 +1,10 @@
 import env from '@beam-australia/react-env';
-import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma';
 import type { EvmTransaction } from '@decent.xyz/box-common';
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { Launch as LaunchIcon } from '@mui/icons-material';
 import { Alert, Box, capitalize, Card, Divider, Link, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { log } from '@packages/core/log';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
 import type { UpgradableTier } from '@packages/subscriptions/constants';
 import { charmVerseBankAddress, uniswapSwapUrl } from '@packages/subscriptions/constants';

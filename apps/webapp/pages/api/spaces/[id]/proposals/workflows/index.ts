@@ -1,6 +1,6 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { hasAccessToSpace } from '@packages/core/permissions';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { requireSpaceMembership } from '@packages/lib/middleware';
 import { defaultHandler } from '@packages/lib/middleware/handler';
 import { deleteWorkflowTemplate } from '@packages/lib/proposals/workflows/deleteWorkflowTemplate';

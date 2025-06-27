@@ -1,8 +1,8 @@
 import env from '@beam-australia/react-env';
-import { log } from '@charmverse/core/log';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
 import { isDevEnv, isProdEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';

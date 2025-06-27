@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
+import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 
 import { usePostDialog } from './hooks/usePostDialog';
 import { PostDialog } from './PostDialog';

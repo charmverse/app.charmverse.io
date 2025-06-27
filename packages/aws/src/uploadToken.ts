@@ -1,5 +1,5 @@
 import { GetFederationTokenCommand, STSClient } from '@aws-sdk/client-sts';
-import { MissingDataError } from '@charmverse/core/errors';
+import { MissingDataError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import { getS3ClientConfig } from './getS3ClientConfig';

@@ -7,7 +7,7 @@ import type {
   Space
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
 
 export type SpaceSettingsExport = Pick<
   Space,

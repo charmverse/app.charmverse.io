@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 // ref: https://wagmi.sh/core/chains
 import { uniqueValues } from '@packages/utils/array';
 import { isDevEnv } from '@packages/utils/constants';

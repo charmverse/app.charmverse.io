@@ -1,5 +1,5 @@
-import { PageNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { PageNotFoundError } from '@packages/core/errors';
 import type { CommentCreate } from '@packages/lib/comments';
 import { addComment } from '@packages/lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';

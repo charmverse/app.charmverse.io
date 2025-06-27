@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getUserProfile } from '@packages/profile/getUser';
 
 import { countConnectableIdentities } from './countConnectableIdentities';

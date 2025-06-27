@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { authSecret } from '@packages/lib/session/authSecret';
 import { withSessionRoute } from '@packages/lib/session/withSession';

@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { InvalidInputError } from '@packages/core/errors';
 import type { PublicClient } from 'viem';
 import { createPublicClient, http } from 'viem';
 

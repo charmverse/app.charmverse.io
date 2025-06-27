@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { gauge, count } from '@packages/metrics';
 import type { NextApiRequest, NextApiResponse } from 'next';
 

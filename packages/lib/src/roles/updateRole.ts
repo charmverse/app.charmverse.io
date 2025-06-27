@@ -1,7 +1,7 @@
-import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from '@charmverse/core/errors';
 import type { Role } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 
 type UpdateableRoleFields = Partial<Pick<Role, 'name'>>;
 

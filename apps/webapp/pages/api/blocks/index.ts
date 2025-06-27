@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
-import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
+import { copyAllPagePermissions } from '@packages/core/permissions';
 import type { BlockWithDetails } from '@packages/databases/block';
 import { prismaToBlock, prismaToUIBlock } from '@packages/databases/block';
 import type { BoardFields } from '@packages/databases/board';

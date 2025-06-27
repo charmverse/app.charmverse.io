@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { FormField, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 import { createForm } from '@packages/lib/proposals/forms/createForm';
 import type { FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
 import { upsertProposalFormFields } from '@packages/lib/proposals/forms/upsertProposalFormFields';

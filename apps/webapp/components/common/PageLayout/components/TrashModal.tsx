@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import RestoreIcon from '@mui/icons-material/Restore';
 import {
@@ -12,6 +11,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import type { PageMeta } from '@packages/core/pages';
 import { initialDatabaseLoad } from '@packages/databases/store/databaseBlocksLoad';
 import { useAppDispatch } from '@packages/databases/store/hooks';
 import { fancyTrim } from '@packages/utils/strings';

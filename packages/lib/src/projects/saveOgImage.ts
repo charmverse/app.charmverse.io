@@ -1,7 +1,7 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import { ProjectShareItem } from '@packages/connect-shared/components/ProjectShareItem';
+import { DataNotFoundError } from '@packages/core/errors';
 import { ImageResponse } from 'next/og';
 import React from 'react';
 import sharp from 'sharp';

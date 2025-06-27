@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import * as mailer from '@packages/lib/mailer';
 import { sendPlainEmail } from '@packages/lib/mailer';
 import { zipContent } from '@packages/lib/utils/file';

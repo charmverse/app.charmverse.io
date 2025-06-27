@@ -1,7 +1,6 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
-import { styled } from '@mui/material';
-import { Box, ClickAwayListener, Grow, Paper } from '@mui/material';
+import { styled, Box, ClickAwayListener, Grow, Paper } from '@mui/material';
 import { hideSuggestionsTooltip } from '@packages/bangleeditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import { isTruthy } from '@packages/utils/types';
 import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';

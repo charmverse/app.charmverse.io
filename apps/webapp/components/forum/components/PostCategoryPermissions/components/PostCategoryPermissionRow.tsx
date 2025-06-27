@@ -1,16 +1,16 @@
 /* eslint-disable camelcase */
-import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
 import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { PostCategoryPermissionAssignment } from '@packages/core/permissions';
+import type { TargetPermissionGroup } from '@packages/lib/permissions/interfaces';
 import type { ReactNode } from 'react';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useRoles } from 'hooks/useRoles';
-import type { TargetPermissionGroup } from '@packages/lib/permissions/interfaces';
 
 import { forumMemberPermissionOptions, postCategoryPermissionLabels } from '../shared';
 

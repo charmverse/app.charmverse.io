@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
+import { getSubmissionPagePath } from '@packages/lib/utils/domains/getPagePath';
 import type { GetServerSidePropsContext } from 'next';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { getSubmissionPagePath } from '@packages/lib/utils/domains/getPagePath';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { submissionId } = ctx.params ?? {};

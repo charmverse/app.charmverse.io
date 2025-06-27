@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { BoxActionRequest, BoxActionResponse } from '@decent.xyz/box-common';
 import { ActionType, SwapDirection } from '@decent.xyz/box-common';
 import type { UseBoxActionArgs } from '@decent.xyz/box-hooks';
+import { log } from '@packages/core/log';
 import { devTokenAddress, decentApiKey } from '@packages/subscriptions/constants';
 import { GET } from '@packages/utils/http';
 import useSWR from 'swr';

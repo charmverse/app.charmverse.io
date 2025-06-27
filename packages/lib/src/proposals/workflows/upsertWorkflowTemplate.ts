@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@packages/core/proposals';
 import { getWorkflowLimits } from '@packages/subscriptions/featureRestrictions';
 
 export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {

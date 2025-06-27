@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import { Octokit } from '@octokit/core';
 import { paginateRest } from '@octokit/plugin-paginate-rest';
 import { restEndpointMethods } from '@octokit/plugin-rest-endpoint-methods';
 import { throttling } from '@octokit/plugin-throttling';
+import { log } from '@packages/core/log';
 
 const OctokitWithThrottling = Octokit.plugin(throttling, paginateRest, restEndpointMethods);
 

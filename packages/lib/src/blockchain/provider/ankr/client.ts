@@ -1,9 +1,9 @@
 import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
-import { log } from '@charmverse/core/log';
 import { GET } from '@packages/adapters/http';
 import ERC721_ABI from '@packages/blockchain/abis/ERC721.json';
+import { log } from '@packages/core/log';
 import { isMantleChain } from '@packages/lib/gnosis/mantleClient';
 import { paginatedCall } from '@packages/lib/utils/async';
 import { RateLimit } from 'async-sema';

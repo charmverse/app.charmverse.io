@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { websocketsHost } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import type { ClientMessage, ServerMessage, WebSocketMessage, WebSocketPayload } from '@packages/websockets/interfaces';
 import { PubSub } from '@packages/websockets/pubSub';
 import type { ReactNode } from 'react';

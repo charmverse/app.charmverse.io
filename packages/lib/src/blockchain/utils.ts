@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { arbitrum, avalanche, base, bsc, mainnet, fantom, mantle, optimism, polygon, zora } from 'viem/chains';
 
 import { openseaChainsByPath } from './config';

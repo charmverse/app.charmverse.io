@@ -1,8 +1,9 @@
-import type { PostPermissionFlags } from '@charmverse/core/permissions';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { List, ListItemText, ListItemButton } from '@mui/material';
 import Divider from '@mui/material/Divider';
 import Tooltip from '@mui/material/Tooltip';
+import type { PostPermissionFlags } from '@packages/core/permissions';
+import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 
 import charmClient from 'charmClient';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
@@ -10,7 +11,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PostWithVotes } from '@packages/lib/forums/posts/interfaces';
 
 import { exportMarkdown } from '../utils/exportMarkdown';
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { actionClient } from '@packages/nextjs/actions/actionClient';
 import { v4 as uuid } from 'uuid';
 

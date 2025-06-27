@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { getPublicClient } from '@packages/lib/blockchain/publicClient';
 import { RateLimit } from 'async-sema';
 import { getAddress } from 'viem';

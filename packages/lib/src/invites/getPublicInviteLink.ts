@@ -1,6 +1,6 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { PublicInviteLinkContext, prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 
 import type { InviteLinkPopulated } from './getInviteLink';
 

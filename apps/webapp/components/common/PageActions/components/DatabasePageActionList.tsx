@@ -1,5 +1,3 @@
-import { log } from '@charmverse/core/log';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma-client';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
@@ -9,6 +7,8 @@ import { Divider, List } from '@mui/material';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
+import { log } from '@packages/core/log';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import mutator from '@packages/databases/mutator';
 import { getSortedBoards } from '@packages/databases/store/boards';
 import { makeSelectViewCardsSortedFilteredAndGrouped } from '@packages/databases/store/cards';

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { getCanonicalURL } from '@packages/lib/utils/domains/getCanonicalURL';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';

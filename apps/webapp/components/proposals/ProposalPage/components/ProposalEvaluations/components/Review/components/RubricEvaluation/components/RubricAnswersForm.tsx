@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type {
   DraftProposalRubricCriteriaAnswer,
   ProposalRubricCriteria,
@@ -18,6 +17,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { log } from '@packages/core/log';
 import type { RubricAnswerData } from '@packages/lib/proposals/rubric/upsertRubricAnswers';
 import { getNumberFromString } from '@packages/lib/utils/numbers';
 import { useEffect, useMemo, useState } from 'react';

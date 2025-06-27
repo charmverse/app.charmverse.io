@@ -1,4 +1,3 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApiPageKey,
   FavoritePage,
@@ -11,6 +10,7 @@ import type {
 } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
 import type { FiatCurrency, IPairQuote } from '@packages/blockchain/connectors/chains';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from '@packages/databases/block';
 import type { SelectedProposalProperties } from '@packages/databases/proposalsSource/interfaces';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from '@packages/databases/utils/blockUtils';

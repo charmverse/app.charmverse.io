@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
+import { log } from '@packages/core/log';
+import { stringUtils } from '@packages/core/utilities';
 import { getAddress } from 'viem';
 
 import { easSchemaChains, easSchemaMainnetChains, getOnChainAttestationUrl } from '../connectors';

@@ -8,8 +8,8 @@ import type {
   ProposalStatus
 } from '@charmverse/core/prisma';
 import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsProposals } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson, PermissionJson } from '@packages/core/proposals';
 import { prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import { updateBoardProperties } from '@packages/databases/proposalsSource/updateBoardProperties';

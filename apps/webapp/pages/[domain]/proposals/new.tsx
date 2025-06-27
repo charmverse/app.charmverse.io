@@ -1,15 +1,15 @@
-import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-
-import ErrorPage from 'components/common/errors/ErrorPage';
+import { log } from '@packages/core/log';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import type { CreateDraftProposalInput, ProposalContentType } from '@packages/lib/proposals/createDraftProposal';
 import { createDraftProposal } from '@packages/lib/proposals/createDraftProposal';
 import { withSessionSsr } from '@packages/lib/session/withSession';
-import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 import { getPagePath } from '@packages/lib/utils/domains/getPagePath';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+
+import ErrorPage from 'components/common/errors/ErrorPage';
+import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 
 export const getServerSideProps = withSessionSsr<{ error?: string }>(async (context) => {
   const template = context.query?.template as string | undefined;

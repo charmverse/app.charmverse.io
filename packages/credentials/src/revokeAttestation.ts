@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { getCurrentGasPrice } from '@packages/blockchain/getCurrentGasPrice';
+import { log } from '@packages/core/log';
 import { credentialsWalletPrivateKey } from '@packages/utils/constants';
 import { JsonRpcProvider, Wallet } from 'ethers';
 

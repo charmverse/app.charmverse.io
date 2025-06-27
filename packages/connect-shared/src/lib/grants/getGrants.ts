@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import type { IPropertyTemplate, BoardFields } from '@packages/databases/board';
 import { type CardFields } from '@packages/databases/card';
 

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import * as googlForms from '@googleapis/forms';
+import { log } from '@packages/core/log';
 import type { GoogleFormSourceData } from '@packages/databases/board';
 
 import { getClient } from '../authorization/authClient';

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { generatePageToCreateStub } from '@packages/testing/generateStubs';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';

@@ -1,7 +1,7 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 
 import { createProjectViaAgora, storeProjectMetadataViaAgora, AGORA_API_KEY } from './agoraApi';

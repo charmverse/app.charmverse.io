@@ -1,4 +1,4 @@
-import { GET } from '@charmverse/core/http';
+import { GET } from '@packages/core/http';
 
 const lockSmithAPI = 'https://locksmith.unlock-protocol.com/v2/api' as const;
 

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { Mux } from '@mux/mux-node';
+import { log } from '@packages/core/log';
 
 import { mux } from './muxClient';
 

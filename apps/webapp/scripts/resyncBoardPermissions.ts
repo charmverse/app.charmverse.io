@@ -1,4 +1,4 @@
-import { resolvePageTree } from '@charmverse/core/pages';
+import { resolvePageTree } from '@packages/core/pages';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 
 async function resyncBoardPermissions({ spaceId }: { spaceId: string }) {

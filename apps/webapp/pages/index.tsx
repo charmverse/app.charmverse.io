@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { getDefaultPage, getLastViewedSpaceId } from '@packages/lib/session/getDefaultPage';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';

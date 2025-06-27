@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { getSpaceByDomain } from '@packages/spaces/getSpaceByDomain';
 
 let cache: Record<string, { isValid: boolean }> = {};

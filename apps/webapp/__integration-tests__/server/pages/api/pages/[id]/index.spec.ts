@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { PageWithPermissions } from '@packages/core/pages';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 

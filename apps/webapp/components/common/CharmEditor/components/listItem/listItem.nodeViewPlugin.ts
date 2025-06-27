@@ -1,5 +1,5 @@
 import { createElement } from '@bangle.dev/utils';
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
 

@@ -1,7 +1,7 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { InviteLink, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
 import { v4 } from 'uuid';
 
 import { acceptInvite } from '../acceptInvite';

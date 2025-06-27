@@ -1,4 +1,4 @@
-import { GET } from '@charmverse/core/http';
+import { GET } from '@packages/core/http';
 
 import { synapsUrl } from '../config';
 

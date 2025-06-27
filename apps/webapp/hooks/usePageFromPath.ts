@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import { useRouter } from 'next/router';
 
 import { usePages } from 'hooks/usePages';

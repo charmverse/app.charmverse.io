@@ -1,6 +1,6 @@
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 import { trackOpUserAction } from '@packages/metrics/mixpanel/trackOpUserAction';
 import { updateTrackOpUserProfile } from '@packages/metrics/mixpanel/updateTrackOpUserProfile';
 import { logInviteAccepted } from '@packages/metrics/postToDiscord';

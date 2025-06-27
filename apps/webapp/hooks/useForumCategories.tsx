@@ -1,5 +1,5 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
+import type { PostCategoryWithPermissions } from '@packages/core/permissions';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 import useSWR from 'swr/immutable';

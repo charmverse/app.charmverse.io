@@ -1,4 +1,4 @@
-import { pageTree } from '@charmverse/core/pages/utilities';
+import { sortNodes } from '@packages/core/pages/mapPageTree';
 import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 
@@ -8,7 +8,7 @@ export function useRootPages() {
   const { pages, loadingPages } = usePages();
   const rootPages = useMemo(
     () =>
-      pageTree.sortNodes(
+      sortNodes(
         Object.values(pages)
           .filter(
             (page) =>

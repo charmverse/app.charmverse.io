@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type Koa from 'koa';
 
 export async function healthCheck(ctx: Koa.Context) {

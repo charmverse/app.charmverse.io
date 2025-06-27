@@ -1,7 +1,7 @@
 import type { ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 

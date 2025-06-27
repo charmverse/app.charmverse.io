@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { appEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 
 import { httpServer, socketServer } from './app/server';
 import { cleanup as originCacheCleanup } from './app/verifyCustomOrigin';

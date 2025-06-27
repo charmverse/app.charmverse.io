@@ -1,6 +1,6 @@
-import type { PageNodeWithChildren } from '@charmverse/core/pages';
-import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
+import type { PageNodeWithChildren } from '@packages/core/pages';
+import { mapPageTree, isParentNode, sortNodes } from '@packages/core/pages/mapPageTree';
 import { isTruthy } from '@packages/utils/types';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';
@@ -71,7 +71,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const pageHash = JSON.stringify(pagesArray);
 
   const mappedItems = useMemo(() => {
-    const mappedPages = pageTree.mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
+    const mappedPages = mapPageTree<MenuNode>({ items: pagesArray, rootPageIds });
     const pageIds: string[] = []; // keep track of page ids to avoid duplicates
     mappedPages.forEach((page, index) => {
       pageIds.push(page.id);
@@ -104,10 +104,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
   const isValidDropTarget = useCallback(
     ({ droppedItem, targetItem }: { droppedItem: MenuNode; targetItem: MenuNode }) => {
       // do not allow to drop parent onto children
-      return (
-        droppedItem.id !== targetItem?.id &&
-        !pageTree.isParentNode({ node: droppedItem, child: targetItem, items: pages })
-      );
+      return droppedItem.id !== targetItem?.id && !isParentNode({ node: droppedItem, child: targetItem, items: pages });
     },
     [pagesArray]
   );
@@ -129,7 +126,7 @@ function PageNavigation({ deletePage, isFavorites, rootPageIds, onClick }: PageN
         const unsortedSiblings = Object.values(_pages)
           .filter(isTruthy)
           .filter((page) => page && page.parentId === parentId && page.id !== droppedItem.id);
-        const siblings = pageTree.sortNodes(unsortedSiblings);
+        const siblings = sortNodes(unsortedSiblings);
         const droppedPage = _pages[droppedItem.id];
         if (!droppedPage) {
           throw new Error('cannot find dropped page');

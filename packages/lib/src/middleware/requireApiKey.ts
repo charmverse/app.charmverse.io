@@ -1,8 +1,8 @@
 import crypto from 'node:crypto';
 
-import { log } from '@charmverse/core/log';
 import type { Space, SpaceApiToken, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getVerifiedSuperApiToken } from '@packages/lib/middleware/requireSuperApiKey';
 import { ApiError, InvalidApiKeyError } from '@packages/nextjs/errors';
 import { uid } from '@packages/utils/strings';

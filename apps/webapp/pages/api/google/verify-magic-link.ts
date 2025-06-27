@@ -1,15 +1,14 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
+import type { LoginWithGoogleRequest } from '@packages/lib/google/loginWithGoogle';
+import { loginWithMagicLink } from '@packages/lib/google/loginWithMagicLink';
+import { onError, onNoMatch } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { extractSignupAnalytics } from '@packages/metrics/mixpanel/utilsSignup';
 import type { SignupCookieType } from '@packages/metrics/userAcquisition/interfaces';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { postUserCreate } from '@packages/users/postUserCreate';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import type { LoginWithGoogleRequest } from '@packages/lib/google/loginWithGoogle';
-import { loginWithMagicLink } from '@packages/lib/google/loginWithMagicLink';
-import { onError, onNoMatch } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

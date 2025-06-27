@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { objectUtils } from '@charmverse/core/utilities';
+import { objectUtils } from '@packages/core/utilities';
 import type { BoardView } from '@packages/databases/boardView';
 import type { Card } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';

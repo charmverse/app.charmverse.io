@@ -1,5 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
+import type { GoogleLoginOauthParams } from '@packages/lib/google/authorization/authClient';
 import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
 import { trackOpSpaceClickSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
@@ -10,7 +11,6 @@ import type { LoggedInUser } from '@packages/profile/getUser';
 import { postUserCreate } from '@packages/users/postUserCreate';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
-import type { GoogleLoginOauthParams } from '@packages/lib/google/authorization/authClient';
 
 import { verifyGoogleToken } from './verifyGoogleToken';
 

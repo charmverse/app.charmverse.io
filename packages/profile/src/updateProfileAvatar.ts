@@ -1,10 +1,10 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
+import { log } from '@packages/core/log';
+import { getNFT, verifyNFTOwner } from '@packages/lib/blockchain/getNFTs';
 import type { UserAvatar } from '@packages/users/interfaces';
 import { InvalidInputError } from '@packages/utils/errors';
 import { getFilenameWithExtension } from '@packages/utils/strings';
-import { getNFT, verifyNFTOwner } from '@packages/lib/blockchain/getNFTs';
 
 import { sessionUserRelations } from './constants';
 import type { LoggedInUser } from './getUser';

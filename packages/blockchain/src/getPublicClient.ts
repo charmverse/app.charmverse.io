@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { isTestEnv } from '@packages/config/constants';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { createPublicClient, http } from 'viem';
 import { optimism } from 'viem/chains';
 

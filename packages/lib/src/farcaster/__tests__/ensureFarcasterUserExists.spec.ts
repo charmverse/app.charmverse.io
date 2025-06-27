@@ -1,6 +1,6 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { DataNotFoundError } from '@packages/core/errors';
 import { isProfilePathAvailable } from '@packages/profile/isProfilePathAvailable';
 import { shortWalletAddress } from '@packages/utils/blockchain';
 import { randomIntFromInterval } from '@packages/utils/random';

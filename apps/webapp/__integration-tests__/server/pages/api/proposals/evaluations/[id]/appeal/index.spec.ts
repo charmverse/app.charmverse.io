@@ -1,8 +1,8 @@
 import type { Proposal, ProposalEvaluation, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
 import { emptyDocument } from '@packages/charmeditor/constants';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { createProposal } from '@packages/lib/proposals/createProposal';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';

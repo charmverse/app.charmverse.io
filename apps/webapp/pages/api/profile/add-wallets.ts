@@ -1,18 +1,17 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
-import type { LoggedInUser } from '@packages/profile/getUser';
-import { shortenHex } from '@packages/utils/blockchain';
-import { InvalidInputError } from '@packages/utils/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { log } from '@packages/core/log';
 import { refreshENSName } from '@packages/lib/blockchain/refreshENSName';
 import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import { checkUserSpaceBanStatus } from '@packages/lib/members/checkUserSpaceBanStatus';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { requireWalletSignature } from '@packages/lib/middleware/requireWalletSignature';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { updateTrackUserProfile } from '@packages/metrics/mixpanel/updateTrackUserProfile';
+import type { LoggedInUser } from '@packages/profile/getUser';
+import { shortenHex } from '@packages/utils/blockchain';
+import { InvalidInputError } from '@packages/utils/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

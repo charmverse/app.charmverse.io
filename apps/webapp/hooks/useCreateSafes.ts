@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { isTruthy } from '@packages/utils/types';
 import Safe from '@safe-global/protocol-kit';
 import type ISafe from '@safe-global/protocol-kit';

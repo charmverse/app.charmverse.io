@@ -1,6 +1,6 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme, styled, Box } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import type { PageMeta } from '@packages/core/pages';
 
 import { BackIcon } from 'components/common/Icons/BackIcon';
 import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';

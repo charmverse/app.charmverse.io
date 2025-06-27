@@ -1,4 +1,3 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type {
   ProposalAppealReviewer,
   ProposalAuthor,
@@ -6,7 +5,8 @@ import type {
   ProposalReviewer
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { privateEvaluationSteps } from '@charmverse/core/proposals';
+import { hasAccessToSpace } from '@packages/core/permissions';
+import { privateEvaluationSteps } from '@packages/core/proposals';
 import { getAssignedRoleIds } from '@packages/lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';

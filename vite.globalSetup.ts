@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 
 config({ path: '.env.test.local' });
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function teardown() {

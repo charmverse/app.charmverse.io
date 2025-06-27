@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import { stringUtils } from '@packages/core/utilities';
 
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import { getAllOnChainAttestations } from './external/getOnchainCredentials';

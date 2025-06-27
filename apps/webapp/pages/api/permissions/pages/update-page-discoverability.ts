@@ -1,12 +1,11 @@
-import type { UpdatePagePermissionDiscoverabilityRequest } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import type { UpdatePagePermissionDiscoverabilityRequest } from '@packages/core/pages';
 import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
 import { requirePaidPermissionsSubscription } from '@packages/lib/middleware/requirePaidPermissionsSubscription';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

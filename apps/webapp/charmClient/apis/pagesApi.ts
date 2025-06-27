@@ -1,6 +1,6 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { PageMeta } from '@packages/core/pages';
 import type { FilterGroup } from '@packages/databases/filterGroup';
 import type { CreateCommentInput, UpdateCommentInput } from '@packages/lib/comments';
 

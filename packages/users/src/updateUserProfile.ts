@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { sessionUserRelations } from '@packages/profile/constants';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { getUserProfile } from '@packages/profile/getUser';

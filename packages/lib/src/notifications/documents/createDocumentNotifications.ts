@@ -1,10 +1,10 @@
 /* eslint-disable no-continue */
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { PageContent } from '@packages/charmeditor/interfaces';
 import type { UserMentionMetadata } from '@packages/charmeditor/utils/extractMentions';
 import { extractMentions } from '@packages/charmeditor/utils/extractMentions';
+import { log } from '@packages/core/log';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { getPermissionsClient } from '@packages/lib/permissions/api';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import type { ThreadAccessGroup } from '@packages/lib/threads';

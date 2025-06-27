@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { isTruthy } from '@packages/utils/types';
 
 import { playbackRestrictionId } from './config';

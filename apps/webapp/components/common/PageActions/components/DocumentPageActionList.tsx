@@ -1,5 +1,3 @@
-import { log } from '@charmverse/core/log';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -11,6 +9,8 @@ import Divider from '@mui/material/Divider';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import { log } from '@packages/core/log';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 
 import charmClient from 'charmClient';
 import { useGetPageMarkdown } from 'charmClient/hooks/pages';

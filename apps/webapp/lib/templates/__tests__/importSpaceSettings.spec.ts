@@ -9,8 +9,8 @@ import type {
   User
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@packages/core/proposals';
 import type { BoardFields } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
 import { v4 as uuid } from 'uuid';

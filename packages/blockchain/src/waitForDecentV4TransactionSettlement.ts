@@ -1,6 +1,6 @@
 import env from '@beam-australia/react-env';
-import { GET } from '@charmverse/core/http';
-import { log } from '@charmverse/core/log';
+import { GET } from '@packages/core/http';
+import { log } from '@packages/core/log';
 
 const decentApiKey = env('DECENT_API_KEY');
 

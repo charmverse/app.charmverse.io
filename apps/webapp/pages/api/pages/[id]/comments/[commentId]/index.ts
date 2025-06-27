@@ -1,18 +1,18 @@
-import { log } from '@charmverse/core/log';
 import type { PageComment } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
+import type { UpdatePostCommentInput } from '@packages/lib/forums/comments/interface';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { isSpaceAdmin } from '@packages/lib/permissions/isSpaceAdmin';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { DataNotFoundError, UndesirableOperationError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { UpdatePostCommentInput } from '@packages/lib/forums/comments/interface';
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { deletePageComment } from 'lib/pages/comments/deletePageComment';
 import { getPageComment } from 'lib/pages/comments/getPageComment';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { isSpaceAdmin } from '@packages/lib/permissions/isSpaceAdmin';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

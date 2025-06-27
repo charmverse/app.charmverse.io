@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
 import type { FormField, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import type { SpaceResourcesRequest } from '@packages/core/permissions';
+import { stringUtils } from '@packages/core/utilities';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 
 export type ProposalTemplateMeta = {

@@ -1,5 +1,5 @@
 import { objectUid } from '@bangle.dev/utils';
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { flushSync } from 'react-dom';

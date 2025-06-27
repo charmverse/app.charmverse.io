@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { Typography } from '@mui/material';
 import type { AlertColor } from '@mui/material/Alert';
 import Alert from '@mui/material/Alert';
@@ -8,6 +7,7 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { log } from '@packages/core/log';
 import { getSnapshotClient } from '@packages/lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from '@packages/lib/snapshot/interfaces';

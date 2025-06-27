@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 
 import type { SpaceDataExport } from './exportSpaceData';
 import type { ImportParams } from './interfaces';

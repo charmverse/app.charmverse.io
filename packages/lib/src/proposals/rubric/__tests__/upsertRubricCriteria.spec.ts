@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 
 import type { RubricCriteriaTyped } from '../interfaces';
 import { upsertRubricCriteria } from '../upsertRubricCriteria';

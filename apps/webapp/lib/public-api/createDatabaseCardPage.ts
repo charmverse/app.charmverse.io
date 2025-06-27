@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import { emptyDocument } from '@packages/charmeditor/constants';
+import { log } from '@packages/core/log';
 import { prismaToUIBlock } from '@packages/databases/block';
 import { createPage } from '@packages/pages/createPage';
 import { getPagePath } from '@packages/pages/utils';

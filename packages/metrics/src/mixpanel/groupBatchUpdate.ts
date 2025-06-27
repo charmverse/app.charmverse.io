@@ -1,4 +1,4 @@
-import { POST } from '@charmverse/core/http';
+import { POST } from '@packages/core/http';
 
 import { getApiKey } from './mixpanel';
 import type { GroupKeys } from './mixpanel';

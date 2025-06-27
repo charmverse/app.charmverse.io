@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import ImageIcon from '@mui/icons-material/Image';
 import { useTheme, styled, Box, ListItemButton, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
+import { log } from '@packages/core/log';
 import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
 import { replaceS3Domain } from '@packages/utils/url';
 import type { HTMLAttributes } from 'react';

@@ -1,5 +1,5 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { TextField, Box } from '@mui/material';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import type { UseFormSetValue } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';

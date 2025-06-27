@@ -1,16 +1,15 @@
-import { UserIsNotSpaceMemberError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { NotFoundError } from '@packages/nextjs/errors';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { UserIsNotSpaceMemberError } from '@packages/core/errors';
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { deleteBlocks } from '@packages/lib/proposals/blocks/deleteBlocks';
 import { getBlocks } from '@packages/lib/proposals/blocks/getBlocks';
 import type { ProposalBlockUpdateInput, ProposalBlockWithTypedFields } from '@packages/lib/proposals/blocks/interfaces';
 import { upsertBlocks } from '@packages/lib/proposals/blocks/upsertBlocks';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { NotFoundError } from '@packages/nextjs/errors';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

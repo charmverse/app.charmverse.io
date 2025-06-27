@@ -1,4 +1,4 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
+import { InsecureOperationError } from '@packages/core/errors';
 
 import { checkPageContent } from '../checkPageContent';
 

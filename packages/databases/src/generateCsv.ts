@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@packages/config/constants';
+import { InvalidInputError } from '@packages/core/errors';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { formatDate, formatDateTime } from '@packages/lib/utils/dates';
 import { isTruthy } from '@packages/utils/types';

@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { InvalidInputError } from '@packages/core/errors';
 import type { TokenGateConditions } from '@packages/lib/tokenGates/interfaces';
 import { capitalize } from 'lodash';
 

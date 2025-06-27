@@ -1,10 +1,10 @@
-import { log } from '@charmverse/core/log';
 import type { Application } from '@charmverse/core/prisma';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { AlertColor, ButtonProps } from '@mui/material';
 import { Divider, Menu, MenuItem, Tooltip } from '@mui/material';
 import ERC20ABI from '@packages/blockchain/abis/ERC20.json';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { log } from '@packages/core/log';
 import type { SupportedChainId } from '@packages/lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
 import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';

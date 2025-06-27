@@ -1,6 +1,6 @@
 import type { ProposalEvaluation, ProposalStatus } from '@charmverse/core/prisma-client';
 import { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from './interfaces';
 

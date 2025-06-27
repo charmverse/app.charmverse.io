@@ -1,4 +1,4 @@
-import { POST } from '@charmverse/core/http';
+import { POST } from '@packages/core/http';
 
 import { synapsUrl } from '../config';
 

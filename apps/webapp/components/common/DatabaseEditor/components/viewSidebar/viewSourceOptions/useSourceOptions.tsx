@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
-import { stringUtils } from '@charmverse/core/utilities';
+import { log } from '@packages/core/log';
+import { stringUtils } from '@packages/core/utilities';
 import type { BoardFields, Board } from '@packages/databases/board';
 import type { BoardView, BoardViewFields } from '@packages/databases/boardView';
 import { createNewDataSource } from '@packages/databases/createNewDataSource';

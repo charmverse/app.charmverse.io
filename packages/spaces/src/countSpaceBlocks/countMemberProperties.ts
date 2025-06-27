@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { MemberPropertyValue } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { paginatedPrismaTask } from '@packages/lib/utils/paginatedPrismaTask';
 import _sum from 'lodash/sum';
 

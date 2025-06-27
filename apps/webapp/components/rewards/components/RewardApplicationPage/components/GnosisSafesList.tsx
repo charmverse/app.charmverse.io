@@ -1,7 +1,8 @@
-import type { SystemError } from '@charmverse/core/errors';
 import type { Application, UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { MenuItem } from '@mui/material';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import type { SystemError } from '@packages/core/errors';
+import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import { shortenHex } from '@packages/utils/blockchain';
 import { isTruthy } from '@packages/utils/types';
 
@@ -14,7 +15,6 @@ import { useMultiRewardPayment } from 'hooks/useMultiRewardPayment';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 
 type ApplicationLite = Pick<Application, 'id' | 'walletAddress' | 'bountyId' | 'createdBy'>;
 

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { Space, User } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { createDefaultProject, defaultProjectMember } from '@packages/lib/projects/constants';
 import { createProject } from '@packages/lib/projects/createProject';
 import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';

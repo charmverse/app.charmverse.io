@@ -1,20 +1,20 @@
 /* eslint-disable camelcase */
+import CheckIcon from '@mui/icons-material/Check';
+import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
 import type {
   AssignablePagePermissionGroups,
   AssignedPagePermission,
   PagePermissionAssignmentByValues
-} from '@charmverse/core/permissions';
-import CheckIcon from '@mui/icons-material/Check';
-import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
+} from '@packages/core/permissions';
+import type { TargetPermissionGroup } from '@packages/lib/permissions/interfaces';
+import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
+import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { Typography } from 'components/common/Typography';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
-import type { TargetPermissionGroup } from '@packages/lib/permissions/interfaces';
-import type { ApplicablePagePermissionLevel } from '@packages/lib/permissions/pages/labels';
-import { pagePermissionLevels } from '@packages/lib/permissions/pages/labels';
 
 import { GuestChip } from '../common/GuestChip';
 import { ReadonlyPagePermissionRow } from '../common/ReadonlyPagePermissionRow';

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
 import { updateTrackGroupProfile } from '@packages/metrics/mixpanel/updateTrackGroupProfile';
 import { communityProduct } from 'lib/subscription/constants';
 import { stripeClient } from 'lib/subscription/stripe';

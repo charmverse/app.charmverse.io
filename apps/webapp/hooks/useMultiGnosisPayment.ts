@@ -1,6 +1,6 @@
-import { SystemError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { SystemError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { switchActiveNetwork } from '@packages/lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from '@packages/lib/gnosis/mantleClient';
 import { isTruthy } from '@packages/utils/types';

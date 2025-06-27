@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import type { AbstractWebsocketBroadcaster } from '@packages/websockets/interfaces';
 

@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
-import { log } from '@charmverse/core/log';
 import type { CharmProjectCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { arrayUtils } from '@charmverse/core/utilities';
+import { log } from '@packages/core/log';
+import { arrayUtils } from '@packages/core/utilities';
 
 import { attestOnchain } from '../attestOnchain';
 import type { EasSchemaChain } from '../connectors';

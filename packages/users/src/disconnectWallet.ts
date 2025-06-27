@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError, MissingDataError } from '@packages/utils/errors';
+import { log } from '@packages/core/log';
 import { verifyTokenGateMembership } from '@packages/lib/tokenGates/verifyTokenGateMembership';
+import { InvalidInputError, MissingDataError } from '@packages/utils/errors';
 
 import { updateUsedIdentity } from './updateUsedIdentity';
 

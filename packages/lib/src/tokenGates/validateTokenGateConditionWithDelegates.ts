@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { V2Delegation } from '@delegatexyz/sdk';
+import { log } from '@packages/core/log';
 import { getIncomingDelegations } from '@packages/lib/blockchain/delegateXYZ/client';
 
 import type { AccessControlCondition } from './interfaces';

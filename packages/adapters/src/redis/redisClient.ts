@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { isDevEnv } from '@packages/utils/constants';
 import type { RedisClientType } from 'redis';
 import { createClient } from 'redis';

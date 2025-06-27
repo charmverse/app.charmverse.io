@@ -1,11 +1,11 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalPermissionFlags } from '@packages/core/permissions';
+import { permissionsApiClient } from '@packages/lib/permissions/api/client';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { apiHandler } from 'lib/public-api/handler';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = apiHandler();
 

@@ -1,6 +1,6 @@
 import type { ElasticLoadBalancingV2ClientConfig } from '@aws-sdk/client-elastic-load-balancing-v2';
 import { ElasticLoadBalancingV2 } from '@aws-sdk/client-elastic-load-balancing-v2';
-import { getLogger } from '@charmverse/core/log';
+import { getLogger } from '@packages/core/log';
 import { getCertificateARNByDomain } from '@packages/lib/aws/ACM';
 
 import { AWS_REGION } from './config';

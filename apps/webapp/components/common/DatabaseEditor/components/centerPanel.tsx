@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable max-lines */
 
-import type { PageMeta } from '@charmverse/core/pages';
 import type { Page } from '@charmverse/core/prisma';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Box, Link, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { webhookEndpoint } from '@packages/config/constants';
+import type { PageMeta } from '@packages/core/pages';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from '@packages/databases/board';
 import type { BoardView } from '@packages/databases/boardView';

@@ -1,4 +1,4 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
 import { generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { getTestUserOtp, updateTestUserOtp } from '@packages/testing/userOtp';
 import { v4 as uuid } from 'uuid';

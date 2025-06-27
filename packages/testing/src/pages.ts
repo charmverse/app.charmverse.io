@@ -1,6 +1,6 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageWithPermissions } from '@packages/core/pages';
 import { v4 } from 'uuid';
 
 export function createPage(

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import type { EasSchemaChain } from '@packages/credentials/connectors';
 import { indexGnosisSafeCredentialTransaction } from '@packages/credentials/indexGnosisSafeCredentialTransaction';
 import { count } from '@packages/metrics';

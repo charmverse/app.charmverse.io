@@ -1,10 +1,12 @@
-import { log } from '@charmverse/core/log';
 import type { PostCategory } from '@charmverse/core/prisma';
 import SearchIcon from '@mui/icons-material/Search';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { log } from '@packages/core/log';
+import type { PostSortOption } from '@packages/lib/forums/posts/constants';
+import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import { debounce } from 'lodash';
 import type { ChangeEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
@@ -16,8 +18,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
-import type { PostSortOption } from '@packages/lib/forums/posts/constants';
-import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategoryNotificationToggle } from './components/CategoryNotificationToggle';

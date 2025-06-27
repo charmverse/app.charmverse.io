@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { getPublicClient } from '@packages/blockchain/getPublicClient';
+import { log } from '@packages/core/log';
 import { charmVerseBankAddress, devTokenAddress } from '@packages/subscriptions/constants';
 import { useState } from 'react';
 import { erc20Abi, parseUnits } from 'viem';

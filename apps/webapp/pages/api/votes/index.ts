@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { mapNotificationActor } from '@packages/lib/notifications/mapNotificationActor';
 import { getPermissionsClient, permissionsApiClient } from '@packages/lib/permissions/api/client';

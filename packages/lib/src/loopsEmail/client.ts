@@ -1,4 +1,4 @@
-import { GET, POST, PUT } from '@charmverse/core/http';
+import { GET, POST, PUT } from '@packages/core/http';
 import { RateLimit } from 'async-sema';
 
 // Loop manages onboarding emails

@@ -1,9 +1,9 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { InvalidInputError } from '@packages/core/errors';
+import { hasAccessToSpace } from '@packages/core/permissions';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';

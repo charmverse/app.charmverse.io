@@ -1,0 +1,9 @@
+{
+  "name": "@packages/permissions",
+  "version": "0.0.0",
+  "description": "",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+  }
+}

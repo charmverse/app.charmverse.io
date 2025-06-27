@@ -1,6 +1,6 @@
-import type { UpdatePagePermissionDiscoverabilityRequest } from '@charmverse/core/pages';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import * as http from '@packages/adapters/http';
+import type { UpdatePagePermissionDiscoverabilityRequest } from '@packages/core/pages';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import type { PermissionCompute } from '@packages/lib/permissions/interfaces';
 
 export class PagePermissionsApi {

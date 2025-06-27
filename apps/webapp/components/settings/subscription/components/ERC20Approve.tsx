@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { ButtonProps } from '@mui/material';
 import { Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
+import { log } from '@packages/core/log';
 import type { Address } from 'viem';
 import { useSwitchChain, useWalletClient } from 'wagmi';
 

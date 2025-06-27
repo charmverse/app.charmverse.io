@@ -1,6 +1,6 @@
-import { GET } from '@charmverse/core/http';
-import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
+import { GET } from '@packages/core/http';
+import { log } from '@packages/core/log';
 
 import type { ExtendedPoap } from './interfaces';
 

@@ -1,7 +1,7 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uploadFileToS3 } from '@packages/aws/uploadToS3Server';
 import { findProject } from '@packages/connect-shared/lib/projects/findProject';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
 import { awsS3Bucket } from '@packages/utils/constants';
 import { replaceS3Domain } from '@packages/utils/url';
 

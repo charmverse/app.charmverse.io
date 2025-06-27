@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type { SpaceSubscriptionTier } from '@charmverse/core/prisma-client';
 import { Edit as EditIcon } from '@mui/icons-material';
 import {
@@ -20,6 +19,7 @@ import {
   InputAdornment
 } from '@mui/material';
 import { isProdEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import { capitalize } from '@packages/utils/strings';
 import type { GetServerSideProps } from 'next';

@@ -1,14 +1,13 @@
-import { stringUtils } from '@charmverse/core/utilities';
 import type { Guild } from '@guildxyz/types';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { stringUtils } from '@packages/core/utilities';
+import { guild as guildSDK } from '@packages/lib/guild-xyz/client';
 import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { VariableSizeList } from 'react-window';
-
-import { guild as guildSDK } from '@packages/lib/guild-xyz/client';
 
 const LISTBOX_PADDING = 8;
 

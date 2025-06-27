@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { log } from '@packages/core/log';
 import { getTokenMetadata } from '@packages/lib/tokens/getTokenMetadata';
 import { ethers } from 'ethers';
 import { formatUnits } from 'viem';

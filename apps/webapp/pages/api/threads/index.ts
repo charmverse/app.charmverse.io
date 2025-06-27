@@ -1,10 +1,5 @@
-import { PageNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
-import { ActionNotPermittedError } from '@packages/nextjs/errors';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import { PageNotFoundError } from '@packages/core/errors';
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -12,6 +7,10 @@ import type { ThreadCreatePayload, ThreadWithComments } from '@packages/lib/thre
 import { createThread } from '@packages/lib/threads';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from '@packages/lib/webhookPublisher/publishEvent';
+import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
+import { ActionNotPermittedError } from '@packages/nextjs/errors';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,8 +1,8 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import type { PostComment } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
 import { createPostComment } from '@packages/lib/forums/comments/createPostComment';
 import type { PostCommentVote } from '@packages/lib/forums/comments/interface';
 import { requireApiKey, requireKeys, requireSuperApiKey } from '@packages/lib/middleware';

@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { charmverseDiscordInvite } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { useEffect } from 'react';
 
 import { Button } from 'components/common/Button';

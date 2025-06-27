@@ -1,4 +1,4 @@
-import * as http from '@charmverse/core/http';
+import * as http from '@packages/core/http';
 
 export const DISCORD_API_URL = 'https://discord.com/api/v8';
 const DISCORD_OAUTH_TOKEN_ENDPOINT = '/oauth2/token';

@@ -1,8 +1,8 @@
 /// <reference types="google.accounts" />
 
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@packages/config/constants';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { getCallbackDomain } from '@packages/lib/oauth/getCallbackDomain';
 import type { GooglePopupLoginState } from '@packages/lib/oauth/interfaces';
 import { useState } from 'react';

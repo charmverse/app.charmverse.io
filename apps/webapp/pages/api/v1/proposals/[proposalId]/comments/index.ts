@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { InvalidInputError } from '@packages/core/errors';
 import { requireApiKey, requireKeys, requireSuperApiKey } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';

@@ -1,9 +1,9 @@
-import { ExternalServiceError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { DocusignCredential, OptionalPrismaTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { GET, POST } from '@packages/adapters/http';
 import { baseUrl } from '@packages/config/constants';
+import { ExternalServiceError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { v4 as uuid } from 'uuid';
 
 import type { RequiredDocusignCredentials } from './constants';

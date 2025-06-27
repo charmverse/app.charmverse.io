@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { refreshDocusignAccessToken } from '@packages/lib/docusign/authentication';
 
 export async function refreshDocusignOAuthTask() {

@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { CharmQualifyingEventCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import { stringUtils } from '@packages/core/utilities';
 import { fancyTrim } from '@packages/utils/strings';
 import { optimismSepolia } from 'viem/chains';
 

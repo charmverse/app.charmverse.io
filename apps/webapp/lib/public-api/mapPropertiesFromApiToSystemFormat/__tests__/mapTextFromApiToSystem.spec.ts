@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import { generateSchema } from '@packages/testing/publicApi/schemas';
 
 import { mapTextFromApiToSystem } from '../mapTextFromApiToSystem';

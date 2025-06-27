@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { PostCategory, Role, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
+import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@packages/core/permissions';
 import { mapPostCategoryPermissionToAssignee } from '@packages/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';

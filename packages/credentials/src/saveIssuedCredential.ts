@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import { WebhookEventNames } from '@packages/lib/webhookPublisher/interfaces';
 import { publishBountyEvent, publishProposalEventBase } from '@packages/lib/webhookPublisher/publishEvent';
 

@@ -1,6 +1,6 @@
 import type { UrlObject } from 'url';
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { redirectToAppLogin, shouldRedirectToAppLogin } from '@packages/lib/utils/browser';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
 import { useRouter } from 'next/router';

@@ -1,7 +1,7 @@
 import dns from 'dns/promises';
 
-import { getLogger } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getLogger } from '@packages/core/log';
 import { getCertificateDetails, requestCertificateForDomain } from '@packages/lib/aws/ACM';
 import { addCertificateToListener, hasCertificateAdded } from '@packages/lib/aws/ELB';
 import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';

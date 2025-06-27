@@ -1,4 +1,4 @@
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { isAddress } from 'viem';
 import fs from 'node:fs/promises';

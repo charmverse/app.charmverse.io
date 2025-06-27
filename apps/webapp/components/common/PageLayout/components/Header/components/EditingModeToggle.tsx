@@ -1,7 +1,7 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { ArrowDropDown } from '@mui/icons-material';
 import type { Theme } from '@mui/material';
 import { IconButton, useMediaQuery, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip } from '@mui/material';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { memo } from 'react';
 

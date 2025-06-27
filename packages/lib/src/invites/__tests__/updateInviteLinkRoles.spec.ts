@@ -1,7 +1,7 @@
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@packages/core/errors';
 import { v4 } from 'uuid';
 
 import { updateInviteLinkRoles } from '../updateInviteLinkRoles';

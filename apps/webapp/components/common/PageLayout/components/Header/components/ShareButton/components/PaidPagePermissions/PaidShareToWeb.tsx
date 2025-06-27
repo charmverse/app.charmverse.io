@@ -1,6 +1,6 @@
-import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import type { AssignedPagePermission } from '@packages/core/permissions';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { capitalize } from '@packages/utils/strings';
 
 import charmClient from 'charmClient';

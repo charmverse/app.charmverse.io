@@ -1,18 +1,18 @@
-import { log } from '@charmverse/core/log';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Divider, IconButton, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
-import { isTruthy } from '@packages/utils/types';
+import { log } from '@packages/core/log';
+import { defaultProjectMember } from '@packages/lib/projects/constants';
+import { projectMemberFieldProperties, projectFieldProperties } from '@packages/lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
+import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 import type { ProjectFieldValue } from '@packages/lib/proposals/forms/interfaces';
+import { isTruthy } from '@packages/utils/types';
 import type { KeyedMutator } from 'swr';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectMember } from '@packages/lib/projects/constants';
-import { projectMemberFieldProperties, projectFieldProperties } from '@packages/lib/projects/formField';
-import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
-import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';
 
 import { FieldAnswers } from '../FieldAnswers';
 

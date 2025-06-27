@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type { PageObjectResponse, RichTextItemResponse } from '@notionhq/client/build/src/api-endpoints';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from '@packages/bangleeditor/components/image/constants';
 import { extractTweetAttrs } from '@packages/bangleeditor/components/tweet/tweetSpec';
@@ -14,6 +13,7 @@ import type {
   ColumnBlockNode,
   TextMark
 } from '@packages/charmeditor/interfaces';
+import { log } from '@packages/core/log';
 import { isPdfEmbedLink } from '@packages/lib/pdf/extractPdfEmbedLink';
 import { isTruthy } from '@packages/utils/types';
 

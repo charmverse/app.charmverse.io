@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { StatusAPIResponse as FarcasterBody } from '@farcaster/auth-client';
+import { log } from '@packages/core/log';
 import { InvalidStateError } from '@packages/nextjs/errors';
 import { sessionUserRelations } from '@packages/profile/constants';
 import { getUserProfile } from '@packages/profile/getUser';

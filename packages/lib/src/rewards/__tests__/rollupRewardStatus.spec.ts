@@ -1,5 +1,5 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma';
+import { DataNotFoundError } from '@packages/core/errors';
 import { ExpectedAnError } from '@packages/testing/errors';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { v4 } from 'uuid';

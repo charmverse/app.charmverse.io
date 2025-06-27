@@ -1,8 +1,8 @@
 import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
 import AddIcon from '@mui/icons-material/Add';
 import type { SxProps, Theme } from '@mui/material';
 import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/material';
+import { stringUtils } from '@packages/core/utilities';
 import { useMemo, type HTMLAttributes } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';

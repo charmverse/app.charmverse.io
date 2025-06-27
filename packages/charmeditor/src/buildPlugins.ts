@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { baseKeymap as pmBaseKeymap } from 'prosemirror-commands';
 import { InputRule, inputRules as pmInputRules, undoInputRule as pmUndoInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 
 export async function checkDuration<T>(
   callback: (...args: any[]) => Promise<T>,

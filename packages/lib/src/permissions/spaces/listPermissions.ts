@@ -1,5 +1,5 @@
-import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { AssignedPostCategoryPermission } from '@packages/core/permissions';
 
 import { mapPostCategoryPermissionToAssignee } from '../forum/mapPostCategoryPermissionToAssignee';
 

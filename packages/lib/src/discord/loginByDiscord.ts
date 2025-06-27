@@ -1,6 +1,9 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
+import { log } from '@packages/core/log';
+import { getDiscordAccount } from '@packages/lib/discord/client/getDiscordAccount';
+import { getDiscordCallbackUrl } from '@packages/lib/discord/getDiscordCallbackUrl';
+import type { OauthFlowType } from '@packages/lib/oauth/interfaces';
 import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
 import { trackOpSpaceClickSigninEvent } from '@packages/metrics/mixpanel/trackOpSpaceSigninEvent';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
@@ -9,9 +12,6 @@ import { sessionUserRelations } from '@packages/profile/constants';
 import { postUserCreate } from '@packages/users/postUserCreate';
 import { DisabledAccountError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
-import { getDiscordAccount } from '@packages/lib/discord/client/getDiscordAccount';
-import { getDiscordCallbackUrl } from '@packages/lib/discord/getDiscordCallbackUrl';
-import type { OauthFlowType } from '@packages/lib/oauth/interfaces';
 import { v4 } from 'uuid';
 
 type LoginWithDiscord = {

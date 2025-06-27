@@ -1,9 +1,9 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Alert, FormControlLabel, FormGroup, Grid, InputLabel, Stack, Switch, TextField } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { log } from '@packages/core/log';
 import { getApiAccessStringifiedTiers, hasApiAccess } from '@packages/subscriptions/featureRestrictions';
 import { isUrl } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
