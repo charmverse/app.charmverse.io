@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageMeta } from '@packages/core/pages';
-import { pageTree } from '@packages/core/pages/mapPageTree';
+import { sortNodes } from '@packages/core/pages/mapPageTree';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from '@packages/lib/utils/browser';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
@@ -147,7 +147,7 @@ async function getDefaultPageForSpaceRaw({
   const pagesToLookup = topLevelPages.length ? topLevelPages : visiblePages;
 
   // TODO: simplify types of sortNodes input to only be index and createdAt
-  const sortedPages = pageTree.sortNodes(pagesToLookup as PageMeta[]);
+  const sortedPages = sortNodes(pagesToLookup as PageMeta[]);
 
   const firstPage = sortedPages[0];
   const homePage = space.homePageId && pageMap[space.homePageId];

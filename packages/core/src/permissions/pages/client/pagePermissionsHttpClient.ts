@@ -1,4 +1,3 @@
-import { DELETE, GET, POST, PUT } from '../../../http';
 import type {
   PageMetaWithPermissions,
   PagesRequest,
@@ -7,6 +6,7 @@ import type {
 import { chunk, asyncSeries } from '../../../utilities/array';
 import { AbstractPermissionsApiClient } from '../../clients/abstractApiClient.class';
 import type { PermissionCompute, PermissionResource, Resource } from '../../core/interfaces';
+import * as pagesController from '../../permissionsApi/controllers/pages';
 import type {
   AssignablePagePermissionGroups,
   AssignedPagePermission,
@@ -20,12 +20,8 @@ import type {
 import type { PagePermissionsClient } from './interfaces';
 
 export class PagePermissionsHttpClient extends AbstractPermissionsApiClient implements PagePermissionsClient {
-  private get prefix() {
-    return `${this.baseUrl}/api/pages`;
-  }
-
   computePagePermissions(request: PermissionCompute): Promise<PagePermissionFlags> {
-    return GET(`${this.prefix}/compute-page-permissions`, request);
+    return pagesController.computePagePermissions(request);
   }
 
   async bulkComputePagePermissions(request: BulkPagePermissionCompute): Promise<BulkPagePermissionFlags> {
@@ -36,9 +32,7 @@ export class PagePermissionsHttpClient extends AbstractPermissionsApiClient impl
     );
 
     const computedResult = await asyncSeries(chunkedPageIds, (chunkedRequest: BulkPagePermissionCompute) =>
-      GET<BulkPagePermissionFlags>(`${this.prefix}/bulk-compute-page-permissions`, chunkedRequest, {
-        addBracketsToArrayValues: false
-      })
+      pagesController.bulkComputePagePermissions(chunkedRequest)
     ).then((results) => {
       const mergedResults: BulkPagePermissionFlags = {};
 
@@ -53,36 +47,36 @@ export class PagePermissionsHttpClient extends AbstractPermissionsApiClient impl
   }
 
   getAccessiblePageIds(request: PagesRequest): Promise<string[]> {
-    return GET(`${this.prefix}/list-ids`, request);
+    return pagesController.listIds(request);
   }
 
   upsertPagePermission(
     request: PagePermissionAssignment<AssignablePagePermissionGroups>
   ): Promise<AssignedPagePermission> {
-    return POST(`${this.prefix}/upsert-page-permission`, request, { headers: this.jsonHeaders });
+    return pagesController.upsertPagePermission(request);
   }
 
   deletePagePermission(request: PermissionResource): Promise<void> {
-    return DELETE(`${this.prefix}/delete-page-permission`, request, { headers: this.jsonHeaders });
+    return pagesController.deletePagePermission(request);
   }
 
   listPagePermissions(request: Resource): Promise<AssignedPagePermission<AssignablePagePermissionGroups>[]> {
-    return GET(`${this.prefix}/page-permissions-list`, request);
+    return pagesController.pagePermissionsList(request);
   }
 
   setupPagePermissionsAfterEvent(request: PageEventTriggeringPermissions): Promise<void> {
-    return POST(`${this.prefix}/setup-page-permissions-after-event`, request, { headers: this.jsonHeaders });
+    return pagesController.setupPagePermissionsAfterEvent(request);
   }
 
   lockPagePermissionsToBountyCreator(request: Resource): Promise<PageMetaWithPermissions> {
-    return POST(`${this.prefix}/lock-page-permissions-to-bounty-creator`, request, { headers: this.jsonHeaders });
+    return pagesController.lockPagePermissionsToBountyCreator(request);
   }
 
   isBountyPageEditableByApplicants(request: Resource): Promise<{ editable: boolean }> {
-    return GET(`${this.prefix}/is-bounty-page-editable-by-applicants`, request);
+    return pagesController.isBountyPageEditableByApplicants(request);
   }
 
   updatePagePermissionDiscoverability(request: UpdatePagePermissionDiscoverabilityRequest): Promise<void> {
-    return PUT(`${this.prefix}/update-page-discoverability`, request, { headers: this.jsonHeaders });
+    return pagesController.updatePageDiscoverability(request);
   }
 }

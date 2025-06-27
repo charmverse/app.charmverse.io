@@ -1,4 +1,4 @@
-import type { PostComment } from 'prisma';
+import type { PostComment } from '@charmverse/core/prisma';
 
 import { generateForumPost, generateForumPosts, generatePostComment } from '../forums';
 import { generateUserAndSpace } from '../user';

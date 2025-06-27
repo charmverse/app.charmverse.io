@@ -56,7 +56,6 @@ services:
       ]
     environment:
       - REACT_APP_APP_ENV=staging
-      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-webapp
 
@@ -77,7 +76,6 @@ services:
       - '80:3000'
     environment:
       - REACT_APP_APP_ENV=staging
-      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-sockets
       #- stg-webapp
@@ -96,17 +94,6 @@ services:
       - localpostgres
     profiles:
       - dev
-
-  permissions-api:
-    image: '310849459438.dkr.ecr.us-east-1.amazonaws.com/charmverse-permissions-api:${PERMISSION_IMGTAG:-latest}'
-    command: ['sh', '-c', 'node --max-old-space-size=750 --experimental-specifier-resolution=node  ./dist/main.js']
-    env_file:
-      - '.env'
-    environment:
-      - HOST=permissions-api
-    profiles:
-      - stg-webapp
-      - stg-sockets
 
   localpostgres:
     image: postgres

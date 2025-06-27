@@ -2,13 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": "../core/src/permissions/src",
     // composite is useful for referenced packages. see https://www.typescriptlang.org/docs/handbook/project-references.html#composite
     "composite": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx" ],
+    "../core/src/permissions/src/**/*.ts",
+    "../core/src/permissions/src/**/*.tsx" ],
   "paths": {
     // Files
     "server": [

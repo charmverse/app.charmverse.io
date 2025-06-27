@@ -1,4 +1,4 @@
-import type { Space, User } from 'prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from 'prisma-client';
 
 import { generateInviteLink, generateRole } from '../members';

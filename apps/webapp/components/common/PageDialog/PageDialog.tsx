@@ -2,7 +2,7 @@ import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { log } from '@packages/core/log';
-import { AvailablePagePermissions } from '@packages/core/permissions/flags';
+import { AvailablePagePermissions } from '@packages/core/permissions/pages/availablePagePermissions.class';
 import debouncePromise from '@packages/lib/utils/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useEffect, useRef } from 'react';

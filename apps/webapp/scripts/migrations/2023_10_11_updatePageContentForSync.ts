@@ -1,6 +1,6 @@
 import { log } from '@packages/core/log';
 import type { PageMeta } from '@packages/core/pages';
-import { pageTree } from '@packages/core/pages/mapPageTree';
+import { sortNodes } from '@packages/core/pages/mapPageTree';
 import { PageDiff, Prisma, prisma } from '@charmverse/core/prisma-client';
 import { Fragment, Slice } from 'prosemirror-model';
 import { replaceStep } from 'prosemirror-transform';
@@ -80,7 +80,7 @@ export async function updatePageContentForSync(
           }
         });
 
-        const childPageIds = pageTree.sortNodes(childPages as PageMeta[]).map((childPage) => childPage.id);
+        const childPageIds = sortNodes(childPages as PageMeta[]).map((childPage) => childPage.id);
         const pageContent = page.content as PageContent;
         const nestedPageIds: Set<string> = new Set();
         let doc = getNodeFromJson(pageContent);

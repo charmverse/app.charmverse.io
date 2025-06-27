@@ -1,4 +1,4 @@
-import { PageOperations } from '@charmverse/core/prisma-client';
+import { PageOperations } from '@charmverse/core/prisma';
 
 import { typedKeys } from '../../utilities/objects';
 import { BasePermissions } from '../core/basePermissions.class';

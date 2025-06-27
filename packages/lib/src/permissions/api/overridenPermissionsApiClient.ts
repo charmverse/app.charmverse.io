@@ -1,4 +1,3 @@
-import { permissionsApiAuthKey, permissionsApiUrl } from '@packages/config/constants';
 import type { PagesRequest } from '@packages/core/pages';
 import type { BulkPagePermissionCompute, BulkPagePermissionFlags, PermissionCompute } from '@packages/core/permissions';
 import { PermissionsApiClient } from '@packages/core/permissions';
@@ -10,8 +9,7 @@ function withUseProposalPermissionsArgs<T>(args: T): T {
 
 export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiClient {
   constructor() {
-    super({ authKey: permissionsApiAuthKey, baseUrl: permissionsApiUrl });
-
+    super();
     // Override methods here
 
     const { pages, proposals } = this;

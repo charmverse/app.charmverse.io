@@ -1,5 +1,5 @@
+import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Space, User } from 'prisma';
 
 import { InvalidInputError } from '../../errors';
 import { generateCommentWithThreadAndPage, generatePage } from '../pages';

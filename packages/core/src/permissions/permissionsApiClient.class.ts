@@ -1,4 +1,3 @@
-import type { PermissionsApiClientConstructor } from './clients/interfaces';
 import { ForumPermissionsHttpClient } from './forums/client/forumPermissionsHttpClient';
 import type { BaseForumPermissionsClient, PremiumForumPermissionsClient } from './forums/client/interfaces';
 import type { PagePermissionsClient } from './pages/client/interfaces';
@@ -29,10 +28,10 @@ export class PermissionsApiClient implements PremiumPermissionsClient {
 
   spaces: SpacePermissionsClient;
 
-  constructor(params: PermissionsApiClientConstructor) {
-    this.forum = new ForumPermissionsHttpClient(params);
-    this.proposals = new ProposalPermissionsHttpClient(params);
-    this.pages = new PagePermissionsHttpClient(params);
-    this.spaces = new SpacePermissionsHttpClient(params);
+  constructor() {
+    this.forum = new ForumPermissionsHttpClient();
+    this.proposals = new ProposalPermissionsHttpClient();
+    this.pages = new PagePermissionsHttpClient();
+    this.spaces = new SpacePermissionsHttpClient();
   }
 }

@@ -1,4 +1,4 @@
-import { PostOperation } from '@charmverse/core/prisma-client';
+import { PostOperation } from '@charmverse/core/prisma';
 
 import { typedKeys } from '../../utilities/objects';
 import { BasePermissions } from '../core/basePermissions.class';

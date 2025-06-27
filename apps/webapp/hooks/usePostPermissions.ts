@@ -1,4 +1,4 @@
-import { AvailablePostPermissions } from '@packages/core/permissions/flags';
+import { AvailablePostPermissions } from '@packages/core/permissions/forums/availablePostPermissions.class';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
