@@ -1,5 +1,4 @@
-import { styled } from '@mui/material';
-import { Box, Checkbox, Stack, TextField } from '@mui/material';
+import { styled, Box, Checkbox, Stack, TextField } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
@@ -10,6 +9,7 @@ import {
 } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
+import { useRoles } from 'hooks/useRoles';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
@@ -28,6 +28,8 @@ export function SubmitStepSettings({
   workflowId
 }: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'isTemplate' | 'workflowId'>) {
   const isAssignedReward = workflowId === 'assigned' || workflowId === 'assigned_kyc';
+  const { roles } = useRoles({ includeArchived: true });
+  const archivedRoleIds = roles?.filter((role) => role.archived).map((role) => role.id) ?? [];
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     onChange({
@@ -88,7 +90,9 @@ export function SubmitStepSettings({
               type='role'
               readOnly={readOnly}
               variant='outlined'
-              value={(rewardInput?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
+              value={(rewardInput?.allowedSubmitterRoles ?? [])
+                .filter((roleId) => !archivedRoleIds.includes(roleId))
+                .map((roleId) => ({ group: 'role', id: roleId }))}
               onChange={(options) => {
                 const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
 
