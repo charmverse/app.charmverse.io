@@ -1,6 +1,6 @@
 'use server';
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 
 import { actionClient } from '../actions/actionClient';
 

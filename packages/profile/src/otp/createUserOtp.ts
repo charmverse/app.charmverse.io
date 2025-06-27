@@ -1,5 +1,5 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import { createOtp } from './createOtp';

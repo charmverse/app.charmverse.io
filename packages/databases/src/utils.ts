@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 

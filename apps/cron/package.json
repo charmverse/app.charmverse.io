@@ -14,6 +14,7 @@
     "@packages/blockchain": "^0.0.0",
     "@packages/charmeditor": "^1.0.0",
     "@packages/config": "^0.0.0",
+    "@packages/core": "^0.0.0",
     "@packages/credentials": "^0.0.0",
     "@packages/features": "^0.0.0",
     "@packages/lib": "^0.0.0",

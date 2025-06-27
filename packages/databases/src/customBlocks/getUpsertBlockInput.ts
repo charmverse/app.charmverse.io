@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import type { ProposalBlockInput, ProposalBlockUpdateInput } from '@packages/lib/proposals/blocks/interfaces';
 import type { RewardBlockInput, RewardBlockUpdateInput } from '@packages/lib/rewards/blocks/interfaces';
 import { v4 } from 'uuid';

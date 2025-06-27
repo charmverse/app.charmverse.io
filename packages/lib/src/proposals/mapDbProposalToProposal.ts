@@ -1,4 +1,3 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   Page,
   Proposal,
@@ -18,9 +17,10 @@ import {
   type ProposalEvaluationAppealReview,
   type ProposalEvaluationReview
 } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { arrayUtils } from '@charmverse/core/utilities';
+import type { ProposalPermissionFlags } from '@packages/core/permissions';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
+import { arrayUtils } from '@packages/core/utilities';
 import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig } from '@packages/lib/projects/formField';
 import type { ProjectWithMembers } from '@packages/lib/projects/interfaces';

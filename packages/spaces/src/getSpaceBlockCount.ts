@@ -1,7 +1,7 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { BlockCount } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 
 export type BlockCountInfo = Pick<BlockCount, 'count' | 'details' | 'createdAt'>;
 

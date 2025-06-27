@@ -5,7 +5,7 @@ import { prettyPrint } from '@packages/utils/strings';
 import { DateTime } from 'luxon';
 import { getPointStatsFromHistory } from '@packages/scoutgame/points/getPointStatsFromHistory';
 import { refreshPointStatsFromHistory } from '@packages/scoutgame/points/refreshPointStatsFromHistory';
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { sendPoints } from '@packages/scoutgame/points/sendPoints';
 const tierByPoints = {
   60: 'Legendary',

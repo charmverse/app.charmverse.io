@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { createCardPage } from '@packages/pages/createCardPage';
 
 import type { BlockWithDetails } from '../block';

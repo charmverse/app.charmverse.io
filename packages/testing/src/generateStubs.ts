@@ -1,5 +1,5 @@
-import type { PageNode } from '@charmverse/core/pages';
 import type { Application, Page } from '@charmverse/core/prisma';
+import type { PageNode } from '@packages/core/pages';
 import { randomETHWalletAddress as _randomETHWalletAddress } from '@packages/utils/blockchain';
 import type { RequiredNotNull } from '@packages/utils/types';
 import { v4 } from 'uuid';

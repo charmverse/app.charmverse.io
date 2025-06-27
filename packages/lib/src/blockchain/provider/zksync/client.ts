@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { GET } from '@packages/adapters/http';
 import ERC721_ABI from '@packages/blockchain/abis/ERC721.json';
 import { getChainById } from '@packages/blockchain/connectors/chains';
+import { InvalidInputError } from '@packages/core/errors';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { RateLimit } from 'async-sema';
 import { zkSync, zksyncSepoliaTestnet } from 'viem/chains';

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import Color from 'color';
 
 const RGBA_PATTERN = /^rgba/i;

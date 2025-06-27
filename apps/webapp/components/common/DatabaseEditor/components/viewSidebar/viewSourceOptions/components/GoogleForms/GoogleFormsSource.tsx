@@ -1,7 +1,8 @@
-import { log } from '@charmverse/core/log';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import ReportProblemIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Box, Link, ListItem, ListItemIcon, ListItemText, MenuItem, Tooltip, Typography } from '@mui/material';
+import { log } from '@packages/core/log';
+import type { BoardViewFields } from '@packages/databases/boardView';
 import Script from 'next/script';
 import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
@@ -10,7 +11,6 @@ import useSwr from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { BoardViewFields } from '@packages/databases/boardView';
 import type { CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem } from 'pages/api/google/forms';
 

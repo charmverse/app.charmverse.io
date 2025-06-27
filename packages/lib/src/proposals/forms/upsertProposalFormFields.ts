@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import type { FormFieldInput } from '@packages/lib/proposals/forms/interfaces';
 import { isUUID } from '@packages/utils/strings';
 import { v4 } from 'uuid';

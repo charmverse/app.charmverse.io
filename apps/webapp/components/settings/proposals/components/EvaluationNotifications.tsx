@@ -1,8 +1,8 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Box, Card, Stack, TextField, Typography } from '@mui/material';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
+import { getActionButtonLabels } from '@packages/lib/proposals/getActionButtonLabels';
 
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { getActionButtonLabels } from '@packages/lib/proposals/getActionButtonLabels';
 
 import { evaluationIcons } from '../constants';
 

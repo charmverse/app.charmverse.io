@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { user } from '@packages/lib/guild-xyz/client';
 
 export async function getGuildRoleIds(addresses: string[]) {

@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 
 import type { TrashOrDeletePageResponse } from 'lib/pages';
 import type { PageViewMeta } from 'lib/pages/getRecentHistory';

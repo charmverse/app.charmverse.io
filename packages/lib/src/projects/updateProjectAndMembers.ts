@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 
 import { getProjectById } from './getProjectById';

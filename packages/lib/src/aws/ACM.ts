@@ -1,6 +1,6 @@
 import type { ACMClientConfig } from '@aws-sdk/client-acm';
 import { ACM } from '@aws-sdk/client-acm';
-import { getLogger } from '@charmverse/core/log';
+import { getLogger } from '@packages/core/log';
 import type { DomainCertificateDetails } from '@packages/lib/aws/interfaces';
 import { isValidDomainName } from '@packages/lib/utils/domains/isValidDomainName';
 

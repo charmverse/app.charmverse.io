@@ -1,13 +1,12 @@
-import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PostCategoryPermissionAssignment, AssignedPostCategoryPermission } from '@packages/core/permissions';
+import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';
 import { generatePostCategory } from '@packages/testing/utils/forums';
 import request from 'supertest';
-
-import { upsertPostCategoryPermission } from '@packages/lib/permissions/forum/upsertPostCategoryPermission';
 
 let user: LoggedInUser;
 let userCookie: string;

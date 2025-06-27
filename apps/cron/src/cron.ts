@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import cron from 'node-cron';
 import { Server } from 'socket.io';
 

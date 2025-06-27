@@ -1,7 +1,8 @@
-import { log } from '@charmverse/core/log';
 import { MoreHoriz } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { IconButton, Menu, Tooltip, MenuItem, ListItemIcon } from '@mui/material';
+import { log } from '@packages/core/log';
+import type { Member } from '@packages/lib/members/interfaces';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -12,7 +13,6 @@ import { StyledListItemText } from 'components/common/StyledListItemText';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Member } from '@packages/lib/members/interfaces';
 
 const roleActions = ['makeAdmin', 'makeMember', 'makeGuest', 'removeFromSpace', 'banFromSpace'] as const;
 export type RoleAction = (typeof roleActions)[number];

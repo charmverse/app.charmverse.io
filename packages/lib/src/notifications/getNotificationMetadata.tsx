@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { type FeatureJson } from '@packages/features/constants';
 import { getFeatureTitle } from '@packages/features/getFeatureTitle';
 import type {

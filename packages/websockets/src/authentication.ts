@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import type { SessionData } from '@packages/lib/session/config';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import { getIronOptions } from '@packages/nextjs/session/getIronOptions';

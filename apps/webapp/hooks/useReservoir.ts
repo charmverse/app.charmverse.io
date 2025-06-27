@@ -1,4 +1,4 @@
-import { getLogger } from '@charmverse/core/log';
+import { getLogger } from '@packages/core/log';
 import { reservoirClient } from '@packages/lib/blockchain/reservoirClient';
 import { BaseError } from 'viem';
 

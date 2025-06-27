@@ -1,7 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -15,6 +14,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { AssignedPostCategoryPermission } from '@packages/core/permissions';
 import { mapPostCategoryPermissionToAssignee } from '@packages/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import {
   mapSpacePermissionToAssignee,

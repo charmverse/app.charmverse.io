@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 import { generateSchema } from '@packages/testing/publicApi/schemas';
 
 import { createDatabase } from '../createDatabase';

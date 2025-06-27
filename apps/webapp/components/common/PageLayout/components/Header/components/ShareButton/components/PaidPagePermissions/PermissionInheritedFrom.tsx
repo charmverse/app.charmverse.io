@@ -1,6 +1,6 @@
-import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import type { AssignedPagePermission } from '@packages/core/permissions';
 
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

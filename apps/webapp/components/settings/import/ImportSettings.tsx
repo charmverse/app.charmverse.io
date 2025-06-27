@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { Box, Stack, Typography } from '@mui/material';
 import SvgIcon from '@mui/material/SvgIcon';
+import { log } from '@packages/core/log';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { SiDiscourse } from 'react-icons/si';
 

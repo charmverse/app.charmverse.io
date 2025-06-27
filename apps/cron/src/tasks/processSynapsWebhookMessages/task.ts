@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { SQS_WEBHOOK_SYNAPS_QUEUE_NAME } from '@packages/lib/kyc/config';
 
 import { processMessages } from '../../webhookSqs';

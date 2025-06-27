@@ -1,9 +1,5 @@
-import type { PostCategoryWithPermissions, PremiumPermissionsClient } from '@charmverse/core/permissions';
 import type { PostCategory } from '@charmverse/core/prisma';
-import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
+import type { PostCategoryWithPermissions, PremiumPermissionsClient } from '@packages/core/permissions';
 import type { CreatePostCategoryInput } from '@packages/lib/forums/categories/createPostCategory';
 import { createPostCategory } from '@packages/lib/forums/categories/createPostCategory';
 import { getPostCategories } from '@packages/lib/forums/categories/getPostCategories';
@@ -11,6 +7,9 @@ import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/midd
 import { getPermissionsClient } from '@packages/lib/permissions/api';
 import { providePermissionClients } from '@packages/lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,7 +1,7 @@
-import { isProposalAuthor } from '@charmverse/core/permissions';
 import type { Space, User, Role } from '@charmverse/core/prisma';
-import { generateUserAndSpace, generateSpaceUser, generateRole } from '@packages/testing/setupDatabase';
+import { isProposalAuthor } from '@packages/core/permissions';
 import { generateProposal } from '@packages/lib/testing/proposals';
+import { generateUserAndSpace, generateSpaceUser, generateRole } from '@packages/testing/setupDatabase';
 
 let proposal: Awaited<ReturnType<typeof generateProposal>>;
 let space: Space;

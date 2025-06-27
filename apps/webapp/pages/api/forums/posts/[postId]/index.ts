@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { Post } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { log } from '@packages/core/log';
 import { deleteForumPost } from '@packages/lib/forums/posts/deleteForumPost';
 import { getForumPost } from '@packages/lib/forums/posts/getForumPost';
 import type { UpdateForumPostInput } from '@packages/lib/forums/posts/updateForumPost';

@@ -2,7 +2,7 @@
 //  * Below methods are the API reference links for the Docusign API
 //  */
 
-// import { log } from '@charmverse/core/log';
+// import { log } from '@packages/core/log';
 // import { prisma } from '@charmverse/core/prisma-client';
 
 // import { GET, POST } from '@packages/adapters/http';

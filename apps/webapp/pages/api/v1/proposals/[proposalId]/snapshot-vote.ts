@@ -1,16 +1,16 @@
-import { DataNotFoundError, UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import * as http from '@packages/adapters/http';
 import { isTestEnv } from '@packages/config/constants';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { getAddress } from 'viem';
-
+import { DataNotFoundError, UndesirableOperationError } from '@packages/core/errors';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { requireKeys } from '@packages/lib/middleware';
-import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { getSnapshotProposal } from '@packages/lib/snapshot/getProposal';
 import { coerceToMilliseconds, getCurrentDate } from '@packages/lib/utils/dates';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getAddress } from 'viem';
+
+import { apiHandler } from 'lib/public-api/handler';
 
 import type { GenerateSnapshotVoteMessageResponseBody } from './generate-vote-message';
 

@@ -1,6 +1,6 @@
-import { InsecureOperationError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
+import { InsecureOperationError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 
 import { extractRuUrls } from './extractRuUrls';
 

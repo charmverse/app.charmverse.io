@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { ProsemirrorJSONStep } from '@packages/websockets/documentEvents/interfaces';
 import type { Node } from 'prosemirror-model';
 import { Step } from 'prosemirror-transform';

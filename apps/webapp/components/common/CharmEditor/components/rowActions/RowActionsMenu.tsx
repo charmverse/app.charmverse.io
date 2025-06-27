@@ -1,5 +1,4 @@
 import { safeInsert } from '@bangle.dev/utils';
-import { log } from '@charmverse/core/log';
 import {
   Add as AddIcon,
   ContentCopy as DuplicateIcon,
@@ -10,6 +9,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { nestedPageNodeName } from '@packages/bangleeditor/components/nestedPage/nestedPage.constants';
+import { log } from '@packages/core/log';
 import { getSortedBoards } from '@packages/databases/store/boards';
 import { useAppSelector } from '@packages/databases/store/hooks';
 import { isMac } from '@packages/lib/utils/browser';

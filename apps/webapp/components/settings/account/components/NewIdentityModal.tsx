@@ -1,6 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
+import { log } from '@packages/core/log';
+import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
+import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
@@ -19,8 +21,6 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
-import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 
 import IdentityProviderItem from './IdentityProviderItem';
 import { TELEGRAM_BOT_ID, TelegramLoginIframe } from './TelegramLoginIframe';

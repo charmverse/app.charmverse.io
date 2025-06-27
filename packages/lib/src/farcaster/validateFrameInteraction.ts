@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { POST } from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 
 import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from './constants';
 

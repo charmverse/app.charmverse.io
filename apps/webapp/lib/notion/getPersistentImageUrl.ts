@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { getFilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
+import { log } from '@packages/core/log';
 
 // if image is stored in notion s3, it will expire so we need to re-upload it to our s3
 export function getPersistentImageUrl({ image, spaceId }: { image: any; spaceId: string }): Promise<string | null> {

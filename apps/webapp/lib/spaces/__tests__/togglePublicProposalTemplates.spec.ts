@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 import { v4 } from 'uuid';
 
 import { toggleSpacePublicProposalTemplates } from '../toggleSpacePublicProposalTemplates';

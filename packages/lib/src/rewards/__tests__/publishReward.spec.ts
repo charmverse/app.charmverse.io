@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsBounties, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 
 import { publishReward } from '../publishReward';

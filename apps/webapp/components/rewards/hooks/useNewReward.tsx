@@ -1,13 +1,13 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
+import type { RewardPageProps } from '@packages/lib/rewards/createReward';
+import type { RewardType } from '@packages/lib/rewards/interfaces';
+import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 import { useCallback, useState } from 'react';
 
 import { useCreateReward } from 'charmClient/hooks/rewards';
 import { EMPTY_PAGE_VALUES } from 'components/common/PageDialog/hooks/useNewPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { RewardPageProps } from '@packages/lib/rewards/createReward';
-import type { RewardType } from '@packages/lib/rewards/interfaces';
-import type { UpdateableRewardFields } from '@packages/lib/rewards/updateRewardSettings';
 
 export type UpdateableRewardFieldsWithType = Omit<UpdateableRewardFields, 'rewardType'> & { rewardType: RewardType };
 

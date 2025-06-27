@@ -1,4 +1,4 @@
-import { pageTree } from '@charmverse/core/pages/utilities';
+import { pageTree } from '@packages/core/pages/mapPageTree';
 import { isTruthy } from '@packages/utils/types';
 import { useMemo } from 'react';
 

@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/LockOutlined';
 import {
@@ -17,6 +16,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import { log } from '@packages/core/log';
 import type { Member } from '@packages/lib/members/interfaces';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';

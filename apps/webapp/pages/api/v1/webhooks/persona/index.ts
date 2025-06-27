@@ -1,8 +1,8 @@
 import { Buffer } from 'node:buffer';
 
-import { InsecureOperationError, DataNotFoundError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InsecureOperationError, DataNotFoundError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import type { PersonaEventData } from '@packages/lib/kyc/persona/interfaces';
 import { checkSignature } from '@packages/lib/kyc/persona/webhook/checkSignature';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';

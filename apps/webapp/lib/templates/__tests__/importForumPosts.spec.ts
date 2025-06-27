@@ -1,9 +1,9 @@
 // File: __tests__/importForumPosts.test.ts
 
-import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsRandom, testUtilsForum } from '@charmverse/core/test';
+import { DataNotFoundError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import type { SpaceDataExport } from '../exportSpaceData';

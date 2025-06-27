@@ -1,11 +1,7 @@
-import type { PagesRequest } from '@charmverse/core/pages';
-import type {
-  BulkPagePermissionCompute,
-  BulkPagePermissionFlags,
-  PermissionCompute
-} from '@charmverse/core/permissions';
-import { PermissionsApiClient } from '@charmverse/core/permissions';
 import { permissionsApiAuthKey, permissionsApiUrl } from '@packages/config/constants';
+import type { PagesRequest } from '@packages/core/pages';
+import type { BulkPagePermissionCompute, BulkPagePermissionFlags, PermissionCompute } from '@packages/core/permissions';
+import { PermissionsApiClient } from '@packages/core/permissions';
 
 // Injected method for expanding args
 function withUseProposalPermissionsArgs<T>(args: T): T {

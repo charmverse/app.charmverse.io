@@ -1,7 +1,7 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
-import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { DragIndicator } from '@mui/icons-material';
 import { styled, Box, Card, Chip, Tooltip, Typography } from '@mui/material';
+import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@packages/core/proposals';
 
 import { useSortable } from 'components/common/DatabaseEditor/hooks/sortable';
 

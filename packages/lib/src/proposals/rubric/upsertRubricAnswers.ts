@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { ProposalRubricCriteriaType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 
 import { setPageUpdatedAt } from '../setPageUpdatedAt';
 

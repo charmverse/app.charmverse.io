@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { htmlToText } from 'html-to-text';
 import type { IMailgunClient } from 'mailgun.js/Interfaces';
 

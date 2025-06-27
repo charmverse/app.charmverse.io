@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import * as http from '@packages/adapters/http';
+import { InvalidInputError } from '@packages/core/errors';
 import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';

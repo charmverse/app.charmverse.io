@@ -1,6 +1,6 @@
-import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import type { ProposalPermissionFlags } from '@packages/core/permissions';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';

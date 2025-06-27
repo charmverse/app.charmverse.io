@@ -1,10 +1,10 @@
-import { log } from '@charmverse/core/log';
 import { Box, Stack } from '@mui/material';
+import { log } from '@packages/core/log';
+import { getTokenInfo } from '@packages/lib/tokens/tokenData';
 import { useMemo } from 'react';
 
 import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { getTokenInfo } from '@packages/lib/tokens/tokenData';
 
 type Props = {
   amount: string | number;

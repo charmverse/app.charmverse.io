@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getENSName } from '@packages/blockchain/getENSName';
+import { log } from '@packages/core/log';
 import type { SignupAnalytics } from '@packages/metrics/mixpanel/interfaces/UserEvent';
 import { logSignupViaWallet } from '@packages/metrics/postToDiscord';
 import { sessionUserRelations } from '@packages/profile/constants';

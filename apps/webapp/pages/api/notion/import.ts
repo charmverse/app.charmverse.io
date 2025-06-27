@@ -1,6 +1,6 @@
-import * as http from '@charmverse/core/http';
-import { log } from '@charmverse/core/log';
 import { isTestEnv } from '@packages/config/constants';
+import * as http from '@packages/core/http';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch, requireSpaceMembership } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { MissingDataError } from '@packages/utils/errors';

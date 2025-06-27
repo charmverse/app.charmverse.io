@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { ApplicationStatus } from '@charmverse/core/prisma';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { log } from '@packages/core/log';
 import type { SafeMultisigTransactionResponse } from '@safe-global/types-kit';
 
 import { getAllMantleSafeTransactions, getMantleSafeTransaction } from './mantleClient';

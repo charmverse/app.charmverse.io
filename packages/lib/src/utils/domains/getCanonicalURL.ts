@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'http';
 
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 
 // Given space configuration, request, and page path, return the canonical URL
 export function getCanonicalURL({

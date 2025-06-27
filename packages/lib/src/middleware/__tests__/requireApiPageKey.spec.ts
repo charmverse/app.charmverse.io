@@ -1,6 +1,6 @@
-import { SubscriptionRequiredError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { SubscriptionRequiredError } from '@packages/core/errors';
 import { InvalidApiKeyError } from '@packages/nextjs/errors';
 import type { NextApiRequest } from 'next';
 import { v4 as uuid } from 'uuid';

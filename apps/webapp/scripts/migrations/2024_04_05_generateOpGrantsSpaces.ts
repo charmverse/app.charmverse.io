@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { parse } from 'csv-parse/sync';
 import { addCharms } from 'lib/charms/addCharms';

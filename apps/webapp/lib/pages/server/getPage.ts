@@ -1,7 +1,7 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import type { PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageWithPermissions } from '@packages/core/pages';
 import { validate } from 'uuid';
 
 import { generatePageQuery } from './generatePageQuery';

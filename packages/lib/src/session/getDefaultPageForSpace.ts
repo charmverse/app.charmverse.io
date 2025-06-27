@@ -1,13 +1,14 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Space } from '@charmverse/core/prisma';
 import { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { PageEventMap, StaticPageType } from '@packages/metrics/mixpanel/interfaces/PageEvent';
-import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
+import type { PageMeta } from '@packages/core/pages';
+import { pageTree } from '@packages/core/pages/mapPageTree';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from '@packages/lib/utils/browser';
 import { getCustomDomainFromHost } from '@packages/lib/utils/domains/getCustomDomainFromHost';
+import type { PageEventMap, StaticPageType } from '@packages/metrics/mixpanel/interfaces/PageEvent';
+
+import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 

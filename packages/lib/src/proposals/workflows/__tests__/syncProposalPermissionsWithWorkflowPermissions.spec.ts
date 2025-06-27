@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 import { syncProposalPermissionsWithWorkflowPermissions } from '../syncProposalPermissionsWithWorkflowPermissions';

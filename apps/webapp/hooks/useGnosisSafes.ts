@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { log } from '@packages/core/log';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';

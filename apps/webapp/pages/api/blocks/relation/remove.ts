@@ -1,5 +1,5 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { UnauthorisedActionError } from '@packages/core/errors';
 import { prismaToBlock } from '@packages/databases/block';
 import type { RemoveRelationPropertyPayload } from '@packages/databases/relationProperty/removeRelationProperty';
 import { removeRelationProperty } from '@packages/databases/relationProperty/removeRelationProperty';

@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom';
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import type { IPropertyOption } from '@packages/databases/board';
 import Mutator from '@packages/databases/mutator';
 import { TestBlockFactory } from '@packages/databases/test/testBlockFactory';

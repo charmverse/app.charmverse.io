@@ -1,12 +1,12 @@
-import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
-import { styled } from '@mui/material';
 import EmailIcon from '@mui/icons-material/EmailOutlined';
+import { styled } from '@mui/material';
 import Box from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import { log } from '@packages/core/log';
 import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import type { SystemError } from '@packages/utils/errors';

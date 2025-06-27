@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import { DateTime } from 'luxon';
 
 import type { ValueToValidate } from './interfaces';

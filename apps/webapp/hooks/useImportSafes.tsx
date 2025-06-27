@@ -1,11 +1,11 @@
-import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma';
+import { log } from '@packages/core/log';
+import { getSafesForAddresses } from '@packages/lib/gnosis/gnosis';
 import type { Signer } from 'ethers';
 import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSafesForAddresses } from '@packages/lib/gnosis/gnosis';
 
 import useMultiWalletSigs from './useMultiWalletSigs';
 import { useSnackbar } from './useSnackbar';

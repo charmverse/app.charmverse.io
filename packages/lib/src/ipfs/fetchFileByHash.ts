@@ -1,4 +1,4 @@
-import { GET } from '@charmverse/core/http';
+import { GET } from '@packages/core/http';
 
 const GATEWAY_BASE_URL = 'https://cloudflare-ipfs.com/ipfs';
 

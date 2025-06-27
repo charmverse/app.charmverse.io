@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { getSettings } from '@packages/bangleeditor/components/fiduswriter/schema/convert';
+import { log } from '@packages/core/log';
 import type { ServerDocDataMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';
 import type { Node } from 'prosemirror-model';

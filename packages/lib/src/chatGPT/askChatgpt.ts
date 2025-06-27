@@ -1,5 +1,5 @@
-import { SystemError } from '@charmverse/core/errors';
 import { POST } from '@packages/adapters/http';
+import { SystemError } from '@packages/core/errors';
 
 import type { ChatGPTModel } from './constants';
 import { CHAT_GPT_BASE_URL, OPENAI_API_KEY, chatGPTModels } from './constants';

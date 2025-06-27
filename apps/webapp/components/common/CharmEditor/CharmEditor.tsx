@@ -1,10 +1,10 @@
-import { log } from '@charmverse/core/log';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import { styled, Box, Divider } from '@mui/material';
 import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import type { CryptoCurrency, FiatCurrency } from '@packages/blockchain/connectors/chains';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { log } from '@packages/core/log';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import { setUrlWithoutRerender } from '@packages/lib/utils/browser';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';

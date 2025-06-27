@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { updateAllowedPlaybackDomains } from '@packages/lib/mux/updateAllowedPlaybackDomains';
 import { isValidDomainName } from '@packages/lib/utils/domains/isValidDomainName';
 import { hasCustomDomainAccess } from '@packages/subscriptions/featureRestrictions';

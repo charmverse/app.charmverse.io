@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { getNotifications } from '../lib/notifications/mailer/sendNotificationEmail';
 
 /**

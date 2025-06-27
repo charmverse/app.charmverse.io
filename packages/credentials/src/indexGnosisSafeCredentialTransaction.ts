@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { AttestationType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { uniqueValues } from '@packages/utils/array';
 
 import { type EasSchemaChain } from './connectors';

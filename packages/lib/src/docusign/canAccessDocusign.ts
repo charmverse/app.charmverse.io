@@ -1,5 +1,5 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/core/permissions';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
 

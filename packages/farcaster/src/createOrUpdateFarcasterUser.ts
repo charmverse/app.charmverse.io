@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getUserS3FilePath, uploadUrlToS3 } from '@packages/aws/uploadToS3Server';
+import { log } from '@packages/core/log';
 import { DisabledAccountError } from '@packages/utils/errors';
 import { uid } from '@packages/utils/strings';
 import { v4 as uuid } from 'uuid';

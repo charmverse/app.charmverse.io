@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import type { Member } from '@packages/lib/members/interfaces';
 import type { EditorView } from 'prosemirror-view';
 

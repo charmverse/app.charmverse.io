@@ -1,9 +1,9 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { userByEmailOrGoogleAccountQuery } from '@packages/profile/getUser';
-import { lowerCaseEqual } from '@packages/utils/strings';
+import { InvalidInputError } from '@packages/core/errors';
 import { getEnvelope } from '@packages/lib/docusign/api';
 import { getSpaceDocusignCredentials } from '@packages/lib/docusign/getSpaceDocusignCredentials';
+import { userByEmailOrGoogleAccountQuery } from '@packages/profile/getUser';
+import { lowerCaseEqual } from '@packages/utils/strings';
 
 import type { DocumentWithSigners } from './getProposalDocumentsToSign';
 

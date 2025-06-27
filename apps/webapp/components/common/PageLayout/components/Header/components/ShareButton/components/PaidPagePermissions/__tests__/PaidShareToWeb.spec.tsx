@@ -1,4 +1,4 @@
-import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
+import { AvailablePagePermissions } from '@packages/core/permissions/flags';
 import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
 import { render } from '@testing-library/react';
 import { v4 as uuid, v4 } from 'uuid';

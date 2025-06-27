@@ -1,5 +1,5 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import * as http from '@packages/adapters/http';
+import type { PageMeta } from '@packages/core/pages';
 
 export class FileApi {
   async uploadZippedMarkdown({ file, spaceId }: { file: File; spaceId: string }) {

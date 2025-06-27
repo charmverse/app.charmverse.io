@@ -1,8 +1,8 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { InviteLink, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { hasAccessToSpace } from '@packages/core/permissions';
+import { stringUtils } from '@packages/core/utilities';
 
 export type InviteLinkWithRoles = InviteLink & {
   roleIds: string[];

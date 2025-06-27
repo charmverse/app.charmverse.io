@@ -1,7 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { addSpaceOperations } from '@packages/lib/permissions/spaces';
 import { createProposal } from '@packages/lib/proposals/createProposal';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';

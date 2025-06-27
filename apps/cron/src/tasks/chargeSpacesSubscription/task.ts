@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { chargeSpaceSubscription } from '@packages/subscriptions/chargeSpaceSubscription';
 import { DateTime } from 'luxon';
 

@@ -1,6 +1,6 @@
-import { InvalidInputError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { charmBlue as blueColor } from '@packages/config/colors';
+import { InvalidInputError, UnauthorisedActionError } from '@packages/core/errors';
 import type { FeatureJson } from '@packages/features/constants';
 import * as mailer from '@packages/lib/mailer';
 import * as emails from '@packages/lib/mailer/emails';

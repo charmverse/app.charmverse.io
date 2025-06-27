@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import type { RootState } from '@packages/databases/store';
 import { createTableView } from '@packages/databases/tableView';

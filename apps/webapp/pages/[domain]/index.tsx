@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getDefaultPageForSpace } from '@packages/lib/session/getDefaultPageForSpace';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';

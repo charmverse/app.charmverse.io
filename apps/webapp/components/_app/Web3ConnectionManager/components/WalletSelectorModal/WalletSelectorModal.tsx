@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
+import { log } from '@packages/core/log';
 import { useEffect, useState } from 'react';
 import type { Connector } from 'wagmi';
 

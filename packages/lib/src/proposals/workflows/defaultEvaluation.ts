@@ -1,6 +1,6 @@
 import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalSystemRole } from '@charmverse/core/prisma';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import { v4 as uuid } from 'uuid';
 
 export function getDefaultPermissions() {

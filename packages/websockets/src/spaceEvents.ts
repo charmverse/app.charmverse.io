@@ -1,6 +1,3 @@
-import { UndesirableOperationError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
-import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { applyStepsToNode } from '@packages/bangleeditor/applyStepsToNode';
@@ -8,6 +5,9 @@ import { getNodeFromJson } from '@packages/bangleeditor/getNodeFromJson';
 import { specRegistry } from '@packages/bangleeditor/specRegistry';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import type { PageContent } from '@packages/charmeditor/interfaces';
+import { UndesirableOperationError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import { resolvePageTree } from '@packages/core/pages';
 import { STATIC_PAGES } from '@packages/features/constants';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { authSecret } from '@packages/lib/session/authSecret';

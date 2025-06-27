@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
+import { log } from '@packages/core/log';
 
 import { mixpanel } from './mixpanel';
 

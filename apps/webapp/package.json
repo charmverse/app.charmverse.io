@@ -33,6 +33,7 @@
     "@packages/charmeditor": "^1.0.0",
     "@packages/config": "^0.0.0",
     "@packages/connect-shared": "^0.0.0",
+    "@packages/core": "^0.0.0",
     "@packages/features": "^0.0.0",
     "@packages/github": "^0.0.0",
     "@packages/lib": "^0.0.0",

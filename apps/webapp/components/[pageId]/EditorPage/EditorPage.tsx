@@ -1,6 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
+import { log } from '@packages/core/log';
+import debouncePromise from '@packages/lib/utils/debouncePromise';
 import { useCallback, useEffect } from 'react';
 
 import charmClient from 'charmClient';
@@ -11,7 +12,6 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import debouncePromise from '@packages/lib/utils/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import { DocumentPageWithSidebars } from '../DocumentPage/DocumentPageWithSidebars';

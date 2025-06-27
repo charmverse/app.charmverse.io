@@ -1,6 +1,6 @@
-import type { PageNodeWithChildren } from '@charmverse/core/pages';
-import { pageTree } from '@charmverse/core/pages/utilities';
 import type { Page } from '@charmverse/core/prisma';
+import type { PageNodeWithChildren } from '@packages/core/pages';
+import { pageTree } from '@packages/core/pages/mapPageTree';
 import { isTruthy } from '@packages/utils/types';
 import type { SyntheticEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo } from 'react';

@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import type { CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from '@packages/blockchain/connectors/chains';
 import { getCurrentGasPrice } from '@packages/blockchain/getCurrentGasPrice';
+import { log } from '@packages/core/log';
 import { credentialsWalletPrivateKey } from '@packages/utils/constants';
 import { JsonRpcProvider, Wallet } from 'ethers';
 import { zeroAddress } from 'viem';

@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma-client';
 import { Alert } from '@mui/material';
+import { log } from '@packages/core/log';
 import type { FormFieldValue } from '@packages/lib/proposals/forms/interfaces';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { usePopupState } from 'material-ui-popup-state/hooks';

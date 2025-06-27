@@ -1,6 +1,6 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
 import { v4 } from 'uuid';
 
 import { getPublicInviteLink } from '../getPublicInviteLink';

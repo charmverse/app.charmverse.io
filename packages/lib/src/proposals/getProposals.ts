@@ -1,4 +1,3 @@
-import type { ProposalPermissionFlags, SmallProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   IssuedCredential,
   Proposal,
@@ -9,7 +8,8 @@ import type {
   ProposalReviewer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import type { ProposalPermissionFlags, SmallProposalPermissionFlags } from '@packages/core/permissions';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import type {
   IssuableProposalCredentialAuthor,
   IssuableProposalCredentialSpace,

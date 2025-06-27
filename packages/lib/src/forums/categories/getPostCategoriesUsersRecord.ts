@@ -1,5 +1,5 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PostCategoryWithPermissions } from '@packages/core/permissions';
 import { getPermissionsClient } from '@packages/lib/permissions/api';
 import { getUserSpaceNotifications } from '@packages/lib/userNotifications/spaceNotifications';
 

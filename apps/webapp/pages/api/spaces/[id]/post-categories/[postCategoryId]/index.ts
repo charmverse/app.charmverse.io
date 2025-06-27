@@ -1,4 +1,4 @@
-import type { PostCategoryWithPermissions } from '@charmverse/core/permissions';
+import type { PostCategoryWithPermissions } from '@packages/core/permissions';
 import { deletePostCategory } from '@packages/lib/forums/categories/deletePostCategory';
 import { updatePostCategory } from '@packages/lib/forums/categories/updatePostCategory';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';

@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { getSpaceUrl } from '@packages/lib/utils/browser';
 import { isSpaceDomain } from '@packages/spaces/utils';
 

@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import PhoneIphoneIcon from '@mui/icons-material/PhoneIphone';
 import { Stack, Typography } from '@mui/material';
 import * as http from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 import type { FarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import { getFarcasterProfile } from '@packages/farcaster/getFarcasterProfile';
 import type { FarcasterUser, SignedKeyRequest } from '@packages/lib/farcaster/interfaces';

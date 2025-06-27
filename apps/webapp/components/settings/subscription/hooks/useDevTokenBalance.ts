@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { devTokenAddress } from '@packages/subscriptions/constants';
 import { useCallback } from 'react';
 import useSWR, { mutate } from 'swr';

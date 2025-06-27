@@ -1,5 +1,5 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/core/errors';
 import { getSnapshotSpace } from '@packages/lib/snapshot/getSpace';
 
 export async function updateSnapshotDomain(spaceId: string, snapshotDomain: string | null) {

@@ -1,5 +1,5 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { UnauthorisedActionError } from '@packages/core/errors';
 import { prismaToBlock } from '@packages/databases/block';
 import type { SyncRelatedCardsValuesPayload } from '@packages/databases/relationProperty/syncRelatedCardsValues';
 import { syncRelatedCardsValues } from '@packages/databases/relationProperty/syncRelatedCardsValues';

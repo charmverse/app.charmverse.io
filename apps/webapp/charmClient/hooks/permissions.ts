@@ -3,7 +3,7 @@ import type {
   PagePermissionAssignment,
   PagePermissionWithSource,
   PermissionResource
-} from '@charmverse/core/permissions';
+} from '@packages/core/permissions';
 
 import { useDELETE, useGET, usePOST } from './helpers';
 

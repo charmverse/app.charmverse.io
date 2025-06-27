@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
+import { log } from '@packages/core/log';
 import type { ReactNode } from 'react';
 
 // props based on https://mui.com/material-ui/api/hidden/

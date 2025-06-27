@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { Address } from 'viem';
 import { parseUnits } from 'viem';
 import { useSendTransaction, useWalletClient } from 'wagmi';

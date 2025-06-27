@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { sendEmail } from '@packages/lib/mailer';
 import { getPricingChangeEmail } from '@packages/lib/mailer/emails/emails';

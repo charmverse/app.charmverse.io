@@ -1,4 +1,6 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
+import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
+import type { UploadedFileInfo } from '@packages/lib/proposals/forms/interfaces';
 import type { ResizeType } from '@packages/utils/constants';
 import {
   DEFAULT_MAX_FILE_SIZE_MB,
@@ -6,13 +8,11 @@ import {
   FORM_DATA_IMAGE_RESIZE_TYPE
 } from '@packages/utils/constants';
 import { replaceS3Domain } from '@packages/utils/url';
-import type { UploadedFileInfo } from '@packages/lib/proposals/forms/interfaces';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useFilePicker } from 'hooks/useFilePicker';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
 
 export type UploadedFileCallback = (info: UploadedFileInfo) => void;
 

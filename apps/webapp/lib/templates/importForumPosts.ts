@@ -1,6 +1,6 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Post, PostCategory, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError } from '@packages/core/errors';
 import { getPostPath } from '@packages/lib/forums/posts/getPostPath';
 import { v4 as uuid } from 'uuid';
 

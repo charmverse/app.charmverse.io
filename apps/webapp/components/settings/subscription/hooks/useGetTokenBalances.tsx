@@ -1,6 +1,6 @@
 import env from '@beam-australia/react-env';
-import { log } from '@charmverse/core/log';
 import { ChainId } from '@decent.xyz/box-common';
+import { log } from '@packages/core/log';
 import { devTokenAddress, NULL_EVM_ADDRESS } from '@packages/subscriptions/constants';
 import { useEffect, useState } from 'react';
 import type { Address } from 'viem';

@@ -1,7 +1,7 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 import { ListItemIcon, ListItemText, MenuItem, Tooltip } from '@mui/material';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 
 import charmClient from 'charmClient';
 import { useRewards } from 'components/rewards/hooks/useRewards';

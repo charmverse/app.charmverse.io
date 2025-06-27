@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
-import { AvailablePagePermissions } from '@charmverse/core/permissions/flags';
 import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
+import { log } from '@packages/core/log';
+import { AvailablePagePermissions } from '@packages/core/permissions/flags';
 import debouncePromise from '@packages/lib/utils/debouncePromise';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useEffect, useRef } from 'react';

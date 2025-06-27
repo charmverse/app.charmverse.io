@@ -1,6 +1,6 @@
-import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
 import type { SpaceOperation } from '@charmverse/core/prisma';
 import { Box, Divider, Grid, Typography } from '@mui/material';
+import type { PostCategoryPermissionAssignment } from '@packages/core/permissions';
 import type { AssignablePermissionGroups } from '@packages/lib/permissions/interfaces';
 import type { SpacePermissions } from '@packages/lib/permissions/spaces/listPermissions';
 import { useEffect, useReducer, useState } from 'react';

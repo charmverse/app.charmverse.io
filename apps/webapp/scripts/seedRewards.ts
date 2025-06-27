@@ -1,5 +1,5 @@
-import { stringUtils } from '@charmverse/core/utilities';
-import { InvalidInputError } from '@charmverse/core/errors';
+import { stringUtils } from '@packages/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
 import { ApplicationStatus, Page, prisma } from '@charmverse/core/prisma-client';
 import { RewardCreationData, createReward } from 'lib/rewards/createReward';
 import { RewardWithUsers } from 'lib/rewards/interfaces';

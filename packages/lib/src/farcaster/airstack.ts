@@ -1,6 +1,6 @@
 import type { ValidateFramesMessageOutput } from '@airstack/frames';
-import { log } from '@charmverse/core/log';
 import { POST } from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 
 export function hexStringToUint8Array(hexstring: string): Uint8Array {
   return new Uint8Array(hexstring.match(/.{1,2}/g)!.map((byte: string) => parseInt(byte, 16)));

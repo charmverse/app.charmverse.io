@@ -1,8 +1,8 @@
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';

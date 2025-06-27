@@ -1,4 +1,4 @@
-import { objectUtils } from '@charmverse/core/utilities';
+import { objectUtils } from '@packages/core/utilities';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,

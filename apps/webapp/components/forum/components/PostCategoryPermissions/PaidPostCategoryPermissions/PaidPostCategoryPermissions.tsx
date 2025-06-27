@@ -1,6 +1,6 @@
-import type { AssignedPostCategoryPermission } from '@charmverse/core/permissions';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
+import type { AssignedPostCategoryPermission } from '@packages/core/permissions';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 
 import { Button } from 'components/common/Button';

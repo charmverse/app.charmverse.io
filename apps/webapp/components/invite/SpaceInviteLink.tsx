@@ -1,8 +1,9 @@
-import { log } from '@charmverse/core/log';
 import type { InviteLink, Space } from '@charmverse/core/prisma';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import { log } from '@packages/core/log';
+import { getSpaceUrl } from '@packages/lib/utils/browser';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -12,7 +13,6 @@ import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getSpaceUrl } from '@packages/lib/utils/browser';
 
 import { CenteredBox } from './components/CenteredBox';
 

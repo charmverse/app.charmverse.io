@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { objectUtils, stringUtils } from '@charmverse/core/utilities';
+import { objectUtils, stringUtils } from '@packages/core/utilities';
 import { BoardFields } from '@packages/databases/board';
 import { CardFields } from '@packages/databases/card';
 import { ProposalBoardBlock, ProposalPropertyField } from '@packages/lib/proposals/blocks/interfaces';

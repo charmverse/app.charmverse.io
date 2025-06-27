@@ -2,8 +2,8 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, Space, User } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@packages/core/pages';
 import {
   createPage,
   generateBounty,

@@ -1,12 +1,12 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import type { PagePermissionFlags } from '@packages/core/permissions';
+import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
+import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 import type { EditorState } from 'prosemirror-state';
 import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { ProposalWithUsersAndRubric } from '@packages/lib/proposals/interfaces';
-import type { ThreadWithComments } from '@packages/lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';
 import { SidebarColumn } from '../DocumentColumnLayout';

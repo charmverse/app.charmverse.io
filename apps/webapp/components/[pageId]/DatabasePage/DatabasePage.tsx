@@ -1,6 +1,6 @@
-import type { PageMeta } from '@charmverse/core/pages';
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma';
+import type { PageMeta } from '@packages/core/pages';
+import type { PagePermissionFlags } from '@packages/core/permissions';
 import type { Board } from '@packages/databases/board';
 import mutator from '@packages/databases/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from '@packages/databases/store/boards';

@@ -1,6 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { InvalidStateError } from '@packages/nextjs/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import type { PropertyType } from '@packages/databases/board';
+import { InvalidStateError } from '@packages/nextjs/errors';
+
 import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
 
 import { InvalidCustomPropertyKeyError } from '../errors';

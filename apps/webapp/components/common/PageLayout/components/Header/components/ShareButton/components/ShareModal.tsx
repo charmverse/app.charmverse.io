@@ -1,6 +1,6 @@
-import type { AssignedPagePermission } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma-client';
 import Box from '@mui/material/Box';
+import type { AssignedPagePermission } from '@packages/core/permissions';
 import { useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';

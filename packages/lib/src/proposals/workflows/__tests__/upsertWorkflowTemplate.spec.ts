@@ -1,7 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsProposals } from '@charmverse/core/test';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import { generateSpaceUser, generateUserAndSpace } from '@packages/testing/setupDatabase';
 import { v4 as uuid } from 'uuid';
 

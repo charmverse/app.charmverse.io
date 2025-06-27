@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { arrayUtils } from '@charmverse/core/utilities';
+import { arrayUtils } from '@packages/core/utilities';
 import { PaymentMethod, TokenGate, prisma } from '@charmverse/core/prisma-client';
 import { baseUrl } from '@packages/config/constants';
 import { lowerCaseEqual, prettyPrint } from '@packages/utils/strings';

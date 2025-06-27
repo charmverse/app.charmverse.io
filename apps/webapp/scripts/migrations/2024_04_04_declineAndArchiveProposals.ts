@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { submitEvaluationResult } from '@packages/lib/proposals/submitEvaluationResult';
 import { archiveProposals } from '@packages/lib/proposals/archiveProposals';
