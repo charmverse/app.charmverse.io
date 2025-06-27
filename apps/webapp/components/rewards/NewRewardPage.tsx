@@ -39,6 +39,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useRoles } from 'hooks/useRoles';
 import { fontClassName } from 'theme/fonts';
 
 import { RewardEvaluations } from './components/RewardEvaluations/RewardEvaluations';
@@ -65,6 +66,7 @@ export function NewRewardPage({
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | undefined | string>(templateIdFromUrl);
   const [, setPageTitle] = usePageTitle();
+  const { roles } = useRoles({ includeArchived: true });
   const { data: sourceTemplate } = useGetRewardTemplate(rewardTemplateId);
   const { data: rewardTemplates } = useGetRewardTemplatesBySpace(currentSpace?.id);
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
@@ -117,6 +119,8 @@ export function NewRewardPage({
     }));
   }
 
+  const archivedRoleIds = roles?.filter((role) => role.archived).map((role) => role.id) ?? [];
+
   function applyTemplate(template: RewardTemplate) {
     setRewardTemplateId(template.page.id);
     setPageData({
@@ -127,7 +131,7 @@ export function NewRewardPage({
     });
     setRewardValues({
       assignedSubmitters: template.assignedSubmitters,
-      allowedSubmitterRoles: template.allowedSubmitterRoles,
+      allowedSubmitterRoles: template.allowedSubmitterRoles?.filter((roleId) => !archivedRoleIds.includes(roleId)),
       allowMultipleApplications: template.allowMultipleApplications,
       approveSubmitters: template.approveSubmitters,
       chainId: template.chainId,
