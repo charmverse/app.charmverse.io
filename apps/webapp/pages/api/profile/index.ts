@@ -2,8 +2,6 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
-import { deleteLoopsContact } from '@packages/lib/loopsEmail/deleteLoopsContact';
-import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { requireWalletSignature } from '@packages/lib/middleware/requireWalletSignature';
 import { withSessionRoute } from '@packages/lib/session/withSession';
@@ -99,19 +97,6 @@ async function updateUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
   const updatedUser = await updateUserProfile(userId, req.body);
 
   updateTrackUserProfile(updatedUser);
-
-  if (original.email !== updatedUser.email || original.emailNewsletter !== updatedUser.emailNewsletter) {
-    try {
-      if (!updatedUser.email) {
-        // remove from Loops
-        await deleteLoopsContact({ email: original.email! });
-      } else {
-        await registerLoopsContact(updatedUser, original.email);
-      }
-    } catch (error) {
-      log.error('Error updating contact with Loop', { error, userId });
-    }
-  }
 
   return res.status(200).json(updatedUser);
 }

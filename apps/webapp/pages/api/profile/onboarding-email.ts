@@ -3,8 +3,6 @@ import type { UserDetails } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { magicLinkEmailCookie } from '@packages/config/constants';
 import { sendMagicLink } from '@packages/lib/google/sendMagicLink';
-import { registerLoopsContact } from '@packages/lib/loopsEmail/registerLoopsContact';
-import { sendSignupEvent as sendLoopSignupEvent } from '@packages/lib/loopsEmail/sendSignupEvent';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { updateUserProfile } from '@packages/users/updateUserProfile';
@@ -33,31 +31,6 @@ async function saveOnboardingEmail(req: NextApiRequest, res: NextApiResponse<Use
 
   const cookies = new Cookies(req, res);
 
-  if (updatedUser.email && updatedUser.emailNewsletter && payload.spaceId) {
-    try {
-      // retrieve space template used via cookie
-      const spaceTemplate = cookies.get(spaceTemplateCookie);
-
-      const space = await prisma.space.findUniqueOrThrow({
-        where: {
-          id: payload.spaceId
-        }
-      });
-      const isAdmin = updatedUser.spaceRoles.some((role) => role.spaceId === payload.spaceId && role.isAdmin);
-      const result = await registerLoopsContact(updatedUser);
-      if (result.isNewContact) {
-        await sendLoopSignupEvent({
-          email: updatedUser.email,
-          isAdmin,
-          spaceName: space.name,
-          spaceTemplate
-        });
-        log.info('Sent signup to Loop', { userId });
-      }
-    } catch (error) {
-      log.error('Could not register user with Loop', { error, userId });
-    }
-  }
   if (updatedUser.email) {
     const verifiedEmail = await prisma.verifiedEmail.count({
       where: {
