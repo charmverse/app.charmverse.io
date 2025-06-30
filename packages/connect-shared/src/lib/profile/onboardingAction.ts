@@ -15,8 +15,7 @@ export const onboardingAction = authActionClient
       where: { id: userId },
       data: {
         connectOnboarded: true,
-        email: parsedInput.email,
-        emailNewsletter: parsedInput.notify
+        email: parsedInput.email
       }
     });
 

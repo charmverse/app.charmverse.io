@@ -13,13 +13,12 @@ import { useUser } from 'hooks/useUser';
 const emailSchema = yup.string().email().ensure().trim();
 
 export const schema = yup.object({
-  email: emailSchema.when(['emailNewsletter', 'emailNotifications'], {
-    is: (emailNewsletter: boolean, emailNotifications: boolean) => emailNewsletter || emailNotifications,
+  email: emailSchema.when(['emailNotifications'], {
+    is: (emailNotifications: boolean) => emailNotifications,
     then: () => emailSchema.required('Unselect email options to proceed without email'),
     otherwise: () => emailSchema
   }),
   emailNotifications: yup.boolean(),
-  emailNewsletter: yup.boolean(),
   agreeTermsConditions: yup.boolean().oneOf([true], 'You must agree to the terms and privacy policy to continue')
 });
 
@@ -46,7 +45,6 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
     resolver: yupResolver(schema)
   });
 
-  const emailNewsletter = getValues('emailNewsletter');
   const emailNotifications = getValues('emailNotifications');
   const agreeTermsConditions = getValues('agreeTermsConditions');
 
@@ -58,14 +56,13 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
 
   const onSubmit = async (values: FormValues) => {
     // eslint-disable-next-line @typescript-eslint/no-shadow
-    const { email, emailNewsletter, emailNotifications } = values;
+    const { email, emailNotifications } = values;
     await saveForm({
       email: email || undefined,
-      emailNewsletter,
       emailNotifications,
       spaceId
     });
-    updateUser({ ...user, email, emailNewsletter, emailNotifications });
+    updateUser({ ...user, email, emailNotifications });
     onClick();
   };
 
@@ -96,10 +93,6 @@ export function OnboardingEmailForm({ onClick, spaceId }: { onClick: VoidFunctio
               />
             }
             label='Notify me about key activities (e.g., proposal feedback, reward status, mentions, comments)'
-          />
-          <FormControlLabel
-            control={<Checkbox {...register('emailNewsletter')} checked={emailNewsletter} onChange={onChange} />}
-            label='Receive tips and examples how to use CharmVerse.'
           />
           <Button
             variant='outlined'
