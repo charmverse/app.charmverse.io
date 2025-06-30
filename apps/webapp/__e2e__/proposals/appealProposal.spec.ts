@@ -1,7 +1,7 @@
 import type { Page, Proposal, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';
 

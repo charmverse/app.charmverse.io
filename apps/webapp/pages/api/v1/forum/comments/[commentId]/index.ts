@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { log } from '@packages/core/log';
 import { deletePostComment } from '@packages/lib/forums/comments/deletePostComment';
 import { requireKeys } from '@packages/lib/middleware';
 import { withSessionRoute } from '@packages/lib/session/withSession';

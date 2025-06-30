@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Space } from '@charmverse/core/prisma';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import { generateBounty, generateSpaceUser, generateUserAndSpaceWithApiToken } from '@packages/testing/setupDatabase';

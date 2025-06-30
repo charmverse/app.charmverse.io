@@ -1,9 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { PageMeta } from '@charmverse/core/pages';
-import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@charmverse/core/permissions';
 import type {
   MemberProperty,
   MemberPropertyPermission,
@@ -24,6 +21,9 @@ import {
   testUtilsProposals,
   testUtilsUser
 } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
+import type { PageMeta } from '@packages/core/pages';
+import type { AssignedPostCategoryPermission, TargetPermissionGroup } from '@packages/core/permissions';
 import { mapPostCategoryPermissionToAssignee } from '@packages/lib/permissions/forum/mapPostCategoryPermissionToAssignee';
 import type { AssignedSpacePermission } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';
 import { mapSpacePermissionToAssignee } from '@packages/lib/permissions/spaces/mapSpacePermissionToAssignee';

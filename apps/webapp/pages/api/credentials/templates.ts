@@ -1,19 +1,18 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/core/permissions';
 import type { CreateCredentialTemplateInput } from '@packages/credentials/templates';
 import {
   createCredentialTemplate,
   getCredentialTemplates,
   updateCredentialTemplate
 } from '@packages/credentials/templates';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { requireSpaceMembership } from '@packages/lib/middleware/requireSpaceMembership';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { AdministratorOnlyError } from '@packages/users/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { requireSpaceMembership } from '@packages/lib/middleware/requireSpaceMembership';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

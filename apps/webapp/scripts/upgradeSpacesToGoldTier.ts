@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { calculateSubscriptionCost } from '@packages/subscriptions/calculateSubscriptionCost';
 import { parseUnits } from 'viem';

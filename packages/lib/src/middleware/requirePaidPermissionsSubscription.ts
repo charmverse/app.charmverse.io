@@ -1,5 +1,5 @@
-import { SubscriptionRequiredError } from '@charmverse/core/errors';
-import type { ResourceIdEntity } from '@charmverse/core/permissions';
+import { SubscriptionRequiredError } from '@packages/core/errors';
+import type { ResourceIdEntity } from '@packages/core/permissions';
 import { providePermissionClients } from '@packages/lib/permissions/api/permissionsClientMiddleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';

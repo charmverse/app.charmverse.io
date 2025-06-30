@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { getAttestation } from '@packages/credentials/getAttestation';
 import { mapProjectToOptimism } from '@packages/credentials/mapProjectToOptimism';
 import { decodeOptimismProjectSnapshotAttestation } from '@packages/credentials/schemas/optimismProjectUtils';

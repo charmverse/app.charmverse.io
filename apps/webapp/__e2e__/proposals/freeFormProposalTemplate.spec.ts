@@ -9,8 +9,8 @@ import type {
   User
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import type { ProposalWorkflowTyped } from '@packages/core/proposals';
 import { generateProposalWorkflowWithEvaluations } from '@packages/lib/testing/proposals';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';

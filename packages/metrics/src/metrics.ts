@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import StatsD from 'hot-shots';
 
 const dogstatsd = new StatsD({

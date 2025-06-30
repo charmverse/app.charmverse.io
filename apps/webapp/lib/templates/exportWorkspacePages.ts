@@ -1,11 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import type { PageNodeWithChildren } from '@charmverse/core/pages';
-import { resolvePageTree } from '@charmverse/core/pages';
 import type { Block, Page, PagePermission } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PageContent, TextContent } from '@packages/charmeditor/interfaces';
+import { resolvePageTree } from '@packages/core/pages';
+import type { PageNodeWithChildren } from '@packages/core/pages';
 import type { RelatedPageData } from '@packages/pages/interfaces';
 import { isBoardPageType } from '@packages/pages/isBoardPageType';
 import { DataNotFoundError } from '@packages/utils/errors';

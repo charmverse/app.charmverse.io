@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { stringUtils } from '@packages/core/utilities';
 import { authSecret } from '@packages/utils/constants';
 import { sealData, unsealData } from 'iron-session';
 import { v4 as uuid } from 'uuid';

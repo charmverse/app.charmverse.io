@@ -1,4 +1,3 @@
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { Archive, ContentCopyOutlined, DeleteOutlined, ExpandMore, MoreHoriz, Unarchive } from '@mui/icons-material';
 import {
   Accordion,
@@ -18,6 +17,7 @@ import {
   Tooltip,
   Typography
 } from '@mui/material';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@packages/core/proposals';
 import { getDefaultEvaluation } from '@packages/lib/proposals/workflows/defaultEvaluation';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';

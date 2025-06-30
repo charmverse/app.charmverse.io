@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
+import { log } from '@packages/core/log';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import { RateLimit } from 'async-sema';
 

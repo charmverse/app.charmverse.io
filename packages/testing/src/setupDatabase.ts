@@ -1,6 +1,5 @@
 import crypto, { randomUUID } from 'node:crypto';
 
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApplicationStatus,
   Block,
@@ -24,6 +23,7 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageWithPermissions } from '@packages/core/pages';
 import type { DataSourceType } from '@packages/databases/board';
 import type { IViewType } from '@packages/databases/boardView';
 import type { NotificationToggles } from '@packages/lib/notifications/notificationToggles';

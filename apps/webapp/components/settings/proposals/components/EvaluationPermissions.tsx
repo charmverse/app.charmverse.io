@@ -1,9 +1,10 @@
 import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
-import { capitalize } from '@packages/utils/strings';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
+import type { ConcealableEvaluationType } from '@packages/lib/proposals/interfaces';
 import { approvableEvaluationTypes } from '@packages/lib/proposals/workflows/constants';
+import { capitalize } from '@packages/utils/strings';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {
@@ -12,7 +13,6 @@ import {
   type SystemRoleOptionPopulated
 } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { MembersIcon } from 'components/common/PageIcon';
-import type { ConcealableEvaluationType } from '@packages/lib/proposals/interfaces';
 
 import { evaluationIcons } from '../constants';
 

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringify } from 'csv-stringify/sync';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { sortBy } from 'lodash-es';
 import { writeFileSync } from 'fs';
 import { fieldIds, spaceId, templateId, getProjectsFromFile, applicationsFile } from './data';

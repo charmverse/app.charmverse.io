@@ -1,5 +1,5 @@
 import { ProposalOperation, prisma } from '@charmverse/core/prisma-client';
-import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import { ProposalWorkflowTyped } from '@packages/core/proposals';
 
 const spaceDomain = 'demo-space';
 

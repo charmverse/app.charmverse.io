@@ -1,13 +1,13 @@
-import type { Resource, UserPermissionFlags } from '@charmverse/core/permissions';
 import type { Application, ApplicationComment, BountyOperation, Space } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
-
+import type { Resource, UserPermissionFlags } from '@packages/core/permissions';
 import type { RewardCreationData } from '@packages/lib/rewards/createReward';
 import type { RewardWithUsers } from '@packages/lib/rewards/interfaces';
 import type { ApplicationReview } from '@packages/lib/rewards/reviewApplication';
 import type { RewardUpdate } from '@packages/lib/rewards/updateRewardSettings';
 import type { WorkUpsertData } from '@packages/lib/rewards/work';
 import type { TransactionCreationData } from '@packages/lib/transactions/interface';
+
 import type { CreateApplicationCommentPayload } from 'pages/api/reward-applications/comments';
 
 export class RewardsApi {

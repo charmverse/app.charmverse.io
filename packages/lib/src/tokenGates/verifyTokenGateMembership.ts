@@ -1,4 +1,3 @@
-import { getLogger } from '@charmverse/core/log';
 import type {
   SpaceRoleToRole,
   TokenGate as PrismaTokenGate,
@@ -6,6 +5,7 @@ import type {
   UserTokenGate
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getLogger } from '@packages/core/log';
 import { isTruthy } from '@packages/utils/types';
 
 import type { TokenGateWithRoles } from './interfaces';

@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import {
   googleOAuthClientIdSensitive as googleOAuthClientId,
   googleOAuthClientSecretSensitive as googleOAuthClientSecret
 } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { OAuth2Client } from 'google-auth-library';
 
 export type GoogleLoginOauthParams = {

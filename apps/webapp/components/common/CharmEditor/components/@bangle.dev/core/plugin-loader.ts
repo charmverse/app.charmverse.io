@@ -1,8 +1,8 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/13127cf2e4187ebaa6d5e01d80f4e9018fae02a5/lib/core/src/plugin-loader.ts
 
-import { log } from '@charmverse/core/log';
 import type { SpecRegistry } from '@packages/bangleeditor/components/@bangle.dev/core/specRegistry';
 import * as history from '@packages/charmeditor/extensions/history';
+import { log } from '@packages/core/log';
 import { baseKeymap as pmBaseKeymap } from 'prosemirror-commands';
 import { gapCursor as pmGapCursor } from 'prosemirror-gapcursor';
 import { InputRule, inputRules as pmInputRules, undoInputRule as pmUndoInputRule } from 'prosemirror-inputrules';

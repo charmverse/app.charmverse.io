@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { requireApiAccess } from '@packages/lib/middleware/requireApiAccess';
 import { requireApiKey } from '@packages/lib/middleware/requireApiKey';

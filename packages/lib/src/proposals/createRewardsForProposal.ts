@@ -1,7 +1,7 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import type { TargetPermissionGroup } from '@packages/core/permissions';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import type { ProposalFields } from '@packages/lib/proposals/interfaces';
 import type { RewardFields } from '@packages/lib/rewards/blocks/interfaces';
 import { createReward } from '@packages/lib/rewards/createReward';

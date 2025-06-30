@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { SpaceExportJob } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { sendPlainEmail } from '@packages/lib/mailer';
 
 import { createDataExport } from './createDataExport';

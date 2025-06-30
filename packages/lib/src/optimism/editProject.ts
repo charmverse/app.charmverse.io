@@ -1,9 +1,9 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Project } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { resolveENSName } from '@packages/blockchain/getENSName';
-import { isTruthy } from '@packages/utils/types';
+import { InvalidInputError } from '@packages/core/errors';
 import { ensureFarcasterUserExists } from '@packages/lib/farcaster/ensureFarcasterUserExists';
+import { isTruthy } from '@packages/utils/types';
 
 import type { FormValues } from './projectSchema';
 

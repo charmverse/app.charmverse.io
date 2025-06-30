@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { applyTokenGates } from '@packages/lib/tokenGates/applyTokenGates';
 import { evaluateTokenGateEligibility } from '@packages/lib/tokenGates/evaluateEligibility';
 import { getSpaceMembershipWithRoles } from '@packages/spaces/getSpaceMembershipWithRoles';

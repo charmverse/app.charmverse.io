@@ -1,5 +1,5 @@
-import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
+import { DataNotFoundError, InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
 import { isNumber } from '@packages/lib/utils/numbers';
 import { getAddress } from 'viem';
 

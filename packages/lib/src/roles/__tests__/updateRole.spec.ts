@@ -1,6 +1,6 @@
-import { InvalidInputError, UndesirableOperationError } from '@charmverse/core/errors';
 import type { Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError, UndesirableOperationError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import { updateRole } from '../updateRole';

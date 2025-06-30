@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import {
   User as CharmverseUser,
   Post as CharmversePost,
@@ -7,13 +7,13 @@ import {
   PostComment,
   prisma
 } from '@charmverse/core/prisma-client';
-import { GET } from '@charmverse/core/http';
+import { GET } from '@packages/core/http';
 import { htmlToText } from 'html-to-text';
 import { RateLimit } from 'async-sema';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
 import TurndownService from 'turndown';
 import emoji from 'emoji-js';
-import { PremiumPermissionsClient } from '@charmverse/core/permissions';
+import { PremiumPermissionsClient } from '@packages/core/permissions';
 import { getPermissionsClient } from 'lib/permissions/api';
 
 const rateLimiter = RateLimit(1);

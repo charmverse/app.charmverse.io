@@ -1,7 +1,7 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { ExpandMore } from '@mui/icons-material';
 import { Accordion, AccordionSummary, Typography, AccordionDetails, Box } from '@mui/material';
 import { Stack } from '@mui/system';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import { useState } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
 

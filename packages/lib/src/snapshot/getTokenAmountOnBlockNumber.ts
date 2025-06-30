@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import * as http from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 import { getTokenMetadata } from '@packages/lib/tokens/getTokenMetadata';
 
 const SNAPSHOT_SCORE_URL = 'https://score.snapshot.org';

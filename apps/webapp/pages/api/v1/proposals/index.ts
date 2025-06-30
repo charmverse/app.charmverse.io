@@ -1,7 +1,7 @@
 import type { ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import type { ProposalEvaluationResultExtended } from '@packages/lib/proposals/interfaces';
 import { withSessionRoute } from '@packages/lib/session/withSession';
 import { InvalidStateError } from '@packages/nextjs/errors';

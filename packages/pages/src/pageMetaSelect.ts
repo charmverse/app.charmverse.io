@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 
 export function pageMetaSelect(): Record<keyof PageMeta, true> {
   return {

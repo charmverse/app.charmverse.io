@@ -1,4 +1,4 @@
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { ProposalFields } from '@packages/lib/proposals/interfaces';
 import { PageContent } from '@packages/charmeditor/interfaces';

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import type { PageWithPermissions } from '@packages/core/pages';
 import { addSpaceOperations } from '@packages/lib/permissions/spaces/addSpaceOperations';
 import { generatePageToCreateStub } from '@packages/testing/generateStubs';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';

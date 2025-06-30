@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import * as OTPAuth from 'otpauth';
 
 import { decryptRecoveryCode } from './recoveryCodeEncryption';

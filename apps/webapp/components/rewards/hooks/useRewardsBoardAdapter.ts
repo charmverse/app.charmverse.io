@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import type { BoardView, IViewType } from '@packages/databases/boardView';
 import type { Card, CardWithRelations } from '@packages/databases/card';
 import { CardFilter } from '@packages/databases/cardFilter';

@@ -1,8 +1,8 @@
-import { stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@packages/core/utilities';
+import type { InviteLinkWithRoles } from '@packages/lib/invites/getSpaceInviteLinks';
 
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
-import type { InviteLinkWithRoles } from '@packages/lib/invites/getSpaceInviteLinks';
 
 type Props = {
   open: boolean;

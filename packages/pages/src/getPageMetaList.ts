@@ -1,5 +1,5 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { PageMeta } from '@packages/core/pages';
 
 import { pageMetaSelect } from './pageMetaSelect';
 

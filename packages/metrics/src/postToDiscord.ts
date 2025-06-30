@@ -1,7 +1,7 @@
-import * as http from '@charmverse/core/http';
-import { log } from '@charmverse/core/log';
 import type { Bounty, Page, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import * as http from '@packages/core/http';
+import { log } from '@packages/core/log';
 import { isProdEnv, isTestEnv } from '@packages/utils/constants';
 
 /**

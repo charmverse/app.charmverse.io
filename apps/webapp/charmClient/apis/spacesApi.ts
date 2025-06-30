@@ -1,6 +1,6 @@
-import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
 import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 import * as http from '@packages/adapters/http';
+import type { SpaceDefaultPublicPageToggle } from '@packages/core/permissions';
 
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import type { CustomDomainVerification } from 'lib/spaces/interfaces';

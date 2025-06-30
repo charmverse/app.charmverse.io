@@ -1,7 +1,7 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
-import { stringUtils } from '@charmverse/core/utilities';
 import type { TransactionSigner } from '@ethereum-attestation-service/eas-sdk';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import { stringUtils } from '@packages/core/utilities';
 import type { EasSchemaChain } from '@packages/credentials/connectors';
 import type {
   IssuableProposalCredentialContent,

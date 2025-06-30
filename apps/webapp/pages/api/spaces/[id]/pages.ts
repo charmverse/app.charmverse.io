@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
-import type { PagesRequest } from '@charmverse/core/pages';
 import type { Prisma, PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
+import type { PagesRequest } from '@packages/core/pages';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';

@@ -1,9 +1,9 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { InvalidInputError } from '@packages/core/errors';
+import { log } from '@packages/core/log';
+import { hasAccessToSpace } from '@packages/core/permissions';
+import { stringUtils } from '@packages/core/utilities';
 import { authSecret } from '@packages/utils/constants';
 import { sealData, unsealData } from 'iron-session';
 

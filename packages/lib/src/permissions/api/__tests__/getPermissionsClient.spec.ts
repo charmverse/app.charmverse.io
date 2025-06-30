@@ -1,6 +1,6 @@
-import { PermissionsApiClient } from '@charmverse/core/permissions';
 import type { SubscriptionTier } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { PermissionsApiClient } from '@packages/core/permissions';
 
 import { getPermissionsClient } from '../client';
 import { PublicPermissionsClient } from '../freeClient';

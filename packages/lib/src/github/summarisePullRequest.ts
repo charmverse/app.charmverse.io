@@ -1,9 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { log } from '@charmverse/core/log';
 import type { PullRequestSummary } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { askChatGPT } from '@packages/lib/chatGPT/askChatgpt';
 import type { ChatGPTModel } from '@packages/lib/chatGPT/constants';
 import { writeToSameFolder } from '@packages/lib/utils/file';

@@ -1,11 +1,10 @@
+import * as http from '@packages/adapters/http';
 import type {
   PostCategoryPermissionAssignment,
   AssignedPostCategoryPermission,
   PostCategoryPermissionFlags,
   PostPermissionFlags
-} from '@charmverse/core/permissions';
-import * as http from '@packages/adapters/http';
-
+} from '@packages/core/permissions';
 import type { PermissionCompute, PermissionResource } from '@packages/lib/permissions/interfaces';
 
 export class ForumPermissionsApi {

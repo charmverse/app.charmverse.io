@@ -1,6 +1,6 @@
-import { WrongStateError } from '@charmverse/core/errors';
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { WrongStateError } from '@packages/core/errors';
 
 export async function markSubmissionAsPaid(submissionId: string): Promise<Application> {
   const submission = await prisma.application.findUniqueOrThrow({

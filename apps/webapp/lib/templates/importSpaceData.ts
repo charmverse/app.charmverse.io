@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 
 import type { SpaceDataExport } from './exportSpaceData';
 import { importForumPosts } from './importForumPosts';

@@ -1,7 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { isTestEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { addMessageToSQS } from '@packages/lib/aws/SQS';
 import type { WebhookEvent, WebhookPayload } from '@packages/lib/webhookPublisher/interfaces';
 

@@ -1,5 +1,5 @@
-import { InvalidInputError, MissingDataError } from '@charmverse/core/errors';
 import { getSafeApiClient } from '@packages/blockchain/getSafeApiClient';
+import { InvalidInputError, MissingDataError } from '@packages/core/errors';
 import { isSupportedSafeApiChain } from '@packages/lib/gnosis/safe/isSupportedSafeApiChain';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import type SafeApiKit from '@safe-global/api-kit';

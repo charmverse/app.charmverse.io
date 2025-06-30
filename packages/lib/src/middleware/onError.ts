@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { UnknownError } from '@packages/nextjs/errors';
 import { DataNotFoundError, SystemError } from '@packages/utils/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -19,7 +19,7 @@ export function onError(err: any, req: NextApiRequest, res: NextApiResponse) {
   const errorAsSystemError = isValidSystemError ? err : new UnknownError(err.stack ?? err.error ?? err);
 
   if (errorAsSystemError.code === 500) {
-    // err.error?.message is for errors from @charmverse/core/http
+    // err.error?.message is for errors from @packages/core/http
     log.error(`Server Error: ${err.message || err.error?.message || err.error || err.status || err}`, {
       error: err instanceof SystemError === false ? err.message || 'Something went wrong' : errorAsSystemError,
       stack: err.error?.stack || err.stack,

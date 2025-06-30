@@ -1,6 +1,6 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 
 import { lockablePageTypes } from './constants';
 

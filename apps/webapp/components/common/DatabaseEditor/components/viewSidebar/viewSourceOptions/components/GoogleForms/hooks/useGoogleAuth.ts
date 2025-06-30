@@ -1,13 +1,13 @@
 /// <reference types="google.accounts" />
 
-import { log } from '@charmverse/core/log';
 import { googleOAuthClientIdSensitive as googleOAuthClientId } from '@packages/config/constants';
+import { log } from '@packages/core/log';
+import { formScopes } from '@packages/lib/google/forms/config';
+import { validateFormScopes } from '@packages/lib/google/forms/validateFormScopes';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { formScopes } from '@packages/lib/google/forms/config';
-import { validateFormScopes } from '@packages/lib/google/forms/validateFormScopes';
 import type { CredentialItem } from 'pages/api/google/credentials';
 
 // login flow example: https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#authorization_code_flow_examples

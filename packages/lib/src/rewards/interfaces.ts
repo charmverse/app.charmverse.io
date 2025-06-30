@@ -1,5 +1,5 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Application, Bounty, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
+import type { TargetPermissionGroup } from '@packages/core/permissions';
 import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import type { IssuableRewardApplicationCredentialContent } from '@packages/credentials/findIssuableRewardCredentials';
 

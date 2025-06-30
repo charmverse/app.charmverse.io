@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { isTestEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { loginByDiscord } from '@packages/lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from '@packages/lib/guild-xyz/server/updateGuildRolesForUser';
 import { onError, onNoMatch, requireKeys } from '@packages/lib/middleware';

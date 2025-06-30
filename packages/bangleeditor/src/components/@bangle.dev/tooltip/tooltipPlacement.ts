@@ -1,4 +1,4 @@
-import { log as _log } from '@charmverse/core/log';
+import { log as _log } from '@packages/core/log';
 import type {
   Instance as PopperInstance,
   Modifier,

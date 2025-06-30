@@ -1,4 +1,4 @@
-import { GET } from '@charmverse/core/http';
+import { GET } from '@packages/core/http';
 import { uniqBy } from 'lodash';
 
 import { NEYNAR_API_BASE_URL, NEYNAR_API_KEY } from './constants';

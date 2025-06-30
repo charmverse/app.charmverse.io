@@ -1,7 +1,7 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 import { generateMarkdown } from '@packages/bangleeditor/markdown/generateMarkdown';
 import { parseMarkdown } from '@packages/bangleeditor/markdown/parseMarkdown';
+import { UnauthorisedActionError } from '@packages/core/errors';
 import { createForumPost, trackCreateForumPostEvent } from '@packages/lib/forums/posts/createForumPost';
 import { getPostVoteSummary, type ForumPostMeta } from '@packages/lib/forums/posts/getPostMeta';
 import { listForumPosts } from '@packages/lib/forums/posts/listForumPosts';

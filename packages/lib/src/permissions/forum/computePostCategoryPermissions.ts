@@ -1,6 +1,6 @@
-import { AvailablePostCategoryPermissions } from '@charmverse/core/permissions';
-import type { PostCategoryPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
+import { AvailablePostCategoryPermissions } from '@packages/core/permissions';
+import type { PostCategoryPermissionFlags } from '@packages/core/permissions';
 import { PostCategoryNotFoundError } from '@packages/lib/forums/categories/errors';
 import { hasAccessToSpace } from '@packages/users/hasAccessToSpace';
 import { InvalidInputError } from '@packages/utils/errors';

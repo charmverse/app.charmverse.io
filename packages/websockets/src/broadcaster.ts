@@ -1,8 +1,8 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getClient as getPostgresClient } from '@packages/adapters/postgres/postgresClient';
 import { redisClient } from '@packages/adapters/redis/redisClient';
 import { isDevEnv, isTestEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { SpaceMembershipRequiredError } from '@packages/lib/permissions/errors';
 import { createAdapter as createPostgresAdapter } from '@socket.io/postgres-adapter';
 import { createAdapter as createRedisAdapter } from '@socket.io/redis-adapter';

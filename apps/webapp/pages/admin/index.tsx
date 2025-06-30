@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { Box, Typography } from '@mui/material';
 import { isProdEnv } from '@packages/config/constants';
+import { log } from '@packages/core/log';
 import { withSessionSsr } from '@packages/lib/session/withSession';
 import type { GetServerSideProps } from 'next';
 

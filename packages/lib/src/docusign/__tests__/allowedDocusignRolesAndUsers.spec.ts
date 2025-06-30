@@ -1,7 +1,7 @@
-import { InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import type { User, Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser, testUtilsMembers, testUtilsRandom } from '@charmverse/core/test';
+import { InsecureOperationError, InvalidInputError } from '@packages/core/errors';
 import { v4 as uuid } from 'uuid';
 
 import { getAllowedDocusignRolesAndUsers, updateAllowedDocusignRolesAndUsers } from '../allowedDocusignRolesAndUsers';

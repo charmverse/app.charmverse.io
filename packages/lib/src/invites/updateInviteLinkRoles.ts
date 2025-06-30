@@ -1,6 +1,6 @@
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
-import { arrayUtils } from '@charmverse/core/utilities';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from '@packages/core/errors';
+import { arrayUtils } from '@packages/core/utilities';
 
 import type { InviteLinkWithRoles } from './getSpaceInviteLinks';
 

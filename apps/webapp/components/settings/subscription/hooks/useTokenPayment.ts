@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { devTokenDecimals } from '@packages/subscriptions/constants';
 import { ceilToPrecision } from '@packages/utils/numbers';
 import { useEffect } from 'react';

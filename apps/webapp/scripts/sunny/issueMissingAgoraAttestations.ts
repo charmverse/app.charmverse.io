@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import { prettyPrint } from '@packages/utils/strings';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';

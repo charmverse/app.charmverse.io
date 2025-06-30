@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
+import { InvalidInputError } from '@packages/core/errors';
 
 import { getAssignedRoleIds } from '../getAssignedRoleIds';
 

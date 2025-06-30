@@ -1,4 +1,4 @@
-import { type PermissionsClient } from '@charmverse/core/permissions';
+import { type PermissionsClient } from '@packages/core/permissions';
 
 import { PublicForumPermissionsClient } from '../forum/client';
 import { PublicProposalsPermissionsClient } from '../proposals/client';

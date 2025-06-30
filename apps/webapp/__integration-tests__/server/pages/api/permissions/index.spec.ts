@@ -1,8 +1,8 @@
-import type { PagePermissionAssignment } from '@charmverse/core/permissions';
 import type { Role, Space } from '@charmverse/core/prisma';
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { PagePermissionAssignment } from '@packages/core/permissions';
 import { baseUrl, loginUser } from '@packages/testing/mockApiCall';
 import request from 'supertest';
 

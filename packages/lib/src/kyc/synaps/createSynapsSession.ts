@@ -1,5 +1,5 @@
-import { DataNotFoundError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { DataNotFoundError, UnauthorisedActionError } from '@packages/core/errors';
 
 import { initSynapsSession } from './initSynapsSession';
 import type { SynapsSession } from './interfaces';

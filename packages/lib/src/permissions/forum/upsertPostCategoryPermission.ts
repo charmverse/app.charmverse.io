@@ -1,20 +1,20 @@
+import type { Prisma } from '@charmverse/core/prisma';
+import { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import {
   SystemError,
   DataNotFoundError,
   InsecureOperationError,
   InvalidInputError,
   UndesirableOperationError
-} from '@charmverse/core/errors';
+} from '@packages/core/errors';
 import type {
   PostCategoryPermissionAssignment,
   AssignedPostCategoryPermission,
   AssignablePostCategoryPermissionGroups,
   AssignablePermissionGroups
-} from '@charmverse/core/permissions';
-import type { Prisma } from '@charmverse/core/prisma';
-import { PostCategoryPermissionLevel } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+} from '@packages/core/permissions';
+import { stringUtils } from '@packages/core/utilities';
 
 import { mapPostCategoryPermissionToAssignee } from './mapPostCategoryPermissionToAssignee';
 

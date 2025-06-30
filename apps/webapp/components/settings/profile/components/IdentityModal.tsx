@@ -1,8 +1,9 @@
-import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import { Box, Chip, MenuItem, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
+import { log } from '@packages/core/log';
+import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 import { countConnectableIdentities } from '@packages/users/countConnectableIdentities';
 import { shortWalletAddress } from '@packages/utils/blockchain';
 import { randomName } from '@packages/utils/randomName';
@@ -29,7 +30,6 @@ import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { TelegramAccount } from '@packages/lib/telegram/interfaces';
 
 import { useUserDetails } from '../hooks/useUserDetails';
 

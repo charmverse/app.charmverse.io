@@ -1,4 +1,4 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { prettyPrint } from '@packages/utils/strings';

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import * as http from '@packages/utils/http';
 import { lowerCaseEqual } from '@packages/utils/strings';
 import { isTruthy } from '@packages/utils/types';

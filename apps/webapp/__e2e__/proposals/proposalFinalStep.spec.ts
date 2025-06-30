@@ -1,9 +1,9 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Proposal, ProposalWorkflow, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation, type WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { emptyDocument } from '@packages/charmeditor/constants';
 import { baseUrl } from '@packages/config/constants';
+import type { PageWithPermissions } from '@packages/core/pages';
+import { getCurrentEvaluation, type WorkflowEvaluationJson } from '@packages/core/proposals';
 import { createProposal } from '@packages/lib/proposals/createProposal';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';

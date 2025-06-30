@@ -1,5 +1,7 @@
-import { log } from '@charmverse/core/log';
 import type { SxProps, Theme } from '@mui/material';
+import { log } from '@packages/core/log';
+import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
+import { isTouchScreen } from '@packages/lib/utils/browser';
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 
@@ -7,8 +9,6 @@ import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SignatureVerificationPayload } from '@packages/lib/blockchain/signAndVerify';
-import { isTouchScreen } from '@packages/lib/utils/browser';
 
 interface Props {
   signSuccess: (data: SignatureVerificationPayload) => Promise<any>;

@@ -1,4 +1,4 @@
-import type { PageMeta } from '@charmverse/core/pages';
+import type { PageMeta } from '@packages/core/pages';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import { pageStubToCreate } from '@packages/testing/generatePageStub';
 import React from 'react';

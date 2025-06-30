@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 
 import type { TokenGate } from './interfaces';
 import { validateTokenGateConditionWithDelegates } from './validateTokenGateConditionWithDelegates';

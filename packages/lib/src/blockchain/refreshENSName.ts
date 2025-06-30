@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getENSName } from '@packages/blockchain/getENSName';
+import { log } from '@packages/core/log';
 import { getUserProfile } from '@packages/profile/getUser';
 import type { LoggedInUser } from '@packages/profile/getUser';
 import { matchWalletAddress, shortWalletAddress } from '@packages/utils/blockchain';

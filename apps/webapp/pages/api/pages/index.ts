@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';

@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { ClientDiffMessage } from '@packages/pages/generateFirstDiff';
 import type { ServerDocDataMessage, ClientSelectionMessage } from '@packages/websockets/documentEvents/interfaces';
 import { sendableSteps, receiveTransaction } from 'prosemirror-collab';

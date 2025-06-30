@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { uploadToS3 } from '@packages/aws/uploadToS3Browser';
+import { log } from '@packages/core/log';
 import { DEFAULT_MAX_FILE_SIZE_MB } from '@packages/utils/constants';
 import { encodeFilename } from '@packages/utils/encodeFilename';
 import { replaceS3Domain } from '@packages/utils/url';

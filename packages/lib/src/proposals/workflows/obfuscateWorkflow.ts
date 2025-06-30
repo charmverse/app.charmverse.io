@@ -1,5 +1,5 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
-import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { privateEvaluationSteps, type WorkflowEvaluationJson } from '@packages/core/proposals';
 
 export function obfuscateWorkflow({ evaluations }: { evaluations: WorkflowEvaluationJson[] }) {
   const stepsWithCollapsedEvaluations: WorkflowEvaluationJson[] = [];

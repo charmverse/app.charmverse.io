@@ -1,11 +1,10 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { InvalidInputError } from '@packages/core/errors';
 import { getProposalOrApplicationCredentials } from '@packages/credentials/getProposalOrApplicationCredentials';
-import type { NextApiRequest, NextApiResponse } from 'next';
-import nc from 'next-connect';
-
 import { onError, onNoMatch, requireKeys, requireUser } from '@packages/lib/middleware';
 import { permissionsApiClient } from '@packages/lib/permissions/api/client';
 import { withSessionRoute } from '@packages/lib/session/withSession';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import nc from 'next-connect';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

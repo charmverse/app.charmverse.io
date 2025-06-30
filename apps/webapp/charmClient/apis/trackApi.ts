@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import * as http from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 import type { MixpanelEventMap, MixpanelEventName } from '@packages/metrics/mixpanel/interfaces';
 import type { MixpanelOpEventMap, MixpanelOpEventName } from '@packages/metrics/mixpanel/opEvents';
 

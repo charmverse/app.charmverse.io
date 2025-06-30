@@ -1,11 +1,11 @@
-import type { PostPermissionFlags } from '@charmverse/core/permissions';
-import { AvailablePostPermissions } from '@charmverse/core/permissions';
 import type { Space, User } from '@charmverse/core/prisma';
 import { PostOperation } from '@charmverse/core/prisma';
 import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
-import { objectUtils } from '@charmverse/core/utilities';
-import { InvalidInputError } from '@packages/utils/errors';
+import { AvailablePostPermissions } from '@packages/core/permissions';
+import type { PostPermissionFlags } from '@packages/core/permissions';
+import { objectUtils } from '@packages/core/utilities';
 import { PostNotFoundError } from '@packages/lib/forums/posts/errors';
+import { InvalidInputError } from '@packages/utils/errors';
 import { v4 } from 'uuid';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';

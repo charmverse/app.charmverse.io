@@ -1,14 +1,14 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { ClickAwayListener, Collapse } from '@mui/material';
+import type { PageMeta } from '@packages/core/pages';
+import type { Board, IPropertyTemplate } from '@packages/databases/board';
+import type { BoardView, IViewType } from '@packages/databases/boardView';
+import type { Card } from '@packages/databases/card';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useCallback, useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { Board, IPropertyTemplate } from '@packages/databases/board';
-import type { BoardView, IViewType } from '@packages/databases/boardView';
-import type { Card } from '@packages/databases/card';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 import { StyledSidebar } from './styledSidebar';

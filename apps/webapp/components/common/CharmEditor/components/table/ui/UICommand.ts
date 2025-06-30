@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import type { EditorState, Selection } from 'prosemirror-state';
 import { Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';

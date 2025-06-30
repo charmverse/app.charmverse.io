@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type { Page } from '@charmverse/core/prisma';
 import type { Client } from '@notionhq/client';
 import type {
@@ -6,6 +5,7 @@ import type {
   ListBlockChildrenParameters,
   PageObjectResponse
 } from '@notionhq/client/build/src/api-endpoints';
+import { log } from '@packages/core/log';
 import type { IPropertyTemplate } from '@packages/databases/board';
 import { isTruthy } from '@packages/utils/types';
 import { relay } from '@packages/websockets/relay';

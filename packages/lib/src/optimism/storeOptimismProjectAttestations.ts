@@ -1,9 +1,9 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { GET } from '@packages/adapters/http';
+import { log } from '@packages/core/log';
 import type { EASAttestationFromApi } from '@packages/credentials/external/getOnchainCredentials';
 import { getTrackedOnChainCredentials } from '@packages/credentials/external/getOnchainCredentials';
 import { isTruthy } from '@packages/utils/types';
-import { GET } from '@packages/adapters/http';
 import { optimism } from 'viem/chains';
 
 type OptimismProjectAttestation = {

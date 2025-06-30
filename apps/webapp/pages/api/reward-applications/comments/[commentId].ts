@@ -1,13 +1,12 @@
-import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ApplicationComment } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { hasAccessToSpace } from '@packages/core/permissions';
+import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
+import { withSessionRoute } from '@packages/lib/session/withSession';
 import { ActionNotPermittedError } from '@packages/nextjs/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-
-import { onError, onNoMatch, requireUser } from '@packages/lib/middleware';
-import { withSessionRoute } from '@packages/lib/session/withSession';
 
 import type { CreateApplicationCommentPayload } from './index';
 

@@ -1,5 +1,5 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { InvalidInputError } from '@packages/core/errors';
 import { trackUserAction } from '@packages/metrics/mixpanel/trackUserAction';
 import { v4 } from 'uuid';
 

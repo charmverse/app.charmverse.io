@@ -1,6 +1,6 @@
-import { log } from '@charmverse/core/log';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 import type { UIBlockWithDetails } from '@packages/databases/block';
 import { blockToPrisma, prismaToBlock, prismaToUIBlock } from '@packages/databases/block';
 import { createBoard } from '@packages/databases/board';

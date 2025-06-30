@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import throttle from 'lodash/throttle';
 import type { PluginKey } from 'prosemirror-state';
 import { Plugin, NodeSelection } from 'prosemirror-state';

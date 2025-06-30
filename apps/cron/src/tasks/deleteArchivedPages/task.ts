@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { count } from '@packages/metrics';
 import { deleteArchivedPages } from '@packages/pages/deleteArchivedPages';
 

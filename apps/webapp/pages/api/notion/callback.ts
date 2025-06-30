@@ -1,4 +1,4 @@
-import { log } from '@charmverse/core/log';
+import { log } from '@packages/core/log';
 import { onError, onNoMatch } from '@packages/lib/middleware';
 import Cookies from 'cookies';
 import nc from 'next-connect';

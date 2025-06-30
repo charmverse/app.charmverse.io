@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import type { PageNode, TargetPageTree } from '@charmverse/core/pages';
+import type { PageNode, TargetPageTree } from '@packages/core/pages';
 import { generatePageNode } from '@packages/testing/generateStubs';
 
 import { findParentOfType } from '../findParentOfType';

@@ -1,5 +1,5 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
+import { log } from '@packages/core/log';
 
 export const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
 export const templateId = 'a8ac2799-5c79-45f7-9527-a1d52d717625';

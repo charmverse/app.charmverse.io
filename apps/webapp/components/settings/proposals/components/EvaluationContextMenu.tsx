@@ -1,6 +1,6 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { MoreHoriz, ContentCopyOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
 import { Box, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
+import type { WorkflowEvaluationJson } from '@packages/core/proposals';
 import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/hooks';
 
 export type ContextMenuProps = {

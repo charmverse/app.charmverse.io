@@ -1,5 +1,5 @@
 import type { Proposal, ProposalEvaluation } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation } from '@packages/core/proposals';
 import type { ProposalNotificationType } from '@packages/lib/notifications/interfaces';
 import type { Reward } from '@packages/lib/rewards/interfaces';
 

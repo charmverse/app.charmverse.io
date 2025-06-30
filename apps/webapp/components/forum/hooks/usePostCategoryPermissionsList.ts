@@ -1,5 +1,5 @@
-import type { PostCategoryPermissionAssignment } from '@charmverse/core/permissions';
 import type { PostCategoryPermissionLevel } from '@charmverse/core/prisma-client';
+import type { PostCategoryPermissionAssignment } from '@packages/core/permissions';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';

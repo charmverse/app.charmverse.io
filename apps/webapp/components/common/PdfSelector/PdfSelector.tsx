@@ -1,12 +1,12 @@
-import { log } from '@charmverse/core/log';
 import { Box } from '@mui/material';
+import { log } from '@packages/core/log';
+import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
 import { useState, type ReactNode } from 'react';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
-import { uploadToS3 } from '@packages/lib/aws/uploadToS3Browser';
 
 import { selectorPopupSizeConfig } from '../CharmEditor/components/common/selectorPopupSizeConfig';
 

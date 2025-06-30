@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import fs from 'node:fs/promises';
 
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   Page,
   Proposal,
@@ -15,8 +14,9 @@ import type {
   User
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import type { PageWithPermissions } from '@packages/core/pages';
+import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } from '@packages/core/proposals';
 import { blockToPrisma, prismaToBlock } from '@packages/databases/block';
 import type { Board } from '@packages/databases/board';
 import type { BoardViewFields } from '@packages/databases/boardView';
