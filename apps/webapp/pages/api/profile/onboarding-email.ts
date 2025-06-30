@@ -18,7 +18,6 @@ handler.use(requireUser).put(saveOnboardingEmail);
 
 export type EmailPreferences = {
   email?: string;
-  emailNewsletter?: boolean;
   emailNotifications?: boolean;
   spaceId?: string; // the current space id
 };

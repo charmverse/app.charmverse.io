@@ -84,7 +84,6 @@ describe('updateUserProfile', () => {
 
     const update: Partial<User> = {
       email: 'user@charmverse.io',
-      emailNewsletter: true,
       emailNotifications: false
     };
 
@@ -92,7 +91,6 @@ describe('updateUserProfile', () => {
 
     // Preserved values
     expect(updatedUser.email).toBe(update.email);
-    expect(updatedUser.emailNewsletter).toBe(update.emailNewsletter);
     expect(updatedUser.emailNotifications).toBe(update.emailNotifications);
   });
 });

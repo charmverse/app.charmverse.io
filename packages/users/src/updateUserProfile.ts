@@ -35,7 +35,6 @@ export async function updateUserProfile(userId: string, update: Partial<User>): 
         path: update.path,
         email: update.email,
         spacesOrder: update.spacesOrder,
-        emailNewsletter: update.emailNewsletter,
         emailNotifications: update.emailNotifications
       }
     });

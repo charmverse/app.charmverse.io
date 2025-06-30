@@ -31,8 +31,7 @@ import Legend from '../../components/Legend';
 
 export const schema = yup.object({
   email: yup.string().ensure().trim().email(),
-  emailNotifications: yup.boolean(),
-  emailNewsletter: yup.boolean()
+  emailNotifications: yup.boolean()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -49,7 +48,6 @@ export function AccountPreferences() {
   } = useSWRMutation('/api/profile', (_url, { arg }: Readonly<{ arg: Partial<User> }>) => charmClient.updateUser(arg), {
     onSuccess: (data) => {
       updateUser({
-        emailNewsletter: data.emailNewsletter,
         emailNotifications: data.emailNotifications,
         email: data.email
       });
@@ -64,7 +62,6 @@ export function AccountPreferences() {
   } = useForm<FormValues>({
     defaultValues: {
       email: user?.email || '',
-      emailNewsletter: user?.emailNewsletter || false,
       emailNotifications: user?.emailNotifications || false
     },
     mode: 'onChange',
@@ -130,13 +127,6 @@ export function AccountPreferences() {
                 />
               }
               label='Receive email updates on mentions, comments, post and other things in CharmVerse.'
-            />
-            <FormControlLabel
-              disabled={!user?.email || isMutating}
-              control={
-                <Checkbox {...register('emailNewsletter')} checked={!!user?.emailNewsletter} onChange={onChange} />
-              }
-              label='Receive tips and examples how to use CharmVerse.'
             />
           </FormGroup>
           <Button
