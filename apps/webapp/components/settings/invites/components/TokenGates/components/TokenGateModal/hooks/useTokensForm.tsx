@@ -1,11 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { wagmiConfig } from '@packages/blockchain/connectors/config';
-import { getBytecode, readContracts, readContract } from '@wagmi/core';
+import { isValidChainAddress } from '@packages/lib/tokens/validation';
+import { getBytecode, readContract, readContracts } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import { erc20Abi, isAddress, parseAbi } from 'viem';
 import * as yup from 'yup';
-
-import { isValidChainAddress } from '@packages/lib/tokens/validation';
 
 import { tokenCheck } from '../utils/utils';
 

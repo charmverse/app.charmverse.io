@@ -5,7 +5,7 @@ import { createPublicClient, http } from 'viem';
 
 import { getAlchemyBaseUrl } from './provider/alchemy/client';
 import { getAnkrBaseUrl } from './provider/ankr/client';
-import { isAnkrChain } from './provider/ankr/config';
+import { ankrApiId, isAnkrChain } from './provider/ankr/config';
 
 /**
  * Create a viem public client for a given chain.
@@ -32,7 +32,7 @@ export const getPublicClient = (chainId: number): PublicClient => {
   try {
     providerUrl = chainDetails.alchemyUrl
       ? getAlchemyBaseUrl(chainDetails.chainId)
-      : isAnkrChain(chainId)
+      : isAnkrChain(chainId) && ankrApiId
         ? getAnkrBaseUrl(chainId)
         : chainDetails.rpcUrls[0];
   } catch (err) {

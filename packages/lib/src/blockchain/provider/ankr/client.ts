@@ -13,7 +13,7 @@ import type { NFTData } from '../../getNFTs';
 import { getNFTUrl } from '../../utils';
 
 import type { SupportedChainId } from './config';
-import { advancedAPIEndpoint, ankrAdvancedApis, supportedChainIds } from './config';
+import { advancedAPIEndpoint, ankrAdvancedApis, ankrApiId } from './config';
 
 // 50 requests/minute for Public tier - https://www.ankr.com/docs/rpc-service/service-plans/#rate-limits
 const rateLimiter = RateLimit(0.8);
@@ -21,7 +21,7 @@ const rateLimiter = RateLimit(0.8);
 export function getAnkrBaseUrl(chainId: SupportedChainId) {
   const chainPath = ankrAdvancedApis[chainId];
   if (!chainPath) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
-  return `https://rpc.ankr.com/${chainPath}/${process.env.ANKR_API_ID}`;
+  return `https://rpc.ankr.com/${chainPath}/${ankrApiId}`;
 }
 
 // Docs: https://api-docs.ankr.com/reference/post_ankr-getnftholders
@@ -34,7 +34,7 @@ export async function getNFTs({
   address: string;
   walletId: string;
 }): Promise<NFTData[]> {
-  if (!process.env.ANKR_API_ID) {
+  if (!ankrApiId) {
     return [];
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
@@ -69,7 +69,7 @@ type GetNFTInput = {
 };
 
 export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promise<NFTData | null> {
-  if (!process.env.ANKR_API_ID) {
+  if (!ankrApiId) {
     log.warn('Ankr API Key is missing to retrive NFT');
     return null;
   }
@@ -159,6 +159,9 @@ export async function getTokenInfoOnMantle({
   walletId = null,
   tokenId
 }: RPCTokenInput): Promise<NFTData> {
+  if (!ankrApiId) {
+    throw new Error('Ankr API Key is missing to retrieve NFT on Mantle');
+  }
   const provider = new ethers.JsonRpcProvider(getAnkrBaseUrl(chainId));
   const contract = new ethers.Contract(address, ERC721_ABI, provider);
 
