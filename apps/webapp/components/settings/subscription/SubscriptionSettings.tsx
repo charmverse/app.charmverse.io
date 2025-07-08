@@ -144,7 +144,7 @@ export function SubscriptionSettings({ space: { id: spaceId, paidTier, name } }:
       <UpgradeSubscriptionModal
         spaceId={spaceId}
         currentTier={subscriptionStatus.tier}
-        monthlyPrice={subscriptionStatus.monthlyPrice}
+        overridenTierPrice={subscriptionStatus.subscriptionMonthlyPrice}
         isOpen={!!tierToUpgrade}
         onClose={() => setTierToUpgrade(null)}
         newTier={tierToUpgrade || 'bronze'}

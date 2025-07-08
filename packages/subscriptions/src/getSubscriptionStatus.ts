@@ -9,6 +9,7 @@ import { getExpiresAt } from './getExpiresAt';
 export type SpaceSubscriptionStatus = {
   tier: SpaceSubscriptionTier;
   monthlyPrice: number;
+  subscriptionMonthlyPrice: number | null;
   pendingTier?: SpaceSubscriptionTier; // if the user is upgrading or downgrading next month
   pendingTierExpiresAt?: string;
   tokenBalance: { value: string; formatted: number };
@@ -64,6 +65,7 @@ export async function getSubscriptionStatus(spaceId: string): Promise<SpaceSubsc
       value: tokenBalance.value.toString(),
       formatted: tokenBalance.formatted
     },
+    subscriptionMonthlyPrice: space.subscriptionMonthlyPrice,
     tier: currentTier,
     monthlyPrice: space.subscriptionMonthlyPrice || tierConfig[currentTier].tokenPrice,
     pendingTier: nextTier !== currentTier ? nextTier : undefined,

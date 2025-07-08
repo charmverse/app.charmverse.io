@@ -32,7 +32,7 @@ import { DEV_PAYMENT_OPTION, PaymentTokenSelector, TOKEN_LOGO_RECORD } from '../
 
 export function UpgradeSubscriptionModal({
   spaceId,
-  monthlyPrice,
+  overridenTierPrice,
   isOpen,
   onClose: _onClose,
   onSuccess,
@@ -40,7 +40,7 @@ export function UpgradeSubscriptionModal({
   newTier
 }: {
   spaceId: string;
-  monthlyPrice?: number;
+  overridenTierPrice?: number | null;
   isOpen: boolean;
   onClose: VoidFunction;
   onSuccess: VoidFunction;
@@ -79,7 +79,7 @@ export function UpgradeSubscriptionModal({
     currentTier,
     newTier,
     paymentMonths,
-    overridenTierPrice: monthlyPrice
+    overridenTierPrice
   });
 
   function onClose() {
