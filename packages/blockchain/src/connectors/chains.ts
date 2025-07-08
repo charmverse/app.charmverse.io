@@ -1,5 +1,6 @@
 import { log } from '@packages/core/log';
 // ref: https://wagmi.sh/core/chains
+import { ankrApiId } from '@packages/lib/blockchain/provider/ankr/config';
 import { uniqueValues } from '@packages/utils/array';
 import { isDevEnv } from '@packages/utils/constants';
 import { defineChain } from 'viem';
@@ -11,6 +12,7 @@ import {
   baseSepolia,
   bsc,
   celo,
+  cyber,
   fantom,
   gnosis,
   harmonyOne,
@@ -20,15 +22,14 @@ import {
   optimism,
   optimismSepolia,
   polygon,
-  polygonZkEvm,
   polygonAmoy,
+  polygonZkEvm,
   sepolia,
-  zkSync,
-  zora,
-  taikoHekla,
   taiko,
+  taikoHekla,
+  zkSync,
   zksyncSepoliaTestnet,
-  cyber
+  zora
 } from 'viem/chains';
 
 export interface IChainDetails {
@@ -113,13 +114,13 @@ export const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     ...EVM_DEFAULT,
     chainId: mainnet.id,
-    viem: { ...mainnet, rpcUrls: { default: { http: ['https://rpc.ankr.com/eth'] } } },
+    viem: { ...mainnet, rpcUrls: { default: { http: [`https://rpc.ankr.com/eth/${ankrApiId}`] } } },
     chainName: mainnet.name,
     alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
     blockExplorerUrls: [mainnet.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-icon-purple.svg',
-    rpcUrls: ['https://rpc.ankr.com/eth'], // this one returns errors in prod: mainnet.rpcUrls.default.http,
+    rpcUrls: [`https://rpc.ankr.com/eth/${ankrApiId}`], // this one returns errors in prod: mainnet.rpcUrls.default.http,
     shortName: 'eth',
     unlockNetwork: true,
     hypersubNetwork: true
