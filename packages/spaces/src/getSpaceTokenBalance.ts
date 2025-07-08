@@ -22,7 +22,8 @@ export async function getSpaceTokenBalance({ spaceId }: { spaceId: string }): Pr
       subscriptionPayments: {
         select: {
           createdAt: true,
-          paidTokenAmount: true
+          paidTokenAmount: true,
+          subscriptionTier: true
         }
       },
       subscriptionContributions: {
