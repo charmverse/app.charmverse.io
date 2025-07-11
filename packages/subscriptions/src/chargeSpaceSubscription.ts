@@ -10,7 +10,7 @@ import { upgradableTiers } from './constants';
 import { updateSubscription } from './updateSubscription';
 
 export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) {
-  const startOfMonth = DateTime.now().startOf('month');
+  const startOfMonth = DateTime.utc().startOf('month');
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -60,7 +60,7 @@ export async function chargeSpaceSubscription({ spaceId }: { spaceId: string }) 
     await prisma.$transaction(async () => {
       await prisma.spaceSubscriptionPayment.create({
         data: {
-          paidTokenAmount: amountToCharge.toString(),
+          paidTokenAmount: amountToChargeInWei.toString(),
           spaceId,
           subscriptionTier,
           subscriptionPeriodStart: startOfMonth.toJSDate(),
