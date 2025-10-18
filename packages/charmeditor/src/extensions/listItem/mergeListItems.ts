@@ -29,7 +29,7 @@ export function mergeListItemUp(tr: Transaction, schema: Schema): Transaction {
   }
   const { pos, node } = result;
   if (from !== pos + 2) {
-    // Selection is not at the begining of the list item.
+    // Selection is not at the beginning of the list item.
     return tr;
   }
   const $pos = tr.doc.resolve(pos);
@@ -77,7 +77,7 @@ export function mergeListItemDown(tr: Transaction, schema: Schema): Transaction 
   }
   const { pos, node } = result;
   if (from !== pos + node.content.size) {
-    // Selection is not at the begining of the list item.
+    // Selection is not at the beginning of the list item.
     return tr;
   }
 
