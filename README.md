@@ -51,7 +51,7 @@ To do so, create a file in the root directory ie. '.env.myenv'
 
 Start the app from the dotenv CLI, which you can download [here](https://www.npmjs.com/package/dotenv-cli).
 
-For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/basic-features/environment-variables).
+For further information about environment variables in Next.js, see the [docs](https://nextjs.org/docs/pages/guides/environment-variables).
 
 ### Useful Plugins
 
